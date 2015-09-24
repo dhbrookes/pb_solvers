@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0364A8861BB494EC00850EB6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8851BB494EC00850EB6 /* main.cpp */; };
-		0364A88E1BB495E700850EB6 /* constant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A88C1BB495E700850EB6 /* constant.cpp */; settings = {ASSET_TAGS = (); }; };
+		0364A88E1BB495E700850EB6 /* Constants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A88C1BB495E700850EB6 /* Constants.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,8 +26,8 @@
 /* Begin PBXFileReference section */
 		0364A8821BB494EC00850EB6 /* pb_solvers_code */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = pb_solvers_code; sourceTree = BUILT_PRODUCTS_DIR; };
 		0364A8851BB494EC00850EB6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		0364A88C1BB495E700850EB6 /* constant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = constant.cpp; sourceTree = "<group>"; };
-		0364A88D1BB495E700850EB6 /* constant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constant.h; sourceTree = "<group>"; };
+		0364A88C1BB495E700850EB6 /* Constants.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Constants.cpp; sourceTree = "<group>"; };
+		0364A88D1BB495E700850EB6 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,8 +60,8 @@
 		0364A8841BB494EC00850EB6 /* pb_solvers_code */ = {
 			isa = PBXGroup;
 			children = (
-				0364A88C1BB495E700850EB6 /* constant.cpp */,
-				0364A88D1BB495E700850EB6 /* constant.h */,
+				0364A88C1BB495E700850EB6 /* Constants.cpp */,
+				0364A88D1BB495E700850EB6 /* Constants.h */,
 				0364A8851BB494EC00850EB6 /* main.cpp */,
 			);
 			path = pb_solvers_code;
@@ -124,7 +124,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0364A8861BB494EC00850EB6 /* main.cpp in Sources */,
-				0364A88E1BB495E700850EB6 /* constant.cpp in Sources */,
+				0364A88E1BB495E700850EB6 /* Constants.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
