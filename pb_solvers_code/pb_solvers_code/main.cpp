@@ -7,8 +7,11 @@
 //
 
 #include <iostream>
+#include "Constants.h"
+#include "MyMatrix.h"
+#include "util.h"
 
 int main(int argc, const char * argv[])
 {
-
+    MyMatrix<int> a;
 }
