@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		0364A8861BB494EC00850EB6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8851BB494EC00850EB6 /* main.cpp */; };
 		0364A88E1BB495E700850EB6 /* Constants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A88C1BB495E700850EB6 /* Constants.cpp */; settings = {ASSET_TAGS = (); }; };
+		0364A89B1BB605FB00850EB6 /* ASolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8991BB605FB00850EB6 /* ASolver.cpp */; settings = {ASSET_TAGS = (); }; };
+		0364A8A11BB60E7100850EB6 /* BesselCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A89F1BB60E7100850EB6 /* BesselCalc.cpp */; settings = {ASSET_TAGS = (); }; };
+		0364A8A41BB616B000850EB6 /* SHCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A21BB616B000850EB6 /* SHCalc.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,6 +33,12 @@
 		0364A88D1BB495E700850EB6 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		0364A8901BB496BF00850EB6 /* MyMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyMatrix.h; sourceTree = "<group>"; };
 		0364A8931BB4A90400850EB6 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		0364A8991BB605FB00850EB6 /* ASolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ASolver.cpp; sourceTree = "<group>"; };
+		0364A89A1BB605FB00850EB6 /* ASolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASolver.h; sourceTree = "<group>"; };
+		0364A89F1BB60E7100850EB6 /* BesselCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BesselCalc.cpp; sourceTree = "<group>"; };
+		0364A8A01BB60E7100850EB6 /* BesselCalc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BesselCalc.h; sourceTree = "<group>"; };
+		0364A8A21BB616B000850EB6 /* SHCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SHCalc.cpp; sourceTree = "<group>"; };
+		0364A8A31BB616B000850EB6 /* SHCalc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHCalc.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +76,12 @@
 				0364A8851BB494EC00850EB6 /* main.cpp */,
 				0364A8901BB496BF00850EB6 /* MyMatrix.h */,
 				0364A8931BB4A90400850EB6 /* util.h */,
+				0364A8991BB605FB00850EB6 /* ASolver.cpp */,
+				0364A89A1BB605FB00850EB6 /* ASolver.h */,
+				0364A89F1BB60E7100850EB6 /* BesselCalc.cpp */,
+				0364A8A01BB60E7100850EB6 /* BesselCalc.h */,
+				0364A8A21BB616B000850EB6 /* SHCalc.cpp */,
+				0364A8A31BB616B000850EB6 /* SHCalc.h */,
 			);
 			path = pb_solvers_code;
 			sourceTree = "<group>";
@@ -127,6 +142,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0364A8A41BB616B000850EB6 /* SHCalc.cpp in Sources */,
+				0364A8A11BB60E7100850EB6 /* BesselCalc.cpp in Sources */,
+				0364A89B1BB605FB00850EB6 /* ASolver.cpp in Sources */,
 				0364A8861BB494EC00850EB6 /* main.cpp in Sources */,
 				0364A88E1BB495E700850EB6 /* Constants.cpp in Sources */,
 			);

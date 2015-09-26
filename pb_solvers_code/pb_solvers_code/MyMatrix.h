@@ -38,7 +38,7 @@ public:
 };
 
 
-enum ArithmeticType { ADDITION, MULTIPLICATION };
+enum ArithmeticType { ADDITION, MULTIPLICATION, INNER_PRODUCT };
         
         
 class MatrixArithmeticException: public exception
@@ -60,8 +60,10 @@ public:
     {
         ostringstream ss;
         string start;
-        if (type_ == ADDITION) start = "Cannot add matrices of sizes ";
-        else start = "Cannot multiply matrices of size (";
+        if (type_ == ADDITION) start = "Cannot add matrices of sizes (";
+        else if (type_ == MULTIPLICATION) start = "Cannot multiply matrices of size (";
+        else if (type_ == INNER_PRODUCT) start = "Cannot find inner product of vectors of sizes (";
+        else start = "Unknown arithmetic error with matrices of sizes (";
         ss << start << nrows1_ << "," << ncols1_ << ") and (" << nrows2_ << "," << ncols2_ << ")" << endl;
         return ss.str().c_str();
     }
@@ -176,11 +178,9 @@ public:
         
     const int get_nrows() const { return nrows_; }
     const int get_ncols() const { return ncols_; }
-    
-    
+
 };
-        
-        
+
 /*
  Vector class is implemented as extension of matrix class but with only one column
  */
@@ -202,14 +202,43 @@ public:
         int i;
         for (i = 0; i < vals.size(); i++)
         {
-            vals_[i][0] = vals[0];
+            this->vals_[i][0] = vals[0];
         }
     }
     
     void set_val(const int i, const T& val)
     {
-        vals_[i][0] = val
+        this->MyMatrix<T>::set_val(i, 0, val);
     }
+    
+    /*
+     Access operator with brackets only requires one value
+     */
+    const T& operator[](int i)
+    {
+        return this(i, 0);
+    }
+    
+    /*
+     The multiplication operator now computes the inner product
+     */
+    const T operator*(const MyVector<T>& rhs)
+    {
+        if (rhs->nrows_ != this->nrows)
+        {
+            throw MatrixArithmeticException(INNER_PRODUCT, this->nrows_, this->ncols_,
+                                            rhs->nrows_, rhs->ncols_);
+        }
+        T out = T();
+        int i;
+        for(i = 0; i < this->nrows_; i++)
+        {
+            out = out + (this[i] * rhs[i]);
+        }
+        return out;
+    }
+    
+    
 };
 
 #endif /* MyMatrix_h */
