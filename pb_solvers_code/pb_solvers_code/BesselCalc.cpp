@@ -8,8 +8,9 @@
 
 #include "BesselCalc.h"
 
-BesselCalc::BesselCalc(int N)
-: N_(N)
+
+BesselConstants::BesselConstants(const int N)
+:N_(N)
 {
     recConsts_.reserve(2 * N_);
     int n;
@@ -21,7 +22,15 @@ BesselCalc::BesselCalc(int N)
     }
 }
 
-vector<double> BesselCalc::calc_mbfK(int num_iter, double z)
+
+BesselCalc::BesselCalc(int N, BesselConstants* consts)
+: N_(N), _consts_(consts)
+{
+    assert (_consts_->get_n() == N_);
+}
+
+const vector<double> BesselCalc::calc_mbfK(const int num_iter,
+                                           const double z) const
 {
     vector<double> K;
     K.reserve(num_iter);
@@ -34,13 +43,14 @@ vector<double> BesselCalc::calc_mbfK(int num_iter, double z)
     double val;
     for (i = 2; i < num_iter; i++)
     {
-        val = K[i-1] + z_sq * K[i-2] * recConsts_[i];
+        val = K[i-1] + z_sq * K[i-2] * _consts_->get_const_val(i);
         K.push_back(val);
     }
     return K;
 }
 
-vector<double> BesselCalc::calc_mbfI(int num_iter, double z)
+const vector<double> BesselCalc::calc_mbfI(const int num_iter,
+                                           const double z) const
 {
     vector<double> I;
     I.reserve(num_iter);

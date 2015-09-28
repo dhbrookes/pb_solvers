@@ -76,8 +76,8 @@ template <typename T>
 class MyMatrix
 {
 protected:
-    int nrows_;
-    int ncols_;
+    int                 nrows_;
+    int                 ncols_;
     vector< vector<T> > vals_;  //length of first vector is number of rows, length of second is ncols
     
 
@@ -108,7 +108,7 @@ public:
     /*
      Element access operator given position (i, j)
      */
-    const T& operator()(const int i, const int j)
+    const T& operator()(const int i, const int j) const
     {
         if (i < 0 || j < 0 || i > nrows_ || j > ncols_)
         {
@@ -123,7 +123,7 @@ public:
     /*
      Addition operator returns new matrix
      */
-    const MyMatrix<T> operator+(const MyMatrix<T>& rhs)
+    const MyMatrix<T> operator+(const MyMatrix<T>& rhs) const
     {
         if (ncols_ != rhs.ncols_ || nrows_ != rhs.nrows_)
         {
@@ -145,7 +145,7 @@ public:
     /*
      Matrix multiplication. If this is size n x m, then rhs must be size m x p
      */
-    const MyMatrix<T> operator*(const MyMatrix<T>& rhs)
+    const MyMatrix<T> operator*(const MyMatrix<T>& rhs) const
     {
         if (ncols_ != rhs.nrows_)
         {

@@ -11,8 +11,27 @@
 
 #include <stdio.h>
 #include <vector>
+#include <assert.h>
 
 using namespace std;
+
+/*
+ Class for storing constants that can be used for multiple runs of bessel calcualtions
+ */
+class BesselConstants
+{
+protected:
+    int N_;
+    vector<double> recConsts_;  // recursion constants
+    
+public:
+    
+    BesselConstants(const int N);
+    
+    const int get_n() const             { return N_; }
+    const double get_const_val(int i)   { return recConsts_[i]; }
+    
+};
 
 /*
  Calculator class for modified bessel functions (spherical and standard)
@@ -21,23 +40,24 @@ class BesselCalc
 {
 protected:
     
-    int N_;  // order of the Bessel function
-    vector<double> recConsts_;  //constants used in recursion: Lotan 2006 eq3
+    int                 N_;  // order of the Bessel function
+    BesselConstants*    _consts_;  //constants used in recursion: Lotan 2006 eq3
     
 public:
     
     /*
-     Constructor initializes constants
+     Constructuro if recursion constants have not already been calculated:
      */
-    BesselCalc(int N);
+    BesselCalc(int N, BesselConstants* consts);
     
     /*
      Calculate the modified sphereical bessel functions I and K (MBF of the first and second kind, respectively).
      Input is desired number of iterations an output is a vector containing the calculated value at every iteration
      */
-    vector<double> calc_mbfI(int num_iter, double z);
-    vector<double> calc_mbfK(int num_iter, double z);
+    const vector<double> calc_mbfI(const int num_iter, const double z) const;
+    const vector<double> calc_mbfK(const int num_iter, const double z) const;
     
 };
+
 
 #endif /* BesselCalc_hpp */
