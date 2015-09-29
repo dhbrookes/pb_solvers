@@ -21,14 +21,14 @@ using namespace std;
 class BesselConstants
 {
 protected:
-    int N_;
+    int nPoles_;
     vector<double> recConsts_;  // recursion constants
     
 public:
     
     BesselConstants(const int N);
     
-    const int get_n() const             { return N_; }
+    const int get_n() const             { return nPoles_; }
     const double get_const_val(int i)   { return recConsts_[i]; }
     
 };
@@ -40,7 +40,7 @@ class BesselCalc
 {
 protected:
     
-    int                 N_;  // order of the Bessel function
+    int                 nPoles_;  // order of the Bessel function
     BesselConstants*    _consts_;  //constants used in recursion: Lotan 2006 eq3
     
 public:
@@ -48,14 +48,14 @@ public:
     /*
      Constructuro if recursion constants have not already been calculated:
      */
-    BesselCalc(int N, BesselConstants* consts);
+    BesselCalc(int N, BesselConstants* _consts);
     
     /*
      Calculate the modified sphereical bessel functions I and K (MBF of the first and second kind, respectively).
      Input is desired number of iterations an output is a vector containing the calculated value at every iteration
      */
-    const vector<double> calc_mbfI(const int num_iter, const double z) const;
-    const vector<double> calc_mbfK(const int num_iter, const double z) const;
+    const vector<double> calc_mbfI(const int n, const double z) const;
+    const vector<double> calc_mbfK(const int n, const double z) const;
     
 };
 

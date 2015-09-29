@@ -10,19 +10,19 @@
 
 
 SHCalcConstants::SHCalcConstants(const int N)
-:N_(N), legConsts1_(2*N, 2*N), legConsts2_(2*N, 2*N),
+:nPoles_(N), legConsts1_(2*N, 2*N), legConsts2_(2*N, 2*N),
 shConsts_(2*N, 2*N), dubFac_(2*N)
 {
     vector<double> temp;
-    temp.reserve(4 * N_);
+    temp.reserve(4 * nPoles_);
     temp.push_back(0);
     int i, n, m;
-    for (i = 1; i < 4 * N_; i++)
+    for (i = 1; i < 4 * nPoles_; i++)
     {
         temp.push_back(temp[i-1] * sqrt(i));
     }
 
-    for (n = 0; n < 2 * N_; n++)
+    for (n = 0; n < 2 * nPoles_; n++)
     {
         for (m = 0; m <= n; m++)
         {
@@ -34,7 +34,7 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
 
     dubFac_[0] = 1.0;
     dubFac_[1] = 1.0;
-    for (i = 2; i < 2 * N_; i++)
+    for (i = 2; i < 2 * nPoles_; i++)
     {
         dubFac_[i] = dubFac_[i-1] * (2*i - 1);
     }
@@ -44,12 +44,12 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
 /*
  Full calculation is performed in constructor:
  */
-SHCalc::SHCalc(const int N, const SHCalcConstants* consts,
+SHCalc::SHCalc(const int N, const SHCalcConstants* _consts,
                const double theta, const double phi)
-:_consts_(consts), N_(N), P_(2 * N_, 2 * N_), Y_(2 * N_, 2 * N_),
+:_consts_(_consts), nPoles_(N), P_(2 * nPoles_, 2 * nPoles_), Y_(2 * nPoles_, 2 * nPoles_),
 theta_(theta), phi_(phi)
 {
-    assert (_consts_->get_n() == N_);
+    assert (_consts_->get_n() == nPoles_);
     
     calc_legendre();
     calc_sh();
@@ -72,7 +72,7 @@ void SHCalc::calc_legendre()
     
     int l, m, lInd, mInd;
     double val;
-    for (l = 0; l < 2 * N_; l++)
+    for (l = 0; l < 2 * nPoles_; l++)
     {
         for (m = 0; m < l; m++)
         {
@@ -109,9 +109,9 @@ void SHCalc::calc_sh()
     int n, m;
     complex<double> val, mcomp;
     double shc;  // constant value
-    for (n = 0; n < 2*N_; n++)
+    for (n = 0; n < 2*nPoles_; n++)
     {
-        for (m = 0; m < 2*N_; m++)
+        for (m = 0; m < 2*nPoles_; m++)
         {
             shc = _consts_->get_sh_consts_val(n, m);
             mcomp = complex<double> (m, 0);

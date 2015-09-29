@@ -49,7 +49,7 @@ public:
     static const double LITRE; // [ m^3/L]
     static const double PI;
     static const double COLOUMB_CONSTANT; //!< [ N*m^2/C^2 ]
-    static const double ELECTRON_CHARGE; //!<  [ coulombs ]
+    static const double ELECTROnPoles_CHARGE; //!<  [ coulombs ]
     static const double E2;
     static const double AVOGADRO_NUM;  //[C2]
     static const double KCAL; //!<  [ 1 kCal = 4184 Joules ]

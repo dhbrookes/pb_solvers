@@ -13,7 +13,7 @@ const double Constants::KB = 1.380658e-23;  //!<  [ m^2 kg/ s^2 / K ] = [ J/K ]
 const double Constants::LITRE = 1e-3;  // [ m^3/L]
 const double Constants::PI = 3.141592654;
 const double Constants::COLOUMB_CONSTANT = 8.988e9;  //!< [ N*m^2/C^2 ]
-const double Constants::ELECTRON_CHARGE = 1.60217733e-19;  //!<  [ coulombs ]
+const double Constants::ELECTROnPoles_CHARGE = 1.60217733e-19;  //!<  [ coulombs ]
 const double Constants::E2 = 1.60217733e-19 * 1.60217733e-19;
 const double Constants::AVOGADRO_NUM = 6.02209e23;  //[C2]
 const double Constants::KCAL = 4184.0;  //!<  [ 1 kCal = 4184 Joules ]

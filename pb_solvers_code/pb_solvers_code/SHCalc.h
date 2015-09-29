@@ -25,7 +25,7 @@ using namespace std;
 class SHCalcConstants
 {
 protected:
-    int                             N_;  // number of poles
+    int                             nPoles_;  // number of poles
     MyMatrix<double>                legConsts1_;  // (2l-1)/(l-m) for use in legendre computation
     MyMatrix<double>                legConsts2_;  // (l+m-1)/(l-m) for use in legendre computation
     MyMatrix<double>                shConsts_;  // sqrt((n-m)!/(n+m)!) in EQ1, Lotan 2006
@@ -38,7 +38,7 @@ public:
     const double get_leg_consts2_val(const int n, const int m) const    { return legConsts2_(n, m); }
     const double get_sh_consts_val(const int n, const int m) const      { return shConsts_(n, m);   }
     const double get_dub_fac_val(const int i) const                     { return dubFac_[i];        }
-    const int get_n() const                                             { return N_;                }
+    const int get_n() const                                             { return nPoles_;                }
 };
 
 /*
@@ -57,7 +57,7 @@ class SHCalc
 {
 protected:
     
-    int                         N_;  //number of poles (the output matrix will be 2Nx2N)
+    int                         nPoles_;  //number of poles (the output matrix will be 2Nx2N)
     double                      theta_;
     double                      phi_;
     const SHCalcConstants*      _consts_;
@@ -72,7 +72,7 @@ public:
     /*
      Constructor given size and constants:
      */
-    SHCalc(const int N, const SHCalcConstants* consts,
+    SHCalc(const int N, const SHCalcConstants* _consts,
            const double theta, const double phi);
     
     

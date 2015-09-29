@@ -70,8 +70,7 @@ public:
 
 };
 
-
-
+        
 template <typename T>
 class MyMatrix
 {
