@@ -44,15 +44,11 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
 /*
  Full calculation is performed in constructor:
  */
-SHCalc::SHCalc(const int N, const SHCalcConstants* _consts,
-               const double theta, const double phi)
-:_consts_(_consts), nPoles_(N), P_(2 * nPoles_, 2 * nPoles_), Y_(2 * nPoles_, 2 * nPoles_),
-theta_(theta), phi_(phi)
+SHCalc::SHCalc(const int nPoles, const SHCalcConstants* _consts)
+:_consts_(_consts), nPoles_(nPoles), P_(2 * nPoles_, 2 * nPoles_),
+Y_(2 * nPoles_, 2 * nPoles_)
 {
     assert (_consts_->get_n() == nPoles_);
-    
-    calc_legendre();
-    calc_sh();
 }
 
 /*
@@ -63,10 +59,12 @@ Calculate the Legendre polynomial for the input theta using the
 Pl,l (x) = (-1)^l * (2l-1)!! * (1-x^2)^(l/2)                            (1)
 Pl,l+1 (x) = x * (2l+1) * Pl,l(x)                                       (2)
 Pl,m (x) = x * (2l-1)/(l-m) * Pl-1,m(x) - (l+m-1)/(l-m) * Pl-2,m(x)     (3)
+ 
+This sets the member P_ to the results
 */
-void SHCalc::calc_legendre()
+void SHCalc::calc_legendre(const double theta)
 {
-    double x = cos(theta_);
+    double x = cos(theta);
     P_.set_val(0, 0, 1.0);  // base value for recursion
     P_.set_val(1, 0, x);
     
@@ -103,8 +101,9 @@ void SHCalc::calc_legendre()
  where P_(n, m) are the associated Legendre polynomials.
  
  */
-void SHCalc::calc_sh()
+void SHCalc::calc_sh(const double theta, const double phi)
 {
+    calc_legendre(theta);  // first calculate legendre
     complex<double> iu (0, 1.0);  // complex unit
     int n, m;
     complex<double> val, mcomp;
@@ -115,7 +114,7 @@ void SHCalc::calc_sh()
         {
             shc = _consts_->get_sh_consts_val(n, m);
             mcomp = complex<double> (m, 0);
-            val = pow(-1, (double) m) * shc * P_(n, m) * exp(iu * mcomp * phi_);
+            val = pow(-1, (double) m) * shc * P_(n, m) * exp(iu * mcomp * phi);
             Y_.set_val(n, m, val);
         }
     }

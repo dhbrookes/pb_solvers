@@ -12,6 +12,7 @@
 #include "ASolver.h"
 #include "BesselCalc.h"
 #include "SHCalc.h"
+#include "System.h"
 #include "util.h"
 
 int main(int argc, const char * argv[])

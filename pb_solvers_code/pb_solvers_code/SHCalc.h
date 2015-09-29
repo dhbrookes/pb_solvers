@@ -32,7 +32,7 @@ protected:
     vector<double>                  dubFac_;  // (2l-1)!! double factorial, for use in legendre recursion
     
 public:
-    SHCalcConstants(const int N);
+    SHCalcConstants(const int nPoles);
     
     const double get_leg_consts1_val(const int n, const int m) const    { return legConsts1_(n, m); }
     const double get_leg_consts2_val(const int n, const int m) const    { return legConsts2_(n, m); }
@@ -58,23 +58,20 @@ class SHCalc
 protected:
     
     int                         nPoles_;  //number of poles (the output matrix will be 2Nx2N)
-    double                      theta_;
-    double                      phi_;
     const SHCalcConstants*      _consts_;
-    MyMatrix<double>            P_; // legendre polynomial calculated for this spherical harmonics
+    MyMatrix<double>            P_; // legendre polynomials
     MyMatrix<complex<double> >  Y_;  // the spherical harmonics calcualted by this class
     
-    void calc_legendre();  // calculate the legendre polynomial at every n, m (store in this.P_)
-    void calc_sh(); // calculate the spherical harmonics at every n, m  (store in this.Y_)
+    void calc_legendre(const double theta);  // calculate the legendre polynomial at every n, m (store in this.P_)
 
 public:
     
     /*
      Constructor given size and constants:
      */
-    SHCalc(const int N, const SHCalcConstants* _consts,
-           const double theta, const double phi);
+    SHCalc(const int nPoles, const SHCalcConstants* _consts);
     
+    void calc_sh(const double theta, const double phi); // calculate the spherical harmonics at every n, m  (store in this.Y_)
     
     const complex<double> get_result(const int n, const int m) const;  // retrieve the result for n, m values
     

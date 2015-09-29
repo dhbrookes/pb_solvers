@@ -12,6 +12,7 @@
 		0364A89B1BB605FB00850EB6 /* ASolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8991BB605FB00850EB6 /* ASolver.cpp */; settings = {ASSET_TAGS = (); }; };
 		0364A8A11BB60E7100850EB6 /* BesselCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A89F1BB60E7100850EB6 /* BesselCalc.cpp */; settings = {ASSET_TAGS = (); }; };
 		0364A8A41BB616B000850EB6 /* SHCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A21BB616B000850EB6 /* SHCalc.cpp */; settings = {ASSET_TAGS = (); }; };
+		0364A8A71BBA1E6F00850EB6 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A51BBA1E6F00850EB6 /* System.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,6 +40,8 @@
 		0364A8A01BB60E7100850EB6 /* BesselCalc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BesselCalc.h; sourceTree = "<group>"; };
 		0364A8A21BB616B000850EB6 /* SHCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SHCalc.cpp; sourceTree = "<group>"; };
 		0364A8A31BB616B000850EB6 /* SHCalc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHCalc.h; sourceTree = "<group>"; };
+		0364A8A51BBA1E6F00850EB6 /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = System.cpp; sourceTree = "<group>"; };
+		0364A8A61BBA1E6F00850EB6 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +85,8 @@
 				0364A8A01BB60E7100850EB6 /* BesselCalc.h */,
 				0364A8A21BB616B000850EB6 /* SHCalc.cpp */,
 				0364A8A31BB616B000850EB6 /* SHCalc.h */,
+				0364A8A51BBA1E6F00850EB6 /* System.cpp */,
+				0364A8A61BBA1E6F00850EB6 /* System.h */,
 			);
 			path = pb_solvers_code;
 			sourceTree = "<group>";
@@ -147,6 +152,7 @@
 				0364A89B1BB605FB00850EB6 /* ASolver.cpp in Sources */,
 				0364A8861BB494EC00850EB6 /* main.cpp in Sources */,
 				0364A88E1BB495E700850EB6 /* Constants.cpp in Sources */,
+				0364A8A71BBA1E6F00850EB6 /* System.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,6 +273,7 @@
 				0364A88B1BB494EC00850EB6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
