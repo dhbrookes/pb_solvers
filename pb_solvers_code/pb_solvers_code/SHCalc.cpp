@@ -41,9 +41,6 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
     
 }
 
-/*
- Full calculation is performed in constructor:
- */
 SHCalc::SHCalc(const int nPoles, const SHCalcConstants* _consts)
 :_consts_(_consts), nPoles_(nPoles), P_(2 * nPoles_, 2 * nPoles_),
 Y_(2 * nPoles_, 2 * nPoles_)
@@ -104,9 +101,9 @@ void SHCalc::calc_legendre(const double theta)
 void SHCalc::calc_sh(const double theta, const double phi)
 {
     calc_legendre(theta);  // first calculate legendre
-    complex<double> iu (0, 1.0);  // complex unit
+    cmplx iu (0, 1.0);  // complex unit
     int n, m;
-    complex<double> val, mcomp;
+    cmplx val, mcomp;
     double shc;  // constant value
     for (n = 0; n < 2*nPoles_; n++)
     {

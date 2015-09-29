@@ -15,6 +15,7 @@
 
 using namespace std;
 
+
 /*
  Class for storing constants that can be used for multiple runs of bessel calcualtions
  */
@@ -32,6 +33,7 @@ public:
     const double get_const_val(int i)   { return recConsts_[i]; }
     
 };
+
 
 /*
  Calculator class for modified bessel functions (spherical and standard)

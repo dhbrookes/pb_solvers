@@ -15,6 +15,7 @@
 #include <math.h>
 #include <assert.h>
 #include "MyMatrix.h"
+#include "util.h"
 
 using namespace std;
 
@@ -38,8 +39,9 @@ public:
     const double get_leg_consts2_val(const int n, const int m) const    { return legConsts2_(n, m); }
     const double get_sh_consts_val(const int n, const int m) const      { return shConsts_(n, m);   }
     const double get_dub_fac_val(const int i) const                     { return dubFac_[i];        }
-    const int get_n() const                                             { return nPoles_;                }
+    const int get_n() const                                             { return nPoles_;           }
 };
+
 
 /*
  Class for computing spherical harmonics. This includes
@@ -51,16 +53,14 @@ public:
  
  These are constrcucted dynamically and returned as a matrix of values for every n,m
  */
-
-
 class SHCalc
 {
 protected:
     
     int                         nPoles_;  //number of poles (the output matrix will be 2Nx2N)
     const SHCalcConstants*      _consts_;
-    MyMatrix<double>            P_; // legendre polynomials
-    MyMatrix<complex<double> >  Y_;  // the spherical harmonics calcualted by this class
+    MyMatrix<double>            P_;  // legendre polynomials
+    MyMatrix<cmplx>  Y_;  // the spherical harmonics calcualted by this class
     
     void calc_legendre(const double theta);  // calculate the legendre polynomial at every n, m (store in this.P_)
 
@@ -70,10 +70,12 @@ public:
      Constructor given size and constants:
      */
     SHCalc(const int nPoles, const SHCalcConstants* _consts);
-    
+
     void calc_sh(const double theta, const double phi); // calculate the spherical harmonics at every n, m  (store in this.Y_)
     
-    const complex<double> get_result(const int n, const int m) const;  // retrieve the result for n, m values
+    const cmplx get_result(const int n, const int m) const;  // retrieve the result for n, m values
+    
+    const MyMatrix<cmplx> get_full_result() { return Y_; }  // retrieve the full calculated Y_ matrix
     
 };
 

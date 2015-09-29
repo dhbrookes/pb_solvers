@@ -10,14 +10,48 @@
 
 
 ASolver::ASolver(const vector<double>* a, const int N, const int p,
-                 const BesselCalc* _bcalc, const SHCalc* _shCalc, const System sys)
-:N_(N), p_(p), _besselCalc_(_bcalc), consts_(sys.get_consts()), gamma_(N, N)
-,delta_(N, N), A_(N), E_(N), _shCalc_(_shCalc), sys_(sys)
+                 const BesselCalc* _bcalc, SHCalc* _shCalc, const System sys)
+:p_(p), _besselCalc_(_bcalc), consts_(sys.get_consts()), gamma_(N, N)
+,delta_(N, N), E_(N), _shCalc_(_shCalc), sys_(sys), N_(sys.get_n())
 {
+    // precompute all SH:
+    all_sh.reserve(N_);
+    int i;
+    for (i = 0; i < N_; i++)
+    {
+        all_sh.push_back(calc_mol_sh(sys.get_molecule(i)));
+    }
+    
+    //precomput gamma, delta and E:
+    compute_gamma();
+    compute_delta();
+    compute_E();
+    
 }
 
 /*
- Equation on Lotan 2006 page 544
+ Calculate the SH matrix for every charge in a molecule
+ */
+vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
+{
+    vector<MyMatrix<cmplx> > vout;
+    vout.reserve(mol.get_m());
+    int j;
+    double theta, phi;
+    ShPt pt;
+    for (j = 0; j < mol.get_m(); j++)
+    {
+        pt = mol.get_sph_posj(j);
+        theta = pt.get_theta();
+        phi = pt.get_phi();
+        _shCalc_->calc_sh(theta, phi);
+        vout.push_back(_shCalc_->get_full_result());
+    }
+    return vout;
+}
+
+/*
+ Equation 19--Lotan 2006 page 544
  */
 const double ASolver::calc_indi_gamma(int i, int n) const
 {
@@ -36,7 +70,7 @@ const double ASolver::calc_indi_gamma(int i, int n) const
 }
 
 /*
- Equation on Lotan 2006 page 544
+ Equation 20--Lotan 2006 page 544
  */
 const double ASolver::calc_indi_delta(int i, int n) const
 {
@@ -56,10 +90,29 @@ const double ASolver::calc_indi_delta(int i, int n) const
     return d;
 }
 
+/*
+ Calculates an E^(i)_(n,m) value
+ Equation 13--Lotan 2006 page 543
+ */
+const cmplx ASolver::calc_indi_e(int i, int n, int m)
+{
+    cmplx e = 0.0;
+    int j;
+    double q, rho;
+    for (j = 0; j < sys_.get_Mi(i); j++)
+    {
+        q = sys_.get_qij(i, j);
+        rho = sys_.get_sph_posij(i, j).get_r();
+        e += q * rho * all_sh[i][j](n, m);  // q_ij * rho_ij * Y_(n,m)(theta_ij, phi_ij)
+    }
+    
+    return e;
+}
+
 
 /*
  Constructs the gamma matrix, which is a diagonal matrix of diagonal
- matrices that contain values calculated in calc_indi_gamma()
+ matrices that contains values calculated in calc_indi_gamma()
  */
 void ASolver::compute_gamma()
 {
@@ -79,7 +132,7 @@ void ASolver::compute_gamma()
 
 /*
  Constructs the delta matrix, which is a diagonal matrix of diagonal
- matrices that contain values calculated in calc_indi_delta()
+ matrices that contains values calculated in calc_indi_delta()
  */
 void ASolver::compute_delta()
 {
@@ -93,6 +146,29 @@ void ASolver::compute_delta()
             di.set_val(j, j, calc_indi_delta(i, j));
         }
         delta_.set_val(i, i, di);
+    }
+}
+
+/*
+ Constructs the E vector, which contains a matrix for each molecule
+ that defines the multipole expansion of that molecule. The values
+ of the inner matrices are calculated in calc_indi_e()
+ */
+void ASolver::compute_E()
+{
+    int i, n, m;
+    MyMatrix<cmplx> ei;
+    for (i = 0; i < N_; i++)
+    {
+        ei = MyMatrix<cmplx>(p_, 2*p_ + 1);  // m goes from -n to n so you need 2*p columns
+        for (n = 0; n < p_; n++)
+        {
+            for (m = -n; m < n; m++)
+            {
+                ei.set_val(n, m + p_, calc_indi_e(i, n, m));
+            }
+        }
+        E_.set_val(i, ei);
     }
 }
 
