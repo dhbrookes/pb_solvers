@@ -16,7 +16,8 @@
 using namespace std;
 
 /*
- Class for storing constants that can be used for multiple runs of bessel calcualtions
+ Class for storing constants that can be used for multiple runs of 
+  bessel calculations
  */
 class BesselConstants
 {
