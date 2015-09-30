@@ -180,6 +180,7 @@ public:
 
 };
 
+        
 /*
  Vector class is implemented as extension of matrix class but with only one column
  */
@@ -236,9 +237,40 @@ public:
         }
         return out;
     }
-    
-    
 };
 
+        
+/*
+ Convenience classes for matrices of matrices, vectors of vectors
+ and vectors of matrices.
+ 
+ These are used by calling the name of the class and then ::type
+ to retrieve the typedef that they contain.
+ 
+ So to get a matrix of matrices containing ints you would write:
+ 
+ MatofMats<int>::type my_mat;
+ 
+ */
+template <typename T>
+struct MatOfMats
+{
+    typedef MyMatrix<MyMatrix<T> > type;
+};
+
+template <typename T>
+struct VecOfVecs
+{
+    typedef MyVector<MyVector<T> > type;
+};
+        
+template <typename T>
+struct VecOfMats
+{
+    typedef MyVector<MyMatrix<T> > type;
+};
+
+
+        
 #endif /* MyMatrix_h */
         

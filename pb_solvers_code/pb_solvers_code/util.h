@@ -12,6 +12,19 @@
 #include <stdio.h>
 #include "MyMatrix.h"
 #include <math.h>
+#include <complex>
+
+
+template <typename T>
+class SphPoint;
+
+template<typename T>
+class EuPoint;
+
+//Useful typedefs:
+typedef EuPoint<double> EPt;
+typedef SphPoint<double> ShPt;
+typedef complex<double> cmplx;
 
 
 /*
@@ -32,6 +45,7 @@ const MyMatrix<T> operator*(const MyMatrix<T> mat, const T& rhs)
     return result;
 }
 
+
 /*
  lhs scalar multiplication of a matrix
  */
@@ -51,8 +65,6 @@ const MyMatrix<T> operator*(const T& lhs, const MyMatrix<T> mat)
 }
 
 
-template <typename T>
-class SphPoint;
 
 /*
  Class for 3 dimensional euclidean points
@@ -66,7 +78,7 @@ protected:
     T z_;
 
 public:
-    EuPoint(T x=0.0, T y=0.0, T z=0.0)
+    EuPoint(T x=T(), T y=T(), T z=T())
     :x_(x), y_(y), z_(z)
     {
     }
@@ -98,7 +110,7 @@ protected:
     T phi_;
     
 public:
-    SphPoint(T r, T theta, T phi)
+    SphPoint(T r=T(), T theta=T(), T phi=T())
     :r_(r), theta_(theta), phi_(phi)
     {
     }
@@ -117,5 +129,6 @@ public:
     const T& get_phi() const    { return phi_;      }
     
 };
+
 
 #endif /* util_hpp */

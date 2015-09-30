@@ -15,31 +15,57 @@
 #include "Constants.h"
 
 using namespace std;
+
+
+/*
+ Class for storing relevant data about each molecule
+ */
+class Molecule
+{
+protected:
+    int                 M_;  // number of charges in this molecule
+    double              a_;  // radii of this molecule
+    vector<double>      qs_;  // magnitude of each charge in the molecule
+    vector<EPt>         pos_;  // position of each charge in the molecule\
+    
+public:
+    Molecule(int M, int a, vector<double> qs, vector<EPt> pos);
+    
+    const int get_m() const               { return M_;                              }
+    const double get_a() const            { return a_;                              }
+    const double get_qj(int j) const      { return qs_[j];                          }
+    const EPt get_posj(int j) const       { return pos_[j];                         }
+    const ShPt get_sph_posj(int j) const  { return pos_[j].convert_to_spherical();  }
+    
+};
+
+
 /*
  Class containing all of the relevant information for a particular system
- (molecule positions, charges, etc.)
  */
-
 class System
 {
 protected:
-    vector<double>               a_; // radii of every molecule
-    vector<double>               M_; // number of charges in each molecule
-    vector<vector<double> >      qs_; // magnitude of each charge in each molecule
-    vector<EuPoint<double> >     pos_; // positions of every molecules
-    Constants                    consts_;
+    
+    int                          N_; // number of molecules
+    vector<Molecule>             molecules_;
+    Constants                    consts_;  // Constants for this system
     
 public:
-    System(Constants consts, const vector<double>& a, const vector<double>& M,
-           const vector<vector<double> > qs, const vector<EuPoint<double> > pos);
+    System(Constants consts, const vector<Molecule>& mols);
     
-    const double get_ai(int i) const                    { return a_[i];     }
-    const double get_Mi(int i) const                    { return M_[i];     }
-    const double get_qij(int i, int j)                  { return qs_[i][j]; }
-    const EuPoint<double>& get_posi(int i) const        { return pos_[i];   }
-    const Constants& get_consts() const                 { return consts_;   }
-    const SphPoint<double> get_sph_posi(int i) const    { return pos_[i].convert_to_spherical(); }
+    const Constants& get_consts() const                 { return consts_;                           }
+    const int get_n() const                             { return N_;                                }
+    const double get_ai(int i) const                    { return molecules_[i].get_a();             }
+    const double get_Mi(int i) const                    { return molecules_[i].get_m();             }
+    const double get_qij(int i, int j) const            { return molecules_[i].get_qj(j);           }
+    const EPt get_posij(int i, int j) const             { return molecules_[i].get_posj(j);         }
+    const ShPt get_sph_posij(int i, int j) const        { return molecules_[i].get_sph_posj(j);     }
+    const Molecule get_molecule(int i) const            { return molecules_[i];                     }
     
 };
+
+
+
 
 #endif /* Setup_hpp */

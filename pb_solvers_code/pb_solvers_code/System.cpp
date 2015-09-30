@@ -9,8 +9,13 @@
 #include "System.h"
 
 
-System::System(Constants consts, const vector<double>& a, const vector<double>& M,
-               const vector<vector<double> > qs, const vector<EuPoint<double> > pos)
-:a_(a), M_(M), qs_(qs), pos_(pos), consts_(consts)
+Molecule::Molecule(int M, int a, vector<double> qs, vector<EPt> pos)
+:M_(M), a_(a), qs_(qs), pos_(pos)
+{
+}
+
+
+System::System(Constants consts, const vector<Molecule>& mols)
+:consts_(consts), molecules_(mols), N_((int) mols.size())
 {
 }
