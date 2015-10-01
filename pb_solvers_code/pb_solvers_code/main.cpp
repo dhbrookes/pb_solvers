@@ -15,8 +15,20 @@
 #include "System.h"
 #include "util.h"
 
-//int main(int argc, const char * argv[])
-//{
-//	cout << "Hi there" << endl;
-//	cout << "Hi there" << endl;
-//}
+#include "tester.h"
+
+int main(int argc, const char * argv[])
+{
+	
+	
+	bool test = true;
+	
+	if (test)
+	{
+		cout << "Welcome to test suite" << endl;
+		CTester allTest = CTester();
+		allTest.unitTest( argc, argv );
+	}
+	
+	return 0;
+}

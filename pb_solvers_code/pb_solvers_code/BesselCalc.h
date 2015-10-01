@@ -24,7 +24,6 @@ class BesselConstants
 protected:
     int numVals_;
     vector<double> kConsts_;  // recursion constants for k
-    vector<double> iConsts_;  // recursion constants for i
     
 public:
     
@@ -32,7 +31,6 @@ public:
     
     const int get_n() const                 { return numVals_; }
     const double get_kconst_val(int i)      { return kConsts_[i]; }
-    const double get_iconst_val(int i)      { return iConsts_[i]; }
     
 };
 

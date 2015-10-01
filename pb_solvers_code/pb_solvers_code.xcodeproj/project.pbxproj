@@ -13,7 +13,6 @@
 		0364A8A11BB60E7100850EB6 /* BesselCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A89F1BB60E7100850EB6 /* BesselCalc.cpp */; settings = {ASSET_TAGS = (); }; };
 		0364A8A41BB616B000850EB6 /* SHCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A21BB616B000850EB6 /* SHCalc.cpp */; settings = {ASSET_TAGS = (); }; };
 		0364A8A71BBA1E6F00850EB6 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A51BBA1E6F00850EB6 /* System.cpp */; settings = {ASSET_TAGS = (); }; };
-		52FC86F71BBDB51B009E19F0 /* main_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 52FC86F61BBDB51B009E19F0 /* main_test.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -44,7 +43,7 @@
 		0364A8A51BBA1E6F00850EB6 /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = System.cpp; sourceTree = "<group>"; };
 		0364A8A61BBA1E6F00850EB6 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.h; sourceTree = "<group>"; };
 		52FC86F51BBDAB55009E19F0 /* BesselCalcTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BesselCalcTest.h; sourceTree = "<group>"; };
-		52FC86F61BBDB51B009E19F0 /* main_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main_test.cpp; sourceTree = "<group>"; };
+		52FC86F81BBDCE4A009E19F0 /* tester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tester.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +90,7 @@
 				0364A8A31BB616B000850EB6 /* SHCalc.h */,
 				0364A8A51BBA1E6F00850EB6 /* System.cpp */,
 				0364A8A61BBA1E6F00850EB6 /* System.h */,
-				52FC86F61BBDB51B009E19F0 /* main_test.cpp */,
+				52FC86F81BBDCE4A009E19F0 /* tester.h */,
 			);
 			path = pb_solvers_code;
 			sourceTree = "<group>";
@@ -152,7 +151,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52FC86F71BBDB51B009E19F0 /* main_test.cpp in Sources */,
 				0364A8A41BB616B000850EB6 /* SHCalc.cpp in Sources */,
 				0364A8A11BB60E7100850EB6 /* BesselCalc.cpp in Sources */,
 				0364A89B1BB605FB00850EB6 /* ASolver.cpp in Sources */,
