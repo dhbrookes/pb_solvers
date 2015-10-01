@@ -26,20 +26,20 @@ using namespace std;
 class SHCalcConstants
 {
 protected:
-    int                             nPoles_;  // number of poles
+    int                             numVals_;  // number of poles
     MyMatrix<double>                legConsts1_;  // (2l-1)/(l-m) for use in legendre computation
     MyMatrix<double>                legConsts2_;  // (l+m-1)/(l-m) for use in legendre computation
     MyMatrix<double>                shConsts_;  // sqrt((n-m)!/(n+m)!) in EQ1, Lotan 2006
     vector<double>                  dubFac_;  // (2l-1)!! double factorial, for use in legendre recursion
     
 public:
-    SHCalcConstants(const int nPoles);
+    SHCalcConstants(const int num_vals);
     
     const double get_leg_consts1_val(const int n, const int m) const    { return legConsts1_(n, m); }
     const double get_leg_consts2_val(const int n, const int m) const    { return legConsts2_(n, m); }
     const double get_sh_consts_val(const int n, const int m) const      { return shConsts_(n, m);   }
     const double get_dub_fac_val(const int i) const                     { return dubFac_[i];        }
-    const int get_n() const                                             { return nPoles_;           }
+    const int get_n() const                                             { return numVals_;           }
 };
 
 
@@ -57,7 +57,7 @@ class SHCalc
 {
 protected:
     
-    int                         nPoles_;  //number of poles (the output matrix will be 2Nx2N)
+    int                         numVals_;  //number of poles (the output matrix will be 2Nx2N)
     const SHCalcConstants*      _consts_;
     MyMatrix<double>            P_;  // legendre polynomials
     MyMatrix<cmplx>  Y_;  // the spherical harmonics calcualted by this class
@@ -69,7 +69,7 @@ public:
     /*
      Constructor given size and constants:
      */
-    SHCalc(const int nPoles, const SHCalcConstants* _consts);
+    SHCalc(const int num_vals, const SHCalcConstants* _consts);
 
     void calc_sh(const double theta, const double phi); // calculate the spherical harmonics at every n, m  (store in this.Y_)
     

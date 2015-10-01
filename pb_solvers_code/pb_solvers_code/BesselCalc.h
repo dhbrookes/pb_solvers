@@ -22,15 +22,17 @@ using namespace std;
 class BesselConstants
 {
 protected:
-    int nPoles_;
-    vector<double> recConsts_;  // recursion constants
+    int numVals_;
+    vector<double> kConsts_;  // recursion constants for k
+    vector<double> iConsts_;  // recursion constants for i
     
 public:
     
     BesselConstants(const int N);
     
-    const int get_n() const             { return nPoles_; }
-    const double get_const_val(int i)   { return recConsts_[i]; }
+    const int get_n() const                 { return numVals_; }
+    const double get_kconst_val(int i)      { return kConsts_[i]; }
+    const double get_iconst_val(int i)      { return iConsts_[i]; }
     
 };
 
@@ -42,7 +44,7 @@ class BesselCalc
 {
 protected:
     
-    int                 nPoles_;  // order of the Bessel function
+    int                 numVals_;  // order of the Bessel function
     BesselConstants*    _consts_;  //constants used in recursion: Lotan 2006 eq3
     
 public:

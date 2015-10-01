@@ -10,19 +10,19 @@
 
 
 SHCalcConstants::SHCalcConstants(const int N)
-:nPoles_(N), legConsts1_(2*N, 2*N), legConsts2_(2*N, 2*N),
+:numVals_(N), legConsts1_(2*N, 2*N), legConsts2_(2*N, 2*N),
 shConsts_(2*N, 2*N), dubFac_(2*N)
 {
     vector<double> temp;
-    temp.reserve(4 * nPoles_);
+    temp.reserve(4 * numVals_);
     temp.push_back(0);
     int i, n, m;
-    for (i = 1; i < 4 * nPoles_; i++)
+    for (i = 1; i < 4 * numVals_; i++)
     {
         temp.push_back(temp[i-1] * sqrt(i));
     }
 
-    for (n = 0; n < 2 * nPoles_; n++)
+    for (n = 0; n < 2 * numVals_; n++)
     {
         for (m = 0; m <= n; m++)
         {
@@ -34,18 +34,18 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
 
     dubFac_[0] = 1.0;
     dubFac_[1] = 1.0;
-    for (i = 2; i < 2 * nPoles_; i++)
+    for (i = 2; i < 2 * numVals_; i++)
     {
         dubFac_[i] = dubFac_[i-1] * (2*i - 1);
     }
     
 }
 
-SHCalc::SHCalc(const int nPoles, const SHCalcConstants* _consts)
-:_consts_(_consts), nPoles_(nPoles), P_(2 * nPoles_, 2 * nPoles_),
-Y_(2 * nPoles_, 2 * nPoles_)
+SHCalc::SHCalc(const int num_vals, const SHCalcConstants* _consts)
+:_consts_(_consts), numVals_(num_vals), P_(2 * numVals_, 2 * numVals_),
+Y_(2 * numVals_, 2 * numVals_)
 {
-    assert (_consts_->get_n() == nPoles_);
+    assert (_consts_->get_n() == numVals_);
 }
 
 /*
@@ -67,7 +67,7 @@ void SHCalc::calc_legendre(const double theta)
     
     int l, m, lInd, mInd;
     double val;
-    for (l = 0; l < 2 * nPoles_; l++)
+    for (l = 0; l < 2 * numVals_; l++)
     {
         for (m = 0; m < l; m++)
         {
@@ -105,9 +105,9 @@ void SHCalc::calc_sh(const double theta, const double phi)
     int n, m;
     cmplx val, mcomp;
     double shc;  // constant value
-    for (n = 0; n < 2*nPoles_; n++)
+    for (n = 0; n < 2*numVals_; n++)
     {
-        for (m = 0; m < 2*nPoles_; m++)
+        for (m = 0; m < 2*numVals_; m++)
         {
             shc = _consts_->get_sh_consts_val(n, m);
             mcomp = complex<double> (m, 0);
