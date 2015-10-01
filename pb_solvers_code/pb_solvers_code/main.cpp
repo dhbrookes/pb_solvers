@@ -15,7 +15,8 @@
 #include "System.h"
 #include "util.h"
 
-int main(int argc, const char * argv[])
-{
-    
-}
+//int main(int argc, const char * argv[])
+//{
+//	cout << "Hi there" << endl;
+//	cout << "Hi there" << endl;
+//}

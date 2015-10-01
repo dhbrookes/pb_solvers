@@ -25,7 +25,7 @@ Constants::Constants()
 {
 //    coulNum_ = E2 * AVOGADRO_NUM;
 //    coulDen_ = PERMITTIVITY_VAC * 4.0 * PI * ANGSTROM * KCAL;
-    update_all();
+	update_all();
 }
 
 
