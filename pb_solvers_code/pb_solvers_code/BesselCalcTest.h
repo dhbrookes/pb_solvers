@@ -1,47 +1,48 @@
 //
-//  BesselCalc.h
+//  BesselCalcTest.h
 //  pb_solvers_code
 //
-//  Created by David Brookes on 9/25/15.
-//  Copyright © 2015 David Brookes. All rights reserved.
+//  Created by Lisa Felberg on 9/30/15.
+//  Copyright © 2015 Lisa Felberg. All rights reserved.
 //
 
-#ifndef BesselCalc_h
-#define BesselCalc_h
+#ifndef BesselCalcTest_h
+#define BesselCalcTest_h
 
 #include <stdio.h>
 #include <vector>
 #include <assert.h>
 
+#include "BesselCalc.h"
+
 using namespace std;
 
 /*
- Class for storing constants that can be used for multiple runs of 
-  bessel calculations
+ Class for testing Bessel recursion constants
  */
-class BesselConstants
+class BesselConstantsTest
 {
-protected:
-  int nPoles_;
-  vector<double> recConsts_;  // recursion constants
   
 public:
-  
-  BesselConstants(const int N);
-  
-  const int get_n() const             { return nPoles_; }
-  const double get_const_val(int i)   { return recConsts_[i]; }
-  
+  void TestBesselConstants( )
+  {
+    int nPol = 10;
+    double preFactors[10] = { 
+    BesselConstants bConstTest = new BesselConstants( nPol );
+    assert( bConstTest.get_n() == nPol );
+    for (int i = 0; i < nPol; i++)
+      assert( abs(preFactors[i]-bConstTest.get_const_val( i )) < 1.0e-4);
+    
+  }  
 };
 
 
 /*
- Calculator class for modified bessel functions (spherical and standard)
+ Testing class for modified bessel functions (spherical and standard)
  */
-class BesselCalc
+class BesselCalcTest
 {
 protected:
-  
   int                nPoles_;  // order of the Bessel function
   BesselConstants*  _consts_;  //constants used in recursion: Lotan 2006 eq3
   
@@ -64,4 +65,4 @@ public:
 };
 
 
-#endif /* BesselCalc_h */
+#endif /* BesselCalcTest_h */
