@@ -39,7 +39,7 @@ BesselCalc::BesselCalc(int N, BesselConstants* _consts)
  param n is the number of bessel functions to calculate
  */
 const vector<double> BesselCalc::calc_mbfK(const int n,
-                                           const double z) const
+                       const double z) const
 {
     vector<double> K;
     K.reserve(n);
@@ -66,30 +66,30 @@ const vector<double> BesselCalc::calc_mbfK(const int n,
  param n i the number of bessel functions to calculate
  */
 const vector<double> BesselCalc::calc_mbfI(const int n,
-                                           const double z) const
+                       const double z) const
 {
-    vector<double> I;
-    I.reserve(n);
-    for (int j = 0; j < n; j++)
+  vector<double> I;
+  I.reserve(n);
+  for (int j = 0; j < n; j++)
+  {
+    I.push_back(1);
+  }
+  
+  if (z != 0)
+  {
+    double z2 = 0.5 * z * z;
+    int k, m;
+    double t;
+    for (k = 0; k < n; k++)
     {
-        I.push_back(1);
+      t = z2 / (2*k + 3);
+      for (m = 0; m <= 20; m++)
+      {
+        I[k] += t;
+        t *= z2 / ((m+1) * (2 * (k+m) + 3 ));  //EQ 1.15
+        if (t < 1e-20) break;
+      }
     }
-    
-    if (z != 0)
-    {
-        double z2 = 0.5 * z * z;
-        int k, m;
-        double t;
-        for (k = 0; k < n; k++)
-        {
-            t = z2 / (2*k + 3);
-            for (m = 0; m <= 20; m++)
-            {
-                I[k] += t;
-                t *= z2 / ((m+1) * (2 * (k+m) + 3 ));  //EQ 1.15
-                if (t < 1e-20) break;
-            }
-        }
-    }
-    return I;
+  }
+  return I;
 }
