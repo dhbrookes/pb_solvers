@@ -14,7 +14,7 @@ BesselConstants::BesselConstants(const int N)
 {
     kConsts_.reserve(2 * numVals_);
     int n;
-    double kval, ival;
+    double kval;
     for (n = 0; n < 2*numVals_; n++)
     {
         kval = 1.0 / ((2*n+1) * (2*n-1));

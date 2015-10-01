@@ -26,11 +26,11 @@ using namespace std;
 class SHCalcConstants
 {
 protected:
-    int                             numVals_;  // number of poles
-    MyMatrix<double>                legConsts1_;  // (2l-1)/(l-m) for use in legendre computation
-    MyMatrix<double>                legConsts2_;  // (l+m-1)/(l-m) for use in legendre computation
-    MyMatrix<double>                shConsts_;  // sqrt((n-m)!/(n+m)!) in EQ1, Lotan 2006
-    vector<double>                  dubFac_;  // (2l-1)!! double factorial, for use in legendre recursion
+    int                numVals_;  // number of poles
+    MyMatrix<double>   legConsts1_;  // (2l-1)/(l-m) for use in legendre computation
+    MyMatrix<double>   legConsts2_;  // (l+m-1)/(l-m) for use in legendre computation
+    MyMatrix<double>   shConsts_;  // sqrt((n-m)!/(n+m)!) in EQ1, Lotan 2006
+    vector<double>     dubFac_;  // (2l-1)!! double factorial, for use in legendre recursion
     
 public:
     SHCalcConstants(const int num_vals);
@@ -48,19 +48,21 @@ public:
  calcualtion of the associated Legendre Polynomials
  
  The spherical harmonics in this case are defined by the equation:
- Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!) * P_(n,m)(cos(theta)) * exp(i*m*phi)
+ Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!) * 
+                             P_(n,m)(cos(theta)) * exp(i*m*phi)
  where P_(n, m) are the associated Legendre polynomials.
  
- These are constrcucted dynamically and returned as a matrix of values for every n,m
+ These are constrcucted dynamically and returned as a matrix of 
+     values for every n,m
  */
 class SHCalc
 {
 protected:
     
-    int                         numVals_;  //number of poles (the output matrix will be 2Nx2N)
-    const SHCalcConstants*      _consts_;
-    MyMatrix<double>            P_;  // legendre polynomials
-    MyMatrix<cmplx>  Y_;  // the spherical harmonics calcualted by this class
+    int                     numVals_;  //number of poles (the output matrix will be 2Nx2N)
+    const SHCalcConstants*  _consts_;
+    MyMatrix<double>        P_;  // legendre polynomials
+    MyMatrix<cmplx>         Y_;  // the spherical harmonics calcualted by this class
     
     void calc_legendre(const double theta);  // calculate the legendre polynomial at every n, m (store in this.P_)
 

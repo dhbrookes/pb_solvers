@@ -83,7 +83,7 @@ void SHCalc::calc_legendre(const double theta)
             else if (m <= l)
             {
                 val = _consts_->get_leg_consts1_val(l, m) * x * P_(l-1, m) -
-                            _consts_->get_leg_consts2_val(lInd, mInd) * P_(l-1, m);  // (3)
+                            _consts_->get_leg_consts2_val(lInd, mInd) * P_(l-1, m); // (3)
             }
             P_.set_val(lInd, mInd, val);
         }
@@ -94,7 +94,8 @@ void SHCalc::calc_legendre(const double theta)
 /*
  Calculate the spherical harmonics according to the equation:
  
-    Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!) * P_(n,m)(cos(theta)) * exp(i*m*phi)
+    Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!) 
+                           * P_(n,m)(cos(theta)) * exp(i*m*phi)
  where P_(n, m) are the associated Legendre polynomials.
  
  */
