@@ -179,7 +179,7 @@ public:
     const int get_ncols() const { return ncols_; }
 
 };
-
+        
         
 /*
  Vector class is implemented as extension of matrix class but with only one column
