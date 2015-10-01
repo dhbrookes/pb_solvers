@@ -25,7 +25,7 @@ class ASolver
 protected:
     
     int                         N_;  // number of molecules
-    int                         p_;  // max value for n (2*nPoles_ usually)
+    int                         p_;  // max value for n (2*numVals_ usually)
     VecOfMats<cmplx>::type      E_;
     MatOfMats<double>::type     gamma_, delta_;
     const BesselCalc*           _besselCalc_;

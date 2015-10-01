@@ -10,23 +10,26 @@
 
 
 BesselConstants::BesselConstants(const int N)
-:nPoles_(N)
+:numVals_(N)
 {
-  recConsts_.reserve(2 * nPoles_);
-  int n;
-  double val;
-  for (n = 0; n < 2*nPoles_; n++)
-  {
-    val = 1.0 / ((2 * n-1) * (2 * n-3));
-    recConsts_.push_back(val);
-  }
+    kConsts_.reserve(2 * numVals_);
+    iConsts_.reserve(2 * numVals_);
+    int n;
+    double kval, ival;
+    for (n = 0; n < 2*numVals_; n++)
+    {
+        kval = 1.0 / ((2*n+1) * (2*n-1));
+        ival = (2* n+1) * (2*n+3);
+        kConsts_.push_back(kval);
+        iConsts_.push_back(ival);
+    }
 }
 
 
 BesselCalc::BesselCalc(int N, BesselConstants* _consts)
-: nPoles_(N), _consts_(_consts)
+: numVals_(N), _consts_(_consts)
 {
-  assert (_consts_->get_n() == nPoles_);
+    assert (_consts_->get_n() == numVals_);
 }
 
 /*
@@ -38,21 +41,21 @@ BesselCalc::BesselCalc(int N, BesselConstants* _consts)
 const vector<double> BesselCalc::calc_mbfK(const int n,
                        const double z) const
 {
-  vector<double> K;
-  K.reserve(n);
-  
-  if (n > 0) K.push_back(1.0);
-  if (n > 1) K.push_back(1 + z);
-  
-  double z_sq = z * z;
-  int i;
-  double val;
-  for (i = 2; i < n; i++)
-  {
-    val = K[i-1] + z_sq * K[i-2] * _consts_->get_const_val(i);
-    K.push_back(val);
-  }
-  return K;
+    vector<double> K;
+    K.reserve(n);
+    
+    if (n > 0) K.push_back(1.0);
+    if (n > 1) K.push_back(1 + z);
+    
+    double z_sq = z * z;
+    int i;
+    double val;
+    for (i = 2; i < n; i++)
+    {
+        val = K[i-1] + z_sq * K[i-2] * _consts_->get_kconst_val(i);
+        K.push_back(val);
+    }
+    return K;
 }
 
 /*
