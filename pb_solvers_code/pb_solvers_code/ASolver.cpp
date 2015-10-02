@@ -9,8 +9,7 @@
 #include "ASolver.h"
 
 
-ASolver::ASolver(const vector<double>* a, const int N, const int p,
-                 const BesselCalc* _bcalc, SHCalc* _shCalc, const System sys)
+ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc, SHCalc* _shCalc, const System sys)
 :p_(p), _besselCalc_(_bcalc), consts_(sys.get_consts()), gamma_(N, N)
 ,delta_(N, N), E_(N), _shCalc_(_shCalc), sys_(sys), N_(sys.get_n())
 {
@@ -173,6 +172,18 @@ void ASolver::compute_E()
 }
 
 
+ASolver::~ASolver()
+{
+    delete _besselCalc_;
+    delete _shCalc_;
+}
 
 
-
+ASolver::ASolver(const ASolver& other)
+:sys_(other.sys_), p_(other.p_), gamma_(other.gamma_),
+delta_(other.delta_), N_(other.N_), E_(other.E_),
+consts_(other.consts_), all_sh(other.all_sh)
+{
+    _besselCalc_ = new BesselCalc;
+    
+}

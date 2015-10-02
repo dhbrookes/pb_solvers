@@ -142,17 +142,18 @@ SHCalc::~SHCalc()
 
 
 SHCalc::SHCalc(const SHCalc& other)
+:numVals_(other.numVals_), P_(other.P_),
+Y_(other.Y_)
 {
-    _consts_ = new SHCalcConstants(*other._consts_);
-    numVals_ = int(other.numVals_);
-    P_ = MyMatrix<double>(other.P_);
-    Y_ = MyMatrix<cmplx>(other.Y_);
+    _consts_ = new SHCalcConstants;
+    _consts_ = other._consts_;
 }
 
 
 SHCalc& SHCalc::operator=(const SHCalc& other)
 {
-    _consts_ = new SHCalcConstants(*other._consts_);
+    _consts_ = new SHCalcConstants;
+    _consts_ = other._consts_;
     numVals_ = int(other.numVals_);
     P_ = MyMatrix<double>(other.P_);
     Y_ = MyMatrix<cmplx>(other.Y_);

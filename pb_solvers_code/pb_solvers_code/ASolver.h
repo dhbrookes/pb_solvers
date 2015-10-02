@@ -48,10 +48,9 @@ protected:
 
 public:
     
-    ASolver(const vector<double>* a, const int N, const int p,
-            const BesselCalc* _bcalc, SHCalc* _shCalc,
-            const System sys);
-    
+    ASolver(const int N, const int p, const BesselCalc* _bcalc, SHCalc* _shCalc, const System sys);
+    virtual ~ASolver();
+    ASolver(const ASolver& other);
 };
 
 #endif /* ASolver_hpp */

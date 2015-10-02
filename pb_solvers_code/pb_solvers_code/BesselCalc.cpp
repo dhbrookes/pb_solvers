@@ -101,15 +101,17 @@ BesselCalc::~BesselCalc()
 }
 
 BesselCalc::BesselCalc(const BesselCalc& other)
+:numVals_(other.numVals_)
 {
-    numVals_ = int(other.numVals_);
-    _consts_ = new BesselConstants(*other._consts_);
+    _consts_ = new BesselConstants;
+    _consts_ = other._consts_;
 }
 
 BesselCalc& BesselCalc::operator=(const BesselCalc& other)
 {
     numVals_ = int(other.numVals_);
-    _consts_ = new BesselConstants(*other._consts_);
+    _consts_ = new BesselConstants;
+    _consts_ = other._consts_;
     return *this;
 }
 

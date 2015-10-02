@@ -43,6 +43,8 @@ protected:
     
 public:
     
+    static const int MAX_NUM_POLES;
+    
     //Absolute constants:
     static const double PERMITTIVITY_VAC;  // [F/m]=[C2/J/m] , F = Farad
     static const double KB; //!<  [ m^2 kg/ s^2 / K ] = [ J/K ]

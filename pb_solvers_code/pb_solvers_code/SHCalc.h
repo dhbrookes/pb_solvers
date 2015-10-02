@@ -33,7 +33,7 @@ protected:
     vector<double>                  dubFac_;  // (2l-1)!! double factorial, for use in legendre recursion
     
 public:
-    SHCalcConstants(const int num_vals);
+    SHCalcConstants(const int num_vals=30);
     
     const double get_leg_consts1_val(const int n, const int m) const    { return legConsts1_(n, m); }
     const double get_leg_consts2_val(const int n, const int m) const    { return legConsts2_(n, m); }

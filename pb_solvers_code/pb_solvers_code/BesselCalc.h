@@ -28,7 +28,7 @@ protected:
     
 public:
     
-    BesselConstants(const int N);
+    BesselConstants(const int N=Constants::MAX_NUM_POLES);
     
     const int get_n() const                 { return numVals_; }
     const double get_kconst_val(int i)      { return kConsts_[i]; }
@@ -48,11 +48,11 @@ protected:
     BesselConstants*    _consts_;  // constants used in recursion: Lotan 2006 eq3
     
 public:
+    
+    BesselCalc();
   
-  /*
-   Constructor if recursion constants have not already been calculated:
-   */
-  BesselCalc(int N, BesselConstants* _consts);
+    BesselCalc(int N, BesselConstants* _consts);
+    
     BesselCalc(const BesselCalc& other);
     
     virtual ~BesselCalc();
