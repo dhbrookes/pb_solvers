@@ -44,6 +44,7 @@
 		0364A8A61BBA1E6F00850EB6 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.h; sourceTree = "<group>"; };
 		52FC86F51BBDAB55009E19F0 /* BesselCalcTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BesselCalcTest.h; sourceTree = "<group>"; };
 		52FC86F81BBDCE4A009E19F0 /* tester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tester.h; sourceTree = "<group>"; };
+		52FC86F91BBE011F009E19F0 /* SHCalcTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHCalcTest.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +92,7 @@
 				0364A8A51BBA1E6F00850EB6 /* System.cpp */,
 				0364A8A61BBA1E6F00850EB6 /* System.h */,
 				52FC86F81BBDCE4A009E19F0 /* tester.h */,
+				52FC86F91BBE011F009E19F0 /* SHCalcTest.h */,
 			);
 			path = pb_solvers_code;
 			sourceTree = "<group>";

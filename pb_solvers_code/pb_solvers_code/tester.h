@@ -11,14 +11,8 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "Constants.h"
-#include "MyMatrix.h"
-#include "ASolver.h"
-#include "BesselCalc.h"
 #include "BesselCalcTest.h"
-#include "SHCalc.h"
-#include "System.h"
-#include "util.h"
+#include "SHCalcTest.h"
 
 /*
  Class for testing all Classes
@@ -29,11 +23,14 @@ public:
 	
 	int unitTest(int argc, const char * argv[])
 	{
-		BesselConstantsTest BCT = BesselConstantsTest();
+		BesselConstantsTest BCT;
 		BCT.TestBesselConstants();
 		
-		BesselCalcTest BCalcT = BesselCalcTest();
+		BesselCalcTest BCalcT;
 		BCalcT.TestBesselCalc();
+		
+		SHCalcConstantsTest SHConT;
+		SHConT.TestSHCalcConstants();
 		
 		cout << "Complete all tests" << endl;
 		return 0;

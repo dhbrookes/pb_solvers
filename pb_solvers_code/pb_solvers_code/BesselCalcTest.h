@@ -40,7 +40,7 @@ public:
     for (int i = 0; i < nPol; i++) // check that our prefactors are right
       assert( abs(kPreFactors[i]-bConstTest.get_kconst_val( i )) < precLim);
 	}
-};
+}; // end BesselConstantsTest
 
 
 /*
@@ -53,8 +53,8 @@ public:
 	{
 		const int nPol = 10;
 		double precLim = 1.0e-4;
-		BesselConstants * BConst = new BesselConstants( nPol );
-		BesselCalc bConstTest = BesselCalc( nPol,  BConst );
+		BesselConstants BConst = BesselConstants( nPol );
+		BesselCalc bConstTest = BesselCalc( nPol,  &BConst );
 		
 		// for z = 1.0 and z = 10.0, calculated from python pbam_unit_test.py
 		double i1[] = {1.17520119e+00,   1.10363832e+00,   1.07344305e+00,
@@ -91,10 +91,9 @@ public:
 			assert( abs(mBFI10[besselIt] - i10[besselIt]) < precLim );
 			assert( abs(mBFK1[besselIt] - k1[besselIt]) < precLim );
 			assert( abs(mBFK10[besselIt] - k10[besselIt]) < precLim );
-
 		}
 	}
-};
+}; // end BesselCalcTest
 
 
 #endif /* BesselCalcTest_h */
