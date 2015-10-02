@@ -42,8 +42,8 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
 }
 
 SHCalc::SHCalc(const int num_vals, const SHCalcConstants* _consts)
-:_consts_(_consts), numVals_(num_vals), P_(2 * numVals_, 2 * numVals_),
-Y_(2 * numVals_, 2 * numVals_)
+:_consts_(_consts), numVals_(num_vals), P_(2 * num_vals, 2 * num_vals),
+Y_(2 * num_vals, 2 * num_vals)
 {
     assert (_consts_->get_n() == numVals_);
 }
@@ -134,3 +134,30 @@ const complex<double> SHCalc::get_result(const int n, const int m) const
         return Y_(n, m);
     }
 }
+
+SHCalc::~SHCalc()
+{
+    delete _consts_;
+}
+
+
+SHCalc::SHCalc(const SHCalc& other)
+{
+    _consts_ = new SHCalcConstants(*other._consts_);
+    numVals_ = int(other.numVals_);
+    P_ = MyMatrix<double>(other.P_);
+    Y_ = MyMatrix<cmplx>(other.Y_);
+}
+
+
+SHCalc& SHCalc::operator=(const SHCalc& other)
+{
+    _consts_ = new SHCalcConstants(*other._consts_);
+    numVals_ = int(other.numVals_);
+    P_ = MyMatrix<double>(other.P_);
+    Y_ = MyMatrix<cmplx>(other.Y_);
+    return *this;
+}
+
+
+

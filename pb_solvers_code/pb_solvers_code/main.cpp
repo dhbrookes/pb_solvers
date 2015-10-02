@@ -17,7 +17,4 @@
 
 int main(int argc, const char * argv[])
 {
-    BesselConstants bconst (10);
-//    BesselConstants* _bconst = &bconst;
-    BesselCalc bcalc (10, _bconst);
 }

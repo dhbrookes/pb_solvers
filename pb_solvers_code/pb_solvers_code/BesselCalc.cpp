@@ -93,3 +93,26 @@ const vector<double> BesselCalc::calc_mbfI(const int n,
   }
   return I;
 }
+
+
+BesselCalc::~BesselCalc()
+{
+    delete _consts_;
+}
+
+BesselCalc::BesselCalc(const BesselCalc& other)
+{
+    numVals_ = int(other.numVals_);
+    _consts_ = new BesselConstants(*other._consts_);
+}
+
+BesselCalc& BesselCalc::operator=(const BesselCalc& other)
+{
+    numVals_ = int(other.numVals_);
+    _consts_ = new BesselConstants(*other._consts_);
+    return *this;
+}
+
+
+
+

@@ -70,11 +70,13 @@ public:
      Constructor given size and constants:
      */
     SHCalc(const int num_vals, const SHCalcConstants* _consts);
-
+    SHCalc(const SHCalc& other);  //copy constrctor
+    
+    virtual ~SHCalc();
+    
     void calc_sh(const double theta, const double phi); // calculate the spherical harmonics at every n, m  (store in this.Y_)
-    
+    SHCalc& operator=(const SHCalc& other);
     const cmplx get_result(const int n, const int m) const;  // retrieve the result for n, m values
-    
     const MyMatrix<cmplx> get_full_result() { return Y_; }  // retrieve the full calculated Y_ matrix
     
 };

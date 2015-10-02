@@ -53,6 +53,11 @@ public:
    Constructor if recursion constants have not already been calculated:
    */
   BesselCalc(int N, BesselConstants* _consts);
+    BesselCalc(const BesselCalc& other);
+    
+    virtual ~BesselCalc();
+    
+    BesselCalc& operator=(const BesselCalc& other);
   
   /*
    Calculate the modified sphereical bessel functions I and K 
@@ -64,6 +69,7 @@ public:
   const vector<double> calc_mbfK(const int n, const double z) const;
   
 };
+
 
 
 #endif /* BesselCalc_h */
