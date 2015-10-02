@@ -52,7 +52,7 @@ const vector<double> BesselCalc::calc_mbfK(const int n,
     double val;
     for (i = 2; i < n; i++)
     {
-        val = K[i-1] + z_sq * K[i-2] * _consts_->get_kconst_val(i);
+        val = K[i-1] + (z_sq * K[i-2] * _consts_->get_kconst_val(i-1));
         K.push_back(val);
     }
     return K;

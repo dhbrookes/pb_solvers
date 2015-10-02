@@ -45,7 +45,7 @@ class BesselCalc
 protected:
     
     int                 numVals_;  // order of the Bessel function
-    BesselConstants*    _consts_;  //constants used in recursion: Lotan 2006 eq3
+    BesselConstants*    _consts_;  // constants used in recursion: Lotan 2006 eq3
     
 public:
   
