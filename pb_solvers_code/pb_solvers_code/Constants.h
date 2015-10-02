@@ -13,7 +13,7 @@
 #include <math.h>
 
 
-/*
+/**
  Class for storing all relevant constants. Many have default values that are defined inline.
  Others are dependent on each and are defined in the constructor. 
  Absolute constants (i.e. those with values that will never change, are const and public)
@@ -23,16 +23,16 @@ class Constants
 protected:
     
     //Independent constants:
-    double bDist_ ; //= 100.0;  //!< Initial distance between 2 proteins for BD run
-    double qDist_ ; //= 500.0;  //!< Distance for molecules to be considered escaped
-    double fDist_ ; //= 100.0;  //!< Cutoff for protein force interactions
-    double dielectricWater_ ; //= 78.0;  //!< The dielectric constant of water
-    double dielectricProt_ ; //= 4.0;  //!< Dielectric constant of the protein
-    double saltConcentration_ ; //= 0.0100;  //!< [ Molar ]
-    double temp_ ; //= 353.0;  //!<  [ Kelvin ]
-    double tol_ ; //= 2.5;
-    double patchAngle_ ; //= 6.0;
-    double rotateAngle_ ; //= 20.0;
+    double bDist_;  //!< Initial distance between 2 proteins for BD run
+    double qDist_;  //!< Distance for molecules to be considered escaped
+    double fDist_;  //!< Cutoff for protein force interactions
+    double dielectricWater_;  //!< The dielectric constant of water
+    double dielectricProt_;  //!< Dielectric constant of the protein
+    double saltConcentration_;  //!< [ Molar ]
+    double temp_;  //!<  [ Kelvin ]
+    double tol_;
+    double patchAngle_;
+    double rotateAngle_;
     
     //Dependent constants:
     double KbT_;  //!< [kCal/mol] = [J/K]*[#/mol]*[K]*[kCal/J]

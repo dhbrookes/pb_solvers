@@ -21,11 +21,15 @@ const double Constants::ANGSTROM = 1e-10;  //!<  [ 1A = 1e-10 Meters ]
 const double Constants::PICO_SEC = 1e-12;  //!<  [ 1 ps = 1e-12 s ]
 
 
+/*
+ Constructor sets default values of independent constants
+ */
 Constants::Constants()
+:bDist_(100.0), qDist_(500.0), fDist_(100.0), dielectricWater_(78.0),
+dielectricProt_(4.0), saltConcentration_(0.0100), temp_(353.0), tol_(2.5),
+patchAngle_(6.0), rotateAngle_(20.0)
 {
-//    coulNum_ = E2 * AVOGADRO_NUM;
-//    coulDen_ = PERMITTIVITY_VAC * 4.0 * PI * ANGSTROM * KCAL;
-    update_all();
+	update_all();
 }
 
 
