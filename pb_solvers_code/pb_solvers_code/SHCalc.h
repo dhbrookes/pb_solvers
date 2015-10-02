@@ -14,6 +14,7 @@
 #include <vector>
 #include <math.h>
 #include <assert.h>
+#include "Constants.h"
 #include "MyMatrix.h"
 #include "util.h"
 
@@ -33,7 +34,7 @@ protected:
     vector<double>                  dubFac_;  // (2l-1)!! double factorial, for use in legendre recursion
     
 public:
-    SHCalcConstants(const int num_vals=30);
+    SHCalcConstants(const int num_vals=Constants::MAX_NUM_POLES);
     
     const double get_leg_consts1_val(const int n, const int m) const    { return legConsts1_(n, m); }
     const double get_leg_consts2_val(const int n, const int m) const    { return legConsts2_(n, m); }
@@ -66,9 +67,7 @@ protected:
 
 public:
     
-    /*
-     Constructor given size and constants:
-     */
+    SHCalc();
     SHCalc(const int num_vals, const SHCalcConstants* _consts);
     SHCalc(const SHCalc& other);  //copy constrctor
     
@@ -78,6 +77,7 @@ public:
     SHCalc& operator=(const SHCalc& other);
     const cmplx get_result(const int n, const int m) const;  // retrieve the result for n, m values
     const MyMatrix<cmplx> get_full_result() { return Y_; }  // retrieve the full calculated Y_ matrix
+    
     
 };
 

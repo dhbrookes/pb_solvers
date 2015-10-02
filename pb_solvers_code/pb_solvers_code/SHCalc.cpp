@@ -135,6 +135,14 @@ const complex<double> SHCalc::get_result(const int n, const int m) const
     }
 }
 
+SHCalc::SHCalc()
+:_consts_(), numVals_(Constants::MAX_NUM_POLES),
+P_(2 * Constants::MAX_NUM_POLES, 2 * Constants::MAX_NUM_POLES),
+Y_(2 * Constants::MAX_NUM_POLES, 2 * Constants::MAX_NUM_POLES)
+{
+    assert (_consts_->get_n() == numVals_);
+}
+
 SHCalc::~SHCalc()
 {
     delete _consts_;

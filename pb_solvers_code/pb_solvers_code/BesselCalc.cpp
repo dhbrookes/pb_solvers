@@ -94,6 +94,11 @@ const vector<double> BesselCalc::calc_mbfI(const int n,
   return I;
 }
 
+BesselCalc::BesselCalc()
+:numVals_(Constants::MAX_NUM_POLES)
+{
+    
+}
 
 BesselCalc::~BesselCalc()
 {

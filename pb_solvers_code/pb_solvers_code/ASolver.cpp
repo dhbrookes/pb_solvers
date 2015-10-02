@@ -185,5 +185,10 @@ delta_(other.delta_), N_(other.N_), E_(other.E_),
 consts_(other.consts_), all_sh(other.all_sh)
 {
     _besselCalc_ = new BesselCalc;
+    _besselCalc_ = other._besselCalc_;
+    
+    _shCalc_ = new SHCalc;
+    _shCalc_ = other._shCalc_;
+    
     
 }
