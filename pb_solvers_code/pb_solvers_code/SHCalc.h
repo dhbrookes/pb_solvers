@@ -14,6 +14,7 @@
 #include <vector>
 #include <math.h>
 #include <assert.h>
+#include <iostream>
 #include "MyMatrix.h"
 #include "util.h"
 
@@ -58,7 +59,7 @@ public:
                          P_(n,m)(cos(theta)) * exp(i*m*phi)
  where P_(n, m) are the associated Legendre polynomials.
  
- These are constrcucted dynamically and returned as a matrix of 
+ These are constructed dynamically and returned as a matrix of
    values for every n,m
  */
 class SHCalc
@@ -82,6 +83,8 @@ public:
 
   void calc_sh(const double theta, const double phi); // calculate SPH HARM
                                          //  at every n, m  (store in this.Y_)
+  
+  double get_legendre_result( int n, int m ); // retrieve part of Legendre
   
   const cmplx get_result(const int n, const int m) const;  // retrieve result 
                                                          // for n, m values

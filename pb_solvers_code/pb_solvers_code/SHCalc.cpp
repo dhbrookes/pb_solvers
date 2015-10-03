@@ -14,7 +14,7 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
 {
   vector<double> temp;
   temp.reserve(4 * numVals_);
-  temp.push_back(0);
+  temp.push_back(1.0);
   int i, n, m;
   for (i = 1; i < 4 * numVals_; i++)
   {
@@ -25,8 +25,15 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
   {
     for (m = 0; m <= n; m++)
     {
-//      legConsts1_.set_val(n, m, (2*n-1) / (n-m));
-//      legConsts2_.set_val(n, m, (n+m-1) / (n-m));
+      if ((n-m) != 0 )
+      {
+        legConsts1_.set_val(n, m, (2*n-1) / (double) (n-m));
+        legConsts2_.set_val(n, m, (n+m-1) / (double) (n-m));
+      } else
+      {
+        legConsts1_.set_val(n, m, 0.0);
+        legConsts2_.set_val(n, m, 0.0);
+      }
       shConsts_.set_val(n, m, temp[n-m] / temp[n+m]);
     }
   }
@@ -64,32 +71,42 @@ void SHCalc::calc_legendre(const double theta)
   P_.set_val(0, 0, 1.0);  // base value for recursion
   P_.set_val(1, 0, x);
   
-  int l, m, lInd, mInd;
+  int l, m;
   double val;
   for (l = 0; l < 2 * numVals_; l++)
   {
-    for (m = 0; m < l; m++)
+    for (m = 0; m <= l; m++)
     {
-      if ((l == 0 && m == 0) || (l == 1 && m == 0)) continue;  //skip base values
+      if ((l == 0 && m == 0) || (l == 1 && m == 0)) continue; //skip base values
       else if (l == m)
       {
-        val = pow(-1,(double)l) * _consts_->get_dub_fac_val(l) * pow(1-x*x, l/2); 
+        double dblL = (double) l;
+        val = pow(-1.0, dblL) * _consts_->get_dub_fac_val(l)
+                       * pow(1.0-x*x, dblL/2.0);
                                                              // (1) in doc string
       }
       else if (m == l + 1)
       {
         val = x * (2*l + 1) * P_(l, l);  // (2)
       }
-      else if (m <= l)
+      else if (m < l)
       {
         val = _consts_->get_leg_consts1_val(l, m) * x * P_(l-1, m) -
-              _consts_->get_leg_consts2_val(lInd, mInd) * P_(l-1, m); // (3)
+              _consts_->get_leg_consts2_val(l, m) * P_(l-2, m); // (3)
       }
-      P_.set_val(lInd, mInd, val);
+      P_.set_val(l, m, val);
     }
   }
 }
 
+
+/*
+ Return the results of the legendre calculation for an n, m.
+ */
+double SHCalc::get_legendre_result( int n, int m )
+{
+  return P_( n, m);
+}
 
 /*
  Calculate the spherical harmonics according to the equation:
@@ -111,8 +128,9 @@ void SHCalc::calc_sh(const double theta, const double phi)
     for (m = 0; m < 2*numVals_; m++)
     {
       shc = _consts_->get_sh_consts_val(n, m);
-      mcomp = complex<double> (m, 0);
-      val = pow(-1, (double) m) * shc * P_(n, m) * exp(iu * mcomp * phi);
+      double dblM = (double) m;
+      mcomp = complex<double> (dblM, 0.0);
+      val = pow(-1.0, dblM) * shc * P_(n, m) * exp(iu * mcomp * phi);
       Y_.set_val(n, m, val);
     }
   }
