@@ -57,7 +57,7 @@ const double ASolver::calc_indi_gamma(int i, int n) const
   double g;  // output
   double kap = consts_.get_kappa();
   double ai = sys_.get_ai(i);
-  double eps_p = consts_.get_dielectric_prot();  // IS THIS WHAT epsilon_p is?? ##########################!!!!!!!!#####################
+  double eps_p = consts_.get_dielectric_prot();
   double eps_s = consts_.get_dielectric_water();
   vector<double> bk_all = _besselCalc_->calc_mbfK(n+1, kap*ai); // all bessel function k
   double bk2 = bk_all[n];   // bessel k at n+1
