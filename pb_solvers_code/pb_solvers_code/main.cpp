@@ -15,6 +15,8 @@
 #include "System.h"
 #include "util.h"
 
+#include "tester.h"
+
 int main(int argc, const char * argv[])
 {
 }

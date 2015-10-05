@@ -22,17 +22,18 @@ using namespace std;
 
 
 /*
- Class for storing the constants that may be used in multiple spherical harmonics calculations
+ Class for storing the constants that may be used in 
+     multiple spherical harmonics calculations
  */
 class SHCalcConstants
 {
 protected:
-    int                             numVals_;  // number of poles
-    MyMatrix<double>                legConsts1_;  // (2l-1)/(l-m) for use in legendre computation
-    MyMatrix<double>                legConsts2_;  // (l+m-1)/(l-m) for use in legendre computation
-    MyMatrix<double>                shConsts_;  // sqrt((n-m)!/(n+m)!) in EQ1, Lotan 2006
-    vector<double>                  dubFac_;  // (2l-1)!! double factorial, for use in legendre recursion
-    
+  int                numVals_;    // number of poles
+  MyMatrix<double>   legConsts1_; // (2l-1)/(l-m) for use in legdre comp
+  MyMatrix<double>   legConsts2_; // (l+m-1)/(l-m) for use in legdre compn
+  MyMatrix<double>   shConsts_;  // sqrt((n-m)!/(n+m)!) in EQ1, Lotan 2006
+  vector<double>     dubFac_;    // (2l-1)!! double factrl, in legendre recursion
+  
 public:
     SHCalcConstants(const int num_vals=Constants::MAX_NUM_POLES);
     
@@ -49,10 +50,12 @@ public:
  calcualtion of the associated Legendre Polynomials
  
  The spherical harmonics in this case are defined by the equation:
- Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!) * P_(n,m)(cos(theta)) * exp(i*m*phi)
+ Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!) * 
+                         P_(n,m)(cos(theta)) * exp(i*m*phi)
  where P_(n, m) are the associated Legendre polynomials.
  
- These are constrcucted dynamically and returned as a matrix of values for every n,m
+ These are constructed dynamically and returned as a matrix of
+   values for every n,m
  */
 class SHCalc
 {

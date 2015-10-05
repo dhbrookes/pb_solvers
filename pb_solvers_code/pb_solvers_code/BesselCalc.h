@@ -23,10 +23,9 @@ using namespace std;
 class BesselConstants
 {
 protected:
-    int numVals_;
-    vector<double> kConsts_;  // recursion constants for k
-    vector<double> iConsts_;  // recursion constants for i
-    
+  int numVals_;
+  vector<double> kConsts_;  // recursion constants for k
+  
 public:
     
     BesselConstants(const int N=Constants::MAX_NUM_POLES);
@@ -62,9 +61,9 @@ public:
   
   /*
    Calculate the modified sphereical bessel functions I and K 
-    (MBF of the first and second kind, respectively).
+  (MBF of the first and second kind, respectively).
    Input is desired number of iterations an output is a vector 
-    containing the calculated value at every iteration
+  containing the calculated value at every iteration
    */
   const vector<double> calc_mbfI(const int n, const double z) const;
   const vector<double> calc_mbfK(const int n, const double z) const;

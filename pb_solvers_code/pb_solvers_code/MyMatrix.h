@@ -77,7 +77,7 @@ class MyMatrix
 protected:
     int                 nrows_;
     int                 ncols_;
-    vector< vector<T> > vals_;  //length of first vector is number of rows, length of second is ncols
+    vector< vector<T> >  vals_;  //length of first vector is number of rows, length of second is ncols
     
 
 public:
