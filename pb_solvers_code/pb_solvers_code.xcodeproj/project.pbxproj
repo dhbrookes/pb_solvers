@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		035E1AA41BC30D7700B2CFC9 /* ReExpCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 035E1AA21BC30D7700B2CFC9 /* ReExpCalc.cpp */; settings = {ASSET_TAGS = (); }; };
 		0364A8861BB494EC00850EB6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8851BB494EC00850EB6 /* main.cpp */; };
 		0364A88E1BB495E700850EB6 /* Constants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A88C1BB495E700850EB6 /* Constants.cpp */; settings = {ASSET_TAGS = (); }; };
 		0364A89B1BB605FB00850EB6 /* ASolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8991BB605FB00850EB6 /* ASolver.cpp */; settings = {ASSET_TAGS = (); }; };
@@ -28,6 +29,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		035E1AA21BC30D7700B2CFC9 /* ReExpCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ReExpCalc.cpp; sourceTree = "<group>"; };
+		035E1AA31BC30D7700B2CFC9 /* ReExpCalc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReExpCalc.h; sourceTree = "<group>"; };
 		0364A8821BB494EC00850EB6 /* pb_solvers_code */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = pb_solvers_code; sourceTree = BUILT_PRODUCTS_DIR; };
 		0364A8851BB494EC00850EB6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0364A88C1BB495E700850EB6 /* Constants.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Constants.cpp; sourceTree = "<group>"; };
@@ -93,6 +96,8 @@
 				0364A8A51BBA1E6F00850EB6 /* System.cpp */,
 				0364A8A61BBA1E6F00850EB6 /* System.h */,
 				52FC86F81BBDCE4A009E19F0 /* tester.h */,
+				035E1AA21BC30D7700B2CFC9 /* ReExpCalc.cpp */,
+				035E1AA31BC30D7700B2CFC9 /* ReExpCalc.h */,
 			);
 			path = pb_solvers_code;
 			sourceTree = "<group>";
@@ -157,6 +162,7 @@
 				0364A8A11BB60E7100850EB6 /* BesselCalc.cpp in Sources */,
 				0364A89B1BB605FB00850EB6 /* ASolver.cpp in Sources */,
 				0364A8861BB494EC00850EB6 /* main.cpp in Sources */,
+				035E1AA41BC30D7700B2CFC9 /* ReExpCalc.cpp in Sources */,
 				0364A88E1BB495E700850EB6 /* Constants.cpp in Sources */,
 				0364A8A71BBA1E6F00850EB6 /* System.cpp in Sources */,
 			);
