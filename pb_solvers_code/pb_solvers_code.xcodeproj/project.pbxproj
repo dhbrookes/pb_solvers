@@ -16,6 +16,21 @@
 		3DA744101BC2F36E0036BDDE /* gtest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7440F1BC2F36E0036BDDE /* gtest.framework */; };
 		3DA744161BC2FB3D0036BDDE /* BesselCalcUnitTest.h in Sources */ = {isa = PBXBuildFile; fileRef = 3DA744151BC2FB3D0036BDDE /* BesselCalcUnitTest.h */; };
 		3DA744181BC2FBC10036BDDE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA7440A1BC2F35B0036BDDE /* main.cpp */; };
+		3DA7441A1BC3153D0036BDDE /* ASolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8991BB605FB00850EB6 /* ASolver.cpp */; };
+		3DA7441B1BC3153D0036BDDE /* ASolver.h in Sources */ = {isa = PBXBuildFile; fileRef = 0364A89A1BB605FB00850EB6 /* ASolver.h */; };
+		3DA7441C1BC3153D0036BDDE /* BesselCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A89F1BB60E7100850EB6 /* BesselCalc.cpp */; };
+		3DA7441D1BC3153D0036BDDE /* BesselCalc.h in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A01BB60E7100850EB6 /* BesselCalc.h */; };
+		3DA7441E1BC3153D0036BDDE /* BesselCalcTest.h in Sources */ = {isa = PBXBuildFile; fileRef = 52FC86F51BBDAB55009E19F0 /* BesselCalcTest.h */; };
+		3DA7441F1BC3153D0036BDDE /* Constants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A88C1BB495E700850EB6 /* Constants.cpp */; };
+		3DA744201BC3153D0036BDDE /* Constants.h in Sources */ = {isa = PBXBuildFile; fileRef = 0364A88D1BB495E700850EB6 /* Constants.h */; };
+		3DA744221BC3153D0036BDDE /* MyMatrix.h in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8901BB496BF00850EB6 /* MyMatrix.h */; };
+		3DA744231BC3153D0036BDDE /* SHCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A21BB616B000850EB6 /* SHCalc.cpp */; };
+		3DA744241BC3153D0036BDDE /* SHCalc.h in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A31BB616B000850EB6 /* SHCalc.h */; };
+		3DA744251BC3153D0036BDDE /* SHCalcTest.h in Sources */ = {isa = PBXBuildFile; fileRef = 52FC86F91BBE011F009E19F0 /* SHCalcTest.h */; };
+		3DA744261BC3153D0036BDDE /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A51BBA1E6F00850EB6 /* System.cpp */; };
+		3DA744271BC3153D0036BDDE /* System.h in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8A61BBA1E6F00850EB6 /* System.h */; };
+		3DA744281BC3153D0036BDDE /* tester.h in Sources */ = {isa = PBXBuildFile; fileRef = 52FC86F81BBDCE4A009E19F0 /* tester.h */; };
+		3DA744291BC3153D0036BDDE /* util.h in Sources */ = {isa = PBXBuildFile; fileRef = 0364A8931BB4A90400850EB6 /* util.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,7 +72,8 @@
 		3DA744081BC2F35B0036BDDE /* Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Tests; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DA7440A1BC2F35B0036BDDE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3DA7440F1BC2F36E0036BDDE /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gtest.framework; path = ../../../../gtest.framework; sourceTree = "<group>"; };
-		3DA744151BC2FB3D0036BDDE /* BesselCalcUnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BesselCalcUnitTest.h; sourceTree = "<group>"; };
+		3DA744151BC2FB3D0036BDDE /* BesselCalcUnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BesselCalcUnitTest.h; path = ../pb_solvers_code/BesselCalcUnitTest.h; sourceTree = "<group>"; };
+		3DA7442A1BC319C20036BDDE /* SHCalcUnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHCalcUnitTest.h; sourceTree = "<group>"; };
 		52FC86F51BBDAB55009E19F0 /* BesselCalcTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BesselCalcTest.h; sourceTree = "<group>"; };
 		52FC86F81BBDCE4A009E19F0 /* tester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tester.h; sourceTree = "<group>"; };
 		52FC86F91BBE011F009E19F0 /* SHCalcTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHCalcTest.h; sourceTree = "<group>"; };
@@ -120,7 +136,6 @@
 				0364A8A61BBA1E6F00850EB6 /* System.h */,
 				52FC86F81BBDCE4A009E19F0 /* tester.h */,
 				0364A8931BB4A90400850EB6 /* util.h */,
-				3DA744151BC2FB3D0036BDDE /* BesselCalcUnitTest.h */,
 			);
 			path = pb_solvers_code;
 			sourceTree = "<group>";
@@ -128,7 +143,9 @@
 		3DA744091BC2F35B0036BDDE /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				3DA744151BC2FB3D0036BDDE /* BesselCalcUnitTest.h */,
 				3DA7440A1BC2F35B0036BDDE /* main.cpp */,
+				3DA7442A1BC319C20036BDDE /* SHCalcUnitTest.h */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -224,6 +241,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DA7441A1BC3153D0036BDDE /* ASolver.cpp in Sources */,
+				3DA7441B1BC3153D0036BDDE /* ASolver.h in Sources */,
+				3DA7441C1BC3153D0036BDDE /* BesselCalc.cpp in Sources */,
+				3DA7441D1BC3153D0036BDDE /* BesselCalc.h in Sources */,
+				3DA7441E1BC3153D0036BDDE /* BesselCalcTest.h in Sources */,
+				3DA7441F1BC3153D0036BDDE /* Constants.cpp in Sources */,
+				3DA744201BC3153D0036BDDE /* Constants.h in Sources */,
+				3DA744221BC3153D0036BDDE /* MyMatrix.h in Sources */,
+				3DA744231BC3153D0036BDDE /* SHCalc.cpp in Sources */,
+				3DA744241BC3153D0036BDDE /* SHCalc.h in Sources */,
+				3DA744251BC3153D0036BDDE /* SHCalcTest.h in Sources */,
+				3DA744261BC3153D0036BDDE /* System.cpp in Sources */,
+				3DA744271BC3153D0036BDDE /* System.h in Sources */,
+				3DA744281BC3153D0036BDDE /* tester.h in Sources */,
+				3DA744291BC3153D0036BDDE /* util.h in Sources */,
 				3DA744181BC2FBC10036BDDE /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -341,6 +373,7 @@
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				"HEADER_SEARCH_PATHS[arch=*]" = /Users/mariellesoniat/Desktop/PEM/PBSAM_ReWrite/pb_solvers/pb_solvers_code/pb_solvers_code;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;

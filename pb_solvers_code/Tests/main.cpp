@@ -12,14 +12,10 @@
 #include "gtest/gtest.h"
 
 #include "Constants.h"
-#include "MyMatrix.h"
-#include "ASolver.h"
-#include "BesselCalc.h"
-#include "SHCalc.h"
-#include "System.h"
 #include "util.h"
 
 #include "BesselCalcUnitTest.h"
+#include "SHCalcUnitTest.h"
 
 using namespace std ;
 
