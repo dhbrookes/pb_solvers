@@ -3,7 +3,7 @@
 //  pb_solvers_code
 //
 //  Created by Lisa Felberg on 10/1/15.
-//  Copyright © 2015 David Brookes. All rights reserved.
+//  Copyright © 2015 LF. All rights reserved.
 //
 
 #ifndef tester_h
@@ -31,6 +31,9 @@ public:
 		
 		SHCalcConstantsTest SHConT;
 		SHConT.TestSHCalcConstants();
+    
+    SHCalcTest SHCalcT;
+    SHCalcT.TestSHCalc();
 		
 		cout << "Complete all tests" << endl;
 		return 0;
