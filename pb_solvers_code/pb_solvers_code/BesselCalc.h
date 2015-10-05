@@ -41,28 +41,28 @@ public:
 class BesselCalc
 {
     
-    int                 numVals_;  // order of the Bessel function
-    BesselConstants*    _consts_;  // constants used in recursion: Lotan 2006 eq3
-    
-    
+  int                 numVals_;  // order of the Bessel function
+  BesselConstants*    _consts_;  // constants used in recursion: Lotan 2006 eq3
+
+  
 public:
     
-    BesselCalc();
-  
-    BesselCalc(int N, BesselConstants* _consts);
-    
-    BesselCalc(const BesselCalc& other);
-    
-    virtual ~BesselCalc();
-    
-    BesselCalc& operator=(const BesselCalc& other);
-  
+  BesselCalc();
+
+  BesselCalc(int N, BesselConstants* _consts);
+
+  BesselCalc(const BesselCalc& other);
+
+  virtual ~BesselCalc();
+
+  BesselCalc& operator=(const BesselCalc& other);
+
   /*
-   Calculate the modified sphereical bessel functions I and K 
+  Calculate the modified sphereical bessel functions I and K 
   (MBF of the first and second kind, respectively).
-   Input is desired number of iterations an output is a vector 
+  Input is desired number of iterations an output is a vector 
   containing the calculated value at every iteration
-   */
+  */
   const vector<double> calc_mbfI(const int n, const double z) const;
   const vector<double> calc_mbfK(const int n, const double z) const;
   

@@ -17,8 +17,8 @@ BesselConstants::BesselConstants(const int N)
   double kval;
   for (n = 0; n < 2*numVals_; n++)
   {
-      kval = 1.0 / ((2*n+1) * (2*n-1));
-      kConsts_.push_back(kval);
+    kval = 1.0 / ((2*n+1) * (2*n-1));
+    kConsts_.push_back(kval);
   }
 }
 
@@ -38,21 +38,21 @@ BesselCalc::BesselCalc(int N, BesselConstants* _consts)
 const vector<double> BesselCalc::calc_mbfK(const int n,
                                            const double z) const
 {
-    vector<double> K;
-    K.reserve(n);
-    
-    if (n > 0) K.push_back(1.0);
-    if (n > 1) K.push_back(1 + z);
-    
-    double z_sq = z * z;
-    int i;
-    double val;
-    for (i = 2; i < n; i++)
-    {
-        val = K[i-1] + (z_sq * K[i-2] * _consts_->get_kconst_val(i-1));
-        K.push_back(val);
-    }
-    return K;
+  vector<double> K;
+  K.reserve(n);
+  
+  if (n > 0) K.push_back(1.0);
+  if (n > 1) K.push_back(1 + z);
+  
+  double z_sq = z * z;
+  int i;
+  double val;
+  for (i = 2; i < n; i++)
+  {
+    val = K[i-1] + (z_sq * K[i-2] * _consts_->get_kconst_val(i-1));
+    K.push_back(val);
+  }
+  return K;
 }
 
 /*
@@ -69,24 +69,24 @@ const vector<double> BesselCalc::calc_mbfI(const int n,
   I.reserve(n);
   for (int k = 0; k < n; k++)
   {
-  I.push_back(1);
+    I.push_back(1);
   }
   
   if (z != 0)
   {
-  double y = 0.5 * z * z;
-  int k, j;
-  double t;
-  for (k = 0; k < n; k++)
-  {
-    t = y / (2*k + 3);
-    for (j = 1; j <= 20; j++)
+    double y = 0.5 * z * z;
+    int k, j;
+    double t;
+    for (k = 0; k < n; k++)
     {
-				I[k] += t;
-      t *= y / ((j+1) * (2 * (k+j) + 3 ));  //EQ 1.15
-      if (t < 1e-20) break;
+      t = y / (2*k + 3);
+      for (j = 1; j <= 20; j++)
+      {
+          I[k] += t;
+        t *= y / ((j+1) * (2 * (k+j) + 3 ));  //EQ 1.15
+        if (t < 1e-20) break;
+      }
     }
-  }
   }
   return I;
 }
@@ -99,22 +99,22 @@ BesselCalc::BesselCalc()
 
 BesselCalc::~BesselCalc()
 {
-    delete _consts_;
+  delete _consts_;
 }
 
 BesselCalc::BesselCalc(const BesselCalc& other)
 :numVals_(other.numVals_)
 {
-    _consts_ = new BesselConstants;
-    _consts_ = other._consts_;
+  _consts_ = new BesselConstants;
+  _consts_ = other._consts_;
 }
 
 BesselCalc& BesselCalc::operator=(const BesselCalc& other)
 {
-    numVals_ = int(other.numVals_);
-    _consts_ = new BesselConstants;
-    _consts_ = other._consts_;
-    return *this;
+  numVals_ = int(other.numVals_);
+  _consts_ = new BesselConstants;
+  _consts_ = other._consts_;
+  return *this;
 }
 
 

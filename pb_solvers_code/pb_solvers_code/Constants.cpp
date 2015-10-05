@@ -37,48 +37,48 @@ patchAngle_(6.0), rotateAngle_(20.0)
 
 void Constants::update_kbt()
 {
-    KbT_ = KB * AVOGADRO_NUM * temp_ / KCAL;
-    iKbT_ = 1 / KbT_;
+  KbT_ = KB * AVOGADRO_NUM * temp_ / KCAL;
+  iKbT_ = 1 / KbT_;
 }
 
 void Constants::update_kappa()
 {
-    double kap_num = sqrt(2 * saltConcentration_ * AVOGADRO_NUM * E2);
-    double kap_den = sqrt(LITRE * dielectricWater_ * PERMITTIVITY_VAC * KB * temp_);
+  double kap_num = sqrt(2 * saltConcentration_ * AVOGADRO_NUM * E2);
+  double kap_den = sqrt(LITRE * dielectricWater_ * PERMITTIVITY_VAC * KB * temp_);
     
-    kappa_ = ANGSTROM * kap_num * kap_den;
+  kappa_ = ANGSTROM * kap_num * kap_den;
 }
 
 void Constants::update_patch_size()
 {
-    patchSize_ = cos((patchAngle_ * PI) / 180.0);
+  patchSize_ = cos((patchAngle_ * PI) / 180.0);
 }
 
 void Constants::update_rotate_size()
 {
-    patchSize_ = cos((rotateAngle_ * PI) / 180.0);
+  patchSize_ = cos((rotateAngle_ * PI) / 180.0);
 }
 
 void Constants::update_all()
 {
-    update_kappa();
-    update_rotate_size();
-    update_kbt();
-    update_rotate_size();
+  update_kappa();
+  update_rotate_size();
+  update_kbt();
+  update_rotate_size();
 }
 
 const double Constants::convert_int_to_kcal_mol(double val)
 {
-    double coul_num = E2 * AVOGADRO_NUM;
-    double coul_den = PERMITTIVITY_VAC * 4.0 * PI * ANGSTROM * KCAL;
-    return val * (coul_num / coul_den );
+  double coul_num = E2 * AVOGADRO_NUM;
+  double coul_den = PERMITTIVITY_VAC * 4.0 * PI * ANGSTROM * KCAL;
+  return val * (coul_num / coul_den );
 }
 
 const double Constants::convert_int_to_jmol(double val)
 {
-    double coul_num = E2 * AVOGADRO_NUM;
-    double intj_den = PERMITTIVITY_VAC * 4.0 * PI * ANGSTROM; //IU units density
-    return val * (coul_num / intj_den);
+  double coul_num = E2 * AVOGADRO_NUM;
+  double intj_den = PERMITTIVITY_VAC * 4.0 * PI * ANGSTROM; //IU units density
+  return val * (coul_num / intj_den);
 }
                                                 
                                                 

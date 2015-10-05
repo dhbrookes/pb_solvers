@@ -24,33 +24,35 @@ class ASolver
 {
 protected:
     
-    int                         N_;  // number of molecules
-    int                         p_;  // max value for n (2*numVals_ usually)
-    VecOfMats<cmplx>::type      E_;
-    MatOfMats<double>::type     gamma_, delta_;
-    const BesselCalc*           _besselCalc_;
-    const System                sys_;  // system data (radii, charges, etc.)
-    const Constants             consts_;
-    SHCalc*                     _shCalc_;
+  int                         N_;  // number of molecules
+  int                         p_;  // max value for n (2*numVals_ usually)
+  VecOfMats<cmplx>::type      E_;
+  MatOfMats<double>::type     gamma_, delta_;
+  const BesselCalc*           _besselCalc_;
+  System                      sys_;  // system data (radii, charges, etc.)
+  Constants                   consts_;
+  SHCalc*                     _shCalc_;
     
-    // pre-computed spherical harmonics matrices for every charge in the system
-    // inner vector is all SH for all the charges in a molecule. Outer vector is every molecule
-    vector<vector<MyMatrix<cmplx> > > all_sh;
+  // pre-computed spherical harmonics matrices for every charge in the system
+  // inner vector is all SH for all the charges in a molecule. Outer vector is every molecule
+  vector<vector<MyMatrix<cmplx> > > all_sh;
     
-    vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol); // calculate the SH for all charges in a molecule
-    const double calc_indi_gamma(int i, int n) const;  // calculate one index of inner gamma matrix
-    const double calc_indi_delta(int i, int n) const;  // calculate on index of inner delta matrix
-    const cmplx calc_indi_e(int i, int n, int m);
+  vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol); // calculate the SH for all charges in a molecule
+  const double calc_indi_gamma(int i, int n) const;  // calculate one index of inner gamma matrix
+  const double calc_indi_delta(int i, int n) const;  // calculate on index of inner delta matrix
+  const cmplx calc_indi_e(int i, int n, int m);
     
-    void compute_gamma();  // compute the gamma matrix (as defined on page 544 of Lotan 2006)
-    void compute_delta();  //comput the delta
-    void compute_E();  // compute the E vector (equations on page 543 of Lotan 2006)
+  void compute_gamma();  // compute the gamma matrix (as defined on page 544 of Lotan 2006)
+  void compute_delta();  //comput the delta
+  void compute_E();  // compute the E vector (equations on page 543 of Lotan 2006)
 
 public:
     
-    ASolver(const int N, const int p, const BesselCalc* _bcalc, SHCalc* _shCalc, const System sys);
-    virtual ~ASolver();
-    ASolver(const ASolver& other);
+  ASolver(const int N, const int p, const BesselCalc* _bcalc, SHCalc* _shCalc, const System sys);
+  virtual ~ASolver();
+  ASolver(const ASolver& other);
+  ASolver& operator=(const ASolver& other);
+  
 };
 
 #endif /* ASolver_hpp */
