@@ -36,12 +36,17 @@ protected:
   
 public:
     SHCalcConstants(const int num_vals=Constants::MAX_NUM_POLES);
-    
-    const double get_leg_consts1_val(const int n, const int m) const    { return legConsts1_(n, m); }
-    const double get_leg_consts2_val(const int n, const int m) const    { return legConsts2_(n, m); }
-    const double get_sh_consts_val(const int n, const int m) const      { return shConsts_(n, m);   }
-    const double get_dub_fac_val(const int i) const                     { return dubFac_[i];        }
-    const int get_n() const                                             { return numVals_;          }
+  
+  const double get_leg_consts1_val(const int n, const int m) const    
+                                { return legConsts1_(n, m); }
+  const double get_leg_consts2_val(const int n, const int m) const    
+                                { return legConsts2_(n, m); }
+  const double get_sh_consts_val(const int n, const int m) const      
+                                { return shConsts_(n, m);   }
+  const double get_dub_fac_val(const int i) const                     
+                                { return dubFac_[i];        }
+  const int get_n() const                                             
+                                { return numVals_;           }
 };
 
 
@@ -60,13 +65,14 @@ public:
 class SHCalc
 {
 protected:
-    
-    int                         numVals_;  //number of poles (the output matrix will be 2Nx2N)
-    const SHCalcConstants*      _consts_;
-    MyMatrix<double>            P_;  // legendre polynomials
-    MyMatrix<cmplx>             Y_;  // the spherical harmonics calcualted by this class
-    
-    void calc_legendre(const double theta);  // calculate the legendre polynomial at every n, m (store in this.P_)
+  
+  int                     numVals_;  //# of poles (output matrix will be 2Nx2N)
+  const SHCalcConstants*  _consts_;
+  MyMatrix<double>        P_;  // legendre polynomials
+  MyMatrix<cmplx>         Y_;  // spherical harmonics calcualted by this class
+  
+  void calc_legendre(const double theta);  // calculate the legendre polynomial
+                                         //  at every n, m (store in this.P_)
 
 public:
     
@@ -81,7 +87,7 @@ public:
     const cmplx get_result(const int n, const int m) const;  // retrieve the result for n, m values
     const MyMatrix<cmplx> get_full_result() { return Y_; }  // retrieve the full calculated Y_ matrix
     
-    
+    double get_legendre_result( int n, int m );
 };
 
 #endif /* SHCalc_hpp */

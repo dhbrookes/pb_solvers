@@ -36,7 +36,7 @@ BesselCalc::BesselCalc(int N, BesselConstants* _consts)
  param n is the number of bessel functions to calculate
  */
 const vector<double> BesselCalc::calc_mbfK(const int n,
-                     const double z) const
+                                           const double z) const
 {
     vector<double> K;
     K.reserve(n);

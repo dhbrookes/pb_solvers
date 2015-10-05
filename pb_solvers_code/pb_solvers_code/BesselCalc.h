@@ -27,25 +27,23 @@ protected:
   vector<double> kConsts_;  // recursion constants for k
   
 public:
-    
-    BesselConstants(const int N=Constants::MAX_NUM_POLES);
-    
-    const int get_n() const                 { return numVals_; }
-    const double get_kconst_val(int i)      { return kConsts_[i]; }
-    const double get_iconst_val(int i)      { return iConsts_[i]; }
-    
+  
+  BesselConstants(const int N=Constants::MAX_NUM_POLES);
+  
+  const int get_n() const                 { return numVals_; }
+  const double get_kconst_val(int i)      { return kConsts_[i]; }
+  
 };
-
 
 /*
  Calculator class for modified bessel functions (spherical and standard)
  */
 class BesselCalc
 {
-protected:
     
     int                 numVals_;  // order of the Bessel function
     BesselConstants*    _consts_;  // constants used in recursion: Lotan 2006 eq3
+    
     
 public:
     
