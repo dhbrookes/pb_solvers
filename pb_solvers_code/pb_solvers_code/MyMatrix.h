@@ -24,7 +24,8 @@ protected:
   int nrows_, ncols_;
     
 public:
-  MatrixAccessException(const int i, const int j, const int nrows, const int ncols)
+  MatrixAccessException(const int i, const int j,
+                        const int nrows, const int ncols)
   :i_(i), j_(j), nrows_(nrows), ncols_(ncols)
   {
   }
@@ -32,7 +33,8 @@ public:
   virtual const char* what() const throw()
   {
     ostringstream ss;
-    ss << "Cannot access point [" << i_ << "," <<  j_ << "] in matrix of size (" << nrows_ << "," << ncols_ << ")" << endl;
+    ss << "Cannot access point [" << i_ << "," <<  j_ <<
+    "] in matrix of size (" << nrows_ << "," << ncols_ << ")" << endl;
     return ss.str().c_str();
   }
 };
@@ -50,9 +52,11 @@ protected:
   
 public:
     
-  MatrixArithmeticException(ArithmeticType type, const int nrows1, const int ncols1,
-                            const int nrows2, const int ncols2)
-  :nrows1_(nrows1), ncols1_(ncols1), nrows2_(nrows2), ncols2_(ncols2), type_(type)
+  MatrixArithmeticException(ArithmeticType type, const int nrows1,
+                            const int ncols1, const int nrows2,
+                            const int ncols2)
+  :nrows1_(nrows1), ncols1_(ncols1), nrows2_(nrows2),
+  ncols2_(ncols2), type_(type)
   {
   }
     
@@ -61,10 +65,13 @@ public:
       ostringstream ss;
       string start;
       if (type_ == ADDITION) start = "Cannot add matrices of sizes (";
-      else if (type_ == MULTIPLICATION) start = "Cannot multiply matrices of size (";
-      else if (type_ == INNER_PRODUCT) start = "Cannot find inner product of vectors of sizes (";
+      else if (type_ == MULTIPLICATION)
+        start = "Cannot multiply matrices of size (";
+      else if (type_ == INNER_PRODUCT)
+          start = "Cannot find inner product of vectors of sizes (";
       else start = "Unknown arithmetic error with matrices of sizes (";
-      ss << start << nrows1_ << "," << ncols1_ << ") and (" << nrows2_ << "," << ncols2_ << ")" << endl;
+        ss << start << nrows1_ << "," << ncols1_ << ") and (" <<
+        nrows2_ << "," << ncols2_ << ")" << endl;
       return ss.str().c_str();
   }
 
@@ -77,7 +84,8 @@ class MyMatrix
 protected:
   int                 nrows_;
   int                 ncols_;
-  vector< vector<T> >  vals_;  //length of first vector is number of rows, length of second is ncols
+  //length of first vector is number of rows, length of second is ncols:
+  vector< vector<T> >  vals_;
   
 
 public:
@@ -126,7 +134,8 @@ public:
   {
     if (ncols_ != rhs.ncols_ || nrows_ != rhs.nrows_)
     {
-      throw MatrixArithmeticException(ADDITION, nrows_, ncols_, rhs.nrows_, rhs.ncols_);
+      throw MatrixArithmeticException(ADDITION, nrows_, ncols_, rhs.nrows_,
+                                      rhs.ncols_);
     }
     
     MyMatrix<T> result = MyMatrix<T>(nrows_, ncols_);
@@ -148,7 +157,8 @@ public:
   {
       if (ncols_ != rhs.nrows_)
       {
-        throw MatrixArithmeticException(MULTIPLICATION, nrows_, ncols_, rhs.nrows_, rhs.ncols_);
+        throw MatrixArithmeticException(MULTIPLICATION, nrows_,
+                                        ncols_, rhs.nrows_, rhs.ncols_);
       }
       
       int n, m, p;
@@ -182,7 +192,8 @@ public:
         
         
 /*
- Vector class is implemented as extension of matrix class but with only one column
+ Vector class is implemented as extension of matrix class but 
+ with only one column
  */
 template<typename T>
 class MyVector : public MyMatrix<T>
@@ -226,8 +237,8 @@ public:
     {
       if (rhs->nrows_ != this->nrows)
       {
-        throw MatrixArithmeticException(INNER_PRODUCT, this->nrows_, this->ncols_,
-                                          rhs->nrows_, rhs->ncols_);
+        throw MatrixArithmeticException(INNER_PRODUCT, this->nrows_,
+                                        this->ncols_, rhs->nrows_, rhs->ncols_);
       }
       T out = T();
       int i;

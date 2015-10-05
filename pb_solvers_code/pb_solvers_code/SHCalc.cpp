@@ -83,8 +83,7 @@ void SHCalc::calc_legendre(const double theta)
       {
         double dblL = (double) l;
         val = pow(-1.0, dblL) * _consts_->get_dub_fac_val(l)
-                       * pow(1.0-x*x, dblL/2.0);
-                                                             // (1) in doc string
+                       * pow(1.0-x*x, dblL/2.0);  // (1) in doc string
       }
       else if (m == l + 1)
       {

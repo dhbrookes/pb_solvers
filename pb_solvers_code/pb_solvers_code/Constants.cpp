@@ -7,8 +7,8 @@
 //
 
 #include "Constants.h"
-
-const double Constants::PERMITTIVITY_VAC = 8.854187817e-12;  // [F/m]=[C2/J/m] , F = Farad
+// [F/m]=[C2/J/m] , F = Farad:
+const double Constants::PERMITTIVITY_VAC = 8.854187817e-12;
 const double Constants::KB = 1.380658e-23;  //!<  [ m^2 kg/ s^2 / K ] = [ J/K ]
 const double Constants::LITRE = 1e-3;  // [ m^3/L]
 const double Constants::PI = 3.141592654;
@@ -44,7 +44,8 @@ void Constants::update_kbt()
 void Constants::update_kappa()
 {
   double kap_num = sqrt(2 * saltConcentration_ * AVOGADRO_NUM * E2);
-  double kap_den = sqrt(LITRE * dielectricWater_ * PERMITTIVITY_VAC * KB * temp_);
+  double kap_den = sqrt(LITRE * dielectricWater_ *
+                        PERMITTIVITY_VAC * KB * temp_);
     
   kappa_ = ANGSTROM * kap_num * kap_den;
 }

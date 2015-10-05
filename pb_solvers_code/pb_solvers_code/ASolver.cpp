@@ -9,7 +9,8 @@
 #include "ASolver.h"
 
 
-ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc, SHCalc* _shCalc, const System sys)
+ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
+                 SHCalc* _shCalc, const System sys)
 :p_(p), _besselCalc_(_bcalc), consts_(sys.get_consts()), gamma_(N, N)
 ,delta_(N, N), E_(N), _shCalc_(_shCalc), sys_(sys), N_(sys.get_n())
 {
@@ -59,7 +60,8 @@ const double ASolver::calc_indi_gamma(int i, int n) const
   double ai = sys_.get_ai(i);
   double eps_p = consts_.get_dielectric_prot();
   double eps_s = consts_.get_dielectric_water();
-  vector<double> bk_all = _besselCalc_->calc_mbfK(n+1, kap*ai); // all bessel function k
+  // all bessel function k
+  vector<double> bk_all = _besselCalc_->calc_mbfK(n+1, kap*ai);
   double bk2 = bk_all[n];   // bessel k at n+1
   double bk1 = bk_all[n-1];  // bessel k at n
   
@@ -78,7 +80,8 @@ const double ASolver::calc_indi_delta(int i, int n) const
   double ai = sys_.get_ai(i);  // radius
   double eps_p = consts_.get_dielectric_prot();
   double eps_s = consts_.get_dielectric_water();
-  vector<double> bi_all = _besselCalc_->calc_mbfK(n+1, kap*ai); // all bessel function I
+  // all bessel function I:
+  vector<double> bi_all = _besselCalc_->calc_mbfK(n+1, kap*ai);
   double bi2 = bi_all[n];   // bessel i at n+1
   double bi1 = bi_all[n-1];  // bessel i at n
   
@@ -102,7 +105,8 @@ const cmplx ASolver::calc_indi_e(int i, int n, int m)
   {
     q = sys_.get_qij(i, j);
     rho = sys_.get_sph_posij(i, j).get_r();
-    e += q * rho * all_sh[i][j](n, m);  // q_ij * rho_ij * Y_(n,m)(theta_ij, phi_ij)
+    // q_ij * rho_ij * Y_(n,m)(theta_ij, phi_ij):
+    e += q * rho * all_sh[i][j](n, m);
   }
   return e;
 }
@@ -158,7 +162,8 @@ void ASolver::compute_E()
   MyMatrix<cmplx> ei;
   for (i = 0; i < N_; i++)
   {
-    ei = MyMatrix<cmplx>(p_, 2*p_ + 1);  // m goes from -n to n so you need 2*p columns
+    // m goes from -n to n so you need 2*p columns:
+    ei = MyMatrix<cmplx>(p_, 2*p_ + 1);
     for (n = 0; n < p_; n++)
     {
       for (m = -n; m < n; m++)

@@ -14,9 +14,11 @@
 
 
 /**
- Class for storing all relevant constants. Many have default values that are defined inline.
+ Class for storing all relevant constants. Many have default values that are 
+ defined inline.
  Others are dependent on each and are defined in the constructor. 
- Absolute constants (i.e. those with values that will never change, are const and public)
+ Absolute constants (i.e. those with values that will never change, are const 
+ and public)
  */
 class Constants
 {
@@ -60,7 +62,8 @@ public:
   
   Constants();
   
-  //The methods below update dependent constants (called when others are set in setter methods)
+  //The methods below update dependent constants (called when others are set in
+  //setter methods)
   void update_kbt();
   void update_kappa();
   void update_patch_size();
@@ -71,13 +74,33 @@ public:
   void set_b_dist(double val)                 { bDist_ = val; }
   void set_q_dist(double val)                 { qDist_ = val; }
   void set_f_dist(double val)                 { fDist_ = val; }
-  void set_dielectric_water(double val)       { dielectricWater_ = val; update_kappa(); }
+  void set_dielectric_water(double val)
+  {
+    dielectricWater_ = val;
+    update_kappa();
+  }
   void set_dielectric_prot(double val)        { dielectricProt_ = val; }
-  void set_salt_concentration(double val)     { saltConcentration_ = val; update_kappa(); }
-  void set_temp(double val)                   { temp_ = val; update_kappa(); update_kbt(); }
+  void set_salt_concentration(double val)
+  {
+    saltConcentration_ = val;
+    update_kappa();
+  }
+  void set_temp(double val)
+  {
+    temp_ = val;
+    update_kappa(); update_kbt();
+  }
   void set_tol(double val)                    { tol_ = val; }
-  void set_patch_angle(double val)            { patchAngle_ = val; update_patch_size(); }
-  void set_rotate_angle(double val)           { rotateAngle_ = val; update_rotate_size(); }
+  void set_patch_angle(double val)
+  {
+    patchAngle_ = val;
+    update_patch_size();
+  }
+  void set_rotate_angle(double val)
+  {
+    rotateAngle_ = val;
+    update_rotate_size();
+  }
   
   
   const double get_b_dist() const             { return bDist_; }
