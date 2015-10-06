@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "BesselCalcTest.h"
+#include "ConstantsTest.h"
 #include "SHCalcTest.h"
 
 /*
@@ -28,6 +29,9 @@ public:
 		
 		BesselCalcTest BCalcT;
 		BCalcT.TestBesselCalc();
+    
+    ConstantsTest ConT;
+    ConT.TestConstants();
 		
 		SHCalcConstantsTest SHConT;
 		SHConT.TestSHCalcConstants();
