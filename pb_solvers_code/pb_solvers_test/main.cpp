@@ -11,6 +11,7 @@
 #include <limits.h>
 #include "gtest/gtest.h"
 #include "BesselCalcUnitTest.h"
+#include "ConstantsUnitTest.h"
 #include "SHCalcUnitTest.h"
 
 #include "tester.h"
@@ -26,7 +27,6 @@ int main(int argc, char * argv[])
 {
   
   bool test = true;
-  
   if (test)
   {
     cout << "Welcome to test suite" << endl;
@@ -38,6 +38,7 @@ int main(int argc, char * argv[])
   
   if (gtest)
   {
+    double preclim = 1.0e-4;
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
   }

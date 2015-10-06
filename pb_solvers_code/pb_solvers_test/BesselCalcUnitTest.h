@@ -15,14 +15,13 @@ const int nPol = 10 ;
 double precLim = 1.0e-4;
 
 
-
 BesselConstants bConstTest = BesselConstants( nPol );
 BesselCalc bCalcTest = BesselCalc( nPol, &bConstTest ) ; 
 
 
 class BesselConstUTest : public ::testing::Test
 {
-  protected :
+protected :
 
   double kPreFactors[10] = { -1. , 0.33333333, 0.06666667,
              0.02857143, 0.01587302, 0.01010101,
@@ -47,7 +46,7 @@ TEST_F(BesselConstUTest, first10)
 
 class BesselCalcUTest : public ::testing::Test
 {
-  protected :
+protected :
 
   // for z = 1.0 and z = 10.0, calculated from python pbam_unit_test.py
   double i1[10] = {1.17520119e+00,   1.10363832e+00,   1.07344305e+00,

@@ -6,15 +6,15 @@
 //  Copyright (c) 2015 David Brookes. All rights reserved.
 //
 
-#ifndef pb_solvers_code_SHCalcUnitTest_h
-#define pb_solvers_code_SHCalcUnitTest_h
+#ifndef SHCalcUnitTest_h
+#define SHCalcUnitTest_h
 
 #include "SHCalc.h"
 
 const int nVals = 10 ;
-double preclim = 1.0e-4;
 
-SHCalcConstants SHConstTest( nPol );
+
+SHCalcConstants SHConstTest( nVals );
 
 
 class SHCalcUTest : public ::testing::Test
