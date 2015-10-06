@@ -18,7 +18,8 @@
 #include "util.h"
 
 /*
- This class is designed to compute the vector A defined in Equation 22 -- Lotan 2006, page 544
+ This class is designed to compute the vector A 
+            defined in Equation 22 -- Lotan 2006, page 544
  */
 class ASolver
 {
@@ -34,17 +35,21 @@ protected:
     SHCalc*                     _shCalc_;
     
     // pre-computed spherical harmonics matrices for every charge in the system
-    // inner vector is all SH for all the charges in a molecule. Outer vector is every molecule
+    // inner vector is all SH for all the charges in a molecule.
+    //   Outer vector is every molecule
     vector<vector<MyMatrix<cmplx> > > all_sh;
     
-    vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol); // calculate the SH for all charges in a molecule
-    const double calc_indi_gamma(int i, int n) const;  // calculate one index of inner gamma matrix
-    const double calc_indi_delta(int i, int n) const;  // calculate on index of inner delta matrix
+    vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol); // calc SH for all
+                                                        // chargs in a molecule
+    const double calc_indi_gamma(int i, int n) const;   // calculate 1 index of
+                                                        // inner gamma matrix
+    const double calc_indi_delta(int i, int n) const;   // calculate 1 index of
+                                                        // inner delta matrix
     const cmplx calc_indi_e(int i, int n, int m);
     
-    void compute_gamma();  // compute the gamma matrix (as defined on page 544 of Lotan 2006)
-    void compute_delta();  //comput the delta
-    void compute_E();  // compute the E vector (equations on page 543 of Lotan 2006)
+    void compute_gamma();  // compute gamma matrix (Defined on p.544 Lotan 2006)
+    void compute_delta();  // compute the delta
+    void compute_E();      // compute E vector (EQs on page 543 of Lotan 2006)
 
 public:
     

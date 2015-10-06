@@ -19,11 +19,10 @@
 
 int main(int argc, const char * argv[])
 {
-    cout << "Running PB solver." << endl ;	
+  cout << "Running PB solver." << endl ;
 	
 
-	bool test = false;
-	
+	bool test = true;
 	if (test)
 	{
 		cout << "Welcome to test suite" << endl;
