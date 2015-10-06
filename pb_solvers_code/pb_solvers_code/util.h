@@ -82,7 +82,7 @@ public:
   :x_(x), y_(y), z_(z)
   {
   }
-
+  
   const SphPoint<T> convert_to_spherical() const
   {
     T r, theta, phi;
@@ -91,7 +91,7 @@ public:
     phi = atan(sqrt(x_*x_ + y_*y_) / z_);
     return SphPoint<T>(r, theta, phi);
   }
-
+  
   const T& get_x() const  { return x_; }
   const T& get_y() const  { return y_; }
   const T& get_z() const  { return z_; }
@@ -108,7 +108,7 @@ protected:
   T r_;
   T theta_;
   T phi_;
-    
+  
 public:
   SphPoint(T r=T(), T theta=T(), T phi=T())
   :r_(r), theta_(theta), phi_(phi)

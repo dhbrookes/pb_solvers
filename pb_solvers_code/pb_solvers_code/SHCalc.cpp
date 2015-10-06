@@ -29,8 +29,7 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
       {
         legConsts1_.set_val(n, m, (2*n-1) / (double) (n-m));
         legConsts2_.set_val(n, m, (n+m-1) / (double) (n-m));
-      }
-      else
+      } else
       {
         legConsts1_.set_val(n, m, 0.0);
         legConsts2_.set_val(n, m, 0.0);
@@ -49,8 +48,8 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
 }
 
 SHCalc::SHCalc(const int num_vals, const SHCalcConstants* _consts)
-:_consts_(_consts), numVals_(num_vals), P_(2 * num_vals, 2 * num_vals),
-Y_(2 * num_vals, 2 * num_vals)
+:_consts_(_consts), numVals_(num_vals), P_(2 * numVals_, 2 * numVals_),
+Y_(2 * numVals_, 2 * numVals_)
 {
   assert (_consts_->get_n() == numVals_);
 }
@@ -154,39 +153,3 @@ const complex<double> SHCalc::get_result(const int n, const int m) const
     return Y_(n, m);
   }
 }
-
-SHCalc::SHCalc()
-:_consts_(), numVals_(Constants::MAX_NUM_POLES),
-P_(2 * Constants::MAX_NUM_POLES, 2 * Constants::MAX_NUM_POLES),
-Y_(2 * Constants::MAX_NUM_POLES, 2 * Constants::MAX_NUM_POLES)
-{
-    assert (_consts_->get_n() == numVals_);
-}
-
-SHCalc::~SHCalc()
-{
-  delete _consts_;
-}
-
-
-SHCalc::SHCalc(const SHCalc& other)
-:numVals_(other.numVals_), P_(other.P_),
-Y_(other.Y_)
-{
-  _consts_ = new SHCalcConstants;
-  _consts_ = other._consts_;
-}
-
-
-SHCalc& SHCalc::operator=(const SHCalc& other)
-{
-  _consts_ = new SHCalcConstants;
-  _consts_ = other._consts_;
-  numVals_ = int(other.numVals_);
-  P_ = MyMatrix<double>(other.P_);
-  Y_ = MyMatrix<cmplx>(other.Y_);
-  return *this;
-}
-
-
-

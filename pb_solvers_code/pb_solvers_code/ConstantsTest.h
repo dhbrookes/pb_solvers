@@ -2,7 +2,7 @@
 //  ConstantsTest.h
 //  pb_solvers_code
 //
-//  Created by Lisa Felberg on 10/5/15.
+//  Created by Lisa Felberg on 10/6/15.
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
@@ -25,11 +25,11 @@ public:
     
     // With system defaults, testing kappa calc
     assert( abs(ConstTest.get_kappa() - 0.03030729144) < precLim );
-
+    
     // check Kappa after changing \( eps_s \)
     ConstTest.set_dielectric_water( 40.0 );
     assert( abs(ConstTest.get_kappa() - 0.04232182927) < precLim );
-
+    
     // check Kappa after changing Salt concentration \( Molar \)
     ConstTest.set_salt_concentration( 0.05 );
     assert( abs(ConstTest.get_kappa() - 0.09463448717) < precLim );

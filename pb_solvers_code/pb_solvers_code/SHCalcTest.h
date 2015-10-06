@@ -10,6 +10,7 @@
 #define SHCalcTest_h
 
 #include "SHCalc.h"
+
 using namespace std;
 
 /*

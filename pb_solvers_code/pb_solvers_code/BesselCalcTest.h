@@ -38,7 +38,7 @@ public:
 			                          0.00309598 };
 
     for (int i = 0; i < nPol; i++) // check that our prefactors are right
-      assert( abs(kPreFactors[i]-bConstTest.get_kconst_val( i )) < precLim);
+      assert( abs((double) (kPreFactors[i]-bConstTest.get_kconst_val( i ))) < precLim);
 	}
 }; // end BesselConstantsTest
 

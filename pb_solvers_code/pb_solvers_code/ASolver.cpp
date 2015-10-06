@@ -9,8 +9,8 @@
 #include "ASolver.h"
 
 
-ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
-                 SHCalc* _shCalc, const System sys)
+ASolver::ASolver(const vector<double>* a, const int N, const int p,
+     const BesselCalc* _bcalc, SHCalc* _shCalc, const System sys)
 :p_(p), _besselCalc_(_bcalc), consts_(sys.get_consts()), gamma_(N, N)
 ,delta_(N, N), E_(N), _shCalc_(_shCalc), sys_(sys), N_(sys.get_n())
 {
@@ -58,10 +58,9 @@ const double ASolver::calc_indi_gamma(int i, int n) const
   double g;  // output
   double kap = consts_.get_kappa();
   double ai = sys_.get_ai(i);
-  double eps_p = consts_.get_dielectric_prot();
+  double eps_p = consts_.get_dielectric_prot(); 
   double eps_s = consts_.get_dielectric_water();
-  // all bessel function k
-  vector<double> bk_all = _besselCalc_->calc_mbfK(n+1, kap*ai);
+  vector<double> bk_all = _besselCalc_->calc_mbfK(n+1, kap*ai);// all bessel function k
   double bk2 = bk_all[n];   // bessel k at n+1
   double bk1 = bk_all[n-1];  // bessel k at n
   
@@ -80,8 +79,7 @@ const double ASolver::calc_indi_delta(int i, int n) const
   double ai = sys_.get_ai(i);  // radius
   double eps_p = consts_.get_dielectric_prot();
   double eps_s = consts_.get_dielectric_water();
-  // all bessel function I:
-  vector<double> bi_all = _besselCalc_->calc_mbfK(n+1, kap*ai);
+  vector<double> bi_all = _besselCalc_->calc_mbfK(n+1, kap*ai); // all bessel function I
   double bi2 = bi_all[n];   // bessel i at n+1
   double bi1 = bi_all[n-1];  // bessel i at n
   
@@ -105,9 +103,10 @@ const cmplx ASolver::calc_indi_e(int i, int n, int m)
   {
     q = sys_.get_qij(i, j);
     rho = sys_.get_sph_posij(i, j).get_r();
-    // q_ij * rho_ij * Y_(n,m)(theta_ij, phi_ij):
     e += q * rho * all_sh[i][j](n, m);
+    // q_ij * rho_ij * Y_(n,m)(theta_ij, phi_ij)
   }
+  
   return e;
 }
 
@@ -128,7 +127,7 @@ void ASolver::compute_gamma()
       gi.set_val(j, j, calc_indi_gamma(i, j));
     }
     gamma_.set_val(i, i, gi);
-}
+  }
 }
 
 
@@ -162,8 +161,7 @@ void ASolver::compute_E()
   MyMatrix<cmplx> ei;
   for (i = 0; i < N_; i++)
   {
-    // m goes from -n to n so you need 2*p columns:
-    ei = MyMatrix<cmplx>(p_, 2*p_ + 1);
+    ei = MyMatrix<cmplx>(p_, 2*p_ + 1);// m goes from [-n, n], need 2*p columns
     for (n = 0; n < p_; n++)
     {
       for (m = -n; m < n; m++)
@@ -176,42 +174,6 @@ void ASolver::compute_E()
 }
 
 
-ASolver::~ASolver()
-{
-  delete _besselCalc_;
-  delete _shCalc_;
-}
 
 
-ASolver::ASolver(const ASolver& other)
-:sys_(other.sys_), p_(other.p_), gamma_(other.gamma_),
-delta_(other.delta_), N_(other.N_), E_(other.E_),
-consts_(other.consts_), all_sh(other.all_sh)
-{
-  _besselCalc_ = new BesselCalc;
-  _besselCalc_ = other._besselCalc_;
-  
-  _shCalc_ = new SHCalc;
-  _shCalc_ = other._shCalc_;
-    
-    
-}
-
-ASolver& ASolver::operator=(const ASolver& other)
-{
-  _besselCalc_ = new BesselCalc;
-  _shCalc_ = new SHCalc;
-  _besselCalc_ = other._besselCalc_;
-  _shCalc_ = other._shCalc_;
-  
-  sys_ = System(other.sys_);
-  gamma_ = MatOfMats<double>::type(other.gamma_);
-  delta_ = MatOfMats<double>::type(other.delta_);
-  E_ = VecOfMats<cmplx>::type(other.E_);
-  N_ = int(other.N_);
-  p_ = int(other.p_);
-  consts_ = Constants(other.consts_);
-  all_sh = vector<vector<MyMatrix<cmplx> > >(other.all_sh);
-  return *this;
-}
 

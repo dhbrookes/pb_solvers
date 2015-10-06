@@ -10,18 +10,19 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
-#include <math.h>
+#include <cmath>
 
 /**
- Class for storing all relevant constants. 
-    Many have default values that are defined inline.
-    Others are dependent on each and are defined in the constructor.
-    Absolute constants (i.e. those with values that will 
-                        never change, are const and public)
+ Class for storing all relevant constants.
+ Many have default values that are defined inline.
+ Others are dependent on each and are defined in the constructor.
+ Absolute constants (i.e. those with values that will
+ never change, are const and public)
  */
 class Constants
 {
 protected:
+  
   //Independent constants:
   double bDist_;  //!< Initial dist btw 2 proteins for BD run
   double qDist_;  //!< Dist for molecules to be considered escaped
@@ -40,13 +41,11 @@ protected:
   double kappa_;  //!< Inverse debye length [1/A]
   double patchSize_;  //(cos(PATCH_ANGLE * M_PI / 180.0))
   double rotateSize_;  //(cos(ROTATE_ANGLE * M_PI / 180.0))
-    
+  
 public:
-    
-  static const int MAX_NUM_POLES;
   
   //Absolute constants:
-  static const double PERMITTIVITY_VAC;  // [F/m]=[C2/J/m] , F = Farad
+  static const double PERMITTIVITY_VAC;  // [F/m]=[C2/J/m],F=Farad
   static const double KB; //!<  [ m^2 kg/ s^2 / K ] = [ J/K ]
   static const double LITRE; // [ m^3/L]
   static const double PI;
@@ -69,46 +68,33 @@ public:
   void update_all(); // calls all of the above methods
   
   //Setter methods. Some call update methods if necessary
-  void set_b_dist(double val)                 { bDist_ = val; }
-  void set_q_dist(double val)                 { qDist_ = val; }
-  void set_f_dist(double val)                 { fDist_ = val; }
+  void set_b_dist(double val)             { bDist_ = val; }
+  void set_q_dist(double val)             { qDist_ = val; }
+  void set_f_dist(double val)             { fDist_ = val; }
   void set_dielectric_water(double val)
-  {
-    dielectricWater_ = val;
-    update_kappa();
-  }
-  void set_dielectric_prot(double val)        { dielectricProt_ = val; }
+  { dielectricWater_ = val; update_kappa(); }
+  void set_dielectric_prot(double val)
+  { dielectricProt_ = val; }
   void set_salt_concentration(double val)
-  {
-    saltConcentration_ = val;
-    update_kappa();
-  }
+  { saltConcentration_ = val; update_kappa(); }
   void set_temp(double val)
-  {
-    temp_ = val;
-    update_kappa(); update_kbt();
-  }
-  void set_tol(double val)                    { tol_ = val; }
+  { temp_ = val; update_kappa(); update_kbt(); }
+  void set_tol(double val)                { tol_ = val; }
   void set_patch_angle(double val)
-  {
-    patchAngle_ = val;
-    update_patch_size();
-  }
+  { patchAngle_ = val; update_patch_size(); }
   void set_rotate_angle(double val)
-  {
-    rotateAngle_ = val;
-    update_rotate_size();
-  }
+  { rotateAngle_ = val; update_rotate_size(); }
+  
   
   const double get_b_dist() const         { return bDist_; }
   const double get_q_dist() const         { return qDist_; }
   const double get_f_dist() const         { return fDist_; }
   const double get_dielectric_water() const
-               { return dielectricWater_; }
+  { return dielectricWater_; }
   const double get_dielectric_prot()  const
-               { return dielectricProt_; }
+  { return dielectricProt_; }
   const double get_salt_concentration() const
-               { return saltConcentration_; }
+  { return saltConcentration_; }
   const double get_temp() const           { return temp_; }
   const double get_tol() const            { return tol_; }
   const double get_kbt() const            { return KbT_; }

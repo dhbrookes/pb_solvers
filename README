@@ -1,0 +1,8 @@
+For the simple schemes:
+
+Need to change the Search Paths : User Header Search Paths
+to where your code is on the local machine!
+
+For gtest, it's a little more complicated...
+
+
