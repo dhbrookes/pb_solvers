@@ -69,11 +69,7 @@
 		0364A8A31BB616B000850EB6 /* SHCalc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHCalc.h; sourceTree = "<group>"; };
 		0364A8A51BBA1E6F00850EB6 /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = System.cpp; sourceTree = "<group>"; };
 		0364A8A61BBA1E6F00850EB6 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.h; sourceTree = "<group>"; };
-		3DA744081BC2F35B0036BDDE /* Tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Tests; sourceTree = BUILT_PRODUCTS_DIR; };
-		3DA7440A1BC2F35B0036BDDE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		3DA7440F1BC2F36E0036BDDE /* gtest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = gtest.framework; path = ../../../../gtest.framework; sourceTree = "<group>"; };
-		3DA744151BC2FB3D0036BDDE /* BesselCalcUnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BesselCalcUnitTest.h; path = ../pb_solvers_code/BesselCalcUnitTest.h; sourceTree = "<group>"; };
-		3DA7442A1BC319C20036BDDE /* SHCalcUnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHCalcUnitTest.h; sourceTree = "<group>"; };
+		52795C1C1BC3226200864974 /* ConstantsTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConstantsTest.h; sourceTree = "<group>"; };
 		52FC86F51BBDAB55009E19F0 /* BesselCalcTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BesselCalcTest.h; sourceTree = "<group>"; };
 		52FC86F81BBDCE4A009E19F0 /* tester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tester.h; sourceTree = "<group>"; };
 		52FC86F91BBE011F009E19F0 /* SHCalcTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHCalcTest.h; sourceTree = "<group>"; };
@@ -120,6 +116,12 @@
 		0364A8841BB494EC00850EB6 /* pb_solvers_code */ = {
 			isa = PBXGroup;
 			children = (
+				0364A88C1BB495E700850EB6 /* Constants.cpp */,
+				0364A88D1BB495E700850EB6 /* Constants.h */,
+				52795C1C1BC3226200864974 /* ConstantsTest.h */,
+				0364A8851BB494EC00850EB6 /* main.cpp */,
+				0364A8901BB496BF00850EB6 /* MyMatrix.h */,
+				0364A8931BB4A90400850EB6 /* util.h */,
 				0364A8991BB605FB00850EB6 /* ASolver.cpp */,
 				0364A89A1BB605FB00850EB6 /* ASolver.h */,
 				0364A89F1BB60E7100850EB6 /* BesselCalc.cpp */,
