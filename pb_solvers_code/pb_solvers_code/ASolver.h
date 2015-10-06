@@ -18,7 +18,8 @@
 #include "util.h"
 
 /*
- This class is designed to compute the vector A defined in Equation 22 -- Lotan 2006, page 544
+ This class is designed to compute the vector A 
+            defined in Equation 22 -- Lotan 2006, page 544
  */
 class ASolver
 {
@@ -33,6 +34,7 @@ protected:
   Constants                   consts_;
   SHCalc*                     _shCalc_;
     
+<<<<<<< HEAD
   // pre-computed spherical harmonics matrices for every charge in the system
   // inner vector is all SH for all the charges in a molecule. Outer vector is every molecule
   vector<vector<MyMatrix<cmplx> > > all_sh;
@@ -55,7 +57,6 @@ protected:
   
   // compute the E vector (equations on page 543 of Lotan 2006)
   void compute_E();
-
 public:
     
   ASolver(const int N, const int p, const BesselCalc* _bcalc,

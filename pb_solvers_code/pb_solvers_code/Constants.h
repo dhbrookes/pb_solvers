@@ -12,21 +12,19 @@
 
 #include <math.h>
 
-
 /**
- Class for storing all relevant constants. Many have default values that are 
- defined inline.
- Others are dependent on each and are defined in the constructor. 
- Absolute constants (i.e. those with values that will never change, are const 
- and public)
+ Class for storing all relevant constants. 
+    Many have default values that are defined inline.
+    Others are dependent on each and are defined in the constructor.
+    Absolute constants (i.e. those with values that will 
+                        never change, are const and public)
  */
 class Constants
 {
 protected:
-    
   //Independent constants:
-  double bDist_;  //!< Initial distance between 2 proteins for BD run
-  double qDist_;  //!< Distance for molecules to be considered escaped
+  double bDist_;  //!< Initial dist btw 2 proteins for BD run
+  double qDist_;  //!< Dist for molecules to be considered escaped
   double fDist_;  //!< Cutoff for protein force interactions
   double dielectricWater_;  //!< The dielectric constant of water
   double dielectricProt_;  //!< Dielectric constant of the protein
@@ -62,8 +60,8 @@ public:
   
   Constants();
   
-  //The methods below update dependent constants (called when others are set in
-  //setter methods)
+  //The methods below update dependent constants
+  //  (called when others are set in setter methods)
   void update_kbt();
   void update_kappa();
   void update_patch_size();
@@ -102,24 +100,27 @@ public:
     update_rotate_size();
   }
   
+  const double get_b_dist() const         { return bDist_; }
+  const double get_q_dist() const         { return qDist_; }
+  const double get_f_dist() const         { return fDist_; }
+  const double get_dielectric_water() const
+               { return dielectricWater_; }
+  const double get_dielectric_prot()  const
+               { return dielectricProt_; }
+  const double get_salt_concentration() const
+               { return saltConcentration_; }
+  const double get_temp() const           { return temp_; }
+  const double get_tol() const            { return tol_; }
+  const double get_kbt() const            { return KbT_; }
+  const double get_ikbt() const           { return iKbT_; }
+  const double get_kappa() const          { return kappa_; }
+  const double get_patch_size() const     { return patchSize_; }
+  const double get_rotate_size() const    { return rotateSize_; }
   
-  const double get_b_dist() const             { return bDist_; }
-  const double get_q_dist() const             { return qDist_; }
-  const double get_f_dist() const             { return fDist_; }
-  const double get_dielectric_water() const   { return dielectricWater_; }
-  const double get_dielectric_prot()  const   { return dielectricProt_; }
-  const double get_salt_concentration() const { return saltConcentration_; }
-  const double get_temp() const               { return temp_; }
-  const double get_tol() const                { return tol_; }
-  const double get_kbt() const                { return KbT_; }
-  const double get_ikbt() const               { return iKbT_; }
-  const double get_kappa() const              { return kappa_; }
-  const double get_patch_size() const         { return patchSize_; }
-  const double get_rotate_size() const        { return rotateSize_; }
-  
-  //convert a value from international units to mol units:
+  //convert a value from international units to given units:
   static const double convert_int_to_kcal_mol(double val);
   static const double convert_int_to_jmol(double val);
+  double convert_int_to_kT(double val);
   
 };
 
