@@ -69,11 +69,25 @@ protected:
 class ReExpCoeffs
 {
 protected:
-  vector<MyMatrix<cmplx> >  R_;  // Rotation coefficient matrices (labeled R '
-                                // matrix in Lotan 2006)
-  vector<MyMatrix<cmplx> >  S_;  // From Lotan 2006 Eq 34
-  ReExpCoeffsConstants*     _consts_;
   
+  int p_; // max value of n when solving for A
+  vector<MyMatrix<cmplx> >  R_;  // rotation coefficients
+  vector<MyMatrix<cmplx> >  S_;  // translation coefficients
+  ReExpCoeffsConstants*     _theseConsts_;
+  Constants*                _consts_;
+  
+  void calc_r(double theta);  // calculate all the values for R_
+  void calc_s(); // calculate all the values for S_
+  
+public:
+  
+  ReExpCoeffs();
+  ReExpCoeffs(int p, ReExpCoeffsConstants* _consts);
+  virtual ~ReExpCoeffs();
+  ReExpCoeffs& operator=(const ReExpCoeffs* other);
+  
+  cmplx get_rval(int n, int m, int s) { return R_[n](m, s); }
+  cmplx get_sval(int i, int n, int m) { return S_[i](n, m); }
   
   
 };

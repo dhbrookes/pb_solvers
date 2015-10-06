@@ -64,6 +64,7 @@ public:
   ASolver(const ASolver& other);
   ASolver& operator=(const ASolver& other);
   
+  
 };
 
 #endif /* ASolver_hpp */

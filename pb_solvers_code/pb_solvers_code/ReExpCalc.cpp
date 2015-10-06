@@ -7,3 +7,9 @@
 //
 
 #include "ReExpCalc.h"
+
+
+ReExpCoeffs()
+:
+{
+}
