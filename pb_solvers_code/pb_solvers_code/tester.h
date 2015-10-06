@@ -33,9 +33,6 @@ public:
     
     ConstantsTest ConT;
     ConT.TestConstants();
-    
-    MyMatrixTest MatT;
-    MatT.TestMatrix();
 		
 		SHCalcConstantsTest SHConT;
 		SHConT.TestSHCalcConstants();

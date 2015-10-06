@@ -10,6 +10,10 @@
 
 #include <limits.h>
 #include "gtest/gtest.h"
+
+double preclim = 1.0e-4;
+const int nvals = 10 ;
+
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
 #include "SHCalcUnitTest.h"
@@ -38,7 +42,6 @@ int main(int argc, char * argv[])
   
   if (gtest)
   {
-    double preclim = 1.0e-4;
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
   }

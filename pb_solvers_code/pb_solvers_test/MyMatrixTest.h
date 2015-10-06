@@ -15,14 +15,16 @@ using namespace std;
 /*
  Class for testing matrix class
  */
-class MyMatrixTest
+class MyMatrixUTest  : public ::testing::Test
 {
+protected:
+  MyMatrix <double> testMat_;
+  
 public:
-  void TestMatrix( )
+  MyMatrixUTest( )
   {
     const int nCol = 4;
     const int nRow = 2;
-    //double precLim = 1.0e-4;
     
     double val = 1.0;
     vector< vector<double> > testInp;
@@ -38,15 +40,23 @@ public:
       }
     }
     
-    MyMatrix <double> Mat( testInp );
+    MyMatrix <double> testMat_( testInp );
     
-//    BesselConstants bConstTest = BesselConstants( nPol );
-//    assert( bConstTest.get_n() == nPol ); // make sure numVals stores right
-//
-//    
-//    for (int i = 0; i < nPol; i++) // check that our prefactors are right
-//      assert( abs(kPreFactors[i]-bConstTest.get_kconst_val( i )) < precLim);
   }
+
+protected :
+  virtual void SetUp() {}
+  virtual void TearDown() {}
 }; // end MyMatrixTest
+
+
+
+TEST_F(MyMatrixUTest, settingAndCalc)
+{
+//  EXPECT_NEAR( ConstUTest.convert_int_to_kcal_mol( 1.0 ), 332.061203, preclim);
+}
+
+
+
 
 #endif /* MyMatrixTest_h */

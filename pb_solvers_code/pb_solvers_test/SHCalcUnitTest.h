@@ -11,10 +11,7 @@
 
 #include "SHCalc.h"
 
-const int nVals = 10 ;
-
-
-SHCalcConstants SHConstTest( nVals );
+SHCalcConstants SHConstTest( nvals );
 
 
 class SHCalcUTest : public ::testing::Test
@@ -34,14 +31,19 @@ class SHCalcUTest : public ::testing::Test
     
   virtual void SetUp() {}
   virtual void TearDown() {}
+  
+  SHCalcConstants SHConstTest;
+public:
+  SHCalcUTest( ) : SHConstTest( nvals ) {  }
+  
 };
 
 
 TEST_F(SHCalcUTest, first10)
 {
-  ASSERT_EQ( SHConstTest.get_n() , nVals ); // make sure numVals stores right
+  ASSERT_EQ( SHConstTest.get_n() , nvals ); // make sure numVals stores right
 
-  for (int i = 0; i < nPol; i++) // check that our prefactors are right
+  for (int i = 0; i < nvals; i++) // check that our prefactors are right
   {
     EXPECT_NEAR( SHConstTest.get_dub_fac_val(i), doubleFactorial[i], preclim);
   }
