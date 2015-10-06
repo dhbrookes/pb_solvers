@@ -21,8 +21,8 @@ int main(int argc, const char * argv[])
 {
     cout << "Running PB solver." << endl ;	
 	
-/*
-	bool test = true;
+
+	bool test = false;
 	
 	if (test)
 	{
@@ -30,7 +30,6 @@ int main(int argc, const char * argv[])
 		CTester allTest = CTester();
 		allTest.unitTest( argc, argv );
 	}
-*/
 	
 	return 0;
 }
