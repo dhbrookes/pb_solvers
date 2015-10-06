@@ -9,9 +9,9 @@
 #include <iostream>
 
 #include <limits.h>
-//#include "gtest/gtest.h"
-//#include "BesselCalcUnitTest.h"
-//#include "SHCalcUnitTest.h"
+#include "gtest/gtest.h"
+#include "BesselCalcUnitTest.h"
+#include "SHCalcUnitTest.h"
 
 #include "tester.h"
 
@@ -34,12 +34,11 @@ int main(int argc, char * argv[])
     allTest.unitTest( argc, argv );
   }
   
-  bool gtest = false;
+  bool gtest = true;
   
-  
-//  if (gtest)
-//  {
-//    ::testing::InitGoogleTest(&argc, argv);
-//    return RUN_ALL_TESTS();
-//  }
+  if (gtest)
+  {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+  }
 }
