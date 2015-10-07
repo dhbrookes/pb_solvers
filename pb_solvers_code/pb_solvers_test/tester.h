@@ -13,7 +13,6 @@
 #include <iostream>
 #include "BesselCalcTest.h"
 #include "ConstantsTest.h"
-#include "MyMatrixTest.h"
 #include "SHCalcTest.h"
 
 /*
