@@ -10,13 +10,18 @@
 
 #include <limits.h>
 #include "gtest/gtest.h"
+
+#include "Constants.h"
+#include "util.h"
+
+const int nPol = 10 ;
+double precLim = 1.0e-4;
+
 #include "BesselCalcUnitTest.h"
 #include "SHCalcUnitTest.h"
 
 #include "tester.h"
 
-#include "Constants.h"
-#include "util.h"
 
 
 
