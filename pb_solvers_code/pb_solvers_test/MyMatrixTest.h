@@ -79,6 +79,7 @@ TEST_F(MyMatrixUTest, defaultConstruct)
   EXPECT_NEAR( testMat_(0,0), 5.2, preclim);
 }
 
+// testing matrix addition
 TEST_F(MyMatrixUTest, matAdd)
 {
   MyMatrix <double> testMat1( testInp_ );
@@ -93,6 +94,7 @@ TEST_F(MyMatrixUTest, matAdd)
   EXPECT_NEAR( testMat3(1,2), 14.0, preclim);
 }
 
+// testing matrix multiplication
 TEST_F(MyMatrixUTest, matMul)
 {
   MyMatrix <double> testMat1( testInp_ );

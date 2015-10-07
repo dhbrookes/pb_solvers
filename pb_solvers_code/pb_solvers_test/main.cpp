@@ -16,6 +16,7 @@ const int nvals = 10 ;
 
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
+#include "MyMatrixTest.h"
 #include "SHCalcUnitTest.h"
 
 #include "tester.h"
