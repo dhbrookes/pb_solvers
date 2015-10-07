@@ -19,11 +19,8 @@ const int nvals = 10 ;
 #include "SHCalcUnitTest.h"
 
 #include "tester.h"
-
 #include "Constants.h"
 #include "util.h"
-
-
 
 using namespace std ;
 

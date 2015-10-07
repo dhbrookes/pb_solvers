@@ -17,45 +17,97 @@ using namespace std;
  */
 class MyMatrixUTest  : public ::testing::Test
 {
-protected:
-  MyMatrix <double> testMat_;
-  
 public:
-  MyMatrixUTest( )
+
+
+protected :
+  
+  virtual void SetUp()
   {
     const int nCol = 4;
     const int nRow = 2;
     
     double val = 1.0;
-    vector< vector<double> > testInp;
-    testInp.resize(nRow);
+    testInp_.resize(nRow);
     
     for ( int i = 0.0; i < nRow; i++ )
     {
-      testInp[i].resize(nCol);
+      testInp_[i].resize(nCol);
       for ( int j = 0.0; j < nCol; j++ )
       {
-        testInp[i][j] = val;
+        testInp_[i][j] = val;
         val += 1.0;
       }
     }
     
-    MyMatrix <double> testMat_( testInp );
+    testInp2_.resize(nCol);
+    val = 1.0;
+    
+    for ( int i = 0; i < nCol; i++ )
+    {
+      testInp2_[i].resize(nRow);
+      for ( int j = 0; j < nRow; j++ )
+      {
+        testInp2_[i][j] = val;
+        val += 1.0;
+      }
+    }
     
   }
-
-protected :
-  virtual void SetUp() {}
   virtual void TearDown() {}
+  
+  MyMatrix <double> testMat_;
+  vector< vector<double> > testInp_;
+  vector< vector<double> > testInp2_;
 }; // end MyMatrixTest
 
 
 
-TEST_F(MyMatrixUTest, settingAndCalc)
+TEST_F(MyMatrixUTest, constFromOther)
 {
-//  EXPECT_NEAR( ConstUTest.convert_int_to_kcal_mol( 1.0 ), 332.061203, preclim);
+  MyMatrix <double> testMat_( testInp_ );
+  EXPECT_NEAR( testMat_(0,0), 1.0, preclim);
+  EXPECT_NEAR( testMat_(0,3), 4.0, preclim);
+  EXPECT_NEAR( testMat_(1,0), 5.0, preclim);
+  EXPECT_NEAR( testMat_(1,2), 7.0, preclim);
 }
 
+TEST_F(MyMatrixUTest, defaultConstruct)
+{
+  MyMatrix <double> testMat_;
+  testMat_.set_val( 0, 0, 5.2);
+  EXPECT_NEAR( testMat_(0,0), 5.2, preclim);
+}
+
+TEST_F(MyMatrixUTest, matAdd)
+{
+  MyMatrix <double> testMat1( testInp_ );
+  MyMatrix <double> testMat2( testInp_ );
+  MyMatrix <double> testMat3;
+  
+  testMat3 = testMat1 + testMat2;
+  
+  EXPECT_NEAR( testMat3(0,0),  2.0, preclim);
+  EXPECT_NEAR( testMat3(0,3),  8.0, preclim);
+  EXPECT_NEAR( testMat3(1,0), 10.0, preclim);
+  EXPECT_NEAR( testMat3(1,2), 14.0, preclim);
+}
+
+TEST_F(MyMatrixUTest, matMul)
+{
+  MyMatrix <double> testMat1( testInp_ );
+  MyMatrix <double> testMat2( testInp2_ );
+  MyMatrix <double> testMat3;
+
+  testMat3 = testMat1 * testMat2;
+  ASSERT_EQ( testMat3.get_nrows() , 2 );
+  ASSERT_EQ( testMat3.get_ncols() , 2 );
+  
+  EXPECT_NEAR( testMat3(0,0),  50.0, preclim);
+  EXPECT_NEAR( testMat3(0,1),  60.0, preclim);
+  EXPECT_NEAR( testMat3(1,0), 114.0, preclim);
+  EXPECT_NEAR( testMat3(1,1), 140.0, preclim);
+}
 
 
 

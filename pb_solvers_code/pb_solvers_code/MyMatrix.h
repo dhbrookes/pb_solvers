@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <vector>
+#include <iostream>
 #include <sstream>
 
 
@@ -146,7 +147,7 @@ public:
     {
       for (j= 0; j < ncols_; j++)
       {
-        result.set_val(i, j, this(i, j) + rhs(i, j));
+        result.set_val(i, j, vals_[i][j] + rhs(i, j));
       }
     }
     return result;
@@ -167,18 +168,18 @@ public:
     n = nrows_;
     m = ncols_;
     p = rhs.ncols_;
-    
+
     MyMatrix<T> result = MyMatrix<T>(n, p);
     int i, j, k;
     T inner_sum;
-    for (i = 0; i < n; i++)
+    for (i = 0; i < n; i++) // for rows in mat1
     {
-      for (j= 0; j < p; j++)
+      for (j = 0; j < p; j++) // for cols in mat 2
       {
         inner_sum = T();  // default constructor should be equiv to zero
         for (k = 0; k < m; k++)
         {
-          inner_sum += this(i, k) * rhs(k, j);
+          inner_sum += vals_[i][k] * rhs(k, j);
         }
         result.set_val(i, j, inner_sum);
       }
