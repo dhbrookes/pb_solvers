@@ -14,13 +14,14 @@
 #include "Constants.h"
 #include "util.h"
 
-double precLim = 1.0e-4;
-const int nvals = 10 ;
+double preclim = 1.0e-4;    //! precision limit
+const int nvals = 10 ;      //! standard number of poles for testing
 
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
 #include "MyMatrixTest.h"
 #include "SHCalcUnitTest.h"
+#include "ASolverUnitTest.h"
 
 #include "tester.h"
 

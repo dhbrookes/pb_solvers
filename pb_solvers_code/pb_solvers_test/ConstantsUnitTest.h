@@ -27,7 +27,8 @@ TEST_F(ConstantsUTest, settingAndCalc)
   
   // check Kappa after changing \( eps_s \)
   ConstUTest_.set_dielectric_water( 40.0 );
-  EXPECT_NEAR( ConstUTest_.get_kappa(), 0.04232182927, preclim);
+  EXPECT_NEAR( ConstUTest_.get_kappa(), 0.04232182927, preclim
+              );
   
   // check Kappa after changing Salt concentration \( Molar \)
   ConstUTest_.set_salt_concentration( 0.05 );
