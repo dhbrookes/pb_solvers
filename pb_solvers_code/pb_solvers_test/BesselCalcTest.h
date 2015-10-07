@@ -10,7 +10,6 @@
 #define BesselCalcTest_h
 
 #include "BesselCalc.h"
-
 using namespace std;
 
 /*
@@ -85,8 +84,6 @@ public:
 
 		for (int besselIt = 0; besselIt < mBFI1.size(); besselIt++)
 		{
-			/*cout << " Program val " << mBFK1[besselIt] <<
-			        " Python val " << k1[besselIt] << endl;*/
 			assert( abs(mBFI1[besselIt] - i1[besselIt]) < precLim );
 			assert( abs(mBFI10[besselIt] - i10[besselIt]) < precLim );
 			assert( abs(mBFK1[besselIt] - k1[besselIt]) < precLim );

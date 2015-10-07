@@ -14,15 +14,15 @@
 #include "Constants.h"
 #include "util.h"
 
-const int nPol = 10 ;
 double precLim = 1.0e-4;
+const int nvals = 10 ;
 
 #include "BesselCalcUnitTest.h"
+#include "ConstantsUnitTest.h"
+#include "MyMatrixTest.h"
 #include "SHCalcUnitTest.h"
 
 #include "tester.h"
-
-
 
 
 using namespace std ;
@@ -31,7 +31,6 @@ int main(int argc, char * argv[])
 {
   
   bool test = true;
-  
   if (test)
   {
     cout << "Welcome to test suite" << endl;

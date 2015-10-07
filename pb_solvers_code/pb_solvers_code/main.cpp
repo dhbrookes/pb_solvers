@@ -15,13 +15,11 @@
 #include "System.h"
 #include "util.h"
 
-//#include "tester.h"
 
 int main(int argc, const char * argv[])
 {
 	
   cout << "Hello i build and run" << endl;
 
-	
 	return 0;
 }

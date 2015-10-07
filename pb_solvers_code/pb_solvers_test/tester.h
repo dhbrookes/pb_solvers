@@ -13,7 +13,6 @@
 #include <iostream>
 #include "BesselCalcTest.h"
 #include "ConstantsTest.h"
-#include "MyMatrixTest.h"
 #include "SHCalcTest.h"
 
 /*
@@ -33,9 +32,6 @@ public:
     
     ConstantsTest ConT;
     ConT.TestConstants();
-    
-    MyMatrixTest MatT;
-    MatT.TestMatrix();
 		
 		SHCalcConstantsTest SHConT;
 		SHConT.TestSHCalcConstants();

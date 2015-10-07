@@ -11,18 +11,18 @@
 
 #include "BesselCalc.h"
 
-const int nPol = 10 ;
-double precLim = 1.0e-4;
-
-
-
-BesselConstants bConstTest = BesselConstants( nPol );
-BesselCalc bCalcTest = BesselCalc( nPol, &bConstTest ) ; 
 
 
 class BesselConstUTest : public ::testing::Test
 {
-  protected :
+public :
+  BesselConstUTest() : bConstTest_( nvals ) {  }
+
+//  BesselConstants get_BConst() { return bConstTest_; }
+//  BesselCalc      get_BCalcs() { return bCalcTest_; }
+  
+protected :
+  BesselConstants bConstTest_;
 
   double kPreFactors[10] = { -1. , 0.33333333, 0.06666667,
              0.02857143, 0.01587302, 0.01010101,
@@ -35,11 +35,11 @@ class BesselConstUTest : public ::testing::Test
 
 TEST_F(BesselConstUTest, first10)
 {
-  ASSERT_EQ( bConstTest.get_n() , nPol ); // make sure numVals stores right
+  ASSERT_EQ( bConstTest_.get_n() , nvals ); // make sure numVals stores right
 
-  for (int i = 0; i < nPol; i++) // check that our prefactors are right
+  for (int i = 0; i < nvals; i++) // check that our prefactors are right
   {
-    EXPECT_NEAR( bConstTest.get_kconst_val(i), kPreFactors[i], precLim);
+    EXPECT_NEAR( bConstTest_.get_kconst_val(i), kPreFactors[i], preclim);
   }
 }
 
@@ -47,8 +47,15 @@ TEST_F(BesselConstUTest, first10)
 
 class BesselCalcUTest : public ::testing::Test
 {
-  protected :
-
+public:
+  BesselCalcUTest() : bConstTest_(nvals), bCalcTest_( nvals, &bConstTest_) {  }
+  
+  //  BesselConstants get_BConst() { return bConstTest_; }
+  //  BesselCalc      get_BCalcs() { return bCalcTest_; }
+  
+protected :
+  BesselConstants bConstTest_;
+  BesselCalc bCalcTest_;
   // for z = 1.0 and z = 10.0, calculated from python pbam_unit_test.py
   double i1[10] = {1.17520119e+00,   1.10363832e+00,   1.07344305e+00,
         1.05683451e+00,   1.04633846e+00,   1.03910889e+00,
@@ -76,17 +83,17 @@ class BesselCalcUTest : public ::testing::Test
 
 TEST_F(BesselCalcUTest, first10)
 {
-   const vector<double> mBFI10 = bCalcTest.calc_mbfI( nPol, 10.0 );
-   const vector<double> mBFK10 = bCalcTest.calc_mbfK( nPol, 10.0 );
-   const vector<double> mBFI1  = bCalcTest.calc_mbfI( nPol,  1.0 );
-   const vector<double> mBFK1  = bCalcTest.calc_mbfK( nPol,  1.0 );
+  const vector<double> mBFI10 = bCalcTest_.calc_mbfI( nvals, 10.0 );
+  const vector<double> mBFK10 = bCalcTest_.calc_mbfK( nvals, 10.0 );
+  const vector<double> mBFI1  = bCalcTest_.calc_mbfI( nvals,  1.0 );
+  const vector<double> mBFK1  = bCalcTest_.calc_mbfK( nvals,  1.0 );
 
-  for (int i = 0; i < nPol; i++) 
+  for (int i = 0; i < nvals; i++)
   {
-    EXPECT_NEAR( mBFI10[i] , i10[i] , precLim);
-    EXPECT_NEAR( mBFK10[i] , k10[i] , precLim);
-    EXPECT_NEAR( mBFI1[i]  , i1[i]  , precLim);
-    EXPECT_NEAR( mBFK1[i]  , k1[i]  , precLim);
+    EXPECT_NEAR( mBFI10[i] , i10[i] , preclim);
+    EXPECT_NEAR( mBFK10[i] , k10[i] , preclim);
+    EXPECT_NEAR( mBFI1[i]  , i1[i]  , preclim);
+    EXPECT_NEAR( mBFK1[i]  , k1[i]  , preclim);
   }
 }
 
