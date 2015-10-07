@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <vector>
-#include <iostream>
 #include <sstream>
 
 
@@ -23,10 +22,10 @@ class MatrixAccessException: public exception
 protected:
   int i_, j_;
   int nrows_, ncols_;
-  
+    
 public:
   MatrixAccessException(const int i, const int j,
-                      const int nrows, const int ncols)
+                        const int nrows, const int ncols)
   :i_(i), j_(j), nrows_(nrows), ncols_(ncols)
   {
   }
@@ -35,15 +34,15 @@ public:
   {
     ostringstream ss;
     ss << "Cannot access point [" << i_ << "," <<  j_ <<
-       "] in matrix of size (" << nrows_ << "," << ncols_ << ")" << endl;
+    "] in matrix of size (" << nrows_ << "," << ncols_ << ")" << endl;
     return ss.str().c_str();
   }
 };
 
 
 enum ArithmeticType { ADDITION, MULTIPLICATION, INNER_PRODUCT };
-    
-    
+        
+        
 class MatrixArithmeticException: public exception
 {
 protected:
@@ -52,43 +51,41 @@ protected:
   ArithmeticType type_;
   
 public:
-  
-  MatrixArithmeticException(ArithmeticType type,
-                          const int nrows1, const int ncols1,
-                          const int nrows2, const int ncols2)
-  :nrows1_(nrows1), ncols1_(ncols1),
-   nrows2_(nrows2), ncols2_(ncols2), type_(type)
+    
+  MatrixArithmeticException(ArithmeticType type, const int nrows1,
+                            const int ncols1, const int nrows2,
+                            const int ncols2)
+  :nrows1_(nrows1), ncols1_(ncols1), nrows2_(nrows2),
+  ncols2_(ncols2), type_(type)
   {
   }
-  
+    
   virtual const char* what() const throw()
   {
-    ostringstream ss;
-    string start;
-    if (type_ == ADDITION) start = "Cannot add matrices of sizes (";
-    else if (type_ == MULTIPLICATION)
-      start = "Cannot multiply matrices of size (";
-    else if (type_ == INNER_PRODUCT)
-      start = "Cannot find inner product of vectors of sizes (";
-    else start = "Unknown arithmetic error with matrices of sizes (";
-    ss << start << nrows1_ << "," << ncols1_ <<
-          ") and (" << nrows2_ << "," << ncols2_ << ")" << endl;
-    return ss.str().c_str();
+      ostringstream ss;
+      string start;
+      if (type_ == ADDITION) start = "Cannot add matrices of sizes (";
+      else if (type_ == MULTIPLICATION)
+        start = "Cannot multiply matrices of size (";
+      else if (type_ == INNER_PRODUCT)
+          start = "Cannot find inner product of vectors of sizes (";
+      else start = "Unknown arithmetic error with matrices of sizes (";
+        ss << start << nrows1_ << "," << ncols1_ << ") and (" <<
+        nrows2_ << "," << ncols2_ << ")" << endl;
+      return ss.str().c_str();
   }
 
 };
 
-/*
-  Class for matrices
-*/
+        
 template <typename T>
 class MyMatrix
 {
 protected:
   int                 nrows_;
   int                 ncols_;
-  vector< vector<T> >  vals_; //Len of 1st vector is # of rows,
-                            //  length of second is ncols
+  //length of first vector is number of rows, length of second is ncols:
+  vector< vector<T> >  vals_;
   
 
 public:
@@ -137,8 +134,8 @@ public:
   {
     if (ncols_ != rhs.ncols_ || nrows_ != rhs.nrows_)
     {
-      throw MatrixArithmeticException(ADDITION, nrows_, ncols_,
-                                      rhs.nrows_, rhs.ncols_);
+      throw MatrixArithmeticException(ADDITION, nrows_, ncols_, rhs.nrows_,
+                                      rhs.ncols_);
     }
     
     MyMatrix<T> result = MyMatrix<T>(nrows_, ncols_);
@@ -147,7 +144,7 @@ public:
     {
       for (j= 0; j < ncols_; j++)
       {
-        result.set_val(i, j, vals_[i][j] + rhs(i, j));
+          result.set_val(i, j, this(i, j) + rhs(i, j));
       }
     }
     return result;
@@ -158,101 +155,102 @@ public:
    */
   const MyMatrix<T> operator*(const MyMatrix<T>& rhs) const
   {
-    if (ncols_ != rhs.nrows_)
-    {
-      throw MatrixArithmeticException(MULTIPLICATION, nrows_, ncols_,
-                                      rhs.nrows_, rhs.ncols_);
-    }
-    
-    int n, m, p;
-    n = nrows_;
-    m = ncols_;
-    p = rhs.ncols_;
-
-    MyMatrix<T> result = MyMatrix<T>(n, p);
-    int i, j, k;
-    T inner_sum;
-    for (i = 0; i < n; i++) // for rows in mat1
-    {
-      for (j = 0; j < p; j++) // for cols in mat 2
+      if (ncols_ != rhs.nrows_)
       {
-        inner_sum = T();  // default constructor should be equiv to zero
-        for (k = 0; k < m; k++)
-        {
-          inner_sum += vals_[i][k] * rhs(k, j);
-        }
-        result.set_val(i, j, inner_sum);
+        throw MatrixArithmeticException(MULTIPLICATION, nrows_,
+                                        ncols_, rhs.nrows_, rhs.ncols_);
       }
-    }
-    return result;
+      
+      int n, m, p;
+      n = nrows_;
+      m = ncols_;
+      p = rhs.ncols_;
+      
+      MyMatrix<T> result = MyMatrix<T>(n, p);
+      int i, j, k;
+      T inner_sum;
+      for (i = 0; i < n; i++)
+      {
+        for (j= 0; j < p; j++)
+        {
+          inner_sum = T();  // default constructor should be equivalent to zero
+          for (k = 0; k < m; k++)
+          {
+            inner_sum += this(i, k) * rhs(k, j);
+          }
+          result.set_val(i, j, inner_sum);
+        }
+      }
+      return result;
   }
   
-  
+      
   const int get_nrows() const { return nrows_; }
   const int get_ncols() const { return ncols_; }
 
 };
-    
-    
+        
+        
 /*
- Vector class is implemented as extension of matrix class but w/ only one column
+ Vector class is implemented as extension of matrix class but 
+ with only one column
  */
 template<typename T>
 class MyVector : public MyMatrix<T>
 {
 public:
-  /*
-   Initialize empty vector given the size
-   */
-  MyVector(const int size=1)
-  :MyMatrix<T>(size, 1)
-  {
-  }
-  
-  MyVector(const vector<T>& vals)
-  :MyMatrix<T>(vals.size(), 1)
-  {
-    int i;
-    for (i = 0; i < vals.size(); i++)
+    /*
+     Initialize empty vector given the size
+     */
+    MyVector(const int size=1)
+    :MyMatrix<T>(size, 1)
     {
+    }
+    
+    MyVector(const vector<T>& vals)
+    :MyMatrix<T>(vals.size(), 1)
+    {
+      int i;
+      for (i = 0; i < vals.size(); i++)
+      {
         this->vals_[i][0] = vals[0];
+      }
     }
-  }
-  
-  void set_val(const int i, const T& val)
-  {
-    this->MyMatrix<T>::set_val(i, 0, val);
-  }
-  
-  /*
-   Access operator with brackets only requires one value
-   */
-  const T& operator[](int i)
-  {
-    return this(i, 0);
-  }
-  
-  /*
-   The multiplication operator now computes the inner product
-   */
-  const T operator*(const MyVector<T>& rhs)
-  {
-    if (rhs->nrows_ != this->nrows)
+    
+    void set_val(const int i, const T& val)
     {
-      throw MatrixArithmeticException(INNER_PRODUCT, this->nrows_, this->ncols_,
-                                      rhs->nrows_, rhs->ncols_);
+      this->MyMatrix<T>::set_val(i, 0, val);
     }
-    T out = T();
-    int i;
-    for(i = 0; i < this->nrows_; i++)
+    
+    /*
+     Access operator with brackets only requires one value
+     */
+    const T& operator[](int i)
     {
-      out = out + (this[i] * rhs[i]);
+      return this(i, 0);
     }
-    return out;
-  }
+    
+    /*
+     The multiplication operator now computes the inner product
+     */
+    const T operator*(const MyVector<T>& rhs)
+    {
+      if (rhs->nrows_ != this->nrows)
+      {
+        throw MatrixArithmeticException(INNER_PRODUCT, this->nrows_,
+                                        this->ncols_, rhs->nrows_, rhs->ncols_);
+      }
+      T out = T();
+      int i;
+      for(i = 0; i < this->nrows_; i++)
+      {
+        out = out + (this[i] * rhs[i]);
+      }
+      return out;
+    }
 };
 
-    
+        
 /*
  Convenience classes for matrices of matrices, vectors of vectors
  and vectors of matrices.
@@ -276,7 +274,7 @@ struct VecOfVecs
 {
   typedef MyVector<MyVector<T> > type;
 };
-    
+        
 template <typename T>
 struct VecOfMats
 {
@@ -284,6 +282,6 @@ struct VecOfMats
 };
 
 
-    
+        
 #endif /* MyMatrix_h */
-    
+        

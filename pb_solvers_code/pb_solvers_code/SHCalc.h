@@ -12,9 +12,9 @@
 #include <stdio.h>
 #include <complex>
 #include <vector>
-#include <cmath>
+#include <math.h>
 #include <assert.h>
-#include <iostream>
+#include "Constants.h"
 #include "MyMatrix.h"
 #include "util.h"
 
@@ -35,7 +35,7 @@ protected:
   vector<double>     dubFac_;    // (2l-1)!! double factrl, in legendre recursion
   
 public:
-  SHCalcConstants(const int num_vals);
+    SHCalcConstants(const int num_vals=Constants::MAX_NUM_POLES);
   
   const double get_leg_consts1_val(const int n, const int m) const    
                                 { return legConsts1_(n, m); }
@@ -75,23 +75,25 @@ protected:
                                          //  at every n, m (store in this.P_)
 
 public:
-  
-  /*
-   Constructor given size and constants:
-   */
+    
+  SHCalc();
   SHCalc(const int num_vals, const SHCalcConstants* _consts);
-
-  void calc_sh(const double theta, const double phi); // calculate SPH HARM
-                                         //  at every n, m  (store in this.Y_)
+  SHCalc(const SHCalc& other);  //copy constrctor
   
-  double get_legendre_result( int n, int m ); // retrieve part of Legendre
+  virtual ~SHCalc();
   
-  const cmplx get_result(const int n, const int m) const;  // retrieve result 
-                                                         // for n, m values
+  // calculate the spherical harmonics at every n, m  (store in this.Y_)
+  void calc_sh(const double theta, const double phi);
   
-  const MyMatrix<cmplx> get_full_result() { return Y_; }  // retrieve full 
-                                                        // calcd Y_ matrix
+  SHCalc& operator=(const SHCalc& other);
   
+  // retrieve the result for n, m values
+  const cmplx get_result(const int n, const int m) const;
+  
+  // retrieve the full calculated Y_ matrix
+  const MyMatrix<cmplx> get_full_result() { return Y_; }
+  
+  double get_legendre_result( int n, int m );
 };
 
 #endif /* SHCalc_hpp */
