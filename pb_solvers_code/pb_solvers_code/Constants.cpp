@@ -47,7 +47,7 @@ void Constants::update_kappa()
   double kap_den = sqrt(LITRE * dielectricWater_ *
                         PERMITTIVITY_VAC * KB * temp_);
     
-  kappa_ = ANGSTROM * kap_num * kap_den;
+  kappa_ = ANGSTROM * kap_num / kap_den;
 }
 
 void Constants::update_patch_size()

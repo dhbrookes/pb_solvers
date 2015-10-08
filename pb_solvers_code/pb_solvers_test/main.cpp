@@ -18,10 +18,10 @@ double preclim = 1.0e-4;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
 
 #include "BesselCalcUnitTest.h"
-#include "ConstantsUnitTest.h"
-#include "MyMatrixTest.h"
-#include "SHCalcUnitTest.h"
-#include "ASolverUnitTest.h"
+//#include "ConstantsUnitTest.h"
+//#include "MyMatrixTest.h"
+//#include "SHCalcUnitTest.h"
+//#include "ASolverUnitTest.h"
 
 #include "tester.h"
 
@@ -39,8 +39,9 @@ int main(int argc, char * argv[])
     allTest.unitTest( argc, argv );
   }
   
-  bool gtest = true;
-  
+  cout << "Now for Google Tests." << endl ;
+    
+  bool gtest = false;
   if (gtest)
   {
     ::testing::InitGoogleTest(&argc, argv);

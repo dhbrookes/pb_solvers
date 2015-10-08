@@ -25,16 +25,21 @@ class SHCalcUTest : public ::testing::Test
         2.02702500e+06, 3.44594250e+07 };
     
   // ensure propler calculation of shConsts
-  double SHConst1[1]  = {};
+/*
+    double SHConst1[1]  = {};
   double SHConst5[1]  = {};
   double SHConst10[1] = {};
+*/
     
-  virtual void SetUp() {}
+  virtual void SetUp()
+  {
+//      SHCalcConstants SHConstTest( nvals );
+  }
   virtual void TearDown() {}
   
-  SHCalcConstants SHConstTest;
+//  SHCalcConstants SHConstTest;
 public:
-  SHCalcUTest( ) : SHConstTest( nvals ) {  }
+//  SHCalcUTest( ) : SHConstTest( nvals ) {  }
   
 };
 

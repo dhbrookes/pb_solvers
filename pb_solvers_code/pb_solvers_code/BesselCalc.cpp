@@ -24,9 +24,11 @@ BesselConstants::BesselConstants(const int N)
 
 
 BesselCalc::BesselCalc(int N, BesselConstants* _consts)
-: numVals_(N), _consts_(_consts)
+: numVals_(N)
 {
-  assert (_consts_->get_n() == numVals_);
+  assert (_consts->get_n() == numVals_);
+  _consts_ = new BesselConstants;
+  _consts_ = _consts;
 }
 
 /*
@@ -94,12 +96,13 @@ const vector<double> BesselCalc::calc_mbfI(const int n,
 BesselCalc::BesselCalc()
 :numVals_(Constants::MAX_NUM_POLES)
 {
-    
+  _consts_ = new BesselConstants;
+  
 }
 
 BesselCalc::~BesselCalc()
 {
-  delete _consts_;
+//  delete _consts_;
 }
 
 BesselCalc::BesselCalc(const BesselCalc& other)

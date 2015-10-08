@@ -164,7 +164,7 @@ Y_(2 * Constants::MAX_NUM_POLES, 2 * Constants::MAX_NUM_POLES)
 
 SHCalc::~SHCalc()
 {
-  delete _consts_;
+//  delete _consts_;
 }
 
 

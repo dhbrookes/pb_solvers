@@ -32,3 +32,12 @@ For gtest, it's a little more complicated...
 5. The .cpp files of the main source must have Target Membership to Test and to pbsolvers.
     The .cpp files of the main source should also appear in Build Phases --> Compile Sources for Target gtests
 
+
+
+Other XCode hints : 
+- To see page width:
+    XCode --> Preferences --> Text Editing --> Show : Page guide at column 80
+
+- To increase font size :
+    XCode --> Preferences --> Fonts and Colors 
+    Duplicate one of the styles. Select all text in example box. Change font size. 

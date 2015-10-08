@@ -8,8 +8,9 @@
 
 #include "ReExpCalc.h"
 
-
+/*
 ReExpCoeffs()
 :
 {
 }
+*/

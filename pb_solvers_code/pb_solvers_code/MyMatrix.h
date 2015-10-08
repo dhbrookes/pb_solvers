@@ -144,7 +144,7 @@ public:
     {
       for (j= 0; j < ncols_; j++)
       {
-          result.set_val(i, j, this(i, j) + rhs(i, j));
+          result.set_val(i, j, vals_[i][j] + rhs(i, j));
       }
     }
     return result;
@@ -176,7 +176,7 @@ public:
           inner_sum = T();  // default constructor should be equivalent to zero
           for (k = 0; k < m; k++)
           {
-            inner_sum += this(i, k) * rhs(k, j);
+            inner_sum += vals_[i][j] * rhs(k, j);
           }
           result.set_val(i, j, inner_sum);
         }
