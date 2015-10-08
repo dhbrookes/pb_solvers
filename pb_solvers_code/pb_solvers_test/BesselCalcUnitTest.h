@@ -1,5 +1,5 @@
 //
-//  SHCalcUnitTest.h
+//  BesselCalcUnitTest.h
 //  pb_solvers_code
 //
 //  Created by Marielle Soniat on 10/5/15.
@@ -11,7 +11,8 @@
 
 #include "BesselCalc.h"
 
-
+//BesselConstants bConstTest = BesselConstants(nvals);
+//BesselCalc bCalcTest = BesselCalc( nvals, &bConstTest ) ;
 
 class BesselConstUTest : public ::testing::Test
 {
@@ -48,14 +49,15 @@ TEST_F(BesselConstUTest, first10)
 class BesselCalcUTest : public ::testing::Test
 {
 public:
-  BesselCalcUTest() : bConstTest_(nvals), bCalcTest_( nvals, &bConstTest_) {  }
-  
+  BesselCalcUTest() : bConstTest_( nvals ), bCalcTest_( nvals, &bConstTest_) {}
+    
   //  BesselConstants get_BConst() { return bConstTest_; }
   //  BesselCalc      get_BCalcs() { return bCalcTest_; }
   
 protected :
   BesselConstants bConstTest_;
   BesselCalc bCalcTest_;
+ 
   // for z = 1.0 and z = 10.0, calculated from python pbam_unit_test.py
   double i1[10] = {1.17520119e+00,   1.10363832e+00,   1.07344305e+00,
         1.05683451e+00,   1.04633846e+00,   1.03910889e+00,
@@ -77,12 +79,14 @@ protected :
         6.77907167e+02,   9.79379768e+02,   1.32702447e+03,
         1.71109497e+03};
     
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  //virtual void SetUp() {}
+  //virtual void TearDown() {}
 };
 
 TEST_F(BesselCalcUTest, first10)
 {
+ // BesselCalcUTest bcut = BesselCalcUTest() ;
+  
   const vector<double> mBFI10 = bCalcTest_.calc_mbfI( nvals, 10.0 );
   const vector<double> mBFK10 = bCalcTest_.calc_mbfK( nvals, 10.0 );
   const vector<double> mBFI1  = bCalcTest_.calc_mbfI( nvals,  1.0 );
@@ -96,5 +100,6 @@ TEST_F(BesselCalcUTest, first10)
     EXPECT_NEAR( mBFK1[i]  , k1[i]  , preclim);
   }
 }
+
 
 #endif

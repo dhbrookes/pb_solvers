@@ -24,7 +24,7 @@ class SHConstUTest : public ::testing::Test
         9.45000000e+02, 1.03950000e+04,   1.35135000e+05,
         2.02702500e+06, 3.44594250e+07 };
     
-		// ensure proper calculation of legendre Consts
+  // ensure proper calculation of legendre Consts
   double LegConst1N5[6] = {1.8, 2.25,  3.0 ,  4.5 ,  9.0 , 0.0};
   double LegConst2N5[6] = {0.8, 1.25,  2.0 ,  3.5 ,  8.0 , 0.0};
   
@@ -33,23 +33,26 @@ class SHConstUTest : public ::testing::Test
     8.99653161e-04,   9.08786929e-05,   9.57945535e-06, 1.07101567e-06,
     1.29879727e-07,   1.76743922e-08, 2.86716502e-09 };
   
-  virtual void SetUp() {}
+  virtual void SetUp()
+  {
+    SHCalcConstants SHConstTest( nvals );
+  }
   virtual void TearDown() {}
   
-  SHCalcConstants SHConstTest;
+  SHCalcConstants SHConstTest_;
 public:
-  SHConstUTest( ) : SHConstTest( nvals ) {  }
+  SHConstUTest( ) : SHConstTest_( nvals ) {  }
   
 };
 
 
 TEST_F(SHConstUTest, constantTest)
 {
-  ASSERT_EQ( SHConstTest.get_n() , nvals ); // make sure numVals stores right
+  ASSERT_EQ( SHConstTest_.get_n() , nvals ); // make sure numVals stores right
 
   for (int i = 0; i < nvals; i++) // check that our prefactors are right
   {
-    EXPECT_NEAR( SHConstTest.get_dub_fac_val(i), doubleFactorial[i], preclim);
+    EXPECT_NEAR( SHConstTest_.get_dub_fac_val(i), doubleFactorial[i], preclim);
   }
 }
 
@@ -57,9 +60,9 @@ TEST_F(SHConstUTest, LegConsTest)
 {
   for (int constIt = 0; constIt < 6; constIt++)
   {
-    EXPECT_NEAR( SHConstTest.get_leg_consts1_val( 5, constIt),
+    EXPECT_NEAR( SHConstTest_.get_leg_consts1_val( 5, constIt),
                  LegConst1N5[constIt], preclim);
-    EXPECT_NEAR( SHConstTest.get_leg_consts2_val( 5, constIt),
+    EXPECT_NEAR( SHConstTest_.get_leg_consts2_val( 5, constIt),
                 LegConst2N5[constIt], preclim);
   }
 }
@@ -69,7 +72,7 @@ TEST_F(SHConstUTest, SHConsTest)
 {
   for (int i = 0; i < nvals; i++) // check that our prefactors are right
   {
-    EXPECT_NEAR( SHConstTest.get_sh_consts_val( 10, i ), SHConst[i], preclim);
+    EXPECT_NEAR( SHConstTest_.get_sh_consts_val( 10, i ), SHConst[i], preclim);
   }
 }
 
