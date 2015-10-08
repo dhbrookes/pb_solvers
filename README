@@ -41,3 +41,12 @@ Other XCode hints :
 - To increase font size :
     XCode --> Preferences --> Fonts and Colors 
     Duplicate one of the styles. Select all text in example box. Change font size. 
+
+- To access Instruments :
+    XCode --> Product --> Profile ; select profiling template
+        For timings, select Counters
+    make sure path to executable is correct -- XCode makes a Debug and Release version in separate folders
+    Product --> Clean ; Product --> Build for --> Profiling ; Product --> Profile
+        should display data in Instruments window 
+
+
