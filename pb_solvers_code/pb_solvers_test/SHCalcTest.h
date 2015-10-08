@@ -47,7 +47,7 @@ public:
     // First check const1 and const2 of legendre polynomials
     assert( abs( 0.0 - SHConstTest.get_leg_consts1_val( 0, 0))
            < precLim);
-    assert( abs( 0.0 - SHConstTest.get_leg_consts1_val( 0, 0))
+    assert( abs( 0.0 - SHConstTest.get_leg_consts2_val( 0, 0))
            < precLim);
     
     for (int constIt = 0; constIt < 6; constIt++)

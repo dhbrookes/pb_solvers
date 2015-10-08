@@ -21,7 +21,6 @@ public:
 
 
 protected :
-  
   virtual void SetUp()
   {
     const int nCol = 4;
@@ -74,9 +73,11 @@ TEST_F(MyMatrixUTest, constFromOther)
 
 TEST_F(MyMatrixUTest, defaultConstruct)
 {
-  MyMatrix <double> testMat_;
-  testMat_.set_val( 0, 0, 5.2);
-  EXPECT_NEAR( testMat_(0,0), 5.2, preclim);
+  MyMatrix <double> testMat_( 4, 3);
+  ASSERT_EQ( testMat_.get_nrows() , 4 );
+  ASSERT_EQ( testMat_.get_ncols() , 3 );
+  testMat_.set_val( 3, 1, 5.2);
+  EXPECT_NEAR( testMat_( 3, 1), 5.2, preclim);
 }
 
 // testing matrix addition

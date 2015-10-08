@@ -14,7 +14,7 @@
 #include "Constants.h"
 #include "util.h"
 
-double precLim = 1.0e-4;
+double preclim = 1.0e-4;
 const int nvals = 10 ;
 
 #include "BesselCalcUnitTest.h"
@@ -30,7 +30,7 @@ using namespace std ;
 int main(int argc, char * argv[])
 {
   
-  bool test = true;
+  bool test = false;
   if (test)
   {
     cout << "Welcome to test suite" << endl;

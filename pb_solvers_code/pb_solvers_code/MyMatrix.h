@@ -89,8 +89,6 @@ protected:
   int                 ncols_;
   vector< vector<T> >  vals_; //Len of 1st vector is # of rows,
                             //  length of second is ncols
-  
-
 public:
 
   /*
@@ -103,7 +101,7 @@ public:
   }
   
   MyMatrix(vector< vector<T> >& vals)
-  : vals_(vals), nrows_(vals.size()), ncols_(vals[0].size())
+  : vals_(vals), nrows_( (int) vals.size()), ncols_( (int) vals[0].size())
   {
   }
   
