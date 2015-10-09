@@ -9,7 +9,8 @@
 #ifndef MyMatrixTest_h
 #define MyMatrixTest_h
 
-#include "MyMatrix.h"
+//#include "MyMatrix.h"
+#include "util.h"
 using namespace std;
 
 /*
@@ -110,6 +111,38 @@ TEST_F(MyMatrixUTest, matMul)
   EXPECT_NEAR( testMat3(0,1),  60.0, preclim);
   EXPECT_NEAR( testMat3(1,0), 114.0, preclim);
   EXPECT_NEAR( testMat3(1,1), 140.0, preclim);
+}
+
+// testing scalar matrix multiplication
+TEST_F(MyMatrixUTest, scalMatMulRHS)
+{
+  MyMatrix <double> testMat1( testInp_ );
+  MyMatrix <double> testMat3;
+  
+  testMat3 = testMat1 * 4.0;
+  ASSERT_EQ( testMat3.get_nrows() , 2 );
+  ASSERT_EQ( testMat3.get_ncols() , 4 );
+  
+  EXPECT_NEAR( testMat3(0,0),  4.0, preclim);
+  EXPECT_NEAR( testMat3(0,1),  8.0, preclim);
+  EXPECT_NEAR( testMat3(1,0), 20.0, preclim);
+  EXPECT_NEAR( testMat3(1,1), 24.0, preclim);
+}
+
+// testing scalar matrix multiplication
+TEST_F(MyMatrixUTest, scalMatMulLHS)
+{
+  MyMatrix <double> testMat1( testInp2_ );
+  MyMatrix <double> testMat3;
+  
+  testMat3 = 3.0 * testMat1;
+  ASSERT_EQ( testMat3.get_nrows() , 4 );
+  ASSERT_EQ( testMat3.get_ncols() , 2 );
+  
+  EXPECT_NEAR( testMat3(0,0),  3.0, preclim);
+  EXPECT_NEAR( testMat3(0,1),  6.0, preclim);
+  EXPECT_NEAR( testMat3(1,0),  9.0, preclim);
+  EXPECT_NEAR( testMat3(1,1), 12.0, preclim);
 }
 
 // testing matrix assertions for accessing matrix members

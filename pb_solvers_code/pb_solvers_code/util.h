@@ -107,7 +107,7 @@ class SphPoint
 protected:
   T r_;
   T theta_;
-  T phi_;
+  T phi_;  
     
 public:
   SphPoint(T r=T(), T theta=T(), T phi=T())
