@@ -77,7 +77,7 @@ void ReExpCoeffsConstants::calc_alpha_and_beta()
     for (n = -1; n < 2*p_-1; n++)
     {
       alpha_val = sqrt((n + m + 1) * (n - m + 1));
-      beta_val = (pow(lambda_, 2) * kappa_ * alpha_val) / ((2*n + 1) * (2*n+3));
+      beta_val = (pow(lambda_, 2)*kappa_*alpha_val) / ((2*n + 1)*(2*n+3));
       alpha_m.push_back(alpha_val);
       beta_m.push_back(beta_val);
     }
@@ -98,24 +98,27 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
   double nu_val, mu_val;
   vector<double> nu_m, mu_m;
   
-  
+
   //calculate alpha and beta:
   for (m = -p_+1; m < p_-1; m++)
   {
     inner_size = 2*p_-1;
     nu_m.reserve(inner_size);
-    beta_m.reserve(inner_size);
+    mu_m.reserve(inner_size);
     for (n = -1; n < 2*p_-1; n++)
     {
-      alpha_val = sqrt((n + m + 1) * (n - m + 1));
-      beta_val = (pow(lambda_, 2) * kappa_ * alpha_val) / ((2*n + 1) * (2*n+3));
-      nu_m.push_back(alpha_val);
-      mu_m.push_back(beta_val);
+      if (m < 0)        sign = -1.0;
+      else if (m == 0)  sign = 0.0;
+      else              sign = 1.0;
+      nu_val = sign * sqrt((n - m - 1) * (n - m));
+      mu_val = (pow(lambda_, 2) * kappa_ * nu_val) / ((2*n-1) * (2*n+1));
+      nu_m.push_back(nu_val);
+      mu_m.push_back(mu_val);
     }
-    alpha_.push_back(alpha_m);
-    beta_.push_back(beta_m);
-    alpha_m.clear();
-    beta_m.clear();
+    nu_.push_back(nu_m);
+    mu_.push_back(mu_m);
+    nu_m.clear();
+    mu_m.clear();
   }
 }
 
