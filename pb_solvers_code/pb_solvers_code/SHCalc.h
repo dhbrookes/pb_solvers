@@ -35,7 +35,7 @@ protected:
   vector<double>     dubFac_;    // (2l-1)!! double factrl, in legendre recursion
   
 public:
-    SHCalcConstants(const int num_vals=Constants::MAX_NUM_POLES);
+  SHCalcConstants(const int num_vals=Constants::MAX_NUM_POLES);
   
   const double get_leg_consts1_val(const int n, const int m) const    
                                 { return legConsts1_(n, m); }

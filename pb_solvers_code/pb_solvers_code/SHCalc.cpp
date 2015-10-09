@@ -6,6 +6,7 @@
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
+#include <iostream>
 #include "SHCalc.h"
 
 SHCalcConstants::SHCalcConstants(const int N)
@@ -159,7 +160,7 @@ SHCalc::SHCalc()
 P_(2 * Constants::MAX_NUM_POLES, 2 * Constants::MAX_NUM_POLES),
 Y_(2 * Constants::MAX_NUM_POLES, 2 * Constants::MAX_NUM_POLES)
 {
-    assert (_consts_->get_n() == numVals_);
+  assert (_consts_->get_n() == numVals_);
 }
 
 SHCalc::~SHCalc()
@@ -172,7 +173,7 @@ SHCalc::SHCalc(const SHCalc& other)
 :numVals_(other.numVals_), P_(other.P_),
 Y_(other.Y_)
 {
-  _consts_ = new SHCalcConstants;
+  _consts_ = new SHCalcConstants(numVals_);
   _consts_ = other._consts_;
 }
 

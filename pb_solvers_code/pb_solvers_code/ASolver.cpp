@@ -22,7 +22,7 @@ ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
     all_sh.push_back(calc_mol_sh(sys.get_molecule(i)));
   }
   
-  //precomput gamma, delta and E:
+  //precompute gamma, delta and E:
   compute_gamma();
   compute_delta();
   compute_E();
@@ -106,7 +106,10 @@ const cmplx ASolver::calc_indi_e(int i, int n, int m)
     q = sys_.get_qij(i, j);
     rho = sys_.get_sph_posij(i, j).get_r();
     // q_ij * rho_ij * Y_(n,m)(theta_ij, phi_ij):
-    e += q * rho * all_sh[i][j](n, m);
+    cmplx all_sh_acc = all_sh[i][j](n, abs(m));
+    if ( m < 0 )
+      all_sh_acc = conj( all_sh_acc );
+    e += q * rho * all_sh_acc;
   }
   return e;
 }
@@ -178,8 +181,9 @@ void ASolver::compute_E()
 
 ASolver::~ASolver()
 {
-  delete _besselCalc_;
-  delete _shCalc_;
+// potentially problematic. Need to address later
+//  delete _besselCalc_;
+//  delete _shCalc_;
 }
 
 

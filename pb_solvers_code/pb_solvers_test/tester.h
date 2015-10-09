@@ -38,6 +38,9 @@ public:
     
     SHCalcTest SHCalcT;
     SHCalcT.TestSHCalc();
+    
+    ASolverTest ASolvT;
+    ASolvT.RunASolverTest();
 		
 		cout << "Complete all tests" << endl;
 		return 0;

@@ -112,6 +112,30 @@ TEST_F(MyMatrixUTest, matMul)
   EXPECT_NEAR( testMat3(1,1), 140.0, preclim);
 }
 
+// testing matrix assertions for accessing matrix members
+TEST_F(MyMatrixUTest, exceptAccess)
+{
+  MyMatrix <double> testMat_( testInp_ );
+  ASSERT_THROW(testMat_( 0, 5), MatrixAccessException);
+  ASSERT_THROW(testMat_( 5, 0), MatrixAccessException);
+  ASSERT_THROW(testMat_(-1, 0), MatrixAccessException);
+  ASSERT_THROW(testMat_( 0,-1), MatrixAccessException);
+}
 
+// testing matrix assertions for addition
+TEST_F(MyMatrixUTest, exceptAdd)
+{
+  MyMatrix <double> testMat1( testInp_ );
+  MyMatrix <double> testMat2( testInp2_ );
+  ASSERT_THROW(testMat1 + testMat2, MatrixArithmeticException);
+}
+
+// testing matrix assertions for multiplication
+TEST_F(MyMatrixUTest, exceptMult)
+{
+  MyMatrix <double> testMat1( testInp_ );
+  MyMatrix <double> testMat2( testInp_ );
+  ASSERT_THROW(testMat1 * testMat2, MatrixArithmeticException);
+}
 
 #endif /* MyMatrixTest_h */

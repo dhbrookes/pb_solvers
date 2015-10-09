@@ -53,7 +53,7 @@ protected:
   Constants                    consts_;  // Constants for this system
     
 public:
-    System(Constants consts, const vector<Molecule>& mols);
+  System(Constants consts, const vector<Molecule>& mols);
     
   const Constants& get_consts() const { return consts_; }
   const int get_n() const { return N_; }
