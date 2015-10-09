@@ -18,8 +18,8 @@
 
 int main(int argc, const char * argv[])
 {
-	
-  cout << "Hello i build and run" << endl;
-
-	return 0;
+//	
+//  cout << "Hello i build and run" << endl;
+//
+//	return 0;
 }

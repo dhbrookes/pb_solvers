@@ -29,8 +29,8 @@ protected:
   VecOfMats<cmplx>::type      E_;
   MatOfMats<double>::type     gamma_, delta_;
   const BesselCalc*           _besselCalc_;
-  System                      sys_;  // system data (radii, charges, etc.)
-  Constants                   consts_;
+  const System*               _sys_;  // system data (radii, charges, etc.)
+  const Constants*            _consts_;
   SHCalc*                     _shCalc_;
     
   // pre-computed spherical harmonics matrices for every charge in the system
@@ -59,7 +59,7 @@ protected:
 public:
     
   ASolver(const int N, const int p, const BesselCalc* _bcalc,
-          SHCalc* _shCalc, const System sys);
+                   SHCalc* _shCalc, const System* _sys);
   virtual ~ASolver();
   ASolver(const ASolver& other);
   ASolver& operator=(const ASolver& other);

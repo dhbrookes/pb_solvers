@@ -23,42 +23,30 @@ class ReExpCoeffsConstants
 {
 protected:
   vector<vector<double> > a_;  // first index is m, second is n
-  vector<vector<double> > b_;  // first index is m, second is n
+  vector<vector<double> > b_;
+  vector<vector<double> > alpha_;
+  vector<vector<double> > beta_;
+  vector<vector<double> > nu_;
+  vector<vector<double> > mu_;
+  double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
+  int p_;
+  double kappa_; //from Constants
   
-  ReExpCoeffsConstants(int p=Constants::MAX_NUM_POLES)
-  :a_(p -1), b_(p-1)
-  {
-    int m, n, inner_size, sign;
-    double a_val, b_val;
-    vector<double> a_m;
-    vector<double> b_m;
-    for (m = 0; m < p -1; m++)
-    {
-      inner_size = (2*p-m-1);
-      a_m.reserve(inner_size);
-      b_m.reserve(inner_size);
-      for (n = 0; n < 2*p-m-1; n++)
-      {
-        if (n < (m-2))
-        {
-          a_val = 0.0;
-          b_val = 0.0;
-        }
-        else
-        {
-          a_val = sqrt(((n+m+1) * (n-m+1)) / ((2*n+1) * (2*n+3)));
-          if (m < 0)        sign = -1.0;
-          else if (m == 0)  sign = 0.0;
-          else              sign = 1.0;
-          b_val = sign * sqrt(((n-m-1) * (n-m)) / ((2*n-1) * (2*n+1)));
-        }
-        a_m.push_back(a_val);
-        b_m.push_back(b_val);
-      }
-      a_.push_back(a_m);
-      b_.push_back(b_m);
-    }
-  }
+  void calc_a_and_b();
+  void calc_alpha_and_beta();
+  void calc_nu_and_mu();
+
+public:
+  
+  ReExpCoeffsConstants(double kappa, double lambda,
+                       int p=Constants::MAX_NUM_POLES);
+  
+  const double get_a_val(int m, int n) const      { return a_[m][n]; }
+  const double get_b_val(int m, int n) const      { return b_[m][n]; }
+  const double get_alpha_val(int m, int n) const  { return alpha_[m][n+1]; }
+  const double get_beta_val(int m, int n) const   { return beta_[m][n+1]; }
+  const double get_nu_val(int m, int n) const     { return nu_[m+(p_-1)][n]; }
+  const double get_mu_val(int m, int n) const     { return mu_[m+(p_-1)][n];}
   
 };
 

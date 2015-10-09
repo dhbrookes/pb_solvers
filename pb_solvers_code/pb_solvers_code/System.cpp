@@ -15,7 +15,20 @@ Molecule::Molecule(int M, int a, vector<double> qs, vector<EPt> pos)
 }
 
 
+
 System::System(Constants consts, const vector<Molecule>& mols)
 :consts_(consts), molecules_(mols), N_((int) mols.size())
 {
+}
+
+
+const double System::get_average_radius() const
+{
+  double ave = 0;
+  for (int i = 0; i < N_; i++)
+  {
+    ave += get_ai(i);
+  }
+  ave  =  ave / N_;
+  return ave;
 }
