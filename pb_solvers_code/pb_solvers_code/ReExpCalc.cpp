@@ -144,7 +144,6 @@ void ReExpCoeffs_IJ::calc_s()
 {
   int m, n, l;
   cmplx val;
-  cmplx ic = cmplx(0, 1);
   double r = v_.get_r();
   S_ = MyVector<MyMatrix<cmplx> > (p_);
   vector<double> besselK = _besselCalc_->calc_mbfK(2*p_, kappa_*r);
