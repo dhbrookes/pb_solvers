@@ -113,7 +113,7 @@ public:
   /*
    Element access operator given position (i, j)
    */
-  const T& operator()(const int i, const int j) const
+  T& operator()(const int i, const int j) const
   {
     if (i < 0 || j < 0 || i > nrows_ || j > ncols_)
     {
@@ -223,9 +223,9 @@ public:
     /*
      Access operator with brackets only requires one value
      */
-    const T& operator[](int i)
+    T& operator[](int i) const
     {
-      return this(i, 0);
+      return this->vals_[i][0];
     }
     
     /*
