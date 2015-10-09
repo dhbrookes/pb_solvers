@@ -159,7 +159,43 @@ void ReExpCoeffs_IJ::calc_s()
     S_[0].set_val(0, l, val);
   }
   
-  for 
+  for (n = 0; p_ - 1; n++)
+  {
+    for(l = n+1; l < 2*p_ - n - 1; l++)
+    {
+      val = calc_beta(0, l-1) * S_[0](n, l-1);
+      val += calc_beta(0, n-1) * S_[0](n-1, l);
+      val += calc_alpha(0, l) * S_[0](n, l+1);
+      val *= -1 / calc_alpha(0, n);
+      S_[0].set_val(n+1, l, val);
+    }
+  }
+  
+  cmplx val2;
+  int l2;
+  for (m=0; m < p_-1; m++)
+  {
+    for (l = m; l < 2*p_ - m - 1; l++)
+    {
+      val = calc_mu(-m-1, l) * S_[m](m, l-1);
+      val += calc_nu(m, l+1) * S_[m](m, l+1);
+      val *= 1 / calc_nu(-m-1, m+1);
+      S_[m+1].set_val(m+1, l, val);
+      
+      for (n = m; n < p_-1; n++)
+      {
+        for (l2 = n+1; l2 < 2*p_ - n -1; l2++)
+        {
+          val2 = calc_beta(m+1, l2-1) * S_[m+1](n, l-1);
+          val2 += calc_beta(m+1, n-1) * S_[m+1](n-1, l);
+          val2 += calc_alpha(m+1, l) * S_[m+1](n-1, l);
+          val2 *= -1/(calc_alpha(m+1, n));
+          S_[m+1].set_val(n+1, l, val2);
+        }
+      }
+      
+    }
+  }
   
 }
 
