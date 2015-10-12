@@ -226,7 +226,7 @@ public:
      */
     T operator[](int i) const
     {
-      return MyMatrix<T>::vals_[i][0];
+      return this->vals_[i][0];
     }
     
     /*

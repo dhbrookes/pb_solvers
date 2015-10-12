@@ -15,11 +15,11 @@
 #include "System.h"
 #include "util.h"
 
+using namespace std;
 
 int main(int argc, const char * argv[])
 {
-//	
-//  cout << "Hello i build and run" << endl;
-//
-//	return 0;
+  vector<double> av (5, 1);
+  MyVector<double> a (av);
+  cout << a[2] << endl;;
 }
