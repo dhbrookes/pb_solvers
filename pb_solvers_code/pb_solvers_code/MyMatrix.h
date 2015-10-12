@@ -194,9 +194,10 @@ public:
  with only one column
  */
 template<typename T>
-class MyVector : public MyMatrix<T>
+class MyVector : MyMatrix<T>
 {
 public:
+  
     /*
      Initialize empty vector given the size
      */
@@ -217,7 +218,7 @@ public:
     
     void set_val(const int i, const T& val)
     {
-      this->MyMatrix<T>::set_val(i, 0, val);
+      MyMatrix<T>::set_val(i, 0, val);
     }
     
     /*
@@ -225,7 +226,7 @@ public:
      */
     T operator[](int i) const
     {
-      return this->vals_[i][0];
+      return MyMatrix<T>::vals_[i][0];
     }
     
     /*
