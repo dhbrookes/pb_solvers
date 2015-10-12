@@ -13,6 +13,7 @@
 
 /*
  Class for testing euclidean points
+ used: http://keisan.casio.com/exec/system/1359533867 for calcs
  */
 class EuPointUTest : public ::testing::Test
 {
@@ -55,6 +56,7 @@ TEST_F(EuPointUTest, setGetConvert2)
 
 /*
  Class for testing spherical coordinate points
+  used: http://keisan.casio.com/exec/system/1359533867 for calcs
  */
 class SpPointUTest : public ::testing::Test
 {
