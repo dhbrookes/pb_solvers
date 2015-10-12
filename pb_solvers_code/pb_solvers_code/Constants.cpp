@@ -9,7 +9,7 @@
 #include "Constants.h"
 // [F/m]=[C2/J/m] , F = Farad:
 const double Constants::PERMITTIVITY_VAC = 8.854187817e-12;
-const double Constants::KB = 1.380658e-23;  //!<  [ m^2 kg/ s^2 / K ] = [ J/K ]
+const double Constants::KB = 1.380658e-23; //!<  [ m^2 kg/ s^2 / K ] = [ J/K ]
 const double Constants::LITRE = 1e-3;  // [ m^3/L]
 const double Constants::PI = M_PI;
 const double Constants::COLOUMB_CONSTANT = 8.988e9;  //!< [ N*m^2/C^2 ]

@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include "ASolverTest.h"
 #include "BesselCalcTest.h"
 #include "ConstantsTest.h"
 #include "SHCalcTest.h"

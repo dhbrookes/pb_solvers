@@ -6,6 +6,8 @@ from scipy.misc import factorial
 ns = np.arange(0.0,10.0,1.0)
 zs = np.arange(1.0,11.0,9.0)
 
+zs = np.array([0.16972088, 0.31519592])
+
 resultsK = np.zeros((len(zs),len(ns)))
 resultsI = np.zeros((len(zs),len(ns)))
 nCt, zCt = 0, 0
@@ -91,7 +93,7 @@ theta = 0.5
 phi = [0.5]
 
 for p in phi:
-    print p
+    #print p
     for m in range(nmax):
         Ynm = scipy.special.sph_harm(m, nmax-1, p, theta)
 

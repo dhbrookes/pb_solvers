@@ -9,7 +9,7 @@
 #include "System.h"
 
 
-Molecule::Molecule(int M, int a, vector<double> qs, vector<EPt> pos)
+Molecule::Molecule(int M, double a, vector<double> qs, vector<EPt> pos)
 :M_(M), a_(a), qs_(qs), pos_(pos)
 {
 }

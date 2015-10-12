@@ -57,7 +57,19 @@ protected:
   void compute_E();
 
 public:
-    
+  
+  MatOfMats<double>::type get_gamma()   { return gamma_; }
+  MatOfMats<double>::type get_delta()   { return delta_; }
+  VecOfMats<cmplx>::type  get_E()       { return E_; }
+  
+  double get_gamma_ni( int i, int n)    { return gamma_( i, i )( n, n); }
+  double get_delta_ni( int i, int n)    { return delta_( i, i )( n, n); }
+  cmplx  get_E_ni( int i, int n, int m)
+  {
+    if (m < 0) return conj( E_[ i ]( n, m) );
+    else return E_[ i ]( n, m);
+  }
+  
   ASolver(const int N, const int p, const BesselCalc* _bcalc,
           SHCalc* _shCalc, const System sys);
   virtual ~ASolver();

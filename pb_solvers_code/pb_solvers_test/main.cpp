@@ -21,16 +21,14 @@ const int nvals = 10 ;      //! standard number of poles for testing
 #include "SystemUnitTest.h"
 #include "utilUnitTest.h"
 
-#include "ASolverTest.h"
 #include "tester.h"
-
 
 using namespace std;
 
 int main(int argc, char * argv[])
 {
   
-  bool test = true;
+  bool test = false;
   if (test)
   {
     cout << "Welcome to test suite" << endl;

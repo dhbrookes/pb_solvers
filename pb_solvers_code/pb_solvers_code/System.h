@@ -29,7 +29,7 @@ protected:
   vector<EPt>         pos_;  // position of each charge in the molecule\
     
 public:
-  Molecule(int M, int a, vector<double> qs, vector<EPt> pos);
+  Molecule(int M, double a, vector<double> qs, vector<EPt> pos);
     
   const int get_m() const               { return M_; }
   const double get_a() const            { return a_; }

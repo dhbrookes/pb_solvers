@@ -217,7 +217,7 @@ public:
     
     void set_val(const int i, const T& val)
     {
-      this->MyMatrix<T>::set_val(i, 0, val);
+      MyMatrix<T>::set_val(i, 0, val);
     }
     
     /*
@@ -225,7 +225,7 @@ public:
      */
     const T& operator[](int i)
     {
-      return this(i, 0);
+      return this->vals_[i][0];
     }
     
     /*
