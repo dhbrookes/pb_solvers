@@ -13,7 +13,6 @@
 
 /*
  Class for testing euclidean points
- used: http://keisan.casio.com/exec/system/1359533867 for calcs
  */
 class EuPointUTest : public ::testing::Test
 {
@@ -37,8 +36,8 @@ TEST_F(EuPointUTest, setGetConvert)
   
   SphPoint<double> testSpPt = testPt.convert_to_spherical();
   EXPECT_NEAR( testSpPt.get_r(),     95.814195190, preclim);
-  EXPECT_NEAR( testSpPt.get_theta(),  0.412135754, preclim);
-  EXPECT_NEAR( testSpPt.get_phi(),    1.055698348, preclim);
+  EXPECT_NEAR( testSpPt.get_theta(),  1.055698348, preclim);
+  EXPECT_NEAR( testSpPt.get_phi(),    0.412135754, preclim);
 }
 
 TEST_F(EuPointUTest, setGetConvert2)
@@ -50,8 +49,21 @@ TEST_F(EuPointUTest, setGetConvert2)
   
   SphPoint<double> testSpPt = testPt.convert_to_spherical();
   EXPECT_NEAR( testSpPt.get_r(),     20.615528128, preclim);
-  EXPECT_NEAR( testSpPt.get_theta(),  1.570796327, preclim);
-  EXPECT_NEAR( testSpPt.get_phi(),    1.325817664, preclim);
+  EXPECT_NEAR( testSpPt.get_theta(),  1.325817664, preclim);
+  EXPECT_NEAR( testSpPt.get_phi(),    1.570796327, preclim);
+}
+
+TEST_F(EuPointUTest, setGetConvert3)
+{
+  EuPoint <double> testPt( 0.0, 0.0,-5.0 );
+  EXPECT_NEAR( testPt.get_x(),  0.0, preclim);
+  EXPECT_NEAR( testPt.get_y(),  0.0, preclim);
+  EXPECT_NEAR( testPt.get_z(), -5.0, preclim);
+  
+  SphPoint<double> testSpPt = testPt.convert_to_spherical();
+  EXPECT_NEAR( testSpPt.get_r(),      5.000000000, preclim);
+  EXPECT_NEAR( testSpPt.get_theta(),         M_PI, preclim);
+  EXPECT_NEAR( testSpPt.get_phi(),    0.000000000, preclim);
 }
 
 /*

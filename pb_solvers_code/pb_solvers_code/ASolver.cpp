@@ -105,11 +105,13 @@ const cmplx ASolver::calc_indi_e(int i, int n, int m)
   {
     q = sys_.get_qij(i, j);
     rho = sys_.get_sph_posij(i, j).get_r();
-    // q_ij * rho_ij * Y_(n,m)(theta_ij, phi_ij):
+    // q_ij * (rho_ij)^n * Y_(n,m)(theta_ij, phi_ij):
     cmplx all_sh_acc = all_sh[i][j](n, abs(m));
     if ( m < 0 )
       all_sh_acc = conj( all_sh_acc );
-    e += q * rho * all_sh_acc;
+
+    e += q * pow( rho, n ) * all_sh_acc;
+    
   }
   return e;
 }
@@ -169,9 +171,9 @@ void ASolver::compute_E()
     ei = MyMatrix<cmplx>(p_, 2*p_ + 1);
     for (n = 0; n < p_; n++)
     {
-      for (m = -n; m < n; m++)
+      for (m = -n; m <= n; m++)
       {
-        ei.set_val(n, m + p_, calc_indi_e(i, n, m));
+        ei.set_val(n, m + n, calc_indi_e(i, n, m));
       }
     }
     E_.set_val(i, ei);

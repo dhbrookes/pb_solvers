@@ -13,82 +13,107 @@
 #include "MyMatrix.h"
 #include "Constants.h"
 #include "util.h"
+#include "BesselCalc.h"
 
 using namespace std;
 
 /*
  Class for pre-computing the constants in the re-expansion coefficne
- */
-class ReExpCoeffsConstants
-{
-protected:
-  vector<vector<double> > a_;  // first index is m, second is n
-  vector<vector<double> > b_;  // first index is m, second is n
-  
-  ReExpCoeffsConstants(int p=Constants::MAX_NUM_POLES)
-  :a_(p -1), b_(p-1)
-  {
-    int m, n, inner_size, sign;
-    double a_val, b_val;
-    vector<double> a_m;
-    vector<double> b_m;
-    for (m = 0; m < p -1; m++)
-    {
-      inner_size = (2*p-m-1);
-      a_m.reserve(inner_size);
-      b_m.reserve(inner_size);
-      for (n = 0; n < 2*p-m-1; n++)
-      {
-        if (n < (m-2))
-        {
-          a_val = 0.0;
-          b_val = 0.0;
-        }
-        else
-        {
-          a_val = sqrt(((n+m+1) * (n-m+1)) / ((2*n+1) * (2*n+3)));
-          if (m < 0)        sign = -1.0;
-          else if (m == 0)  sign = 0.0;
-          else              sign = 1.0;
-          b_val = sign * sqrt(((n-m-1) * (n-m)) / ((2*n-1) * (2*n+1)));
-        }
-        a_m.push_back(a_val);
-        b_m.push_back(b_val);
-      }
-      a_.push_back(a_m);
-      b_.push_back(b_m);
-    }
-  }
-  
-};
+// */
+//class ReExpCoeffsConstants
+//{
+//protected:
+//  MyMatrix<double> a_;  // first index is m, second is n
+//  MyMatrix<double> b_;
+//  MyMatrix<double> alpha_;
+//  MyMatrix<double> beta_;
+//  MyMatrix<double> nu_;
+//  MyMatrix<double> mu_;
+//  double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
+//  int p_;
+//  double kappa_; //from Constants
+//  
+//  void calc_a_and_b();
+//  void calc_alpha_and_beta();
+//  void calc_nu_and_mu();
+//
+//public:
+//  
+//  /*
+//   Initialize proper amount of memory in default constructor:
+//   */
+//  ReExpCoeffsConstants(int p=Constants::MAX_NUM_POLES)
+//  :p_(p), a_(p, p), b_(p, p), alpha_(p, p+1), beta_(p, p+1)
+//  ,nu_(2*p, p), mu_(2*p, p)
+//  {
+//  }
+//  
+//  ReExpCoeffsConstants(double kappa, double lambda,
+//                       int p=Constants::MAX_NUM_POLES);
+//  
+//  const double get_a_val(int m, int n) const      { return a_(m, n); }
+//  const double get_b_val(int m, int n) const      { return b_(m, n); }
+//  const double get_alpha_val(int m, int n) const  { return alpha_(m, n+1); }
+//  const double get_beta_val(int m, int n) const   { return beta_(m, n+1); }
+//  const double get_nu_val(int m, int n) const     { return nu_(m+(p_-1), n); }
+//  const double get_mu_val(int m, int n) const     { return mu_(m+(p_-1), n);}
+//  
+//};
 
 /*
- Class containing necessary information for calculating re-expansion
- coefficients (labeled T matrix in Lotan 2006)
+ Class representing one entry in the re-expansion coefficient matrix. So if 
+ that matrix is T (as in Lotan 2006), then this class contains the info 
+ for one T^(i,j)
  */
-class ReExpCoeffs
+class ReExpCoeffs_IJ
 {
 protected:
   
   int p_; // max value of n when solving for A
-  vector<MyMatrix<cmplx> >  R_;  // rotation coefficients
-  vector<MyMatrix<cmplx> >  S_;  // translation coefficients
-  ReExpCoeffsConstants*     _theseConsts_;
-  Constants*                _consts_;
   
-  void calc_r(double theta);  // calculate all the values for R_
+  /*
+   R_ contains rotation coefficients for this entry. R_ has three
+   indices: R[n](m, s)
+   */
+  MyVector<MyMatrix<cmplx> >  R_;
+  /*
+   S_ contains translation coefficients for this entry. S_ has three
+   indices: S[m](n, l)
+   */
+  MyVector<MyMatrix<cmplx> >  S_;
+//  ReExpCoeffsConstants*     _consts_;
+  double kappa_; //from Constants
+  double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
+  
+  ShPt v_; //computing re-expansion along this vector
+  
+  /*
+   Spherical harmonics for this v_:
+   */
+  const MyMatrix<cmplx>* Ytp_;
+  const BesselCalc* _besselCalc_;
+  
+  void calc_r();  // calculate all the values for R_
   void calc_s(); // calculate all the values for S_
+  
+  // The below functions calculate constants required for R_ and S_
+  const double calc_b(int m, int n);  // R_
+  const double calc_a(int m, int n);  // R_
+  const double calc_alpha(int m, int n);  // S_
+  const double calc_beta(int m, int n);  // S_
+  const double calc_nu(int m, int n);  // S_
+  const double calc_mu(int m, int n); // S_
   
 public:
   
-  ReExpCoeffs();
-  ReExpCoeffs(int p, ReExpCoeffsConstants* _consts);
-  virtual ~ReExpCoeffs();
-  ReExpCoeffs& operator=(const ReExpCoeffs* other);
+//  ReExpCoeffs_IJ();
+  ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp,
+                 double kappa, double lambda);
+//  virtual ~ReExpCoeffs_IJ();
+//  ReExpCoeffs_IJ& operator=(const ReExpCoeffs_IJ* other);
   
-  cmplx get_rval(int n, int m, int s) { return R_[n](m, s); }
-  cmplx get_sval(int i, int n, int m) { return S_[i](n, m); }
-  
+//  const cmplx get_rval(int n, int m, int s) const { return R_[n](m, s); }
+//  const cmplx get_sval(int m, int n, int l) const { return S_[m](n, l); }
   
 };
 

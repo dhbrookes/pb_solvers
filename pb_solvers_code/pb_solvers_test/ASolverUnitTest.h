@@ -26,7 +26,7 @@ protected :
   virtual void SetUp()
   {
     mol_.clear( );
-    EPt pos[2]   = { EPt( 0.0, 0.0, -5.0 ), EPt( 0.0, 0.0, 25.0 ) };
+    EPt pos[2]   = { EPt( 0.0, 0.0, -5.0 ), EPt( 10.0, 7.8, 25.0 ) };
     double cg[2] = { 5.0, -0.4};
     double rd[2] = { 5.6, 10.4};
     for (int molInd = 0; molInd < 2; molInd ++ )
@@ -47,10 +47,6 @@ protected :
 } ;
 
 // functions to test:
-/*
- compute_E();
- calc_indi_e
- */
 
 TEST_F(ASolverUTest, checkGamma)
 {
@@ -89,6 +85,7 @@ TEST_F(ASolverUTest, checkDelta)
   EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 1)/46846.22401, 1.0, preclim);
   EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 6)/8.00377E+14, 1.0, preclim);
 }
+ 
 
 TEST_F(ASolverUTest, checkE)
 {
@@ -102,11 +99,24 @@ TEST_F(ASolverUTest, checkE)
   
   ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, sys );
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 0)/56.03476045, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 4)/73361234.99, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 1)/46846.22401, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 6)/8.00377E+14, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5,5+0).real()/-15625, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5,5+0).imag(),        0.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6,6-5).real(),        0.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6,6-5).imag(),        0.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).real(),-0.4, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).imag(), 0.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3,3-3).real()/184.52,  1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3,3-3).imag()/417.127, 1.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6,6-5).real()/5.31968e+06, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6,6-5).imag()/-916110,     1.0, preclim);
+
 }
 
 /*
