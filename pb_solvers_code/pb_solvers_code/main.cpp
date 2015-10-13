@@ -19,7 +19,7 @@
 int main(int argc, const char * argv[])
 {
 	
-  cout << "Hello i build and run" << endl;
+  cout << "Hello I build and run" << endl;
 
 	return 0;
 }

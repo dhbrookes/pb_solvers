@@ -223,7 +223,7 @@ public:
     /*
      Access operator with brackets only requires one value
      */
-    const T& operator[](int i)
+    T& operator[](int i)
     {
       return this->vals_[i][0];
     }

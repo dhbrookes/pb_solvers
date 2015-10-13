@@ -9,9 +9,7 @@
 #ifndef pbsolvers_ASolverUnitTest_h
 #define pbsolvers_ASolverUnitTest_h
 
-#include <iostream>
 #include "ASolver.h"
-using namespace std;
 
 class ASolverUTest : public ::testing::Test
 {
@@ -44,9 +42,9 @@ protected :
   } // end SetUp
   
   virtual void TearDown() {}
-} ;
+} ; // end ASolverUTest
 
-// functions to test:
+
 
 TEST_F(ASolverUTest, checkGamma)
 {
@@ -60,11 +58,11 @@ TEST_F(ASolverUTest, checkGamma)
   
   ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, sys );
 
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 0),  1.463995711, preclim);
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 4),  1.760111936, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1),  1.463995711, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5),  1.760111936, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 1),  1.621243794, preclim);
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 6),  1.799701878, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 2),  1.621243794, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 7),  1.799701878, preclim);
 }
 
 TEST_F(ASolverUTest, checkDelta)
@@ -79,11 +77,11 @@ TEST_F(ASolverUTest, checkDelta)
   
   ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, sys );
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 0)/56.03476045, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 4)/73361234.99, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1)/56.03476045, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5)/73361234.99, 1.0, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 1)/46846.22401, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 6)/8.00377E+14, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 2)/46846.22401, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 7)/8.00377E+14, 1.0, preclim);
 }
  
 
@@ -118,20 +116,6 @@ TEST_F(ASolverUTest, checkE)
   EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6,6-5).imag()/-916110,     1.0, preclim);
 
 }
-
-/*
- 
- // testing matrix assertions for accessing matrix members
- TEST_F(MyMatrixUTest, exceptAccess)
- {
- MyMatrix <double> testMat_( testInp_ );
-
- ASSERT_THROW(testMat_( 0,-1), MatrixAccessException);
- }
- 
- 
- */
-
 
 
 #endif

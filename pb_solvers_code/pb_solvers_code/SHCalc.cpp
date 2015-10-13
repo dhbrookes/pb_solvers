@@ -10,19 +10,19 @@
 #include "SHCalc.h"
 
 SHCalcConstants::SHCalcConstants(const int N)
-:numVals_(N), legConsts1_(2*N, 2*N), legConsts2_(2*N, 2*N),
-shConsts_(2*N, 2*N), dubFac_(2*N)
+:numVals_(N), legConsts1_(N, N), legConsts2_(N, N),
+shConsts_(N, N), dubFac_(N)
 {
   vector<double> temp;
-  temp.reserve(4 * numVals_);
+  temp.reserve(2 * numVals_);
   temp.push_back(1.0);
   int i, n, m;
-  for (i = 1; i < 4 * numVals_; i++)
+  for (i = 1; i < 2 * numVals_; i++)
   {
     temp.push_back(temp[i-1] * sqrt(i));
   }
 
-  for (n = 0; n < 2 * numVals_; n++)
+  for (n = 0; n < numVals_; n++)
   {
     for (m = 0; m <= n; m++)
     {
@@ -42,7 +42,7 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
 
   dubFac_[0] = 1.0;
   dubFac_[1] = 1.0;
-  for (i = 2; i < 2 * numVals_; i++)
+  for (i = 2; i < numVals_; i++)
   {
     dubFac_[i] = dubFac_[i-1] * (2*i - 1);
   }
@@ -50,8 +50,8 @@ shConsts_(2*N, 2*N), dubFac_(2*N)
 }
 
 SHCalc::SHCalc(const int num_vals, const SHCalcConstants* _consts)
-:_consts_(_consts), numVals_(num_vals), P_(2 * num_vals, 2 * num_vals),
-Y_(2 * num_vals, 2 * num_vals)
+:_consts_(_consts), numVals_(num_vals), P_( num_vals, num_vals),
+Y_( num_vals, num_vals)
 {
   assert (_consts_->get_n() == numVals_);
 }
@@ -75,7 +75,7 @@ void SHCalc::calc_legendre(const double theta)
   
   int l, m;
   double val;
-  for (l = 0; l < 2 * numVals_; l++)
+  for (l = 0; l < numVals_; l++)
   {
     for (m = 0; m <= l; m++)
     {
@@ -124,9 +124,9 @@ void SHCalc::calc_sh(const double theta, const double phi)
   int n, m;
   cmplx val, mcomp;
   double shc;  // constant value
-  for (n = 0; n < 2*numVals_; n++)
+  for (n = 0; n < numVals_; n++)
   {
-    for (m = 0; m < 2*numVals_; m++)
+    for (m = 0; m < numVals_; m++)
     {
       shc = _consts_->get_sh_consts_val(n, m);
       double dblM = (double) m;
@@ -157,8 +157,8 @@ const complex<double> SHCalc::get_result(const int n, const int m) const
 
 SHCalc::SHCalc()
 :_consts_(), numVals_(Constants::MAX_NUM_POLES),
-P_(2 * Constants::MAX_NUM_POLES, 2 * Constants::MAX_NUM_POLES),
-Y_(2 * Constants::MAX_NUM_POLES, 2 * Constants::MAX_NUM_POLES)
+P_( Constants::MAX_NUM_POLES, Constants::MAX_NUM_POLES),
+Y_( Constants::MAX_NUM_POLES, Constants::MAX_NUM_POLES)
 {
   assert (_consts_->get_n() == numVals_);
 }

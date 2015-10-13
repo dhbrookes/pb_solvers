@@ -12,10 +12,10 @@
 BesselConstants::BesselConstants(const int N)
 :numVals_(N)
 {
-  kConsts_.reserve(2 * numVals_);
+  kConsts_.reserve(numVals_);
   int n;
   double kval;
-  for (n = 0; n < 2*numVals_; n++)
+  for (n = 0; n < numVals_; n++)
   {
     kval = 1.0 / ((2*n+1) * (2*n-1));
     kConsts_.push_back(kval);
@@ -36,6 +36,7 @@ BesselCalc::BesselCalc(int N, BesselConstants* _consts)
  k n+1(z) = k n(z) + ( k n-1(z) * z^2 )/( (2n+1)*(2n-1) )
  
  param n is the number of bessel functions to calculate
+  Will return vector for \hat{i} that ranges from 0 to nval-1
  */
 const vector<double> BesselCalc::calc_mbfK(const int n,
                                            const double z) const
@@ -63,6 +64,7 @@ const vector<double> BesselCalc::calc_mbfK(const int n,
  where: t_j^n(y) = (1/j)*t_(j-1)^n(y)*(y/(2n+2j+3))
  
  param n is the number of bessel functions to calculate
+     Will return vector for \hat{i} that ranges from 0 to nval-1
  */
 const vector<double> BesselCalc::calc_mbfI(const int n,
                      const double z) const

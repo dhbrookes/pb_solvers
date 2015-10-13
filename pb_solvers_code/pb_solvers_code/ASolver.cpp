@@ -130,7 +130,7 @@ void ASolver::compute_gamma()
     gi = MyMatrix<double> (p_, p_);
     for(j = 0; j < p_; j++)
     {
-      gi.set_val(j, j, calc_indi_gamma(i, j+1));
+      gi.set_val(j, j, calc_indi_gamma(i, j));
     }
     gamma_.set_val(i, i, gi);
   }
@@ -150,7 +150,7 @@ void ASolver::compute_delta()
     di = MyMatrix<double> (p_, p_);
     for(j = 0; j < p_; j++)
     {
-      di.set_val(j, j, calc_indi_delta(i, j+1));
+      di.set_val(j, j, calc_indi_delta(i, j));
     }
     delta_.set_val(i, i, di);
   }

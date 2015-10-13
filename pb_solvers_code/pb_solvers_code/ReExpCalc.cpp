@@ -117,8 +117,7 @@ void ReExpCoeffs_IJ::calc_r()
     for (s = -n; s <= n; n++)
     {
       val = Ytp_->operator()(n, -s);
-     // R_[n].set_val(0, s, val);
-      
+      R_[n].set_val(0, s, val);      
     }
   }
   

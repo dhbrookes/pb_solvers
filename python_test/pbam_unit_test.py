@@ -50,7 +50,7 @@ for n in ns:
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
 
 # Useful SH and legendre constants:
-nmax = 5.0
+nmax = 9.0
 ms = np.arange(0.0,nmax,1.0)
 const1 = ((2.0*nmax-1.0)/(nmax-ms))
 const2 = ((ms+nmax-1.0)/(nmax-ms))
@@ -64,7 +64,7 @@ for l in ls:
         dub_fac[l] = reduce(int.__mul__,range(2*int(l)-1,0,-2))
         
 ## for calculating \sqrt{\frac{(n-|m|)!}{(n+|m|)!}}
-nmax = 10.0
+nmax = 9.0
 ms = np.arange(0.0,nmax+1.0,1.0)
 sh_const = np.sqrt( factorial(nmax-ms) /
                                 factorial(nmax+ms) )
@@ -72,7 +72,7 @@ sh_const = np.sqrt( factorial(nmax-ms) /
 ## For calculating the associated Legendre Polynomial
 ## P_{n,m} (x) in eq 1 of Lotan 2006
 theta = np.arange(0.0, np.pi + 0.1, np.pi/3.0)
-n = 10
+n = 9.0
 
 for z in theta:
     zCt = 0
@@ -85,9 +85,9 @@ for z in theta:
 ## Y_{n,m} (\theta, \phi) in eq 1 of Lotan 2006
 ## In the paper they are different by a factor of
 ## \sqrt{ \frac{2n+1}{4\pi}}
-theta = np.arange(0.0, np.pi + 0.1, np.pi/2.0)    # polar
+theta = np.arange(0.0, np.pi + 0.1, np.pi/3.0)    # polar
 phi = np.arange(0.0, 2.0*np.pi + 0.1, 0.5) # azimuthal
-nmax = 6
+nmax = 10
 
 theta = 0.5
 phi = [0.5]
@@ -97,8 +97,8 @@ for p in phi:
     for m in range(nmax):
         Ynm = scipy.special.sph_harm(m, nmax-1, p, theta)
 
-        print Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi)
-                                        /(2.0*float(nmax-1)+1.0))
+       # print Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
+       #                                 /(2.0*float(nmax-1)+1.0))
         
 
 
