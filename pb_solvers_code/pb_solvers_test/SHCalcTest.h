@@ -38,9 +38,9 @@ public:
     double LegConst2N5[6] = {0.8, 1.25,  2.0 ,  3.5 ,  8.0 , 0.0};
     
     // ensure proper calculation of shConstant
-    double SHConst[10] = { 1.00000000e+00, 9.53462589e-02, 9.17469804e-03,
-      8.99653161e-04,   9.08786929e-05,   9.57945535e-06, 1.07101567e-06,
-      1.29879727e-07,   1.76743922e-08, 2.86716502e-09 };
+    double SHConst[10] = {  1.00000000e+00,   1.05409255e-01,   1.12366644e-02,
+      1.22602060e-03,   1.38819496e-04,   1.65921034e-05,    2.14203133e-06,
+      3.09175592e-07,   5.30231766e-08,   1.24976826e-08};
 
     
     // check that our prefactors are right
@@ -63,7 +63,7 @@ public:
     {
       assert( abs(doubleFactorial[i]-SHConstTest.get_dub_fac_val( i ))
              < precLim);
-      assert( abs(SHConst[i]-SHConstTest.get_sh_consts_val( 10, i ))
+      assert( abs(SHConst[i]-SHConstTest.get_sh_consts_val( 9, i ))
              < precLim);
     }
     
@@ -90,19 +90,19 @@ public:
     SHCalcTest.calc_sh( 0.0, 0.0 );
     assert( abs(SHCalcTest.get_legendre_result( 0, 0) - 1.0)
            < precLim );
-    assert( abs(SHCalcTest.get_legendre_result(10, 0) - 1.0)
+    assert( abs(SHCalcTest.get_legendre_result(vals-1, 0) - 1.0)
            < precLim );
-    assert( abs(SHCalcTest.get_legendre_result(10,10) - 0.0)
+    assert( abs(SHCalcTest.get_legendre_result(vals-1,vals-1) - 0.0)
            < precLim );
     
     // Testing \theta = \pi/3.0, z = cos(\theta) = 0.5
-    double largeLeg = 1.55370279e+08;
+    double largeLeg = -9.44242865e+06;
     SHCalcTest.calc_sh( M_PI/3.0, 0.0 );
     assert( abs(SHCalcTest.get_legendre_result( 0, 0) - 1.0)
            < precLim );
-    assert( abs(SHCalcTest.get_legendre_result(10, 0)
-                + 1.88228607e-01) < precLim );
-    assert( abs(SHCalcTest.get_legendre_result(10,10)
+    assert( abs(SHCalcTest.get_legendre_result(vals-1, 0)
+                + 2.67898560e-01) < precLim );
+    assert( abs(SHCalcTest.get_legendre_result(vals-1,vals-1)
                 - largeLeg )/largeLeg < precLim );
     
     // Testing \theta = 2.0\pi/3.0, z = cos(\theta) = -0.5
@@ -110,9 +110,9 @@ public:
     SHCalcTest.calc_sh( 2.0*M_PI/3.0, 0.0 );
     assert( abs(SHCalcTest.get_legendre_result( 0, 0) - 1.0)
            < precLim );
-    assert( abs(SHCalcTest.get_legendre_result(10, 0)
-                + 1.88228607e-01) < precLim );
-    assert( abs(SHCalcTest.get_legendre_result(10,10)
+    assert( abs(SHCalcTest.get_legendre_result(vals-1, 0)
+                - 2.67898560e-01) < precLim );
+    assert( abs(SHCalcTest.get_legendre_result(vals-1,vals-1)
                 - largeLeg )/largeLeg < precLim );
 
     // Testing \theta = \pi, z = cos(\theta) = -1.0
@@ -121,7 +121,7 @@ public:
            < precLim );
     assert( abs(SHCalcTest.get_legendre_result( 5, 0) + 1.0)
            < precLim );
-    assert( abs(SHCalcTest.get_legendre_result(10,10)
+    assert( abs(SHCalcTest.get_legendre_result(vals-1,vals-1)
                 - 0 ) < precLim );
     
     // Now test SPHERICAL HARMONICS

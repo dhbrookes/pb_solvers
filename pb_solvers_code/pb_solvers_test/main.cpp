@@ -28,7 +28,6 @@ using namespace std;
 
 int main(int argc, char * argv[])
 {
-  
   bool test = false;
   if (test)
   {
@@ -37,11 +36,10 @@ int main(int argc, char * argv[])
     allTest.unitTest( argc, argv );
   }
   
-  cout << "Now for Google Tests." << endl ;
-    
   bool gtest = true;
   if (gtest)
   {
+    cout << "Now for Google Tests." << endl ;
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
   }

@@ -74,6 +74,9 @@ protected:
   /*
    R_ contains rotation coefficients for this entry. R_ has three
    indices: R[n](m, s)
+   And the range of each:  0 <= n <  poles
+                          -n <= m <= n, but -m = conj(+m), so really just [0,p)
+                          -n <= s <= n
    */
   MyVector<MyMatrix<cmplx> >  R_;
   /*
@@ -107,13 +110,42 @@ protected:
 public:
   
 //  ReExpCoeffs_IJ();
-  ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp,
+  ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp, BesselCalc * BesselCalc,
                  double kappa, double lambda);
 //  virtual ~ReExpCoeffs_IJ();
 //  ReExpCoeffs_IJ& operator=(const ReExpCoeffs_IJ* other);
+
+  const cmplx get_yval(int n, int s) const
+  {
+    if ( s < 0 ) return conj(Ytp_->operator()(n, -s));
+    else         return Ytp_->operator()(n, s);
+  }
   
-//  const cmplx get_rval(int n, int m, int s) const { return R_[n](m, s); }
-//  const cmplx get_sval(int m, int n, int l) const { return S_[m](n, l); }
+  
+  const cmplx get_rval(int n, int m, int s) const
+  {
+    if ( m < 0 ) return conj(R_[n](-m, -s+n));
+    else         return R_[n](m, s+n);
+  }
+  
+  //const cmplx get_sval(int m, int n, int l) const { return S_[m](n, l); }
+  
+  const cmplx get_sval(int n, int l, int m) const  { return S_[n](l, n+m); }
+  
+//  void set_yval(int n, int s, cmplx val)
+//  {
+//    if ( s < 0 ) Ytp_->set_val(n, s, conj( val ));
+//    else         Ytp_->set_val(n, s, val );
+//  }
+  
+
+  void set_rval(int n, int m, int s, cmplx val)
+  {
+    if ( m < 0 ) R_[n].set_val(-m, s+n, conj( val ));
+    else         R_[n].set_val( m, s+n, val );
+  }
+  
+  void set_sval(int n, int l, int m, cmplx val) { R_[n].set_val(l, n+m, val); }
   
 };
 

@@ -113,7 +113,7 @@ public:
   /*
    Element access operator given position (i, j)
    */
-  const T& operator()(const int i, const int j) const
+  T operator()(const int i, const int j) const
   {
     if (i < 0 || j < 0 || i > nrows_ || j > ncols_)
     {
@@ -194,9 +194,10 @@ public:
  with only one column
  */
 template<typename T>
-class MyVector : public MyMatrix<T>
+class MyVector : MyMatrix<T>
 {
 public:
+  
     /*
      Initialize empty vector given the size
      */
@@ -223,7 +224,7 @@ public:
     /*
      Access operator with brackets only requires one value
      */
-    T& operator[](int i)
+    T operator[](int i) const
     {
       return this->vals_[i][0];
     }

@@ -14,6 +14,7 @@
 #include "ASolverTest.h"
 #include "BesselCalcTest.h"
 #include "ConstantsTest.h"
+#include "ReExpCalcTest.h"
 #include "SHCalcTest.h"
 
 /*
@@ -25,23 +26,32 @@ public:
 	
 	int unitTest(int argc, char * argv[])
 	{
+    ASolverTest ASolvT;
+    ASolvT.RunASolverTest();
+    cout << "Complete ASolv test" << endl;
+    
 		BesselConstantsTest BCT;
 		BCT.TestBesselConstants();
+    cout << "Complete Bessel test" << endl;
 		
 		BesselCalcTest BCalcT;
 		BCalcT.TestBesselCalc();
+    cout << "Complete SH test" << endl;
     
     ConstantsTest ConT;
     ConT.TestConstants();
+    cout << "Complete Constant test" << endl;
+    
+    ReExpTest ReR;
+    ReR.runReExTest();
+    cout << "Complete ReExpan test" << endl;
 		
 		SHCalcConstantsTest SHConT;
 		SHConT.TestSHCalcConstants();
+    cout << "Complete SH test" << endl;
     
     SHCalcTest SHCalcT;
     SHCalcT.TestSHCalc();
-    
-    ASolverTest ASolvT;
-    ASolvT.RunASolverTest();
 		
 		cout << "Complete all tests" << endl;
 		return 0;

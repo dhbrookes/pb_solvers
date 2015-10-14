@@ -95,8 +95,10 @@
 
 
 ReExpCoeffs_IJ::ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp,
+                               BesselCalc * BesselCalc,
                                double kappa, double lambda)
-:p_(p), v_(v), Ytp_(Ytp), kappa_(kappa), lambda_(lambda)
+:p_(p), v_(v), Ytp_(Ytp), _besselCalc_(BesselCalc),
+ kappa_(kappa), lambda_(lambda)
 {
   calc_r();
   calc_s();
@@ -114,26 +116,26 @@ void ReExpCoeffs_IJ::calc_r()
   for (n = 0; n < p_; n++)
   {
     R_.set_val(n, MyMatrix<cmplx> (p_, 2*p_));
-    for (s = -n; s <= n; n++)
+    for (s = -n; s <= n; s++)
     {
-      val = Ytp_->operator()(n, -s);
-      R_[n].set_val(0, s, val);      
+      val = get_yval(n, -s);
+      set_rval(n, 0, s, val);
     }
   }
   
   for (m = 0; m < p_; m++)
   {
-    for (n=m+2; n< 2*p_ - m; n++)
+    for (n=m+2; n < p_ - m; n++)
     {
       for (s=-n+1; s < n; s++)
       {
-        val = 0.5 * exp(ic * phi) * (1 + cos(theta)) *
-        calc_b(s-1, n) * R_[n](m, s-1);
+        val = 0.5 * exp(-ic * phi) * (1 + cos(theta)) *
+              calc_b(s-1, n) * get_rval(n, m, s-1);
         val -= 0.5 * exp(ic * phi) * (1 - cos(theta)) *
-        calc_b(-s+1, n) * R_[n](m, s-1);
-        val += sin(theta)*calc_a(s, n)*R_[n](m, s);
+              calc_b(-s-1, n) * get_rval(n, m, s+1);
+        val += sin(theta) * calc_a(s, n) * get_rval(n, m, s);
         val *= 1 / calc_b(m, n);
-        //R_[n-1].set_val(m+1, s, val);
+        set_rval(n-1, m+1, s, val);
       }
     }
   }
@@ -145,80 +147,116 @@ void ReExpCoeffs_IJ::calc_s()
   cmplx val;
   double r = v_.get_r();
   S_ = MyVector<MyMatrix<cmplx> > (p_);
-  vector<double> besselK = _besselCalc_->calc_mbfK(2*p_, kappa_*r);
-  for (m = 0; m < p_; m++)
+  vector<double> besselK = _besselCalc_->calc_mbfK(p_, kappa_*r);
+  
+  for (n = 0; n < p_; n++)
   {
-    S_.set_val(m, MyMatrix<cmplx> (2*p_, 2*p_));
+    S_.set_val(n, MyMatrix<cmplx> (p_, 2*p_));
   }
   
-  for (l = 0; l < 2*p_; l++)
+  for (l = 0; l < p_; l++)
   {
-    val = pow((lambda_ / r), l) * (besselK[l-1] * exp(-kappa_*r)) / r;
-    //S_[0].set_val(0, l, val);
-  }
+    val = pow((lambda_ / r), l) * (besselK[l] * exp(-kappa_*r)) / r;
+    set_sval( 0, l, 0, val );
+    
+    // Set S_{n,0}^0 vals
+    set_sval( l, 0, 0, pow(-1.0, l) * val );
+    }
   
-  for (n = 0; p_ - 1; n++)
+  for (n = 1; n < p_ - 1; n++)
   {
-    for(l = n+1; l < 2*p_ - n - 1; l++)
+    for(l = n+1; l < p_ - n - 1; l++)
     {
-      val = calc_beta(0, l-1) * S_[0](n, l-1);
-      val += calc_beta(0, n-1) * S_[0](n-1, l);
-      val += calc_alpha(0, l) * S_[0](n, l+1);
-      val *= -1 / calc_alpha(0, n);
-      //S_[0].set_val(n+1, l, val);
+      val  = calc_beta(0, l-1) * get_sval( n, l-1, 0);
+      val += calc_beta(0, n-1) * get_sval( n,   l, 0);
+      val += calc_alpha(0,  l) * get_sval( n, l+1, 0);
+      val *= -1.0 / calc_alpha(0, n);
+      set_sval(n+1, l, 0, val);
     }
   }
   
+  
+  /* old code implementation differs from paper:
+   for (int m = 1; m < m_p; m++)
+     for (int l = m; l < 2*m_p-1-m; l++)
+     {
+        U[l][m][m] = -(kpio*DELTA(l,-m)*U[l-1][m-1][m-1] +
+                      o_i*GAMMA(l+1,m-1)*U[l+1][m-1][m-1])/GAMMA(m,-m);
+     }
+   
+   for (int n = m+1; n < m_p-1; n++)
+     for (int l = n+1; l < 2*m_p-2-n; l++)
+     {
+       U[l][n+1][m] = -(kpio*BETA(l-1,m)*U[l-1][n][m] +
+                        kpoo*BETA(n-1,m)*U[l][n-1][m] +
+                        o_i*ALPHA(l,m)*U[l+1][n][m])/ALPHA(n,m);
+     }
+   */
   cmplx val2;
-  int l2;
-  for (m=0; m < p_-1; m++)
+  for (m = 1; m < p_ - 1; m++)
   {
-    for (l = m; l < 2*p_ - m - 1; l++)
+    for (l = m; l < p_ - m - 1; l++)
     {
-      val = calc_mu(-m-1, l) * S_[m](m, l-1);
-      val += calc_nu(m, l+1) * S_[m](m, l+1);
-      val *= 1 / calc_nu(-m-1, m+1);
-      //S_[m+1].set_val(m+1, l, val);
-      
-      for (n = m; n < p_-1; n++)
+      val  = calc_mu( -m,   l) * get_sval(m-1, l-1,m-1);
+      val += calc_nu(m-1, l+1) * get_sval(m-1, l+1,m-1);
+      val *= 1.0 / calc_nu(-m, m);
+      set_sval(m+1, l, m+1, val);
+    }
+    
+    for (n = m; n < p_ - 1; n++)
+    {
+      for (l = n + 1; l < p_ - n - 1; l++)
       {
-        for (l2 = n+1; l2 < 2*p_ - n -1; l2++)
-        {
-          val2 = calc_beta(m+1, l2-1) * S_[m+1](n, l-1);
-          val2 += calc_beta(m+1, n-1) * S_[m+1](n-1, l);
-          val2 += calc_alpha(m+1, l) * S_[m+1](n-1, l);
-          val2 *= -1/(calc_alpha(m+1, n));
-          //S_[m+1].set_val(n+1, l, val2);
-        }
+        val2  = calc_beta(m, l-1) * get_sval(  n, l-1, m);
+        val2 += calc_beta(m, n-1) * get_sval(n-1,   l, m);
+        val2 += calc_alpha(m,  l) * get_sval(  n, l+1, m);
+        val2 *= -1.0 / calc_alpha(m, n);
+        set_sval(n+1, l, m+1, val2);
       }
-      
     }
   }
   
-}
+} // end calc_s
 
 
 const double ReExpCoeffs_IJ::calc_a(int m, int n)
 {
-  double a_val = sqrt(((n+m+1) * (n-m+1)) / ((2*n+1)* (2*n+3)));
+  double mD = (double) m;
+  double nD = (double) n;
+  double a_val = sqrt(((nD+mD+1.0) * (nD-mD+1.0)) /
+                      ((2.0*nD+1.0)* (2.0*nD+3.0)));
   return a_val;
 }
 
-
+/*
+ 
+ Original code: 0 is positive
+ for (int n = 0; n < 2*N_POLES; n++)
+   for (int m = 0; m <= n; m++)
+   {
+     b(n,m) = sqrt((REAL)(n-m-1)*(n-m)/((2*n+1)*(2*n-1)));//Lotan 2006 (eq 1.2)
+     if (m != 0)
+       b(n,-m) = -sqrt((REAL)(n+m-1)*(n+m)/((2*n+1)*(2*n-1)));
+   }
+ */
 const double ReExpCoeffs_IJ::calc_b(int m, int n)
 {
-  int sign;
-  if (m < 0)        sign = -1.0;
-  else if (m == 0)  sign = 0.0;
-  else              sign = 1.0;
-  double b_val = sign * sqrt(((n-m-1) * (n-m)) / ((2*n-1) * (2*n+1)));
+  double sign = 1.0;
+  if (m < 0)  sign = -1.0;
+  double mD = (double) m;
+  double nD = (double) n;
+
+  double b_val = sign * sqrt(((nD-mD-1.0) * (nD-mD)) /
+                             ((2.0*nD-1.0) * (2.0*nD+1.0)));
   return b_val;
 }
 
 
 const double ReExpCoeffs_IJ::calc_alpha(int m, int n)
 {
-  double alpha_val = sqrt((n + m + 1) * (n - m + 1));
+  double mD = (double) m;
+  double nD = (double) n;
+  double alpha_val = sqrt((nD + mD + 1.0) * (nD - mD + 1.0));
   return alpha_val;
 }
 

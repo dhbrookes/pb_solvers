@@ -64,11 +64,7 @@ public:
   
   double get_gamma_ni( int i, int n)    { return gamma_( i, i )( n, n); }
   double get_delta_ni( int i, int n)    { return delta_( i, i )( n, n); }
-  cmplx  get_E_ni( int i, int n, int m)
-  {
-    if (m < 0) return conj( E_[ i ]( n, m) );
-    else return E_[ i ]( n, m);
-  }
+  cmplx  get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+n ); }
   
   ASolver(const int N, const int p, const BesselCalc* _bcalc,
           SHCalc* _shCalc, const System sys);
@@ -76,7 +72,6 @@ public:
   ASolver(const ASolver& other);
   ASolver& operator=(const ASolver& other);
   
-  
-};
+}; // End ASolver
 
 #endif /* ASolver_hpp */

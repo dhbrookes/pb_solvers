@@ -89,16 +89,52 @@ theta = np.arange(0.0, np.pi + 0.1, np.pi/3.0)    # polar
 phi = np.arange(0.0, 2.0*np.pi + 0.1, 0.5) # azimuthal
 nmax = 10
 
-theta = 0.5
-phi = [0.5]
-
 for p in phi:
-    #print p
     for m in range(nmax):
         Ynm = scipy.special.sph_harm(m, nmax-1, p, theta)
 
-       # print Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
-       #                                 /(2.0*float(nmax-1)+1.0))
+        #print np.imag(Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
+        #                              /(2.0*float(nmax-1)+1.0)))
         
 
 
+
+## For calculating rotation coefficients
+## R_n^{0,s} = Y_{n,-s}(\theta)(\phi)
+
+#theta = 0.0
+theta = 1.5953910356207
+#phi = [ 0.0 ]
+phi = 5.7258897721
+nmax = 10
+
+R = np.zeros(( nmax, 2*nmax),dtype=complex)
+
+Ynm = scipy.special.sph_harm(range(nmax), nmax-1, phi, theta)
+
+for s in range(nmax):
+    R[0][s] = Ynm[s]
+
+print np.imag(Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
+                                      /(2.0*float(nmax-1)+1.0)))
+                                      
+
+n = nmax-1
+
+for m in range(1,nmax):
+    for s in range(-n+1, n):
+        bmn = np.sqrt(float((n - m -1)*(n-m))/float((2.0*n-1.0)*2.0*n+1))
+        amn = np.sqrt(float((n+m+1)*(n-m+1))/float((2.0*n+1.0)*(2.0*n+3.0)))
+        
+        bs1n = np.sqrt(float((n - ( s-1) -1)*(n-( s-1)))/float((2.0*n-1.0)*2.0*n+1))
+        bs2n = np.sqrt(float((n - (-s-1) -1)*(n-(-s-1)))/float((2.0*n-1.0)*2.0*n+1))
+        
+        asn = np.sqrt(float((n+s+1)*(n-s+1))/float((2.0*n+1.0)*(2.0*n+3.0)))
+        
+        R[m][s+nmax] = 0.5*np.exp(complex(0.0,-1.0)*phi)*(1.0+np.cos(theta))*bs1n*R[m,s+nmax-1]
+        R[m][s+nmax]-= 0.5*np.exp(complex(0.0, 1.0)*phi)*(1.0-np.cos(theta))*bs2n*R[m,s+nmax+1]
+        R[m][s+nmax]+= np.sin(theta)*asn*R[m,s+nmax]
+        R[m][s+nmax] *= (1.0/bmn)
+        
+
+print R

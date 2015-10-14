@@ -100,20 +100,20 @@ TEST_F(ASolverUTest, checkE)
   EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
   EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5,5+0).real()/-15625, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5,5+0).imag(),        0.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5, 0).real()/-15625, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5, 0).imag(),        0.0, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6,6-5).real(),        0.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6,6-5).imag(),        0.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6, -5).real(),        0.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6, -5).imag(),        0.0, preclim);
   
   EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).real(),-0.4, preclim);
   EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).imag(), 0.0, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3,3-3).real()/184.52,  1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3,3-3).imag()/417.127, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3, -3).real()/184.52,  1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3, -3).imag()/417.127, 1.0, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6,6-5).real()/5.31968e+06, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6,6-5).imag()/-916110,     1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6, -5).real()/5.31968e+06, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6, -5).imag()/-916110,     1.0, preclim);
 
 }
 
