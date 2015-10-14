@@ -7,30 +7,27 @@
 //
 
 #include <iostream>
-
 #include <limits.h>
 #include "gtest/gtest.h"
-
-#include "Constants.h"
-#include "util.h"
 
 double preclim = 1.0e-4;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
 
+#include "ASolverUnitTest.h"
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
-#include "MyMatrixTest.h"
+#include "MyMatrixUnitTest.h"
+#include "ReExpCalcUnitTest.h"
 #include "SHCalcUnitTest.h"
-#include "ASolverUnitTest.h"
+#include "SystemUnitTest.h"
+#include "utilUnitTest.h"
 
 #include "tester.h"
 
-
-using namespace std ;
+using namespace std;
 
 int main(int argc, char * argv[])
 {
-  
   bool test = false;
   if (test)
   {
@@ -39,11 +36,10 @@ int main(int argc, char * argv[])
     allTest.unitTest( argc, argv );
   }
   
-  cout << "Now for Google Tests." << endl ;
-    
   bool gtest = true;
   if (gtest)
   {
+    cout << "Now for Google Tests." << endl ;
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
   }

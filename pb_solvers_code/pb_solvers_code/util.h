@@ -83,12 +83,26 @@ public:
   {
   }
 
+  // for dealing with possible singularities
+  // Should note that THETA = polar angle [ 0 <= THETA <= PI ]
+  //    and PHI = azimuthal angle [ 0 <= PHI <= 2*PI ]
   const SphPoint<T> convert_to_spherical() const
   {
-    T r, theta, phi;
+    T r, rp;
+    T theta = 0.0;
+    T phi   = 0.0;
+    
     r = sqrt(x_*x_ + y_*y_ + z_*z_);
-    theta = atan(y_ / x_);
-    phi = atan(sqrt(x_*x_ + y_*y_) / z_);
+    rp = sqrt(x_*x_ + y_*y_);
+    
+    if ( abs(r) > 1e-5 ) theta = acos( z_ / r );
+    
+    if ( abs(rp) > 1e-5 )
+    {
+      if ( y_ < 0 )   phi = 2*M_PI - acos( x_ / rp );
+      else            phi = acos( x_ / rp );
+    }
+    
     return SphPoint<T>(r, theta, phi);
   }
 
@@ -100,6 +114,8 @@ public:
 
 /*
  Class for 3 dimensional spherical points
+ Should note that THETA = polar angle [ 0 <= THETA <= PI ]
+ and PHI = azimuthal angle [ 0 <= PHI <= 2*PI ]
  */
 template<typename T>
 class SphPoint

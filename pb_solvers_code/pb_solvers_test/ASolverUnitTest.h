@@ -11,20 +11,111 @@
 
 #include "ASolver.h"
 
-//ASolver aSolverTest = ASolver() ;
-
-class ASolverTest : public ::testing::Test
+class ASolverUTest : public ::testing::Test
 {
+public :
+  
 protected :
-    
-    
-    
-    virtual void SetUp() {}
-    virtual void TearDown() {}
-} ;
+  
+  int vals_;
+  Constants const_;
+  vector< Molecule > mol_;
+  
+  virtual void SetUp()
+  {
+    mol_.clear( );
+    EPt pos[2]   = { EPt( 0.0, 0.0, -5.0 ), EPt( 10.0, 7.8, 25.0 ) };
+    double cg[2] = { 5.0, -0.4};
+    double rd[2] = { 5.6, 10.4};
+    for (int molInd = 0; molInd < 2; molInd ++ )
+    {
+      int M = 1;
+      vector<double> charges(1);
+      vector<EPt> posCharges(1);
+      
+      charges[0] = cg[molInd];
+      posCharges[0] = pos[molInd];
+      
+      Molecule molNew = Molecule( M, rd[molInd], charges, posCharges );
+      mol_.push_back( molNew );
+    }
+  } // end SetUp
+  
+  virtual void TearDown() {}
+} ; // end ASolverUTest
 
 
 
+TEST_F(ASolverUTest, checkGamma)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( vals );
+  BesselCalc bCalcu        = BesselCalc( vals, &bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( vals );
+  SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
+  System sys               = System( const_, mol_ );
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, sys );
+
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1),  1.463995711, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5),  1.760111936, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 2),  1.621243794, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 7),  1.799701878, preclim);
+}
+
+TEST_F(ASolverUTest, checkDelta)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( vals );
+  BesselCalc bCalcu        = BesselCalc( vals, &bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( vals );
+  SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
+  System sys               = System( const_, mol_ );
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, sys );
+  
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1)/56.03476045, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5)/73361234.99, 1.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 2)/46846.22401, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 7)/8.00377E+14, 1.0, preclim);
+}
+ 
+
+TEST_F(ASolverUTest, checkE)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( vals );
+  BesselCalc bCalcu        = BesselCalc( vals, &bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( vals );
+  SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
+  System sys               = System( const_, mol_ );
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, sys );
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5, 0).real()/-15625, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5, 0).imag(),        0.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6, -5).real(),        0.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6, -5).imag(),        0.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).real(),-0.4, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).imag(), 0.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3, -3).real()/184.52,  1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3, -3).imag()/417.127, 1.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6, -5).real()/5.31968e+06, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6, -5).imag()/-916110,     1.0, preclim);
+
+}
 
 
 #endif

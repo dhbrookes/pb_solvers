@@ -11,16 +11,13 @@
 
 #include "BesselCalc.h"
 
-//BesselConstants bConstTest = BesselConstants(nvals);
-//BesselCalc bCalcTest = BesselCalc( nvals, &bConstTest ) ;
-
+/*
+ Class for unit testing constants of bessel calculations
+ */
 class BesselConstUTest : public ::testing::Test
 {
 public :
   BesselConstUTest() : bConstTest_( nvals ) {  }
-
-//  BesselConstants get_BConst() { return bConstTest_; }
-//  BesselCalc      get_BCalcs() { return bCalcTest_; }
   
 protected :
   BesselConstants bConstTest_;
@@ -45,14 +42,13 @@ TEST_F(BesselConstUTest, first10)
 }
 
 
-
+/*
+ Calculator class for unit testing modified bessel functions
+ */
 class BesselCalcUTest : public ::testing::Test
 {
 public:
   BesselCalcUTest() : bConstTest_( nvals ), bCalcTest_( nvals, &bConstTest_) {}
-    
-  //  BesselConstants get_BConst() { return bConstTest_; }
-  //  BesselCalc      get_BCalcs() { return bCalcTest_; }
   
 protected :
   BesselConstants bConstTest_;

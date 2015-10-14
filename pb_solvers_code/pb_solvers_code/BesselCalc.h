@@ -44,7 +44,6 @@ class BesselCalc
   int                 numVals_;  // order of the Bessel function
   BesselConstants*    _consts_;  // constants used in recursion: Lotan 2006 eq3
 
-  
 public:
     
   BesselCalc();
@@ -67,7 +66,5 @@ public:
   const vector<double> calc_mbfK(const int n, const double z) const;
   
 };
-
-
 
 #endif /* BesselCalc_h */

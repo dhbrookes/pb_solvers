@@ -8,7 +8,6 @@
 
 #include "ASolver.h"
 
-
 ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
                  SHCalc* _shCalc, const System* _sys)
 :p_(p), _besselCalc_(_bcalc), gamma_(N, N), _sys_(_sys),
@@ -23,7 +22,7 @@ _shCalc_(_shCalc), N_(_sys->get_n())
     all_sh.push_back(calc_mol_sh(_sys_->get_molecule(i)));
   }
   
-  //precomput gamma, delta and E:
+  //precompute gamma, delta and E:
   compute_gamma();
   compute_delta();
   compute_E();
@@ -62,12 +61,13 @@ const double ASolver::calc_indi_gamma(int i, int n) const
   double eps_p = _consts_->get_dielectric_prot();
   double eps_s = _consts_->get_dielectric_water();
   // all bessel function k
-  vector<double> bk_all = _besselCalc_->calc_mbfK(n+1, kap*ai);
-  double bk2 = bk_all[n];   // bessel k at n+1
-  double bk1 = bk_all[n-1];  // bessel k at n
+  vector<double> bk_all = _besselCalc_->calc_mbfK(n+2, kap*ai);
+  double bk1 = bk_all[n];  // bessel k at n
+  double bk2 = bk_all[n+1];   // bessel k at n+1
   
-  g = (2*n + 1) * exp(kap*ai);
-  g = g / (((2*n + 1)*bk2) + (n*bk1*((eps_p / eps_s) - 1)));
+  double n_dub = (double) n;
+  g = (2.0*n_dub + 1.0) * exp(kap*ai);
+  g = g / (((2.0*n_dub + 1.0)*bk2) + (n_dub*bk1*((eps_p / eps_s) - 1.0)));
   return g;
 }
 
@@ -82,14 +82,14 @@ const double ASolver::calc_indi_delta(int i, int n) const
   double eps_p = _consts_->get_dielectric_prot();
   double eps_s = _consts_->get_dielectric_water();
   // all bessel function I:
-  vector<double> bi_all = _besselCalc_->calc_mbfK(n+1, kap*ai);
-  double bi2 = bi_all[n];   // bessel i at n+1
-  double bi1 = bi_all[n-1];  // bessel i at n
+  vector<double> bi_all = _besselCalc_->calc_mbfI(n+2, kap*ai);
+  double bi1 = bi_all[n];  // bessel i at n
+  double bi2 = bi_all[n+1];   // bessel i at n+1
   
-//    d = pow(ai, 2*n+1) / (2*n+1);
-  d = (kap*kap*ai*ai) * (bi2 / (2*n + 3));
-  d += (n * bi1 * (1 - (eps_p / eps_s)));
-  d *= pow(ai, 2*n+1) / (2*n+1);
+  double n_dub = (double) n;
+  d = (kap*kap*ai*ai) * (bi2 / (2.0*n_dub + 3.0));
+  d += (n_dub * bi1 * (1.0 - (eps_p / eps_s)));
+  d *= pow(ai, 2.0*n_dub+1.0) / (2.0*n_dub+1.0);
   return d;
 }
 
@@ -129,7 +129,7 @@ void ASolver::compute_gamma()
       gi.set_val(j, j, calc_indi_gamma(i, j));
     }
     gamma_.set_val(i, i, gi);
-}
+  }
 }
 
 
@@ -167,7 +167,7 @@ void ASolver::compute_E()
     ei = MyMatrix<cmplx>(p_, 2*p_ + 1);
     for (n = 0; n < p_; n++)
     {
-      for (m = -n; m < n; m++)
+      for (m = -n; m <= n; m++)
       {
         ei.set_val(n, m + n, calc_indi_e(i, n, m));
       }

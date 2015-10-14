@@ -6,6 +6,8 @@ from scipy.misc import factorial
 ns = np.arange(0.0,10.0,1.0)
 zs = np.arange(1.0,11.0,9.0)
 
+zs = np.array([0.16972088, 0.31519592])
+
 resultsK = np.zeros((len(zs),len(ns)))
 resultsI = np.zeros((len(zs),len(ns)))
 nCt, zCt = 0, 0
@@ -48,7 +50,7 @@ for n in ns:
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
 
 # Useful SH and legendre constants:
-nmax = 5.0
+nmax = 9.0
 ms = np.arange(0.0,nmax,1.0)
 const1 = ((2.0*nmax-1.0)/(nmax-ms))
 const2 = ((ms+nmax-1.0)/(nmax-ms))
@@ -62,7 +64,7 @@ for l in ls:
         dub_fac[l] = reduce(int.__mul__,range(2*int(l)-1,0,-2))
         
 ## for calculating \sqrt{\frac{(n-|m|)!}{(n+|m|)!}}
-nmax = 10.0
+nmax = 9.0
 ms = np.arange(0.0,nmax+1.0,1.0)
 sh_const = np.sqrt( factorial(nmax-ms) /
                                 factorial(nmax+ms) )
@@ -70,7 +72,7 @@ sh_const = np.sqrt( factorial(nmax-ms) /
 ## For calculating the associated Legendre Polynomial
 ## P_{n,m} (x) in eq 1 of Lotan 2006
 theta = np.arange(0.0, np.pi + 0.1, np.pi/3.0)
-n = 10
+n = 9.0
 
 for z in theta:
     zCt = 0
@@ -83,20 +85,56 @@ for z in theta:
 ## Y_{n,m} (\theta, \phi) in eq 1 of Lotan 2006
 ## In the paper they are different by a factor of
 ## \sqrt{ \frac{2n+1}{4\pi}}
-theta = np.arange(0.0, np.pi + 0.1, np.pi/2.0)    # polar
+theta = np.arange(0.0, np.pi + 0.1, np.pi/3.0)    # polar
 phi = np.arange(0.0, 2.0*np.pi + 0.1, 0.5) # azimuthal
-nmax = 6
-
-theta = 0.5
-phi = [0.5]
+nmax = 10
 
 for p in phi:
-    print p
     for m in range(nmax):
         Ynm = scipy.special.sph_harm(m, nmax-1, p, theta)
 
-        print Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi)
-                                        /(2.0*float(nmax-1)+1.0))
+        #print np.imag(Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
+        #                              /(2.0*float(nmax-1)+1.0)))
         
 
 
+
+## For calculating rotation coefficients
+## R_n^{0,s} = Y_{n,-s}(\theta)(\phi)
+
+#theta = 0.0
+theta = 1.5953910356207
+#phi = [ 0.0 ]
+phi = 5.7258897721
+nmax = 10
+
+R = np.zeros(( nmax, 2*nmax),dtype=complex)
+
+Ynm = scipy.special.sph_harm(range(nmax), nmax-1, phi, theta)
+
+for s in range(nmax):
+    R[0][s] = Ynm[s]
+
+print np.imag(Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
+                                      /(2.0*float(nmax-1)+1.0)))
+                                      
+
+n = nmax-1
+
+for m in range(1,nmax):
+    for s in range(-n+1, n):
+        bmn = np.sqrt(float((n - m -1)*(n-m))/float((2.0*n-1.0)*2.0*n+1))
+        amn = np.sqrt(float((n+m+1)*(n-m+1))/float((2.0*n+1.0)*(2.0*n+3.0)))
+        
+        bs1n = np.sqrt(float((n - ( s-1) -1)*(n-( s-1)))/float((2.0*n-1.0)*2.0*n+1))
+        bs2n = np.sqrt(float((n - (-s-1) -1)*(n-(-s-1)))/float((2.0*n-1.0)*2.0*n+1))
+        
+        asn = np.sqrt(float((n+s+1)*(n-s+1))/float((2.0*n+1.0)*(2.0*n+3.0)))
+        
+        R[m][s+nmax] = 0.5*np.exp(complex(0.0,-1.0)*phi)*(1.0+np.cos(theta))*bs1n*R[m,s+nmax-1]
+        R[m][s+nmax]-= 0.5*np.exp(complex(0.0, 1.0)*phi)*(1.0-np.cos(theta))*bs2n*R[m,s+nmax+1]
+        R[m][s+nmax]+= np.sin(theta)*asn*R[m,s+nmax]
+        R[m][s+nmax] *= (1.0/bmn)
+        
+
+print R
