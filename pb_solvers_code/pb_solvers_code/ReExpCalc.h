@@ -76,6 +76,7 @@ protected:
    indices: R[n](m, s)
    */
   MyVector<MyMatrix<cmplx> >  R_;
+  
   /*
    S_ contains translation coefficients for this entry. S_ has three
    indices: S[m](n, l)
