@@ -17,36 +17,36 @@
 //  calc_alpha_and_beta();
 //  calc_nu_and_mu();
 //}
-//
-//void ReExpCoeffsConstants::calc_a_and_b()
-//{
-//  
-//  int m, n,sign;
-//  double a_val, b_val;
-//  
-//  //calculate a and b:
-//  for (m = 0; m < p_; m++)
-//  {
-//    for (n = 0; n < 2*p_-m; n++)
-//    {
-//      if (n < (m-2))
-//      {
-//        a_val = 0.0;
-//        b_val = 0.0;
-//      }
-//      else
-//      {
-//        a_val = sqrt(((n+m+1) * (n-m+1)) / ((2*n+1)* (2*n+3)));
-//        if (m < 0)        sign = -1.0;
-//        else if (m == 0)  sign = 0.0;
-//        else              sign = 1.0;
-//        b_val = sign * sqrt(((n-m-1) * (n-m)) / ((2*n-1) * (2*n+1)));
-//      }
-//      a_.set_val(m, n, a_val);
-//      b_.set_val(m, n, b_val);
-//    }
-//  }
-//}
+
+void ReExpCoeffsConstants::calc_a_and_b()
+{
+  
+  int m, n,sign;
+  double a_val, b_val;
+  
+  //calculate a and b:
+  for (m = -2*p_; m <= 2*p_; m++)
+  {
+    for (n = -2*p_; n <= 2*p_; n++)
+    {
+      if (n < (m-2))
+      {
+        a_val = 0.0;
+        b_val = 0.0;
+      }
+      else
+      {
+        a_val = sqrt(((n+m+1) * (n-m+1)) / ((2*n+1)* (2*n+3)));
+        if (m < 0)        sign = -1.0;
+        else if (m == 0)  sign = 0.0;
+        else              sign = 1.0;
+        b_val = sign * sqrt(((n-m-1) * (n-m)) / ((2*n-1) * (2*n+1)));
+      }
+      a_.set_val(m, n, a_val);
+      b_.set_val(m, n, b_val);
+    }
+  }
+}
 //
 //
 //void ReExpCoeffsConstants::calc_alpha_and_beta()
@@ -96,10 +96,20 @@
 
 ReExpCoeffs_IJ::ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp,
                                BesselCalc * BesselCalc,
+                               ReExpCoeffsConstants* _consts,
                                double kappa, double lambda)
-:p_(p), v_(v), Ytp_(Ytp), _besselCalc_(BesselCalc),
- kappa_(kappa), lambda_(lambda)
+:p_(p), v_(v), _Ytp_(Ytp), _besselCalc_(BesselCalc),
+ kappa_(kappa), lambda_(lambda), _consts_(_consts)
 {
+  if (_besselCalc_->get_num_vals() < 2 * p_)
+  {
+   throw BesselSizeException(p_, _besselCalc_->get_num_vals());
+  }
+  
+  if (_Ytp_->get_nrows() < 2 * p_)
+  {
+    throw SHSizeException(p_, _Ytp_->get_nrows());
+  }
   calc_r();
   calc_s();
 }
@@ -130,11 +140,12 @@ void ReExpCoeffs_IJ::calc_r()
       for (s=-n+1; s < n; s++)
       {
         val = 0.5 * exp(-ic * phi) * (1 + cos(theta)) *
-              calc_b(s-1, n) * get_rval(n, m, s-1);
+          _consts_->get_b_val(s-1, n) * get_rval(n, m, s-1);
         val -= 0.5 * exp(ic * phi) * (1 - cos(theta)) *
-              calc_b(-s-1, n) * get_rval(n, m, s+1);
-        val += sin(theta) * calc_a(s, n) * get_rval(n, m, s);
-        val *= 1 / calc_b(m, n);
+          _consts_->get_b_val(-s- 1, n) * get_rval(n, m, s+1);
+        val += sin(theta) * _consts_->get_a_val(s, n) *
+          get_rval(n, m, s);
+        val *= 1 / _consts_->get_b_val(m, n);
         set_rval(n-1, m+1, s, val);
       }
     }
@@ -217,37 +228,37 @@ void ReExpCoeffs_IJ::calc_s()
 } // end calc_s
 
 
-const double ReExpCoeffs_IJ::calc_a(int m, int n)
-{
-  double mD = (double) m;
-  double nD = (double) n;
-  double a_val = sqrt(((nD+mD+1.0) * (nD-mD+1.0)) /
-                      ((2.0*nD+1.0)* (2.0*nD+3.0)));
-  return a_val;
-}
-
-/*
- 
- Original code: 0 is positive
- for (int n = 0; n < 2*N_POLES; n++)
-   for (int m = 0; m <= n; m++)
-   {
-     b(n,m) = sqrt((REAL)(n-m-1)*(n-m)/((2*n+1)*(2*n-1)));//Lotan 2006 (eq 1.2)
-     if (m != 0)
-       b(n,-m) = -sqrt((REAL)(n+m-1)*(n+m)/((2*n+1)*(2*n-1)));
-   }
- */
-const double ReExpCoeffs_IJ::calc_b(int m, int n)
-{
-  double sign = 1.0;
-  if (m < 0)  sign = -1.0;
-  double mD = (double) m;
-  double nD = (double) n;
-
-  double b_val = sign * sqrt(((nD-mD-1.0) * (nD-mD)) /
-                             ((2.0*nD-1.0) * (2.0*nD+1.0)));
-  return b_val;
-}
+//const double ReExpCoeffs_IJ::calc_a(int m, int n)
+//{
+//  double mD = (double) m;
+//  double nD = (double) n;
+//  double a_val = sqrt(((nD+mD+1.0) * (nD-mD+1.0)) /
+//                      ((2.0*nD+1.0)* (2.0*nD+3.0)));
+//  return a_val;
+//}
+//
+///*
+// 
+// Original code: 0 is positive
+// for (int n = 0; n < 2*N_POLES; n++)
+//   for (int m = 0; m <= n; m++)
+//   {
+//     b(n,m) = sqrt((REAL)(n-m-1)*(n-m)/((2*n+1)*(2*n-1)));//Lotan 2006 (eq 1.2)
+//     if (m != 0)
+//       b(n,-m) = -sqrt((REAL)(n+m-1)*(n+m)/((2*n+1)*(2*n-1)));
+//   }
+// */
+//const double ReExpCoeffs_IJ::calc_b(int m, int n)
+//{
+//  double sign = 1.0;
+//  if (m < 0)  sign = -1.0;
+//  double mD = (double) m;
+//  double nD = (double) n;
+//
+//  double b_val = sign * sqrt(((nD-mD-1.0) * (nD-mD)) /
+//                             ((2.0*nD-1.0) * (2.0*nD+1.0)));
+//  return b_val;
+//}
 
 
 const double ReExpCoeffs_IJ::calc_alpha(int m, int n)

@@ -94,6 +94,8 @@ public:
   const MyMatrix<cmplx> get_full_result() { return Y_; }
   
   double get_legendre_result( int n, int m );
+  
+  const int get_num_vals() const { return numVals_; }
 };
 
 #endif /* SHCalc_hpp */
