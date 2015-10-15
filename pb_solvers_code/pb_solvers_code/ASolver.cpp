@@ -52,7 +52,7 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
 /*
  Equation 19--Lotan 2006 page 544
  */
-const double ASolver::calc_indi_gamma(int i, int n) const
+double ASolver::calc_indi_gamma(int i, int n)
 {
   double g;  // output
   double kap = consts_.get_kappa();
@@ -73,7 +73,7 @@ const double ASolver::calc_indi_gamma(int i, int n) const
 /*
  Equation 20--Lotan 2006 page 544
  */
-const double ASolver::calc_indi_delta(int i, int n) const
+double ASolver::calc_indi_delta(int i, int n)
 {
   double d;  // output
   double kap = consts_.get_kappa();
@@ -96,7 +96,7 @@ const double ASolver::calc_indi_delta(int i, int n) const
  Calculates an E^(i)_(n,m) value
  Equation 13--Lotan 2006 page 543
  */
-const cmplx ASolver::calc_indi_e(int i, int n, int m)
+cmplx ASolver::calc_indi_e(int i, int n, int m)
 {
   cmplx e = 0.0;
   int j;

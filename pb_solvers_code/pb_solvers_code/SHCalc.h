@@ -37,11 +37,11 @@ protected:
 public:
   SHCalcConstants(const int num_vals=Constants::MAX_NUM_POLES);
   
-  const double get_leg_consts1_val(const int n, const int m) const    
+  const double get_leg_consts1_val(const int n, const int m)
                                 { return legConsts1_(n, m); }
-  const double get_leg_consts2_val(const int n, const int m) const    
+  const double get_leg_consts2_val(const int n, const int m)
                                 { return legConsts2_(n, m); }
-  const double get_sh_consts_val(const int n, const int m) const      
+  const double get_sh_consts_val(const int n, const int m)     
                                 { return shConsts_(n, m);   }
   const double get_dub_fac_val(const int i) const                     
                                 { return dubFac_[i];        }
@@ -67,7 +67,7 @@ class SHCalc
 protected:
   
   int                     numVals_;  //# of poles (output matrix will be 2Nx2N)
-  const SHCalcConstants*  _consts_;
+  SHCalcConstants*  _consts_;
   MyMatrix<double>        P_;  // legendre polynomials
   MyMatrix<cmplx>         Y_;  // spherical harmonics calcualted by this class
   
@@ -77,7 +77,7 @@ protected:
 public:
     
   SHCalc();
-  SHCalc(const int num_vals, const SHCalcConstants* _consts);
+  SHCalc(const int num_vals, SHCalcConstants* _consts);
   SHCalc(const SHCalc& other);  //copy constrctor
   
   virtual ~SHCalc();
@@ -88,14 +88,12 @@ public:
   SHCalc& operator=(const SHCalc& other);
   
   // retrieve the result for n, m values
-  const cmplx get_result(const int n, const int m) const;
+  cmplx get_result(const int n, const int m);
   
   // retrieve the full calculated Y_ matrix
-  const MyMatrix<cmplx> get_full_result() { return Y_; }
+  MyMatrix<cmplx> get_full_result() { return Y_; }
   
   double get_legendre_result( int n, int m );
-  
-  const int get_num_vals() const { return numVals_; }
 };
 
 #endif /* SHCalc_hpp */

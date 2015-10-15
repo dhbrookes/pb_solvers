@@ -98,8 +98,8 @@ public:
   ReExpCoeffsConstants(double kappa, double lambda,
                        int p=Constants::MAX_NUM_POLES);
   
-  const double get_a_val(int m, int n) const  { return a_(m + 2*p_, n+ 2*p_); }
-  const double get_b_val(int m, int n) const  { return b_(m + 2*p_, n+ 2*p_); }
+  double get_a_val(int m, int n)  { return a_(m + 2*p_, n+ 2*p_); }
+  double get_b_val(int m, int n)  { return b_(m + 2*p_, n+ 2*p_); }
 //  const double get_alpha_val(int m, int n) const  { return alpha_(m, n+1); }
 //  const double get_beta_val(int m, int n) const   { return beta_(m, n+1); }
 //  const double get_nu_val(int m, int n) const     { return nu_(m+(p_-1), n); }
@@ -141,8 +141,8 @@ protected:
   /*
    Spherical harmonics for this v_:
    */
-  const MyMatrix<cmplx>* _Ytp_;
-  const BesselCalc* _besselCalc_;
+  MyMatrix<cmplx>* _Ytp_;
+  BesselCalc* _besselCalc_;
   
   void calc_r();  // calculate all the values for R_
   void calc_s(); // calculate all the values for S_
@@ -170,13 +170,13 @@ public:
   }
   
   
-  const cmplx get_rval(int n, int m, int s) const
+  cmplx get_rval(int n, int m, int s)
   {
     if ( m < 0 ) return conj(R_[n](-m, -s+n));
     else         return R_[n](m, s+n);
   }
   //const cmplx get_sval(int m, int n, int l) const { return S_[m](n, l); }
-  const cmplx get_sval(int n, int l, int m) const  { return S_[n](l, n+m); }
+  cmplx get_sval(int n, int l, int m)  { return S_[n](l, n+m); }
   
 
   void set_rval(int n, int m, int s, cmplx val)

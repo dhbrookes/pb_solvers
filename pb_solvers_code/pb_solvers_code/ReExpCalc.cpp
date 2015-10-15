@@ -254,7 +254,7 @@ void ReExpCoeffs_IJ::calc_s()
 //  if (m < 0)  sign = -1.0;
 //  double mD = (double) m;
 //  double nD = (double) n;
-//
+// 
 //  double b_val = sign * sqrt(((nD-mD-1.0) * (nD-mD)) /
 //                             ((2.0*nD-1.0) * (2.0*nD+1.0)));
 //  return b_val;
