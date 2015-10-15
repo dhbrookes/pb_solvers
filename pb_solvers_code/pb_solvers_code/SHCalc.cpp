@@ -49,7 +49,7 @@ shConsts_(N, N), dubFac_(N)
   
 }
 
-SHCalc::SHCalc(const int num_vals, const SHCalcConstants* _consts)
+SHCalc::SHCalc(const int num_vals, SHCalcConstants* _consts)
 :_consts_(_consts), numVals_(num_vals), P_( num_vals, num_vals),
 Y_( num_vals, num_vals)
 {
@@ -143,7 +143,7 @@ void SHCalc::calc_sh(const double theta, const double phi)
  If m is negative, then we return the complex conjugate of the calculated 
  value for the positive value of m
  */
-const complex<double> SHCalc::get_result(const int n, const int m) const
+cmplx SHCalc::get_result(const int n, const int m)
 {
   if (m < 0)
   {
