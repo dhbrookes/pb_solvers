@@ -21,12 +21,12 @@ class ReExpTest
   {
     Constants Cst;
     ShPt testPt = EPt( 0.0, 0.0, 5.0).convert_to_spherical();
-    SHCalcConstants shCon( nvals );
-    SHCalc shCalc( nvals, &shCon );
+    SHCalcConstants shCon( 2*nvals );
+    SHCalc shCalc( 2*nvals, &shCon );
     shCalc.calc_sh( testPt.get_theta(), testPt.get_phi());
     
-    BesselConstants bCon( nvals );
-    BesselCalc      bCal( nvals, &bCon );
+    BesselConstants bCon( 2*nvals );
+    BesselCalc      bCal( 2*nvals, &bCon );
     
     MyMatrix<cmplx> shMat = shCalc.get_full_result();
     double kap            = Cst.get_kappa();

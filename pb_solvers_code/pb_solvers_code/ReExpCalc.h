@@ -127,16 +127,8 @@ public:
     if ( m < 0 ) return conj(R_[n](-m, -s+n));
     else         return R_[n](m, s+n);
   }
-  
   //const cmplx get_sval(int m, int n, int l) const { return S_[m](n, l); }
-  
   const cmplx get_sval(int n, int l, int m) const  { return S_[n](l, n+m); }
-  
-//  void set_yval(int n, int s, cmplx val)
-//  {
-//    if ( s < 0 ) Ytp_->set_val(n, s, conj( val ));
-//    else         Ytp_->set_val(n, s, val );
-//  }
   
 
   void set_rval(int n, int m, int s, cmplx val)
@@ -145,7 +137,7 @@ public:
     else         R_[n].set_val( m, s+n, val );
   }
   
-  void set_sval(int n, int l, int m, cmplx val) { R_[n].set_val(l, n+m, val); }
+  void set_sval(int n, int l, int m, cmplx val) { S_[n].set_val(l, n+m, val); }
   
 };
 
