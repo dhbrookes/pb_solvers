@@ -20,7 +20,8 @@ class ReExpTest
   void runReExTest()
   {
     Constants Cst;
-    ShPt testPt = EPt( 0.0, 0.0, 5.0).convert_to_spherical();
+    //ShPt testPt = EPt( 0.0, 0.0, 5.0).convert_to_spherical();
+    ShPt testPt = EPt( 6.9,-4.3,-0.2).convert_to_spherical();
     SHCalcConstants shCon( 2*nvals );
     SHCalc shCalc( 2*nvals, &shCon );
     shCalc.calc_sh( testPt.get_theta(), testPt.get_phi());

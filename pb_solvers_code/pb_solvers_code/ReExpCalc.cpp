@@ -115,7 +115,7 @@ void ReExpCoeffs_IJ::calc_r()
   R_ = MyVector<MyMatrix<cmplx> > (2*p_); // n range of 0 to 2p-1 is needed!
   for (n = 0; n < 2 * p_; n++)
   {
-    R_.set_val(n, MyMatrix<cmplx> (p_, 4*p_)); // s range: -2p+1 to 2p-1 needed!
+    R_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_)); // s range: -2p+1 to 2p-1 needed!
     for (s = -n; s <= n; s++)
     {
       val = get_yval(n, -s);
