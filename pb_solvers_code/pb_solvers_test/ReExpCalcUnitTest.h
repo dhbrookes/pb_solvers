@@ -57,10 +57,10 @@ TEST_F(ReExpUTest, checkR0Zpt)
   ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCo,
                            kap, lambda );
 
-  for ( int s = -nvals+1; s <= nvals-1; s++ )
+  for ( int s = 0; s < nvals; s++ )
   {
     EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 0, s).real(),
-                R0Zreal[s+nvals-1], preclim);
+                R0Zreal[s], preclim);
     EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 0, s).imag(),
                 R0Zimag, preclim);
   }
@@ -86,12 +86,12 @@ TEST_F(ReExpUTest, checkR0)
   ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCoeff,
                            kap, lambda );
   
-  for ( int s = -nvals+1; s <= nvals-1; s++ )
+  for ( int s = 0; s <= nvals-1; s++ )
   {
     EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 0, s).real(),
-                R0real[s+nvals-1], preclim);
+                R0real[s], preclim);
     EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 0, s).imag(),
-                R0imag[s+nvals-1], preclim);
+                R0imag[s], preclim);
   }
   
 }
