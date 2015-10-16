@@ -52,8 +52,10 @@ TEST_F(ReExpUTest, checkR0Zpt)
   MyMatrix<cmplx> shMat = shCalc.get_full_result();
   double kap            = Cst.get_kappa();
   double lambda         = 5.0;
+  ReExpCoeffsConstants ReExpCo( kap, lambda, nvals);
   
-  ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, kap, lambda );
+  ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCo,
+                           kap, lambda );
 
   for ( int s = -nvals+1; s <= nvals-1; s++ )
   {
@@ -79,8 +81,10 @@ TEST_F(ReExpUTest, checkR0)
   MyMatrix<cmplx> shMat = shCalc.get_full_result();
   double kap            = Cst.get_kappa();
   double lambda         = 5.0;
+  ReExpCoeffsConstants ReExpCoeff( kap, lambda, nvals);
   
-  ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, kap, lambda );
+  ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCoeff,
+                           kap, lambda );
   
   for ( int s = -nvals+1; s <= nvals-1; s++ )
   {

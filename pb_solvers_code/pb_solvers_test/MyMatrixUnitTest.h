@@ -9,7 +9,7 @@
 #ifndef MyMatrixTest_h
 #define MyMatrixTest_h
 
-//#include "MyMatrix.h"
+#include "MyMatrix.h"
 #include "util.h"
 using namespace std;
 
@@ -88,10 +88,10 @@ TEST_F(MyMatrixUTest, defaultVecConstruct)
   for (int i = 0; i<ncol; i++)
     testVec_.set_val( i, MyMatrix<double> (2,2));
   
-//  ASSERT_EQ( testVec_.get_nrows() , 4 );
-//  ASSERT_EQ( testVec_.get_ncols() , 1 );
-  testVec_[2].set_val( 0, 0, 5.2);
-  EXPECT_NEAR( testVec_[3](0,0), 5.2, preclim);
+  ASSERT_EQ( testVec_.get_nrows() , 4 );
+  ASSERT_EQ( testVec_.get_ncols() , 1 );
+  (&testVec_.operator[](2))->set_val(0, 0, 5.2);
+  EXPECT_NEAR( testVec_[2](0,0), 5.2, preclim);
 }
 
 // testing matrix addition

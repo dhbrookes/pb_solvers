@@ -128,7 +128,7 @@ public:
   /*
    Addition operator returns new matrix
    */
-  const MyMatrix<T> operator+(const MyMatrix<T>& rhs)
+  MyMatrix<T> operator+(MyMatrix<T>& rhs)
   {
     if (ncols_ != rhs.ncols_ || nrows_ != rhs.nrows_)
     {
@@ -151,7 +151,7 @@ public:
   /*
    Matrix multiplication. If this is size n x m, then rhs must be size m x p
    */
-  const MyMatrix<T> operator*(const MyMatrix<T>& rhs)
+  MyMatrix<T> operator*(MyMatrix<T>& rhs)
   {
       if (ncols_ != rhs.nrows_)
       {
@@ -247,6 +247,9 @@ public:
       }
       return out;
     }
+  
+  const int get_nrows() { return this->nrows_; }
+  const int get_ncols() { return this->ncols_; }
 };
 
         

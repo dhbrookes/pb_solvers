@@ -8,15 +8,14 @@
 
 #include "ReExpCalc.h"
 
-//ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
-//                                           double lambda, int p)
-//:p_(p), a_(p, p), b_(p, p), alpha_(p, p+1), beta_(p, p+1)
-//,nu_(2*p, p), mu_(2*p, p)
-//{
-//  calc_a_and_b();
-//  calc_alpha_and_beta();
-//  calc_nu_and_mu();
-//}
+ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
+                                           double lambda, int p)
+:p_(p), a_(4*p, 4*p), b_(4*p, 4*p)
+{
+  calc_a_and_b();
+ // calc_alpha_and_beta();
+ // calc_nu_and_mu();
+}
 
 void ReExpCoeffsConstants::calc_a_and_b()
 {
@@ -25,9 +24,9 @@ void ReExpCoeffsConstants::calc_a_and_b()
   double a_val, b_val;
   
   //calculate a and b:
-  for (m = -2*p_; m <= 2*p_; m++)
+  for (n = 0; n <= 2*p_; n++)
   {
-    for (n = -2*p_; n <= 2*p_; n++)
+    for (m = -n+1; m < n; m++)
     {
       if (n < (m-2))
       {
@@ -42,8 +41,8 @@ void ReExpCoeffsConstants::calc_a_and_b()
         else              sign = 1.0;
         b_val = sign * sqrt(((n-m-1) * (n-m)) / ((2*n-1) * (2*n+1)));
       }
-      a_.set_val(m, n, a_val);
-      b_.set_val(m, n, b_val);
+      set_a_val(m, n, a_val);
+      set_b_val(m, n, b_val);
     }
   }
 }

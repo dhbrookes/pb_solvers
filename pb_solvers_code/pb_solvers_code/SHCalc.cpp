@@ -74,7 +74,7 @@ void SHCalc::calc_legendre(const double theta)
   P_.set_val(1, 0, x);
   
   int l, m;
-  double val;
+  double val = 0.0;
   for (l = 0; l < numVals_; l++)
   {
     for (m = 0; m <= l; m++)

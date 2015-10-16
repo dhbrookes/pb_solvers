@@ -31,7 +31,7 @@ typedef complex<double> cmplx;
 Right scalar multiplication of a matrix
  */
 template<typename T>
-const MyMatrix<T> operator*(const MyMatrix<T> mat, const T& rhs)
+MyMatrix<T> operator*( MyMatrix<T> mat, T rhs)
 {
   MyMatrix<T> result = MyMatrix<T>(mat.get_nrows(), mat.get_ncols());
   int i, j;
@@ -50,7 +50,7 @@ const MyMatrix<T> operator*(const MyMatrix<T> mat, const T& rhs)
  lhs scalar multiplication of a matrix
  */
 template<typename T>
-const MyMatrix<T> operator*(const T& lhs, const MyMatrix<T> mat)
+MyMatrix<T> operator*( T lhs, MyMatrix<T> mat)
 {
   MyMatrix<T> result = MyMatrix<T>(mat.get_nrows(), mat.get_ncols());
   int i, j;

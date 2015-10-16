@@ -91,17 +91,13 @@ public:
   /*
    Initialize proper amount of memory in default constructor:
    */
-//  ReExpCoeffsConstants(int p=Constants::MAX_NUM_POLES)
-//  :p_(p), a_(p, p), b_(p, p), alpha_(p, p+1), beta_(p, p+1)
-//  ,nu_(2*p, p), mu_(2*p, p)
-//  {
-//  }
-  
   ReExpCoeffsConstants(double kappa, double lambda,
                        int p=Constants::MAX_NUM_POLES);
   
-  double get_a_val(int m, int n)  { return a_(m + 2*p_, n+ 2*p_); }
-  double get_b_val(int m, int n)  { return b_(m + 2*p_, n+ 2*p_); }
+  double get_a_val(int m, int n)  { return a_(m + n, n); }
+  double get_b_val(int m, int n)  { return b_(m + n, n); }
+  void set_a_val(int m, int n, double val)  { a_.set_val(m + n, n, val); }
+  void set_b_val(int m, int n, double val)  { b_.set_val(m + n, n, val); }
 //  const double get_alpha_val(int m, int n) const  { return alpha_(m, n+1); }
 //  const double get_beta_val(int m, int n) const   { return beta_(m, n+1); }
 //  const double get_nu_val(int m, int n) const     { return nu_(m+(p_-1), n); }
@@ -183,11 +179,11 @@ public:
 
   void set_rval(int n, int m, int s, cmplx val)
   {
-    if ( m < 0 ) R_[n].set_val(-m, s+n, conj( val ));
-    else         R_[n].set_val( m, s+n, val );
+    if ( m < 0 ) (&R_[n])->set_val(-m, s+n, conj( val ));
+    else         (&R_[n])->set_val( m, s+n, val );
   }
   
-  void set_sval(int n, int l, int m, cmplx val) { S_[n].set_val(l, n+m, val); }
+  void set_sval(int n, int l, int m, cmplx val) { (&S_[n])->set_val(l, n+m, val); }
   
 };
 

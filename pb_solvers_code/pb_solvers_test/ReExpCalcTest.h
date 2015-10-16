@@ -33,7 +33,10 @@ class ReExpTest
     double kap            = Cst.get_kappa();
     double lambda         = 5.0;
     
-    ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, kap, lambda );
+    ReExpCoeffsConstants ReExpCoeff( kap, lambda, nvals);
+    
+    ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCoeff,
+                             kap, lambda );
     
   }
   
@@ -42,9 +45,7 @@ class ReExpTest
   protected :
   
   int vals_;
-  
-  virtual void SetUp()     { }
-  virtual void TearDown()  { }
+
 };
 
 
