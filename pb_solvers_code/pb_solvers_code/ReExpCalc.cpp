@@ -6,11 +6,12 @@
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
+#include <iostream>
 #include "ReExpCalc.h"
 
 ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
                                            double lambda, int p)
-:p_(p), a_(4*p, 4*p), b_(4*p, 4*p)
+:p_(p), a_(2*p, 4*p), b_(2*p, 4*p)
 {
   calc_a_and_b();
  // calc_alpha_and_beta();
@@ -19,30 +20,23 @@ ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
 
 void ReExpCoeffsConstants::calc_a_and_b()
 {
-  
-  int m, n,sign;
-  double a_val, b_val;
+  int m, n;
+  double sign, a_val, b_val;
   
   //calculate a and b:
-  for (n = 0; n <= 2*p_; n++)
+  for (n = 0; n < 2*p_; n++)
   {
-    for (m = -n+1; m < n; m++)
+    for (m = -n; m <= n; m++)
     {
-      if (n < (m-2))
-      {
-        a_val = 0.0;
-        b_val = 0.0;
-      }
-      else
-      {
-        a_val = sqrt(((n+m+1) * (n-m+1)) / ((2*n+1)* (2*n+3)));
-        if (m < 0)        sign = -1.0;
-        else if (m == 0)  sign = 0.0;
-        else              sign = 1.0;
-        b_val = sign * sqrt(((n-m-1) * (n-m)) / ((2*n-1) * (2*n+1)));
-      }
-      set_a_val(m, n, a_val);
-      set_b_val(m, n, b_val);
+      double nD = (double) n;
+      double mD = (double) m;
+      a_val = sqrt(((nD+mD+1.) * (nD-mD+1.)) / ((2.*nD+1.)* (2.*nD+3.)));
+      if (m < 0)        sign = -1.0;
+      else              sign = 1.0;
+      b_val = sign * sqrt(((nD-mD-1.) * (nD-mD)) / ((2.*nD-1.) * (2.*nD+1.)));
+      
+      set_a_val(n, m, a_val);
+      set_b_val(n, m, b_val);
     }
   }
 }
@@ -124,7 +118,7 @@ void ReExpCoeffs_IJ::calc_r()
   R_ = MyVector<MyMatrix<cmplx> > (2*p_); // n range of 0 to 2p-1 is needed!
   for (n = 0; n < 2 * p_; n++)
   {
-    R_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_)); // s range: -2p+1 to 2p-1 needed!
+    R_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));//s range: -2p+1 to 2p-1 needed!
     for (s = -n; s <= n; s++)
     {
       val = get_yval(n, -s);
@@ -139,12 +133,13 @@ void ReExpCoeffs_IJ::calc_r()
       for (s=-n+1; s < n; s++)
       {
         val = 0.5 * exp(-ic * phi) * (1 + cos(theta)) *
-          _consts_->get_b_val(s-1, n) * get_rval(n, m, s-1);
+          _consts_->get_b_val(n, s-1) * get_rval(n, m, s-1);
         val -= 0.5 * exp(ic * phi) * (1 - cos(theta)) *
-          _consts_->get_b_val(-s- 1, n) * get_rval(n, m, s+1);
-        val += sin(theta) * _consts_->get_a_val(s, n) *
+          _consts_->get_b_val(n, -s-1) * get_rval(n, m, s+1);
+        val += sin(theta) * _consts_->get_a_val(n ,s) *
           get_rval(n, m, s);
-        val *= 1 / _consts_->get_b_val(m, n);
+        val *= ( 1.0 / _consts_->get_b_val( n, m) );
+
         set_rval(n-1, m+1, s, val);
       }
     }

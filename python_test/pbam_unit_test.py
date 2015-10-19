@@ -105,8 +105,8 @@ if (SHCalc or Rot):
             Ynm = scipy.special.sph_harm(m, nmax-1, p, theta)
     
             if SHCalc:
-              print np.imag(Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
-                                          /(2.0*float(nmax-1)+1.0)))
+              print Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
+                                          /(2.0*float(nmax-1)+1.0))
         
 
 
@@ -117,11 +117,11 @@ if (SHCalc or Rot):
 ## R_n^{0,s} = Y_{n,-s}(\theta)(\phi)
 
 if (Rot):
-    #theta = 0.0
-    theta = 1.5953910356207
-    #phi = [ 0.0 ]
-    phi = 5.7258897721
-    nmax = 5
+    theta = 0.0 
+    phi =  0.0 
+    #theta = 1.5953910356207
+    #phi = 5.7258897721
+    nmax = 10
     
     R = np.zeros(( 2*nmax, 2*nmax, 4*nmax),dtype=complex)
     
@@ -129,35 +129,56 @@ if (Rot):
         Ynm = scipy.special.sph_harm(range(0,n+1), n, phi, theta)
         for s in range(-n,n+1):
             if (s<0):
-                val = Ynm[s+n]
+                val = Ynm[-s]
             else:
                 val = np.conj(Ynm[s])
-            R[n][0][s+n] = val
+            R[n][0][s+2*nmax] = val*pow(-1.0, s)*np.sqrt((4.0*np.pi) 
+                                          /(2.0*float(n)+1.0))
 
-    #print np.imag(Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
-    #                                    /(2.0*float(nmax-1)+1.0)))
+    #n = nmax
+    #for m in range(0,1): 
+    #    for s in range(-n, n+1):
+    #        print( "{:.6f}, {:.6f} " .format( float(np.real(R[n][m][s+2*nmax])),  
+    #                                    float(np.imag(R[n][m][s+2*nmax]))))
+    #    
+    #    print("\n")
                                         
     
-    for m in range(0,nmax-1):
+    for m in range(0,nmax):
         for n in range(m+2,2*nmax-m):
             for s in range(-n+1, n):
-                bmn = np.sqrt(float((n - m -1)*(n-m))/
-                                        float((2.0*n-1.0)*2.0*n+1))
                 
-                bs1n = np.sqrt(float((n - ( s-1) -1)*(n-( s-1)))/
-                                        float((2.0*n-1.0)*2.0*n+1))
-                bs2n = np.sqrt(float((n - (-s-1) -1)*(n-(-s-1)))/
-                                        float((2.0*n-1.0)*2.0*n+1))
+                sign1, sign2, sign3 = 1.0, 1.0, 1.0
+                
+                if (m<0):
+                    sign1 = -1.0
+                bmn = sign1 * np.sqrt(float((n - m -1)*(n-m))/
+                                        float((2.0*n-1.0)*(2.0*n+1)))
+                if ((s-1)<0):
+                    sign2 = -1.0
+                bs1n =  sign2 * np.sqrt(float((n - ( s-1) -1)*(n-( s-1)))/
+                                        float((2.0*n-1.0)*(2.0*n+1)))
+                                        
+                if ((-s-1)<0):
+                    sign3 = -1.0
+                bs2n =  sign3 * np.sqrt(float((n - (-s-1) -1)*(n-(-s-1)))/
+                                        float((2.0*n-1.0)*(2.0*n+1)))
                 
                 asn = np.sqrt(float((n+s+1)*(n-s+1))/float((2.0*n+1.0)*(2.0*n+3.0)))
                 
-                R[n][m+1][s+n] = (0.5*np.exp(complex(0.0,-1.0)*phi)*
+                R[n-1][m+1][s+2*nmax] = (0.5*np.exp(complex(0.0,-1.0)*phi)*
                                                 (1.0+np.cos(theta))*
-                                                bs1n*R[n][m][s+n-1])
-                R[n][m+1][s+n]-= (0.5*np.exp(complex(0.0, 1.0)*phi)*
+                                                bs1n*R[n][m][s-1+2*nmax])
+
+                R[n-1][m+1][s+2*nmax]-= (0.5*np.exp(complex(0.0, 1.0)*phi)*
                                             (1.0-np.cos(theta))*
-                                            bs2n*R[n][m][s+n+1])
-                R[n][m+1][s+n]+= np.sin(theta)*asn*R[n][m][s+n]
-                R[n][m+1][s+n] *= (1.0/bmn)
-            
-    print R[4]
+                                            bs2n*R[n][m][s+1+2*nmax])
+                R[n-1][m+1][s+2*nmax]+= np.sin(theta)*asn*R[n][m][s+2*nmax]
+                R[n-1][m+1][s+2*nmax] *= (1.0/bmn)
+    
+    n = nmax-1
+    for m in range(0,nmax): 
+        print n ,m
+        for s in range(0, n+1):
+            print( "{:.6f}, " .format( float(np.real(R[n][m][s+2*nmax])))),
+        

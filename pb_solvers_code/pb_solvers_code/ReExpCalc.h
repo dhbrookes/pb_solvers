@@ -94,10 +94,10 @@ public:
   ReExpCoeffsConstants(double kappa, double lambda,
                        int p=Constants::MAX_NUM_POLES);
   
-  double get_a_val(int m, int n)  { return a_(m + n, n); }
-  double get_b_val(int m, int n)  { return b_(m + n, n); }
-  void set_a_val(int m, int n, double val)  { a_.set_val(m + n, n, val); }
-  void set_b_val(int m, int n, double val)  { b_.set_val(m + n, n, val); }
+  double get_a_val(int n, int m)  { return a_(n, m + 2*p_); }
+  double get_b_val(int n, int m)  { return b_(n, m + 2*p_); }
+  void set_a_val( int n, int m, double val)  { a_.set_val(n, m + 2*p_, val); }
+  void set_b_val(int n, int m, double val)  { b_.set_val(n, m + 2*p_, val); }
 //  const double get_alpha_val(int m, int n) const  { return alpha_(m, n+1); }
 //  const double get_beta_val(int m, int n) const   { return beta_(m, n+1); }
 //  const double get_nu_val(int m, int n) const     { return nu_(m+(p_-1), n); }
@@ -170,20 +170,21 @@ public:
   
   cmplx get_rval(int n, int m, int s)
   {
-    if ( m < 0 ) return conj(R_[n](-m, -s+n));
-    else         return R_[n](m, s+n);
+    if ( m < 0 ) return conj(R_[n](-m, -s+2*p_));
+    else         return R_[n](m, s+2*p_);
   }
   //const cmplx get_sval(int m, int n, int l) const { return S_[m](n, l); }
-  cmplx get_sval(int n, int l, int m)  { return S_[n](l, n+m); }
+  cmplx get_sval(int n, int l, int m)  { return S_[n](l, m+2*p_); }
   
 
   void set_rval(int n, int m, int s, cmplx val)
   {
-    if ( m < 0 ) (&R_[n])->set_val(-m, s+n, conj( val ));
-    else         (&R_[n])->set_val( m, s+n, val );
+    if ( m < 0 ) (&R_[n])->set_val(-m, -s+2*p_, conj( val ));
+    else         (&R_[n])->set_val( m, s+2*p_, val );
   }
   
-  void set_sval(int n, int l, int m, cmplx val) { (&S_[n])->set_val(l, n+m, val); }
+  void set_sval(int n, int l, int m, cmplx val)
+  { (&S_[n])->set_val(l, m+2*p_, val); }
   
 };
 
