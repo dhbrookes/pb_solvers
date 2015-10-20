@@ -6,7 +6,7 @@ from scipy.misc import factorial
 bessel    = False
 SHCons = False
 SHCalc  = False
-Rot         = False
+Rot         = True
 Trans      = True
 nCt, zCt = 0, 0
 
@@ -124,6 +124,25 @@ if (Rot):
     
     R = np.zeros(( 2*nmax, 2*nmax, 4*nmax),dtype=complex)
     
+    A = np.zeros(( 2*nmax, 4*nmax))
+    B = np.zeros(( 2*nmax, 4*nmax))
+    
+    for n in range(2*nmax):
+        for m in range(-n, n+1):
+            nD, mD = float( n ), float( m )
+            A[n][m+nmax] =  np.sqrt(((nD+mD+1.)*(nD-mD+1.))
+                                            /((2.*n+1.0)*(2.0*nD+3.)))
+            sign = 1.0
+            if (m<0):
+                sign = -1.0
+            B[n][m+nmax] =  sign * np.sqrt(((nD - mD -1)*(nD-mD))/
+                                        ((2.*nD-1.)*(2.*nD+1.)))
+                                        
+    #for n in range(nmax):
+    #    for m in range(-n, n+1):
+    #        print( " {:.8f}, " .format( B[n][m+nmax])),     
+    #    print ""
+            
     for n in range(2*nmax):
         Ynm = scipy.special.sph_harm(range(0,n+1), n, phi, theta)
         for s in range(-n,n+1):
@@ -187,12 +206,36 @@ if (Trans):
     #lam = 5.0
     #z = 5.0
     z = 8.132650244539
-    lam = 25.0
+    lam = 1.0 #25.0
     nmax = 10
     
-    kap = 0.0303073
+    kap = 0.5 #0.0303073
     
     S = np.zeros(( 2*nmax, 2*nmax, 4*nmax))
+    
+    alpha = np.zeros(( 2*nmax, 4*nmax))
+    beta   = np.zeros(( 2*nmax, 4*nmax))
+    nu      = np.zeros(( 2*nmax, 4*nmax))
+    mu     = np.zeros(( 2*nmax, 4*nmax))
+    
+    for n in range(2*nmax):
+        for m in range(-n, n+1):
+            nD, mD = float( n ), float( m )
+            
+            alpha[n][m+nmax] = np.sqrt( ( nD + mD + 1.) * ( nD - mD + 1. ))
+            beta[n][m+nmax]   = ( alpha[n][m+nmax] * pow( lam*kap, 2 ) ) / ( (2.*nD+1.)*(2.*nD+3.))
+            
+            sign = 1.0
+            if (m<0):
+                sign = -1.0
+            nu[n][m+nmax] =  sign * np.sqrt(((nD - mD -1)*(nD-mD)))
+            mu[n][m+nmax] = ( nu[n][m+nmax] * pow( lam*kap, 2 ) ) / ( (2*nD-1.)*(2.*nD+1.))
+                                        
+    for n in range(nmax):
+        for m in range(-n, n+1):
+            print( " {:.8f}, " .format( mu[n][m+nmax])),     
+        print ""
+    
     
     resultsK = np.zeros(2*nmax)
     nCt = 0
@@ -273,5 +316,5 @@ if (Trans):
                 
                 S[n+1][l][m]  = bl1m * S[n][l-1][m] + bn1m * S[n-1][l][m] + alm* S[n][l+1][m]
                 S[n+1][l][m] *= ( -1.0 / anm )
-    for m in range(1, nmax-1): 
-        print( "{:.8f}, ".format(S[m+2][m+3][m])),  
+    #for m in range(1, nmax-1): 
+    #    print( "{:.8f}, ".format(S[m+2][m+3][m])),  
