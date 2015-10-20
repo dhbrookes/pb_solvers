@@ -3,11 +3,11 @@ import scipy
 from scipy.special import *
 from scipy.misc import factorial
 
-
 bessel    = False
 SHCons = False
 SHCalc  = False
-Rot         = True
+Rot         = False
+Trans      = True
 nCt, zCt = 0, 0
 
 
@@ -84,7 +84,6 @@ if (SHCons):
     for z in theta:
         zCt = 0
         Pnm, deriv = scipy.special.lpmn(n, n, np.cos(z))
-        #print z, np.cos(z)
         zCt += 1
 
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
@@ -95,7 +94,7 @@ if (SHCons):
 ## In the paper they are different by a factor of
 ## \sqrt{ \frac{2n+1}{4\pi}}
 
-if (SHCalc or Rot):
+if (SHCalc):
     theta = np.arange(0.0, np.pi + 0.1, np.pi/3.0)    # polar
     phi = np.arange(0.0, 2.0*np.pi + 0.1, 0.5) # azimuthal
     nmax = 10
@@ -104,8 +103,7 @@ if (SHCalc or Rot):
         for m in range(nmax):
             Ynm = scipy.special.sph_harm(m, nmax-1, p, theta)
     
-            if SHCalc:
-              print Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
+        print Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
                                           /(2.0*float(nmax-1)+1.0))
         
 
@@ -114,6 +112,7 @@ if (SHCalc or Rot):
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
 ## For calculating rotation coefficients
+## R_n^{m,s} has a recursion relation
 ## R_n^{0,s} = Y_{n,-s}(\theta)(\phi)
 
 if (Rot):
@@ -134,14 +133,6 @@ if (Rot):
                 val = np.conj(Ynm[s])
             R[n][0][s+2*nmax] = val*pow(-1.0, s)*np.sqrt((4.0*np.pi) 
                                           /(2.0*float(n)+1.0))
-
-    #n = nmax
-    #for m in range(0,1): 
-    #    for s in range(-n, n+1):
-    #        print( "{:.6f}, {:.6f} " .format( float(np.real(R[n][m][s+2*nmax])),  
-    #                                    float(np.imag(R[n][m][s+2*nmax]))))
-    #    
-    #    print("\n")
                                         
     
     for m in range(0,nmax):
@@ -176,9 +167,47 @@ if (Rot):
                 R[n-1][m+1][s+2*nmax]+= np.sin(theta)*asn*R[n][m][s+2*nmax]
                 R[n-1][m+1][s+2*nmax] *= (1.0/bmn)
     
-    n = nmax-1
-    for m in range(0,nmax): 
-        print n ,m
-        for s in range(0, n+1):
-            print( "{:.6f}, " .format( float(np.real(R[n][m][s+2*nmax])))),
+    #n = nmax-1
+    #for m in range(0,nmax): 
+    #    print n ,m
+    #    for s in range(0, n+1):
+    #        print( "{:.6f}, " .format( float(np.real(R[n][m][s+2*nmax])))),
+    #    
+    #    print ("\n"),
+
+
+
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+## For calculating rotation coefficients
+## S_{n,l}^{m} has a recursion relation
+
+if (Trans):
+    z = 1.0
+    nmax = 10
+    lam = 5.0
+    kap = 0.0303073
+    
+    S = np.zeros(( 2*nmax, 2*nmax, 4*nmax))
+    
+    resultsK = np.zeros(2*nmax)
+    nCt = 0
+    ## for calculating the \hat{k}_n (z) of eq 3a, lotan 2006
+    for n in range(2*nmax):
+        mbfK = scipy.special.kv(n+0.5,z*kap)
+        knum = np.exp(z*kap)*pow(z*kap, n+0.5)
+        kden = 1.0
+        if n > 0:
+            dfRan = range(2*n-1,0,-2)
+            for i in dfRan:
+                kden *= i
+        resultsK[n] =  np.sqrt(2.0/np.pi)*(knum/kden)*mbfK
+        
+        S[0][n][0] = pow(lam/z, n) * np.exp(-kap*z) * (1.0/z) * resultsK[n] 
+        S[n][0][0] = pow(-1.0, n) * S[0][n][0]
+        
+    for n in range(nmax): 
+        print( "{:.6f}, ".format(S[n][0][0])), 
+        
         

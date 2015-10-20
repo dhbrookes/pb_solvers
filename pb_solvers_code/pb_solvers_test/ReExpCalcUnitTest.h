@@ -42,6 +42,9 @@ protected :
   double RM7Imag[nvals] = {-0.000000,  -0.108268,  0.037856,  0.212323,
     -0.367881,  0.186130,  0.056455,  0.188322,  -0.910017,  1.550056 };
   
+  double SN0Zreal[nvals] = {0.970147, 4.99775, 24.99617, 124.988519, 624.958996,
+    3124.840538,  15624.347650,  78122.240044,  390613.040154, 1953072.235847};
+  
   virtual void SetUp()     { }
   virtual void TearDown()  { }
 };
@@ -164,6 +167,126 @@ TEST_F(ReExpUTest, checkR)
   }
   
 }
+
+
+TEST_F(ReExpUTest, checkS0Zpt)
+{
+  Constants Cst;
+  ShPt testPt = EPt( 0.0, 0.0, 1.0).convert_to_spherical();
+  SHCalcConstants shCon( 2*nvals );
+  SHCalc shCalc( 2*nvals, &shCon );
+  shCalc.calc_sh( testPt.get_theta(), testPt.get_phi());
+  
+  BesselConstants bCon( 2*nvals );
+  BesselCalc      bCal( 2*nvals, &bCon );
+  
+  MyMatrix<cmplx> shMat = shCalc.get_full_result();
+  double kap            = Cst.get_kappa();
+  double lambda         = 5.0;
+  ReExpCoeffsConstants ReExpCo( kap, lambda, nvals);
+  
+  ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCo,
+                           kap, lambda );
+  
+  for ( int s = 0; s < nvals; s++ )
+  {
+    EXPECT_NEAR( ReExpTest.get_sval( 0, s, 0),SN0Zreal[s],             preclim);
+    EXPECT_NEAR( ReExpTest.get_sval( s, 0, 0),SN0Zreal[s]*pow(-1.0,s), preclim);
+  }
+}
+
+/*
+TEST_F(ReExpUTest, checkS0)
+{
+  Constants Cst;
+  ShPt testPt = EPt( 6.9,-4.3,-0.2).convert_to_spherical();
+  SHCalcConstants shCon( 2*nvals );
+  SHCalc shCalc( 2*nvals, &shCon );
+  shCalc.calc_sh( testPt.get_theta(), testPt.get_phi());
+  
+  BesselConstants bCon( 2*nvals );
+  BesselCalc      bCal( 2*nvals, &bCon );
+  
+  MyMatrix<cmplx> shMat = shCalc.get_full_result();
+  double kap            = Cst.get_kappa();
+  double lambda         = 5.0;
+  ReExpCoeffsConstants ReExpCoeff( kap, lambda, nvals);
+  
+  ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCoeff,
+                           kap, lambda );
+  
+  for ( int s = 0; s < nvals; s++ )
+  {
+    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 0, s).real(),
+                R0real[s], preclim);
+    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 0, s).imag(),
+                R0imag[s], preclim);
+  }
+  
+}
+
+TEST_F(ReExpUTest, checkSZpt)
+{
+  Constants Cst;
+  ShPt testPt = EPt( 0.0, 0.0, 5.0).convert_to_spherical();
+  SHCalcConstants shCon( 2*nvals );
+  SHCalc shCalc( 2*nvals, &shCon );
+  shCalc.calc_sh( testPt.get_theta(), testPt.get_phi());
+  
+  BesselConstants bCon( 2*nvals );
+  BesselCalc      bCal( 2*nvals, &bCon );
+  
+  MyMatrix<cmplx> shMat = shCalc.get_full_result();
+  double kap            = Cst.get_kappa();
+  double lambda         = 5.0;
+  ReExpCoeffsConstants ReExpCoeff( kap, lambda, nvals);
+  
+  ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCoeff,
+                           kap, lambda );
+  
+  
+  for ( int s = 0; s < nvals; s++ )
+  {
+    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 5, s).real(),
+                RM5Zreal[s], preclim);
+    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 1, s).imag(),
+                RM5Zimag, preclim);
+  }
+  
+}
+
+TEST_F(ReExpUTest, checkS)
+{
+  Constants Cst;
+  ShPt testPt = EPt( 6.9,-4.3,-0.2).convert_to_spherical();
+  SHCalcConstants shCon( 2*nvals );
+  SHCalc shCalc( 2*nvals, &shCon );
+  shCalc.calc_sh( testPt.get_theta(), testPt.get_phi());
+  
+  BesselConstants bCon( 2*nvals );
+  BesselCalc      bCal( 2*nvals, &bCon );
+  
+  MyMatrix<cmplx> shMat = shCalc.get_full_result();
+  double kap            = Cst.get_kappa();
+  double lambda         = 5.0;
+  ReExpCoeffsConstants ReExpCoeff( kap, lambda, nvals);
+  
+  ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCoeff,
+                           kap, lambda );
+  
+  
+  for ( int s = 0; s < nvals; s++ )
+  {
+    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 1, s).real(),
+                RM1Real[s], preclim);
+    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 7, s).imag(),
+                RM7Imag[s], preclim);
+  }
+  
+}
+
+*/
+
 
 
 #endif /* ReExpCalcUnitTest_h */
