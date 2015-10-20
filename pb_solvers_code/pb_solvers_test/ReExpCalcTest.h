@@ -31,7 +31,7 @@ class ReExpTest
     
     MyMatrix<cmplx> shMat = shCalc.get_full_result();
     double kap            = Cst.get_kappa();
-    double lambda         = 5.0;
+    double lambda         = 25.0;
     
     ReExpCoeffsConstants ReExpCoeff( kap, lambda, nvals);
     

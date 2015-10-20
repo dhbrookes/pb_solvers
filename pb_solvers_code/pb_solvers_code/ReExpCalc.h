@@ -173,7 +173,8 @@ public:
     else         return R_[n](m, s+2*p_);
   }
   
-  double get_sval(int n, int l, int m)  { return S_[n](l, m+2*p_); }
+  double get_sval(int n, int l, int m)
+  { return S_[n](l, m+2*p_); }
   
   void set_rval(int n, int m, int s, cmplx val)
   {

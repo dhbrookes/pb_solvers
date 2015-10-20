@@ -184,9 +184,12 @@ if (Rot):
 ## S_{n,l}^{m} has a recursion relation
 
 if (Trans):
-    z = 1.0
+    #lam = 5.0
+    #z = 5.0
+    z = 8.132650244539
+    lam = 25.0
     nmax = 10
-    lam = 5.0
+    
     kap = 0.0303073
     
     S = np.zeros(( 2*nmax, 2*nmax, 4*nmax))
@@ -207,7 +210,68 @@ if (Trans):
         S[0][n][0] = pow(lam/z, n) * np.exp(-kap*z) * (1.0/z) * resultsK[n] 
         S[n][0][0] = pow(-1.0, n) * S[0][n][0]
         
-    for n in range(nmax): 
-        print( "{:.6f}, ".format(S[n][0][0])), 
-        
-        
+    #for n in range(nmax): 
+    #    print( "{:.6f}, ".format(S[0][n][0])), 
+    #print ""
+    
+    for n in range(1, nmax-1):
+        for l in range(n+1, 2*nmax - n - 1 ):
+            al0 = np.sqrt( float( ( (l-1) + 0 + 1) * ( (l-1) - 0 + 1 )))
+            bl0 = ( al0 * pow( lam*kap, 2 ) ) / ( float( (2*(l-1)+1)*(2*(l-1)+3))) 
+            
+            an0 = np.sqrt( float( ( (n-1) + 0 + 1) * ( (n-1) - 0 + 1 )))
+            bn0 = ( an0 * pow( lam*kap, 2 ) ) / ( float( (2*(n-1)+1)*(2*(n-1)+3))) 
+            
+            al = np.sqrt( float( ( (l) + 0 + 1) * ( (l) - 0 + 1 )))
+            an = np.sqrt( float( ( (n) + 0 + 1) * ( (n) - 0 + 1 )))
+            
+            S[n+1][l][0]   = bl0 * S[n][l-1][0] + bn0 * S[n-1][l][0]
+            S[n+1][l][0] += al * S[n][l+1][0]
+            S[n+1][l][0] *=  ( -1.0 / an ) 
+    
+    #for n in range(nmax): 
+    #    print( "{:.6f}, ".format(S[n][n+1][0])),  
+
+    for m in range(1, nmax-1):
+        for l in range(m, 2*nmax - m - 1):
+            
+            sign1, sign2, sign3 = 1.0, 1.0, 1.0
+            
+            if ( (-m) < 0 ):
+                sign1 = -1.0
+                sign2 = -1.0
+                
+            if ( (m-1) < 0 ):
+                sign3 = -1.0
+                
+            eta1 = sign1 * np.sqrt( float( ( m - (-m) - 1.0 ) * (m - (-m) )))
+            
+            eta2 = sign2 * np.sqrt( float( ( l - (-m) - 1.0 ) * (l - (-m) )))
+            mu2 = ( eta2 * pow( lam*kap, 2 ) ) / float( (2*l-1)*(2*l+1))
+            
+            eta3 = sign3 * np.sqrt( float( ( (l+1) - (m-1) - 1.0 ) * ((l+1) - (m-1) )))
+            
+            S[m][l][m] = mu2 * S[m-1][l-1][m-1] + eta3 * S[m-1][l+1][m-1]
+            S[m][l][m] *=  ( -1.0 / eta1 ) 
+            
+    #for m in range(0, nmax): 
+    #    print( "{:.8f}, ".format(S[m][m+2][m])),  
+    
+    for m in range(1, nmax-1):
+        for n in range( m, nmax-1):
+            for l in range( n+1, 2*nmax - n - 1):
+                
+                al1m = np.sqrt( float( ( (l-1) + m + 1) * ( (l-1) - m + 1 )))
+                bl1m = ( al1m * pow( lam*kap, 2 ) ) / ( float( (2*(l-1)+1)*(2*(l-1)+3))) 
+            
+                an1m = np.sqrt( float( ( (n-1) + m + 1) * ( (n-1) - m + 1 )))
+                bn1m = ( an1m * pow( lam*kap, 2 ) ) / ( float( (2*(n-1)+1)*(2*(n-1)+3))) 
+                
+                alm = np.sqrt( float( ( l + m + 1) * ( l - m + 1 )))
+                
+                anm = np.sqrt( float( ( n + m + 1) * ( n - m + 1 )))
+                
+                S[n+1][l][m]  = bl1m * S[n][l-1][m] + bn1m * S[n-1][l][m] + alm* S[n][l+1][m]
+                S[n+1][l][m] *= ( -1.0 / anm )
+    for m in range(1, nmax-1): 
+        print( "{:.8f}, ".format(S[m+2][m+3][m])),  

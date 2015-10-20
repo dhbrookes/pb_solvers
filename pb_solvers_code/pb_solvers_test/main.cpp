@@ -15,14 +15,14 @@ const int nvals = 10 ;      //! standard number of poles for testing
 
 #include "ReExpCalcUnitTest.h"
 
-//#include "ASolverUnitTest.h"
-//#include "BesselCalcUnitTest.h"
-//#include "ConstantsUnitTest.h"
-//#include "MyMatrixUnitTest.h"
-//
-//#include "SHCalcUnitTest.h"
-//#include "SystemUnitTest.h"
-//#include "utilUnitTest.h"
+#include "ASolverUnitTest.h"
+#include "BesselCalcUnitTest.h"
+#include "ConstantsUnitTest.h"
+#include "MyMatrixUnitTest.h"
+
+#include "SHCalcUnitTest.h"
+#include "SystemUnitTest.h"
+#include "utilUnitTest.h"
 
 #include "tester.h"
 

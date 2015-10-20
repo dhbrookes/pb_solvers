@@ -11,7 +11,8 @@
 
 ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
                                            double lambda, int p)
-:p_(p), a_(2*p, 4*p), b_(2*p, 4*p),
+: kappa_(kappa), lambda_(lambda), p_(p),
+a_(2*p, 4*p), b_(2*p, 4*p),
 alpha_(2*p, 4*p), beta_(2*p, 4*p),
 nu_(2*p, 4*p), mu_(2*p, 4*p)
 {
@@ -55,10 +56,14 @@ void ReExpCoeffsConstants::calc_alpha_and_beta()
   {
     for (m = -n; m <= n; m++)
     {
-      alpha_val = sqrt((double)(n + m + 1) * (n - m + 1));
-      beta_val = (pow(lambda_*kappa_, 2.0)*alpha_val)/((double)(2*n+1)*(2*n+3));
-      alpha_.set_val( n, m, alpha_val);
-      beta_.set_val(  n, m, beta_val);
+      double nD = (double) n;
+      double mD = (double) m;
+      alpha_val = sqrt((nD + mD + 1.0) * (nD - mD + 1.0));
+      beta_val  = (pow(lambda_*kappa_, 2.0)*alpha_val);
+      beta_val *= (1.0 / ((2.0 * nD + 1.0) * (2.0 * nD + 3.0)));
+      set_alpha( n, m, alpha_val);
+      set_beta(  n, m, beta_val);
+      
     }
   }
 }
@@ -76,10 +81,12 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
     {
       if (m < 0)        sign = -1.0;
       else              sign = 1.0;
-      nu_val = sign * sqrt((double)(n - m - 1) * (n - m));
-      mu_val = (pow(lambda_*kappa_, 2) * nu_val) / ((double)(2*n-1) * (2*n+1));
-      nu_.set_val( n, m, nu_val);
-      mu_.set_val( n, m, mu_val);
+      double nD = (double) n;
+      double mD = (double) m;
+      nu_val = sign * sqrt((nD - mD - 1.) * (nD - mD));
+      mu_val = (pow(lambda_*kappa_, 2) * nu_val) / ((2.*nD-1.) * (2.*nD+1.));
+      set_nu( n, m, nu_val);
+      set_mu( n, m, mu_val);
     }
   }
 }
@@ -165,13 +172,13 @@ void ReExpCoeffs_IJ::calc_s()
     set_sval( l, 0, 0, pow(-1.0, l) * val );
   }
   
-  for (n = 1; n < 2*p_ - 1; n++)
+  for (n = 1; n < p_ - 1; n++)
   {
-    for(l = n+1; l < 2*p_ - n - 1; l++)
+    for(l = n + 1; l < 2*p_ - n - 1; l++)
     {
-      val  = _consts_->get_beta(l-1, 0) * get_sval( n, l-1, 0);
-      val += _consts_->get_beta(n-1, 0) * get_sval( n,   l, 0);
-      val += _consts_->get_alpha( l, 0) * get_sval( n, l+1, 0);
+      val  = _consts_->get_beta(l-1, 0) * get_sval(  n, l-1, 0);
+      val += _consts_->get_beta(n-1, 0) * get_sval(n-1,   l, 0);
+      val += _consts_->get_alpha( l, 0) * get_sval(  n, l+1, 0);
       val *= -1.0 / _consts_->get_alpha(n, 0);
       set_sval(n+1, l, 0, val);
     }
@@ -192,14 +199,14 @@ void ReExpCoeffs_IJ::calc_s()
    }
    */
   double val2;
-  for (m = 1; m < p_ - 1; m++)
+  for (m = 1; m < p_ ; m++)
   {
     for (l = m; l < 2*p_ - m - 1; l++)
     {
-      val  = _consts_->get_mu( l,  -m) * get_sval(m-1, l-1,m-1);
-      val += _consts_->get_nu(l+1,m-1) * get_sval(m-1, l+1,m-1);
-      val *= 1.0 / _consts_->get_nu( m, -m);
-      set_sval(m+1, l, m+1, val);
+      val  = _consts_->get_mu(  l,  -m) * get_sval(m-1, l-1, m-1);
+      val += _consts_->get_nu(l+1,m-1) * get_sval( m-1, l+1, m-1);
+      val *= ( -1.0 / _consts_->get_nu( m, -m) );
+      set_sval(m, l, m, val);
     }
     
     for (n = m; n < p_ - 1; n++)
@@ -209,11 +216,27 @@ void ReExpCoeffs_IJ::calc_s()
         val2  = _consts_->get_beta(l-1, m) * get_sval(  n, l-1, m);
         val2 += _consts_->get_beta(n-1, m) * get_sval(n-1,   l, m);
         val2 += _consts_->get_alpha( l, m) * get_sval(  n, l+1, m);
-        val2 *= -1.0 / _consts_->get_alpha(n, m);
-        set_sval(n+1, l, m+1, val2);
+        val2 *= (-1.0 / _consts_->get_alpha(n, m));
+        set_sval(n+1, l, m, val2);
       }
     }
   }
+  
+ 
+  // Filling in the rest !
+  for (n = 1; n < p_ ; n++)
+    for (l = 0; l < p_; l++)
+      for (m = -n; m <= n; m++)
+        if ( n  > l )
+          set_sval(n, l, m, pow(-1.0, n) * get_sval( l, n, m));
+  
+  
+  for (n = 1; n < p_ ; n++)
+    for (l = 0; l < p_; l++)
+      for (m = -n; m <= n; m++)
+        if ( m  < 0 )
+          set_sval(n, l, m, get_sval( l, n, -m));
+
   
 } // end calc_s
 
