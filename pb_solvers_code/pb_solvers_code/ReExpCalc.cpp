@@ -8,45 +8,45 @@
 
 #include "ReExpCalc.h"
 
-//ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
-//                                           double lambda, int p)
-//:p_(p), a_(p, p), b_(p, p), alpha_(p, p+1), beta_(p, p+1)
-//,nu_(2*p, p), mu_(2*p, p)
-//{
-//  calc_a_and_b();
-//  calc_alpha_and_beta();
-//  calc_nu_and_mu();
-//}
-//
-//void ReExpCoeffsConstants::calc_a_and_b()
-//{
-//  
-//  int m, n,sign;
-//  double a_val, b_val;
-//  
-//  //calculate a and b:
-//  for (m = 0; m < p_; m++)
-//  {
-//    for (n = 0; n < 2*p_-m; n++)
-//    {
-//      if (n < (m-2))
-//      {
-//        a_val = 0.0;
-//        b_val = 0.0;
-//      }
-//      else
-//      {
-//        a_val = sqrt(((n+m+1) * (n-m+1)) / ((2*n+1)* (2*n+3)));
-//        if (m < 0)        sign = -1.0;
-//        else if (m == 0)  sign = 0.0;
-//        else              sign = 1.0;
-//        b_val = sign * sqrt(((n-m-1) * (n-m)) / ((2*n-1) * (2*n+1)));
-//      }
-//      a_.set_val(m, n, a_val);
-//      b_.set_val(m, n, b_val);
-//    }
-//  }
-//}
+ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
+                                           double lambda, int p)
+:p_(p), a_(p, p), b_(p, p), alpha_(p, p+1), beta_(p, p+1)
+,nu_(2*p, p), mu_(2*p, p)
+{
+  calc_a_and_b();
+  calc_alpha_and_beta();
+  calc_nu_and_mu();
+}
+
+void ReExpCoeffsConstants::calc_a_and_b()
+{
+  
+  int m, n,sign;
+  double a_val, b_val;
+  
+  //calculate a and b:
+  for (m = 0; m < p_; m++)
+  {
+    for (n = 0; n < 2*p_-m; n++)
+    {
+      if (n < (m-2))
+      {
+        a_val = 0.0;
+        b_val = 0.0;
+      }
+      else
+      {
+        a_val = sqrt(((n+m+1) * (n-m+1)) / ((2*n+1)* (2*n+3)));
+        if (m < 0)        sign = -1.0;
+        else if (m == 0)  sign = 0.0;
+        else              sign = 1.0;
+        b_val = sign * sqrt(((n-m-1) * (n-m)) / ((2*n-1) * (2*n+1)));
+      }
+      a_.set_val(m, n, a_val);
+      b_.set_val(m, n, b_val);
+    }
+  }
+}
 //
 //
 //void ReExpCoeffsConstants::calc_alpha_and_beta()
@@ -197,7 +197,6 @@ void ReExpCoeffs_IJ::calc_s()
   }
   
 }
-
 
 const double ReExpCoeffs_IJ::calc_a(int m, int n)
 {
