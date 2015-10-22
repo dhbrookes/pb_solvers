@@ -39,8 +39,8 @@ shConsts_(N, N), dubFac_(N)
       shConsts_.set_val(n, m, temp[n-m] / temp[n+m]);
     }
   }
-
-  dubFac_[0] = 1.0;
+  
+  dubFac_[0] = 1.0 * 1.0;
   dubFac_[1] = 1.0;
   for (i = 2; i < numVals_; i++)
   {
