@@ -42,18 +42,18 @@ TEST_F(ReExpUTest, checkR0Zpt)
 {
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 5.0);
-  SHCalcConstants shCon( nvals );
-  SHCalc shCalc( nvals, &shCon );
+  SHCalcConstants shCon( 2*nvals );
+  SHCalc shCalc( 2*nvals, &shCon );
   shCalc.calc_sh( testPt.theta(), testPt.phi());
   
-  BesselConstants bCon( nvals );
-  BesselCalc      bCal( nvals, &bCon );
+  BesselConstants bCon( 2*nvals );
+  BesselCalc      bCal( 2*nvals, &bCon );
   
   
   MyMatrix<cmplx> shMat = shCalc.get_full_result();
   double kap            = Cst.get_kappa();
   double lambda         = 5.0;
-  ReExpCoeffsConstants reExpConsts (kap, lambda);
+  ReExpCoeffsConstants reExpConsts (kap, lambda, nvals);
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, &bCal, &reExpConsts, kap, lambda );
 
@@ -71,17 +71,18 @@ TEST_F(ReExpUTest, checkR0)
 {
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
-  SHCalcConstants shCon( nvals );
-  SHCalc shCalc( nvals, &shCon );
+  SHCalcConstants shCon( 2*nvals );
+  SHCalc shCalc( 2*nvals, &shCon );
   shCalc.calc_sh( testPt.theta(), testPt.phi());
   
-  BesselConstants bCon( nvals );
-  BesselCalc      bCal( nvals, &bCon );
+  BesselConstants bCon( 2*nvals );
+  BesselCalc      bCal( 2*nvals, &bCon );
+  
   
   MyMatrix<cmplx> shMat = shCalc.get_full_result();
   double kap            = Cst.get_kappa();
   double lambda         = 5.0;
-  ReExpCoeffsConstants reExpConsts (kap, lambda);
+  ReExpCoeffsConstants reExpConsts (kap, lambda, nvals);
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, &bCal, &reExpConsts, kap, lambda );
   

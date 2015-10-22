@@ -78,7 +78,7 @@ public:
   cmplx  get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+n ); }
   
   ASolver(const int N, const int p, const BesselCalc* _bcalc,
-          SHCalc* _shCalc, System* sys);
+          SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts);
   virtual ~ASolver();
   ASolver(const ASolver& other);
   ASolver& operator=(const ASolver& other);

@@ -91,8 +91,7 @@ public:
   /*
    Initialize proper amount of memory in default constructor:
    */
-  ReExpCoeffsConstants(double kappa, double lambda,
-                       int p=Constants::MAX_NUM_POLES);
+  ReExpCoeffsConstants(double kappa, double lambda, int p);
   
   double get_a_val(int n, int m)  { return a_(n, m + 2*p_); }
   double get_b_val(int n, int m)  { return b_(n, m + 2*p_); }

@@ -50,13 +50,14 @@ TEST_F(ASolverUTest, checkGamma)
 {
   const int vals           = nvals;
   int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( vals );
-  BesselCalc bCalcu        = BesselCalc( vals, &bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( vals );
-  SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, &bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, &SHConsta );
   System sys               = System( const_, mol_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(), sys.get_lambda(), nvals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys );
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys, &re_exp_consts);
 
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1),  1.463995711, preclim);
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5),  1.760111936, preclim);
@@ -69,13 +70,14 @@ TEST_F(ASolverUTest, checkDelta)
 {
   const int vals           = nvals;
   int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( vals );
-  BesselCalc bCalcu        = BesselCalc( vals, &bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( vals );
-  SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, &bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, &SHConsta );
   System sys               = System( const_, mol_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(), sys.get_lambda(), nvals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys );
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys, &re_exp_consts);
   
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1)/56.03476045, 1.0, preclim);
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5)/73361234.99, 1.0, preclim);
@@ -89,13 +91,14 @@ TEST_F(ASolverUTest, checkE)
 {
   const int vals           = nvals;
   int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( vals );
-  BesselCalc bCalcu        = BesselCalc( vals, &bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( vals );
-  SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, &bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, &SHConsta );
   System sys               = System( const_, mol_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(), sys.get_lambda(), nvals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys );
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys, &re_exp_consts);
   
   EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
   EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
