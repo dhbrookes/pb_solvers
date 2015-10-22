@@ -24,7 +24,7 @@
  Right scalar multiplication of a matrix
 */
 template<typename T>
-MyMatrix<T> operator*( MyMatrix<T> mat, T rhs)
+const MyMatrix<T> operator*(const MyMatrix<T> mat, const T& rhs)
 {
   MyMatrix<T> result = MyMatrix<T>(mat.get_nrows(), mat.get_ncols());
   int i, j;
@@ -43,7 +43,7 @@ MyMatrix<T> operator*( MyMatrix<T> mat, T rhs)
  lhs scalar multiplication of a matrix
  */
 template<typename T>
-MyMatrix<T> operator*( T lhs, MyMatrix<T> mat)
+const MyMatrix<T> operator*(const T& lhs, const MyMatrix<T> mat)
 {
   MyMatrix<T> result = MyMatrix<T>(mat.get_nrows(), mat.get_ncols());
   int i, j;

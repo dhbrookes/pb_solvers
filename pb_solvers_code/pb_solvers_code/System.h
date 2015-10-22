@@ -60,6 +60,7 @@ protected:
     
 public:
   System(Constants consts, const vector<Molecule>& mols);
+  System() { }
     
   const Constants& get_consts() const { return consts_; }
   const int get_n() const { return N_; }

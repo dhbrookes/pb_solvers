@@ -97,7 +97,7 @@ public:
   {
   }
   
-  MyMatrix(vector< vector<T> > vals)
+  MyMatrix(vector< vector<T> >& vals)
   : vals_(vals), nrows_( (int) vals.size()), ncols_( (int) vals[0].size())
   {
   }
@@ -105,7 +105,7 @@ public:
   /*
    Set the value of a coordinate in this matrix given the position (i, j)
    */
-  void set_val(const int i, const int j, T val)
+  void set_val(const int i, const int j, const T& val)
   {
     vals_[i][j] = val;
   }
@@ -113,7 +113,7 @@ public:
   /*
    Element access operator given position (i, j)
    */
-  T& operator()(const int i, const int j)
+  T operator()(const int i, const int j) const
   {
     if (i < 0 || j < 0 || i > nrows_ || j > ncols_)
     {
@@ -128,7 +128,7 @@ public:
   /*
    Addition operator returns new matrix
    */
-  MyMatrix<T> operator+(MyMatrix<T>& rhs)
+  const MyMatrix<T> operator+(const MyMatrix<T>& rhs) const
   {
     if (ncols_ != rhs.ncols_ || nrows_ != rhs.nrows_)
     {
@@ -151,7 +151,7 @@ public:
   /*
    Matrix multiplication. If this is size n x m, then rhs must be size m x p
    */
-  MyMatrix<T> operator*(MyMatrix<T>& rhs)
+  const MyMatrix<T> operator*(const MyMatrix<T>& rhs) const
   {
       if (ncols_ != rhs.nrows_)
       {
@@ -183,8 +183,8 @@ public:
   }
   
       
-  const int get_nrows() { return nrows_; }
-  const int get_ncols() { return ncols_; }
+  const int get_nrows() const { return nrows_; }
+  const int get_ncols() const { return ncols_; }
 
 };
         
@@ -206,7 +206,7 @@ public:
     {
     }
     
-    MyVector(vector<T> vals)
+    MyVector(const vector<T>& vals)
     :MyMatrix<T>(vals.size(), 1)
     {
       int i;
@@ -216,7 +216,7 @@ public:
       }
     }
     
-    void set_val(const int i, T val)
+    void set_val(const int i, const T& val)
     {
       MyMatrix<T>::set_val(i, 0, val);
     }
@@ -224,15 +224,15 @@ public:
     /*
      Access operator with brackets only requires one value
      */
-    T& operator[](int i)
+    T operator[](int i) const
     {
       return this->vals_[i][0];
     }
-  
+    
     /*
      The multiplication operator now computes the inner product
      */
-    T operator*(const MyVector<T>& rhs)
+    const T operator*(const MyVector<T>& rhs)
     {
       if (rhs->nrows_ != this->nrows)
       {
@@ -247,9 +247,6 @@ public:
       }
       return out;
     }
-  
-  const int get_nrows() { return this->nrows_; }
-  const int get_ncols() { return this->ncols_; }
 };
 
         

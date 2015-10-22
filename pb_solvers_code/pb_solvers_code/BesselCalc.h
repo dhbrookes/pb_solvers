@@ -65,8 +65,6 @@ public:
   const vector<double> calc_mbfI(const int n, const double z) const;
   const vector<double> calc_mbfK(const int n, const double z) const;
   
-  const int get_num_vals() const { return numVals_; }
-  
 };
 
 #endif /* BesselCalc_h */

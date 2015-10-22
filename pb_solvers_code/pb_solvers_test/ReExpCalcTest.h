@@ -20,23 +20,19 @@ class ReExpTest
   void runReExTest()
   {
     Constants Cst;
-    //ShPt testPt = EPt( 0.0, 0.0, 5.0).convert_to_spherical();
-    ShPt testPt = EPt( 6.9,-4.3,-0.2).convert_to_spherical();
-    SHCalcConstants shCon( 2*nvals );
-    SHCalc shCalc( 2*nvals, &shCon );
+    ShPt testPt = EPt( 0.0, 0.0, 5.0).convert_to_spherical();
+    SHCalcConstants shCon( nvals );
+    SHCalc shCalc( nvals, &shCon );
     shCalc.calc_sh( testPt.get_theta(), testPt.get_phi());
     
-    BesselConstants bCon( 2*nvals );
-    BesselCalc      bCal( 2*nvals, &bCon );
+    BesselConstants bCon( nvals );
+    BesselCalc      bCal( nvals, &bCon );
     
     MyMatrix<cmplx> shMat = shCalc.get_full_result();
     double kap            = Cst.get_kappa();
-    double lambda         = 25.0;
+    double lambda         = 5.0;
     
-    ReExpCoeffsConstants ReExpCoeff( kap, lambda, nvals);
-    
-    ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, &ReExpCoeff,
-                             kap, lambda );
+    ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, kap, lambda );
     
   }
   
@@ -45,7 +41,9 @@ class ReExpTest
   protected :
   
   int vals_;
-
+  
+  virtual void SetUp()     { }
+  virtual void TearDown()  { }
 };
 
 

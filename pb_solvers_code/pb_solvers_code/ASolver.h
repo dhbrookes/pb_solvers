@@ -52,11 +52,11 @@ protected:
   vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol);
   
   // calculate one index of inner gamma matrix
-  double calc_indi_gamma(int i, int n);
+  const double calc_indi_gamma(int i, int n) const;
   
   // calculate on index of inner delta matrix
-  double calc_indi_delta(int i, int n);
-  cmplx calc_indi_e(int i, int n, int m);
+  const double calc_indi_delta(int i, int n) const;
+  const cmplx calc_indi_e(int i, int n, int m);
   
   // compute the gamma matrix (as defined on page 544 of Lotan 2006):
   void compute_gamma();

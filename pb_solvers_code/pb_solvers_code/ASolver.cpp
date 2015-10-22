@@ -77,7 +77,7 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
 /*
  Equation 19--Lotan 2006 page 544
  */
-double ASolver::calc_indi_gamma(int i, int n)
+const double ASolver::calc_indi_gamma(int i, int n) const
 {
   double g;  // output
   double kap = _consts_->get_kappa();
@@ -98,7 +98,7 @@ double ASolver::calc_indi_gamma(int i, int n)
 /*
  Equation 20--Lotan 2006 page 544
  */
-double ASolver::calc_indi_delta(int i, int n)
+const double ASolver::calc_indi_delta(int i, int n) const
 {
   double d;  // output
   double kap = _consts_->get_kappa();
@@ -121,7 +121,7 @@ double ASolver::calc_indi_delta(int i, int n)
  Calculates an E^(i)_(n,m) value
  Equation 13--Lotan 2006 page 543
  */
-cmplx ASolver::calc_indi_e(int i, int n, int m)
+const cmplx ASolver::calc_indi_e(int i, int n, int m)
 {
   cmplx e = 0.0;
   int j;
@@ -208,7 +208,6 @@ void ASolver::compute_E()
 
 ASolver::~ASolver()
 {
-// potentially problematic. Need to address later
 //  delete _besselCalc_;
 //  delete _shCalc_;
 }
@@ -227,6 +226,10 @@ ASolver& ASolver::operator=(const ASolver& other)
 {
   _besselCalc_ = other._besselCalc_;
   _shCalc_ = other._shCalc_;
+  _sys_ = new System;
+  _sys_ = other._sys_;
+  _consts_ = new Constants;
+  _consts_ = other._consts_;
   
   _sys_ = other._sys_;
   gamma_ = MatOfMats<double>::type(other.gamma_);

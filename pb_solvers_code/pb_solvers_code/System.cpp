@@ -32,6 +32,7 @@ Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos)
 }
 
 
+
 System::System(Constants consts, const vector<Molecule>& mols)
 :consts_(consts), molecules_(mols), N_((int) mols.size())
 {
