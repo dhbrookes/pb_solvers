@@ -15,16 +15,11 @@
 #include <complex>
 
 
-
-
-
-
-
 /*
  Right scalar multiplication of a matrix
 */
 template<typename T>
-const MyMatrix<T> operator*(const MyMatrix<T> mat, const T& rhs)
+MyMatrix<T> operator*(MyMatrix<T> mat, const T& rhs)
 {
   MyMatrix<T> result = MyMatrix<T>(mat.get_nrows(), mat.get_ncols());
   int i, j;
@@ -43,7 +38,7 @@ const MyMatrix<T> operator*(const MyMatrix<T> mat, const T& rhs)
  lhs scalar multiplication of a matrix
  */
 template<typename T>
-const MyMatrix<T> operator*(const T& lhs, const MyMatrix<T> mat)
+MyMatrix<T> operator*(const T& lhs, MyMatrix<T> mat)
 {
   MyMatrix<T> result = MyMatrix<T>(mat.get_nrows(), mat.get_ncols());
   int i, j;
@@ -96,6 +91,7 @@ protected:
     p1_ = r;
     p2_ = theta;
     p3_ = phi;
+    sph_ = true;
   }
   
   void convert_to_euclidean()
@@ -111,6 +107,7 @@ protected:
     p1_ = x;
     p2_ = y;
     p3_ = z;
+    sph_ = false;
   }
   
 public:
@@ -185,7 +182,7 @@ public:
   const T& phi()
   {
     if (sph_) convert_to_spherical();
-    return p1_;
+    return p3_;
   }
   
   
@@ -216,7 +213,7 @@ public:
 //  const T& get_phi() const    { return phi_;      }
 //  
 //};
-//
+////
 ///*
 // Class for 3 dimensional euclidean points
 // */
@@ -262,8 +259,8 @@ public:
 //  const T& z() const  { return z_; }
 //  
 //};
-
-
+//
+//
 ///*
 // Point arithmetic operators
 // */
@@ -284,8 +281,8 @@ public:
 //                                           lhs.z() - rhs.z());
 //  return result;
 //}
-
-//Useful typedefs:
+//
+////Useful typedefs:
 //typedef EuPoint<double> EPt;
 //typedef SphPoint<double> ShPt;
 typedef complex<double> cmplx;

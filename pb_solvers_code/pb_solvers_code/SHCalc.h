@@ -22,8 +22,8 @@ using namespace std;
 
 
 /*
- Class for storing the constants that may be used in 
-     multiple spherical harmonics calculations
+ Class for storing the constants that may be used in
+ multiple spherical harmonics calculations
  */
 class SHCalcConstants
 {
@@ -37,16 +37,16 @@ protected:
 public:
   SHCalcConstants(const int num_vals=Constants::MAX_NUM_POLES);
   
-  const double get_leg_consts1_val(const int n, const int m) const    
-                                { return legConsts1_(n, m); }
-  const double get_leg_consts2_val(const int n, const int m) const    
-                                { return legConsts2_(n, m); }
-  const double get_sh_consts_val(const int n, const int m) const      
-                                { return shConsts_(n, m);   }
-  const double get_dub_fac_val(const int i) const                     
-                                { return dubFac_[i];        }
-  const int get_n() const                                             
-                                { return numVals_;           }
+  const double get_leg_consts1_val(const int n, const int m)
+  { return legConsts1_(n, m); }
+  const double get_leg_consts2_val(const int n, const int m)
+  { return legConsts2_(n, m); }
+  const double get_sh_consts_val(const int n, const int m)
+  { return shConsts_(n, m);   }
+  const double get_dub_fac_val(const int i) const
+  { return dubFac_[i];        }
+  const int get_n() const
+  { return numVals_;           }
 };
 
 
@@ -55,29 +55,29 @@ public:
  calcualtion of the associated Legendre Polynomials
  
  The spherical harmonics in this case are defined by the equation:
- Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!) * 
-                         P_(n,m)(cos(theta)) * exp(i*m*phi)
+ Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!) *
+ P_(n,m)(cos(theta)) * exp(i*m*phi)
  where P_(n, m) are the associated Legendre polynomials.
  
  These are constructed dynamically and returned as a matrix of
-   values for every n,m
+ values for every n,m
  */
 class SHCalc
 {
 protected:
   
   int                     numVals_;  //# of poles (output matrix will be 2Nx2N)
-  const SHCalcConstants*  _consts_;
+  SHCalcConstants*  _consts_;
   MyMatrix<double>        P_;  // legendre polynomials
   MyMatrix<cmplx>         Y_;  // spherical harmonics calcualted by this class
   
   void calc_legendre(const double theta);  // calculate the legendre polynomial
-                                         //  at every n, m (store in this.P_)
-
+  //  at every n, m (store in this.P_)
+  
 public:
-    
+  
   SHCalc();
-  SHCalc(const int num_vals, const SHCalcConstants* _consts);
+  SHCalc(const int num_vals, SHCalcConstants* _consts);
   SHCalc(const SHCalc& other);  //copy constrctor
   
   virtual ~SHCalc();
@@ -88,10 +88,10 @@ public:
   SHCalc& operator=(const SHCalc& other);
   
   // retrieve the result for n, m values
-  const cmplx get_result(const int n, const int m) const;
+  cmplx get_result(const int n, const int m);
   
   // retrieve the full calculated Y_ matrix
-  const MyMatrix<cmplx> get_full_result() { return Y_; }
+  MyMatrix<cmplx> get_full_result() { return Y_; }
   
   double get_legendre_result( int n, int m );
 };

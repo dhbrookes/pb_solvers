@@ -7,21 +7,24 @@
 //
 
 #include "ASolver.h"
+#include <iostream>
 
 ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
                  SHCalc* _shCalc, System* sys)
 :p_(p), _besselCalc_(_bcalc), _consts_(&sys->get_consts()), gamma_(N, N)
-,delta_(N, N), E_(N), _shCalc_(_shCalc), _sys_(sys), N_(sys->get_n())
+,delta_(N, N), E_(N), _shCalc_(_shCalc), _sys_(sys), N_(sys->get_n()),
+T_ (N_, N_)
 {
   // precompute all SH:
   all_sh.reserve(N_);
-  int i, j;
+  int i = 0;
+  int j = 0;
 
   // Calculate the T matrix (i.e the re expansion coefficients along
   // every inter-molecular vector (distance between every molecular center
   Pt v, ci, cj;  // inter molecular vector
-  T_ (N_, N_);
-  all_inter_sh(N_, N_);
+  
+//  all_inter_sh(N_, N_);
   for (i = 0; i < N_; i++)
   {
     for (j = 0; j < N_; j++)
@@ -33,8 +36,8 @@ ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
       v = ci - cj;
       // calculate spherical harmonics for inter molecular vector:
       _shCalc_->calc_sh(v.theta(), v.phi());
-      all_inter_sh.set_val(i, j, _shCalc_->get_full_result());
-      T_.set_val(i, j, ReExpCoeffs(p_, v, &all_inter_sh(i, j),
+//      all_inter_sh.set_val(i, j, _shCalc_->get_full_result());
+      T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
                                    _besselCalc_, _reExpConsts_,
                                    _consts_->get_kappa(),
                                    _sys_->get_lambda()));
@@ -77,7 +80,7 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
 /*
  Equation 19--Lotan 2006 page 544
  */
-const double ASolver::calc_indi_gamma(int i, int n) const
+double ASolver::calc_indi_gamma(int i, int n)
 {
   double g;  // output
   double kap = _consts_->get_kappa();
@@ -98,7 +101,7 @@ const double ASolver::calc_indi_gamma(int i, int n) const
 /*
  Equation 20--Lotan 2006 page 544
  */
-const double ASolver::calc_indi_delta(int i, int n) const
+double ASolver::calc_indi_delta(int i, int n)
 {
   double d;  // output
   double kap = _consts_->get_kappa();
@@ -121,7 +124,7 @@ const double ASolver::calc_indi_delta(int i, int n) const
  Calculates an E^(i)_(n,m) value
  Equation 13--Lotan 2006 page 543
  */
-const cmplx ASolver::calc_indi_e(int i, int n, int m)
+cmplx ASolver::calc_indi_e(int i, int n, int m)
 {
   cmplx e = 0.0;
   int j;
@@ -208,6 +211,7 @@ void ASolver::compute_E()
 
 ASolver::~ASolver()
 {
+// potentially problematic. Need to address later
 //  delete _besselCalc_;
 //  delete _shCalc_;
 }
@@ -226,10 +230,6 @@ ASolver& ASolver::operator=(const ASolver& other)
 {
   _besselCalc_ = other._besselCalc_;
   _shCalc_ = other._shCalc_;
-  _sys_ = new System;
-  _sys_ = other._sys_;
-  _consts_ = new Constants;
-  _consts_ = other._consts_;
   
   _sys_ = other._sys_;
   gamma_ = MatOfMats<double>::type(other.gamma_);

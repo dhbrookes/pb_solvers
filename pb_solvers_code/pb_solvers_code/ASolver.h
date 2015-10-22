@@ -38,7 +38,7 @@ protected:
   
 //  MyMatrix<ShPt> interDists_; //inter molecular vector
 //  // pre-computed spherical harmonics for every inter molecular vector
-  MatOfMats<cmplx>::type all_inter_sh;
+//  MatOfMats<cmplx>::type all_inter_sh;
   
   //re expansion coefficients calcualted for every inter molecular vector
   MyMatrix<ReExpCoeffs>  T_;
@@ -52,11 +52,11 @@ protected:
   vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol);
   
   // calculate one index of inner gamma matrix
-  const double calc_indi_gamma(int i, int n) const;
+  double calc_indi_gamma(int i, int n);
   
   // calculate on index of inner delta matrix
-  const double calc_indi_delta(int i, int n) const;
-  const cmplx calc_indi_e(int i, int n, int m);
+  double calc_indi_delta(int i, int n);
+  cmplx calc_indi_e(int i, int n, int m);
   
   // compute the gamma matrix (as defined on page 544 of Lotan 2006):
   void compute_gamma();

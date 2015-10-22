@@ -20,10 +20,10 @@ class ReExpTest
   void runReExTest()
   {
     Constants Cst;
-    ShPt testPt = EPt( 0.0, 0.0, 5.0).convert_to_spherical();
+    Pt testPt = Pt( 0.0, 0.0, 5.0);
     SHCalcConstants shCon( nvals );
     SHCalc shCalc( nvals, &shCon );
-    shCalc.calc_sh( testPt.get_theta(), testPt.get_phi());
+    shCalc.calc_sh( testPt.theta(), testPt.phi());
     
     BesselConstants bCon( nvals );
     BesselCalc      bCal( nvals, &bCon );
@@ -31,8 +31,9 @@ class ReExpTest
     MyMatrix<cmplx> shMat = shCalc.get_full_result();
     double kap            = Cst.get_kappa();
     double lambda         = 5.0;
+    ReExpCoeffsConstants reExpConsts (kap, lambda);
     
-    ReExpCoeffs_IJ ReExpTest( nvals, testPt, &shMat, &bCal, kap, lambda );
+    ReExpCoeffs ReExpTest( nvals, testPt, shMat, &bCal, &reExpConsts, kap, lambda );
     
   }
   

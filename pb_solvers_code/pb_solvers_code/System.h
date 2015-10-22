@@ -57,10 +57,11 @@ protected:
   double                       lambda_; // average molecular radius
   vector<Molecule>             molecules_;
   Constants                    consts_;  // Constants for this system
+  
+  const double calc_average_radius() const;
     
 public:
   System(Constants consts, const vector<Molecule>& mols);
-  System() { }
     
   const Constants& get_consts() const { return consts_; }
   const int get_n() const { return N_; }

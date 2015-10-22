@@ -20,13 +20,13 @@ public :
     vector< Molecule > mol_;
     
     mol_.clear( );
-    EPt pos[2] = { EPt( 0.0, 0.0, 0.0 ), EPt( 0.0, 0.0, 5.0 ) };
+    Pt pos[2] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 0.0, 5.0 ) };
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
       int M = 1;
       double a = 1.0;
       vector<double> charges(1);
-      vector<EPt> posCharges(1);
+      vector<Pt> posCharges(1);
       
       charges[0] = 1.0;
       posCharges[0] = pos[molInd];
@@ -41,7 +41,7 @@ public :
     SHCalcConstants SHConsta = SHCalcConstants( vals );
     SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
     System sys               = System( const_, mol_ );
-    ASolver ASolvTest = ASolver( 2, vals, &bCalcu, &SHCalcu, sys);
+    ASolver ASolvTest = ASolver( 2, vals, &bCalcu, &SHCalcu, &sys);
     
   }
   

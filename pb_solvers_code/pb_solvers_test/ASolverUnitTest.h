@@ -24,14 +24,14 @@ protected :
   virtual void SetUp()
   {
     mol_.clear( );
-    EPt pos[2]   = { EPt( 0.0, 0.0, -5.0 ), EPt( 10.0, 7.8, 25.0 ) };
+    Pt pos[2]   = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
     double cg[2] = { 5.0, -0.4};
     double rd[2] = { 5.6, 10.4};
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
       int M = 1;
       vector<double> charges(1);
-      vector<EPt> posCharges(1);
+      vector<Pt> posCharges(1);
       
       charges[0] = cg[molInd];
       posCharges[0] = pos[molInd];
@@ -56,7 +56,7 @@ TEST_F(ASolverUTest, checkGamma)
   SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
   System sys               = System( const_, mol_ );
   
-  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, sys );
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys );
 
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1),  1.463995711, preclim);
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5),  1.760111936, preclim);
@@ -75,7 +75,7 @@ TEST_F(ASolverUTest, checkDelta)
   SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
   System sys               = System( const_, mol_ );
   
-  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, sys );
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys );
   
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1)/56.03476045, 1.0, preclim);
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5)/73361234.99, 1.0, preclim);
@@ -95,7 +95,7 @@ TEST_F(ASolverUTest, checkE)
   SHCalc SHCalcu           = SHCalc( vals, &SHConsta );
   System sys               = System( const_, mol_ );
   
-  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, sys );
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys );
   
   EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
   EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
