@@ -111,11 +111,10 @@ public:
 };
 
 /*
- Class representing one entry in the re-expansion coefficient matrix. So if 
- that matrix is T (as in Lotan 2006), then this class contains the info 
- for one T^(i,j)
+ Class representing the re-expansion coefficients (so the R,S decomposition
+ of T in Lotan 2006
  */
-class ReExpCoeffs_IJ
+class ReExpCoeffs
 {
 protected:
   
@@ -141,25 +140,27 @@ protected:
   double kappa_; //from Constants
   double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
   
-  ShPt v_; //computing re-expansion along this vector
+  Pt v_; //computing re-expansion along this vector
   ReExpCoeffsConstants* _consts_;
   
   /*
    Spherical harmonics for this v_:
    */
   MyMatrix<cmplx>* _Ytp_;
-  BesselCalc* _besselCalc_;
+  const BesselCalc* _besselCalc_;
   
   void calc_r();  // calculate all the values for R_
   void calc_s(); // calculate all the values for S_
   
 public:
   
-//  ReExpCoeffs_IJ();
-  ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp, BesselCalc * BesselCalc,
-                 ReExpCoeffsConstants* _consts, double kappa, double lambda);
-//  virtual ~ReExpCoeffs_IJ();
-//  ReExpCoeffs_IJ& operator=(const ReExpCoeffs_IJ* other);
+  ReExpCoeffs() { }
+  
+  ReExpCoeffs(int p, Pt v, MyMatrix<cmplx>* Ytp,
+              const BesselCalc* BesselCalc,
+              ReExpCoeffsConstants* _consts,
+              const double kappa, const double lambda);
+
 
   const cmplx get_yval(int n, int s) const
   {
@@ -186,5 +187,7 @@ public:
   { (&S_[n])->set_val(l, m+2*p_, val); }
   
 };
+    
 
-#endif /* ReExpCalc_hpp */
+
+#endif /* ReExpCalc_h */

@@ -92,8 +92,8 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
 }
 
 
-ReExpCoeffs_IJ::ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp,
-                               BesselCalc * BesselCalc,
+ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx>* Ytp,
+                               const BesselCalc* BesselCalc,
                                ReExpCoeffsConstants* _consts,
                                double kappa, double lambda)
 :p_(p), v_(v), _Ytp_(Ytp), _besselCalc_(BesselCalc),
@@ -113,13 +113,13 @@ ReExpCoeffs_IJ::ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp,
 }
 
 
-void ReExpCoeffs_IJ::calc_r()
+void ReExpCoeffs::calc_r()
 {
   int n, m, s;
   cmplx val;
   cmplx ic = cmplx(0, 1);
-  double phi = v_.get_phi();
-  double theta = v_.get_theta();
+  double phi = v_.phi();
+  double theta = v_.theta();
   R_ = MyVector<MyMatrix<cmplx> > (2*p_); // n range of 0 to 2p-1 is needed!
   for (n = 0; n < 2 * p_; n++)
   {
@@ -150,11 +150,11 @@ void ReExpCoeffs_IJ::calc_r()
   }
 }
 
-void ReExpCoeffs_IJ::calc_s()
+void ReExpCoeffs::calc_s()
 {
   int m, n, l;
   double val;
-  double r = v_.get_r();
+  double r = v_.r();
   S_ = MyVector<MyMatrix<double> > ( 2 * p_ );
   vector<double> besselK = _besselCalc_->calc_mbfK( 2*p_, kappa_*r);
   
@@ -239,9 +239,5 @@ void ReExpCoeffs_IJ::calc_s()
 
   
 } // end calc_s
-
-
-
-
 
 

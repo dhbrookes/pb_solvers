@@ -23,20 +23,25 @@ using namespace std;
 class Molecule
 {
 protected:
+  
   int                 M_;  // number of charges in this molecule
   double              a_;  // radii of this molecule
+  Pt                  center_;
   vector<double>      qs_;  // magnitude of each charge in the molecule
-  vector<EPt>         pos_;  // position of each charge in the molecule\
+  vector<Pt>          pos_;  // position of each charge in the molecule
     
 public:
-  Molecule(int M, double a, vector<double> qs, vector<EPt> pos);
+  Molecule(int M, double a, vector<double> qs, vector<Pt> pos);
     
   const int get_m() const               { return M_; }
   const double get_a() const            { return a_; }
   const double get_qj(int j) const      { return qs_[j]; }
-  const EPt get_posj(int j) const       { return pos_[j]; }
-  const ShPt get_sph_posj(int j) const  { return pos_[j].
-                                                convert_to_spherical(); }
+  const Pt get_posj(int j) const       { return pos_[j]; }
+//  const ShPt get_sph_posj(int j) const  { return pos_[j].
+//                                                convert_to_spherical(); }
+  const Pt get_center() const          { return center_; }
+//  const ShPt get_sph_center() const     { return center_.
+//                                                convert_to_spherical(); }
   
 };
 
@@ -49,6 +54,7 @@ class System
 protected:
     
   int                          N_; // number of molecules
+  double                       lambda_; // average molecular radius
   vector<Molecule>             molecules_;
   Constants                    consts_;  // Constants for this system
     
@@ -60,10 +66,14 @@ public:
   const double get_ai(int i) const { return molecules_[i].get_a(); }
   const double get_Mi(int i) const { return molecules_[i].get_m(); }
   const double get_qij(int i, int j) const { return molecules_[i].get_qj(j); }
-  const EPt get_posij(int i, int j) const { return molecules_[i].get_posj(j); }
-  const ShPt get_sph_posij(int i, int j) const { return molecules_[i].
-                                                          get_sph_posj(j); }
+  Pt get_posij(int i, int j) { return molecules_[i].get_posj(j); }
+//  const ShPt get_sph_posij(int i, int j) const { return molecules_[i].
+//                                                          get_sph_posj(j); }
   const Molecule get_molecule(int i) const { return molecules_[i]; }
+  Pt get_centeri(int i) { return molecules_[i].get_center(); }
+//  const ShPt get_sph_centeri(int i) const { return get_centeri(i)
+//    .convert_to_spherical(); }
+  const double get_lambda()  { return lambda_; }
   
 };
 
