@@ -182,7 +182,6 @@ public:
     return result;
   }
   
-  
   const int get_nrows() { return nrows_; }
   const int get_ncols() { return ncols_; }
   

@@ -25,7 +25,9 @@
 class ASolver
 {
 protected:
-    
+  
+  VecOfMats<cmplx>::type      A_;  // what we iteratively solve for
+  
   int                         N_;  // number of molecules
   int                         p_;  // max value for n (2*numVals_ usually)    
   VecOfMats<cmplx>::type      E_;
@@ -36,9 +38,8 @@ protected:
   SHCalc*                     _shCalc_;
   ReExpCoeffsConstants*       _reExpConsts_;
   
-//  MyMatrix<ShPt> interDists_; //inter molecular vector
-//  // pre-computed spherical harmonics for every inter molecular vector
-//  MatOfMats<cmplx>::type all_inter_sh;
+  // result of re-expanding A
+  VecOfMats<cmplx>::type Z_;
   
   //re expansion coefficients calcualted for every inter molecular vector
   MyMatrix<ReExpCoeffs>  T_;
@@ -58,6 +59,13 @@ protected:
   double calc_indi_delta(int i, int n);
   cmplx calc_indi_e(int i, int n, int m);
   
+  // pre-compute spherical harmonics matrices for every charge in the system
+  void pre_compute_all_sh();
+  
+  // Compute the T matrix (re expansion coefficients for
+  // every inter molecular vector)
+  void compute_T();
+  
   // compute the gamma matrix (as defined on page 544 of Lotan 2006):
   void compute_gamma();
   
@@ -66,6 +74,10 @@ protected:
   
   // compute the E vector (equations on page 543 of Lotan 2006)
   void compute_E();
+  
+  //re-expand A using equation 46 from Lotan 2006 and fill Z_ with results
+  void re_expandA();
+  
 
 public:
   
@@ -76,6 +88,7 @@ public:
   double get_gamma_ni( int i, int n)    { return gamma_( i, i )( n, n); }
   double get_delta_ni( int i, int n)    { return delta_( i, i )( n, n); }
   cmplx  get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+n ); }
+  cmplx  get_A_ni(int i, int n, int m)  { return A_[ i ]( n, m+n ); }
   
   ASolver(const int N, const int p, const BesselCalc* _bcalc,
           SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts);

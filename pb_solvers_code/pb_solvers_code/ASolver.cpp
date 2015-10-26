@@ -13,48 +13,94 @@ ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
                  SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts)
 :p_(p), _besselCalc_(_bcalc), _consts_(&sys->get_consts()), gamma_(N, N)
 ,delta_(N, N), E_(N), _shCalc_(_shCalc), _sys_(sys), N_(sys->get_n()),
-T_ (N_, N_), _reExpConsts_(_re_exp_consts)
+T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N), Z_(N)
 {
   // precompute all SH:
-  all_sh.reserve(N_);
-  int i = 0;
-  int j = 0;
-
-  // Calculate the T matrix (i.e the re expansion coefficients along
-  // every inter-molecular vector (distance between every molecular center
-  Pt v, ci, cj;  // inter molecular vector
+  pre_compute_all_sh();
   
-//  all_inter_sh(N_, N_);
-  for (i = 0; i < N_; i++)
-  {
-    for (j = 0; j < N_; j++)
-    {
-      
-      if (i == j) continue;
-      ci = _sys_->get_centeri(i);
-      cj = _sys_->get_centeri(j);
-      v = ci - cj;
-      // calculate spherical harmonics for inter molecular vector:
-      _shCalc_->calc_sh(v.theta(), v.phi());
-//      all_inter_sh.set_val(i, j, _shCalc_->get_full_result());
-      T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
-                                   _besselCalc_, _reExpConsts_,
-                                   _consts_->get_kappa(),
-                                   _sys_->get_lambda()));
-    }
-  }
+  //precompute gamma, delta, E and T:
+  compute_T();
+  compute_gamma();
+  compute_delta();
+  compute_E();
+  
+}
+
+void ASolver::pre_compute_all_sh()
+{
+  all_sh.reserve(N_);
+  int i;
   
   for (i = 0; i < N_; i++)
   {
     all_sh.push_back(calc_mol_sh(_sys_->get_molecule(i)));
   }
   
-  //precompute gamma, delta and E:
-  compute_gamma();
-  compute_delta();
-  compute_E();
-  
 }
+
+void ASolver::re_expandA()
+{
+  
+  int i, j, n, m, s, l;
+  cmplx inter; // intermediate sum
+  MyMatrix<cmplx> x1, x2, zj;
+  
+  // for every element in A_:
+  for (i = 0; i < N_; i++)
+  {
+    Z_.set_val(i, MyMatrix<cmplx> (p_, p_));
+    //for every element in the ith row of T
+    for (j = 0; j < N_; j++)
+    {
+      zj = MyMatrix<cmplx> (p_, p_);
+      x1 = MyMatrix<cmplx> (p_, p_);
+      x2 = MyMatrix<cmplx> (p_, p_);
+      // fill X1:
+      for (n = 0; n < p_; n++)
+      {
+        for (m = 0; m < p_; m++)
+        {
+          inter  = 0;
+          for (s = -n; s < n; s++)
+          {
+            inter += T_(i, j).get_rval(n, m, s) * A_[i](n, m);
+          } // end s
+          x1.set_val(n, m, inter);
+        } // end m
+      } //end n
+      
+      // fill x2:
+      for (n = 0; n < p_; n++)
+      {
+        for (m = 0; m < p_; m++)
+        {
+          inter  = 0;
+          for (l = m; l < p_; l++)
+          {
+            inter += T_(i, j).get_sval(n, l, m) * x1(l, m);
+          } // end s
+          x2.set_val(n, m, inter);
+        } // end m
+      } //end n
+      
+      //fill zj:
+      for (n = 0; n < p_; n++)
+      {
+        for (m = 0; m < p_; m++)
+        {
+          inter  = 0;
+          for (s = -n; s < n; s++)
+          {
+            inter += conj(T_(i, j).get_rval(n, m, s)) * x2(n, s);
+          } // end s
+          zj.set_val(n, m, inter);
+        } // end m
+      } //end n
+      Z_.set_val(i, Z_[i] + zj);
+    } // end j
+  } // end i
+}
+
 
 /*
  Calculate the SH matrix for every charge in a molecule
@@ -206,6 +252,34 @@ void ASolver::compute_E()
     }
     E_.set_val(i, ei);
   }
+}
+
+void ASolver::compute_T()
+{
+  int i, j;
+  // Calculate the T matrix (i.e the re expansion coefficients along
+  // every inter-molecular vector (distance between every molecular center
+  Pt v, ci, cj;  // inter molecular vector
+  
+  
+  for (i = 0; i < N_; i++)
+  {
+    for (j = 0; j < N_; j++)
+    {
+      
+      if (i == j) continue;
+      ci = _sys_->get_centeri(i);
+      cj = _sys_->get_centeri(j);
+      v = ci - cj;
+      // calculate spherical harmonics for inter molecular vector:
+      _shCalc_->calc_sh(v.theta(), v.phi());
+      T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
+                                   _besselCalc_, _reExpConsts_,
+                                   _consts_->get_kappa(),
+                                   _sys_->get_lambda()));
+    }
+  }
+  
 }
 
 
