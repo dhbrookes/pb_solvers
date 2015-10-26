@@ -15,15 +15,11 @@
 #include "System.h"
 #include "util.h"
 
+using namespace std;
 
 int main(int argc, const char * argv[])
 {
-	
-  cout << "Hello I build and run" << endl;
-  
-  vector<MyMatrix<double> > a (2, (2, 2));
-  MyVector<MyMatrix<double> >* my_a = new MyVector<MyMatrix<double> >(a);
-  (&my_a->operator[](0))->set_val(0, 0, 5);
-  
-	return 0;
+  vector<double> av (5, 1);
+  MyVector<double> a (av);
+  cout << a[2] << endl;;
 }

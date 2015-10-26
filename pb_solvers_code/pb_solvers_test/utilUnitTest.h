@@ -20,7 +20,7 @@ class EuPointUTest : public ::testing::Test
   
   protected :
   
-  EuPoint <double> testPt_;
+  Point <double> testPt_;
   
   virtual void SetUp() {}
   virtual void TearDown() {}
@@ -29,41 +29,38 @@ class EuPointUTest : public ::testing::Test
 
 TEST_F(EuPointUTest, setGetConvert)
 {
-  EuPoint <double> testPt( 76.4, 33.4, 47.2 );
-  EXPECT_NEAR( testPt.get_x(), 76.4, preclim);
-  EXPECT_NEAR( testPt.get_y(), 33.4, preclim);
-  EXPECT_NEAR( testPt.get_z(), 47.2, preclim);
+  Point <double> testPt( 76.4, 33.4, 47.2, false );
+  EXPECT_NEAR( testPt.x(), 76.4, preclim);
+  EXPECT_NEAR( testPt.y(), 33.4, preclim);
+  EXPECT_NEAR( testPt.z(), 47.2, preclim);
   
-  SphPoint<double> testSpPt = testPt.convert_to_spherical();
-  EXPECT_NEAR( testSpPt.get_r(),     95.814195190, preclim);
-  EXPECT_NEAR( testSpPt.get_theta(),  1.055698348, preclim);
-  EXPECT_NEAR( testSpPt.get_phi(),    0.412135754, preclim);
+  EXPECT_NEAR( testPt.r(),     95.814195190, preclim);
+  EXPECT_NEAR( testPt.theta(),  1.055698348, preclim);
+  EXPECT_NEAR( testPt.phi(),    0.412135754, preclim);
 }
 
 TEST_F(EuPointUTest, setGetConvert2)
 {
-  EuPoint <double> testPt( 0.0, 20.0, 5.0 );
-  EXPECT_NEAR( testPt.get_x(),  0.0, preclim);
-  EXPECT_NEAR( testPt.get_y(), 20.0, preclim);
-  EXPECT_NEAR( testPt.get_z(),  5.0, preclim);
+  Point <double> testPt( 0.0, 20.0, 5.0, false );
+  EXPECT_NEAR( testPt.x(),  0.0, preclim);
+  EXPECT_NEAR( testPt.y(), 20.0, preclim);
+  EXPECT_NEAR( testPt.z(),  5.0, preclim);
   
-  SphPoint<double> testSpPt = testPt.convert_to_spherical();
-  EXPECT_NEAR( testSpPt.get_r(),     20.615528128, preclim);
-  EXPECT_NEAR( testSpPt.get_theta(),  1.325817664, preclim);
-  EXPECT_NEAR( testSpPt.get_phi(),    1.570796327, preclim);
+  EXPECT_NEAR( testPt.r(),     20.615528128, preclim);
+  EXPECT_NEAR( testPt.theta(),  1.325817664, preclim);
+  EXPECT_NEAR( testPt.phi(),    1.570796327, preclim);
 }
 
 TEST_F(EuPointUTest, setGetConvert3)
 {
-  EuPoint <double> testPt( 0.0, 0.0,-5.0 );
-  EXPECT_NEAR( testPt.get_x(),  0.0, preclim);
-  EXPECT_NEAR( testPt.get_y(),  0.0, preclim);
-  EXPECT_NEAR( testPt.get_z(), -5.0, preclim);
-  
-  SphPoint<double> testSpPt = testPt.convert_to_spherical();
-  EXPECT_NEAR( testSpPt.get_r(),      5.000000000, preclim);
-  EXPECT_NEAR( testSpPt.get_theta(),         M_PI, preclim);
-  EXPECT_NEAR( testSpPt.get_phi(),    0.000000000, preclim);
+  Point <double> testPt( 0.0, 0.0,-5.0, false );
+  EXPECT_NEAR( testPt.x(),  0.0, preclim);
+  EXPECT_NEAR( testPt.y(),  0.0, preclim);
+  EXPECT_NEAR( testPt.z(), -5.0, preclim);
+
+  EXPECT_NEAR( testPt.r(),      5.000000000, preclim);
+  EXPECT_NEAR( testPt.theta(),         M_PI, preclim);
+  EXPECT_NEAR( testPt.phi(),    0.000000000, preclim);
 }
 
 /*
@@ -76,7 +73,7 @@ class SpPointUTest : public ::testing::Test
   
   protected :
   
-  EuPoint <double> testPt_;
+  Point <double> testPt_;
   
   virtual void SetUp() {}
   virtual void TearDown() {}
@@ -85,28 +82,26 @@ class SpPointUTest : public ::testing::Test
 
 TEST_F(SpPointUTest, setGetConvert)
 {
-  SphPoint <double> testPt( -30.3, 0.8, 9.7 );
-  EXPECT_NEAR( testPt.get_r(),     -30.3, preclim);
-  EXPECT_NEAR( testPt.get_theta(),   0.8, preclim);
-  EXPECT_NEAR( testPt.get_phi(),     9.7, preclim);
+  Point <double> testPt( -30.3, 0.8, 9.7, true );
+  EXPECT_NEAR( testPt.r(),     -30.3, preclim);
+  EXPECT_NEAR( testPt.theta(),   0.8, preclim);
+  EXPECT_NEAR( testPt.phi(),     9.7, preclim);
   
-  EuPoint<double> testEuPt = testPt.convert_to_euclidean();
-  EXPECT_NEAR( testEuPt.get_x(),  5.73692479, preclim);
-  EXPECT_NEAR( testEuPt.get_y(),  5.90695896, preclim);
-  EXPECT_NEAR( testEuPt.get_z(), 29.15965586, preclim);
+  EXPECT_NEAR( testPt.x(),  5.73692479, preclim);
+  EXPECT_NEAR( testPt.y(),  5.90695896, preclim);
+  EXPECT_NEAR( testPt.z(), 29.15965586, preclim);
 }
 
 TEST_F(SpPointUTest, setGetConvert2)
 {
-  SphPoint <double> testPt( 5.0, 7.5, 3.5 );
-  EXPECT_NEAR( testPt.get_r(),     5.0, preclim);
-  EXPECT_NEAR( testPt.get_theta(), 7.5, preclim);
-  EXPECT_NEAR( testPt.get_phi(),   3.5, preclim);
-  
-  EuPoint<double> testEuPt = testPt.convert_to_euclidean();
-  EXPECT_NEAR( testEuPt.get_x(), -0.6079693, preclim);
-  EXPECT_NEAR( testEuPt.get_y(), -1.6451733, preclim);
-  EXPECT_NEAR( testEuPt.get_z(), -4.6822834, preclim);
+  Point <double> testPt( 5.0, 7.5, 3.5, true );
+  EXPECT_NEAR( testPt.r(),     5.0, preclim);
+  EXPECT_NEAR( testPt.theta(), 7.5, preclim);
+  EXPECT_NEAR( testPt.phi(),   3.5, preclim);
+
+  EXPECT_NEAR( testPt.x(), -0.6079693, preclim);
+  EXPECT_NEAR( testPt.y(), -1.6451733, preclim);
+  EXPECT_NEAR( testPt.z(), -4.6822834, preclim);
 }
 
 #endif /* utilUnitTest_h */

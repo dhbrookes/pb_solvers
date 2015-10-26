@@ -35,6 +35,7 @@ protected:
   double tol_;
   double patchAngle_;
   double rotateAngle_;
+  double lambda_; //uniform scaling 
   
   //Dependent constants:
   double KbT_;  //!< [kCal/mol] = [J/K]*[#/mol]*[K]*[kCal/J]

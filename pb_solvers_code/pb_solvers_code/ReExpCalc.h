@@ -1,4 +1,4 @@
-//
+
 //  ReExpCalc.h
 //  pb_solvers_code
 //
@@ -23,26 +23,26 @@ using namespace std;
 class BesselSizeException
 {
 protected:
-  int p_;
-  int besselSize_;
+int p_;
+int besselSize_;
 
 public:
-  BesselSizeException(const int p, const int besselSize)
-  :p_(p), besselSize_(besselSize)
-  {
-  }
-  
-  virtual const char* what() const throw()
-  {
-    ostringstream ss;
-    ss << "The bessel vector is the wrong size. It is supposed to be: " <<
-    2 * p_ <<" but is:  " << besselSize_ << endl;
-    return ss.str().c_str();
-  }
-  
+BesselSizeException(const int p, const int besselSize)
+:p_(p), besselSize_(besselSize)
+{
+}
+
+virtual const char* what() const throw()
+{
+ostringstream ss;
+ss << "The bessel vector is the wrong size. It is supposed to be: " <<
+2 * p_ <<" but is:  " << besselSize_ << endl;
+return ss.str().c_str();
+}
+
 };
-    
-    
+
+
 class SHSizeException
 {
 protected:
@@ -85,14 +85,13 @@ protected:
   void calc_a_and_b();
   void calc_alpha_and_beta();
   void calc_nu_and_mu();
-
+  
 public:
   
   /*
    Initialize proper amount of memory in default constructor:
    */
-  ReExpCoeffsConstants(double kappa, double lambda,
-                       int p=Constants::MAX_NUM_POLES);
+  ReExpCoeffsConstants(double kappa, double lambda, int p);
   
   double get_a_val(int n, int m)  { return a_(n, m + 2*p_); }
   double get_b_val(int n, int m)  { return b_(n, m + 2*p_); }
@@ -111,11 +110,11 @@ public:
 };
 
 /*
- Class representing one entry in the re-expansion coefficient matrix. So if 
- that matrix is T (as in Lotan 2006), then this class contains the info 
+ Class representing one entry in the re-expansion coefficient matrix. So if
+ that matrix is T (as in Lotan 2006), then this class contains the info
  for one T^(i,j)
  */
-class ReExpCoeffs_IJ
+class ReExpCoeffs
 {
 protected:
   
@@ -125,46 +124,46 @@ protected:
    R_ contains rotation coefficients for this entry. R_ has three
    indices: R[n](m, s)
    And the range of each:  0 <= n <  poles
-                          -n <= m <= n, but -m = conj(+m), so really just [0,p)
-                          -n <= s <= n
+   -n <= m <= n, but -m = conj(+m), so really just [0,p)
+   -n <= s <= n
    */
   MyVector<MyMatrix<cmplx> >  R_;
   /*
    S_ contains translation coefficients for this entry. S_ has three
    indices: S[m](n, l)
    And the range of each:  0 <= n <  poles
-                           0 <= l <= poles
-                          -n <= m <= n
+   0 <= l <= poles
+   -n <= m <= n
    */
   MyVector<MyMatrix<double> >  S_;
-//  ReExpCoeffsConstants*     _consts_;
+  //  ReExpCoeffsConstants*     _consts_;
   double kappa_; //from Constants
   double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
   
-  ShPt v_; //computing re-expansion along this vector
+  Pt v_; //computing re-expansion along this vector
   ReExpCoeffsConstants* _consts_;
   
   /*
    Spherical harmonics for this v_:
    */
-  MyMatrix<cmplx>* _Ytp_;
-  BesselCalc* _besselCalc_;
+  MyMatrix<cmplx> Ytp_;
+  const BesselCalc* _besselCalc_;
   
   void calc_r();  // calculate all the values for R_
   void calc_s(); // calculate all the values for S_
   
 public:
   
-//  ReExpCoeffs_IJ();
-  ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp, BesselCalc * BesselCalc,
+  ReExpCoeffs() { };
+  ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, const BesselCalc * BesselCalc,
                  ReExpCoeffsConstants* _consts, double kappa, double lambda);
-//  virtual ~ReExpCoeffs_IJ();
-//  ReExpCoeffs_IJ& operator=(const ReExpCoeffs_IJ* other);
-
-  const cmplx get_yval(int n, int s) const
+  //  virtual ~ReExpCoeffs_IJ();
+  //  ReExpCoeffs_IJ& operator=(const ReExpCoeffs_IJ* other);
+  
+  cmplx get_yval(int n, int s)
   {
-    if ( s < 0 ) return conj(_Ytp_->operator()(n, -s));
-    else         return _Ytp_->operator()(n, s);
+    if ( s < 0 ) return conj(Ytp_(n, -s));
+    else         return Ytp_(n, s);
   }
   
   cmplx get_rval(int n, int m, int s)

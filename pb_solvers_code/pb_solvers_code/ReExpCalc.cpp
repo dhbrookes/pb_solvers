@@ -92,34 +92,34 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
 }
 
 
-ReExpCoeffs_IJ::ReExpCoeffs_IJ(int p, ShPt v, MyMatrix<cmplx>* Ytp,
-                               BesselCalc * BesselCalc,
+ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp,
+                               const BesselCalc * BesselCalc,
                                ReExpCoeffsConstants* _consts,
                                double kappa, double lambda)
-:p_(p), v_(v), _Ytp_(Ytp), _besselCalc_(BesselCalc),
- kappa_(kappa), lambda_(lambda), _consts_(_consts)
+:p_(p), v_(v), Ytp_(Ytp), _besselCalc_(BesselCalc),
+kappa_(kappa), lambda_(lambda), _consts_(_consts)
 {
   if (_besselCalc_->get_num_vals() < 2 * p_)
   {
-   throw BesselSizeException(p_, _besselCalc_->get_num_vals());
+    throw BesselSizeException(p_, _besselCalc_->get_num_vals());
   }
   
-  if (_Ytp_->get_nrows() < 2 * p_)
+  if (Ytp_.get_nrows() < 2 * p_)
   {
-    throw SHSizeException(p_, _Ytp_->get_nrows());
+    throw SHSizeException(p_, Ytp_.get_nrows());
   }
   calc_r();
   calc_s();
 }
 
 
-void ReExpCoeffs_IJ::calc_r()
+void ReExpCoeffs::calc_r()
 {
   int n, m, s;
   cmplx val;
   cmplx ic = cmplx(0, 1);
-  double phi = v_.get_phi();
-  double theta = v_.get_theta();
+  double phi = v_.phi();
+  double theta = v_.theta();
   R_ = MyVector<MyMatrix<cmplx> > (2*p_); // n range of 0 to 2p-1 is needed!
   for (n = 0; n < 2 * p_; n++)
   {
@@ -138,11 +138,11 @@ void ReExpCoeffs_IJ::calc_r()
       for (s=-n+1; s < n; s++)
       {
         val = 0.5 * exp(-ic * phi) * (1 + cos(theta)) *
-          _consts_->get_b_val(n, s-1) * get_rval(n, m, s-1);
+        _consts_->get_b_val(n, s-1) * get_rval(n, m, s-1);
         val -= 0.5 * exp(ic * phi) * (1 - cos(theta)) *
-          _consts_->get_b_val(n, -s-1) * get_rval(n, m, s+1);
+        _consts_->get_b_val(n, -s-1) * get_rval(n, m, s+1);
         val += sin(theta) * _consts_->get_a_val(n ,s) *
-          get_rval(n, m, s);
+        get_rval(n, m, s);
         val *= ( 1.0 / _consts_->get_b_val( n, m) );
         set_rval(n-1, m+1, s, val);
       }
@@ -150,11 +150,11 @@ void ReExpCoeffs_IJ::calc_r()
   }
 }
 
-void ReExpCoeffs_IJ::calc_s()
+void ReExpCoeffs::calc_s()
 {
   int m, n, l;
   double val;
-  double r = v_.get_r();
+  double r = v_.r();
   S_ = MyVector<MyMatrix<double> > ( 2 * p_ );
   vector<double> besselK = _besselCalc_->calc_mbfK( 2*p_, kappa_*r);
   
@@ -187,15 +187,15 @@ void ReExpCoeffs_IJ::calc_s()
   /* old code implementation differs from paper:
    for (int m = 1; m < m_p; m++)
    {
-     for (int l = m; l < 2*m_p-1-m; l++)	// EQ 1.7, Lotan 2006
-       U[l][m][m] = -(DELTA(l,-m)*U[l-1][m-1][m-1] +
-          GAMMA(l+1,m-1)*U[l+1][m-1][m-1])/GAMMA(m,-m);
+   for (int l = m; l < 2*m_p-1-m; l++)	// EQ 1.7, Lotan 2006
+   U[l][m][m] = -(DELTA(l,-m)*U[l-1][m-1][m-1] +
+   GAMMA(l+1,m-1)*U[l+1][m-1][m-1])/GAMMA(m,-m);
    
-     for (int n = m; n < m_p-1; n++)				// EQ 1.8, Lotan 2006
-			  for (int l = n+1; l < 2*m_p-2-n; l++)
-          U[l][n+1][m] = -(BETA(l-1,m)*U[l-1][n][m] +
-                           BETA(n-1,m)*U[l][n-1][m] +
-                           ALPHA(l,m)*U[l+1][n][m])/ALPHA(n,m);
+   for (int n = m; n < m_p-1; n++)				// EQ 1.8, Lotan 2006
+   for (int l = n+1; l < 2*m_p-2-n; l++)
+   U[l][n+1][m] = -(BETA(l-1,m)*U[l-1][n][m] +
+   BETA(n-1,m)*U[l][n-1][m] +
+   ALPHA(l,m)*U[l+1][n][m])/ALPHA(n,m);
    }
    */
   double val2;
@@ -222,7 +222,7 @@ void ReExpCoeffs_IJ::calc_s()
     }
   }
   
- 
+  
   // Filling in the rest !
   for (n = 1; n < p_ ; n++)
     for (l = 0; l < p_; l++)
@@ -236,11 +236,9 @@ void ReExpCoeffs_IJ::calc_s()
       for (m = -n; m <= n; m++)
         if ( m  < 0 )
           set_sval(n, l, m, get_sval( l, n, -m));
-
+  
   
 } // end calc_s
-
-
 
 
 

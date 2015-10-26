@@ -21,7 +21,7 @@ shConsts_(N, N), dubFac_(N)
   {
     temp.push_back(temp[i-1] * sqrt(i));
   }
-
+  
   for (n = 0; n < numVals_; n++)
   {
     for (m = 0; m <= n; m++)
@@ -40,7 +40,7 @@ shConsts_(N, N), dubFac_(N)
     }
   }
   
-  dubFac_[0] = 1.0 * 1.0;
+  dubFac_[0] = 1.0;
   dubFac_[1] = 1.0;
   for (i = 2; i < numVals_; i++)
   {
@@ -58,15 +58,14 @@ Y_( num_vals, num_vals)
 
 /*
  
-Calculate the Legendre polynomial for the input theta using the
+ Calculate the Legendre polynomial for the input theta using the
  recursion functions for the polynomials, which are as follows:
-
-Pl,l (x) = (-1)^l * (2l-1)!! * (1-x^2)^(l/2)                          (1)
-Pl,l+1 (x) = x * (2l+1) * Pl,l(x)                                     (2)
-Pl,m (x) = x * (2l-1)/(l-m) * Pl-1,m(x) - (l+m-1)/(l-m) * Pl-2,m(x)   (3)
+ Pl,l (x) = (-1)^l * (2l-1)!! * (1-x^2)^(l/2)                          (1)
+ Pl,l+1 (x) = x * (2l+1) * Pl,l(x)                                     (2)
+ Pl,m (x) = x * (2l-1)/(l-m) * Pl-1,m(x) - (l+m-1)/(l-m) * Pl-2,m(x)   (3)
  
-This sets the member P_ to the results
-*/
+ This sets the member P_ to the results
+ */
 void SHCalc::calc_legendre(const double theta)
 {
   double x = cos(theta);
@@ -84,7 +83,7 @@ void SHCalc::calc_legendre(const double theta)
       {
         double dblL = (double) l;
         val = pow(-1.0, dblL) * _consts_->get_dub_fac_val(l)
-                       * pow(1.0-x*x, dblL/2.0);  // (1) in doc string
+        * pow(1.0-x*x, dblL/2.0);  // (1) in doc string
       }
       else if (m == l + 1)
       {
@@ -93,7 +92,7 @@ void SHCalc::calc_legendre(const double theta)
       else if (m < l)
       {
         val = _consts_->get_leg_consts1_val(l, m) * x * P_(l-1, m) -
-              _consts_->get_leg_consts2_val(l, m) * P_(l-2, m); // (3)
+        _consts_->get_leg_consts2_val(l, m) * P_(l-2, m); // (3)
       }
       P_.set_val(l, m, val);
     }
@@ -112,8 +111,8 @@ double SHCalc::get_legendre_result( int n, int m )
 /*
  Calculate the spherical harmonics according to the equation:
  
-  Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!) 
-               * P_(n,m)(cos(theta)) * exp(i*m*phi)
+ Y_(n,m)(theta, phi) = (-1)^m * sqrt((n-m)! / (n + m)!)
+ * P_(n,m)(cos(theta)) * exp(i*m*phi)
  where P_(n, m) are the associated Legendre polynomials.
  
  */
@@ -140,7 +139,7 @@ void SHCalc::calc_sh(const double theta, const double phi)
 
 /*
  Return the results of the spherical harmonic calculation for an n, m.
- If m is negative, then we return the complex conjugate of the calculated 
+ If m is negative, then we return the complex conjugate of the calculated
  value for the positive value of m
  */
 cmplx SHCalc::get_result(const int n, const int m)
@@ -165,7 +164,7 @@ Y_( Constants::MAX_NUM_POLES, Constants::MAX_NUM_POLES)
 
 SHCalc::~SHCalc()
 {
-//  delete _consts_;
+  //  delete _consts_;
 }
 
 
@@ -187,6 +186,4 @@ SHCalc& SHCalc::operator=(const SHCalc& other)
   Y_ = MyMatrix<cmplx>(other.Y_);
   return *this;
 }
-
-
 
