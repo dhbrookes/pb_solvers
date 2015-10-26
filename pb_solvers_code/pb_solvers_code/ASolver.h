@@ -31,15 +31,12 @@ protected:
   int                         N_;  // number of molecules
   int                         p_;  // max value for n (2*numVals_ usually)    
   VecOfMats<cmplx>::type      E_;
-  MatOfMats<double>::type     gamma_, delta_;
+  VecOfMats<cmplx>::type      gamma_, delta_;
   const BesselCalc*           _besselCalc_;
   System*                     _sys_;  // system data (radii, charges, etc.)
   const Constants*            _consts_;
   SHCalc*                     _shCalc_;
   ReExpCoeffsConstants*       _reExpConsts_;
-  
-  // result of re-expanding A
-  VecOfMats<cmplx>::type Z_;
   
   //re expansion coefficients calcualted for every inter molecular vector
   MyMatrix<ReExpCoeffs>  T_;
@@ -53,10 +50,10 @@ protected:
   vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol);
   
   // calculate one index of inner gamma matrix
-  double calc_indi_gamma(int i, int n);
+  cmplx calc_indi_gamma(int i, int n);
   
   // calculate on index of inner delta matrix
-  double calc_indi_delta(int i, int n);
+  cmplx calc_indi_delta(int i, int n);
   cmplx calc_indi_e(int i, int n, int m);
   
   // pre-compute spherical harmonics matrices for every charge in the system
@@ -75,26 +72,36 @@ protected:
   // compute the E vector (equations on page 543 of Lotan 2006)
   void compute_E();
   
-  //re-expand A using equation 46 from Lotan 2006 and fill Z_ with results
-  void re_expandA();
+  //re-expand element i of A withh element (i, j) of T and return results
+  MyMatrix<cmplx> re_expandA(int i, int j);
+  
+  // perform one iteration of the solution for A (eq 51 in Lotan 2006)
+  void iter();
   
 
 public:
   
-  MatOfMats<double>::type get_gamma()   { return gamma_; }
-  MatOfMats<double>::type get_delta()   { return delta_; }
-  VecOfMats<cmplx>::type  get_E()       { return E_; }
+  VecOfMats<cmplx>::type&  get_gamma()   { return gamma_; }
+  VecOfMats<cmplx>::type&  get_delta()   { return delta_; }
+  VecOfMats<cmplx>::type&  get_E()       { return E_; }
+  VecOfMats<cmplx>::type&  get_A()       { return A_; }
   
-  double get_gamma_ni( int i, int n)    { return gamma_( i, i )( n, n); }
-  double get_delta_ni( int i, int n)    { return delta_( i, i )( n, n); }
+  cmplx get_gamma_ni( int i, int n)    { return gamma_[i]( n, n); }
+  cmplx get_delta_ni( int i, int n)    { return delta_[i]( n, n); }
   cmplx  get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+n ); }
   cmplx  get_A_ni(int i, int n, int m)  { return A_[ i ]( n, m+n ); }
   
   ASolver(const int N, const int p, const BesselCalc* _bcalc,
           SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts);
   virtual ~ASolver();
+  
+  
   ASolver(const ASolver& other);
   ASolver& operator=(const ASolver& other);
+  
+  
+  //numerically solve for A given the number of desired iterations
+  void solve_A(int num_iter);
   
 }; // End ASolver
 

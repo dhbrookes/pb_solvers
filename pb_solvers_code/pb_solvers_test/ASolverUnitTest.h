@@ -59,11 +59,11 @@ TEST_F(ASolverUTest, checkGamma)
   
   ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys, &re_exp_consts);
 
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1),  1.463995711, preclim);
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5),  1.760111936, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1).real(),  1.463995711, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5).real(),  1.760111936, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 2),  1.621243794, preclim);
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 7),  1.799701878, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 2).real(),  1.621243794, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 7).real(),  1.799701878, preclim);
 }
 
 TEST_F(ASolverUTest, checkDelta)
@@ -79,11 +79,11 @@ TEST_F(ASolverUTest, checkDelta)
   
   ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys, &re_exp_consts);
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1)/56.03476045, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5)/73361234.99, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1).real()/56.03476045, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5).real()/73361234.99, 1.0, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 2)/46846.22401, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 7)/8.00377E+14, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 2).real()/46846.22401, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 7).real()/8.00377E+14, 1.0, preclim);
 }
  
 

@@ -11,9 +11,9 @@
 
 ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
                  SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts)
-:p_(p), _besselCalc_(_bcalc), _consts_(&sys->get_consts()), gamma_(N, N)
-,delta_(N, N), E_(N), _shCalc_(_shCalc), _sys_(sys), N_(sys->get_n()),
-T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N), Z_(N)
+:p_(p), _besselCalc_(_bcalc), _consts_(&sys->get_consts()), gamma_(N)
+,delta_(N), E_(N), _shCalc_(_shCalc), _sys_(sys), N_(sys->get_n()),
+T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N)
 {
   // precompute all SH:
   pre_compute_all_sh();
@@ -25,6 +25,40 @@ T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N), Z_(N)
   compute_E();
   
 }
+
+// perform many iterations of the solution for A
+void ASolver::solve_A(int num_iter)
+{
+  int t;
+  for (t = 0; t < num_iter; t++)
+  {
+    iter();
+  }
+}
+
+// one iteration of numerical solution for A
+void ASolver::iter()
+{
+  int i, j;
+  MyMatrix<cmplx> Z, zj, ai;
+  for (i = 0; i <  N_; i++)
+  {
+    // relevant re-expansions:
+    Z = MyMatrix<cmplx> (p_, 2*p_ + 1);
+    for (j = 0; j < N_; j++)
+    {
+      if (i == j) continue;
+      zj = re_expandA(i, j);
+      Z += zj;
+    }
+    ai = delta_[i] * Z;
+    ai += E_[i];
+    ai = gamma_[i] * ai;
+    A_.set_val(i, ai);
+  }
+}
+
+
 
 void ASolver::pre_compute_all_sh()
 {
@@ -38,67 +72,60 @@ void ASolver::pre_compute_all_sh()
   
 }
 
-void ASolver::re_expandA()
+//re-expand element i of A withh element (i, j) of T and return results
+MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
 {
   
-  int i, j, n, m, s, l;
+  int n, m, s, l;
   cmplx inter; // intermediate sum
-  MyMatrix<cmplx> x1, x2, zj;
-  
-  // for every element in A_:
-  for (i = 0; i < N_; i++)
+  MyMatrix<cmplx> x1, x2, z;
+      
+  z = MyMatrix<cmplx> (p_, 2*p_+1);
+  x1 = MyMatrix<cmplx> (p_, 2*p_ + 1);
+  x2 = MyMatrix<cmplx> (p_, 2*p_ + 1);
+  // fill X1:
+  for (n = 0; n < p_; n++)
   {
-    Z_.set_val(i, MyMatrix<cmplx> (p_, p_));
-    //for every element in the ith row of T
-    for (j = 0; j < N_; j++)
+    for (m = -n; m < n; m++)
     {
-      zj = MyMatrix<cmplx> (p_, p_);
-      x1 = MyMatrix<cmplx> (p_, p_);
-      x2 = MyMatrix<cmplx> (p_, p_);
-      // fill X1:
-      for (n = 0; n < p_; n++)
+      inter  = 0;
+      for (s = -n; s < n; s++)
       {
-        for (m = 0; m < p_; m++)
-        {
-          inter  = 0;
-          for (s = -n; s < n; s++)
-          {
-            inter += T_(i, j).get_rval(n, m, s) * A_[i](n, m);
-          } // end s
-          x1.set_val(n, m, inter);
-        } // end m
-      } //end n
-      
-      // fill x2:
-      for (n = 0; n < p_; n++)
+        inter += T_(i, j).get_rval(n, m, s) * A_[i](n, m);
+      } // end s
+      x1.set_val(n, m, inter);
+    } // end m
+  } //end n
+  
+  // fill x2:
+  for (n = 0; n < p_; n++)
+  {
+    for (m = -n; m < n; m++)
+    {
+      inter  = 0;
+      for (l = abs(m); l < p_; l++)
       {
-        for (m = 0; m < p_; m++)
-        {
-          inter  = 0;
-          for (l = m; l < p_; l++)
-          {
-            inter += T_(i, j).get_sval(n, l, m) * x1(l, m);
-          } // end s
-          x2.set_val(n, m, inter);
-        } // end m
-      } //end n
-      
-      //fill zj:
-      for (n = 0; n < p_; n++)
+        inter += T_(i, j).get_sval(n, l, m) * x1(l, m);
+      } // end l
+      x2.set_val(n, m, inter);
+    } // end m
+  } //end n
+  
+  //fill zj:
+  for (n = 0; n < p_; n++)
+  {
+    for (m = -n; m < n; m++)
+    {
+      inter  = 0;
+      for (s = -n; s < n; s++)
       {
-        for (m = 0; m < p_; m++)
-        {
-          inter  = 0;
-          for (s = -n; s < n; s++)
-          {
-            inter += conj(T_(i, j).get_rval(n, m, s)) * x2(n, s);
-          } // end s
-          zj.set_val(n, m, inter);
-        } // end m
-      } //end n
-      Z_.set_val(i, Z_[i] + zj);
-    } // end j
-  } // end i
+        inter += conj(T_(i, j).get_rval(n, m, s)) * x2(n, s);
+      } // end s
+      z.set_val(n, m, inter);
+    } // end m
+  } //end n
+  
+  return z;
 }
 
 
@@ -126,7 +153,7 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
 /*
  Equation 19--Lotan 2006 page 544
  */
-double ASolver::calc_indi_gamma(int i, int n)
+cmplx ASolver::calc_indi_gamma(int i, int n)
 {
   double g;  // output
   double kap = _consts_->get_kappa();
@@ -141,13 +168,13 @@ double ASolver::calc_indi_gamma(int i, int n)
   double n_dub = (double) n;
   g = (2.0*n_dub + 1.0) * exp(kap*ai);
   g = g / (((2.0*n_dub + 1.0)*bk2) + (n_dub*bk1*((eps_p / eps_s) - 1.0)));
-  return g;
+  return cmplx(g, 0);
 }
 
 /*
  Equation 20--Lotan 2006 page 544
  */
-double ASolver::calc_indi_delta(int i, int n)
+cmplx ASolver::calc_indi_delta(int i, int n)
 {
   double d;  // output
   double kap = _consts_->get_kappa();
@@ -163,7 +190,7 @@ double ASolver::calc_indi_delta(int i, int n)
   d = (kap*kap*ai*ai) * (bi2 / (2.0*n_dub + 3.0));
   d += (n_dub * bi1 * (1.0 - (eps_p / eps_s)));
   d *= pow(ai, 2.0*n_dub+1.0) / (2.0*n_dub+1.0);
-  return d;
+  return cmplx(d, 0);
 }
 
 /*
@@ -197,16 +224,16 @@ cmplx ASolver::calc_indi_e(int i, int n, int m)
  */
 void ASolver::compute_gamma()
 {
-  MyMatrix<double> gi;
+  MyMatrix<cmplx> gi;
   int i, j;
   for (i = 0; i < N_; i++)
   {
-    gi = MyMatrix<double> (p_, p_);
+    gi = MyMatrix<cmplx> (p_, p_);
     for(j = 0; j < p_; j++)
     {
       gi.set_val(j, j, calc_indi_gamma(i, j));
     }
-    gamma_.set_val(i, i, gi);
+    gamma_.set_val(i, gi);
   }
 }
 
@@ -217,16 +244,16 @@ void ASolver::compute_gamma()
  */
 void ASolver::compute_delta()
 {
-  MyMatrix<double> di;
+  MyMatrix<cmplx> di;
   int i, j;
   for (i = 0; i < N_; i++)
   {
-    di = MyMatrix<double> (p_, p_);
+    di = MyMatrix<cmplx> (p_, p_);
     for(j = 0; j < p_; j++)
     {
       di.set_val(j, j, calc_indi_delta(i, j));
     }
-    delta_.set_val(i, i, di);
+    delta_.set_val(i, di);
   }
 }
 
@@ -306,8 +333,8 @@ ASolver& ASolver::operator=(const ASolver& other)
   _shCalc_ = other._shCalc_;
   
   _sys_ = other._sys_;
-  gamma_ = MatOfMats<double>::type(other.gamma_);
-  delta_ = MatOfMats<double>::type(other.delta_);
+  gamma_ = VecOfMats<cmplx>::type(other.gamma_);
+  delta_ = VecOfMats<cmplx>::type(other.delta_);
   E_ = VecOfMats<cmplx>::type(other.E_);
   N_ = int(other.N_);
   p_ = int(other.p_);

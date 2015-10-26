@@ -149,6 +149,28 @@ public:
   }
   
   /*
+   summation operator adds to existing matrix
+   */
+  MyMatrix<T>& operator+=(MyMatrix<T>& rhs)
+  {
+    if (ncols_ != rhs.ncols_ || nrows_ != rhs.nrows_)
+    {
+      throw MatrixArithmeticException(ADDITION, nrows_, ncols_, rhs.nrows_,
+                                      rhs.ncols_);
+    }
+    int i, j;
+    for (i = 0; i < nrows_; i++)
+    {
+      for (j= 0; j < ncols_; j++)
+      {
+        set_val(i, j, vals_[i][j] + rhs(i, j));
+      }
+    }
+    return *this;
+  }
+  
+  
+  /*
    Matrix multiplication. If this is size n x m, then rhs must be size m x p
    */
   MyMatrix<T> operator*(MyMatrix<T>& rhs)
