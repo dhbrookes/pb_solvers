@@ -49,11 +49,11 @@ shConsts_(N, N), dubFac_(N)
   
 }
 
-SHCalc::SHCalc(const int num_vals, SHCalcConstants* _consts)
+SHCalc::SHCalc(const int num_vals, SHCalcConstants _consts)
 :_consts_(_consts), numVals_(num_vals), P_( num_vals, num_vals),
 Y_( num_vals, num_vals)
 {
-  assert (_consts_->get_n() == numVals_);
+  assert (_consts_.get_n() == numVals_);
 }
 
 /*
@@ -82,7 +82,7 @@ void SHCalc::calc_legendre(const double theta)
       else if (l == m)
       {
         double dblL = (double) l;
-        val = pow(-1.0, dblL) * _consts_->get_dub_fac_val(l)
+        val = pow(-1.0, dblL) * _consts_.get_dub_fac_val(l)
         * pow(1.0-x*x, dblL/2.0);  // (1) in doc string
       }
       else if (m == l + 1)
@@ -91,8 +91,8 @@ void SHCalc::calc_legendre(const double theta)
       }
       else if (m < l)
       {
-        val = _consts_->get_leg_consts1_val(l, m) * x * P_(l-1, m) -
-        _consts_->get_leg_consts2_val(l, m) * P_(l-2, m); // (3)
+        val = _consts_.get_leg_consts1_val(l, m) * x * P_(l-1, m) -
+        _consts_.get_leg_consts2_val(l, m) * P_(l-2, m); // (3)
       }
       P_.set_val(l, m, val);
     }
@@ -127,7 +127,7 @@ void SHCalc::calc_sh(const double theta, const double phi)
   {
     for (m = 0; m < numVals_; m++)
     {
-      shc = _consts_->get_sh_consts_val(n, m);
+      shc = _consts_.get_sh_consts_val(n, m);
       double dblM = (double) m;
       mcomp = complex<double> (dblM, 0.0);
       val = pow(-1.0, dblM) * shc * P_(n, m) * exp(iu * mcomp * phi);
@@ -154,36 +154,36 @@ cmplx SHCalc::get_result(const int n, const int m)
   }
 }
 
-SHCalc::SHCalc()
-:_consts_(), numVals_(Constants::MAX_NUM_POLES),
-P_( Constants::MAX_NUM_POLES, Constants::MAX_NUM_POLES),
-Y_( Constants::MAX_NUM_POLES, Constants::MAX_NUM_POLES)
-{
-  assert (_consts_->get_n() == numVals_);
-}
+//SHCalc::SHCalc()
+//:_consts_(), numVals_(Constants::MAX_NUM_POLES),
+//P_( Constants::MAX_NUM_POLES, Constants::MAX_NUM_POLES),
+//Y_( Constants::MAX_NUM_POLES, Constants::MAX_NUM_POLES)
+//{
+//  assert (_consts_->get_n() == numVals_);
+//}
 
-SHCalc::~SHCalc()
-{
-  //  delete _consts_;
-}
-
-
-SHCalc::SHCalc(const SHCalc& other)
-:numVals_(other.numVals_), P_(other.P_),
-Y_(other.Y_)
-{
-  _consts_ = new SHCalcConstants(numVals_);
-  _consts_ = other._consts_;
-}
-
-
-SHCalc& SHCalc::operator=(const SHCalc& other)
-{
-  _consts_ = new SHCalcConstants;
-  _consts_ = other._consts_;
-  numVals_ = int(other.numVals_);
-  P_ = MyMatrix<double>(other.P_);
-  Y_ = MyMatrix<cmplx>(other.Y_);
-  return *this;
-}
+//SHCalc::~SHCalc()
+//{
+//  //  delete _consts_;
+//}
+//
+//
+//SHCalc::SHCalc(const SHCalc& other)
+//:numVals_(other.numVals_), P_(other.P_),
+//Y_(other.Y_)
+//{
+//  _consts_ = new SHCalcConstants(numVals_);
+//  _consts_ = other._consts_;
+//}
+//
+//
+//SHCalc& SHCalc::operator=(const SHCalc& other)
+//{
+//  _consts_ = new SHCalcConstants;
+//  _consts_ = other._consts_;
+//  numVals_ = int(other.numVals_);
+//  P_ = MyMatrix<double>(other.P_);
+//  Y_ = MyMatrix<cmplx>(other.Y_);
+//  return *this;
+//}
 

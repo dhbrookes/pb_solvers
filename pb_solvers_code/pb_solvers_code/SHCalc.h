@@ -67,7 +67,7 @@ class SHCalc
 protected:
   
   int                     numVals_;  //# of poles (output matrix will be 2Nx2N)
-  SHCalcConstants*  _consts_;
+  SHCalcConstants  _consts_;
   MyMatrix<double>        P_;  // legendre polynomials
   MyMatrix<cmplx>         Y_;  // spherical harmonics calcualted by this class
   
@@ -76,16 +76,16 @@ protected:
   
 public:
   
-  SHCalc();
-  SHCalc(const int num_vals, SHCalcConstants* _consts);
-  SHCalc(const SHCalc& other);  //copy constrctor
-  
-  virtual ~SHCalc();
+//  SHCalc();
+  SHCalc(const int num_vals, SHCalcConstants _consts);
+//  SHCalc(const SHCalc& other);  //copy constrctor
+//  
+//  virtual ~SHCalc();
   
   // calculate the spherical harmonics at every n, m  (store in this.Y_)
   void calc_sh(const double theta, const double phi);
   
-  SHCalc& operator=(const SHCalc& other);
+//  SHCalc& operator=(const SHCalc& other);
   
   // retrieve the result for n, m values
   cmplx get_result(const int n, const int m);

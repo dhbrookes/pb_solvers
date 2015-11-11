@@ -83,7 +83,7 @@ public:
     const int vals = 10;
     double precLim = 1.0e-4;
     SHCalcConstants SHConstTest( vals );
-    SHCalc SHCalcTest( vals, &SHConstTest );
+    SHCalc SHCalcTest( vals, SHConstTest );
     
     // First test LEGENDRE
     // Testing \theta = 0, z = cos(\theta) = 1

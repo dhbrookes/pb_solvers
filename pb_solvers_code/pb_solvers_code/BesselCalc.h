@@ -30,8 +30,8 @@ public:
   
   BesselConstants(const int N=Constants::MAX_NUM_POLES);
   
-  const int get_n() const                 { return numVals_; }
-  const double get_kconst_val(int i)      { return kConsts_[i]; }
+  const int get_n() const                     { return numVals_; }
+  const double get_kconst_val(int i) const     { return kConsts_[i]; }
   
 };
 
@@ -42,19 +42,19 @@ class BesselCalc
 {
     
   int                 numVals_;  // order of the Bessel function
-  BesselConstants*    _consts_;  // constants used in recursion: Lotan 2006 eq3
+  BesselConstants    _consts_;  // constants used in recursion: Lotan 2006 eq3
 
 public:
     
   BesselCalc();
 
-  BesselCalc(int N, BesselConstants* _consts);
+  BesselCalc(int N, BesselConstants _consts);
 
-  BesselCalc(const BesselCalc& other);
-
-  virtual ~BesselCalc();
-
-  BesselCalc& operator=(const BesselCalc& other);
+//  BesselCalc(const BesselCalc& other);
+//
+//  virtual ~BesselCalc();
+//
+  BesselCalc& operator=(BesselCalc& other);
 
   /*
   Calculate the modified sphereical bessel functions I and K 

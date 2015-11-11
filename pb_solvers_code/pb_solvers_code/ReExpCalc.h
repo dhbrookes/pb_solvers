@@ -88,6 +88,8 @@ protected:
   
 public:
   
+  ReExpCoeffsConstants() { }
+  
   /*
    Initialize proper amount of memory in default constructor:
    */
@@ -141,13 +143,13 @@ protected:
   double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
   
   Pt v_; //computing re-expansion along this vector
-  ReExpCoeffsConstants* _consts_;
+  ReExpCoeffsConstants _consts_;
   
   /*
    Spherical harmonics for this v_:
    */
   MyMatrix<cmplx> Ytp_;
-  const BesselCalc* _besselCalc_;
+  BesselCalc _besselCalc_;
   
   void calc_r();  // calculate all the values for R_
   void calc_s(); // calculate all the values for S_
@@ -155,10 +157,10 @@ protected:
 public:
   
   ReExpCoeffs() { };
-  ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, const BesselCalc * BesselCalc,
-                 ReExpCoeffsConstants* _consts, double kappa, double lambda);
+  ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, BesselCalc BesselCalc,
+                 ReExpCoeffsConstants _consts, double kappa, double lambda);
   //  virtual ~ReExpCoeffs_IJ();
-  //  ReExpCoeffs_IJ& operator=(const ReExpCoeffs_IJ* other);
+  ReExpCoeffs& operator=(ReExpCoeffs& other);
   
   cmplx get_yval(int n, int s)
   {

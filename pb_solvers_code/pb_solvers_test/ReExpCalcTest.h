@@ -22,18 +22,18 @@ class ReExpTest
     Constants Cst;
     Pt testPt = Pt( 0.0, 0.0, 5.0);
     SHCalcConstants shCon( 2*nvals );
-    SHCalc shCalc( 2*nvals, &shCon );
+    SHCalc shCalc( 2*nvals, shCon );
     shCalc.calc_sh( testPt.theta(), testPt.phi());
     
     BesselConstants bCon( 2*nvals );
-    BesselCalc      bCal( 2*nvals, &bCon );
+    BesselCalc      bCal( 2*nvals, bCon );
     
     MyMatrix<cmplx> shMat = shCalc.get_full_result();
     double kap            = Cst.get_kappa();
     double lambda         = 5.0;
     ReExpCoeffsConstants reExpConsts (kap, lambda, nvals);
     
-    ReExpCoeffs ReExpTest( nvals, testPt, shMat, &bCal, &reExpConsts, kap, lambda );
+    ReExpCoeffs ReExpTest( nvals, testPt, shMat, bCal, reExpConsts, kap, lambda );
     
   }
   

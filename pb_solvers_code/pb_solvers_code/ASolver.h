@@ -32,11 +32,11 @@ protected:
   int                         p_;  // max value for n (2*numVals_ usually)    
   VecOfMats<cmplx>::type      E_;
   VecOfMats<cmplx>::type      gamma_, delta_;
-  const BesselCalc*           _besselCalc_;
-  System*                     _sys_;  // system data (radii, charges, etc.)
-  const Constants*            _consts_;
-  SHCalc*                     _shCalc_;
-  ReExpCoeffsConstants*       _reExpConsts_;
+  BesselCalc           _besselCalc_;
+  System                     _sys_;  // system data (radii, charges, etc.)
+  Constants            _consts_;
+  SHCalc                   _shCalc_;
+  ReExpCoeffsConstants      _reExpConsts_;
   
   //re expansion coefficients calcualted for every inter molecular vector
   MyMatrix<ReExpCoeffs>  T_;
@@ -97,12 +97,12 @@ public:
   //void set_E_ni( int i, int n, int m)  { E_[ i ]( n, m+p_ ); }
   //void set_A_ni( int i, int n, int m)  { A_[ i ]( n, m+p_ ); }
   
-  ASolver(const int N, const int p, const BesselCalc* _bcalc,
-          SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts);
-  virtual ~ASolver();
-  
-  ASolver(const ASolver& other);
-  ASolver& operator=(const ASolver& other);
+  ASolver(const int N, const int p, const BesselCalc _bcalc,
+          SHCalc _shCalc, System sys, ReExpCoeffsConstants _re_exp_consts);
+//  virtual ~ASolver();
+//  
+//  ASolver(const ASolver& other);
+  ASolver& operator=(ASolver& other);
   
   
   //numerically solve for A given the number of desired iterations
