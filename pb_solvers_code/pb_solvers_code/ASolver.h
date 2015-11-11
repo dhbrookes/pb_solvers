@@ -72,6 +72,9 @@ protected:
   // compute the E vector (equations on page 543 of Lotan 2006)
   void compute_E();
   
+  // initialize A vector
+  void init_A();
+  
   //re-expand element i of A withh element (i, j) of T and return results
   MyMatrix<cmplx> re_expandA(int i, int j);
   
@@ -88,13 +91,15 @@ public:
   
   cmplx get_gamma_ni( int i, int n)    { return gamma_[i]( n, n); }
   cmplx get_delta_ni( int i, int n)    { return delta_[i]( n, n); }
-  cmplx  get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+n ); }
-  cmplx  get_A_ni(int i, int n, int m)  { return A_[ i ]( n, m+n ); }
+  cmplx get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+p_ ); }
+  cmplx get_A_ni(int i, int n, int m)  { return A_[ i ]( n, m+p_ ); }
+  
+  //void set_E_ni( int i, int n, int m)  { E_[ i ]( n, m+p_ ); }
+  //void set_A_ni( int i, int n, int m)  { A_[ i ]( n, m+p_ ); }
   
   ASolver(const int N, const int p, const BesselCalc* _bcalc,
           SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts);
   virtual ~ASolver();
-  
   
   ASolver(const ASolver& other);
   ASolver& operator=(const ASolver& other);
