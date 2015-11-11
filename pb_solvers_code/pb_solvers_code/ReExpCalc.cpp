@@ -172,9 +172,17 @@ void ReExpCoeffs::calc_s()
     set_sval( l, 0, 0, pow(-1.0, l) * val );
   }
   
+  for (l = 1; l < 2 * p_ - 2; l++)
+  {
+    val  = _consts_->get_beta(l-1, 0) * get_sval( 0, l-1, 0);
+    val += _consts_->get_alpha( l, 0) * get_sval( 0, l+1, 0);
+    val *= -1.0 / _consts_->get_alpha(0, 0);
+    set_sval( 0, l, 0, val );
+  }
+  
   for (n = 1; n < p_ - 1; n++)
   {
-    for(l = n + 1; l < 2*p_ - n - 1; l++)
+    for(l = n + 1; l < 2*p_ - n - 2; l++)
     {
       val  = _consts_->get_beta(l-1, 0) * get_sval(  n, l-1, 0);
       val += _consts_->get_beta(n-1, 0) * get_sval(n-1,   l, 0);
@@ -211,7 +219,7 @@ void ReExpCoeffs::calc_s()
     
     for (n = m; n < p_ - 1; n++)
     {
-      for (l = n + 1; l < 2*p_ - n - 1; l++)
+      for (l = n + 1; l < 2*p_ - n - 2; l++)
       {
         val2  = _consts_->get_beta(l-1, m) * get_sval(  n, l-1, m);
         val2 += _consts_->get_beta(n-1, m) * get_sval(n-1,   l, m);

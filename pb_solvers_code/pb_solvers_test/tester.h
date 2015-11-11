@@ -42,6 +42,22 @@ public:
     ConT.TestConstants();
     cout << "Complete Constant test" << endl;
     
+    ASolverTest ASolvT;
+    ASolvT.RunASolverTest();
+    cout << "Complete ASolv test" << endl;
+    
+		BesselConstantsTest BCT;
+		BCT.TestBesselConstants();
+    cout << "Complete Bessel test" << endl;
+		
+		BesselCalcTest BCalcT;
+		BCalcT.TestBesselCalc();
+    cout << "Complete SH test" << endl;
+    
+    ConstantsTest ConT;
+    ConT.TestConstants();
+    cout << "Complete Constant test" << endl;
+
     ReExpTest ReR;
     ReR.runReExTest();
     cout << "Complete ReExpan test" << endl;

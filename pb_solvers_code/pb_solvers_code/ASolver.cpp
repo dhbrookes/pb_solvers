@@ -274,7 +274,7 @@ void ASolver::compute_E()
     {
       for (m = -n; m <= n; m++)
       {
-        ei.set_val(n, m + n, calc_indi_e(i, n, m));
+        ei.set_val(n, m + p_, calc_indi_e(i, n, m));
       }
     }
     E_.set_val(i, ei);

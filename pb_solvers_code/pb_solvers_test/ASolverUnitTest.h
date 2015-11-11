@@ -120,5 +120,62 @@ TEST_F(ASolverUTest, checkE)
 
 }
 
+TEST_F(ASolverUTest, checkSH)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, &bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, &SHConsta );
+  System sys               = System( const_, mol_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+                                      sys.get_lambda(), nvals);
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys,
+                                     &re_exp_consts);
+}
+
+TEST_F(ASolverUTest, checkT)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, &bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, &SHConsta );
+  System sys               = System( const_, mol_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+                                      sys.get_lambda(), nvals);
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys,
+                                     &re_exp_consts);
+}
+
+TEST_F(ASolverUTest, checkA)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, &bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, &SHConsta );
+  System sys               = System( const_, mol_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+                                      sys.get_lambda(), nvals);
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, &bCalcu, &SHCalcu, &sys,
+                                     &re_exp_consts);
+  ASolvTest.solve_A( 10 );
+  
+//  for (int i = 0; i < nvals; i++)
+//  {
+//    for (int m = -i; m<= i; m++)
+//    {
+//      cout << " " << ASolvTest.get_A_ni( 1, i, m) ;
+//    }
+//    cout << endl;
+//  }
+}
 
 #endif
