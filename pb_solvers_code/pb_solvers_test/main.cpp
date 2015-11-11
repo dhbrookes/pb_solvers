@@ -18,9 +18,9 @@ const int nvals = 10 ;      //! standard number of poles for testing
 #include "ConstantsUnitTest.h"
 #include "MyMatrixUnitTest.h"
 #include "ReExpCalcUnitTest.h"
-//#include "SHCalcUnitTest.h"
-//#include "SystemUnitTest.h"
-//#include "utilUnitTest.h"
+#include "SHCalcUnitTest.h"
+#include "SystemUnitTest.h"
+#include "utilUnitTest.h"
 
 #include "tester.h"
 
@@ -28,7 +28,7 @@ using namespace std;
 
 int main(int argc, char * argv[])
 {
-  bool test = false;
+  bool test = true;
   if (test)
   {
     cout << "Welcome to test suite" << endl;
@@ -43,4 +43,6 @@ int main(int argc, char * argv[])
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
   }
+  
+
 }

@@ -37,11 +37,8 @@ public:
   const double get_a() const            { return a_; }
   const double get_qj(int j) const      { return qs_[j]; }
   const Pt get_posj(int j) const       { return pos_[j]; }
-//  const ShPt get_sph_posj(int j) const  { return pos_[j].
-//                                                convert_to_spherical(); }
   const Pt get_center() const          { return center_; }
-//  const ShPt get_sph_center() const     { return center_.
-//                                                convert_to_spherical(); }
+
   
 };
 
@@ -69,12 +66,10 @@ public:
   const double get_Mi(int i) const { return molecules_[i].get_m(); }
   const double get_qij(int i, int j) const { return molecules_[i].get_qj(j); }
   Pt get_posij(int i, int j) { return molecules_[i].get_posj(j); }
-//  const ShPt get_sph_posij(int i, int j) const { return molecules_[i].
-//                                                          get_sph_posj(j); }
+
   const Molecule get_molecule(int i) const { return molecules_[i]; }
   Pt get_centeri(int i) { return molecules_[i].get_center(); }
-//  const ShPt get_sph_centeri(int i) const { return get_centeri(i)
-//    .convert_to_spherical(); }
+
   const double get_lambda()  { return lambda_; }
   
 };

@@ -6,7 +6,6 @@
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
-#include <iostream>
 #include "ReExpCalc.h"
 
 ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
@@ -92,13 +91,14 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
 }
 
 
-ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp,
+ReExpCoeffs::ReExpCoeffs(Pt v, int p, MyMatrix<cmplx> Ytp,
                                BesselCalc bessel_calc,
                                ReExpCoeffsConstants _consts,
                                double kappa, double lambda)
-:p_(p), v_(v), Ytp_(Ytp), _besselCalc_(bessel_calc),
+: v_(v), p_(p), Ytp_(Ytp), _besselCalc_(bessel_calc),
 kappa_(kappa), lambda_(lambda), _consts_(_consts)
 {
+  
   if (_besselCalc_.get_num_vals() < 2 * p_)
   {
     throw BesselSizeException(p_, _besselCalc_.get_num_vals());
@@ -177,7 +177,7 @@ void ReExpCoeffs::calc_s()
     val  = _consts_.get_beta(l-1, 0) * get_sval( 0, l-1, 0);
     val += _consts_.get_alpha( l, 0) * get_sval( 0, l+1, 0);
     val *= -1.0 / _consts_.get_alpha(0, 0);
-    set_sval( 0, l, 0, val );
+    set_sval( 1, l, 0, val );
   }
   
   for (n = 1; n < p_ - 1; n++)
@@ -230,7 +230,6 @@ void ReExpCoeffs::calc_s()
     }
   }
   
-  
   // Filling in the rest !
   for (n = 1; n < p_ ; n++)
     for (l = 0; l < p_; l++)
@@ -253,12 +252,16 @@ ReExpCoeffs& ReExpCoeffs::operator=(ReExpCoeffs& other)
 {
   R_ = other.R_;
   S_ = other.S_;
-  kappa_ = other.kappa_;
-  lambda_ = other.lambda_;
+  
   v_ = other.v_;
-  _consts_ = other._consts_;
+  p_ = other.p_;
   Ytp_ = other.Ytp_;
   _besselCalc_ = other._besselCalc_;
+  _consts_ = other._consts_;
+  
+  kappa_ = other.kappa_;
+  lambda_ = other.lambda_;
+  
   return *this;
 }
 

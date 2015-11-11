@@ -34,10 +34,10 @@ BesselSizeException(const int p, const int besselSize)
 
 virtual const char* what() const throw()
 {
-ostringstream ss;
-ss << "The bessel vector is the wrong size. It is supposed to be: " <<
-2 * p_ <<" but is:  " << besselSize_ << endl;
-return ss.str().c_str();
+  ostringstream ss;
+  ss << "The bessel vector is the wrong size. It is supposed to be: " <<
+       2 * p_ <<" but is:  " << besselSize_ << endl;
+  return ss.str().c_str();
 }
 
 };
@@ -119,8 +119,20 @@ public:
 class ReExpCoeffs
 {
 protected:
-  
+
+  Pt v_; //computing re-expansion along this vector
   int p_; // max value of n when solving for A
+  
+  /*
+   Spherical harmonics for this v_:
+   */
+  MyMatrix<cmplx> Ytp_;
+  BesselCalc _besselCalc_;
+  
+  ReExpCoeffsConstants _consts_;
+  
+  double kappa_; //from Constants
+  double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
   
   /*
    R_ contains rotation coefficients for this entry. R_ has three
@@ -139,17 +151,6 @@ protected:
    */
   MyVector<MyMatrix<double> >  S_;
   //  ReExpCoeffsConstants*     _consts_;
-  double kappa_; //from Constants
-  double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
-  
-  Pt v_; //computing re-expansion along this vector
-  ReExpCoeffsConstants _consts_;
-  
-  /*
-   Spherical harmonics for this v_:
-   */
-  MyMatrix<cmplx> Ytp_;
-  BesselCalc _besselCalc_;
   
   void calc_r();  // calculate all the values for R_
   void calc_s(); // calculate all the values for S_
@@ -157,7 +158,7 @@ protected:
 public:
   
   ReExpCoeffs() { };
-  ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, BesselCalc BesselCalc,
+  ReExpCoeffs(Pt v, int p, MyMatrix<cmplx> Ytp, BesselCalc BesselCalc,
                  ReExpCoeffsConstants _consts, double kappa, double lambda);
   //  virtual ~ReExpCoeffs_IJ();
   ReExpCoeffs& operator=(ReExpCoeffs& other);

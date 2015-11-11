@@ -32,11 +32,11 @@ protected:
   int                         p_;  // max value for n (2*numVals_ usually)    
   VecOfMats<cmplx>::type      E_;
   VecOfMats<cmplx>::type      gamma_, delta_;
-  BesselCalc           _besselCalc_;
-  System                     _sys_;  // system data (radii, charges, etc.)
-  Constants            _consts_;
-  SHCalc                   _shCalc_;
-  ReExpCoeffsConstants      _reExpConsts_;
+  BesselCalc                  _besselCalc_;
+  System                      _sys_;  // system data (radii, charges, etc.)
+  Constants                   _consts_;
+  SHCalc                      _shCalc_;
+  ReExpCoeffsConstants        _reExpConsts_;
   
   //re expansion coefficients calcualted for every inter molecular vector
   MyMatrix<ReExpCoeffs>  T_;

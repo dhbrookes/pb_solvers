@@ -37,13 +37,16 @@ protected :
       posCharges[0] = pos[molInd];
       
       Molecule molNew = Molecule( M, rd[molInd], charges, posCharges );
+      Pt coc = molNew.get_center();
+      Pt cgPos = molNew.get_posj(0);
+      cout << " molNew centers and charge pos " << coc.x() << " "  << coc.y() << " "  << coc.z() << " "
+            << " and " << cgPos.x() << endl;
       mol_.push_back( molNew );
     }
   } // end SetUp
   
   virtual void TearDown() {}
 } ; // end ASolverUTest
-
 
 
 TEST_F(ASolverUTest, checkGamma)
@@ -126,55 +129,57 @@ TEST_F(ASolverUTest, checkE)
 
 }
 
-TEST_F(ASolverUTest, checkSH)
-{
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), nvals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys,
-                                     re_exp_consts);
-}
+//TEST_F(ASolverUTest, checkSH)
+//{
+//  const int vals           = nvals;
+//  int nmol                 = 2;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), nvals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys,
+//                                     re_exp_consts);
+//}
+//
+//TEST_F(ASolverUTest, checkT)
+//{
+//  const int vals           = nvals;
+//  int nmol                 = 2;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), nvals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys,
+//                                     re_exp_consts);
+//}
 
-TEST_F(ASolverUTest, checkT)
-{
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), nvals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys,
-                                     re_exp_consts);
-}
-
-TEST_F(ASolverUTest, checkA)
-{
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), nvals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys,
-                                     re_exp_consts);
-  ASolvTest.solve_A( 10 );
-  
-//  for (int i = 0; i < nvals; i++)
+//TEST_F(ASolverUTest, checkA)
+//{
+//  const int vals           = nvals;
+//  int nmol                 = 2;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), nvals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys,
+//                                     re_exp_consts);
+//  ASolvTest.solve_A( 10 );
+//  
+//  
+//  cout << "This is my A " <<  endl;
+//  for (int i = 0; i < 5; i++)
 //  {
 //    for (int m = -i; m<= i; m++)
 //    {
@@ -182,6 +187,21 @@ TEST_F(ASolverUTest, checkA)
 //    }
 //    cout << endl;
 //  }
-}
+//  
+//  cout << endl;
+//  cout << "This is my E " <<  endl;
+//  
+//  for (int i = 0; i < 5; i++)
+//  {
+//    for (int m = -i; m<= i; m++)
+//    {
+//      cout << " " << ASolvTest.get_E_ni( 1, i, m) ;
+//    }
+//    cout << endl;
+//  }
+//  
+//  cout << endl;
+//  
+//}
 
 #endif

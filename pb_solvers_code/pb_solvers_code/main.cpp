@@ -21,5 +21,5 @@ int main(int argc, const char * argv[])
 {
   vector<double> av (5, 1);
   MyVector<double> a (av);
-  cout << a[2] << endl;;
+  cout << a[2] << endl;
 }

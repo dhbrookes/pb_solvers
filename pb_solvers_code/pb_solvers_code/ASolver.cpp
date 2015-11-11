@@ -7,6 +7,7 @@
 //
 
 #include "ASolver.h"
+
 #include <iostream>
 
 ASolver::ASolver(const int N, const int p, const BesselCalc _bcalc,
@@ -30,11 +31,37 @@ T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N)
 // perform many iterations of the solution for A
 void ASolver::solve_A(int num_iter)
 {
+  
+  cout << "This is my R in solve_A" << endl;
+  for (int i = 0; i < 5; i++)
+  {
+    for (int m = -i; m<= i; m++)
+    {
+      cout << " " << T_(0,1).get_rval(5, m, i);
+    }
+    cout << endl;
+  }
+  cout << endl;
+  
+  cout << "This is my S in solve_A" << endl;
+  for (int i = 0; i < 5; i++)
+  {
+    for (int m = -i; m<= i; m++)
+    {
+      cout << " " << T_(0,1).get_sval(5, i, m);
+    }
+    cout << endl;
+  }
+  cout << endl;
+  
   int t;
   for (t = 0; t < num_iter; t++)
   {
+    cout << "This is iter " << t << endl;
     iter();
   }
+  
+  cout << endl;
 }
 
 // one iteration of numerical solution for A
@@ -94,7 +121,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
       {
         inter += T_(i, j).get_rval(n, m, s) * get_A_ni(i, n, s);
       } // end s
-      x1.set_val(n, m, inter);
+      x1.set_val(n, m+p_, inter);
     } // end m
   } //end n
   
@@ -108,7 +135,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
       {
         inter += T_(i, j).get_sval(n, l, m) * x1(l, m+p_);
       } // end l
-      x2.set_val(n, m, inter);
+      x2.set_val(n, m+p_, inter);
     } // end m
   } //end n
   
@@ -122,7 +149,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
       {
         inter += conj(T_(i, j).get_rval(n, s, m)) * x2(n, s+p_);
       } // end s
-      z.set_val(n, m, inter);
+      z.set_val(n, m+p_, inter);
     } // end m
   } //end n
   
@@ -300,7 +327,7 @@ void ASolver::compute_T()
       v = ci - cj;
       // calculate spherical harmonics for inter molecular vector:
       _shCalc_.calc_sh(v.theta(), v.phi());
-      T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_.get_full_result(),
+      T_.set_val(i, j, ReExpCoeffs(v, p_, _shCalc_.get_full_result(),
                                    _besselCalc_, _reExpConsts_,
                                    _consts_.get_kappa(),
                                    _sys_.get_lambda()));

@@ -6,7 +6,6 @@
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
-#include <iostream>
 #include "SHCalc.h"
 
 SHCalcConstants::SHCalcConstants(const int N)

@@ -33,7 +33,8 @@ class ReExpTest
     double lambda         = 5.0;
     ReExpCoeffsConstants reExpConsts (kap, lambda, nvals);
     
-    ReExpCoeffs ReExpTest( nvals, testPt, shMat, bCal, reExpConsts, kap, lambda );
+    ReExpCoeffs ReExpTest( testPt, nvals, shMat, bCal, reExpConsts,
+                          kap, lambda );
     
   }
   

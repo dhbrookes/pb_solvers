@@ -10,9 +10,10 @@
 #define BesselCalc_h
 
 #include <stdio.h>
-#include "Constants.h"
 #include <vector>
 #include <assert.h>
+
+#include "Constants.h"
 
 using namespace std;
 
@@ -42,7 +43,7 @@ class BesselCalc
 {
     
   int                 numVals_;  // order of the Bessel function
-  BesselConstants    _consts_;  // constants used in recursion: Lotan 2006 eq3
+  BesselConstants     _consts_;  // constants used in recursion: Lotan 2006 eq3
 
 public:
     
@@ -51,9 +52,8 @@ public:
   BesselCalc(int N, BesselConstants _consts);
 
 //  BesselCalc(const BesselCalc& other);
-//
 //  virtual ~BesselCalc();
-//
+
   BesselCalc& operator=(BesselCalc& other);
 
   /*

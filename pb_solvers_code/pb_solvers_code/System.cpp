@@ -29,6 +29,11 @@ Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos)
   
   center_ = Pt(xc, yc, zc);
   
+  // repositioning the charges WRT center of charge
+  for (int i = 0; i < M_; i++)
+  {
+    pos_[i] = pos_[i] - center_;
+  }
 }
 
 

@@ -28,7 +28,7 @@ public :
       vector<double> charges(1);
       vector<Pt> posCharges(1);
       
-      charges[0] = 1.0;
+      charges[0] = -1.0;
       posCharges[0] = pos[molInd];
       
       Molecule molNew = Molecule( M, a, charges, posCharges );
@@ -46,7 +46,34 @@ public :
     
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys, re_exp_consts);
     
-    ASolvTest.solve_A( 10 );
+    ASolvTest.solve_A( 25 );
+    cout << "This is my Kappa " << sys.get_consts().get_kappa() <<  endl;
+    
+    for (int mol=0; mol<2; mol++)
+    {
+      cout << "This is my A " <<  endl;
+      for (int i = 0; i < 5; i++)
+      {
+        for (int m = -i; m<= i; m++)
+        {
+          cout << " " << ASolvTest.get_A_ni( mol, i, m) ;
+        }
+        cout << endl;
+      }
+      
+      cout << endl;
+      cout << "This is my E " <<  endl;
+      
+      for (int i = 0; i < 5; i++)
+      {
+        for (int m = -i; m<= i; m++)
+        {
+          cout << " " << ASolvTest.get_E_ni( mol, i, m) ;
+        }
+        cout << endl;
+      }
+      cout << endl;
+    }
     
   }
   

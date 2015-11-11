@@ -12,7 +12,6 @@
 
 #include <math.h>
 
-
 /**
  Class for storing all relevant constants. Many have default values that are 
  defined inline.
