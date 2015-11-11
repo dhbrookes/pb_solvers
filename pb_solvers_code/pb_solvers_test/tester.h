@@ -26,6 +26,7 @@ public:
 	
 	int unitTest(int argc, char * argv[])
 	{
+    
     ASolverTest ASolvT;
     ASolvT.RunASolverTest();
     cout << "Complete ASolv test" << endl;
@@ -41,7 +42,7 @@ public:
     ConstantsTest ConT;
     ConT.TestConstants();
     cout << "Complete Constant test" << endl;
-    
+
     ReExpTest ReR;
     ReR.runReExTest();
     cout << "Complete ReExpan test" << endl;

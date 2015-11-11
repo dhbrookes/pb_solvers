@@ -24,6 +24,7 @@ T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N)
   compute_delta();
   compute_E();
   
+  init_A();
 }
 
 // perform many iterations of the solution for A
@@ -59,7 +60,6 @@ void ASolver::iter()
 }
 
 
-
 void ASolver::pre_compute_all_sh()
 {
   all_sh.reserve(N_);
@@ -72,7 +72,7 @@ void ASolver::pre_compute_all_sh()
   
 }
 
-//re-expand element i of A withh element (i, j) of T and return results
+//re-expand element i of A with element (i, j) of T and return results
 MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
 {
   
@@ -80,18 +80,18 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
   cmplx inter; // intermediate sum
   MyMatrix<cmplx> x1, x2, z;
       
-  z = MyMatrix<cmplx> (p_, 2*p_+1);
+  z = MyMatrix<cmplx>  (p_, 2*p_ + 1);
   x1 = MyMatrix<cmplx> (p_, 2*p_ + 1);
   x2 = MyMatrix<cmplx> (p_, 2*p_ + 1);
   // fill X1:
   for (n = 0; n < p_; n++)
   {
-    for (m = -n; m < n; m++)
+    for (m = -n; m <= n; m++)
     {
       inter  = 0;
-      for (s = -n; s < n; s++)
+      for (s = -n; s <= n; s++)
       {
-        inter += T_(i, j).get_rval(n, m, s) * A_[i](n, m);
+        inter += T_(i, j).get_rval(n, m, s) * get_A_ni(i, n, s);
       } // end s
       x1.set_val(n, m, inter);
     } // end m
@@ -100,12 +100,12 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
   // fill x2:
   for (n = 0; n < p_; n++)
   {
-    for (m = -n; m < n; m++)
+    for (m = -n; m <= n; m++)
     {
       inter  = 0;
       for (l = abs(m); l < p_; l++)
       {
-        inter += T_(i, j).get_sval(n, l, m) * x1(l, m);
+        inter += T_(i, j).get_sval(n, l, m) * x1(l, m+p_);
       } // end l
       x2.set_val(n, m, inter);
     } // end m
@@ -114,12 +114,12 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
   //fill zj:
   for (n = 0; n < p_; n++)
   {
-    for (m = -n; m < n; m++)
+    for (m = -n; m <= n; m++)
     {
       inter  = 0;
-      for (s = -n; s < n; s++)
+      for (s = -n; s <= n; s++)
       {
-        inter += conj(T_(i, j).get_rval(n, m, s)) * x2(n, s);
+        inter += conj(T_(i, j).get_rval(n, s, m)) * x2(n, s+p_);
       } // end s
       z.set_val(n, m, inter);
     } // end m
@@ -274,7 +274,7 @@ void ASolver::compute_E()
     {
       for (m = -n; m <= n; m++)
       {
-        ei.set_val(n, m + n, calc_indi_e(i, n, m));
+        ei.set_val(n, m + p_, calc_indi_e(i, n, m));
       }
     }
     E_.set_val(i, ei);
@@ -293,7 +293,6 @@ void ASolver::compute_T()
   {
     for (j = 0; j < N_; j++)
     {
-      
       if (i == j) continue;
       ci = _sys_->get_centeri(i);
       cj = _sys_->get_centeri(j);
@@ -307,6 +306,16 @@ void ASolver::compute_T()
     }
   }
   
+}
+
+// Initialize A to Gamma * E
+void ASolver::init_A()
+{
+  int i;
+  for (i = 0; i < N_; i++)
+  {
+    A_.set_val(i, gamma_[i] * E_[i]);
+  }
 }
 
 

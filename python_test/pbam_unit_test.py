@@ -6,7 +6,7 @@ from scipy.misc import factorial
 bessel    = False
 SHCons = False
 SHCalc  = False
-Rot         = True
+Rot         = False
 Trans      = True
 nCt, zCt = 0, 0
 
@@ -204,12 +204,12 @@ if (Rot):
 
 if (Trans):
     #lam = 5.0
-    #z = 5.0
-    z = 8.132650244539
-    lam = 1.0 #25.0
+    z = 1.0
+    #z = 8.132650244539
+    lam = 5.0 #25.0
     nmax = 10
     
-    kap = 0.5 #0.0303073
+    kap = 0.0303073 #0.5
     
     S = np.zeros(( 2*nmax, 2*nmax, 4*nmax))
     
@@ -231,10 +231,10 @@ if (Trans):
             nu[n][m+nmax] =  sign * np.sqrt(((nD - mD -1)*(nD-mD)))
             mu[n][m+nmax] = ( nu[n][m+nmax] * pow( lam*kap, 2 ) ) / ( (2*nD-1.)*(2.*nD+1.))
                                         
-    for n in range(nmax):
-        for m in range(-n, n+1):
-            print( " {:.8f}, " .format( mu[n][m+nmax])),     
-        print ""
+    #for n in range(nmax):
+    #    for m in range(-n, n+1):
+    #        print( " {:.8f}, " .format( mu[n][m+nmax])),     
+    #    print ""
     
     
     resultsK = np.zeros(2*nmax)
@@ -253,12 +253,20 @@ if (Trans):
         S[0][n][0] = pow(lam/z, n) * np.exp(-kap*z) * (1.0/z) * resultsK[n] 
         S[n][0][0] = pow(-1.0, n) * S[0][n][0]
         
-    #for n in range(nmax): 
-    #    print( "{:.6f}, ".format(S[0][n][0])), 
-    #print ""
+    for n in range(nmax): 
+        print( "{:.6f}, ".format(S[n][0][0])), 
+    print ""
+    
+    for l in range(1, 2*nmax - 2 ):
+        a00  = np.sqrt( float( ( (0) + 0 + 1) * ( (0) - 0 + 1 )))
+        al0   = np.sqrt( float( ( ( l) + 0 + 1) * ( ( l) - 0 + 1 )))  
+        al10  = np.sqrt( float( ( (l-1) + 0 + 1) * ( (l-1) - 0 + 1 )))     
+        bl10 = ( al10 * pow( lam*kap, 2 ) ) / ( float( (2*(l-1)+1)*(2*(l-1)+3)))    
+        
+        S[1][l][0] = (-1.0/a00)*(bl10*S[0][l-1][0] + al0*S[0][l+1][0])
     
     for n in range(1, nmax-1):
-        for l in range(n+1, 2*nmax - n - 1 ):
+        for l in range(n+1, 2*nmax - n - 2 ):
             al0 = np.sqrt( float( ( (l-1) + 0 + 1) * ( (l-1) - 0 + 1 )))
             bl0 = ( al0 * pow( lam*kap, 2 ) ) / ( float( (2*(l-1)+1)*(2*(l-1)+3))) 
             
@@ -275,7 +283,7 @@ if (Trans):
     #for n in range(nmax): 
     #    print( "{:.6f}, ".format(S[n][n+1][0])),  
 
-    for m in range(1, nmax-1):
+    for m in range(1, nmax):
         for l in range(m, 2*nmax - m - 1):
             
             sign1, sign2, sign3 = 1.0, 1.0, 1.0
@@ -300,9 +308,9 @@ if (Trans):
     #for m in range(0, nmax): 
     #    print( "{:.8f}, ".format(S[m][m+2][m])),  
     
-    for m in range(1, nmax-1):
+    for m in range(1, nmax):
         for n in range( m, nmax-1):
-            for l in range( n+1, 2*nmax - n - 1):
+            for l in range( n+1, 2*nmax - n - 2):
                 
                 al1m = np.sqrt( float( ( (l-1) + m + 1) * ( (l-1) - m + 1 )))
                 bl1m = ( al1m * pow( lam*kap, 2 ) ) / ( float( (2*(l-1)+1)*(2*(l-1)+3))) 

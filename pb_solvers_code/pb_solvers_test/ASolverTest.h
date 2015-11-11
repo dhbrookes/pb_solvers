@@ -36,14 +36,17 @@ public :
     }
     
     const int vals           = nvals;
-    BesselConstants bConsta  = BesselConstants( 2*vals );
-    BesselCalc bCalcu        = BesselCalc( 2*vals, &bConsta);
-    SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-    SHCalc SHCalcu           = SHCalc( 2*vals, &SHConsta );
-    System sys               = System( const_, mol_ );
-    ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(), sys.get_lambda(), nvals);
+    BesselConstants bConsta( 2*vals );
+    BesselCalc bCalcu( 2*vals, &bConsta);
+    SHCalcConstants SHConsta( 2*vals );
+    SHCalc SHCalcu( 2*vals, &SHConsta );
+    System sys( const_, mol_ );
+    ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+                                        sys.get_lambda(), nvals);
     
-    ASolver ASolvTest        = ASolver( 2, vals, &bCalcu, &SHCalcu, &sys, &re_exp_consts);
+    ASolver ASolvTest( 2, vals, &bCalcu, &SHCalcu, &sys, &re_exp_consts);
+    
+    ASolvTest.solve_A( 10 );
     
   }
   

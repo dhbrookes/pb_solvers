@@ -13,14 +13,14 @@
 double preclim = 1.0e-4;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
 
-#include "ASolverUnitTest.h"
-#include "BesselCalcUnitTest.h"
-#include "ConstantsUnitTest.h"
+//#include "ASolverUnitTest.h"
+//#include "BesselCalcUnitTest.h"
+//#include "ConstantsUnitTest.h"
 #include "MyMatrixUnitTest.h"
 #include "ReExpCalcUnitTest.h"
-#include "SHCalcUnitTest.h"
-#include "SystemUnitTest.h"
-#include "utilUnitTest.h"
+//#include "SHCalcUnitTest.h"
+//#include "SystemUnitTest.h"
+//#include "utilUnitTest.h"
 
 #include "tester.h"
 
@@ -28,7 +28,7 @@ using namespace std;
 
 int main(int argc, char * argv[])
 {
-  bool test = false;
+  bool test = true;
   if (test)
   {
     cout << "Welcome to test suite" << endl;
