@@ -89,7 +89,7 @@ class SHCalcUTest : public ::testing::Test
   SHCalc SHCalcTest_;
   
 public:
-  SHCalcUTest( ) : SHConstTest_(10), SHCalcTest_(10, &SHConstTest_) {  }
+  SHCalcUTest( ) : SHConstTest_(10), SHCalcTest_(10, SHConstTest_) {  }
 };
 
 TEST_F(SHCalcUTest, legendre_0)

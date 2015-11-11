@@ -9,12 +9,15 @@
 #include "ASolver.h"
 #include <iostream>
 
-ASolver::ASolver(const int N, const int p, const BesselCalc _bcalc,
-                 SHCalc _shCalc, System sys, ReExpCoeffsConstants _re_exp_consts)
-:p_(p), _besselCalc_(_bcalc), _consts_(sys.get_consts()), gamma_(N)
-,delta_(N), E_(N), _shCalc_(_shCalc), _sys_(sys), N_(sys.get_n()),
-T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N)
+ASolver::ASolver(const int N, const int p, BesselCalc bcalc,
+                 SHCalc shCalc, System sys)
+:p_(p), gamma_(N),delta_(N), E_(N), N_(sys.get_n()), T_ (N_, N_), A_(N),
+reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p)
 {
+  _sys_ = make_shared<System> (sys);
+  _besselCalc_ = make_shared<BesselCalc> (bcalc);
+  _shCalc_ = make_shared<SHCalc> (shCalc);
+  
   // precompute all SH:
   pre_compute_all_sh();
   
@@ -68,7 +71,7 @@ void ASolver::pre_compute_all_sh()
   
   for (i = 0; i < N_; i++)
   {
-    all_sh.push_back(calc_mol_sh(_sys_.get_molecule(i)));
+    all_sh.push_back(calc_mol_sh(_sys_->get_molecule(i)));
   }
   
 }
@@ -94,7 +97,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
       {
         inter += T_(i, j).get_rval(n, m, s) * get_A_ni(i, n, s);
       } // end s
-      x1.set_val(n, m, inter);
+      x1.set_val(n, m+p_, inter);
     } // end m
   } //end n
   
@@ -108,7 +111,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
       {
         inter += T_(i, j).get_sval(n, l, m) * x1(l, m+p_);
       } // end l
-      x2.set_val(n, m, inter);
+      x2.set_val(n, m+p_, inter);
     } // end m
   } //end n
   
@@ -122,7 +125,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
       {
         inter += conj(T_(i, j).get_rval(n, s, m)) * x2(n, s+p_);
       } // end s
-      z.set_val(n, m, inter);
+      z.set_val(n, m+p_, inter);
     } // end m
   } //end n
   
@@ -145,8 +148,8 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
     pt = mol.get_posj(j);
     theta = pt.theta();
     phi = pt.phi();
-    _shCalc_.calc_sh(theta, phi);
-    vout.push_back(_shCalc_.get_full_result());
+    _shCalc_->calc_sh(theta, phi);
+    vout.push_back(_shCalc_->get_full_result());
   }
   return vout;
 }
@@ -157,12 +160,12 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
 cmplx ASolver::calc_indi_gamma(int i, int n)
 {
   double g;  // output
-  double kap = _consts_.get_kappa();
-  double ai = _sys_.get_ai(i);
-  double eps_p = _consts_.get_dielectric_prot();
-  double eps_s = _consts_.get_dielectric_water();
+  double kap = _sys_->get_consts().get_kappa();
+  double ai = _sys_->get_ai(i);
+  double eps_p = _sys_->get_consts().get_dielectric_prot();
+  double eps_s = _sys_->get_consts().get_dielectric_water();
   // all bessel function k
-  vector<double> bk_all = _besselCalc_.calc_mbfK(n+2, kap*ai);
+  vector<double> bk_all = _besselCalc_->calc_mbfK(n+2, kap*ai);
   double bk1 = bk_all[n];  // bessel k at n
   double bk2 = bk_all[n+1];   // bessel k at n+1
   
@@ -178,12 +181,12 @@ cmplx ASolver::calc_indi_gamma(int i, int n)
 cmplx ASolver::calc_indi_delta(int i, int n)
 {
   double d;  // output
-  double kap = _consts_.get_kappa();
-  double ai = _sys_.get_ai(i);  // radius
-  double eps_p = _consts_.get_dielectric_prot();
-  double eps_s = _consts_.get_dielectric_water();
+  double kap = _sys_->get_consts().get_kappa();
+  double ai = _sys_->get_ai(i);  // radius
+  double eps_p = _sys_->get_consts().get_dielectric_prot();
+  double eps_s = _sys_->get_consts().get_dielectric_water();
   // all bessel function I:
-  vector<double> bi_all = _besselCalc_.calc_mbfI(n+2, kap*ai);
+  vector<double> bi_all = _besselCalc_->calc_mbfI(n+2, kap*ai);
   double bi1 = bi_all[n];  // bessel i at n
   double bi2 = bi_all[n+1];   // bessel i at n+1
   
@@ -203,10 +206,10 @@ cmplx ASolver::calc_indi_e(int i, int n, int m)
   cmplx e = 0.0;
   int j;
   double q, rho;
-  for (j = 0; j < _sys_.get_Mi(i); j++)
+  for (j = 0; j < _sys_->get_Mi(i); j++)
   {
-    q = _sys_.get_qij(i, j);
-    rho = _sys_.get_posij(i, j).r();
+    q = _sys_->get_qij(i, j);
+    rho = _sys_->get_posij(i, j).r();
     // q_ij * (rho_ij)^n * Y_(n,m)(theta_ij, phi_ij):
     cmplx all_sh_acc = all_sh[i][j](n, abs(m));
     if ( m < 0 )
@@ -295,15 +298,16 @@ void ASolver::compute_T()
     for (j = 0; j < N_; j++)
     {
       if (i == j) continue;
-      ci = _sys_.get_centeri(i);
-      cj = _sys_.get_centeri(j);
+      ci = _sys_->get_centeri(i);
+      cj = _sys_->get_centeri(j);
       v = ci - cj;
       // calculate spherical harmonics for inter molecular vector:
-      _shCalc_.calc_sh(v.theta(), v.phi());
-      T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_.get_full_result(),
-                                   _besselCalc_, _reExpConsts_,
-                                   _consts_.get_kappa(),
-                                   _sys_.get_lambda()));
+      double kappa = _sys_->get_consts().get_kappa();
+      _shCalc_->calc_sh(v.theta(), v.phi());
+      vector<double> besselK = _besselCalc_->calc_mbfK(2*p_, kappa * v.r());
+      T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
+                                   besselK, reExpConsts_,
+                                   kappa, _sys_->get_lambda()));
     }
   }
   
@@ -318,54 +322,4 @@ void ASolver::init_A()
     A_.set_val(i, gamma_[i] * E_[i]);
   }
 }
-
-ASolver& ASolver::operator=(ASolver& other)
-{
-  _besselCalc_ = other._besselCalc_;
-  _shCalc_ = other._shCalc_;
-
-  _sys_ = other._sys_;
-  gamma_ = VecOfMats<cmplx>::type(other.gamma_);
-  delta_ = VecOfMats<cmplx>::type(other.delta_);
-  E_ = VecOfMats<cmplx>::type(other.E_);
-  N_ = int(other.N_);
-  p_ = int(other.p_);
-  _consts_ = other._consts_;
-  all_sh = vector<vector<MyMatrix<cmplx> > >(other.all_sh);
-  return *this;
-}
-
-
-//ASolver::~ASolver()
-//{
-//// potentially problematic. Need to address later
-////  delete _besselCalc_;
-////  delete _shCalc_;
-//}
-//
-//
-//ASolver::ASolver(const ASolver& other)
-//:_sys_(other._sys_), p_(other.p_), gamma_(other.gamma_),
-//delta_(other.delta_), N_(other.N_), E_(other.E_),
-//_consts_(other._consts_), all_sh(other.all_sh),
-//T_(other.T_), _besselCalc_(other._besselCalc_),
-//_reExpConsts_(other._reExpConsts_)
-//{
-//}
-//
-//ASolver& ASolver::operator=(const ASolver& other)
-//{
-//  _besselCalc_ = other._besselCalc_;
-//  _shCalc_ = other._shCalc_;
-//  
-//  _sys_ = other._sys_;
-//  gamma_ = VecOfMats<cmplx>::type(other.gamma_);
-//  delta_ = VecOfMats<cmplx>::type(other.delta_);
-//  E_ = VecOfMats<cmplx>::type(other.E_);
-//  N_ = int(other.N_);
-//  p_ = int(other.p_);
-//  _consts_ =other._consts_;
-//  all_sh = vector<vector<MyMatrix<cmplx> > >(other.all_sh);
-//  return *this;
-//}
 

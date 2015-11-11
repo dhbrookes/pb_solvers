@@ -23,12 +23,11 @@ BesselConstants::BesselConstants(const int N)
 }
 
 
-BesselCalc::BesselCalc(int N, BesselConstants _consts)
-: numVals_(N), _consts_(_consts)
+BesselCalc::BesselCalc(int N, BesselConstants consts)
+: numVals_(N)
 {
-  assert (_consts.get_n() == numVals_);
-//  _consts_ = new BesselConstants;
-//  _consts_ = _consts;
+  _consts_ = make_shared<BesselConstants> (consts);
+  assert (_consts_->get_n() == numVals_);
 }
 
 /*
@@ -52,7 +51,7 @@ const vector<double> BesselCalc::calc_mbfK(const int n,
   double val;
   for (i = 2; i < n; i++)
   {
-    val = K[i-1] + (z_sq * K[i-2] * _consts_.get_kconst_val(i-1));
+    val = K[i-1] + (z_sq * K[i-2] * _consts_->get_kconst_val(i-1));
     K.push_back(val);
   }
   return K;
@@ -94,34 +93,6 @@ const vector<double> BesselCalc::calc_mbfI(const int n,
   }
   return I;
 }
-
-BesselCalc::BesselCalc()
-:numVals_(Constants::MAX_NUM_POLES), _consts_()
-{
-//  _consts_ = new BesselConstants;
-  
-}
-
-//BesselCalc::~BesselCalc()
-//{
-////  delete _consts_;
-//}
-//
-//BesselCalc::BesselCalc(const BesselCalc& other)
-//:numVals_(other.numVals_)
-//{
-////  _consts_ = new BesselConstants;
-//  _consts_ = other._consts_;
-//}
-//
-BesselCalc& BesselCalc::operator=(BesselCalc& other)
-{
-  numVals_ = int(other.numVals_);
-//  _consts_ = new BesselConstants;
-  _consts_ = other._consts_;
-  return *this;
-}
-
 
 
 

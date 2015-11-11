@@ -44,8 +44,7 @@ public :
     ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
                                         sys.get_lambda(), nvals);
     
-    ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys, re_exp_consts);
-    
+    ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
     ASolvTest.solve_A( 10 );
     
   }

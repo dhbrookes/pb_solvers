@@ -93,15 +93,16 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
 
 
 ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp,
-                               BesselCalc bessel_calc,
-                               ReExpCoeffsConstants _consts,
+                               vector<double> besselK,
+                               ReExpCoeffsConstants consts,
                                double kappa, double lambda)
-:p_(p), v_(v), Ytp_(Ytp), _besselCalc_(bessel_calc),
-kappa_(kappa), lambda_(lambda), _consts_(_consts)
+:p_(p), v_(v), Ytp_(Ytp), besselK_(besselK),
+kappa_(kappa), lambda_(lambda)
 {
-  if (_besselCalc_.get_num_vals() < 2 * p_)
+  _consts_ = make_shared<ReExpCoeffsConstants>(consts);
+  if (besselK_.size() < 2 * p_)
   {
-    throw BesselSizeException(p_, _besselCalc_.get_num_vals());
+    throw BesselSizeException(p_, (int) besselK_.size());
   }
   
   if (Ytp_.get_nrows() < 2 * p_)
@@ -138,12 +139,12 @@ void ReExpCoeffs::calc_r()
       for (s=-n+1; s < n; s++)
       {
         val = 0.5 * exp(-ic * phi) * (1 + cos(theta)) *
-        _consts_.get_b_val(n, s-1) * get_rval(n, m, s-1);
+        _consts_->get_b_val(n, s-1) * get_rval(n, m, s-1);
         val -= 0.5 * exp(ic * phi) * (1 - cos(theta)) *
-        _consts_.get_b_val(n, -s-1) * get_rval(n, m, s+1);
-        val += sin(theta) * _consts_.get_a_val(n ,s) *
+        _consts_->get_b_val(n, -s-1) * get_rval(n, m, s+1);
+        val += sin(theta) * _consts_->get_a_val(n ,s) *
         get_rval(n, m, s);
-        val *= ( 1.0 / _consts_.get_b_val( n, m) );
+        val *= ( 1.0 / _consts_->get_b_val( n, m) );
         set_rval(n-1, m+1, s, val);
       }
     }
@@ -156,8 +157,6 @@ void ReExpCoeffs::calc_s()
   double val;
   double r = v_.r();
   S_ = MyVector<MyMatrix<double> > ( 2 * p_ );
-  vector<double> besselK = _besselCalc_.calc_mbfK( 2*p_, kappa_*r);
-  
   for (n = 0; n < 2*p_; n++)
   {
     S_.set_val(n, MyMatrix<double> ( 2*p_, 4*p_));
@@ -165,7 +164,7 @@ void ReExpCoeffs::calc_s()
   
   for (l = 0; l < 2 * p_; l++)
   {
-    val = pow((lambda_ / r), l) * (besselK[l] * exp(-kappa_*r)) / r;
+    val = pow((lambda_ / r), l) * (besselK_[l] * exp(-kappa_*r)) / r;
     set_sval( 0, l, 0, val );
     
     // Set S_{n,0}^0 vals
@@ -174,9 +173,9 @@ void ReExpCoeffs::calc_s()
   
   for (l = 1; l < 2 * p_ - 2; l++)
   {
-    val  = _consts_.get_beta(l-1, 0) * get_sval( 0, l-1, 0);
-    val += _consts_.get_alpha( l, 0) * get_sval( 0, l+1, 0);
-    val *= -1.0 / _consts_.get_alpha(0, 0);
+    val  = _consts_->get_beta(l-1, 0) * get_sval( 0, l-1, 0);
+    val += _consts_->get_alpha( l, 0) * get_sval( 0, l+1, 0);
+    val *= -1.0 / _consts_->get_alpha(0, 0);
     set_sval( 0, l, 0, val );
   }
   
@@ -184,10 +183,10 @@ void ReExpCoeffs::calc_s()
   {
     for(l = n + 1; l < 2*p_ - n - 2; l++)
     {
-      val  = _consts_.get_beta(l-1, 0) * get_sval(  n, l-1, 0);
-      val += _consts_.get_beta(n-1, 0) * get_sval(n-1,   l, 0);
-      val += _consts_.get_alpha( l, 0) * get_sval(  n, l+1, 0);
-      val *= -1.0 / _consts_.get_alpha(n, 0);
+      val  = _consts_->get_beta(l-1, 0) * get_sval(  n, l-1, 0);
+      val += _consts_->get_beta(n-1, 0) * get_sval(n-1,   l, 0);
+      val += _consts_->get_alpha( l, 0) * get_sval(  n, l+1, 0);
+      val *= -1.0 / _consts_->get_alpha(n, 0);
       set_sval(n+1, l, 0, val);
     }
   }
@@ -211,9 +210,9 @@ void ReExpCoeffs::calc_s()
   {
     for (l = m; l < 2*p_ - m - 1; l++)
     {
-      val  = _consts_.get_mu(  l,  -m) * get_sval(m-1, l-1, m-1);
-      val += _consts_.get_nu(l+1,m-1) * get_sval( m-1, l+1, m-1);
-      val *= ( -1.0 / _consts_.get_nu( m, -m) );
+      val  = _consts_->get_mu(  l,  -m) * get_sval(m-1, l-1, m-1);
+      val += _consts_->get_nu(l+1,m-1) * get_sval( m-1, l+1, m-1);
+      val *= ( -1.0 / _consts_->get_nu( m, -m) );
       set_sval(m, l, m, val);
     }
     
@@ -221,15 +220,14 @@ void ReExpCoeffs::calc_s()
     {
       for (l = n + 1; l < 2*p_ - n - 2; l++)
       {
-        val2  = _consts_.get_beta(l-1, m) * get_sval(  n, l-1, m);
-        val2 += _consts_.get_beta(n-1, m) * get_sval(n-1,   l, m);
-        val2 += _consts_.get_alpha( l, m) * get_sval(  n, l+1, m);
-        val2 *= (-1.0 / _consts_.get_alpha(n, m));
+        val2  = _consts_->get_beta(l-1, m) * get_sval(  n, l-1, m);
+        val2 += _consts_->get_beta(n-1, m) * get_sval(n-1,   l, m);
+        val2 += _consts_->get_alpha( l, m) * get_sval(  n, l+1, m);
+        val2 *= (-1.0 / _consts_->get_alpha(n, m));
         set_sval(n+1, l, m, val2);
       }
     }
   }
-  
   
   // Filling in the rest !
   for (n = 1; n < p_ ; n++)
@@ -247,20 +245,5 @@ void ReExpCoeffs::calc_s()
   
   
 } // end calc_s
-
-
-ReExpCoeffs& ReExpCoeffs::operator=(ReExpCoeffs& other)
-{
-  R_ = other.R_;
-  S_ = other.S_;
-  kappa_ = other.kappa_;
-  lambda_ = other.lambda_;
-  v_ = other.v_;
-  _consts_ = other._consts_;
-  Ytp_ = other.Ytp_;
-  _besselCalc_ = other._besselCalc_;
-  return *this;
-}
-
 
 
