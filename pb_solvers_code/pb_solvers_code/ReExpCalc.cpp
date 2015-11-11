@@ -177,7 +177,7 @@ void ReExpCoeffs::calc_s()
     val  = _consts_->get_beta(l-1, 0) * get_sval( 0, l-1, 0);
     val += _consts_->get_alpha( l, 0) * get_sval( 0, l+1, 0);
     val *= -1.0 / _consts_->get_alpha(0, 0);
-    set_sval( 0, l, 0, val );
+    set_sval( 1, l, 0, val );
   }
   
   for (n = 1; n < p_ - 1; n++)

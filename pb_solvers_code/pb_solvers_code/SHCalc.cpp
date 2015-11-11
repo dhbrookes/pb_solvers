@@ -50,10 +50,12 @@ shConsts_(N, N), dubFac_(N)
 }
 
 SHCalc::SHCalc(const int num_vals, SHCalcConstants* _consts)
-:_consts_(_consts), numVals_(num_vals), P_( num_vals, num_vals),
+: numVals_(num_vals), P_( num_vals, num_vals),
 Y_( num_vals, num_vals)
 {
-  assert (_consts_->get_n() == numVals_);
+  assert (_consts->get_n() == numVals_);
+  _consts_  = new SHCalcConstants;
+  *_consts_ = *_consts;
 }
 
 /*
@@ -159,12 +161,12 @@ SHCalc::SHCalc()
 P_( Constants::MAX_NUM_POLES, Constants::MAX_NUM_POLES),
 Y_( Constants::MAX_NUM_POLES, Constants::MAX_NUM_POLES)
 {
-  assert (_consts_->get_n() == numVals_);
+  
 }
 
 SHCalc::~SHCalc()
 {
-  //  delete _consts_;
+  //delete _consts_;
 }
 
 
@@ -173,14 +175,14 @@ SHCalc::SHCalc(const SHCalc& other)
 Y_(other.Y_)
 {
   _consts_ = new SHCalcConstants(numVals_);
-  _consts_ = other._consts_;
+  *_consts_ = *(other._consts_);
 }
 
 
 SHCalc& SHCalc::operator=(const SHCalc& other)
 {
   _consts_ = new SHCalcConstants;
-  _consts_ = other._consts_;
+ *_consts_ = *(other._consts_);
   numVals_ = int(other.numVals_);
   P_ = MyMatrix<double>(other.P_);
   Y_ = MyMatrix<cmplx>(other.Y_);

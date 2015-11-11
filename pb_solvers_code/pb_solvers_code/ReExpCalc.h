@@ -157,8 +157,8 @@ public:
   ReExpCoeffs() { };
   ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, const BesselCalc * BesselCalc,
                  ReExpCoeffsConstants* _consts, double kappa, double lambda);
-  //  virtual ~ReExpCoeffs_IJ();
-  //  ReExpCoeffs_IJ& operator=(const ReExpCoeffs_IJ* other);
+  //virtual ~ReExpCoeffs_IJ();
+  //ReExpCoeffs_IJ& operator=(const ReExpCoeffs_IJ* other);
   
   cmplx get_yval(int n, int s)
   {

@@ -204,9 +204,9 @@ if (Rot):
 
 if (Trans):
     #lam = 5.0
-    z = 1.0
-    #z = 8.132650244539
-    lam = 5.0 #25.0
+    #z = 5.0
+    z = 8.132650244539
+    lam = 25.0
     nmax = 10
     
     kap = 0.0303073 #0.5
@@ -236,7 +236,6 @@ if (Trans):
     #        print( " {:.8f}, " .format( mu[n][m+nmax])),     
     #    print ""
     
-    
     resultsK = np.zeros(2*nmax)
     nCt = 0
     ## for calculating the \hat{k}_n (z) of eq 3a, lotan 2006
@@ -253,9 +252,9 @@ if (Trans):
         S[0][n][0] = pow(lam/z, n) * np.exp(-kap*z) * (1.0/z) * resultsK[n] 
         S[n][0][0] = pow(-1.0, n) * S[0][n][0]
         
-    for n in range(nmax): 
-        print( "{:.6f}, ".format(S[n][0][0])), 
-    print ""
+    #for n in range(nmax): 
+    #    print( "{:.6f}, ".format(S[n][0][0])), 
+    #print ""
     
     for l in range(1, 2*nmax - 2 ):
         a00  = np.sqrt( float( ( (0) + 0 + 1) * ( (0) - 0 + 1 )))
@@ -280,8 +279,9 @@ if (Trans):
             S[n+1][l][0] += al * S[n][l+1][0]
             S[n+1][l][0] *=  ( -1.0 / an ) 
     
-    #for n in range(nmax): 
-    #    print( "{:.6f}, ".format(S[n][n+1][0])),  
+    for n in range(nmax): 
+        print( "{:.6f}, ".format(S[n][n+1][0])),  
+    print ""
 
     for m in range(1, nmax):
         for l in range(m, 2*nmax - m - 1):
@@ -324,5 +324,5 @@ if (Trans):
                 
                 S[n+1][l][m]  = bl1m * S[n][l-1][m] + bn1m * S[n-1][l][m] + alm* S[n][l+1][m]
                 S[n+1][l][m] *= ( -1.0 / anm )
-    #for m in range(1, nmax-1): 
-    #    print( "{:.8f}, ".format(S[m+2][m+3][m])),  
+    for m in range(1, nmax-1): 
+        print( "{:.8f}, ".format(S[m+2][m+3][m])),  

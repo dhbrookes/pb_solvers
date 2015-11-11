@@ -9,12 +9,27 @@
 #include "ASolver.h"
 #include <iostream>
 
+//ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
+//            SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts)
+//:p_(p), _besselCalc_(_bcalc), _consts_(&sys->get_consts()), gamma_(N),
 ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
-                 SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts)
-:p_(p), _besselCalc_(_bcalc), _consts_(&sys->get_consts()), gamma_(N)
-,delta_(N), E_(N), _shCalc_(_shCalc), _sys_(sys), N_(sys->get_n()),
-T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N)
+                 SHCalc* _shCalc, System* sys,
+                 ReExpCoeffsConstants* _re_exp_consts)
+:p_(p), _besselCalc_(_bcalc), _consts_(&sys->get_consts()), gamma_(N),delta_(N), E_(N),
+_sys_(sys), N_(sys->get_n()),T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N)
 {
+//  _besselCalc_  = new BesselCalc;
+//  *_besselCalc_ = *_bcalc;
+  
+  _shCalc_  = new SHCalc;
+  *_shCalc_ = *_shCalc;
+  
+//  _sys_  = new System;
+//  *_sys_ = *sys;
+  
+//  _reExpConsts_  = new ReExpCoeffsConstants;
+//  *_reExpConsts_ = *_re_exp_consts;
+  
   // precompute all SH:
   pre_compute_all_sh();
   

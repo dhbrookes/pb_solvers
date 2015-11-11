@@ -27,8 +27,8 @@ BesselCalc::BesselCalc(int N, BesselConstants* _consts)
 : numVals_(N)
 {
   assert (_consts->get_n() == numVals_);
-  _consts_ = new BesselConstants;
-  _consts_ = _consts;
+  _consts_  = new BesselConstants;
+  *_consts_ = *_consts;
 }
 
 /*
@@ -104,21 +104,21 @@ BesselCalc::BesselCalc()
 
 BesselCalc::~BesselCalc()
 {
-//  delete _consts_;
+  //delete _consts_;
 }
 
 BesselCalc::BesselCalc(const BesselCalc& other)
 :numVals_(other.numVals_)
 {
   _consts_ = new BesselConstants;
-  _consts_ = other._consts_;
+  *_consts_ = *(other._consts_);
 }
 
 BesselCalc& BesselCalc::operator=(const BesselCalc& other)
 {
   numVals_ = int(other.numVals_);
   _consts_ = new BesselConstants;
-  _consts_ = other._consts_;
+  *_consts_ = *(other._consts_);
   return *this;
 }
 
