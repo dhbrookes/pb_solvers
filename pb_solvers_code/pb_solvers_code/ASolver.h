@@ -10,6 +10,7 @@
 #define ASolver_h
 
 #include <stdio.h>
+#include <iostream>
 #include "MyMatrix.h"
 #include "BesselCalc.h"
 #include "Constants.h"
@@ -95,14 +96,45 @@ public:
   cmplx get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+p_ ); }
   cmplx get_A_ni(int i, int n, int m)  { return A_[ i ]( n, m+p_ ); }
   
-  //void set_E_ni( int i, int n, int m)  { E_[ i ]( n, m+p_ ); }
-  //void set_A_ni( int i, int n, int m)  { A_[ i ]( n, m+p_ ); }
-  
   ASolver(const int N, const int p, BesselCalc bcalc,
           SHCalc shCalc, System sys);
 
+  void print_Ei( int i, int p)
+  {
+    cout << "This is my E for molecule " << i << " poles " << p <<  endl;
+    for (int n = 0; n < p; n++)
+    {
+      for (int m = -n; m <= n; m++)
+      {
+        double  r = get_E_ni(i,n,m).real();
+        double im = get_E_ni( i, n, m).imag();
+        r  = fabs( r) > 1e-9 ?  r : 0;
+        im = fabs(im) > 1e-9 ? im : 0;
+        cout << "(" << r << "," << im << ")  ";
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
   
-  
+  void print_Ai( int i, int p)
+  {
+    cout << "This is my A for molecule " << i << " poles " << p <<  endl;
+    for (int n = 0; n < p; n++)
+    {
+      for (int m = -n; m <= n; m++)
+      {
+        double  r = get_A_ni(i,n,m).real();
+        double im = get_A_ni( i, n, m).imag();
+        r  = fabs( r) > 1e-9 ?  r : 0;
+        im = fabs(im) > 1e-9 ? im : 0;
+        cout << "(" << r << "," << im << ")  ";
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
+
   //numerically solve for A given the number of desired iterations
   void solve_A(int num_iter);
   

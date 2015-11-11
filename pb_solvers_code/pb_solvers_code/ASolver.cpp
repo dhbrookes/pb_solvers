@@ -60,7 +60,6 @@ void ASolver::solve_A(int num_iter)
   int t;
   for (t = 0; t < num_iter; t++)
   {
-    cout << "This is iter " << t << endl;
     iter();
   }
   

@@ -37,10 +37,10 @@ protected :
       posCharges[0] = pos[molInd];
       
       Molecule molNew = Molecule( M, rd[molInd], charges, posCharges );
-      Pt coc = molNew.get_center();
-      Pt cgPos = molNew.get_posj(0);
-      cout << " molNew centers and charge pos " << coc.x() << " "  << coc.y() << " "  << coc.z() << " "
-            << " and " << cgPos.x() << endl;
+//      Pt coc = molNew.get_center();
+//      Pt cgPos = molNew.get_posj(0);
+//      cout << " molNew centers and charge pos " << coc.x() << " "  << coc.y() << " "  << coc.z() << " "
+//            << " and " << cgPos.x() << " "  << cgPos.y() << " "  << cgPos.z() << " "  <<endl;
       mol_.push_back( molNew );
     }
   } // end SetUp
