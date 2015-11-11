@@ -89,10 +89,7 @@ protected:
 public:
   
   ReExpCoeffsConstants() { }
-  
-  /*
-   Initialize proper amount of memory in default constructor:
-   */
+
   ReExpCoeffsConstants(double kappa, double lambda, int p);
   
   double get_a_val(int n, int m)  { return a_(n, m + 2*p_); }
@@ -119,20 +116,8 @@ public:
 class ReExpCoeffs
 {
 protected:
-
-  Pt v_; //computing re-expansion along this vector
   int p_; // max value of n when solving for A
-  
-  /*
-   Spherical harmonics for this v_:
-   */
-  MyMatrix<cmplx> Ytp_;
-  BesselCalc _besselCalc_;
-  
-  ReExpCoeffsConstants _consts_;
-  
-  double kappa_; //from Constants
-  double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
+  shared_ptr<ReExpCoeffsConstants> _consts_;
   
   /*
    R_ contains rotation coefficients for this entry. R_ has three
@@ -150,18 +135,32 @@ protected:
    -n <= m <= n
    */
   MyVector<MyMatrix<double> >  S_;
-  //  ReExpCoeffsConstants*     _consts_;
+
+  double kappa_; //from Constants
+  double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
+  
+  Pt v_; //computing re-expansion along this vector
+  
+  /*
+   Bessel function for this v_. If the bessel function be k_n ( z ) then
+   this value should be for n = 2*p_ and z = kappa*r
+   */
+  vector<double> besselK_;
+  
+  /*
+   Spherical harmonics for this v_:
+   */
+  MyMatrix<cmplx> Ytp_;
   
   void calc_r();  // calculate all the values for R_
   void calc_s(); // calculate all the values for S_
   
 public:
-  
   ReExpCoeffs() { };
-  ReExpCoeffs(Pt v, int p, MyMatrix<cmplx> Ytp, BesselCalc BesselCalc,
-                 ReExpCoeffsConstants _consts, double kappa, double lambda);
-  //  virtual ~ReExpCoeffs_IJ();
-  ReExpCoeffs& operator=(ReExpCoeffs& other);
+  ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
+                 ReExpCoeffsConstants consts, double kappa, double lambda);
+//  ReExpCoeffs& operator=(ReExpCoeffs& other);
+
   
   cmplx get_yval(int n, int s)
   {

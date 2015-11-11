@@ -132,7 +132,6 @@ public:
     return pout;
   }
   
-
   Point<T> operator+(Point<T>& other)
   {
     Point<T> pout;
@@ -184,7 +183,6 @@ public:
     if (sph_) convert_to_spherical();
     return p3_;
   }
-  
   
 };
 

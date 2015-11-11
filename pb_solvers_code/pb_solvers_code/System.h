@@ -66,10 +66,8 @@ public:
   const double get_Mi(int i) const { return molecules_[i].get_m(); }
   const double get_qij(int i, int j) const { return molecules_[i].get_qj(j); }
   Pt get_posij(int i, int j) { return molecules_[i].get_posj(j); }
-
   const Molecule get_molecule(int i) const { return molecules_[i]; }
   Pt get_centeri(int i) { return molecules_[i].get_center(); }
-
   const double get_lambda()  { return lambda_; }
   
 };

@@ -14,6 +14,7 @@
 #include "SHCalc.h"
 #include "System.h"
 #include "util.h"
+#include <memory>
 
 using namespace std;
 

@@ -32,8 +32,10 @@ class ReExpTest
     double kap            = Cst.get_kappa();
     double lambda         = 5.0;
     ReExpCoeffsConstants reExpConsts (kap, lambda, nvals);
+
+    vector<double> besselK = bCal.calc_mbfK(2*nvals, kap*testPt.r());
     
-    ReExpCoeffs ReExpTest( testPt, nvals, shMat, bCal, reExpConsts,
+    ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK, reExpConsts,
                           kap, lambda );
     
   }
