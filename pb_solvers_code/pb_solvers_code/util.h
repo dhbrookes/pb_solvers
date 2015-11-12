@@ -73,20 +73,21 @@ protected:
     if (sph_)
       return; // do nothing if already spherical
     
-    T r, rp;
-    T theta = 0.0;
-    T phi   = 0.0;
+    T theta, phi;
+    T r = sqrt(p1_*p1_ + p2_*p2_ + p3_*p3_);
     
-    r = sqrt(p1_*p1_ + p2_*p2_ + p3_*p3_);
-    rp = sqrt(p1_*p1_ + p2_*p2_);
+    if (r < fabs(p3_))
+      r = fabs(p3_);
     
-    if ( abs(r) > 1e-5 ) theta = acos( p3_ / r );
+    if (r == 0.0)
+      theta = 0.0;
+    else
+      theta = acos(p3_/r);
     
-    if ( abs(rp) > 1e-5 )
-    {
-      if ( p2_ < 0 )   phi = 2*M_PI - acos( p1_ / rp );
-      else            phi = acos( p1_ / rp );
-    }
+    if ((p1_ == 0.0) && (p2_ == 0.0))
+      phi = 0.0;
+    else
+      phi = atan2(p2_, p1_);
     
     p1_ = r;
     p2_ = theta;

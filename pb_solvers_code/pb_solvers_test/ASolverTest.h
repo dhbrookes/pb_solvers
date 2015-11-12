@@ -47,12 +47,12 @@ public :
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
     ASolvTest.solve_A( 35 );
     
-    cout << "This is my Kappa " << sys.get_consts().get_kappa() <<  endl;
+    //cout << "This is my Kappa " << sys.get_consts().get_kappa() <<  endl;
     
     for (int mol=0; mol<2; mol++)
     {
-      ASolvTest.print_Ai(mol, 4);
-      ASolvTest.print_Ei(mol, 4);
+//      ASolvTest.print_Ai(mol, 4);
+//      ASolvTest.print_Ei(mol, 4);
     }
   }
   
