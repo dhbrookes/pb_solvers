@@ -93,7 +93,10 @@ public:
   
   cmplx get_gamma_ni( int i, int n)    { return gamma_[i]( n, n); }
   cmplx get_delta_ni( int i, int n)    { return delta_[i]( n, n); }
-  cmplx get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+p_ ); }
+  
+  cmplx get_SH_ij(int i, int j, int n, int m)
+                                       { return all_sh[i][j]( n, abs(m)); }
+  cmplx get_E_ni(int i, int n, int m)  { return E_[ i ]( n, m+p_ ); }
   cmplx get_A_ni(int i, int n, int m)  { return A_[ i ]( n, m+p_ ); }
   
   ASolver(const int N, const int p, BesselCalc bcalc,

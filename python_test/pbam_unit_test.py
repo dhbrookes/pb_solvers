@@ -114,22 +114,24 @@ if (SHCalc):
 ## the point ( rho, theta, phi )
 
 if (MPol):
-    rho    = 0.5       # radius
-    theta = 0.0    # polar
-    phi     = 0.0      # azimuthal
-    q        = -0.4
+    #rho    = 0.5       # radius
+    #theta = np.pi    # polar
+    #phi     = 0.0      # azimuthal
+    #q        = 5.0
     nmax = 10
     
-    #rho = 1.51658 
-    #theta  = 2.05056 
-    #phi    = 5.55037
+    rho = 1.51658 
+    theta  = 2.05056 
+    phi    = -0.732815
+    q        = -.4
     
     for n in range(nmax):
-        for m in range(n+1):
+        for m in range(0,n+1):
             Ynm = scipy.special.sph_harm(m, n, phi, theta)
             
-            print Ynm*q*pow(rho, n) *  \
-                        np.sqrt((4.0*np.pi)/(2.0*float(n)+1.0)),
+            print Ynm  * pow(-1.0,m) *\
+                        np.sqrt((4.0*np.pi)/(2.0*float(n)+1.0)), #*\
+                        #pow(rho, n) *q ,
         print ""
 
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 

@@ -38,9 +38,6 @@ protected :
       posCharges[0] = cgPos[molInd];
       
       Molecule molNew( M, rd[molInd], charges, posCharges, pos[molInd]);
-      Pt cgPos = molNew.get_posj(0);
-      cout << " and r " << cgPos.r() << " theta "  << cgPos.theta() <<
-              " phi "  << cgPos.phi() << endl;
       mol_.push_back( molNew );
     }
   } // end SetUp
@@ -105,26 +102,24 @@ TEST_F(ASolverUTest, checkE)
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
 
-  cout << "This is E 0, 0, 0 : " << ASolvTest.get_E_ni( 0, 0, 0) << endl;
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
-//  
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5, 0).real()/-15625, 1.0, preclim);
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5, 0).imag(),        0.0, preclim);
-//  
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6, -5).real(),        0.0, preclim);
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6, -5).imag(),        0.0, preclim);
-//  
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).real(),-0.4, preclim);
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).imag(), 0.0, preclim);
-//  
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3, -3).real()/184.52,  1.0, preclim);
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3, -3).imag()/417.127, 1.0, preclim);
-//  
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6, -5).real()/5.31968e+06, 1.0, preclim);
-//  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6, -5).imag()/-916110,     1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5, 0).real(),   -0.15625, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 5, 0).imag(),        0.0, preclim);
 
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6, -5).real(),        0.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 0, 6, -5).imag(),        0.0, preclim);
+
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).real(),-0.4, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 0, 0).imag(), 0.0, preclim);
+
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3, -2).real(), 0.0728481807168, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 3, -2).imag(), 0.6901393135990, preclim);
+
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6, -5).real(), -1.75961914197, preclim);
+  EXPECT_NEAR( ASolvTest.get_E_ni( 1, 6, -5).imag(), -1.01329895122, preclim);
 }
 
 TEST_F(ASolverUTest, checkSH)
@@ -140,6 +135,40 @@ TEST_F(ASolverUTest, checkSH)
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+
+  for (int i = 0; i < 2 ; i++)
+    for (int n = 0; n < 7; n++)
+    {
+      for (int m = 0; m <= n; m++)
+      {
+        double  r = ASolvTest.get_SH_ij( i, 0, n, m).real();
+        double im = ASolvTest.get_SH_ij( i, 0, n, m).imag();
+        r  = fabs( r) > 1e-9 ?  r : 0;
+        im = fabs(im) > 1e-9 ? im : 0;
+        cout << "(" << r << "," << im << ")  ";
+      }
+      cout << endl;
+    }
+
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 0, 0).real(), 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 0, 0).imag(), 0.0, preclim);
+
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 5, 0).real(),-1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 5, 0).imag(), 0.0, preclim);
+
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 6,-5).real(), 0.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 6,-5).imag(), 0.0, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 0, 0).real(), 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 0, 0).imag(), 0.0, preclim);
+
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 3,-2).real(),-0.0522110883, preclim);
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 3,-2).imag(), 0.4946303982, preclim);
+  
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 6, 5).real(), 0.3615486465, preclim);
+  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 6, 5).imag(),-0.2082023636, preclim);
+  
+  
 }
 
 TEST_F(ASolverUTest, checkT)
@@ -170,30 +199,7 @@ TEST_F(ASolverUTest, checkA)
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-//  ASolvTest.solve_A( 10 );
-//  for (int i = 0; i < nvals; i++)
-//  {
-//    for (int m = -i; m<= i; m++)
-//    {
-//      cout << " " << ASolvTest.get_A_ni( 1, i, m) ;
-//    }
-//    cout << endl;
-//  }
-//  
-//  cout << endl;
-//  cout << "This is my E " <<  endl;
-//  
-//  for (int i = 0; i < 5; i++)
-//  {
-//    for (int m = -i; m<= i; m++)
-//    {
-//      cout << " " << ASolvTest.get_E_ni( 1, i, m) ;
-//    }
-//    cout << endl;
-//  }
-//  
-//  cout << endl;
-//  
+  ASolvTest.solve_A(20);
 }
 
 #endif

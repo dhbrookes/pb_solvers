@@ -35,27 +35,27 @@ reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p)
 void ASolver::solve_A(int num_iter)
 {
   
-  cout << "This is my R in solve_A" << endl;
-  for (int i = 0; i < 5; i++)
-  {
-    for (int m = -i; m<= i; m++)
-    {
-      cout << " " << T_(0,1).get_rval(5, m, i);
-    }
-    cout << endl;
-  }
-  cout << endl;
-  
-  cout << "This is my S in solve_A" << endl;
-  for (int i = 0; i < 5; i++)
-  {
-    for (int m = -i; m<= i; m++)
-    {
-      cout << " " << T_(0,1).get_sval(5, i, m);
-    }
-    cout << endl;
-  }
-  cout << endl;
+//  cout << "This is my R in solve_A" << endl;
+//  for (int i = 0; i < 5; i++)
+//  {
+//    for (int m = -i; m<= i; m++)
+//    {
+//      cout << " " << T_(0,1).get_rval(5, m, i);
+//    }
+//    cout << endl;
+//  }
+//  cout << endl;
+//  
+//  cout << "This is my S in solve_A" << endl;
+//  for (int i = 0; i < 5; i++)
+//  {
+//    for (int m = -i; m<= i; m++)
+//    {
+//      cout << " " << T_(0,1).get_sval(5, i, m);
+//    }
+//    cout << endl;
+//  }
+//  cout << endl;
   
   int t;
   for (t = 0; t < num_iter; t++)
@@ -87,7 +87,6 @@ void ASolver::iter()
     A_.set_val(i, ai);
   }
 }
-
 
 
 void ASolver::pre_compute_all_sh()
@@ -174,6 +173,7 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
     pt = mol.get_posj(j);
     theta = pt.theta();
     phi = pt.phi();
+    cout << "This is theta, phi " << theta << "  " << phi << endl;
     _shCalc_->calc_sh(theta, phi);
     vout.push_back(_shCalc_->get_full_result());
   }
