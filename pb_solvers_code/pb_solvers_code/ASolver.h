@@ -1,5 +1,5 @@
 //
-//  ASolver.hpp
+//  ASolver.h
 //  pb_solvers_code
 //
 //  Created by David Brookes on 9/25/15.
@@ -10,6 +10,7 @@
 #define ASolver_h
 
 #include <stdio.h>
+#include <iostream>
 #include "MyMatrix.h"
 #include "BesselCalc.h"
 #include "Constants.h"
@@ -32,13 +33,14 @@ protected:
   int                         p_;  // max value for n (2*numVals_ usually)    
   VecOfMats<cmplx>::type      E_;
   VecOfMats<cmplx>::type      gamma_, delta_;
-  const BesselCalc*           _besselCalc_;
-  System*                     _sys_;  // system data (radii, charges, etc.)
-  const Constants*            _consts_;
-  SHCalc*                     _shCalc_;
-  ReExpCoeffsConstants*       _reExpConsts_;
   
-  //re expansion coefficients calcualted for every inter molecular vector
+  ReExpCoeffsConstants        reExpConsts_;
+
+  shared_ptr<BesselCalc>      _besselCalc_;
+  shared_ptr<System>          _sys_;  // system data (radii, charges, etc.)
+  shared_ptr<SHCalc>          _shCalc_;
+  
+  // re expansion coefficients calculated for every inter molecular vector
   MyMatrix<ReExpCoeffs>  T_;
   
   // pre-computed spherical harmonics matrices for every charge in the system
@@ -66,7 +68,7 @@ protected:
   // compute the gamma matrix (as defined on page 544 of Lotan 2006):
   void compute_gamma();
   
-  //compute the delta matrix (as defined on page 544 of Lotan 2006):
+  // compute the delta matrix (as defined on page 544 of Lotan 2006):
   void compute_delta();
   
   // compute the E vector (equations on page 543 of Lotan 2006)
@@ -75,7 +77,7 @@ protected:
   // initialize A vector
   void init_A();
   
-  //re-expand element i of A withh element (i, j) of T and return results
+  // re-expand element i of A withh element (i, j) of T and return results
   MyMatrix<cmplx> re_expandA(int i, int j);
   
   // perform one iteration of the solution for A (eq 51 in Lotan 2006)
@@ -94,20 +96,48 @@ public:
   cmplx get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+p_ ); }
   cmplx get_A_ni(int i, int n, int m)  { return A_[ i ]( n, m+p_ ); }
   
-  //void set_E_ni( int i, int n, int m)  { E_[ i ]( n, m+p_ ); }
-  //void set_A_ni( int i, int n, int m)  { A_[ i ]( n, m+p_ ); }
+  ASolver(const int N, const int p, BesselCalc bcalc,
+          SHCalc shCalc, System sys);
+
+  void print_Ei( int i, int p)
+  {
+    cout << "This is my E for molecule " << i << " poles " << p <<  endl;
+    for (int n = 0; n < p; n++)
+    {
+      for (int m = -n; m <= n; m++)
+      {
+        double  r = get_E_ni(i,n,m).real();
+        double im = get_E_ni( i, n, m).imag();
+        r  = fabs( r) > 1e-9 ?  r : 0;
+        im = fabs(im) > 1e-9 ? im : 0;
+        cout << "(" << r << "," << im << ")  ";
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
   
-  ASolver(const int N, const int p, const BesselCalc* _bcalc,
-          SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts);
-  virtual ~ASolver();
-  
-  ASolver(const ASolver& other);
-  ASolver& operator=(const ASolver& other);
-  
-  
+  void print_Ai( int i, int p)
+  {
+    cout << "This is my A for molecule " << i << " poles " << p <<  endl;
+    for (int n = 0; n < p; n++)
+    {
+      for (int m = -n; m <= n; m++)
+      {
+        double  r = get_A_ni(i,n,m).real();
+        double im = get_A_ni( i, n, m).imag();
+        r  = fabs( r) > 1e-9 ?  r : 0;
+        im = fabs(im) > 1e-9 ? im : 0;
+        cout << "(" << r << "," << im << ")  ";
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
+
   //numerically solve for A given the number of desired iterations
   void solve_A(int num_iter);
   
 }; // End ASolver
 
-#endif /* ASolver_hpp */
+#endif /* ASolver_h */

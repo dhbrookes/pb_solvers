@@ -6,8 +6,9 @@ from scipy.misc import factorial
 bessel    = False
 SHCons = False
 SHCalc  = False
+MPol      = True
 Rot         = False
-Trans      = True
+Trans      = False
 nCt, zCt = 0, 0
 
 
@@ -106,7 +107,30 @@ if (SHCalc):
         print Ynm*pow(-1.0, m)*np.sqrt((4.0*np.pi) 
                                           /(2.0*float(nmax-1)+1.0))
         
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+## For calculating the multipole expansion about 
+## the point ( rho, theta, phi )
 
+if (MPol):
+    rho    = 0.5       # radius
+    theta = 0.0    # polar
+    phi     = 0.0      # azimuthal
+    q        = -0.4
+    nmax = 10
+    
+    #rho = 1.51658 
+    #theta  = 2.05056 
+    #phi    = 5.55037
+    
+    for n in range(nmax):
+        for m in range(n+1):
+            Ynm = scipy.special.sph_harm(m, n, phi, theta)
+            
+            print Ynm*q*pow(rho, n) *  \
+                        np.sqrt((4.0*np.pi)/(2.0*float(n)+1.0)),
+        print ""
 
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
@@ -204,9 +228,9 @@ if (Rot):
 
 if (Trans):
     #lam = 5.0
-    #z = 5.0
-    z = 8.132650244539
-    lam = 25.0
+    z = 1.0
+    #z = 8.132650244539
+    lam = 5.0 #25.0
     nmax = 10
     
     kap = 0.0303073 #0.5
@@ -236,6 +260,7 @@ if (Trans):
     #        print( " {:.8f}, " .format( mu[n][m+nmax])),     
     #    print ""
     
+    
     resultsK = np.zeros(2*nmax)
     nCt = 0
     ## for calculating the \hat{k}_n (z) of eq 3a, lotan 2006
@@ -252,9 +277,9 @@ if (Trans):
         S[0][n][0] = pow(lam/z, n) * np.exp(-kap*z) * (1.0/z) * resultsK[n] 
         S[n][0][0] = pow(-1.0, n) * S[0][n][0]
         
-    #for n in range(nmax): 
-    #    print( "{:.6f}, ".format(S[n][0][0])), 
-    #print ""
+    for n in range(nmax): 
+        print( "{:.6f}, ".format(S[n][0][0])), 
+    print ""
     
     for l in range(1, 2*nmax - 2 ):
         a00  = np.sqrt( float( ( (0) + 0 + 1) * ( (0) - 0 + 1 )))
@@ -279,9 +304,8 @@ if (Trans):
             S[n+1][l][0] += al * S[n][l+1][0]
             S[n+1][l][0] *=  ( -1.0 / an ) 
     
-    for n in range(nmax): 
-        print( "{:.6f}, ".format(S[n][n+1][0])),  
-    print ""
+    #for n in range(nmax): 
+    #    print( "{:.6f}, ".format(S[n][n+1][0])),  
 
     for m in range(1, nmax):
         for l in range(m, 2*nmax - m - 1):
@@ -324,5 +348,5 @@ if (Trans):
                 
                 S[n+1][l][m]  = bl1m * S[n][l-1][m] + bn1m * S[n-1][l][m] + alm* S[n][l+1][m]
                 S[n+1][l][m] *= ( -1.0 / anm )
-    for m in range(1, nmax-1): 
-        print( "{:.8f}, ".format(S[m+2][m+3][m])),  
+    #for m in range(1, nmax-1): 
+    #    print( "{:.8f}, ".format(S[m+2][m+3][m])),  

@@ -7,28 +7,17 @@
 //
 
 #include "ASolver.h"
+
 #include <iostream>
 
-//ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
-//            SHCalc* _shCalc, System* sys, ReExpCoeffsConstants* _re_exp_consts)
-//:p_(p), _besselCalc_(_bcalc), _consts_(&sys->get_consts()), gamma_(N),
-ASolver::ASolver(const int N, const int p, const BesselCalc* _bcalc,
-                 SHCalc* _shCalc, System* sys,
-                 ReExpCoeffsConstants* _re_exp_consts)
-:p_(p), _besselCalc_(_bcalc), _consts_(&sys->get_consts()), gamma_(N),delta_(N), E_(N),
-_sys_(sys), N_(sys->get_n()),T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N)
+ASolver::ASolver(const int N, const int p, BesselCalc bcalc,
+                 SHCalc shCalc, System sys)
+:p_(p), gamma_(N),delta_(N), E_(N), N_(sys.get_n()), T_ (N_, N_), A_(N),
+reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p)
 {
-//  _besselCalc_  = new BesselCalc;
-//  *_besselCalc_ = *_bcalc;
-  
-  _shCalc_  = new SHCalc;
-  *_shCalc_ = *_shCalc;
-  
-//  _sys_  = new System;
-//  *_sys_ = *sys;
-  
-//  _reExpConsts_  = new ReExpCoeffsConstants;
-//  *_reExpConsts_ = *_re_exp_consts;
+  _sys_ = make_shared<System> (sys);
+  _besselCalc_ = make_shared<BesselCalc> (bcalc);
+  _shCalc_ = make_shared<SHCalc> (shCalc);
   
   // precompute all SH:
   pre_compute_all_sh();
@@ -45,11 +34,36 @@ _sys_(sys), N_(sys->get_n()),T_ (N_, N_), _reExpConsts_(_re_exp_consts), A_(N)
 // perform many iterations of the solution for A
 void ASolver::solve_A(int num_iter)
 {
+  
+  cout << "This is my R in solve_A" << endl;
+  for (int i = 0; i < 5; i++)
+  {
+    for (int m = -i; m<= i; m++)
+    {
+      cout << " " << T_(0,1).get_rval(5, m, i);
+    }
+    cout << endl;
+  }
+  cout << endl;
+  
+  cout << "This is my S in solve_A" << endl;
+  for (int i = 0; i < 5; i++)
+  {
+    for (int m = -i; m<= i; m++)
+    {
+      cout << " " << T_(0,1).get_sval(5, i, m);
+    }
+    cout << endl;
+  }
+  cout << endl;
+  
   int t;
   for (t = 0; t < num_iter; t++)
   {
     iter();
   }
+  
+  cout << endl;
 }
 
 // one iteration of numerical solution for A
@@ -73,6 +87,7 @@ void ASolver::iter()
     A_.set_val(i, ai);
   }
 }
+
 
 
 void ASolver::pre_compute_all_sh()
@@ -108,7 +123,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
       {
         inter += T_(i, j).get_rval(n, m, s) * get_A_ni(i, n, s);
       } // end s
-      x1.set_val(n, m, inter);
+      x1.set_val(n, m+p_, inter);
     } // end m
   } //end n
   
@@ -122,7 +137,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
       {
         inter += T_(i, j).get_sval(n, l, m) * x1(l, m+p_);
       } // end l
-      x2.set_val(n, m, inter);
+      x2.set_val(n, m+p_, inter);
     } // end m
   } //end n
   
@@ -136,7 +151,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
       {
         inter += conj(T_(i, j).get_rval(n, s, m)) * x2(n, s+p_);
       } // end s
-      z.set_val(n, m, inter);
+      z.set_val(n, m+p_, inter);
     } // end m
   } //end n
   
@@ -171,10 +186,10 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
 cmplx ASolver::calc_indi_gamma(int i, int n)
 {
   double g;  // output
-  double kap = _consts_->get_kappa();
+  double kap = _sys_->get_consts().get_kappa();
   double ai = _sys_->get_ai(i);
-  double eps_p = _consts_->get_dielectric_prot();
-  double eps_s = _consts_->get_dielectric_water();
+  double eps_p = _sys_->get_consts().get_dielectric_prot();
+  double eps_s = _sys_->get_consts().get_dielectric_water();
   // all bessel function k
   vector<double> bk_all = _besselCalc_->calc_mbfK(n+2, kap*ai);
   double bk1 = bk_all[n];  // bessel k at n
@@ -192,10 +207,10 @@ cmplx ASolver::calc_indi_gamma(int i, int n)
 cmplx ASolver::calc_indi_delta(int i, int n)
 {
   double d;  // output
-  double kap = _consts_->get_kappa();
+  double kap = _sys_->get_consts().get_kappa();
   double ai = _sys_->get_ai(i);  // radius
-  double eps_p = _consts_->get_dielectric_prot();
-  double eps_s = _consts_->get_dielectric_water();
+  double eps_p = _sys_->get_consts().get_dielectric_prot();
+  double eps_s = _sys_->get_consts().get_dielectric_water();
   // all bessel function I:
   vector<double> bi_all = _besselCalc_->calc_mbfI(n+2, kap*ai);
   double bi1 = bi_all[n];  // bessel i at n
@@ -313,11 +328,12 @@ void ASolver::compute_T()
       cj = _sys_->get_centeri(j);
       v = ci - cj;
       // calculate spherical harmonics for inter molecular vector:
+      double kappa = _sys_->get_consts().get_kappa();
       _shCalc_->calc_sh(v.theta(), v.phi());
+      vector<double> besselK = _besselCalc_->calc_mbfK(2*p_, kappa * v.r());
       T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
-                                   _besselCalc_, _reExpConsts_,
-                                   _consts_->get_kappa(),
-                                   _sys_->get_lambda()));
+                                   besselK, reExpConsts_,
+                                   kappa, _sys_->get_lambda()));
     }
   }
   
@@ -331,39 +347,5 @@ void ASolver::init_A()
   {
     A_.set_val(i, gamma_[i] * E_[i]);
   }
-}
-
-
-ASolver::~ASolver()
-{
-// potentially problematic. Need to address later
-//  delete _besselCalc_;
-//  delete _shCalc_;
-}
-
-
-ASolver::ASolver(const ASolver& other)
-:_sys_(other._sys_), p_(other.p_), gamma_(other.gamma_),
-delta_(other.delta_), N_(other.N_), E_(other.E_),
-_consts_(other._consts_), all_sh(other.all_sh),
-T_(other.T_), _besselCalc_(other._besselCalc_),
-_reExpConsts_(other._reExpConsts_)
-{
-}
-
-ASolver& ASolver::operator=(const ASolver& other)
-{
-  _besselCalc_ = other._besselCalc_;
-  _shCalc_ = other._shCalc_;
-  
-  _sys_ = other._sys_;
-  gamma_ = VecOfMats<cmplx>::type(other.gamma_);
-  delta_ = VecOfMats<cmplx>::type(other.delta_);
-  E_ = VecOfMats<cmplx>::type(other.E_);
-  N_ = int(other.N_);
-  p_ = int(other.p_);
-  _consts_ =other._consts_;
-  all_sh = vector<vector<MyMatrix<cmplx> > >(other.all_sh);
-  return *this;
 }
 

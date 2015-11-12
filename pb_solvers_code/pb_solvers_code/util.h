@@ -10,10 +10,10 @@
 #define util_hpp
 
 #include <stdio.h>
-#include "MyMatrix.h"
 #include <math.h>
 #include <complex>
 
+#include "MyMatrix.h"
 
 /*
  Right scalar multiplication of a matrix
@@ -73,20 +73,21 @@ protected:
     if (sph_)
       return; // do nothing if already spherical
     
-    T r, rp;
-    T theta = 0.0;
-    T phi   = 0.0;
+    T theta, phi;
+    T r = sqrt(p1_*p1_ + p2_*p2_ + p3_*p3_);
     
-    r = sqrt(p1_*p1_ + p2_*p2_ + p3_*p3_);
-    rp = sqrt(p1_*p1_ + p2_*p2_);
+    if (r < fabs(p3_))
+      r = fabs(p3_);
     
-    if ( abs(r) > 1e-5 ) theta = acos( p3_ / r );
+    if (r == 0.0)
+      theta = 0.0;
+    else
+      theta = acos(p3_/r);
     
-    if ( abs(rp) > 1e-5 )
-    {
-      if ( p2_ < 0 )   phi = 2*M_PI - acos( p1_ / rp );
-      else            phi = acos( p1_ / rp );
-    }
+    if ((p1_ == 0.0) && (p2_ == 0.0))
+      phi = 0.0;
+    else
+      phi = atan2(p2_, p1_);
     
     p1_ = r;
     p2_ = theta;
@@ -132,7 +133,6 @@ public:
     return pout;
   }
   
-
   Point<T> operator+(Point<T>& other)
   {
     Point<T> pout;
@@ -185,106 +185,8 @@ public:
     return p3_;
   }
   
-  
 };
-//
-///*
-// Class for 3 dimensional spherical points
-// Should note that THETA = polar angle [ 0 <= THETA <= PI ]
-// and PHI = azimuthal angle [ 0 <= PHI <= 2*PI ]
-// */
-//
-//template<typename T>
-//class SphPoint
-//{
-//protected:
-//  T r_;
-//  T theta_;
-//  T phi_;
-//    
-//public:
-//  SphPoint(T r=T(), T theta=T(), T phi=T())
-//  :r_(r), theta_(theta), phi_(phi)
-//  {
-//  }
-//  
-//  const T& get_r() const      { return r_;        }
-//  const T& get_theta() const  { return theta_;    }
-//  const T& get_phi() const    { return phi_;      }
-//  
-//};
-////
-///*
-// Class for 3 dimensional euclidean points
-// */
-//template<typename T>
-//class EuPoint
-//{
-//protected:
-//  T x_;
-//  T y_;
-//  T z_;
-//  
-//public:
-//  EuPoint(T x=T(), T y=T(), T z=T())
-//  :x_(x), y_(y), z_(z)
-//  {
-//  }
-//  
-//  // for dealing with possible singularities
-//  // Should note that THETA = polar angle [ 0 <= THETA <= PI ]
-//  //    and PHI = azimuthal angle [ 0 <= PHI <= 2*PI ]
-//  const SphPoint<T> convert_to_spherical() const
-//  {
-//    T r, rp;
-//    T theta = 0.0;
-//    T phi   = 0.0;
-//    
-//    r = sqrt(x_*x_ + y_*y_ + z_*z_);
-//    rp = sqrt(x_*x_ + y_*y_);
-//    
-//    if ( abs(r) > 1e-5 ) theta = acos( z_ / r );
-//    
-//    if ( abs(rp) > 1e-5 )
-//    {
-//      if ( y_ < 0 )   phi = 2*M_PI - acos( x_ / rp );
-//      else            phi = acos( x_ / rp );
-//    }
-//    
-//    return SphPoint<T>(r, theta, phi);
-//  }
-//  
-//  const T& x() const  { return x_; }
-//  const T& y() const  { return y_; }
-//  const T& z() const  { return z_; }
-//  
-//};
-//
-//
-///*
-// Point arithmetic operators
-// */
-//EuPoint<double> operator+(const EuPoint<double>& lhs,
-//                          const EuPoint<double>& rhs)
-//{
-//  EuPoint<double> result = EuPoint<double>(lhs.x() + rhs.x(),
-//                                           lhs.y() + rhs.y(),
-//                                           lhs.z() + rhs.z());
-//  return result;
-//}
-//
-//EuPoint<double> operator-(const EuPoint<double>& lhs,
-//                          const EuPoint<double>& rhs)
-//{
-//  EuPoint<double> result = EuPoint<double>(lhs.x() - rhs.x(),
-//                                           lhs.y() - rhs.y(),
-//                                           lhs.z() - rhs.z());
-//  return result;
-//}
-//
-////Useful typedefs:
-//typedef EuPoint<double> EPt;
-//typedef SphPoint<double> ShPt;
+
 typedef complex<double> cmplx;
 typedef Point<double> Pt;
 

@@ -28,7 +28,7 @@ public :
       vector<double> charges(1);
       vector<Pt> posCharges(1);
       
-      charges[0] = 1.0;
+      charges[0] = -1.0;
       posCharges[0] = pos[molInd];
       
       Molecule molNew = Molecule( M, a, charges, posCharges );
@@ -37,17 +37,23 @@ public :
     
     const int vals           = nvals;
     BesselConstants bConsta( 2*vals );
-    BesselCalc bCalcu( 2*vals, &bConsta);
+    BesselCalc bCalcu( 2*vals, bConsta);
     SHCalcConstants SHConsta( 2*vals );
-    SHCalc SHCalcu( 2*vals, &SHConsta );
+    SHCalc SHCalcu( 2*vals, SHConsta );
     System sys( const_, mol_ );
     ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
                                         sys.get_lambda(), nvals);
     
-    ASolver ASolvTest( 2, vals, &bCalcu, &SHCalcu, &sys, &re_exp_consts);
+    ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
+    ASolvTest.solve_A( 35 );
     
-    ASolvTest.solve_A( 10 );
+    //cout << "This is my Kappa " << sys.get_consts().get_kappa() <<  endl;
     
+    for (int mol=0; mol<2; mol++)
+    {
+//      ASolvTest.print_Ai(mol, 4);
+//      ASolvTest.print_Ei(mol, 4);
+    }
   }
   
 };

@@ -8,20 +8,28 @@
 
 #include "System.h"
 
+Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos, Pt cen)
+:M_(M), a_(a), qs_(qs), pos_(pos), center_(cen)
+{
+  // repositioning the charges WRT center of charge
+  for (int i = 0; i < M_; i++)
+    pos_[i] = pos_[i] - center_;
+}
+
 
 Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos)
 :M_(M), a_(a), qs_(qs), pos_(pos)
 {
-  // calculate the center of the molecule (first moment of charge):
+  // calculate the center of the molecule (for now using center):
   double xc, yc, zc;
   xc = 0;
   yc = 0;
   zc = 0;
   for (int i = 0; i < M_; i++)
   {
-    xc += qs[i] * pos_[i].x();
-    yc += qs[i] * pos_[i].y();
-    zc += qs[i] * pos_[i].z();
+    xc += pos_[i].x();
+    yc += pos_[i].y();
+    zc += pos_[i].z();
   }
   xc /= M_;
   yc /= M_;
@@ -29,6 +37,11 @@ Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos)
   
   center_ = Pt(xc, yc, zc);
   
+  // repositioning the charges WRT center of charge
+  for (int i = 0; i < M_; i++)
+  {
+    pos_[i] = pos_[i] - center_;
+  }
 }
 
 

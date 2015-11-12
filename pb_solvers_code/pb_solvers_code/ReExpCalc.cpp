@@ -6,7 +6,6 @@
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
-#include <iostream>
 #include "ReExpCalc.h"
 
 ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
@@ -91,17 +90,17 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
   }
 }
 
-
 ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp,
-                               const BesselCalc * BesselCalc,
-                               ReExpCoeffsConstants* _consts,
+                               vector<double> besselK,
+                               ReExpCoeffsConstants consts,
                                double kappa, double lambda)
-:p_(p), v_(v), Ytp_(Ytp), _besselCalc_(BesselCalc),
-kappa_(kappa), lambda_(lambda), _consts_(_consts)
+:p_(p), v_(v), Ytp_(Ytp), besselK_(besselK),
+kappa_(kappa), lambda_(lambda)
 {
-  if (_besselCalc_->get_num_vals() < 2 * p_)
+  _consts_ = make_shared<ReExpCoeffsConstants>(consts);
+  if (besselK_.size() < 2 * p_)
   {
-    throw BesselSizeException(p_, _besselCalc_->get_num_vals());
+    throw BesselSizeException(p_, (int) besselK_.size());
   }
   
   if (Ytp_.get_nrows() < 2 * p_)
@@ -156,8 +155,6 @@ void ReExpCoeffs::calc_s()
   double val;
   double r = v_.r();
   S_ = MyVector<MyMatrix<double> > ( 2 * p_ );
-  vector<double> besselK = _besselCalc_->calc_mbfK( 2*p_, kappa_*r);
-  
   for (n = 0; n < 2*p_; n++)
   {
     S_.set_val(n, MyMatrix<double> ( 2*p_, 4*p_));
@@ -165,7 +162,7 @@ void ReExpCoeffs::calc_s()
   
   for (l = 0; l < 2 * p_; l++)
   {
-    val = pow((lambda_ / r), l) * (besselK[l] * exp(-kappa_*r)) / r;
+    val = pow((lambda_ / r), l) * (besselK_[l] * exp(-kappa_*r)) / r;
     set_sval( 0, l, 0, val );
     
     // Set S_{n,0}^0 vals
@@ -230,7 +227,6 @@ void ReExpCoeffs::calc_s()
     }
   }
   
-  
   // Filling in the rest !
   for (n = 1; n < p_ ; n++)
     for (l = 0; l < p_; l++)
@@ -244,10 +240,7 @@ void ReExpCoeffs::calc_s()
       for (m = -n; m <= n; m++)
         if ( m  < 0 )
           set_sval(n, l, m, get_sval( l, n, -m));
-
+  
   
 } // end calc_s
-
-
-
 

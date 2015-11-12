@@ -10,9 +10,11 @@
 #define BesselCalc_h
 
 #include <stdio.h>
-#include "Constants.h"
 #include <vector>
 #include <assert.h>
+#include <memory>
+
+#include "Constants.h"
 
 using namespace std;
 
@@ -30,31 +32,26 @@ public:
   
   BesselConstants(const int N=Constants::MAX_NUM_POLES);
   
-  const int get_n() const                 { return numVals_; }
-  const double get_kconst_val(int i)      { return kConsts_[i]; }
+  const int get_n() const                     { return numVals_; }
+  const double get_kconst_val(int i) const    { return kConsts_[i]; }
   
 };
+
+
 
 /*
  Calculator class for modified bessel functions (spherical and standard)
  */
 class BesselCalc
 {
-    
-  int                 numVals_;  // order of the Bessel function
-  BesselConstants*    _consts_;  // constants used in recursion: Lotan 2006 eq3
+protected:
+  
+  int                          numVals_;  // order of the Bessel function
+  shared_ptr<BesselConstants>  _consts_;  // recursion constants Lotan 2006 eq3
 
 public:
-    
-  BesselCalc();
-
-  BesselCalc(int N, BesselConstants* _consts);
-
-  BesselCalc(const BesselCalc& other);
-
-  virtual ~BesselCalc();
-
-  BesselCalc& operator=(const BesselCalc& other);
+  
+  BesselCalc(int N, BesselConstants consts);
 
   /*
   Calculate the modified sphereical bessel functions I and K 
