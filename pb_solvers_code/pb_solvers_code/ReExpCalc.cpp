@@ -6,6 +6,7 @@
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
+#include <iostream>
 #include "ReExpCalc.h"
 
 ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,

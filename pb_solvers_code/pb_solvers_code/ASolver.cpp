@@ -35,25 +35,39 @@ reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p)
 void ASolver::solve_A(int num_iter)
 {
   
-//  cout << "This is my R in solve_A" << endl;
-//  for (int i = 0; i < 5; i++)
-//  {
-//    for (int m = -i; m<= i; m++)
-//    {
-//      cout << " " << T_(0,1).get_rval(5, m, i);
-//    }
-//    cout << endl;
-//  }
-//  cout << endl;
-//  
+  cout << "This is my R in solve_A" << endl;
+  for (int m = 0; m < 9; m++)
+  {
+    cout << "\t---m = " << m << "---" << endl;
+    for (int l = m; l < 9; l++)
+    {
+      for (int n = m; n <= l; n++)
+      {
+        double r = fabs(T_(0,1).get_rval(n, m, l).real())>1e-15 ?
+        T_(0,1).get_rval(n, m, l).real() : 0;
+        double im = fabs(T_(0,1).get_rval(n, m, l).imag())>1e-15 ?
+        T_(0,1).get_rval(n, m, l).imag() : 0;
+        cout << "(" << r << "," << im << ") | ";
+      }
+      cout << endl;
+    }
+  }
+  cout << endl;
+  
 //  cout << "This is my S in solve_A" << endl;
-//  for (int i = 0; i < 5; i++)
+//  for (int m = 0; m < 9; m++)
 //  {
-//    for (int m = -i; m<= i; m++)
+//    cout << "\t---m = " << m << "---" << endl;
+//    for (int l = m; l < 9; l++)
 //    {
-//      cout << " " << T_(0,1).get_sval(5, i, m);
+//      for (int n = m; n <= l; n++)
+//      {
+//        double r = fabs(T_(0,1).get_sval(n, l, m))>1e-15 ?
+//                    T_(0,1).get_sval(n, l, m) : 0;
+//        cout << r << " | ";
+//      }
+//      cout << endl;
 //    }
-//    cout << endl;
 //  }
 //  cout << endl;
   
@@ -62,8 +76,7 @@ void ASolver::solve_A(int num_iter)
   {
     iter();
   }
-  
-  cout << endl;
+
 }
 
 // one iteration of numerical solution for A
@@ -173,7 +186,6 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
     pt = mol.get_posj(j);
     theta = pt.theta();
     phi = pt.phi();
-    cout << "This is theta, phi " << theta << "  " << phi << endl;
     _shCalc_->calc_sh(theta, phi);
     vout.push_back(_shCalc_->get_full_result());
   }

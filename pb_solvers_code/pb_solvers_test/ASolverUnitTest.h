@@ -136,20 +136,6 @@ TEST_F(ASolverUTest, checkSH)
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
 
-  for (int i = 0; i < 2 ; i++)
-    for (int n = 0; n < 7; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = ASolvTest.get_SH_ij( i, 0, n, m).real();
-        double im = ASolvTest.get_SH_ij( i, 0, n, m).imag();
-        r  = fabs( r) > 1e-9 ?  r : 0;
-        im = fabs(im) > 1e-9 ? im : 0;
-        cout << "(" << r << "," << im << ")  ";
-      }
-      cout << endl;
-    }
-
   EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 0, 0).real(), 1.0, preclim);
   EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 0, 0).imag(), 0.0, preclim);
 
@@ -168,7 +154,6 @@ TEST_F(ASolverUTest, checkSH)
   EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 6, 5).real(), 0.3615486465, preclim);
   EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 6, 5).imag(),-0.2082023636, preclim);
   
-  
 }
 
 TEST_F(ASolverUTest, checkT)
@@ -184,6 +169,7 @@ TEST_F(ASolverUTest, checkT)
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  
 }
 
 TEST_F(ASolverUTest, checkA)
