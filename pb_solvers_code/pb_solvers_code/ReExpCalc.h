@@ -184,6 +184,17 @@ public:
     else         return R_[n](m, s+2*p_);
   }
   
+  double get_sval(int n, int l, int m)
+  {
+    return S_[n](l, m+2*p_);
+  }
+  
+  double get_dsdr_val(int n, int l, int m)
+  {
+    return dSdR_[n](l, m+2*p_);
+  }
+  
+  
   cmplx get_dr_dtheta_val(int n, int m, int s)
   {
     if ( m < 0 ) return conj(dRdTheta_[n](-m, -s+2*p_));
@@ -201,50 +212,25 @@ public:
     return drdp;
   }
   
-  double get_sval(int n, int l, int m)
-  { return S_[n](l, m+2*p_); }
-  
   void set_rval(int n, int m, int s, cmplx val)
   {
     (&R_[n])->set_val( m, s+2*p_, val);
   }
   
   void set_sval(int n, int l, int m, double val)
-  { (&S_[n])->set_val(l, m+2*p_, val); }
+  {
+    (&S_[n])->set_val(l, m+2*p_, val);
+  }
   
   void set_dr_dtheta_val(int n, int m, int s, cmplx val)
   {
     (&dRdTheta_[n])->set_val( m, s+2*p_, val );
   }
   
-};
-  
-
-/*
- Class containing the derivatives of one entry in the re-expansion
- matrix
- */
-class ReExpDerivs
-{
-protected:
-  
-  /*
-   The useful derivatives are S with respect to r and R with respect to 
-   theta and phi:
-   */
-  VecOfMats<cmplx>::type    dRdTheta_;
-  VecOfMats<cmplx>::type    dRdPhi_;
-  VecOfMats<double>::type   dSdR_;
-  
-  
-  void calc_dr_dtheta();
-  void calc_dr_dphi();
-  void calc_ds_dr();
-  
-public:
-  
-  ReExpDerivs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
-              ReExpCoeffsConstants consts, double kappa, double lambda);
+  void set_dsdr_val(int n, int l, int m, double val)
+  {
+    (&dSdR_[n])->set_val(l, m+2*p_, val);
+  }
   
 };
   
