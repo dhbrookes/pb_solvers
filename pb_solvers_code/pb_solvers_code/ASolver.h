@@ -28,6 +28,8 @@ class ASolver
 protected:
   
   VecOfMats<cmplx>::type      A_;  // what we iteratively solve for
+  VecOfMats<cmplx>::type      prevA_;  // previous value for
+                                       // calculating convergence criteria
   
   int                         N_;  // number of molecules
   int                         p_;  // max value for n (2*numVals_ usually)    
@@ -82,6 +84,9 @@ protected:
   
   // perform one iteration of the solution for A (eq 51 in Lotan 2006)
   void iter();
+  
+  // calculate the change in A_ from prevA_)
+  double calc_change();
   
 
 public:
@@ -138,8 +143,9 @@ public:
     cout << endl;
   }
 
-  //numerically solve for A given the number of desired iterations
-  void solve_A(int num_iter);
+
+  //numerically solve for A given the desired precision
+  void solve_A(double prec);
   
 }; // End ASolver
 

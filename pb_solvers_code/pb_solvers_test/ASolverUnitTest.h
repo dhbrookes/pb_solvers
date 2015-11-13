@@ -153,7 +153,7 @@ TEST_F(ASolverUTest, checkSH)
   
   EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 6, 5).real(), 0.3615486465, preclim);
   EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 6, 5).imag(),-0.2082023636, preclim);
-  
+
 }
 
 TEST_F(ASolverUTest, checkT)
@@ -169,7 +169,7 @@ TEST_F(ASolverUTest, checkT)
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  
+
 }
 
 TEST_F(ASolverUTest, checkA)
@@ -185,7 +185,7 @@ TEST_F(ASolverUTest, checkA)
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(20);
+//  ASolvTest.solve_A(1E-4);
 }
 
 #endif

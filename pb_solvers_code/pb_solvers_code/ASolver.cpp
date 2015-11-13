@@ -7,13 +7,12 @@
 //
 
 #include "ASolver.h"
-
 #include <iostream>
 
 ASolver::ASolver(const int N, const int p, BesselCalc bcalc,
                  SHCalc shCalc, System sys)
 :p_(p), gamma_(N),delta_(N), E_(N), N_(sys.get_n()), T_ (N_, N_), A_(N),
-reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p)
+reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p), prevA_(N)
 {
   _sys_ = make_shared<System> (sys);
   _besselCalc_ = make_shared<BesselCalc> (bcalc);
@@ -32,27 +31,26 @@ reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p)
 }
 
 // perform many iterations of the solution for A
-void ASolver::solve_A(int num_iter)
+void ASolver::solve_A(double prec)
 {
-  
-  cout << "This is my R in solve_A" << endl;
-  for (int m = 0; m < 9; m++)
-  {
-    cout << "\t---m = " << m << "---" << endl;
-    for (int l = m; l < 9; l++)
-    {
-      for (int n = m; n <= l; n++)
-      {
-        double r = fabs(T_(0,1).get_rval(n, m, l).real())>1e-15 ?
-        T_(0,1).get_rval(n, m, l).real() : 0;
-        double im = fabs(T_(0,1).get_rval(n, m, l).imag())>1e-15 ?
-        T_(0,1).get_rval(n, m, l).imag() : 0;
-        cout << "(" << r << "," << im << ") | ";
-      }
-      cout << endl;
-    }
-  }
-  cout << endl;
+//  cout << "This is my R in solve_A" << endl;
+//  for (int m = 0; m < 9; m++)
+//  {
+//    cout << "\t---m = " << m << "---" << endl;
+//    for (int l = m; l < 9; l++)
+//    {
+//      for (int n = m; n <= l; n++)
+//      {
+//        double r = fabs(T_(0,1).get_rval(n, m, l).real())>1e-15 ?
+//        T_(0,1).get_rval(n, m, l).real() : 0;
+//        double im = fabs(T_(0,1).get_rval(n, m, l).imag())>1e-15 ?
+//        T_(0,1).get_rval(n, m, l).imag() : 0;
+//        cout << "(" << r << "," << im << ") | ";
+//      }
+//      cout << endl;
+//    }
+//  }
+//  cout << endl;
   
 //  cout << "This is my S in solve_A" << endl;
 //  for (int m = 0; m < 9; m++)
@@ -71,11 +69,13 @@ void ASolver::solve_A(int num_iter)
 //  }
 //  cout << endl;
   
-  int t;
-  for (t = 0; t < num_iter; t++)
+  prevA_ = A_;
+  while(calc_change() > prec)
   {
     iter();
   }
+  
+  cout << endl;
 
 }
 
@@ -101,6 +101,23 @@ void ASolver::iter()
   }
 }
 
+double ASolver::calc_change()
+{
+  int i, k;
+  double change = 0;
+  cmplx prev, curr; // intermediate values
+  for (i = 0; i < N_; i++)
+  {
+    for(k = 0; k < p_ * p_; k++)
+    {
+      prev = prevA_[i](k, k);
+      curr = A_[i](k, k);
+      change += abs(prev - curr) / abs(prev + curr);
+    }
+  }
+  change *= 1 / (2*N_*p_*p_);
+  return change;
+}
 
 void ASolver::pre_compute_all_sh()
 {

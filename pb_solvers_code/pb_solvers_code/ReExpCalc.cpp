@@ -6,7 +6,6 @@
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
-#include <iostream>
 #include "ReExpCalc.h"
 
 ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
@@ -230,18 +229,168 @@ void ReExpCoeffs::calc_s()
   
   // Filling in the rest !
   for (n = 1; n < p_ ; n++)
+  {
     for (l = 0; l < p_; l++)
+    {
       for (m = -n; m <= n; m++)
-        if ( n  > l )
-          set_sval(n, l, m, pow(-1.0, n) * get_sval( l, n, m));
+      {
+        if (n > l) set_sval(n, l, m, pow(-1.0, n) * get_sval(l, n, m));
+      }
+    }
+  }
   
   
   for (n = 1; n < p_ ; n++)
+  {
     for (l = 0; l < p_; l++)
+    {
       for (m = -n; m <= n; m++)
-        if ( m  < 0 )
-          set_sval(n, l, m, get_sval( l, n, -m));
+      {
+        if ( m  < 0 ) set_sval(n, l, m, get_sval( l, n, -m));
+      }
+    }
+  }
   
   
 } // end calc_s
+
+
+void ReExpCoeffs::calc_dr_dtheta()
+{
+  int n, m, s;
+  cmplx val;
+  cmplx ic = cmplx(0, 1);
+  double phi = v_.phi();
+  double theta = v_.theta();
+  dRdTheta_ = MyVector<MyMatrix<cmplx> > (2*p_);
+  for (n = 0; n < 2 * p_; n++)
+  {
+    dRdTheta_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));
+    for (s = 0; s <= n; s++)
+    {
+      val = s * (cos(theta)/sin(theta)) * get_yval(n, -s);
+      val += sqrt((n-s)*(n+s+1)) * exp(-phi*ic) * get_yval(n, s+1);
+      set_dr_dtheta_val(n, 0, -s, val);
+      set_dr_dtheta_val(n, 0, s, conj(val));
+    }
+  }
+  
+  cmplx val1, val2, val3;  // intermediate calculation values
+  for (m = 0; m < p_; m++)
+  {
+    for (n=m+2; n < 2 * p_ - m; n++)
+    {
+      for (s=-n+1; s < n; s++)
+      {
+        val1 = sin(theta) * get_rval(n, m, s+1);
+        val1 += + (1-cos(theta))*get_dr_dtheta_val(n, m, s+1);
+        val1 *= 0.5 * exp(ic * phi) * _consts_->get_b_val(n, -s-1);
+        
+        val2 = sin(theta) * get_rval(n, m, s-1);
+        val2 -= + (1+cos(theta))*get_dr_dtheta_val(n, m, s-1);
+        val2 *= 0.5 * exp(-ic * phi) * _consts_->get_b_val(n, s-1);
+        
+        val3 = sin(theta) * get_dr_dtheta_val(n, m, s);
+        val3 += cos(theta) * get_rval(n, m, s);
+        val3 *= _consts_->get_a_val(n, s);
+        
+        val = -1 / (_consts_->get_b_val(n, m)) * (val1 + val2 - val3);
+        
+        set_dr_dtheta_val(n, 0, -s, val);
+      }
+    }
+  }
+}
+
+/*
+ Same procedure as for calculating s with different first step
+ */
+void ReExpCoeffs::calc_ds_dr()
+{
+  int m, n, l;
+  double val;
+  double r = v_.r();
+  S_ = MyVector<MyMatrix<double> > ( 2 * p_ );
+  for (n = 0; n < 2*p_; n++)
+  {
+    S_.set_val(n, MyMatrix<double> ( 2*p_, 4*p_));
+  }
+  
+  for (l = 0; l < 2 * p_; l++)
+  {
+//    val = pow((lambda_ / r), l) * (besselK_[l] * exp(-kappa_*r)) / r;
+    val = l * besselK_[l] - ((2*l+1) * besselK_[l+1]);
+    val *= pow((lambda_ / r), l) * (exp(-kappa_*r) / (r*r));
+    set_dsdr_val( 0, l, 0, val );
+    set_dsdr_val( l, 0, 0, pow(-1.0, l) * val );
+  }
+  
+  for (l = 1; l < 2 * p_ - 2; l++)
+  {
+    val  = _consts_->get_beta(l-1, 0) * get_dsdr_val( 0, l-1, 0);
+    val += _consts_->get_alpha( l, 0) * get_dsdr_val( 0, l+1, 0);
+    val *= -1.0 / _consts_->get_alpha(0, 0);
+    set_dsdr_val( 1, l, 0, val );
+  }
+  
+  for (n = 1; n < p_ - 1; n++)
+  {
+    for(l = n + 1; l < 2*p_ - n - 2; l++)
+    {
+      val  = _consts_->get_beta(l-1, 0) * get_dsdr_val(  n, l-1, 0);
+      val += _consts_->get_beta(n-1, 0) * get_dsdr_val(n-1,   l, 0);
+      val += _consts_->get_alpha( l, 0) * get_dsdr_val(  n, l+1, 0);
+      val *= -1.0 / _consts_->get_alpha(n, 0);
+      set_dsdr_val(n+1, l, 0, val);
+    }
+  }
+  
+  double val2;
+  for (m = 1; m < p_ ; m++)
+  {
+    for (l = m; l < 2*p_ - m - 1; l++)
+    {
+      val  = _consts_->get_mu(  l,  -m) * get_dsdr_val(m-1, l-1, m-1);
+      val += _consts_->get_nu(l+1,m-1) * get_dsdr_val( m-1, l+1, m-1);
+      val *= ( -1.0 / _consts_->get_nu( m, -m) );
+      set_dsdr_val(m, l, m, val);
+    }
+    
+    for (n = m; n < p_ - 1; n++)
+    {
+      for (l = n + 1; l < 2*p_ - n - 2; l++)
+      {
+        val2  = _consts_->get_beta(l-1, m) * get_dsdr_val(  n, l-1, m);
+        val2 += _consts_->get_beta(n-1, m) * get_dsdr_val(n-1,   l, m);
+        val2 += _consts_->get_alpha( l, m) * get_dsdr_val(  n, l+1, m);
+        val2 *= (-1.0 / _consts_->get_alpha(n, m));
+        set_dsdr_val(n+1, l, m, val2);
+      }
+    }
+  }
+  
+  // Filling in the rest !
+  for (n = 1; n < p_ ; n++)
+  {
+    for (l = 0; l < p_; l++)
+    {
+      for (m = -n; m <= n; m++)
+      {
+        if (n > l) set_dsdr_val(n, l, m, pow(-1.0, n) * get_dsdr_val(l, n, m));
+      }
+    }
+  }
+  
+  
+  for (n = 1; n < p_ ; n++)
+  {
+    for (l = 0; l < p_; l++)
+    {
+      for (m = -n; m <= n; m++)
+      {
+        if ( m  < 0 ) set_dsdr_val(n, l, m, get_dsdr_val( l, n, -m));
+      }
+    }
+  }
+}
 
