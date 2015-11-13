@@ -111,12 +111,13 @@ public:
 /*
  Class representing one entry in the re-expansion coefficient matrix. So if
  that matrix is T (as in Lotan 2006), then this class contains the info
- for one T^(i,j)
+ for one T^(i,j) and its derivatives
  */
 class ReExpCoeffs
 {
 protected:
   int p_; // max value of n when solving for A
+  
   shared_ptr<ReExpCoeffsConstants> _consts_;
   
   /*
@@ -126,7 +127,8 @@ protected:
    -n <= m <= n, but -m = conj(+m), so really just [0,p)
    -n <= s <= n
    */
-  MyVector<MyMatrix<cmplx> >  R_;
+  VecOfMats<cmplx>::type  R_;
+  
   /*
    S_ contains translation coefficients for this entry. S_ has three
    indices: S[m](n, l)
@@ -134,7 +136,14 @@ protected:
    0 <= l <= poles
    -n <= m <= n
    */
-  MyVector<MyMatrix<double> >  S_;
+  VecOfMats<double>::type  S_;
+  
+  /*
+   The useful derivatives are S with respect to r and R with respect to
+   theta. dR/dPhi is also used, but can be calculated in the getter method
+   */
+  VecOfMats<cmplx>::type    dRdTheta_;
+  VecOfMats<double>::type   dSdR_;
 
   double kappa_; //from Constants
   double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
@@ -154,12 +163,13 @@ protected:
   
   void calc_r();  // calculate all the values for R_
   void calc_s(); // calculate all the values for S_
-  
+  void calc_dr_dtheta();
+  void calc_ds_dr();
+
 public:
   ReExpCoeffs() { };
   ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
                  ReExpCoeffsConstants consts, double kappa, double lambda);
-//  ReExpCoeffs& operator=(ReExpCoeffs& other);
 
   
   cmplx get_yval(int n, int s)
@@ -174,18 +184,69 @@ public:
     else         return R_[n](m, s+2*p_);
   }
   
+  cmplx get_dr_dtheta_val(int n, int m, int s)
+  {
+    if ( m < 0 ) return conj(dRdTheta_[n](-m, -s+2*p_));
+    else         return dRdTheta_[n](m, s+2*p_);
+  }
+  
+  /*
+   dR/dPhi is just -i * s * R
+   */
+  cmplx get_dr_dphi_val(int n, int m, int s)
+  {
+    cmplx ic = cmplx(0, 1);
+    cmplx sc = cmplx(s, 0);
+    cmplx drdp = -ic * sc * get_rval(n, m, s);
+    return drdp;
+  }
+  
   double get_sval(int n, int l, int m)
   { return S_[n](l, m+2*p_); }
   
   void set_rval(int n, int m, int s, cmplx val)
   {
-    if ( m < 0 ) (&R_[n])->set_val(-m, -s+2*p_, conj( val ));
-    else         (&R_[n])->set_val( m, s+2*p_, val );
+    (&R_[n])->set_val( m, s+2*p_, val);
   }
   
   void set_sval(int n, int l, int m, double val)
   { (&S_[n])->set_val(l, m+2*p_, val); }
   
+  void set_dr_dtheta_val(int n, int m, int s, cmplx val)
+  {
+    (&dRdTheta_[n])->set_val( m, s+2*p_, val );
+  }
+  
 };
+  
+
+/*
+ Class containing the derivatives of one entry in the re-expansion
+ matrix
+ */
+class ReExpDerivs
+{
+protected:
+  
+  /*
+   The useful derivatives are S with respect to r and R with respect to 
+   theta and phi:
+   */
+  VecOfMats<cmplx>::type    dRdTheta_;
+  VecOfMats<cmplx>::type    dRdPhi_;
+  VecOfMats<double>::type   dSdR_;
+  
+  
+  void calc_dr_dtheta();
+  void calc_dr_dphi();
+  void calc_ds_dr();
+  
+public:
+  
+  ReExpDerivs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
+              ReExpCoeffsConstants consts, double kappa, double lambda);
+  
+};
+  
 
 #endif /* ReExpCalc_hpp */
