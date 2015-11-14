@@ -107,6 +107,12 @@ kappa_(kappa), lambda_(lambda)
   {
     throw SHSizeException(p_, Ytp_.get_nrows());
   }
+  
+  double sint = sin(v_.theta());
+  double sin_eps = 1e-12;
+
+  if (sint < sin_eps)  rSing_ = true;
+ 
   calc_r();
   calc_s();
 }
@@ -119,8 +125,11 @@ void ReExpCoeffs::calc_r()
   cmplx ic = cmplx(0, 1);
   double phi = v_.phi();
   double theta = v_.theta();
+  double xi  = M_PI;
+  
   R_ = MyVector<MyMatrix<cmplx> > (2*p_); // n range of 0 to 2p-1 is needed!
-  for (n = 0; n < 2 * p_; n++)
+  
+  for (n = 0; n < 2 * p_-1; n++)
   {
     R_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));//s range: -2p+1 to 2p-1 needed!
     for (s = -n; s <= n; s++)
@@ -132,21 +141,23 @@ void ReExpCoeffs::calc_r()
   
   for (m = 0; m < p_; m++)
   {
-    for (n=m+2; n < 2 * p_ - m; n++)
+    for (n=m+2; n < 2 * p_ - m - 1; n++)
     {
       for (s=-n+1; s < n; s++)
       {
-        val = 0.5 * exp(-ic * phi) * (1 + cos(theta)) *
+        val = -0.5 * exp(-ic * phi) * (1 + cos(theta)) *
         _consts_->get_b_val(n, s-1) * get_rval(n, m, s-1);
-        val -= 0.5 * exp(ic * phi) * (1 - cos(theta)) *
+        val += 0.5 * exp(ic * phi) * (1 - cos(theta)) *
         _consts_->get_b_val(n, -s-1) * get_rval(n, m, s+1);
-        val += sin(theta) * _consts_->get_a_val(n ,s) *
+        val -= sin(theta) * _consts_->get_a_val(n-1 , abs(s)) *
         get_rval(n, m, s);
-        val *= ( 1.0 / _consts_->get_b_val( n, m) );
+        val *= ( exp( ic * xi ) / _consts_->get_b_val( n, m) );
         set_rval(n-1, m+1, s, val);
       }
     }
   }
+  
+  
 }
 
 void ReExpCoeffs::calc_s()

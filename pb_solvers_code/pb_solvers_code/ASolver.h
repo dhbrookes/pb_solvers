@@ -112,7 +112,7 @@ public:
     cout << "This is my E for molecule " << i << " poles " << p <<  endl;
     for (int n = 0; n < p; n++)
     {
-      for (int m = -n; m <= n; m++)
+      for (int m = 0; m <= n; m++)
       {
         double  r = get_E_ni(i,n,m).real();
         double im = get_E_ni( i, n, m).imag();
@@ -130,7 +130,7 @@ public:
     cout << "This is my A for molecule " << i << " poles " << p <<  endl;
     for (int n = 0; n < p; n++)
     {
-      for (int m = -n; m <= n; m++)
+      for (int m = 0; m <= n; m++)
       {
         double  r = get_A_ni(i,n,m).real();
         double im = get_A_ni( i, n, m).imag();

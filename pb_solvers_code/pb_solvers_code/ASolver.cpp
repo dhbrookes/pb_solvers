@@ -33,41 +33,41 @@ reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p), prevA_(N)
 // perform many iterations of the solution for A
 void ASolver::solve_A(double prec)
 {
-//  cout << "This is my R in solve_A" << endl;
-//  for (int m = 0; m < 9; m++)
-//  {
-//    cout << "\t---m = " << m << "---" << endl;
-//    for (int l = m; l < 9; l++)
-//    {
-//      for (int n = m; n <= l; n++)
-//      {
-//        double r = fabs(T_(0,1).get_rval(n, m, l).real())>1e-15 ?
-//        T_(0,1).get_rval(n, m, l).real() : 0;
-//        double im = fabs(T_(0,1).get_rval(n, m, l).imag())>1e-15 ?
-//        T_(0,1).get_rval(n, m, l).imag() : 0;
-//        cout << "(" << r << "," << im << ") | ";
-//      }
-//      cout << endl;
-//    }
-//  }
-//  cout << endl;
+  cout << "This is my R in solve_A" << endl;
+  for (int m = 0; m < 9; m++)
+  {
+    cout << "\t---m = " << m << "---" << endl;
+    for (int n = m; n < 9; n++)
+    {
+      for (int l = -n; l <= n; l++)
+      {
+        double r = fabs(T_(0,1).get_rval(n, m, l).real())>1e-15 ?
+        T_(0,1).get_rval(n, m, l).real() : 0;
+        double im = fabs(T_(0,1).get_rval(n, m, l).imag())>1e-15 ?
+        T_(0,1).get_rval(n, m, l).imag() : 0;
+        cout << "(" << r << "," << im << ") | ";
+      }
+      cout << endl;
+    }
+  }
+  cout << endl;
   
-//  cout << "This is my S in solve_A" << endl;
-//  for (int m = 0; m < 9; m++)
-//  {
-//    cout << "\t---m = " << m << "---" << endl;
-//    for (int l = m; l < 9; l++)
-//    {
-//      for (int n = m; n <= l; n++)
-//      {
-//        double r = fabs(T_(0,1).get_sval(n, l, m))>1e-15 ?
-//                    T_(0,1).get_sval(n, l, m) : 0;
-//        cout << r << " | ";
-//      }
-//      cout << endl;
-//    }
-//  }
-//  cout << endl;
+  cout << "This is my S in solve_A" << endl;
+  for (int m = 0; m < 9; m++)
+  {
+    cout << "\t---m = " << m << "---" << endl;
+    for (int l = m; l < 9; l++)
+    {
+      for (int n = m; n <= l; n++)
+      {
+        double r = fabs(T_(0,1).get_sval(n, l, m))>1e-15 ?
+                    T_(0,1).get_sval(n, l, m) : 0;
+        cout << r << " | ";
+      }
+      cout << endl;
+    }
+  }
+  cout << endl;
   
   prevA_ = A_;
   while(calc_change() > prec)
@@ -103,16 +103,19 @@ void ASolver::iter()
 
 double ASolver::calc_change()
 {
-  int i, k;
+  int i, k, m;
   double change = 0;
   cmplx prev, curr; // intermediate values
   for (i = 0; i < N_; i++)
   {
-    for(k = 0; k < p_ * p_; k++)
+    for(k = 0; k < p_; k++)
     {
-      prev = prevA_[i](k, k);
-      curr = A_[i](k, k);
-      change += abs(prev - curr) / abs(prev + curr);
+      for(m = 0; m < k; m++)
+      {
+        prev = prevA_[i](k, m);
+        curr = A_[i](k, m);
+        change += abs(prev - curr) / abs(prev + curr);
+      }
     }
   }
   change *= 1 / (2*N_*p_*p_);
@@ -134,7 +137,6 @@ void ASolver::pre_compute_all_sh()
 //re-expand element i of A with element (i, j) of T and return results
 MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
 {
-  
   int n, m, s, l;
   cmplx inter; // intermediate sum
   MyMatrix<cmplx> x1, x2, z;
@@ -148,10 +150,23 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
     for (m = -n; m <= n; m++)
     {
       inter  = 0;
-      for (s = -n; s <= n; s++)
+      
+      if (T_(i,j).isSingular())
       {
-        inter += T_(i, j).get_rval(n, m, s) * get_A_ni(i, n, s);
-      } // end s
+        Pt vec = T_(i,j).get_TVec();
+        if (vec.theta() > M_PI/2.0)
+          inter = (n % 2 == 0 ? get_A_ni(i, n, -m) : -get_A_ni(i, n, -m));
+        
+        else
+          inter = get_A_ni(i, n, m);
+        
+      } else
+      {
+        for (s = -n; s <= n; s++)
+        {
+          inter += T_(i, j).get_rval(n, m, s) * get_A_ni(i, n, s);
+        } // end s
+      }
       x1.set_val(n, m+p_, inter);
     } // end m
   } //end n

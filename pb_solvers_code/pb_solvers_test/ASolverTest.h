@@ -20,7 +20,7 @@ public :
     vector< Molecule > mol_;
     
     mol_.clear( );
-    Pt pos[2] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 0.0, 5.0 ) };
+    Pt pos[2] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 5.0, 0.0 ) };
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
       int M = 1;
@@ -45,13 +45,13 @@ public :
                                         sys.get_lambda(), nvals);
     
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
-//    ASolvTest.solve_A( 3E-5 );
-//
-//    for (int mol=0; mol<2; mol++)
-//    {
-//      ASolvTest.print_Ai(mol, 4);
-//      ASolvTest.print_Ei(mol, 4);
-//    }
+    ASolvTest.solve_A( 3E-5 );
+
+    for (int mol=0; mol<2; mol++)
+    {
+      ASolvTest.print_Ai(mol, 4);
+      ASolvTest.print_Ei(mol, 4);
+    }
   }
   
 };

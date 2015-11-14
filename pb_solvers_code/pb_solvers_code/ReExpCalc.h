@@ -149,6 +149,8 @@ protected:
   
   Pt v_; //computing re-expansion along this vector
   
+  bool rSing_;
+  
   /*
    Bessel function for this v_. If the bessel function be k_n ( z ) then
    this value should be for n = 2*p_ and z = kappa*r
@@ -169,6 +171,10 @@ public:
   ReExpCoeffs() { };
   ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
                  ReExpCoeffsConstants consts, double kappa, double lambda);
+  
+  bool isSingular()  { return rSing_; }
+  
+  Pt get_TVec()       { return v_; }
   
   cmplx get_yval(int n, int s)
   {
