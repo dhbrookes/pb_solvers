@@ -36,7 +36,7 @@ int main(int argc, char * argv[])
     allTest.unitTest( argc, argv );
   }
   
-  bool gtest = true;
+  bool gtest = false;
   if (gtest)
   {
     cout << "Now for Google Tests." << endl ;

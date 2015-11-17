@@ -33,70 +33,58 @@ reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p), prevA_(N)
 // perform many iterations of the solution for A
 void ASolver::solve_A(double prec)
 {
-  cout << "This is my R in solve_A" << endl;
-  for (int m = 0; m < 9; m++)
-  {
-    cout << "\t---m = " << m << "---" << endl;
-    for (int n = m; n < 9; n++)
-    {
-      for (int l = -n; l <= n; l++)
-      {
-        double r = fabs(T_(0,1).get_rval(n, m, l).real())>1e-15 ?
-        T_(0,1).get_rval(n, m, l).real() : 0;
-        double im = fabs(T_(0,1).get_rval(n, m, l).imag())>1e-15 ?
-        T_(0,1).get_rval(n, m, l).imag() : 0;
-        cout << "(" << r << "," << im << ") | ";
-      }
-      cout << endl;
-    }
-  }
-  cout << endl;
-  
-  cout << "This is my S in solve_A" << endl;
-  for (int m = 0; m < 9; m++)
-  {
-    cout << "\t---m = " << m << "---" << endl;
-    for (int l = m; l < 9; l++)
-    {
-      for (int n = m; n <= l; n++)
-      {
-        double r = fabs(T_(0,1).get_sval(n, l, m))>1e-15 ?
-                    T_(0,1).get_sval(n, l, m) : 0;
-        cout << r << " | ";
-      }
-      cout << endl;
-    }
-  }
-  cout << endl;
-  
   prevA_ = A_;
-  while(calc_change() > prec)
+  iter();
+  
+  double scale_dev = (double)(p_*(p_+1)*0.5);
+  double cng = scale_dev;
+  
+  while((cng/scale_dev) > prec)
   {
     iter();
+    print_Ai(1, 4);
+    cng = calc_change();
+    cout << "This is my cng " << cng << endl;
   }
-  
-  cout << endl;
-
 }
 
 // one iteration of numerical solution for A
 void ASolver::iter()
 {
-  int i, j;
+  int i, j, n, m;
   MyMatrix<cmplx> Z, zj, ai;
   for (i = 0; i <  N_; i++)
   {
     // relevant re-expansions:
     Z = MyMatrix<cmplx> (p_, 2*p_ + 1);
+    ai = MyMatrix<cmplx> (p_, 2*p_ + 1);
     for (j = 0; j < N_; j++)
     {
       if (i == j) continue;
       zj = re_expandA(i, j);
       Z += zj;
     }
-    ai = delta_[i] * Z;
+    
+    for (n = 0; n < p_; n++)
+    {
+      for (m = -n; m <= n; m++)
+      {
+        ai.set_val( n, m+p_, get_delta_ni( i, n ) * Z(n, m+p_));
+      }
+    }
+    
+    //ai = delta_[i] * Z;
     ai += E_[i];
-    ai = gamma_[i] * ai;
+    
+    for (n = 0; n < p_; n++)
+    {
+      for (m = -n; m <= n; m++)
+      {
+        ai.set_val( n, m+p_, get_gamma_ni( i, n ) * ai(n, m+p_));
+      }
+    }
+    
+    //ai = gamma_[i] * ai;
     A_.set_val(i, ai);
   }
 }
@@ -105,20 +93,31 @@ double ASolver::calc_change()
 {
   int i, k, m;
   double change = 0;
-  cmplx prev, curr; // intermediate values
+  cmplx prev, curr, a; // intermediate values
   for (i = 0; i < N_; i++)
   {
     for(k = 0; k < p_; k++)
     {
-      for(m = 0; m < k; m++)
+      for(m = 0; m <= k; m++)
       {
-        prev = prevA_[i](k, m);
-        curr = A_[i](k, m);
-        change += abs(prev - curr) / abs(prev + curr);
+        prev = prevA_[i](k, m+p_);
+        curr = A_[i](k, m+p_);
+        
+        if (prev == cmplx(0.0,0.0) && curr == cmplx(0.0,0.0))
+          continue;
+
+        if (fabs(prev.real()) < 1e-30 && fabs(prev.imag()) < 1e-30 )
+          a = curr;
+        else if (fabs(curr.real()) < 1e-30 && fabs(curr.imag()) < 1e-30)
+          a = prev;
+        else
+          a = 0.5*((prev - curr)/(prev + curr));
+        
+        change += a.real()*a.real() + a.imag()*a.imag();
       }
     }
   }
-  change *= 1 / (2*N_*p_*p_);
+  //change *= 1.0 / ((double)(2*N_*p_*p_));
   return change;
 }
 
@@ -386,10 +385,21 @@ void ASolver::compute_T()
 // Initialize A to Gamma * E
 void ASolver::init_A()
 {
-  int i;
+  int i, n, m;
+  MyMatrix<cmplx> ai;
   for (i = 0; i < N_; i++)
   {
-    A_.set_val(i, gamma_[i] * E_[i]);
+    // m goes from -n to n so you need 2*p columns:
+    ai = MyMatrix<cmplx>(p_, 2*p_ + 1);
+    for (n = 0; n < p_; n++)
+    {
+      for (m = -n; m <= n; m++)
+      {
+        ai.set_val(n, m + p_, get_gamma_ni( i, n) * get_E_ni(i, n, m));
+      }
+    }
+    A_.set_val(i, ai);
   }
+  
 }
 

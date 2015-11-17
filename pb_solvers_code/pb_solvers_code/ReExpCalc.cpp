@@ -405,3 +405,43 @@ void ReExpCoeffs::calc_ds_dr()
   }
 }
 
+void ReExpCoeffs::print_R()
+{
+  cout << "This is my R" << endl;
+  for (int m = 0; m < 9; m++)
+  {
+    cout << "\t---m = " << m << "---" << endl;
+    for (int n = m; n < 9; n++)
+    {
+      for (int l = -n; l <= n; l++)
+      {
+        double r = fabs(get_rval(n, m, l).real())>1e-15 ?
+                      get_rval(n, m, l).real() : 0;
+        double i = fabs(get_rval(n, m, l).imag())>1e-15 ?
+                      get_rval(n, m, l).imag() : 0;
+        cout << "(" << r << "," << i << ") | ";
+      }
+      cout << endl;
+    }
+  }
+  cout << endl;
+}
+
+void ReExpCoeffs::print_S()
+{
+  cout << "This is my S" << endl;
+  for (int m = 0; m < 9; m++)
+  {
+    cout << "\t---m = " << m << "---" << endl;
+    for (int l = m; l < 9; l++)
+    {
+      for (int n = m; n <= l; n++)
+      {
+        double r = fabs(get_sval(n, l, m))>1e-15 ? get_sval(n, l, m) : 0;
+        cout << r << " | ";
+      }
+      cout << endl;
+    }
+  }
+  cout << endl;
+}

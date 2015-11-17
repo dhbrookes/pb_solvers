@@ -45,13 +45,7 @@ public :
                                         sys.get_lambda(), nvals);
     
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
-    ASolvTest.solve_A( 3E-5 );
-
-    for (int mol=0; mol<2; mol++)
-    {
-      ASolvTest.print_Ai(mol, 4);
-      ASolvTest.print_Ei(mol, 4);
-    }
+    ASolvTest.solve_A( 1E-6 );
   }
   
 };

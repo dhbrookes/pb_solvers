@@ -16,7 +16,7 @@
 #include "util.h"
 
 #include <sstream>
-
+#include <iostream>
 
 using namespace std;
 
@@ -215,6 +215,9 @@ public:
     cmplx drdp = -ic * sc * get_rval(n, m, s);
     return drdp;
   }
+  
+  void print_R();
+  void print_S();
   
   void set_rval(int n, int m, int s, cmplx val)
   {

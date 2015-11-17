@@ -104,6 +104,11 @@ public:
   cmplx get_E_ni(int i, int n, int m)  { return E_[ i ]( n, m+p_ ); }
   cmplx get_A_ni(int i, int n, int m)  { return A_[ i ]( n, m+p_ ); }
   
+  void set_A_ni(int i, int n, int m, cmplx val)
+  {
+    (&A_[i])->set_val( n, m+p_, val);
+  }
+  
   ASolver(const int N, const int p, BesselCalc bcalc,
           SHCalc shCalc, System sys);
 
