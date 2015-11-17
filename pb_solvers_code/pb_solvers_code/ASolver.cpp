@@ -53,6 +53,9 @@ void ASolver::iter()
 {
   int i, j, n, m;
   MyMatrix<cmplx> Z, zj, ai;
+  
+  prevA_ = A_;
+  
   for (i = 0; i <  N_; i++)
   {
     // relevant re-expansions:
