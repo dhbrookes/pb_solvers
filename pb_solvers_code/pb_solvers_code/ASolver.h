@@ -91,6 +91,11 @@ protected:
 
 public:
   
+  /*
+   Calculate the vector of matrices L, as defined in equation 16 of Lotan 2006
+   */
+  VecOfMats<cmplx>::type calc_L();
+  
   VecOfMats<cmplx>::type&  get_gamma()   { return gamma_; }
   VecOfMats<cmplx>::type&  get_delta()   { return delta_; }
   VecOfMats<cmplx>::type&  get_E()       { return E_; }

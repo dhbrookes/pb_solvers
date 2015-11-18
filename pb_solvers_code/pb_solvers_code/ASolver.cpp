@@ -366,3 +366,24 @@ void ASolver::init_A()
   }
 }
 
+
+VecOfMats<cmplx>::type ASolver::calc_L()
+{
+  VecOfMats<cmplx>::type L (N_);\
+  
+  int i, j;
+  MyMatrix<cmplx> inner, expand;
+  for (i = 0; i < N_; i++)
+  {
+    inner = MyMatrix<cmplx> (p_, 2*p_ + 1);
+    for (j = 0; j < N_; j++)
+    {
+      if (j == i) continue;
+      expand = re_expandA(i, j);
+      inner += expand;
+    }
+    L.set_val(i, inner);
+  }
+  return L;
+}
+
