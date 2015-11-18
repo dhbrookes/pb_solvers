@@ -153,6 +153,17 @@ public:
     return pout;
   }
   
+  // calculate the distance to another point
+  double dist(Point<T>& other)
+  {
+    convert_to_euclidean();
+    double d = pow(p1_ - other.x(), 2);
+    d += pow(p2_ - other.y(), 2);
+    d += pow(p3_ - other.z(), 2);
+    d = sqrt(d);
+    return d;
+  }
+  
   // Getter methods perform necessary conversions:
   const T& x()
   {

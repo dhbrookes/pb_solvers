@@ -227,7 +227,7 @@ public:
   }
   
   MyVector(vector<T> vals)
-  :MyMatrix<T>(vals.size(), 1)
+  :MyMatrix<T>((int) vals.size(), 1)
   {
     int i;
     for (i = 0; i < vals.size(); i++)

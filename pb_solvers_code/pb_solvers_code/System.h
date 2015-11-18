@@ -37,8 +37,8 @@ public:
   const int get_m() const               { return M_; }
   const double get_a() const            { return a_; }
   const double get_qj(int j) const      { return qs_[j]; }
-  const Pt get_posj(int j) const       { return pos_[j]; }
-  const Pt get_center() const          { return center_; }
+  Pt get_posj(int j) const              { return pos_[j]; }
+  Pt get_center() const                 { return center_; }
 
   
 };
@@ -57,7 +57,7 @@ protected:
   Constants                    consts_;  // Constants for this system
   
   const double calc_average_radius() const;
-    
+  
 public:
   System(Constants consts, const vector<Molecule>& mols);
     
@@ -71,9 +71,63 @@ public:
   Pt get_centeri(int i) { return molecules_[i].get_center(); }
   const double get_lambda()  { return lambda_; }
   
+  /*
+   Check to determine if any molecules are overlapping
+   */
+  void check_for_overlap();
+  
 };
 
+/*
+ Exception thrown when a user-input center and radius does not encompass all
+ the charges
+ */
+class BadCenterException: public exception
+{
+protected:
+  double x_, y_, z_;
+  double radius_;
+  
+public:
+  BadCenterException(Pt center, double radius)
+  :x_(center.x()), y_(center.y()), z_(center.z())
+  {
+  }
+  
+  virtual const char* what() const throw()
+  {
+    ostringstream ss;
+    char buffer [50];
+    printf(buffer, "Center : (%f, %f, %f) with radius : %f do \
+           not encompass all charges", x_, y_, z_, radius_);
+    ss << buffer << endl;
+    return ss.str().c_str();
+  }
+};
 
-
+/*
+ Exception thrown when two molecules in the system are overlapping
+ */
+class OverlappingMoleculeException: public exception
+{
+protected:
+  int idx1_;
+  int idx2_;
+  
+public:
+  OverlappingMoleculeException(int idx1, int idx2)
+  :idx1_(idx1), idx2_(idx2)
+  {
+  }
+  
+  virtual const char* what() const throw()
+  {
+    ostringstream ss;
+    char buffer [50];
+    printf(buffer, "Molecule %i and %i are overlapping", idx1_, idx2_);
+    ss << buffer << endl;
+    return ss.str().c_str();
+  }
+};
 
 #endif /* Setup_hpp */

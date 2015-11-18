@@ -13,7 +13,14 @@ Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos, Pt cen)
 {
   // repositioning the charges WRT center of charge
   for (int i = 0; i < M_; i++)
+  {
     pos_[i] = pos_[i] - center_;
+    // check that the charge is encompassed by the the center and radius:
+    if (pos_[i].dist(center_) > a_)
+    {
+      throw BadCenterException(center_, a_);
+    }
+  }
 }
 
 
@@ -66,4 +73,25 @@ const double System::calc_average_radius() const
   }
   ave  =  ave / N_;
   return ave;
+}
+
+
+void System::check_for_overlap()
+{
+  int i, j;
+  double dist;
+  Pt pi, pj;
+  double ai, aj;
+  for (i = 0; i < N_; i++)
+  {
+    for (j = 0; j < N_; j++)
+    {
+      pi = molecules_[i].get_center();
+      pj = molecules_[j].get_center();
+      ai = molecules_[i].get_a();
+      aj = molecules_[j].get_a();
+      dist = pi.dist(pj);
+      if (dist < (ai + aj)) throw OverlappingMoleculeException(i, j);
+    }
+  }
 }
