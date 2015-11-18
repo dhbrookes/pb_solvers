@@ -35,7 +35,7 @@ public :
       mol_.push_back( molNew );
     }
     
-    const int vals           = nvals;
+    const int vals           = 10;
     BesselConstants bConsta( 2*vals );
     BesselCalc bCalcu( 2*vals, bConsta);
     SHCalcConstants SHConsta( 2*vals );
@@ -45,7 +45,12 @@ public :
                                         sys.get_lambda(), nvals);
     
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
-    ASolvTest.solve_A( 1E-6 );
+    ASolvTest.solve_A( 1E-4 );
+    
+    for (int molInd = 0; molInd < 2; molInd ++ )
+    {
+      ASolvTest.print_Ai( molInd, 5);
+    }
   }
   
 };

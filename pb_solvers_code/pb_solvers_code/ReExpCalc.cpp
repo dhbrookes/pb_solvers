@@ -245,7 +245,7 @@ void ReExpCoeffs::calc_s()
     {
       for (m = -n; m <= n; m++)
       {
-        if (n > l) set_sval(n, l, m, pow(-1.0, n) * get_sval(l, n, m));
+        if (n > l) set_sval(n, l, m, pow(-1.0, n+l) * get_sval(l, n, m));
       }
     }
   }

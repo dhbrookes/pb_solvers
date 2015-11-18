@@ -185,7 +185,10 @@ TEST_F(ASolverUTest, checkA)
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-//  ASolvTest.solve_A(1E-4);
+  ASolvTest.solve_A(1E-4);
+  
+  for ( int i=0; i < nmol; i++)
+    ASolvTest.print_Ai(i, 5);
 }
 
 #endif
