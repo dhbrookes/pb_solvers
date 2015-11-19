@@ -20,11 +20,11 @@ public :
     vector< Molecule > mol_;
     
     mol_.clear( );
-    Pt pos[2] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 5.0, 0.0 ) };
+    Pt pos[2] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 50.0, 0.0 ) };
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
       int M = 1;
-      double a = 1.0;
+      double a = 10.0;
       vector<double> charges(1);
       vector<Pt> posCharges(1);
       

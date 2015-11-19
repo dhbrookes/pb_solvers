@@ -11,8 +11,9 @@
 
 ASolver::ASolver(const int N, const int p, BesselCalc bcalc,
                  SHCalc shCalc, System sys)
-:p_(p), gamma_(N),delta_(N), E_(N), N_(sys.get_n()), T_ (N_, N_), A_(N),
-reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p), prevA_(N)
+:p_(p), a_avg_(sys.get_lambda()), gamma_(N),delta_(N), E_(N), N_(sys.get_n()),
+T_ (N_, N_), A_(N), reExpConsts_(sys.get_consts().get_kappa(),
+                                 sys.get_lambda(), p), prevA_(N)
 {
   _sys_ = make_shared<System> (sys);
   _besselCalc_ = make_shared<BesselCalc> (bcalc);
@@ -61,8 +62,6 @@ void ASolver::iter()
   MyMatrix<cmplx> Z, zj, ai;
   prevA_ = A_;
   
-  int k, m;
-  
   for (i = 0; i <  N_; i++)
   {
     // relevant re-expansions:
@@ -74,20 +73,20 @@ void ASolver::iter()
       Z += zj;
     }
     
-    cout << "This is my total Z = sum T_ij * A_j for " << i << "  " << j << endl;
-    for(k = 0; k < p_; k++)
-    {
-      for(m = 0; m <= k; m++)
-      {
-        double  r = Z(k,m+p_).real();
-        double im = Z(k,m+p_).imag();
-        r  = fabs( r) > 1e-9 ?  r : 0;
-        im = fabs(im) > 1e-9 ? im : 0;
-        cout << " (" << r << "," << im << ")  ";
-      }
-      cout << endl;
-    }
-    
+//  int k, m;
+//    cout << "This is my total Z = sum T_ij * A_j for " << i << "  " << j << endl;
+//    for(k = 0; k < p_; k++)
+//    {
+//      for(m = 0; m <= k; m++)
+//      {
+//        double  r = Z(k,m+p_).real();
+//        double im = Z(k,m+p_).imag();
+//        r  = fabs( r) > 1e-9 ?  r : 0;
+//        im = fabs(im) > 1e-9 ? im : 0;
+//        cout << " (" << r << "," << im << ")  ";
+//      }
+//      cout << endl;
+//    }
     ai = delta_[i] * Z;
     ai += E_[i];
     ai = gamma_[i] * ai;
@@ -143,57 +142,53 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
 {
   MyMatrix<cmplx> x1, x2, z;
   
-  int k, m;
   x1 = expand_RX(  i, j);
-  
-  cout << "This is my x1  for " << i << "  " << j << endl;
-  for(k = 0; k < p_; k++)
-  {
-    for(m = 0; m <= k; m++)
-    {
-      double  r = x1(k,m+p_).real();
-      double im = x1(k,m+p_).imag();
-      r  = fabs( r) > 1e-9 ?  r : 0;
-      im = fabs(im) > 1e-9 ? im : 0;
-      cout << " (" << r << "," << im << ")  ";
-    }
-    cout << endl;
-  }
-  
-  
   x2 = expand_SX(  i, j, x1);
-  
-  cout << "This is my x2  for " << i << "  " << j << endl;
-  for(k = 0; k < p_; k++)
-  {
-    for(m = 0; m <= k; m++)
-    {
-      double  r = x2(k,m+p_).real();
-      double im = x2(k,m+p_).imag();
-      r  = fabs( r) > 1e-9 ?  r : 0;
-      im = fabs(im) > 1e-9 ? im : 0;
-      cout << " (" << r << "," << im << ")  ";
-    }
-    cout << endl;
-  }
-  
   z  = expand_RHX( i, j, x2);
-  
-  cout << "This is my z for " << i << "  " << j << endl;
-  for(k = 0; k < p_; k++)
-  {
-    for(m = 0; m <= k; m++)
-    {
-      double  r = z(k,m+p_).real();
-      double im = z(k,m+p_).imag();
-      r  = fabs( r) > 1e-9 ?  r : 0;
-      im = fabs(im) > 1e-9 ? im : 0;
-      cout << " (" << r << "," << im << ")  ";
-    }
-    cout << endl;
-  }
-
   return z;
+  
+//  int k, m;
+//  cout << "This is my x1  for " << i << "  " << j << endl;
+//  for(k = 0; k < p_; k++)
+//  {
+//    for(m = 0; m <= k; m++)
+//    {
+//      double  r = x1(k,m+p_).real();
+//      double im = x1(k,m+p_).imag();
+//      r  = fabs( r) > 1e-9 ?  r : 0;
+//      im = fabs(im) > 1e-9 ? im : 0;
+//      cout << " (" << r << "," << im << ")  ";
+//    }
+//    cout << endl;
+//  }
+  
+//  cout << "This is my x2  for " << i << "  " << j << endl;
+//  for(k = 0; k < p_; k++)
+//  {
+//    for(m = 0; m <= k; m++)
+//    {
+//      double  r = x2(k,m+p_).real();
+//      double im = x2(k,m+p_).imag();
+//      r  = fabs( r) > 1e-9 ?  r : 0;
+//      im = fabs(im) > 1e-9 ? im : 0;
+//      cout << " (" << r << "," << im << ")  ";
+//    }
+//    cout << endl;
+//  }
+  
+//  cout << "This is my z for " << i << "  " << j << endl;
+//  for(k = 0; k < p_; k++)
+//  {
+//    for(m = 0; m <= k; m++)
+//    {
+//      double  r = z(k,m+p_).real();
+//      double im = z(k,m+p_).imag();
+//      r  = fabs( r) > 1e-9 ?  r : 0;
+//      im = fabs(im) > 1e-9 ? im : 0;
+//      cout << " (" << r << "," << im << ")  ";
+//    }
+//    cout << endl;
+//  }
 }
 
 // perform first part of T*A and return results
@@ -339,7 +334,7 @@ cmplx ASolver::calc_indi_delta(int i, int n)
   double n_dub = (double) n;
   d = (kap*kap*ai*ai) * (bi2 / (2.0*n_dub + 3.0));
   d += (n_dub * bi1 * (1.0 - (eps_p / eps_s)));
-  d *= pow(ai, 2.0*n_dub+1.0) / (2.0*n_dub+1.0);
+  d *= (ai * pow(ai/a_avg_, 2.0*n_dub)) / (2.0*n_dub+1.0);
   return cmplx(d, 0);
 }
 
@@ -396,6 +391,7 @@ void ASolver::compute_delta()
 {
   MyMatrix<cmplx> di;
   int i, j;
+  
   for (i = 0; i < N_; i++)
   {
     di = MyMatrix<cmplx> (p_, p_);

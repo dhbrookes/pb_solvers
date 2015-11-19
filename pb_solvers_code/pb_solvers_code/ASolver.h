@@ -33,7 +33,8 @@ protected:
                                        // calculating convergence criteria
   
   int                         N_;  // number of molecules
-  int                         p_;  // max value for n (2*numVals_ usually)    
+  int                         p_;  // max value for n (2*numVals_ usually)
+  double                  a_avg_;  // the average radius of particles in syst
   VecOfMats<cmplx>::type      E_;
   VecOfMats<cmplx>::type      gamma_, delta_;
   
@@ -152,7 +153,7 @@ public:
         double im = get_A_ni( i, n, m).imag();
         r  = fabs( r) > 1e-9 ?  r : 0;
         im = fabs(im) > 1e-9 ? im : 0;
-        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+        //cout << "(" << setprecision (9) << r << "," << im << ")  ";
       }
       cout << endl;
     }

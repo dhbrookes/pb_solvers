@@ -43,6 +43,24 @@ protected :
   } // end SetUp
   
   virtual void TearDown() {}
+  
+  double A0[15] = { 5.06496536, -3.6619316, -0.000503250061, 2.01779987,
+    -9.82900676e-05, -1.0682227e-05, -1.05479692, -3.28880159e-06,
+    -2.71180395e-06, -4.4780814e-07, 0.541023412, 2.40308854e-06,
+    -3.44083312e-07, -4.12058842e-07, -8.58237216e-08};
+  
+  double A0_im[15] = {0, 0.000340562962, -0.000330632776, 0.000163525329,
+    -2.30829341e-05, -1.86457723e-05, 3.5928091e-05, 1.53052678e-05,
+     2.2200138e-06, 9.73474763e-09, 5.13843793e-06, 5.61706783e-06,
+    2.48309863e-06, 4.65173384e-07, 2.04983496e-08 };
+  
+   double A1[15] = {-0.401833604, 0.265698439, -0.443888271, 0.338291377,
+     0.58064118,-0.07417005,-1.0778658, -0.0567916512, 0.122326234,
+     0.54187217, 0.833960226,-0.9379799,-0.0583482748,-1.02863481, 1.16375327};
+  
+  double A1_im[15] = {0, 0, 0.352227876, 0, -0.481130826, 0.71993116, 0,
+    0.0296375441, -1.1732774, 0.746026633, 0, 0.85301775, 0.560921204,
+    -1.417068, 0.24848249 };
 } ; // end ASolverUTest
 
 
@@ -81,13 +99,13 @@ TEST_F(ASolverUTest, checkDelta)
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1).real()/56.03476045, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5).real()/73361234.99, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1).real(),   0.87554313, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5).real(),   0.06832297, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 2).real()/46846.22401, 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 7).real()/8.00377E+14, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 2).real(),   11.4370663, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 7).real()/181.9847, 1.0, preclim);
 }
- 
+
 
 TEST_F(ASolverUTest, checkE)
 {
@@ -187,8 +205,19 @@ TEST_F(ASolverUTest, checkA)
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
   ASolvTest.solve_A(1E-4);
   
-  for ( int i=0; i < nmol; i++)
-    ASolvTest.print_Ai(i, 5);
+  int ct = 0;
+  for ( int n = 0; n < 5; n++ )
+  {
+    for ( int m = 0; m <= n; m++ )
+    {
+      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).real(), A0[ct],    preclim);
+      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).imag(), A0_im[ct], preclim);
+      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).real(), A1[ct],    preclim);
+      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).imag(), A1_im[ct], preclim);
+      ct++;
+    }
+  }
+  
+  
 }
-
 #endif
