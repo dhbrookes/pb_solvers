@@ -242,6 +242,44 @@ public:
   }
   
   /*
+   Addition operator returns new vector
+   */
+  MyVector<T> operator+(MyVector<T>& rhs)
+  {
+    if (this->nrows_ != rhs.nrows_)
+    {
+      throw MatrixArithmeticException(ADDITION, this->nrows_, 1,
+                                      rhs.nrows_, 1);
+    }
+    
+    MyVector<T> result = MyVector<T>(this->nrows_);
+    int i;
+    for (i = 0; i < this->nrows_; i++)
+    {
+      result.set_val(i, this->vals_[i][0] + rhs[i]);
+    }
+    return result;
+  }
+  
+  /*
+   summation operator adds to existing vector
+   */
+  MyVector<T>& operator+=(MyVector<T>& rhs)
+  {
+    if (this->nrows_ != rhs.nrows_)
+    {
+      throw MatrixArithmeticException(ADDITION, this->nrows_, 1, rhs.nrows_,
+                                      1);
+    }
+    int i;
+    for (i = 0; i < this->nrows_; i++)
+    {
+        set_val(i, this->vals_[i][0] + rhs[i]);
+    }
+    return *this;
+  }
+  
+  /*
    Access operator with brackets only requires one value
    */
   T& operator[](int i)
