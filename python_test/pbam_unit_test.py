@@ -6,8 +6,8 @@ from scipy.misc import factorial
 bessel    = False
 SHCons = False
 SHCalc  = False
-MPol      = True
-Rot         = False
+MPol      = False
+Rot         = True
 Trans      = False
 nCt, zCt = 0, 0
 
@@ -114,22 +114,24 @@ if (SHCalc):
 ## the point ( rho, theta, phi )
 
 if (MPol):
-    rho    = 0.5       # radius
-    theta = 0.0    # polar
-    phi     = 0.0      # azimuthal
-    q        = -0.4
+    #rho    = 0.5       # radius
+    #theta = np.pi    # polar
+    #phi     = 0.0      # azimuthal
+    #q        = 5.0
     nmax = 10
     
-    #rho = 1.51658 
-    #theta  = 2.05056 
-    #phi    = 5.55037
+    rho = 1.51658 
+    theta  = 2.05056 
+    phi    = -0.732815
+    q        = -.4
     
     for n in range(nmax):
-        for m in range(n+1):
+        for m in range(0,n+1):
             Ynm = scipy.special.sph_harm(m, n, phi, theta)
             
-            print Ynm*q*pow(rho, n) *  \
-                        np.sqrt((4.0*np.pi)/(2.0*float(n)+1.0)),
+            print Ynm  * pow(-1.0,m) *\
+                        np.sqrt((4.0*np.pi)/(2.0*float(n)+1.0)), #*\
+                        #pow(rho, n) *q ,
         print ""
 
 ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
@@ -140,10 +142,10 @@ if (MPol):
 ## R_n^{0,s} = Y_{n,-s}(\theta)(\phi)
 
 if (Rot):
-    theta = 0.0 
-    phi =  0.0 
-    #theta = 1.5953910356207
-    #phi = 5.7258897721
+    #theta = 0.0 
+    #phi =  0.0 
+    theta = 1.5953910356207
+    phi = 5.7258897721
     nmax = 10
     
     R = np.zeros(( 2*nmax, 2*nmax, 4*nmax),dtype=complex)
@@ -151,7 +153,7 @@ if (Rot):
     A = np.zeros(( 2*nmax, 4*nmax))
     B = np.zeros(( 2*nmax, 4*nmax))
     
-    for n in range(2*nmax):
+    for n in range(2*nmax-1):
         for m in range(-n, n+1):
             nD, mD = float( n ), float( m )
             A[n][m+nmax] =  np.sqrt(((nD+mD+1.)*(nD-mD+1.))
@@ -167,7 +169,7 @@ if (Rot):
     #        print( " {:.8f}, " .format( B[n][m+nmax])),     
     #    print ""
             
-    for n in range(2*nmax):
+    for n in range(2*nmax-1):
         Ynm = scipy.special.sph_harm(range(0,n+1), n, phi, theta)
         for s in range(-n,n+1):
             if (s<0):
@@ -179,7 +181,7 @@ if (Rot):
                                         
     
     for m in range(0,nmax):
-        for n in range(m+2,2*nmax-m):
+        for n in range(m+2,2*nmax-m-1):
             for s in range(-n+1, n):
                 
                 sign1, sign2, sign3 = 1.0, 1.0, 1.0
@@ -198,25 +200,27 @@ if (Rot):
                 bs2n =  sign3 * np.sqrt(float((n - (-s-1) -1)*(n-(-s-1)))/
                                         float((2.0*n-1.0)*(2.0*n+1)))
                 
-                asn = np.sqrt(float((n+s+1)*(n-s+1))/float((2.0*n+1.0)*(2.0*n+3.0)))
+                asn = np.sqrt(float(((n-1)+abs(s)+1)*((n-1)
+                                        -abs(s)+1))/float((2.0*(n-1)+1.0)
+                                        *(2.0*(n-1)+3.0)))
                 
-                R[n-1][m+1][s+2*nmax] = (0.5*np.exp(complex(0.0,-1.0)*phi)*
+                R[n-1][m+1][s+2*nmax] = (-0.5*np.exp(complex(0.0,-1.0)*phi)*
                                                 (1.0+np.cos(theta))*
                                                 bs1n*R[n][m][s-1+2*nmax])
 
-                R[n-1][m+1][s+2*nmax]-= (0.5*np.exp(complex(0.0, 1.0)*phi)*
+                R[n-1][m+1][s+2*nmax]+= (0.5*np.exp(complex(0.0, 1.0)*phi)*
                                             (1.0-np.cos(theta))*
                                             bs2n*R[n][m][s+1+2*nmax])
-                R[n-1][m+1][s+2*nmax]+= np.sin(theta)*asn*R[n][m][s+2*nmax]
-                R[n-1][m+1][s+2*nmax] *= (1.0/bmn)
+                R[n-1][m+1][s+2*nmax]-= np.sin(theta)*asn*R[n][m][s+2*nmax]
+                R[n-1][m+1][s+2*nmax] *= (np.exp(complex(0.0,1.0)*np.pi)/bmn)
     
-    #n = nmax-1
-    #for m in range(0,nmax): 
-    #    print n ,m
-    #    for s in range(0, n+1):
-    #        print( "{:.6f}, " .format( float(np.real(R[n][m][s+2*nmax])))),
-    #    
-    #    print ("\n"),
+    n = nmax-1
+    for m in range(0,nmax): 
+        print n ,m
+        for s in range(0, n+1):
+            print( "{:.6f}, " .format( float(np.imag(R[n][m][s+2*nmax])))),
+        
+        print ("\n"),
 
 
 

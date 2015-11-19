@@ -7,13 +7,13 @@
 //
 
 #include "ASolver.h"
-
 #include <iostream>
 
 ASolver::ASolver(const int N, const int p, BesselCalc bcalc,
                  SHCalc shCalc, System sys)
-:p_(p), gamma_(N),delta_(N), E_(N), N_(sys.get_n()), T_ (N_, N_), A_(N),
-reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p), prevA_(N)
+:p_(p), a_avg_(sys.get_lambda()), gamma_(N),delta_(N), E_(N), N_(sys.get_n()),
+T_ (N_, N_), A_(N), reExpConsts_(sys.get_consts().get_kappa(),
+                                 sys.get_lambda(), p), prevA_(N)
 {
   _sys_ = make_shared<System> (sys);
   _besselCalc_ = make_shared<BesselCalc> (bcalc);
@@ -34,44 +34,35 @@ reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p), prevA_(N)
 // perform many iterations of the solution for A
 void ASolver::solve_A(double prec)
 {
-  
-  cout << "This is my R in solve_A" << endl;
-  for (int i = 0; i < 5; i++)
-  {
-    for (int m = -i; m<= i; m++)
-    {
-      cout << " " << T_(0,1).get_rval(5, m, i);
-    }
-    cout << endl;
-  }
-  cout << endl;
-  
-  cout << "This is my S in solve_A" << endl;
-  for (int i = 0; i < 5; i++)
-  {
-    for (int m = -i; m<= i; m++)
-    {
-      cout << " " << T_(0,1).get_sval(5, i, m);
-    }
-    cout << endl;
-  }
-  cout << endl;
-  
-  
+  int MAX_POL_ROUNDS = 500;
   prevA_ = A_;
-  while(calc_change() > prec)
+  iter();
+  
+  double scale_dev = (double)(p_*(p_+1)*0.5);
+  double cng = scale_dev;
+  int ct = 0;
+  
+  while((cng/scale_dev) > prec)
   {
     iter();
+    cng = calc_change();
+    if (ct > MAX_POL_ROUNDS*N_)
+    {
+      cout << "Polz doesn't converge! dev="<< cng << " " << ct << endl;
+      exit(0);
+    }
+    ct++;
   }
-  
-  cout << endl;
 }
 
 // one iteration of numerical solution for A
 void ASolver::iter()
 {
+  
   int i, j;
   MyMatrix<cmplx> Z, zj, ai;
+  prevA_ = A_;
+  
   for (i = 0; i <  N_; i++)
   {
     // relevant re-expansions:
@@ -82,6 +73,7 @@ void ASolver::iter()
       zj = re_expandA(i, j);
       Z += zj;
     }
+
     ai = delta_[i] * Z;
     ai += E_[i];
     ai = gamma_[i] * ai;
@@ -91,19 +83,32 @@ void ASolver::iter()
 
 double ASolver::calc_change()
 {
-  int i, k;
+  int i, k, m;
   double change = 0;
-  cmplx prev, curr; // intermediate values
+  cmplx prev, curr, a; // intermediate values
   for (i = 0; i < N_; i++)
   {
-    for(k = 0; k < p_ * p_; k++)
+    for(k = 0; k < p_; k++)
     {
-      prev = prevA_[i](k, k);
-      curr = A_[i](k, k);
-      change += abs(prev - curr) / abs(prev + curr);
+      for(m = 0; m <= k; m++)
+      {
+        prev = get_prevA_ni(i, k, m);
+        curr = get_A_ni(i, k, m);
+        
+        if (prev == cmplx(0.0,0.0) && curr == cmplx(0.0,0.0))
+          continue;
+
+        if (fabs(prev.real()) < 1e-30 && fabs(prev.imag()) < 1e-30 )
+          a = curr;
+        else if (fabs(curr.real()) < 1e-30 && fabs(curr.imag()) < 1e-30)
+          a = prev;
+        else
+          a = 0.5*((prev - curr)/(prev + curr));
+        
+        change += a.real()*a.real() + a.imag()*a.imag();
+      }
     }
   }
-  change *= 1 / (2*N_*p_*p_);
   return change;
 }
 
@@ -119,44 +124,125 @@ void ASolver::pre_compute_all_sh()
   
 }
 
-//re-expand element i of A with element (i, j) of T and return results
+//re-expand element j of A with element (i, j) of T and return results
 MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
 {
-  
-  int n, m, s, l;
-  cmplx inter; // intermediate sum
   MyMatrix<cmplx> x1, x2, z;
-      
-  z = MyMatrix<cmplx>  (p_, 2*p_ + 1);
-  x1 = MyMatrix<cmplx> (p_, 2*p_ + 1);
-  x2 = MyMatrix<cmplx> (p_, 2*p_ + 1);
+  
+  x1 = expand_RX(  i, j);
+  x2 = expand_SX(  i, j, x1);
+  z  = expand_RHX( i, j, x2);
+  return z;
+  
+//  int k, m;
+//  cout << "This is my x1  for " << i << "  " << j << endl;
+//  for(k = 0; k < p_; k++)
+//  {
+//    for(m = 0; m <= k; m++)
+//    {
+//      double  r = x1(k,m+p_).real();
+//      double im = x1(k,m+p_).imag();
+//      r  = fabs( r) > 1e-9 ?  r : 0;
+//      im = fabs(im) > 1e-9 ? im : 0;
+//      cout << " (" << r << "," << im << ")  ";
+//    }
+//    cout << endl;
+//  }
+//  
+//  cout << "This is my x2  for " << i << "  " << j << endl;
+//  for(k = 0; k < p_; k++)
+//  {
+//    for(m = 0; m <= k; m++)
+//    {
+//      double  r = x2(k,m+p_).real();
+//      double im = x2(k,m+p_).imag();
+//      r  = fabs( r) > 1e-9 ?  r : 0;
+//      im = fabs(im) > 1e-9 ? im : 0;
+//      cout << " (" << r << "," << im << ")  ";
+//    }
+//    cout << endl;
+//  }
+//  
+//  cout << "This is my z for " << i << "  " << j << endl;
+//  for(k = 0; k < p_; k++)
+//  {
+//    for(m = 0; m <= k; m++)
+//    {
+//      double  r = z(k,m+p_).real();
+//      double im = z(k,m+p_).imag();
+//      r  = fabs( r) > 1e-9 ?  r : 0;
+//      im = fabs(im) > 1e-9 ? im : 0;
+//      cout << " (" << r << "," << im << ")  ";
+//    }
+//    cout << endl;
+//  }
+}
+
+// perform first part of T*A and return results
+MyMatrix<cmplx> ASolver::expand_RX(int i, int j)
+{
+  int n, m, s;
+  cmplx inter;
+  MyMatrix<cmplx> x1(p_, 2*p_ + 1);
+  
   // fill X1:
   for (n = 0; n < p_; n++)
   {
     for (m = -n; m <= n; m++)
     {
       inter  = 0;
-      for (s = -n; s <= n; s++)
+      if (T_(i,j).isSingular())
       {
-        inter += T_(i, j).get_rval(n, m, s) * get_A_ni(i, n, s);
-      } // end s
+        Pt vec = T_(i,j).get_TVec();
+        if (vec.theta() > M_PI/2.0)
+          inter = (n % 2 == 0 ? get_A_ni(j, n, -m) : -get_A_ni(j, n, -m));
+        
+        else
+          inter = get_A_ni(j, n, m);
+        
+      } else
+      {
+        for (s = -n; s <= n; s++)
+        {
+          inter += T_(i, j).get_rval(n, m, s) * get_A_ni(j, n, s);
+        } // end s
+      }
       x1.set_val(n, m+p_, inter);
     } // end m
   } //end n
+  return x1;
+}
+
+// perform second part of T*A and return results
+MyMatrix<cmplx> ASolver::expand_SX(int i, int j, MyMatrix<cmplx> x1)
+{
+  int n, m, l;
+  cmplx inter;
+  MyMatrix<cmplx> x2(p_, 2*p_ + 1);
   
   // fill x2:
   for (n = 0; n < p_; n++)
   {
-    for (m = -n; m <= n; m++)
+    for (m = 0; m <= n; m++)
     {
       inter  = 0;
       for (l = abs(m); l < p_; l++)
       {
         inter += T_(i, j).get_sval(n, l, m) * x1(l, m+p_);
       } // end l
+      
       x2.set_val(n, m+p_, inter);
     } // end m
   } //end n
+  return x2;
+}
+
+// perform third part of T*A and return results
+MyMatrix<cmplx> ASolver::expand_RHX(int i, int j, MyMatrix<cmplx> x2)
+{
+  int n, m, s;
+  cmplx inter;
+  MyMatrix<cmplx> z(p_, 2*p_ + 1);
   
   //fill zj:
   for (n = 0; n < p_; n++)
@@ -174,7 +260,6 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
   
   return z;
 }
-
 
 /*
  Calculate the SH matrix for every charge in a molecule
@@ -236,7 +321,7 @@ cmplx ASolver::calc_indi_delta(int i, int n)
   double n_dub = (double) n;
   d = (kap*kap*ai*ai) * (bi2 / (2.0*n_dub + 3.0));
   d += (n_dub * bi1 * (1.0 - (eps_p / eps_s)));
-  d *= pow(ai, 2.0*n_dub+1.0) / (2.0*n_dub+1.0);
+  d *= (ai * pow(ai/a_avg_, 2.0*n_dub)) / (2.0*n_dub+1.0);
   return cmplx(d, 0);
 }
 
@@ -293,6 +378,7 @@ void ASolver::compute_delta()
 {
   MyMatrix<cmplx> di;
   int i, j;
+  
   for (i = 0; i < N_; i++)
   {
     di = MyMatrix<cmplx> (p_, p_);
@@ -360,10 +446,16 @@ void ASolver::compute_T()
 void ASolver::init_A()
 {
   int i;
+  MyMatrix<cmplx> ai;
   for (i = 0; i < N_; i++)
   {
-    A_.set_val(i, gamma_[i] * E_[i]);
+    // m goes from -n to n so you need 2*p columns:
+    ai = MyMatrix<cmplx>(p_, 2*p_ + 1);
+    ai = gamma_[i] * E_[i];
+    
+    A_.set_val(i, ai);
   }
+  
 }
 
 

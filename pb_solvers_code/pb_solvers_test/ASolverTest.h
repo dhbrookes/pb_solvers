@@ -20,11 +20,11 @@ public :
     vector< Molecule > mol_;
     
     mol_.clear( );
-    Pt pos[2] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 0.0, 5.0 ) };
+    Pt pos[2] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 50.0, 0.0 ) };
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
       int M = 1;
-      double a = 1.0;
+      double a = 10.0;
       vector<double> charges(1);
       vector<Pt> posCharges(1);
       
@@ -35,7 +35,7 @@ public :
       mol_.push_back( molNew );
     }
     
-    const int vals           = nvals;
+    const int vals           = 10;
     BesselConstants bConsta( 2*vals );
     BesselCalc bCalcu( 2*vals, bConsta);
     SHCalcConstants SHConsta( 2*vals );
@@ -45,15 +45,8 @@ public :
                                         sys.get_lambda(), nvals);
     
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
-    ASolvTest.solve_A( 35 );
+    ASolvTest.solve_A( 1E-4 );
     
-    //cout << "This is my Kappa " << sys.get_consts().get_kappa() <<  endl;
-    
-    for (int mol=0; mol<2; mol++)
-    {
-//      ASolvTest.print_Ai(mol, 4);
-//      ASolvTest.print_Ei(mol, 4);
-    }
   }
   
 };

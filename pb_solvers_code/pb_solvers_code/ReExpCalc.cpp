@@ -107,6 +107,12 @@ kappa_(kappa), lambda_(lambda)
   {
     throw SHSizeException(p_, Ytp_.get_nrows());
   }
+  
+  double sint = sin(v_.theta());
+  double sin_eps = 1e-12;
+
+  if (sint < sin_eps)  rSing_ = true;
+ 
   calc_r();
   calc_s();
 }
@@ -119,8 +125,11 @@ void ReExpCoeffs::calc_r()
   cmplx ic = cmplx(0, 1);
   double phi = v_.phi();
   double theta = v_.theta();
+  double xi  = M_PI;
+  
   R_ = MyVector<MyMatrix<cmplx> > (2*p_); // n range of 0 to 2p-1 is needed!
-  for (n = 0; n < 2 * p_; n++)
+  
+  for (n = 0; n < 2 * p_-1; n++)
   {
     R_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));//s range: -2p+1 to 2p-1 needed!
     for (s = -n; s <= n; s++)
@@ -132,21 +141,23 @@ void ReExpCoeffs::calc_r()
   
   for (m = 0; m < p_; m++)
   {
-    for (n=m+2; n < 2 * p_ - m; n++)
+    for (n=m+2; n < 2 * p_ - m - 1; n++)
     {
       for (s=-n+1; s < n; s++)
       {
-        val = 0.5 * exp(-ic * phi) * (1 + cos(theta)) *
+        val = -0.5 * exp(-ic * phi) * (1 + cos(theta)) *
         _consts_->get_b_val(n, s-1) * get_rval(n, m, s-1);
-        val -= 0.5 * exp(ic * phi) * (1 - cos(theta)) *
+        val += 0.5 * exp(ic * phi) * (1 - cos(theta)) *
         _consts_->get_b_val(n, -s-1) * get_rval(n, m, s+1);
-        val += sin(theta) * _consts_->get_a_val(n ,s) *
+        val -= sin(theta) * _consts_->get_a_val(n-1 , abs(s)) *
         get_rval(n, m, s);
-        val *= ( 1.0 / _consts_->get_b_val( n, m) );
+        val *= ( exp( ic * xi ) / _consts_->get_b_val( n, m) );
         set_rval(n-1, m+1, s, val);
       }
     }
   }
+  
+  
 }
 
 void ReExpCoeffs::calc_s()
@@ -234,7 +245,7 @@ void ReExpCoeffs::calc_s()
     {
       for (m = -n; m <= n; m++)
       {
-        if (n > l) set_sval(n, l, m, pow(-1.0, n) * get_sval(l, n, m));
+        if (n > l) set_sval(n, l, m, pow(-1.0, n+l) * get_sval(l, n, m));
       }
     }
   }
@@ -392,4 +403,45 @@ void ReExpCoeffs::calc_ds_dr()
       }
     }
   }
+}
+
+void ReExpCoeffs::print_R()
+{
+  cout << "This is my R" << endl;
+  for (int m = 0; m < 9; m++)
+  {
+    cout << "\t---m = " << m << "---" << endl;
+    for (int n = m; n < 9; n++)
+    {
+      for (int l = -n; l <= n; l++)
+      {
+        double r = fabs(get_rval(n, m, l).real())>1e-15 ?
+                      get_rval(n, m, l).real() : 0;
+        double i = fabs(get_rval(n, m, l).imag())>1e-15 ?
+                      get_rval(n, m, l).imag() : 0;
+        cout << "(" << r << "," << i << ") | ";
+      }
+      cout << endl;
+    }
+  }
+  cout << endl;
+}
+
+void ReExpCoeffs::print_S()
+{
+  cout << "This is my S" << endl;
+  for (int m = 0; m < 9; m++)
+  {
+    cout << "\t---m = " << m << "---" << endl;
+    for (int l = m; l < 9; l++)
+    {
+      for (int n = m; n <= l; n++)
+      {
+        double r = fabs(get_sval(n, l, m))>1e-15 ? get_sval(n, l, m) : 0;
+        cout << r << " | ";
+      }
+      cout << endl;
+    }
+  }
+  cout << endl;
 }

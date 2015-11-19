@@ -10,6 +10,7 @@
 #define ASolver_h
 
 #include <stdio.h>
+#include <iomanip>
 #include <iostream>
 #include "MyMatrix.h"
 #include "BesselCalc.h"
@@ -32,7 +33,8 @@ protected:
                                        // calculating convergence criteria
   
   int                         N_;  // number of molecules
-  int                         p_;  // max value for n (2*numVals_ usually)    
+  int                         p_;  // max value for n (2*numVals_ usually)
+  double                  a_avg_;  // the average radius of particles in syst
   VecOfMats<cmplx>::type      E_;
   VecOfMats<cmplx>::type      gamma_, delta_;
   
@@ -79,8 +81,17 @@ protected:
   // initialize A vector
   void init_A();
   
-  // re-expand element i of A withh element (i, j) of T and return results
+  // re-expand element j of A with element (i, j) of T and return results
   MyMatrix<cmplx> re_expandA(int i, int j);
+  
+  // perform first part of T*A and return results
+  MyMatrix<cmplx> expand_RX(int i, int j);
+  
+  // perform second part of T*A and return results
+  MyMatrix<cmplx> expand_SX(int i, int j, MyMatrix<cmplx> x1);
+  
+  // perform third part of T*A and return results
+  MyMatrix<cmplx> expand_RHX(int i, int j, MyMatrix<cmplx> x2);
   
   // perform one iteration of the solution for A (eq 51 in Lotan 2006)
   void iter();
@@ -101,10 +112,19 @@ public:
   VecOfMats<cmplx>::type&  get_E()       { return E_; }
   VecOfMats<cmplx>::type&  get_A()       { return A_; }
   
-  cmplx get_gamma_ni( int i, int n)    { return gamma_[i]( n, n); }
-  cmplx get_delta_ni( int i, int n)    { return delta_[i]( n, n); }
-  cmplx get_E_ni( int i, int n, int m) { return E_[ i ]( n, m+p_ ); }
-  cmplx get_A_ni(int i, int n, int m)  { return A_[ i ]( n, m+p_ ); }
+  cmplx get_gamma_ni( int i, int n)        { return gamma_[i]( n, n); }
+  cmplx get_delta_ni( int i, int n)        { return delta_[i]( n, n); }
+  
+  cmplx get_SH_ij(int i, int j, int n, int m)
+                                           { return all_sh[i][j]( n, abs(m)); }
+  cmplx get_E_ni(int i, int n, int m)      { return E_[ i ]( n, m+p_ ); }
+  cmplx get_A_ni(int i, int n, int m)      { return A_[ i ]( n, m+p_ ); }
+  cmplx get_prevA_ni(int i, int n, int m)  { return prevA_[ i ]( n, m+p_ ); }
+  
+  void set_A_ni(int i, int n, int m, cmplx val)
+  {
+    (&A_[i])->set_val( n, m+p_, val);
+  }
   
   ASolver(const int N, const int p, BesselCalc bcalc,
           SHCalc shCalc, System sys);
@@ -114,7 +134,7 @@ public:
     cout << "This is my E for molecule " << i << " poles " << p <<  endl;
     for (int n = 0; n < p; n++)
     {
-      for (int m = -n; m <= n; m++)
+      for (int m = 0; m <= n; m++)
       {
         double  r = get_E_ni(i,n,m).real();
         double im = get_E_ni( i, n, m).imag();
@@ -132,18 +152,19 @@ public:
     cout << "This is my A for molecule " << i << " poles " << p <<  endl;
     for (int n = 0; n < p; n++)
     {
-      for (int m = -n; m <= n; m++)
+      for (int m = 0; m <= n; m++)
       {
         double  r = get_A_ni(i,n,m).real();
         double im = get_A_ni( i, n, m).imag();
         r  = fabs( r) > 1e-9 ?  r : 0;
         im = fabs(im) > 1e-9 ? im : 0;
-        cout << "(" << r << "," << im << ")  ";
+        cout << "(" << setprecision (9) << r << "," << im << ")  ";
       }
       cout << endl;
     }
     cout << endl;
   }
+
 
   //numerically solve for A given the desired precision
   void solve_A(double prec);
