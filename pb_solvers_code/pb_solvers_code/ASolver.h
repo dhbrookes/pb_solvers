@@ -32,6 +32,8 @@ protected:
   VecOfMats<cmplx>::type      prevA_;  // previous value for
                                        // calculating convergence criteria
   
+  bool solvedA_;
+  
   /*
    Gradient of A. Each (i, j) entry in the outer vector is grad_j(A^(i))
    The inner vectors are all of length three and represent dA/dr, dA/dtheta
@@ -101,20 +103,24 @@ protected:
   enum WhichReEx { BASE, DDR, DDPHI, DDTHETA };
   
   // re-expand element j of A with element (i, j) of T and return results
-  MyMatrix<cmplx> re_expandA(int i, int j);
+  // if prev=True then re-expand prevA
+  MyMatrix<cmplx> re_expandA(int i, int j, bool prev=false);
+  
+  
   
   // re-expand element j of grad(A) with element (i, j) of T
-  VecOfMats<cmplx>::type re_expand_gradA(int i, int j, int wrt);
+  VecOfMats<cmplx>::type re_expand_gradA(int i, int j, int wrt, bool prev=false);
   
   // re-expand element j of A with element (i, j) of grad(T) and return results
   // uses eq 46 to solve eq 47 in Lotan 2006
-  VecOfMats<cmplx>::type re_expandA_gradT(int i, int j);
+  VecOfMats<cmplx>::type re_expandA_gradT(int i, int j, bool prev=false);
   
   // perform first part of T*A and return results (see eq 46 in Lotan 2006)
   // input wrt is only used if whichA is not BASE (then we need to know which
-  // molecule the gradient is with respect to)
+  // molecule the gradient is with respect to). If prev=True then expand
+  // prevA (or prevGradA_)
   MyMatrix<cmplx> expand_RX(int i, int j, WhichReEx whichR,
-                            WhichReEx whichA, int wrt=-1);
+                            WhichReEx whichA, bool prev, int wrt=-1);
   
   // perform second part of T*A and return results (see eq 46 in Lotan 2006)
   MyMatrix<cmplx> expand_SX(int i, int j, MyMatrix<cmplx> x1,
@@ -124,6 +130,10 @@ protected:
   MyMatrix<cmplx> expand_RHX(int i, int j, MyMatrix<cmplx> x2,
                              WhichReEx whichRH);
   
+  // convenience method for retrieving values from A and gradA (or their
+  // previous values
+  cmplx which_aval(WhichReEx whichA, bool prev, int i, int n,
+                   int m, int wrt=-1);
 
   // perform one iteration of the solution for A (eq 51 in Lotan 2006)
   void iter();
@@ -132,7 +142,10 @@ protected:
   void grad_iter();
   
   // calculate the change in A_ from prevA_ (eq 52 in Lotan 2006)
-  double calc_change();
+  double calc_change(WhichReEx whichA=BASE, int wrt=-1);
+  
+  // sum of many calls to the above
+  double calc_grad_change();
 
 public:
   
@@ -166,6 +179,19 @@ public:
   cmplx get_dAdphi_ni(int i, int j, int n, int m)
   {
     return gradA_(i, j)[2](n, m+p_);
+  }
+  
+  cmplx get_prev_dAdr_ni(int i, int j, int n, int m)
+  {
+    return prevGradA_(i, j)[0](n, m+p_);
+  }
+  cmplx get_prev_dAdtheta_ni(int i, int j, int n, int m)
+  {
+    return prevGradA_(i, j)[1](n, m+p_);
+  }
+  cmplx get_prev_dAdphi_ni(int i, int j, int n, int m)
+  {
+    return prevGradA_(i, j)[2](n, m+p_);
   }
   
   void set_A_ni(int i, int n, int m, cmplx val)
