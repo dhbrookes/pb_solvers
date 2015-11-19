@@ -58,6 +58,7 @@ void ASolver::solve_A(double prec)
 // one iteration of numerical solution for A
 void ASolver::iter()
 {
+  
   int i, j;
   MyMatrix<cmplx> Z, zj, ai;
   prevA_ = A_;
@@ -72,21 +73,7 @@ void ASolver::iter()
       zj = re_expandA(i, j);
       Z += zj;
     }
-    
-//  int k, m;
-//    cout << "This is my total Z = sum T_ij * A_j for " << i << "  " << j << endl;
-//    for(k = 0; k < p_; k++)
-//    {
-//      for(m = 0; m <= k; m++)
-//      {
-//        double  r = Z(k,m+p_).real();
-//        double im = Z(k,m+p_).imag();
-//        r  = fabs( r) > 1e-9 ?  r : 0;
-//        im = fabs(im) > 1e-9 ? im : 0;
-//        cout << " (" << r << "," << im << ")  ";
-//      }
-//      cout << endl;
-//    }
+
     ai = delta_[i] * Z;
     ai += E_[i];
     ai = gamma_[i] * ai;
@@ -161,7 +148,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
 //    }
 //    cout << endl;
 //  }
-  
+//  
 //  cout << "This is my x2  for " << i << "  " << j << endl;
 //  for(k = 0; k < p_; k++)
 //  {
@@ -175,7 +162,7 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j)
 //    }
 //    cout << endl;
 //  }
-  
+//  
 //  cout << "This is my z for " << i << "  " << j << endl;
 //  for(k = 0; k < p_; k++)
 //  {

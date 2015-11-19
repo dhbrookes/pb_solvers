@@ -153,7 +153,7 @@ public:
         double im = get_A_ni( i, n, m).imag();
         r  = fabs( r) > 1e-9 ?  r : 0;
         im = fabs(im) > 1e-9 ? im : 0;
-        //cout << "(" << setprecision (9) << r << "," << im << ")  ";
+        cout << "(" << setprecision (9) << r << "," << im << ")  ";
       }
       cout << endl;
     }

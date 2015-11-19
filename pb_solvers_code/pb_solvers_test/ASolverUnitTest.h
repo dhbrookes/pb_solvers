@@ -20,12 +20,16 @@ protected :
   int vals_;
   Constants const_;
   vector< Molecule > mol_;
+  vector< Molecule > mol_sing_;
   
   virtual void SetUp()
   {
     mol_.clear( );
     Pt pos[2]     = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
     Pt cgPos[2]   = { Pt( 0.0, 0.0, -5.5 ), Pt( 11.0, 6.9, 24.3 ) };
+    
+    Pt cgPosSi[2] = { Pt( 0.0, 0.0, -35.0 ), Pt( 0.0, 0.0, -0.0 ) };
+    
     double cg[2] = { 5.0, -0.4};
     double rd[2] = { 5.6, 10.4};
     for (int molInd = 0; molInd < 2; molInd ++ )
@@ -39,6 +43,12 @@ protected :
       
       Molecule molNew( M, rd[molInd], charges, posCharges, pos[molInd]);
       mol_.push_back( molNew );
+      
+      charges[0]    = 2.0;
+      posCharges[0] = cgPosSi[molInd];
+
+      Molecule molSing( M, 10.0, charges, posCharges);
+      mol_sing_.push_back( molSing );
     }
   } // end SetUp
   
@@ -61,6 +71,13 @@ protected :
   double A1_im[15] = {0, 0, 0.352227876, 0, -0.481130826, 0.71993116, 0,
     0.0296375441, -1.1732774, 0.746026633, 0, 0.85301775, 0.560921204,
     -1.417068, 0.24848249 };
+  
+  double A0Sing[15] = {2.08493611, 0.0595090739,0, 0.026460114, 0, 0,
+    0.00906667786, 0, 0, 0, 0.00287090794, 0, 0, 0, 0};
+  
+  double A1Sing[15] = {2.08493623, -0.059510451, 0, 0.026460955, 0, 0,
+    -0.00906706693, 0, 0, 0, 0.00287106903, 0, 0, 0, 0};
+
 } ; // end ASolverUTest
 
 
@@ -174,22 +191,6 @@ TEST_F(ASolverUTest, checkSH)
 
 }
 
-TEST_F(ASolverUTest, checkT)
-{
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), nvals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-
-}
-
 TEST_F(ASolverUTest, checkA)
 {
   const int vals           = nvals;
@@ -217,7 +218,36 @@ TEST_F(ASolverUTest, checkA)
       ct++;
     }
   }
-  
-  
 }
+
+TEST_F(ASolverUTest, checkASing)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+  System sys               = System( const_, mol_sing_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+                                      sys.get_lambda(), nvals);
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolvTest.solve_A(1E-4);
+  
+  int ct = 0;
+
+  for ( int n = 0; n < 5; n++ )
+  {
+    for ( int m = 0; m <= n; m++ )
+    {
+      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).real(), A0Sing[ct], preclim);
+      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).imag(),        0.0, preclim);
+      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).real(), A1Sing[ct], preclim);
+      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).imag(),        0.0, preclim);
+      ct++;
+    }
+  }
+}
+
 #endif

@@ -47,10 +47,6 @@ public :
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
     ASolvTest.solve_A( 1E-4 );
     
-    for (int molInd = 0; molInd < 2; molInd ++ )
-    {
-      ASolvTest.print_Ai( molInd, 5);
-    }
   }
   
 };
