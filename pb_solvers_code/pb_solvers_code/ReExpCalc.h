@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -149,7 +150,9 @@ protected:
   
   Pt v_; //computing re-expansion along this vector
   
+  bool grad_;
   bool rSing_;
+
   
   /*
    Bessel function for this v_. If the bessel function be k_n ( z ) then
@@ -169,8 +172,10 @@ protected:
 
 public:
   ReExpCoeffs() { };
+  
   ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
-                 ReExpCoeffsConstants consts, double kappa, double lambda);
+              ReExpCoeffsConstants consts, double kappa,
+              double lambda, bool grad = false);
   
   bool isSingular()  { return rSing_; }
   
@@ -217,7 +222,10 @@ public:
   }
   
   void print_R();
+  void print_dRdtheta();
+  void print_dRdphi();
   void print_S();
+  void print_dSdr();
   
   void set_rval(int n, int m, int s, cmplx val)
   {

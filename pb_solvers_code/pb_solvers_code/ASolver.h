@@ -124,42 +124,8 @@ public:
   ASolver(const int N, const int p, BesselCalc bcalc,
           SHCalc shCalc, System sys);
 
-  void print_Ei( int i, int p)
-  {
-    cout << "This is my E for molecule " << i << " poles " << p <<  endl;
-    for (int n = 0; n < p; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = get_E_ni(i,n,m).real();
-        double im = get_E_ni( i, n, m).imag();
-        r  = fabs( r) > 1e-9 ?  r : 0;
-        im = fabs(im) > 1e-9 ? im : 0;
-        cout << "(" << r << "," << im << ")  ";
-      }
-      cout << endl;
-    }
-    cout << endl;
-  }
-  
-  void print_Ai( int i, int p)
-  {
-    cout << "This is my A for molecule " << i << " poles " << p <<  endl;
-    for (int n = 0; n < p; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = get_A_ni(i,n,m).real();
-        double im = get_A_ni( i, n, m).imag();
-        r  = fabs( r) > 1e-9 ?  r : 0;
-        im = fabs(im) > 1e-9 ? im : 0;
-        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-      }
-      cout << endl;
-    }
-    cout << endl;
-  }
-
+  void print_Ei( int i, int p);
+  void print_Ai( int i, int p);
 
   //numerically solve for A given the desired precision
   void solve_A(double prec);
