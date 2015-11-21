@@ -227,7 +227,7 @@ public:
   }
   
   MyVector(vector<T> vals)
-  :MyMatrix<T>(vals.size(), 1)
+  :MyMatrix<T>((int) vals.size(), 1)
   {
     int i;
     for (i = 0; i < vals.size(); i++)
@@ -239,6 +239,44 @@ public:
   void set_val(const int i, T val)
   {
     MyMatrix<T>::set_val(i, 0, val);
+  }
+  
+  /*
+   Addition operator returns new vector
+   */
+  MyVector<T> operator+(MyVector<T>& rhs)
+  {
+    if (this->nrows_ != rhs.nrows_)
+    {
+      throw MatrixArithmeticException(ADDITION, this->nrows_, 1,
+                                      rhs.nrows_, 1);
+    }
+    
+    MyVector<T> result = MyVector<T>(this->nrows_);
+    int i;
+    for (i = 0; i < this->nrows_; i++)
+    {
+      result.set_val(i, this->vals_[i][0] + rhs[i]);
+    }
+    return result;
+  }
+  
+  /*
+   summation operator adds to existing vector
+   */
+  MyVector<T>& operator+=(MyVector<T>& rhs)
+  {
+    if (this->nrows_ != rhs.nrows_)
+    {
+      throw MatrixArithmeticException(ADDITION, this->nrows_, 1, rhs.nrows_,
+                                      1);
+    }
+    int i;
+    for (i = 0; i < this->nrows_; i++)
+    {
+        set_val(i, this->vals_[i][0] + rhs[i]);
+    }
+    return *this;
   }
   
   /*

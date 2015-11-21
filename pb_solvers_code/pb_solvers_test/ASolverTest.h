@@ -13,6 +13,7 @@
 
 class ASolverTest
 {
+  
 public :
   void RunASolverTest()
   {
@@ -46,7 +47,6 @@ public :
     
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
     ASolvTest.solve_A( 1E-4 );
-    
   }
   
 };
