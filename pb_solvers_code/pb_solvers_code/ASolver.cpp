@@ -29,7 +29,7 @@ solvedA_(false)
   compute_E();
   
   init_A();
-  init_gradA();
+  //init_gradA();
 }
 
 // perform many iterations of the solution for A
@@ -148,8 +148,8 @@ void ASolver::grad_iter()
       for (k = 0; k < N_; k++)
       {
         if (k == i) continue;
-        gTA = re_expandA_gradT(i, k, prev);
-        TgA = re_expand_gradA(i, k, j, prev);
+        //gTA = re_expandA_gradT(i, k, prev);
+        //TgA = re_expand_gradA(i, k, j, prev);
         add = gTA + TgA;
         aij += add;
       }
@@ -162,7 +162,6 @@ void ASolver::grad_iter()
   }
   
 }
-
 
 double ASolver::calc_change(WhichReEx whichA, int wrt)
 {
@@ -196,7 +195,6 @@ double ASolver::calc_change(WhichReEx whichA, int wrt)
           prev = get_prevA_ni(i, k, m);
           curr = get_A_ni(i, k, m);
         }
-      
         
         if (prev == cmplx(0.0,0.0) && curr == cmplx(0.0,0.0))
           continue;
@@ -236,88 +234,196 @@ MyMatrix<cmplx> ASolver::re_expandA(int i, int j, bool prev)
   x1 = expand_RX(  i, j, whichR, whichA, prev);
   x2 = expand_SX(  i, j, x1, whichS);
   z  = expand_RHX( i, j, x2, whichRH);
+  //z  = expand_RHX( i, j, x2);
   return z;
 }
 
-// re-expand element j of grad(A) with element (i, j) of T
-// will re-expand the gradient with respect to the wrt input
-VecOfMats<cmplx>::type ASolver::re_expand_gradA(int i, int j,
-                                                int wrt, bool prev)
+// perform first part of T*A and return results
+MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
+                                   WhichReEx whichA, bool prev, int wrt)
 {
-  MyMatrix<cmplx> x1, x2, z;
-  VecOfMats<cmplx>::type Z (3);
-  WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE, whichA=DDR;
-  
-  // first dA/dR
-  x1 = expand_RX(  i, j, whichR, whichA, wrt);
-  x2 = expand_SX(  i, j, x1, whichS);
-  z = expand_RHX( i, j, x2, whichRH);
-  Z.set_val(0, z);
-  
-  // dA/dtheta:
-  whichA = DDTHETA;
-  x1 = expand_RX(  i, j, whichR, whichA, wrt);
-  x2 = expand_SX(  i, j, x1, whichS);
-  z = expand_RHX( i, j, x2, whichRH);
-  Z.set_val(1, z);
-  
-  // dA/dphiL
-  whichA = DDPHI;
-  x1 = expand_RX(  i, j, whichR, whichA, wrt);
-  x2 = expand_SX(  i, j, x1, whichS);
-  z = expand_RHX( i, j, x2, whichRH);
-  Z.set_val(2, z);
-  
-  return Z;
+  int n, m, s;
+  cmplx inter;
+  MyMatrix<cmplx> x1(p_, 2*p_ + 1);
+  cmplx rval;
+  cmplx aval;
+
+  // fill X1:
+  for (n = 0; n < p_; n++)
+  {
+    for (m = -n; m <= n; m++)
+    {
+      inter  = 0;
+      if (T_(i,j).isSingular())
+      {
+        Pt vec = T_(i,j).get_TVec();
+        aval = which_aval(whichA, prev, j, n, -m, wrt);
+
+        if (vec.theta() > M_PI/2.0)
+          inter = (n % 2 == 0 ? aval : -aval);
+        else
+          inter = aval;
+
+      } else
+      {
+        for (s = -n; s <= n; s++)
+        {
+          if (whichR == DDPHI)
+            rval = T_(i, j).get_dr_dphi_val(n, m, s);
+          else if (whichR == DDTHETA)
+            rval = T_(i, j).get_dr_dtheta_val(n, m, s);
+          else
+            rval = T_(i, j).get_rval(n, m, s);
+
+          aval = which_aval(whichA, prev, j, n, s, wrt);
+          inter += rval * aval;
+        } // end s
+      }
+      x1.set_val(n, m+p_, inter);
+    } // end m
+  } //end n
+  return x1;
 }
 
-/*
- Re-expand element j of A with element (i, j) of grad(T) and return
- as a 3-element vector containing the results for the re-expansion
- with each element of grad(T)
- */
-VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
+// perform second part of T*A and return results
+MyMatrix<cmplx> ASolver::expand_SX(int i, int j, MyMatrix<cmplx> x1,
+                                   WhichReEx whichS)
 {
-  MyMatrix<cmplx> x1, x2, z, z1, z2;
-  VecOfMats<cmplx>::type Z (3); // output vector
-  WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE, whichA=BASE;
-  
-  // first find with respect to dT/dr:
-  whichS = DDR;
-  x1 = expand_RX(  i, j, whichR, whichA, prev);
-  x2 = expand_SX(  i, j, x1, whichS);
-  z = expand_RHX( i, j, x2, whichRH);
-  Z.set_val(0, z);
-  
-  // dT/dtheta:
-  whichS = BASE;
-  whichRH = DDTHETA;
-  x1 = expand_RX(  i, j, whichR, whichA, prev);
-  x2 = expand_SX(  i, j, x1, whichS);
-  z1  = expand_RHX( i, j, x2, whichRH);
-  whichRH = BASE;
-  whichR = DDTHETA;
-  x1 = expand_RX(  i, j, whichR, whichA, prev);
-  x2 = expand_SX(  i, j, x1, whichS);
-  z2  = expand_RHX( i, j, x2, whichRH);
-  Z.set_val(1, z1 + z2);
-  
-  // dT/dphi:
-  whichR = BASE;
-  whichRH = DDPHI;
-  x1 = expand_RX(  i, j, whichR, whichA, prev);
-  x2 = expand_SX(  i, j, x1, whichS);
-  z1  = expand_RHX( i, j, x2, whichRH);
-  whichRH = BASE;
-  whichR = DDPHI;
-  x1 = expand_RX(  i, j, whichR, whichA, prev);
-  x2 = expand_SX(  i, j, x1, whichS);
-  z2  = expand_RHX( i, j, x2, whichRH);
-  Z.set_val(2, z1 + z2);
-  
-  return Z;
+  int n, m, l;
+  cmplx inter;
+  MyMatrix<cmplx> x2(p_, 2*p_ + 1);
+  cmplx sval;
+
+  // fill x2:
+  for (n = 0; n < p_; n++)
+  {
+    for (m = 0; m <= n; m++)
+    {
+      inter  = 0;
+      for (l = abs(m); l < p_; l++)
+      {
+        if (whichS == DDR) sval = T_(i, j).get_dsdr_val(n, l, m);
+        else sval = T_(i, j).get_sval(n, l, m);
+        inter += sval * x1(l, m+p_);
+      } // end l
+      x2.set_val(n, m+p_, inter);
+    } // end m
+  } //end n
+  return x2;
 }
 
+// perform third part of T*A and return results
+MyMatrix<cmplx> ASolver::expand_RHX(int i, int j, MyMatrix<cmplx> x2,
+                                    WhichReEx whichRH)
+{
+  int n, m, s;
+  cmplx inter;
+  MyMatrix<cmplx> z(p_, 2*p_ + 1);
+  cmplx rval;
+
+  //fill zj:
+  for (n = 0; n < p_; n++)
+  {
+    for (m = -n; m <= n; m++)
+    {
+      inter  = 0;
+      for (s = -n; s <= n; s++)
+      {
+        if (whichRH == DDPHI)
+          rval = T_(i, j).get_dr_dphi_val(n, s, m);
+        else if (whichRH == DDTHETA)
+          rval = T_(i, j).get_dr_dtheta_val(n, s, m);
+        else
+          rval = T_(i, j).get_rval(n, s, m);
+        inter += conj(rval) * x2(n, s+p_);
+      } // end s
+      z.set_val(n, m+p_, inter);
+    } // end m
+  } //end n
+
+  return z;
+}
+
+//// re-expand element j of grad(A) with element (i, j) of T
+//// will re-expand the gradient with respect to the wrt input
+//VecOfMats<cmplx>::type ASolver::re_expand_gradA(int i, int j,
+//                                                int wrt, bool prev)
+//{
+//  MyMatrix<cmplx> x1, x2, z;
+//  VecOfMats<cmplx>::type Z (3);
+//  WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE, whichA=DDR;
+//  
+//  // first dA/dR
+//  x1 = expand_RX(  i, j, whichR, whichA, wrt);
+//  x2 = expand_SX(  i, j, x1, whichS);
+//  z = expand_RHX( i, j, x2, whichRH);
+//  Z.set_val(0, z);
+//  
+//  // dA/dtheta:
+//  whichA = DDTHETA;
+//  x1 = expand_RX(  i, j, whichR, whichA, wrt);
+//  x2 = expand_SX(  i, j, x1, whichS);
+//  z = expand_RHX( i, j, x2, whichRH);
+//  Z.set_val(1, z);
+//  
+//  // dA/dphiL
+//  whichA = DDPHI;
+//  x1 = expand_RX(  i, j, whichR, whichA, wrt);
+//  x2 = expand_SX(  i, j, x1, whichS);
+//  z = expand_RHX( i, j, x2, whichRH);
+//  Z.set_val(2, z);
+//  
+//  return Z;
+//}
+//
+///*
+// Re-expand element j of A with element (i, j) of grad(T) and return
+// as a 3-element vector containing the results for the re-expansion
+// with each element of grad(T)
+// */
+//VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
+//{
+//  MyMatrix<cmplx> x1, x2, z, z1, z2;
+//  VecOfMats<cmplx>::type Z (3); // output vector
+//  WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE, whichA=BASE;
+//  
+//  // first find with respect to dT/dr:
+//  whichS = DDR;
+//  x1 = expand_RX(  i, j, whichR, whichA, prev);
+//  x2 = expand_SX(  i, j, x1, whichS);
+//  z = expand_RHX( i, j, x2, whichRH);
+//  Z.set_val(0, z);
+//  
+//  // dT/dtheta:
+//  whichS = BASE;
+//  whichRH = DDTHETA;
+//  x1 = expand_RX(  i, j, whichR, whichA, prev);
+//  x2 = expand_SX(  i, j, x1, whichS);
+//  z1  = expand_RHX( i, j, x2, whichRH);
+//  whichRH = BASE;
+//  whichR = DDTHETA;
+//  x1 = expand_RX(  i, j, whichR, whichA, prev);
+//  x2 = expand_SX(  i, j, x1, whichS);
+//  z2  = expand_RHX( i, j, x2, whichRH);
+//  Z.set_val(1, z1 + z2);
+//  
+//  // dT/dphi:
+//  whichR = BASE;
+//  whichRH = DDPHI;
+//  x1 = expand_RX(  i, j, whichR, whichA, prev);
+//  x2 = expand_SX(  i, j, x1, whichS);
+//  z1  = expand_RHX( i, j, x2, whichRH);
+//  whichRH = BASE;
+//  whichR = DDPHI;
+//  x1 = expand_RX(  i, j, whichR, whichA, prev);
+//  x2 = expand_SX(  i, j, x1, whichS);
+//  z2  = expand_RHX( i, j, x2, whichRH);
+//  Z.set_val(2, z1 + z2);
+//  
+//  return Z;
+//}
+//
+//
 
 cmplx ASolver::which_aval(WhichReEx whichA, bool prev, int i, int n,
                  int m, int wrt)
@@ -346,112 +452,6 @@ cmplx ASolver::which_aval(WhichReEx whichA, bool prev, int i, int n,
       aval = get_A_ni(i, n, m);
   }
   return aval;
-}
-
-// perform first part of T*A and return results
-MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
-                                   WhichReEx whichA, bool prev, int wrt)
-{
-  int n, m, s;
-  cmplx inter;
-  MyMatrix<cmplx> x1(p_, 2*p_ + 1);
-  cmplx rval;
-  cmplx aval;
-  
-  // fill X1:
-  for (n = 0; n < p_; n++)
-  {
-    for (m = -n; m <= n; m++)
-    {
-      inter  = 0;
-      if (T_(i,j).isSingular())
-      {
-        Pt vec = T_(i,j).get_TVec();        
-        aval = which_aval(whichA, prev, j, n, -m, wrt);
-        
-        if (vec.theta() > M_PI/2.0)
-          inter = (n % 2 == 0 ? aval : -aval);
-        else
-          inter = aval;
-        
-      } else
-      {
-        for (s = -n; s <= n; s++)
-        {
-          if (whichR == DDPHI)
-            rval = T_(i, j).get_dr_dphi_val(n, m, s);
-          else if (whichR == DDTHETA)
-            rval = T_(i, j).get_dr_dtheta_val(n, m, s);
-          else
-            rval = T_(i, j).get_rval(n, m, s);
-          
-          aval = which_aval(whichA, prev, j, n, s, wrt);
-          inter += rval * aval;
-        } // end s
-      }
-      x1.set_val(n, m+p_, inter);
-    } // end m
-  } //end n
-  return x1;
-}
-
-// perform second part of T*A and return results
-MyMatrix<cmplx> ASolver::expand_SX(int i, int j, MyMatrix<cmplx> x1,
-                                   WhichReEx whichS)
-{
-  int n, m, l;
-  cmplx inter;
-  MyMatrix<cmplx> x2(p_, 2*p_ + 1);
-  cmplx sval;
-  
-  // fill x2:
-  for (n = 0; n < p_; n++)
-  {
-    for (m = 0; m <= n; m++)
-    {
-      inter  = 0;
-      for (l = abs(m); l < p_; l++)
-      {
-        if (whichS == DDR) sval = T_(i, j).get_dsdr_val(n, l, m);
-        else sval = T_(i, j).get_sval(n, l, m);
-        inter += sval * x1(l, m+p_);
-      } // end l
-      x2.set_val(n, m+p_, inter);
-    } // end m
-  } //end n
-  return x2;
-}
-
-// perform third part of T*A and return results
-MyMatrix<cmplx> ASolver::expand_RHX(int i, int j, MyMatrix<cmplx> x2,
-                                    WhichReEx whichRH)
-{
-  int n, m, s;
-  cmplx inter;
-  MyMatrix<cmplx> z(p_, 2*p_ + 1);
-  cmplx rval;
-  
-  //fill zj:
-  for (n = 0; n < p_; n++)
-  {
-    for (m = -n; m <= n; m++)
-    {
-      inter  = 0;
-      for (s = -n; s <= n; s++)
-      {
-        if (whichRH == DDPHI)
-          rval = T_(i, j).get_dr_dphi_val(n, m, s);
-        else if (whichRH == DDTHETA)
-          rval = T_(i, j).get_dr_dtheta_val(n, m, s);
-        else
-          rval = T_(i, j).get_rval(n, m, s);
-        inter += conj(rval) * x2(n, s+p_);
-      } // end s
-      z.set_val(n, m+p_, inter);
-    } // end m
-  } //end n
-  
-  return z;
 }
 
 /*

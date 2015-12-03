@@ -121,11 +121,11 @@ protected:
   // prevA (or prevGradA_)
   MyMatrix<cmplx> expand_RX(int i, int j, WhichReEx whichR,
                             WhichReEx whichA, bool prev, int wrt=-1);
-  
+
   // perform second part of T*A and return results (see eq 46 in Lotan 2006)
   MyMatrix<cmplx> expand_SX(int i, int j, MyMatrix<cmplx> x1,
                             WhichReEx whichS);
-  
+
   // perform third part of T*A and return results (see eq 46 in Lotan 2006)
   MyMatrix<cmplx> expand_RHX(int i, int j, MyMatrix<cmplx> x2,
                              WhichReEx whichRH);
