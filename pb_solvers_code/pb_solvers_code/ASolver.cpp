@@ -678,7 +678,7 @@ void ASolver::init_gradA()
 
 VecOfMats<cmplx>::type ASolver::calc_L()
 {
-  VecOfMats<cmplx>::type L (N_);\
+  VecOfMats<cmplx>::type L (N_);
   
   int i, j;
   MyMatrix<cmplx> inner, expand;
@@ -694,6 +694,23 @@ VecOfMats<cmplx>::type ASolver::calc_L()
     L.set_val(i, inner);
   }
   return L;
+}
+
+MyVector<VecOfMats<cmplx>::type > ASolver::calc_grad_L()
+{
+  MyVector<VecOfMats<cmplx>::type > gradl (N_);
+  VecOfMats<cmplx>::type inner1, inner2;
+  int i, j;
+  for (i = 0; i < N_; i++)
+  {
+    for (j = 0; j < N_; j++)
+    {
+      inner1 = re_expandA_gradT(i, j);
+      inner2 = re_expand_gradA(i, j, i);
+      gradl.set_val(i, inner1 + inner2);
+    }
+  }
+  return gradl;
 }
 
 
