@@ -109,7 +109,7 @@ protected:
   
   
   // re-expand element j of grad(A) with element (i, j) of T
-  VecOfMats<cmplx>::type re_expand_gradA(int i, int j, int wrt, bool prev=false);
+  VecOfMats<cmplx>::type re_expand_gradA(int i,int j,int wrt,bool prev=false);
   
   // re-expand element j of A with element (i, j) of grad(T) and return results
   // uses eq 46 to solve eq 47 in Lotan 2006
@@ -162,10 +162,11 @@ public:
   cmplx get_SH_ij(int i, int j, int n, int m)
                                            { return all_sh[i][j]( n, abs(m)); }
   cmplx get_E_ni(int i, int n, int m)      { return E_[ i ]( n, m+p_ ); }
-  //get element of A^(i)
   cmplx get_A_ni(int i, int n, int m)      { return A_[ i ]( n, m+p_ ); }
   cmplx get_prevA_ni(int i, int n, int m)  { return prevA_[ i ]( n, m+p_ ); }
   
+  // convert derivs in matrix to cartesian
+  VecOfMats<cmplx>::type conv_to_cart(VecOfMats<cmplx>::type dZ, int i, int j);
   
   // get elements of grad_j(A^(i))
   cmplx get_dAdr_ni(int i, int j, int n, int m)
@@ -204,6 +205,12 @@ public:
 
   void print_Ei( int i, int p);
   void print_Ai( int i, int p);
+  void print_dAidr( int i, int j, int p);
+  void print_dAidtheta( int i, int j, int p);
+  void print_dAidphi( int i, int j, int p);
+  void print_dAidx( int i, int j, int p);
+  void print_dAidy( int i, int j, int p);
+  void print_dAidz( int i, int j, int p);
 
   //numerically solve for A given the desired precision
   void solve_A(double prec);
