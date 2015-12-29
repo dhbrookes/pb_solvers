@@ -283,6 +283,7 @@ VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
   Z.set_val(0, z);
   
   // dT/dtheta:
+  whichR=BASE;
   whichS = BASE;
   whichRH = DDTHETA;
   x1 = expand_RX(  i, j, whichR, whichA, prev);
