@@ -84,19 +84,36 @@ protected :
     2.2200138e-06, 9.73474763e-09, 5.13843793e-06, 5.61706783e-06,
     2.48309863e-06, 4.65173384e-07, 2.04983496e-08 };
   
-  double A1[15] = {-0.401833604, 0.265698439, -0.443888271, 0.338291377,
-    0.58064118,-0.07417005,-1.0778658, -0.0567916512, 0.122326234,
-    0.54187217, 0.833960226,-0.9379799,-0.0583482748,-1.02863481, 1.16375327};
+  double A1[15] = {-0.401833604, 0.265700049, -0.449876813, 0.338288496,
+    0.586157705,-0.0734981144, -1.07786325, -0.0598377042, 0.12171614,
+    0.54211679, 0.83395858, -0.93662999, -0.057964058, -1.028876, 1.1636555};
   
-  double A1_im[15] = {0, 0, 0.352227876, 0, -0.481130826, 0.71993116, 0,
-    0.0296375441, -1.1732774, 0.746026633, 0, 0.85301775, 0.560921204,
-    -1.417068, 0.24848249 };
+  double A1_im[15] = {0, 4.58511161e-06, 0.347557646, -8.25770523e-06,
+    -0.47683061, 0.722606727, 7.39004703e-06, 0.0272651594, -1.17570528,
+    0.74547344,-4.85359351e-06, 0.85406746, 0.56244862,-1.4165226, 0.24853490};
   
   double A0Sing[15] = {2.08493611, 0.0595090739,0, 0.026460114, 0, 0,
     0.00906667786, 0, 0, 0, 0.00287090794, 0, 0, 0, 0};
   
   double A1Sing[15] = {2.08493623, -0.059510451, 0, 0.026460955, 0, 0,
     -0.00906706693, 0, 0, 0, 0.00287106903, 0, 0, 0, 0};
+  
+  double dA00[15] = {1.0544637e-06,7.85368589e-05,-3.7739641e-05,1.1710611e-05,
+    -4.2581267e-06,-2.54957295e-06,1.1509835e-06,-2.02804679e-07,-3.6652067e-07,
+    -4.9837825e-08,8.9749664e-08,2.9501223e-09,-3.6136045e-08,-8.8566072e-09,0};
+  
+  double dA01im[15] = {0,0,4.49886716e-05,0,5.90910631e-06,1.96972506e-06,0,
+    4.233064e-07,2.48485723e-07,5.45274128e-09,0,1.98818687e-08,1.98691187e-08,
+    0,-2.28180158e-09};
+  
+  double dA11[15] = {-3.1633912e-06,0.00015605884,5.5533741e-05,-1.438732e-05,
+    -9.82898223e-06,-8.25866317e-07,8.00828799e-07,1.0218887e-06,
+    1.40543141e-07,-4.82103708e-08,-2.17563271e-08,-8.19726265e-08,
+    -1.62881095e-08,8.72542217e-09,3.2623144e-09};
+  
+  double dA10im[15] = {0,0,-1.44387654e-05,0,3.28980681e-06,-1.10667758e-06,0,
+    -4.39392408e-07,1.06332252e-07,9.822109e-08,0,4.54976027e-08,-3.4394996e-09,
+    -1.4438813e-08,-3.54879966e-09};
 
 } ; // end ASolverUTest
 
@@ -272,28 +289,20 @@ TEST_F(ASolverUTest, checkASing)
 
 TEST_F(ASolverUTest, checkgradA)
 {
+  mol_.clear( ); double cg[3] = { 2.0,  2.0, 2.0};
+  Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
   
-  mol_.clear( );
-  Pt pos[2]     = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
-  Pt cgPos[2]   = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
-  double cg[2] = { 2.0,  2.0};
-  double rd[2] = { 2.0,  2.0};
-  
-  for (int molInd = 0; molInd < 2; molInd ++ )
+  for (int molInd = 0; molInd < 3; molInd ++ )
   {
-    int M = 1;
-    vector<double> charges(1);
-    vector<Pt> posCharges(1);
+    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
+    charges[0]    = cg[molInd]; posCharges[0] = pos[molInd];
     
-    charges[0]    = cg[molInd];
-    posCharges[0] = cgPos[molInd];
-    
-    Molecule molNew( M, rd[molInd], charges, posCharges, pos[molInd]);
+    Molecule molNew( M, cg[molInd], charges, posCharges, pos[molInd]);
     mol_.push_back( molNew );
   }
   
   const int vals           = nvals;
-  int nmol                 = 2;
+  int nmol                 = 3;
   BesselConstants bConsta  = BesselConstants( 2*vals );
   BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
   SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
@@ -304,30 +313,29 @@ TEST_F(ASolverUTest, checkgradA)
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
   ASolvTest.solve_A(1E-20);
-  ASolvTest.solve_gradA(1E-6);
-  
-  for ( int n = 0; n < 2; n++ )
-  {
-    for ( int m = 0; m < 2; m++ )
-    {
-//      ASolvTest.print_dAidx( n, m, 5);
-//      ASolvTest.print_dAidy( n, m, 5);
-//      ASolvTest.print_dAidz( n, m, 5);
-//      ASolvTest.print_dAidr( n, m, 5);
-//      ASolvTest.print_dAidtheta( n, m, 5);
-//      ASolvTest.print_dAidphi( n, m, 5);
-    }
-  }
+  ASolvTest.solve_gradA(1E-16);
 
   int ct = 0;
-  for ( int n = 0; n < 5; n++ )
+  for ( int n = 0; n < 3; n++ )
   {
-    for ( int m = 0; m <= n; m++ )
+    //for ( int m = 0; m <= n; m++ )
+    for ( int m = 0; m < 3; m++ )
     {
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).real(), A0[ct],    preclim);
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).imag(), A0_im[ct], preclim);
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).real(), A1[ct],    preclim);
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).imag(), A1_im[ct], preclim);
+      ASolvTest.print_dAidx(n, m, 4);
+      ASolvTest.print_dAidy(n, m, 4);
+      ASolvTest.print_dAidz(n, m, 4);
+//      if (dA00[ct] != 0)
+//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 0, n, m).real()/dA00[ct],
+//                     1.0, preclim);
+//      if (dA01im[ct] != 0)
+//        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).imag()/dA01im[ct],
+//                     1.0, preclim);
+//      if (dA11[ct] != 0)
+//        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 1, n, m).real()/dA11[ct],
+//                     1.0, preclim);
+//      if (dA10im[ct] != 0)
+//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 0, n, m).imag()/dA10im[ct],
+//                     1.0, preclim);
       ct++;
     }
   }
@@ -363,63 +371,5 @@ TEST_F(ASolverUTest, checkgradA)
 //  }
 //}
 
-//TEST_F(ASolverUTest, checkgradAfinal)
-//{
-//  const int vals           = nvals;
-//  int nmol                 = 2;
-//  BesselConstants bConsta  = BesselConstants( 2*vals );
-//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-//  System sys               = System( const_, mol_ );
-//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-//                                      sys.get_lambda(), nvals);
-//
-//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-//  ASolvTest.solve_A(1E-20);
-//
-//  int ct = 0;
-//  for ( int n = 0; n < 5; n++ )
-//  {
-//    for ( int m = 0; m <= n; m++ )
-//    {
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).real(), A0[ct],    preclim);
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).imag(), A0_im[ct], preclim);
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).real(), A1[ct],    preclim);
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).imag(), A1_im[ct], preclim);
-//      ct++;
-//    }
-//  }
-//}
-//
-//TEST_F(ASolverUTest, checkgradASingfinal)
-//{
-//  const int vals           = nvals;
-//  int nmol                 = 2;
-//  BesselConstants bConsta  = BesselConstants( 2*vals );
-//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-//  System sys               = System( const_, mol_sing_ );
-//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-//                                      sys.get_lambda(), nvals);
-//
-//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-//  ASolvTest.solve_A(1E-7);
-//
-//  int ct = 0;
-//
-//  for ( int n = 0; n < 5; n++ )
-//  {
-//    for ( int m = 0; m <= n; m++ )
-//    {
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).real(), A0Sing[ct], preclim);
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 0, n, m).imag(),        0.0, preclim);
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).real(), A1Sing[ct], preclim);
-//      EXPECT_NEAR( ASolvTest.get_A_ni( 1, n, m).imag(),        0.0, preclim);
-//      ct++;
-//    }
-//  }
-//}
 
 #endif

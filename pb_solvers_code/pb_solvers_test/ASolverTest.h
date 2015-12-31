@@ -47,7 +47,7 @@ public :
     
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
     ASolvTest.solve_A( 1E-4 );
-    //ASolvTest.solve_gradA(1E-2);
+    ASolvTest.solve_gradA(1E-12);
   }
   
 };

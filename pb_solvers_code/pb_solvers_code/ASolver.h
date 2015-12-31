@@ -32,18 +32,23 @@ protected:
   VecOfMats<cmplx>::type      prevA_;  // previous value for
                                        // calculating convergence criteria
   
-  bool solvedA_;
-  
   /*
    Gradient of A. Each (i, j) entry in the outer vector is grad_j(A^(i))
    The inner vectors are all of length three and represent dA/dr, dA/dtheta
    and dA/dphi, respectively. This can only be calculated once A has been
    solved for
    */
+  MyMatrix<VecOfMats<cmplx>::type > gradT_A_;
   MyMatrix<VecOfMats<cmplx>::type > gradA_;
   MyMatrix<VecOfMats<cmplx>::type > prevGradA_;
   
+  /*
+   enum for telling the ReExpCoeffs which values to retrieve
+   in the below methods
+   */
+  enum WhichReEx { BASE, DDR, DDPHI, DDTHETA };
   
+  bool                  solvedA_;  // Boolean of whether or not A is solved
   int                         N_;  // number of molecules
   int                         p_;  // max value for n (2*numVals_ usually)
   double                  a_avg_;  // the average radius of particles in syst
@@ -96,17 +101,9 @@ protected:
   // inialize grad(A) matrix to the zero matrix
   void init_gradA();
   
-  /*
-   enum for telling the ReExpCoeffs which values to retrieve 
-   in the below methods
-   */
-  enum WhichReEx { BASE, DDR, DDPHI, DDTHETA };
-  
   // re-expand element j of A with element (i, j) of T and return results
   // if prev=True then re-expand prevA
   MyMatrix<cmplx> re_expandA(int i, int j, bool prev=false);
-  
-  
   
   // re-expand element j of grad(A) with element (i, j) of T
   VecOfMats<cmplx>::type re_expand_gradA(int i,int j,int wrt,bool prev=false);
@@ -129,6 +126,9 @@ protected:
   // perform third part of T*A and return results (see eq 46 in Lotan 2006)
   MyMatrix<cmplx> expand_RHX(int i, int j, MyMatrix<cmplx> x2,
                              WhichReEx whichRH);
+  
+  // precompute gradT times A(i,j) for all pairs of molecules
+  void pre_compute_gradT_A();
   
   // convenience method for retrieving values from A and gradA (or their
   // previous values
@@ -165,49 +165,49 @@ public:
   cmplx get_A_ni(int i, int n, int m)      { return A_[ i ]( n, m+p_ ); }
   cmplx get_prevA_ni(int i, int n, int m)  { return prevA_[ i ]( n, m+p_ ); }
   
+  VecOfMats<cmplx>::type get_gradT_Aij( int i, int j) {return gradT_A_(i,j);}
+  
   // convert derivs in matrix to cartesian
   VecOfMats<cmplx>::type conv_to_cart(VecOfMats<cmplx>::type dZ, int i, int j);
   
   // get elements of grad_j(A^(i))
   cmplx get_dAdr_ni(int i, int j, int n, int m)
-  {
-    return gradA_(i, j)[0](n, m+p_);
-  }
+  { return gradA_(i, j)[0](n, m+p_);}
   cmplx get_dAdtheta_ni(int i, int j, int n, int m)
-  {
-    return gradA_(i, j)[1](n, m+p_);
-  }
+  { return gradA_(i, j)[1](n, m+p_);}
   cmplx get_dAdphi_ni(int i, int j, int n, int m)
-  {
-    return gradA_(i, j)[2](n, m+p_);
-  }
+  { return gradA_(i, j)[2](n, m+p_);}
   
   cmplx get_prev_dAdr_ni(int i, int j, int n, int m)
-  {
-    return prevGradA_(i, j)[0](n, m+p_);
-  }
+  { return prevGradA_(i, j)[0](n, m+p_);}
   cmplx get_prev_dAdtheta_ni(int i, int j, int n, int m)
-  {
-    return prevGradA_(i, j)[1](n, m+p_);
-  }
+  { return prevGradA_(i, j)[1](n, m+p_);}
   cmplx get_prev_dAdphi_ni(int i, int j, int n, int m)
-  {
-    return prevGradA_(i, j)[2](n, m+p_);
-  }
+  { return prevGradA_(i, j)[2](n, m+p_);}
+  
+  // get elements of grad_j(A^(i))
+  cmplx get_dAdx_ni(int i, int j, int n, int m)
+  { return gradA_(i, j)[0](n, m+p_);}
+  cmplx get_dAdy_ni(int i, int j, int n, int m)
+  { return gradA_(i, j)[1](n, m+p_);}
+  cmplx get_dAdz_ni(int i, int j, int n, int m)
+  { return gradA_(i, j)[2](n, m+p_);}
+  
+  cmplx get_prev_dAdx_ni(int i, int j, int n, int m)
+  { return prevGradA_(i, j)[0](n, m+p_);}
+  cmplx get_prev_dAdy_ni(int i, int j, int n, int m)
+  { return prevGradA_(i, j)[1](n, m+p_);}
+  cmplx get_prev_dAdz_ni(int i, int j, int n, int m)
+  { return prevGradA_(i, j)[2](n, m+p_);}
   
   void set_A_ni(int i, int n, int m, cmplx val)
-  {
-    (&A_[i])->set_val( n, m+p_, val);
-  }
+  { (&A_[i])->set_val( n, m+p_, val);}
   
   ASolver(const int N, const int p, BesselCalc bcalc,
           SHCalc shCalc, System sys);
 
   void print_Ei( int i, int p);
   void print_Ai( int i, int p);
-  void print_dAidr( int i, int j, int p);
-  void print_dAidtheta( int i, int j, int p);
-  void print_dAidphi( int i, int j, int p);
   void print_dAidx( int i, int j, int p);
   void print_dAidy( int i, int j, int p);
   void print_dAidz( int i, int j, int p);
