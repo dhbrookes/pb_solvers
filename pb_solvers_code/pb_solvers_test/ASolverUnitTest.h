@@ -114,6 +114,26 @@ protected :
   double dA10im[15] = {0,0,-1.44387654e-05,0,3.28980681e-06,-1.10667758e-06,0,
     -4.39392408e-07,1.06332252e-07,9.822109e-08,0,4.54976027e-08,-3.4394996e-09,
     -1.4438813e-08,-3.54879966e-09};
+  
+  double dATrip02[15] = {2.5859665e-05,0.000620232366,0.000285436615,
+    0.000236529621,8.34048199e-05,-4.91547478e-05,6.02966515e-05,1.00209838e-05,
+    -1.8599944e-05,2.4739817e-06,1.2321061e-05,-5.74248967e-07,-4.85496063e-06,
+    1.14977575e-06,9.95493175e-08};
+  
+  double dATrip11im[15] = {1.26068667e-07,1.77759087e-06,-0.0183902725,
+    3.50966837e-06,0.00404630668,0.031857372,-4.92548117e-06,0.00782664265,
+    -0.00183388625,-0.0429967544,5.87124061e-06,0.000568727219,-0.018891895,
+    -7.10651767e-05,0.051565011};
+  
+  double dATrip21[15] = {1.11111691e-06,2.36981299e-05,-2.85249661e-05,
+    -2.31735024e-06,2.95909727e-06,2.85184934e-06,-1.8419939e-07,4.31283004e-08,
+    1.5601647e-07,3.89577124e-08,4.5967117e-09,-1.62540654e-08,-3.85136191e-09,
+    1.48585811e-08,4.41682557e-09};
+  
+  double dATrip10im[15] = {-3.62501039e-08,-3.17816832e-07,-0.000808271535,
+    -1.97785916e-07,0.00276094976,-0.000692074481,3.07878903e-06,-0.00162795109,
+    0.00110762117,0.000646125447,-2.84638226e-06,0.00264295314,0.000193963401,
+    -0.000577338053,-0.000156288848};
 
 } ; // end ASolverUTest
 
@@ -289,17 +309,10 @@ TEST_F(ASolverUTest, checkASing)
 
 TEST_F(ASolverUTest, checkgradA)
 {
-  mol_.clear( ); double cg[3] = { 2.0,  2.0, 2.0};
-  Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
-  
-  for (int molInd = 0; molInd < 3; molInd ++ )
-  {
-    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
-    charges[0]    = cg[molInd]; posCharges[0] = pos[molInd];
-    
-    Molecule molNew( M, cg[molInd], charges, posCharges, pos[molInd]);
-    mol_.push_back( molNew );
-  }
+  vector<double> charges(1); vector<Pt> posCharges(1);
+  charges[0] = 2.0; posCharges[0] = Pt(-10.0, 7.8, 25.0);
+  Molecule molNew( 1, 2.0, charges, posCharges, posCharges[0]);
+  mol_.push_back( molNew );
   
   const int vals           = nvals;
   int nmol                 = 3;
@@ -312,30 +325,25 @@ TEST_F(ASolverUTest, checkgradA)
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-20);
-  ASolvTest.solve_gradA(1E-16);
+  ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-16);
 
   int ct = 0;
   for ( int n = 0; n < 3; n++ )
   {
-    //for ( int m = 0; m <= n; m++ )
-    for ( int m = 0; m < 3; m++ )
+    for ( int m = 0; m <= n; m++ )
     {
-      ASolvTest.print_dAidx(n, m, 4);
-      ASolvTest.print_dAidy(n, m, 4);
-      ASolvTest.print_dAidz(n, m, 4);
-//      if (dA00[ct] != 0)
-//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 0, n, m).real()/dA00[ct],
-//                     1.0, preclim);
-//      if (dA01im[ct] != 0)
-//        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).imag()/dA01im[ct],
-//                     1.0, preclim);
-//      if (dA11[ct] != 0)
-//        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 1, n, m).real()/dA11[ct],
-//                     1.0, preclim);
-//      if (dA10im[ct] != 0)
-//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 0, n, m).imag()/dA10im[ct],
-//                     1.0, preclim);
+      if (dATrip02[ct] != 0)
+        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 2, n, m).real()/dATrip02[ct],
+                     1.0, preclim);
+      if (dATrip11im[ct] != 0)
+        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 1, n, m).imag()/dATrip11im[ct],
+                     1.0, preclim);
+      if (dATrip21[ct] != 0)
+        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 1, n, m).real()/dATrip21[ct],
+                     1.0, preclim);
+      if (dATrip10im[ct] != 0)
+        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 0, n, m).imag()/dATrip10im[ct],
+                     1.0, preclim);
       ct++;
     }
   }

@@ -900,6 +900,7 @@ void ASolver::print_dAidy( int i, int j, int p)
       r  = fabs( r) > 1e-9 ?  r : 0;
       im = fabs(im) > 1e-9 ? im : 0;
       cout << "(" << setprecision (9) << r << "," << im << ")  ";
+
     }
     cout << endl;
   }
