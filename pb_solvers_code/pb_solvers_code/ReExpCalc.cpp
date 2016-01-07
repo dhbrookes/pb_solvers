@@ -7,6 +7,7 @@
 //
 
 #include "ReExpCalc.h"
+#include <iostream>
 
 ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
                                            double lambda, int p)
@@ -67,7 +68,6 @@ void ReExpCoeffsConstants::calc_alpha_and_beta()
   }
 }
 
-
 void ReExpCoeffsConstants::calc_nu_and_mu()
 {
   int m, n, sign;
@@ -120,10 +120,71 @@ kappa_(kappa), lambda_(lambda), grad_(grad)
   if (grad_)
   {
     if (!rSing_)  calc_dr_dtheta();
+    else          calc_dR_pre();
     calc_ds_dr();
   }
 }
 
+void ReExpCoeffs::calc_dR_pre()
+{
+  int m,n;
+  MyVector<double> specialSH (2*p_);
+  specialSH = calc_SH_spec(1.0);
+  prefacSing_ = MyVector<MyMatrix<double> > (2*p_);
+  prefacSing_.set_val(0, MyMatrix<double> (p_, 2));
+  
+  for (n = 1; n < 2*p_-1; n++)
+  {
+    prefacSing_.set_val(n, MyMatrix<double> (p_, 2));
+    prefacSing_[n](0, 0) = 0.0; prefacSing_[n](0, 1) = specialSH[n];
+  }
+  
+  for (n = 2; n < 2*p_-1; n++)
+  {
+    set_prefac_dR_val(n-1, 1, 0,(_consts_->get_b_val(n,-1)*prefacSing_[n](0,1)+
+                      _consts_->get_a_val(n-1,0))/_consts_->get_b_val(n,0));
+    if (n > 2)
+      set_prefac_dR_val(n-1,1,1,(_consts_->get_b_val(n,1)/
+                               _consts_->get_b_val(n,0))*prefacSing_[n](0,1));
+    else
+      set_prefac_dR_val(n-1, 1, 1, 0.0);
+  }
+  
+  for (m = 1; m < p_-1; m++)
+    for (n = m+2; n < 2*p_-m-1; n++)
+    {
+      set_prefac_dR_val(n-1,m+1,0, (_consts_->get_b_val(n,m-1)
+                         *prefacSing_[n](m,0) + _consts_->get_a_val(n-1,m))/
+                         _consts_->get_b_val(n,m));
+      if (n > m+2)
+        set_prefac_dR_val(n-1,m+1,1, (_consts_->get_b_val(n,m+1)/
+                                _consts_->get_b_val(n,m))*prefacSing_[n](m,1));
+      else
+        set_prefac_dR_val(n-1, m+1, 1, 0.0);
+    }
+}
+
+MyVector<double> ReExpCoeffs::calc_SH_spec( double val )
+{
+  int i, l;
+  MyVector<double> SH (2*p_);
+  MyVector<double> fact_const (4*p_);
+  
+  fact_const[0] = 1.0;
+  for (i = 1; i < 4*p_; i++)
+    fact_const[i] = fact_const[i-1]*sqrt((double) i);
+  
+  SH[0] = 0.0; SH[1] = -1.0; SH[2] = -val * 3.0;
+  
+  for (l = 3 ; l < 2*p_; l++)
+    SH[l] = (val*(2*l-1)*SH[l-1] - l*SH[l-2])/(l-1);
+  
+  // This part converts the legendre polynomial to a spherical harmonic.
+  for (l = 1; l < 2*p_; l++)
+    SH[l] *= (-fact_const[l-1]/fact_const[l+1]);
+  
+  return SH;
+}
 
 void ReExpCoeffs::calc_r()
 {
@@ -241,7 +302,6 @@ void ReExpCoeffs::calc_s()
     }
   }
   
-  
   for (n = 1; n < p_ ; n++)
   {
     for (l = 0; l < p_; l++)
@@ -252,8 +312,7 @@ void ReExpCoeffs::calc_s()
       }
     }
   }
-  
-  
+
 } // end calc_s
 
 
@@ -304,7 +363,7 @@ void ReExpCoeffs::calc_dr_dtheta()
       }
     }
   }
-}
+} // calc_dr_dtheta
 
 /*
  Same procedure as for calculating s with different first step
@@ -374,28 +433,16 @@ void ReExpCoeffs::calc_ds_dr()
   
   // Filling in the rest !
   for (n = 1; n < p_ ; n++)
-  {
     for (l = 0; l < p_; l++)
-    {
       for (m = -n; m <= n; m++)
-      {
         if (n > l) set_dsdr_val(n, l, m, pow(-1.0, n) * get_dsdr_val(l, n, m));
-      }
-    }
-  }
-  
   
   for (n = 1; n < p_ ; n++)
-  {
     for (l = 0; l < p_; l++)
-    {
       for (m = -n; m <= n; m++)
-      {
         if ( m  < 0 ) set_dsdr_val(n, l, m, get_dsdr_val( l, n, -m));
-      }
-    }
-  }
-}
+
+} // calc_ds_dr
 
 void ReExpCoeffs::print_R()
 {
@@ -501,3 +548,4 @@ void ReExpCoeffs::print_dSdr()
   }
   cout << endl;
 }
+

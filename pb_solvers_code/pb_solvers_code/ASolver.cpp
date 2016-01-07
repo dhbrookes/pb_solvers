@@ -319,6 +319,9 @@ VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
   VecOfMats<cmplx>::type Z (3); // output vector
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE, whichA=BASE;
   
+  int lowI = i; int hiJ = j;
+  if ( i > j ) { lowI = j; hiJ  = i; }
+  
   // first find with respect to dT/dr:
   whichS = DDR;
   x1 = expand_RX( i, j, whichR, whichA, prev);
@@ -333,11 +336,12 @@ VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
   x1 = expand_RX(  i, j, whichR, whichA, prev);
   x2 = expand_SX(  i, j, x1, whichS);
   z1 = expand_RHX( i, j, x2, whichRH);
-  
+
   whichRH = BASE;
   whichR = DDTHETA;
   x1 = expand_RX(  i, j, whichR, whichA, prev);
-  x2 = expand_SX(  j, i, x1, whichS);
+  x2 = (T_(lowI,hiJ).isSingular() ?
+        expand_SX(i, j, x1, whichS) : expand_SX(j, i, x1, whichS));
   z2 = expand_RHX( i, j, x2, whichRH);
   Z.set_val(1, z1 + z2);
   
@@ -351,9 +355,9 @@ VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
   whichRH = BASE;
   whichR = DDPHI;
   x1 = expand_RX(  i, j, whichR, whichA, prev);
-  x2 = expand_SX(  j, i, x1, whichS);
+  x2 = (T_(lowI,hiJ).isSingular() ?
+        expand_SX(i, j, x1, whichS) : expand_SX(j, i, x1, whichS));
   z2 = expand_RHX( i, j, x2, whichRH);
-  
   Z.set_val(2, z1 + z2);
   
   Z = conv_to_cart(Z, i, j);
@@ -369,11 +373,7 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
   cmplx inter, rval, aval;
   
   lowI = i; hiJ = j;
-  if ( i > j )
-  {
-    lowI = j;
-    hiJ  = i;
-  }
+  if ( i > j ) { lowI = j; hiJ  = i; }
 
   // fill X1:
   for (n = 0; n < p_; n++)
@@ -384,12 +384,16 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
       if (T_(lowI,hiJ).isSingular())
       {
         Pt vec = T_(lowI, hiJ).get_TVec();
-        aval = which_aval(whichA, prev, j, n, -m, wrt);
-
-        if (vec.theta() > M_PI/2.0)
-          inter = (n % 2 == 0 ? aval : -aval);
-        else
-          inter = aval;
+        if (whichR == BASE)
+        {
+          aval = which_aval(whichA, prev, j, n, -m, wrt);
+          if (vec.theta() > M_PI/2.0)
+            x1.set_val(n, m+p_, (n%2 == 0 ? aval : -aval));
+          else x1.set_val(n, m+p_, aval);
+        } else if (whichR == DDTHETA)
+            x1 = expand_dRdtheta_sing(i, j, vec.theta(), false);
+          else
+            x1 = expand_dRdphi_sing(i, j, vec.theta(), false);
       } else
       {
         for (s = -n; s <= n; s++)
@@ -404,8 +408,8 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
           aval = which_aval(whichA, prev, j, n, s, wrt);
           inter += rval * aval;
         } // end s
+        x1.set_val(n, m+p_, inter);
       }
-      x1.set_val(n, m+p_, inter);
     } // end m
   } //end n
   return x1;
@@ -420,11 +424,7 @@ MyMatrix<cmplx> ASolver::expand_SX(int i, int j, MyMatrix<cmplx> x1,
   MyMatrix<cmplx> x2(p_, 2*p_ + 1);
   
   lowI = i; hiJ = j;
-  if ( i > j )
-  {
-    lowI = j;
-    hiJ  = i;
-  }
+  if ( i > j )  { lowI = j; hiJ  = i; }
 
   // fill x2:
   for (n = 0; n < p_; n++)
@@ -457,16 +457,11 @@ MyMatrix<cmplx> ASolver::expand_RHX(int i, int j, MyMatrix<cmplx> x2,
                                     WhichReEx whichRH)
 {
   int n, m, s, lowI, hiJ;
-  cmplx inter;
+  cmplx inter, rval;
   MyMatrix<cmplx> z(p_, 2*p_ + 1);
-  cmplx rval;
   
   lowI = i; hiJ = j;
-  if ( i > j )
-  {
-    lowI = j;
-    hiJ  = i;
-  }
+  if ( i > j )  { lowI = j; hiJ  = i; }
 
   //fill zj:
   for (n = 0; n < p_; n++)
@@ -474,21 +469,132 @@ MyMatrix<cmplx> ASolver::expand_RHX(int i, int j, MyMatrix<cmplx> x2,
     for (m = -n; m <= n; m++)
     {
       inter  = 0;
-      for (s = -n; s <= n; s++)
+      if (T_(lowI,hiJ).isSingular())
       {
-        if (whichRH == DDPHI)
-          rval = T_(lowI, hiJ).get_dr_dphi_val(n, s, m);
-        else if (whichRH == DDTHETA)
-          rval = T_(lowI, hiJ).get_dr_dtheta_val(n, s, m);
+        Pt vec = T_(lowI, hiJ).get_TVec();
+        if (whichRH == BASE)
+        {
+          if (vec.theta() > M_PI/2.0)
+            z.set_val(n, m+p_, (n%2 == 0 ? x2(n,m+p_) : -x2(n,m+p_)));
+          else z.set_val(n, m+p_, x2(n,m+p_));
+        } else if (whichRH == DDTHETA)
+          z = expand_dRdtheta_sing(lowI, hiJ, vec.theta(), x2, true);
         else
-          rval = T_(lowI, hiJ).get_rval(n, s, m);
-        inter += conj(rval) * x2(n, s+p_);
-      } // end s
-      z.set_val(n, m+p_, inter);
+          z = expand_dRdphi_sing(lowI, hiJ, vec.theta(), x2, true);
+      } else
+      {
+        for (s = -n; s <= n; s++)
+        {
+          if (whichRH == DDPHI)
+            rval = T_(lowI, hiJ).get_dr_dphi_val(n, s, m);
+          else if (whichRH == DDTHETA)
+            rval = T_(lowI, hiJ).get_dr_dtheta_val(n, s, m);
+          else
+            rval = T_(lowI, hiJ).get_rval(n, s, m);
+          inter += conj(rval) * x2(n, s+p_);
+        } // end s
+        z.set_val(n, m+p_, inter);
+      }
     } // end m
   } //end n
-
   return z;
+}
+
+MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i,int j,double theta,bool ham)
+{
+  int lowI, hiJ;
+  lowI = i; hiJ = j;
+  if ( i > j )  { lowI = j; hiJ  = i; }
+  return expand_dRdtheta_sing(lowI, hiJ, theta, prevA_[j], ham);
+}
+
+MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i, int j, double theta,
+                                              MyMatrix<cmplx> mat, bool ham)
+{
+  MyMatrix<cmplx> x(p_, 2*p_ + 1);
+  x.set_val( 0, p_, cmplx(0.0,0.0));
+  double recip = (ham ? -1.0 : 1.0);
+  
+  if (theta < M_PI/2)
+  {
+    for (int n = 1; n < p_; n++)
+    {
+      x.set_val( n, p_, recip*cmplx(2.0*T_(i,j).get_prefac_dR_val(n,0,1)*
+                              mat(n, 1+p_).real(), 0.0));
+      for (int m = 1; m < n; m++)
+        x.set_val( n, m+p_, recip*T_(i,j).get_prefac_dR_val(n,m,0)*mat(n,m-1+p_)
+                   + recip*T_(i,j).get_prefac_dR_val(n,m,1)*mat(n,m+1+p_));
+        
+      x.set_val(n, n+p_,
+                recip*T_(i,j).get_prefac_dR_val( n, n, 0)*mat(n,n-1+p_));
+    }
+  }
+  else
+  {
+    double s = -1.0;
+    for (int n = 1; n < p_; n++, s = -s)
+    {
+      x.set_val( n, p_, recip*cmplx(2.0*s*T_(i,j).get_prefac_dR_val(n,0,1)*
+                              mat(n,1+p_).real(), 0.0));
+      for (int m = 1; m < n; m++)
+        x.set_val( n, m+p_, recip*s*
+                  (T_(i,j).get_prefac_dR_val(n,m,0)*mat(n,-m+1+p_)
+                   + T_(i,j).get_prefac_dR_val(n,m,1)*mat(n,-m-1+p_)));
+        
+      x.set_val(n,n+p_,recip*s*T_(i,j).get_prefac_dR_val(n,n,0)*mat(n,-n+1+p_));
+    }
+  }
+
+  return x;
+}
+
+MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i,int j,double theta,bool ham)
+{
+  int lowI, hiJ;
+  lowI = i; hiJ = j;
+  if ( i > j )  { lowI = j; hiJ  = i; }
+  return expand_dRdphi_sing(lowI, hiJ, theta, prevA_[j], ham);
+}
+
+MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i, int j, double theta,
+                                            MyMatrix<cmplx> mat, bool ham)
+{
+  MyMatrix<cmplx> x(p_, 2*p_ + 1);
+  x.set_val( 0, p_, cmplx(0.0,0.0));
+  double recip = (ham ? -1.0 : 1.0);
+  
+  if (theta < M_PI/2)
+  {
+    for (int n = 1; n < p_; n++)
+    {
+      x.set_val( n, p_, recip*cmplx(2.0*T_(i,j).get_prefac_dR_val(n,0,1)*
+                             mat(n, 1+p_).imag(),0.0));
+      for (int m = 1; m < n; m++)
+        x.set_val(n, m+p_,
+            recip*(cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,0))*mat(n,m-1+p_)
+                + cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat(n,m+1+p_)));
+
+      x.set_val( n, n+p_,
+            recip*cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,n,0))*mat(n,n-1+p_));
+    }
+  }
+  else
+  {
+    double s = -1.0;
+    for (int n = 1; n < p_; n++, s = -s)
+    {
+      x.set_val(n, p_, recip*cmplx(2.0*s*T_(i,j).get_prefac_dR_val(n,0,1)*
+                             mat(n,1+p_).imag(),0.0));
+      for (int m = 1; m < n; m++)
+        x.set_val(n, m+p_,
+            recip*s*(-cmplx(0.0,T_(i,j).get_prefac_dR_val(n,m,0))*mat(n,-m+1+p_)
+            + cmplx(0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat(n,-m-1+p_)));
+
+      x.set_val(n, n+p_, recip*cmplx(0.0,
+                          -s*T_(i,j).get_prefac_dR_val(n,n,0))*mat(n,-n+1+p_));
+    }
+  }
+  return x;
 }
 
 /*
@@ -786,39 +892,39 @@ VecOfMats<cmplx>::type ASolver::calc_L()
 VecOfMats<cmplx>::type ASolver::conv_to_cart( VecOfMats<cmplx>::type dZ,
                                                int i, int j )
 {
-  int m, n, lowI, hiJ;
+  int m, n; int lowI = i; int hiJ = j;
   double the, r, phi;
-  VecOfMats<cmplx>::type Zcart (3);
-  
-  lowI = i; hiJ = j;
-  if ( i > j )
-  {
-    lowI = j;
-    hiJ  = i;
-  }
+  VecOfMats<cmplx>::type Zcart (3); vector<double> con1(3), con2(3), con3(3);
+
+  if ( i > j ) { lowI = j; hiJ  = i; }
   
   Pt v = T_(lowI, hiJ).get_TVec();
   the = v.theta(); r = v.r(); phi = v.phi();
 
+  if (T_(lowI, hiJ).isSingular())
+  {
+    con1 = {0.0,cos(the)/r, 0.0}; con2 = {0.0,0.0, 1.0/r};
+    con3 = {cos(the),0.0, 0.0};
+  }else
+  {
+    con1 = {sin(the)*cos(phi),  cos(the)*cos(phi)/r, -sin(phi)/sin(the)/r};
+    con2 = {sin(the)*sin(phi),  cos(the)*sin(phi)/r,  cos(phi)/sin(the)/r};
+    con3 = {         cos(the), -sin(the)/r,           0.0};
+  }
+  
   for (n = 0; n < 3; n++)
     Zcart[n] = MyMatrix<cmplx> (p_, 2*p_ + 1);
   
   for ( n = 0; n < p_; n++ )
-  {
     for ( m = -n; m <= n; m++ )
     {
-      (&Zcart[0])->set_val( n, m+p_, sin(the)*cos(phi)*dZ[0](n, m+p_)
-                        + (cos(the)*cos(phi)/r)*dZ[1](n, m+p_)
-                        - (sin(phi)/sin(the)/r)*dZ[2](n, m+p_));
-      
-      (&Zcart[1])->set_val( n, m+p_, sin(the)*sin(phi)*dZ[0](n, m+p_)
-                        + (cos(the)*sin(phi)/r)*dZ[1](n, m+p_)
-                        + (cos(phi)/sin(the)/r)*dZ[2](n, m+p_));
-      
-      (&Zcart[2])->set_val( n, m+p_, cos(the)*dZ[0](n, m+p_)
-                           - (sin(the)/r)*dZ[1](n, m+p_));
+      (&Zcart[0])->set_val( n, m+p_, con1[0]*dZ[0](n, m+p_)
+                        + con1[1]*dZ[1](n, m+p_)+con1[2]*dZ[2](n, m+p_));
+      (&Zcart[1])->set_val( n, m+p_, con2[0]*dZ[0](n, m+p_)
+                           + con2[1]*dZ[1](n, m+p_)+con2[2]*dZ[2](n, m+p_));
+      (&Zcart[2])->set_val( n, m+p_, con3[0]*dZ[0](n, m+p_)
+                           + con3[1]*dZ[1](n, m+p_)+con3[2]*dZ[2](n, m+p_));
     }
-  }
   return Zcart;
 }
 
@@ -900,7 +1006,6 @@ void ASolver::print_dAidy( int i, int j, int p)
       r  = fabs( r) > 1e-9 ?  r : 0;
       im = fabs(im) > 1e-9 ? im : 0;
       cout << "(" << setprecision (9) << r << "," << im << ")  ";
-
     }
     cout << endl;
   }
@@ -923,7 +1028,7 @@ void ASolver::print_dAidz( int i, int j, int p)
       im = fabs(im) > 1e-9 ? im : 0;
       cout << "(" << setprecision (9) << r << "," << im << ")  ";
     }
-    cout << endl;
+        cout << endl;
   }
   cout << endl;
 }

@@ -118,6 +118,16 @@ protected:
   // prevA (or prevGradA_)
   MyMatrix<cmplx> expand_RX(int i, int j, WhichReEx whichR,
                             WhichReEx whichA, bool prev, int wrt=-1);
+  
+  // perform first part of T*A and return results for singular A wrt THETA
+  MyMatrix<cmplx> expand_dRdtheta_sing(int i, int j, double theta,
+                                       MyMatrix<cmplx> mat, bool ham);
+  MyMatrix<cmplx> expand_dRdtheta_sing(int i, int j, double theta, bool ham);
+  
+  // perform first part of T*A and return results for singular A wrt PHI
+  MyMatrix<cmplx> expand_dRdphi_sing(int i, int j, double theta,
+                                     MyMatrix<cmplx> mat, bool ham);
+  MyMatrix<cmplx> expand_dRdphi_sing(int i, int j, double theta, bool ham);
 
   // perform second part of T*A and return results (see eq 46 in Lotan 2006)
   MyMatrix<cmplx> expand_SX(int i, int j, MyMatrix<cmplx> x1,
