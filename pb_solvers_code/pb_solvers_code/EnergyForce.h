@@ -26,27 +26,63 @@ class EnergyCalc
 protected:
   shared_ptr<VecOfMats<cmplx>::type> _A_;
   shared_ptr<VecOfMats<cmplx>::type> _L_;
-  
   double epsS_;  // solvent dielectric constant
   int N_;  // number of molecules
   int p_;  // max number of poles
+  Constants const_;
   
-  MyVector<cmplx> omega_;  // result of energy calculation
+  /*
+   Enum for the units of energy
+   */
+  enum WhichUnit { INTER, KCALMOL, KT, JMOL };
+  
+  MyVector<double> omega_;  // result of energy calculation, internal units
   
 public:
-  
   EnergyCalc(VecOfMats<cmplx>::type A, VecOfMats<cmplx>::type L,
-             double epsS, int N, int p);
+             Constants const_, int N, int p);
   
   // fill omega_
   void calc_energy();
   
   // get the energy for a specific molecule:
-  cmplx get_omega_i(int i)  { return omega_[i]; }
+  double get_omega_i_int(int i)  { return omega_[i]; }
   // get all energy:
-  MyVector<cmplx> get_omega() { return omega_; }
+  MyVector<double> get_omega_int() { return omega_; }
+  
+  // energy in kCal/mol:
+  double get_omega_i_kcal(int i)
+  { return const_.convert_int_to_kcal_mol(omega_[i]); }
+  MyVector<double> get_omega_kcal()
+  {
+    MyVector<double> omeg(N_);
+    for (int n = 0; n < N_; n++)
+      omeg[n] = const_.convert_int_to_kcal_mol(omega_[n]);
+    return omeg;
+  }
+  
+  // energy in kT:
+  double get_omega_i_kT(int i)
+  { return const_.convert_int_to_kT(omega_[i]); }
+  MyVector<double> get_omega_kT()
+  {
+    MyVector<double> omeg(N_);
+    for (int n = 0; n < N_; n++)
+      omeg[n] = const_.convert_int_to_kT(omega_[n]);
+    return omeg;
+  }
+  
+  // energy in joules/mol:
+  double get_omega_i_jmol(int i)
+  { return const_.convert_int_to_jmol(omega_[i]); }
+  MyVector<double> get_omega_jmol()
+  {
+    MyVector<double> omeg(N_);
+    for (int n = 0; n < N_; n++)
+      omeg[n] = const_.convert_int_to_jmol(omega_[n]);
+    return omeg;
+  }
 };
-
 
 /*
  Class for calculating the forces on molecules in the system given
@@ -64,13 +100,14 @@ protected:
   double epsS_;
   int N_;
   int p_;
+  Constants const_;
   
   VecOfVecs<cmplx>::type F_;
   
 public:
   ForceCalc(VecOfMats<cmplx>::type A, MyMatrix<VecOfMats<cmplx>::type > gradA_,
             VecOfMats<cmplx>::type L, MyVector<VecOfMats<cmplx>::type > gradL_,
-            double epsS, int N, int p);
+            Constants con, int N, int p);
   
   void calc_force();  // fill F_
   

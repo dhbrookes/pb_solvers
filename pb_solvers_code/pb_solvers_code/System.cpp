@@ -14,12 +14,12 @@ Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos, Pt cen)
   // repositioning the charges WRT center of charge
   for (int i = 0; i < M_; i++)
   {
-    pos_[i] = pos_[i] - center_;
     // check that the charge is encompassed by the the center and radius:
     if (pos_[i].dist(center_) > a_)
     {
       throw BadCenterException(center_, a_);
     }
+    pos_[i] = pos_[i] - center_;
   }
 }
 

@@ -145,7 +145,6 @@ public:
   const string get_path() const     { return path_; }
   const int get_nmols() const       { return nmols_; }
   const vector<Pt> get_pts() const  { return pts_; }
-  
 };
 
 

@@ -157,9 +157,9 @@ public:
   double dist(Point<T>& other)
   {
     convert_to_euclidean();
-    double d = pow(p1_ - other.x(), 2);
-    d += pow(p2_ - other.y(), 2);
-    d += pow(p3_ - other.z(), 2);
+    double d = pow(this->x() - other.x(), 2);
+    d += pow(this->y() - other.y(), 2);
+    d += pow(this->z() - other.z(), 2);
     d = sqrt(d);
     return d;
   }

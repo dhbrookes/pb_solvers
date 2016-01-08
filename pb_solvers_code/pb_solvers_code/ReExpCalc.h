@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -149,8 +150,9 @@ protected:
   
   Pt v_; //computing re-expansion along this vector
   
+  bool grad_;
   bool rSing_;
-  
+
   /*
    Bessel function for this v_. If the bessel function be k_n ( z ) then
    this value should be for n = 2*p_ and z = kappa*r
@@ -162,18 +164,25 @@ protected:
    */
   MyMatrix<cmplx> Ytp_;
   
+  VecOfMats<double>::type prefacSing_; // for singular case
+  
   void calc_r();  // calculate all the values for R_
   void calc_s(); // calculate all the values for S_
   void calc_dr_dtheta();
   void calc_ds_dr();
 
+  void calc_dR_pre(); // compute prefactors for singularities
+  
 public:
   ReExpCoeffs() { };
+  
   ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
-                 ReExpCoeffsConstants consts, double kappa, double lambda);
+              ReExpCoeffsConstants consts, double kappa,
+              double lambda, bool grad = false);
   
-  bool isSingular()  { return rSing_; }
+  MyVector<double> calc_SH_spec( double val ); // for singularities
   
+  bool isSingular()  { return rSing_; }  
   Pt get_TVec()       { return v_; }
   
   cmplx get_yval(int n, int s)
@@ -216,8 +225,16 @@ public:
     return drdp;
   }
   
+  double get_prefac_dR_val(int n, int m, int l)
+  {
+    return prefacSing_[n](m, l);
+  }
+  
   void print_R();
+  void print_dRdtheta();
+  void print_dRdphi();
   void print_S();
+  void print_dSdr();
   
   void set_rval(int n, int m, int s, cmplx val)
   {
@@ -237,6 +254,11 @@ public:
   void set_dsdr_val(int n, int l, int m, double val)
   {
     (&dSdR_[n])->set_val(l, m+2*p_, val);
+  }
+  
+  void set_prefac_dR_val(int n, int m, int l, double val)
+  {
+    (&prefacSing_[n])->set_val(m, l, val);
   }
   
 };
