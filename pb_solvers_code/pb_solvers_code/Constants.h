@@ -102,7 +102,6 @@ public:
     update_rotate_size();
   }
   
-  
   const double get_b_dist() const             { return bDist_; }
   const double get_q_dist() const             { return qDist_; }
   const double get_f_dist() const             { return fDist_; }

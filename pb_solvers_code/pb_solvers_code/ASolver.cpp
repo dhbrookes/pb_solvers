@@ -512,7 +512,7 @@ MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i, int j, double theta,
                                               MyMatrix<cmplx> mat, bool ham)
 {
   MyMatrix<cmplx> x(p_, 2*p_ + 1);
-  x.set_val( 0, p_, cmplx(0.0,0.0));
+  x.set_val( 0, p_, cmplx(0.0, 0.0));
   double recip = (ham ? -1.0 : 1.0);
   
   if (theta < M_PI/2)
@@ -544,7 +544,6 @@ MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i, int j, double theta,
       x.set_val(n,n+p_,recip*s*T_(i,j).get_prefac_dR_val(n,n,0)*mat(n,-n+1+p_));
     }
   }
-
   return x;
 }
 
@@ -560,7 +559,7 @@ MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i, int j, double theta,
                                             MyMatrix<cmplx> mat, bool ham)
 {
   MyMatrix<cmplx> x(p_, 2*p_ + 1);
-  x.set_val( 0, p_, cmplx(0.0,0.0));
+  x.set_val( 0, p_, cmplx(0.0, 0.0));
   double recip = (ham ? -1.0 : 1.0);
   
   if (theta < M_PI/2)

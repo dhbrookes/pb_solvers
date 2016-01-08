@@ -89,7 +89,3 @@ const double Constants::convert_int_to_kT(double val)
   double iKT_kCal = iKbT_ * ( KCAL / AVOGADRO_NUM );
   return val * intkCal_mol * iKT_kCal;
 }
-                                                
-                                                
-                                                
-                                                

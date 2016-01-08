@@ -93,6 +93,3 @@ const vector<double> BesselCalc::calc_mbfI(const int n,
   }
   return I;
 }
-
-
-

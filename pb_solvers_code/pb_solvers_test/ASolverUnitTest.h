@@ -134,6 +134,30 @@ protected :
   double dASing11im[15] = {0,0,-0.00121722018,0,0.00093845868,0,0,
     -0.000455374968,0,0,0,0.000186430392,0,0,0};
 
+  double L0[15] = {-0.0042958084,-0.0015199557,-0.00039314106,-0.000151941346,
+    -0.0001196473,-1.2948965e-05,3.9843662e-05,-7.88050185e-06,-6.0250525e-06,
+    -9.78873154e-07,2.38774686e-05,9.83466712e-06,-1.48977456e-06,
+    -1.73451619e-06,-3.6075022e-07};
+  double L0_im[15] = {0,0.00026570391,-0.00025835448,0.000197697415,
+    -2.85442258e-05,-2.2679504e-05,7.92585234e-05,3.32760866e-05,4.72712042e-06,
+    1.12487091e-09,2.17628492e-05,2.35222037e-05,1.03871094e-05,1.94603771e-06,
+    8.53505184e-08};
+  double L1[15] = {0.0413679257,-0.0173166068,-0.00405117907,0.003729965,
+    0.00162800449,0.000105438302,-0.00064643838,-0.00045355362,-4.81366529e-05,
+    1.3683007e-05,9.4098892e-05,0.000105662438,1.58220788e-05,-7.0246614e-06,
+    -2.26791712e-06};
+  double L1_im[15] = {0,5.44303496e-07,-0.00315982074,-4.45344828e-07,
+    0.00126969936,0.000419966072,2.1175274e-07,-0.000353670484,-0.000191687314,
+    -3.09373544e-05,-7.75938102e-08,8.23654847e-05,6.2979024e-05,1.58859638e-05,
+    1.2155081e-06};
+  
+  double L0Sing[15] = {0.0210272529,0.0124511487,0,0.00424544438,0,0,
+    0.0013056269,0,0,0,0.000389723882,0,0,0,0};
+  double L0SingIm[15] = {};
+  double L1Sing[15] = {0.0210272529,-0.0124511487,0,0.00424544438,0,0,
+    -0.0013056269,0,0,0,0.000389723882,0,0,0,0};
+  double L1SingIm[15] = {};
+  
 } ; // end ASolverUTest
 
 
@@ -385,5 +409,69 @@ TEST_F(ASolverUTest, checkgradASing)
   }
 }
 
+TEST_F(ASolverUTest, checkL)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+  System sys               = System( const_, mol_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+                                      sys.get_lambda(), nvals);
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolvTest.solve_A(1E-20);
+  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
+  
+  int ct = 0;
+  for ( int n = 0; n < 5; n++ )
+  {
+    for ( int m = 0; m <= n; m++ )
+    {
+      if (L0[ct] != 0)
+        EXPECT_NEAR( myL[0](n,m+nvals).real()/L0[ct],    1.0, preclim);
+      if (L0_im[ct] != 0)
+        EXPECT_NEAR( myL[0](n,m+nvals).imag()/L0_im[ct], 1.0, preclim);
+      if (L1[ct] != 0)
+        EXPECT_NEAR( myL[1](n,m+nvals).real()/L1[ct],    1.0, preclim);
+      if (L1_im[ct] != 0)
+        EXPECT_NEAR( myL[1](n,m+nvals).imag()/L1_im[ct], 1.0, preclim);
+      ct++;
+    }
+  }
+}
+
+TEST_F(ASolverUTest, checkLSing)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+  System sys               = System( const_, mol_sing_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+                                      sys.get_lambda(), nvals);
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolvTest.solve_A(1E-20);
+  
+  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
+  
+  int ct = 0;
+  for ( int n = 0; n < 5; n++ )
+  {
+    for ( int m = 0; m <= n; m++ )
+    {
+      EXPECT_NEAR( myL[0](n,m+nvals).real(), L0Sing[ct], preclim);
+      EXPECT_NEAR( myL[0](n,m+nvals).imag(),          0, preclim);
+      EXPECT_NEAR( myL[1](n,m+nvals).real(), L1Sing[ct], preclim);
+      EXPECT_NEAR( myL[1](n,m+nvals).imag(),          0, preclim);
+      ct++;
+    }
+  }
+}
 
 #endif

@@ -310,7 +310,6 @@ public:
   const int get_ncols() { return this->ncols_; }
 };
 
-
 /*
  Convenience classes for matrices of matrices, vectors of vectors
  and vectors of matrices.
@@ -340,7 +339,5 @@ struct VecOfMats
 {
   typedef MyVector<MyMatrix<T> > type;
 };
-
-
 
 #endif /* MyMatrix_h */

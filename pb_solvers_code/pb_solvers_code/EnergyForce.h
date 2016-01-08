@@ -30,7 +30,7 @@ protected:
   int N_;  // number of molecules
   int p_;  // max number of poles
   
-  MyVector<cmplx> omega_;  // result of energy calculation
+  MyVector<double> omega_;  // result of energy calculation
   
 public:
   
@@ -40,11 +40,10 @@ public:
   // fill omega_
   void calc_energy();
   
-  
   // get the energy for a specific molecule:
-  cmplx get_omega_i(int i)  { return omega_[i]; }
+  double get_omega_i(int i)  { return omega_[i]; }
   // get all energy:
-  MyVector<cmplx> get_omega() { return omega_; }
+  MyVector<double> get_omega() { return omega_; }
 };
 
 #endif /* EnergyForce_h */
