@@ -26,9 +26,8 @@ protected :
   {
     mol_.clear( );
     Pt pos[2]     = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
-    Pt cgPos[2]   = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) }; //= { Pt( 0.0, 0.0, -5.5 ), Pt( 11.0, 6.9, 24.3 ) };
-    double cg[2] = { 2.0, 2.0};//{ 5.0, -0.4};
-    double rd[2] = { 2.0, 2.0};//{ 5.6, 10.4};
+    Pt cgPos[2]   = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
+    double cg[2] = { 5.0, -0.4}; double rd[2] = { 5.6, 10.4};
     
     Pt cgPosSi[2] = { Pt( 0.0, 0.0, -35.0 ), Pt( 0.0, 0.0, 0.0 ) };
     
@@ -86,11 +85,11 @@ TEST_F(EnergyForceUTest, checkEnergy)
   ASolvTest.solve_A(1E-20);
   
   EnergyCalc EnTest( ASolvTest.get_A(), ASolvTest.calc_L(),
-                     sys.get_consts().get_dielectric_water(), nmol, nvals);
+                     const_, nmol, nvals);
 
-  EXPECT_NEAR( EnTest.get_omega_i(0), 0.00117849131, preclim);
-  EXPECT_NEAR( EnTest.get_omega_i(1), 0.00199508625, preclim);
-  EXPECT_NEAR( EnTest.get_omega_i(2), 0.00199508625, preclim);
+  EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.00117849131, preclim);
+  EXPECT_NEAR( EnTest.get_omega_i_int(1), 0.00199508625, preclim);
+  EXPECT_NEAR( EnTest.get_omega_i_int(2), 0.00199508625, preclim);
 }
 
 TEST_F(EnergyForceUTest, checkEnergySing)
@@ -109,10 +108,10 @@ TEST_F(EnergyForceUTest, checkEnergySing)
   ASolvTest.solve_A(1E-20);
   
   EnergyCalc EnTest( ASolvTest.get_A(), ASolvTest.calc_L(),
-                    sys.get_consts().get_dielectric_water(), nmol, nvals);
+                    const_, nmol, nvals);
   
   for (int n=0; n<2; n++)
-    EXPECT_NEAR( EnTest.get_omega_i(0), 0.000573165, preclim);
+    EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.000573165, preclim);
 }
 
   

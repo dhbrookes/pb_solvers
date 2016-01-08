@@ -8,10 +8,9 @@
 
 #include "EnergyForce.h"
 
-
 EnergyCalc::EnergyCalc(VecOfMats<cmplx>::type A, VecOfMats<cmplx>::type L,
-                       double epsS, int N, int p)
-:N_(N), epsS_(epsS), omega_(N), p_(p)
+                       Constants con, int N, int p)
+:N_(N), const_(con), omega_(N), p_(p)
 {
   _A_ = make_shared<VecOfMats<cmplx>::type> (A);
   _L_ = make_shared<VecOfMats<cmplx>::type> (L);
@@ -39,7 +38,7 @@ void EnergyCalc::calc_energy()
         ip += unm.real()*vnm.real() + unm.imag()*vnm.imag();
       }
     }
-    omega_.set_val(i, ip * (1/epsS_));
+    omega_.set_val(i, ip * (1/const_.get_dielectric_water()));
   }
 }
 
