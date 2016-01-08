@@ -84,4 +84,36 @@ public:
   }
 };
 
+/*
+ Class for calculating the forces on molecules in the system given
+ an ASolver object
+ */
+class ForceCalc
+{
+protected:
+  shared_ptr<VecOfMats<cmplx>::type> _A_;
+  shared_ptr<VecOfMats<cmplx>::type> _L_;
+  
+  shared_ptr< MyMatrix<VecOfMats<cmplx>::type > > _gradA_;
+  shared_ptr< MyVector<VecOfMats<cmplx>::type > > _gradL_;
+  
+  double epsS_;
+  int N_;
+  int p_;
+  Constants const_;
+  
+  VecOfVecs<cmplx>::type F_;
+  
+public:
+  ForceCalc(VecOfMats<cmplx>::type A, MyMatrix<VecOfMats<cmplx>::type > gradA_,
+            VecOfMats<cmplx>::type L, MyVector<VecOfMats<cmplx>::type > gradL_,
+            Constants con, int N, int p);
+  
+  void calc_force();  // fill F_
+  
+  MyVector<cmplx> get_fi(int i)     { return F_[i]; }
+  VecOfVecs<cmplx>::type get_F()    { return F_; }
+  
+};
+
 #endif /* EnergyForce_h */

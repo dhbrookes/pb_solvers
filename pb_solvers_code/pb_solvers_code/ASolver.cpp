@@ -885,6 +885,23 @@ VecOfMats<cmplx>::type ASolver::calc_L()
   return L;
 }
 
+MyVector<VecOfMats<cmplx>::type > ASolver::calc_grad_L()
+{
+  MyVector<VecOfMats<cmplx>::type > gradl (N_);
+  VecOfMats<cmplx>::type inner1, inner2;
+  int i, j;
+  for (i = 0; i < N_; i++)
+  {
+    for (j = 0; j < N_; j++)
+    {
+      inner1 = re_expandA_gradT(i, j);
+      inner2 = re_expand_gradA(i, j, i);
+      gradl.set_val(i, inner1 + inner2);
+    }
+  }
+  return gradl;
+}
+
 /*
  Convert derivatives from spherical to cartesian coords
  */
