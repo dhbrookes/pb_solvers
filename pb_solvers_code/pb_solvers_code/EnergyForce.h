@@ -116,4 +116,46 @@ public:
   
 };
 
+/*
+ Class for calculating the torque on every molecule in the system
+ */
+class TorqueCalc
+{
+protected:
+  
+  // outer vector has an entry for every molecule. Inner vector is the torque
+  // on that molecule
+  VecOfVecs<cmplx>::type tau_;
+  
+  shared_ptr<SHCalc> _shCalc_;
+  shared_ptr< MyVector<VecOfMats<cmplx>::type > > _gradL_;
+  
+  Constants consts_;
+  shared_ptr<System> _sys_;
+  
+  int N_;
+  int p_;
+  
+  /*
+   Enum for the units of energy
+   */
+  enum WhichUnit { INTER, KCALMOL, KT, JMOL };
+  
+  shared_ptr<VecOfMats<cmplx>::type> _gamma_;
+  
+  /*
+   Calculate H vector (eq 42 and 43 in Lotan 2006)
+   */
+  VecOfMats<cmplx>::type calc_H(int i);
+  
+public:
+  
+  TorqueCalc(SHCalc shCalc, MyVector<VecOfMats<cmplx>::type> gradL,
+             Constants consts, System sys, VecOfMats<cmplx>::type gamma,
+             int p);
+  
+  void calc_tau();  // fill tau_
+  
+};
+
 #endif /* EnergyForce_h */

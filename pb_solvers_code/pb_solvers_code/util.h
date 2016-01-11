@@ -201,4 +201,25 @@ public:
 typedef complex<double> cmplx;
 typedef Point<double> Pt;
 
+
+
+/*
+ Calculate inner product of two matrices as defined in equation 29 of Lotan
+ 2006
+ */
+cmplx lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p)
+{
+  cmplx ip;
+  int n, m;
+  for (n = 0; n < p; n++)
+  {
+    for (m = -n; m <= -n; m++)
+    {
+      ip += U(n, m+p) * conj(V(n, m+p));
+    }
+  }
+  return ip;
+}
+
+
 #endif /* util_hpp */
