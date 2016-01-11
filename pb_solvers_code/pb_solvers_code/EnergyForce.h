@@ -133,13 +133,13 @@ protected:
   Constants consts_;
   shared_ptr<System> _sys_;
   
+  double epsS_;
   int N_;
   int p_;
   
   /*
    Enum for the units of energy
    */
-  enum WhichUnit { INTER, KCALMOL, KT, JMOL };
   
   shared_ptr<VecOfMats<cmplx>::type> _gamma_;
   

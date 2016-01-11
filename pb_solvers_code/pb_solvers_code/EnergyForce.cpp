@@ -100,7 +100,8 @@ void ForceCalc::calc_force()
 TorqueCalc::TorqueCalc(SHCalc shCalc, MyVector<VecOfMats<cmplx>::type> gradL,
                        Constants consts, System sys,
                        VecOfMats<cmplx>::type gamma, int p)
-: N_(sys.get_n()), p_(p), tau_(sys.get_n()), consts_(consts)
+: N_(sys.get_n()), p_(p), tau_(sys.get_n()), consts_(consts),
+epsS_(consts.get_dielectric_water())
 {
   _shCalc_ = make_shared<SHCalc> (shCalc);
   _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type > > (gradL);
@@ -164,14 +165,14 @@ void TorqueCalc::calc_tau()
     
     //perform cross product:
     
-    tau_i.set_val(0, lotan_inner_prod(Hi[1], gLi[2], p_)
-                  - lotan_inner_prod(Hi[2], gLi[1], p_));
+    tau_i.set_val(0, 1/epsS_ * (lotan_inner_prod(Hi[1], gLi[2], p_)
+                  - lotan_inner_prod(Hi[2], gLi[1], p_)));
     
-    tau_i.set_val(1, lotan_inner_prod(Hi[2], gLi[0], p_)
-                  - lotan_inner_prod(Hi[0], gLi[2], p_));
+    tau_i.set_val(1, 1/epsS_ * (lotan_inner_prod(Hi[2], gLi[0], p_)
+                  - lotan_inner_prod(Hi[0], gLi[2], p_)));
     
-    tau_i.set_val(1, lotan_inner_prod(Hi[0], gLi[1], p_)
-                  - lotan_inner_prod(Hi[1], gLi[0], p_));
+    tau_i.set_val(2, 1/epsS_ * (lotan_inner_prod(Hi[0], gLi[1], p_)
+                  - lotan_inner_prod(Hi[1], gLi[0], p_)));
     
     tau_.set_val(i, tau_i);
   }
