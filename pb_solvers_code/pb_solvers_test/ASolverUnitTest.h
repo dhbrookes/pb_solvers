@@ -158,6 +158,44 @@ protected :
     -0.0013056269,0,0,0,0.000389723882,0,0,0,0};
   double L1SingIm[15] = {};
   
+  double dLdx0[15] = {1.6750432e-06,-6.48184643e-05,2.34002566e-05,
+    9.24707607e-06,1.70674585e-05,4.63747276e-06,2.14310222e-06,4.22726785e-06,
+    1.31460586e-06,1.10177468e-07,-4.90918167e-07,-2.74985149e-06,
+    -8.99415319e-07,1.44385542e-07,1.00536605e-07};
+  double dAdy0im[15] = {-1.61770896e-06,-3.41962773e-06,3.5234244e-05,
+    -1.05669019e-05,7.2297967e-06,4.09008335e-06,-3.47883114e-06,7.54460728e-07,
+    1.96413284e-06,4.91172588e-07,-1.26891901e-08,-2.75940448e-06,
+    -1.43810291e-06,-9.21941465e-08,6.53481772e-08};
+  double dLdz0[15] = {-0.000150691983,-1.33519347e-05,-2.06166021e-05,
+    5.03159396e-05,2.06163519e-05,1.07343682e-06,2.0450875e-05,1.79780738e-05,
+    2.12705147e-06,-5.04752566e-07,-4.9965286e-06,-4.07149703e-06,
+    -6.09290158e-07,1.72960474e-07,5.43921381e-08};
+  double dLdx1[15] = {-0.000987674279,0.000187867261,-0.000357770967,
+    -0.000293354883,5.61544215e-05,4.6981816e-05,3.09724418e-05,-3.49290618e-05,
+    -2.36043496e-05,-2.24351551e-06,-2.44654805e-05,-6.57150526e-06,
+    5.77399697e-06,1.98995506e-06,-1.03763066e-08};
+  double dAdy1im[15] = {2.61723492e-07,-3.77632927e-08,-0.00037629043,
+    9.4750488e-08,9.7902191e-05,3.25167845e-05,-1.47164999e-08,-3.90081e-05,
+    -2.15522995e-05,-1.42788374e-06,1.30984974e-08,1.38167558e-07,
+    9.21538861e-07,-7.45070972e-07,-4.6128438e-07};
+  double dAdz1im[15] = {-1.18032719e-07,-7.74616576e-08,0.000240731667,
+    7.46244492e-08,-0.000116771598,-5.26094072e-05,-4.6568393e-08,
+    4.78806389e-05,3.23462883e-05,6.20808799e-06,1.75724926e-08,-7.2420955e-06,
+    -8.11121113e-06,-2.60581756e-06,-2.39864327e-07};
+  
+  double dLdx0Sing[15] = {0,0,-0.00025467424,0,-0.000150567895,0,0,
+    -6.5572367e-05,0,0,0,-2.53063413e-05,0,0,0};
+  double dAdy0imSing[15] = {0,0,-0.00025467424,0,-0.000150567895,0,0,
+    -6.5572367e-05,0,0,0,-2.53063413e-05,0,0,0};
+  double dLdz0Sing[15] = {0.00128088088,0.000940448055,0,0.000393219492,0,0,
+    0.000151918661,0,0,0,5.43212252e-05,0,0,0,0};
+  double dLdx1Sing[15] = {0,0,-0.000254674238,0,0.000150567895,0,0,
+    -6.5572367e-05,0,0,0,2.53063413e-05,0,0,0};
+  double dAdy1imSing[15] = {0,0,-0.00025467424,0,0.00015056789,0,0,
+    -6.5572367e-05,0,0,0,2.53063413e-05,0,0,0};
+  double dAdz1imSing[15] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  
+  
 } ; // end ASolverUTest
 
 
@@ -469,6 +507,77 @@ TEST_F(ASolverUTest, checkLSing)
       EXPECT_NEAR( myL[0](n,m+nvals).imag(),          0, preclim);
       EXPECT_NEAR( myL[1](n,m+nvals).real(), L1Sing[ct], preclim);
       EXPECT_NEAR( myL[1](n,m+nvals).imag(),          0, preclim);
+      ct++;
+    }
+  }
+}
+
+TEST_F(ASolverUTest, checkdL)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+  System sys               = System( const_, mol_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+                                      sys.get_lambda(), nvals);
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+  MyVector<VecOfMats<cmplx>::type > mydL = ASolvTest.calc_gradL();
+  
+  int ct = 0;
+  for ( int n = 0; n < 5; n++ )
+  {
+    for ( int m = 0; m <= n; m++ )
+    {
+      if (dLdx0[ct] != 0)
+        EXPECT_NEAR( mydL[0][0](n,m+nvals).real(), dLdx0[ct],   preclim);
+      if (dAdy0im[ct] != 0)
+        EXPECT_NEAR( mydL[0][1](n,m+nvals).imag(), dAdy0im[ct], preclim);
+      if (dLdx0[ct] != 0)
+        EXPECT_NEAR( mydL[0][0](n,m+nvals).real(), dLdx0[ct],   preclim);
+      if (dLdx1[ct] != 0)
+        EXPECT_NEAR( mydL[1][0](n,m+nvals).real(), dLdx1[ct],   preclim);
+      if (dAdy1im[ct] != 0)
+        EXPECT_NEAR( mydL[1][1](n,m+nvals).imag(), dAdy1im[ct], preclim);
+      if (dAdz1im[ct] != 0)
+        EXPECT_NEAR( mydL[1][2](n,m+nvals).imag(), dAdz1im[ct], preclim);
+      ct++;
+    }
+  }  
+}
+
+TEST_F(ASolverUTest, checkdLSing)
+{
+  const int vals           = nvals;
+  int nmol                 = 2;
+  BesselConstants bConsta  = BesselConstants( 2*vals );
+  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+  System sys               = System( const_, mol_sing_ );
+  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+                                      sys.get_lambda(), nvals);
+  
+  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+  
+  MyVector<VecOfMats<cmplx>::type > mydL = ASolvTest.calc_gradL();
+  
+  int ct = 0;
+  for ( int n = 0; n < 5; n++ )
+  {
+    for ( int m = 0; m <= n; m++ )
+    {
+      EXPECT_NEAR( mydL[0][0](n,m+nvals).real(), dLdx0Sing[ct],   preclim);
+      EXPECT_NEAR( mydL[0][1](n,m+nvals).imag(), dAdy0imSing[ct], preclim);
+      EXPECT_NEAR( mydL[0][0](n,m+nvals).real(), dLdx0Sing[ct],   preclim);
+      EXPECT_NEAR( mydL[1][0](n,m+nvals).real(), dLdx1Sing[ct],   preclim);
+      EXPECT_NEAR( mydL[1][1](n,m+nvals).imag(), dAdy1imSing[ct], preclim);
+      EXPECT_NEAR( mydL[1][2](n,m+nvals).imag(), dAdz1imSing[ct], preclim);
       ct++;
     }
   }

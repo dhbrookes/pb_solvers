@@ -55,42 +55,44 @@ ForceCalc::ForceCalc(VecOfMats<cmplx>::type A,
   _gradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type> > (gradA_);
   _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type> > (gradL_);
   
+  calc_force();
 }
 
 
 void ForceCalc::calc_force()
 {
   int i, j, n, m;
-  cmplx ip1, ip2, unm1, vnm1, unm2, vnm2;
-  VecOfMats<cmplx> gLi, gAi;
+  cmplx unm1, vnm1, unm2, vnm2;
+  double ip1, ip2;
+  VecOfMats<cmplx>::type gLi, gAi;
   MyMatrix<cmplx> Li, Ai;
-  MyVector<cmplx> inner;
+  MyVector<double> inner;
   for (i = 0; i < N_; i++)
   {
     Li = _L_->operator[](i);
     Ai = _A_->operator[](i);
     
-//    gLi = _gradL_->operator[](i);
-//    gAi = _gradA_->operator[](i);
-    inner = MyVector<cmplx> (3);
+    gLi = _gradL_->operator[](i);
+    gAi = _gradA_->operator()(i, i);
+    inner = MyVector<double> (3);
     for (j = 0; j < 3; j++)  // for each component of the gradient
     {
-      ip1 = cmplx(0, 0);
-      ip2 = cmplx(0, 0);
+      ip1 = 0.0;
+      ip2 = 0.0;
       for (n = 0; n < p_; n++)
       {
         for (m = -n; m < p_; m++)
         {
-//          unm1 = gLi[j](n, m + p_);
-//          vnm1 = Ai(n, m + p_);
-//          ip1 += unm1 * conj(vnm1);
-//          
-//          unm2 = Li(n, m + p_);
-//          vnm2 = gAi[j](n, m + p_);
-//          ip2 += unm1 * conj(vnm1);
+          unm1 = gLi[j](n, m + p_);
+          vnm1 = Ai(n, m + p_);
+          ip1 += unm1.real()*vnm1.real() + unm1.imag()*vnm1.imag();
+          
+          unm2 = Li(n, m + p_);
+          vnm2 = gAi[j](n, m + p_);
+          ip2 += unm2.real()*vnm2.real() + unm2.imag()*vnm2.imag();
         }
       }
-      inner.set_val(j, 1/epsS_ * (ip1 + ip2));
+      inner.set_val(j, -1.0/const_.get_dielectric_water() * (ip1 + ip2));
     }
     F_.set_val(i, inner);
   }

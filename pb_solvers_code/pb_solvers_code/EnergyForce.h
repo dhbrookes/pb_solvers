@@ -102,7 +102,7 @@ protected:
   int p_;
   Constants const_;
   
-  VecOfVecs<cmplx>::type F_;
+  VecOfVecs<double>::type F_;
   
 public:
   ForceCalc(VecOfMats<cmplx>::type A, MyMatrix<VecOfMats<cmplx>::type > gradA_,
@@ -111,8 +111,8 @@ public:
   
   void calc_force();  // fill F_
   
-  MyVector<cmplx> get_fi(int i)     { return F_[i]; }
-  VecOfVecs<cmplx>::type get_F()    { return F_; }
+  MyVector<double> get_fi(int i)     { return F_[i]; }
+  VecOfVecs<double>::type get_F()    { return F_; }
   
 };
 

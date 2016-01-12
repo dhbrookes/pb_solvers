@@ -13,6 +13,7 @@
 #include <iostream>
 #include "ASolverTest.h"
 #include "BesselCalcTest.h"
+#include "EnergyForceTest.h"
 #include "ConstantsTest.h"
 #include "ReExpCalcTest.h"
 #include "SHCalcTest.h"
@@ -42,6 +43,10 @@ public:
     ConstantsTest ConT;
     ConT.TestConstants();
     cout << "Complete Constant test" << endl;
+    
+    EnForTest EnForT;
+    EnForT.RunEnForTest();
+    cout << "Complete Energy and Force test" << endl;
 
     ReExpTest ReR;
     ReR.runReExTest();
