@@ -164,8 +164,10 @@ public:
   VecOfMats<cmplx>::type&  get_E()         { return E_; }
   VecOfMats<cmplx>::type&  get_A()         { return A_; }
   
+  MyMatrix<VecOfMats<cmplx>::type > get_gradA() { return gradA_ ; }
+  
   VecOfMats<cmplx>::type calc_L();
-  MyVector<VecOfMats<cmplx>::type > calc_grad_L();
+  MyVector<VecOfMats<cmplx>::type > calc_gradL();
   
   cmplx get_gamma_ni( int i, int n)        { return gamma_[i]( n, n); }
   cmplx get_delta_ni( int i, int n)        { return delta_[i]( n, n); }

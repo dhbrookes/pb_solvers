@@ -11,14 +11,13 @@
 
 #include <stdio.h>
 #include <memory>
-#include "util.h"
-#include "MyMatrix.h"
 #include "ASolver.h"
 
 using namespace std;
 
+
 /*
- Class for calculating the energy of molecules in the system given 
+ Class for calculating the energy of molecules in the system given
  an ASolver object
  */
 class EnergyCalc
@@ -102,7 +101,7 @@ protected:
   int p_;
   Constants const_;
   
-  VecOfVecs<cmplx>::type F_;
+  VecOfVecs<double>::type F_;
   
 public:
   ForceCalc(VecOfMats<cmplx>::type A, MyMatrix<VecOfMats<cmplx>::type > gradA_,
@@ -111,8 +110,8 @@ public:
   
   void calc_force();  // fill F_
   
-  MyVector<cmplx> get_fi(int i)     { return F_[i]; }
-  VecOfVecs<cmplx>::type get_F()    { return F_; }
+  MyVector<double> get_fi(int i)     { return F_[i]; }
+  VecOfVecs<double>::type get_F()    { return F_; }
   
 };
 
@@ -155,6 +154,24 @@ public:
              int p);
   
   void calc_tau();  // fill tau_
+  
+  /*
+   Calculate inner product of two matrices as defined in equation 29 of Lotan
+   2006
+   */
+  cmplx lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p)
+  {
+    cmplx ip;
+    int n, m;
+    for (n = 0; n < p; n++)
+    {
+      for (m = -n; m <= -n; m++)
+      {
+        ip += U(n, m+p) * conj(V(n, m+p));
+      }
+    }
+    return ip;
+  }
   
 };
 

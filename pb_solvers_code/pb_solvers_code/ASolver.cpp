@@ -885,19 +885,23 @@ VecOfMats<cmplx>::type ASolver::calc_L()
   return L;
 }
 
-MyVector<VecOfMats<cmplx>::type > ASolver::calc_grad_L()
+MyVector<VecOfMats<cmplx>::type > ASolver::calc_gradL()
 {
+  int i, k;
   MyVector<VecOfMats<cmplx>::type > gradl (N_);
   VecOfMats<cmplx>::type inner1, inner2;
-  int i, j;
-  for (i = 0; i < N_; i++)
+  
+  for (i = 0; i < N_; i++) // molecule of interest
   {
-    for (j = 0; j < N_; j++)
+    inner1 = get_gradT_Aij( i, i);
+    
+    for (k = 0; k < N_; k++) // other molecules
     {
-      inner1 = re_expandA_gradT(i, j);
-      inner2 = re_expand_gradA(i, j, i);
-      gradl.set_val(i, inner1 + inner2);
+      if (k == i) continue;
+      inner2 = re_expand_gradA(i, k, i, false); // T^(i,k) * grad_j A^(k)
+      inner1 += inner2;
     }
+    gradl.set_val(i, inner1);
   }
   return gradl;
 }
