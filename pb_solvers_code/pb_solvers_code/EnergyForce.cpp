@@ -64,7 +64,7 @@ void ForceCalc::calc_force()
   int i, j, n, m;
   cmplx unm1, vnm1, unm2, vnm2;
   double ip1, ip2;
-  VecOfMats<cmplx>::type gLi, gAi;
+  VecOfMats<cmplx>::type gLi, gAi;  
   MyMatrix<cmplx> Li, Ai;
   MyVector<double> inner;
   for (i = 0; i < N_; i++)

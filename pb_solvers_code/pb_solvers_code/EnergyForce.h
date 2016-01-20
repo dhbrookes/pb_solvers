@@ -104,8 +104,10 @@ protected:
   VecOfVecs<double>::type F_;
   
 public:
-  ForceCalc(VecOfMats<cmplx>::type A, MyMatrix<VecOfMats<cmplx>::type > gradA_,
-            VecOfMats<cmplx>::type L, MyVector<VecOfMats<cmplx>::type > gradL_,
+  ForceCalc(VecOfMats<cmplx>::type A,
+            MyMatrix<VecOfMats<cmplx>::type > gradA_,
+            VecOfMats<cmplx>::type L,
+            MyVector<VecOfMats<cmplx>::type > gradL_,
             Constants con, int N, int p);
   
   void calc_force();  // fill F_

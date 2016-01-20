@@ -16,6 +16,7 @@
 #include "util.h"
 #include <memory>
 #include "readutil.h"
+#include "BD.h"
 
 using namespace std;
 
