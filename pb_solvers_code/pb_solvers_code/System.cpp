@@ -95,3 +95,13 @@ void System::check_for_overlap()
     }
   }
 }
+
+void Molecule::translate(Pt dr)
+{
+  for (int i = 0; i < M_; i++)
+  {
+    pos_[i] = pos_[i]+ dr;
+  }
+}
+
+

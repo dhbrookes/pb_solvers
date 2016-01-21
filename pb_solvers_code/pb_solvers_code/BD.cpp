@@ -54,3 +54,26 @@ bool BD::check_for_collision(int mol, Pt new_pt)
   return collision;
 }
 
+
+void BD::indi_trans_update(int i, MyVector<double> fi)
+{
+  MyVector<double> vdr;
+  double coeff = (transDiffConsts_[i] * dt_) / (kb_*T_);
+  vdr = fi * coeff;
+  bool accept = false;
+  Pt center = _sys_->get_centeri(i);
+  while (!accept)
+  {
+    Pt rand = rand_vec(0, 2 * transDiffConsts_[i] *dt_);
+    Pt dr (rand.x() + vdr[0], rand.y() + vdr[1], rand.z() + vdr[2]);
+    Pt new_pt = center + dr;
+    if (!check_for_collision(i, new_pt))
+    {
+      _sys_->translate_mol(i, dr);
+      accept = true;
+    }
+  }
+  
+  
+}
+
