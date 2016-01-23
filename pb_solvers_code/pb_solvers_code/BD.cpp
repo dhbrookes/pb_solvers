@@ -64,7 +64,7 @@ void BD::indi_trans_update(int i, MyVector<double> fi)
   Pt rand, new_pt;
   while (!accept)
   {
-    rand = rand_vec(0, 2 * transDiffConsts_[i] *dt_);
+    rand = rand_vec(0, 2 * rotDiffConsts_[i] *dt_);
     new_pt = center + (dr + rand);
     if (!check_for_collision(i, new_pt))
     {
