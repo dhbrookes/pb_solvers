@@ -41,7 +41,7 @@ public:
   Pt get_center() const                 { return center_; }
   
   void translate(Pt dr);
-  void rotate(Pt dtheta);
+  void rotate(Quat qrot);
   
 };
 
@@ -78,7 +78,10 @@ public:
   void translate_mol(int i, Pt dr) { get_molecule(i).translate(dr); }
   
   // rotate every charge in molecule i
-  void rotate_mol(int i, Pt dtheta) { get_molecule(i).rotate(dtheta); }
+  void rotate_mol(int i, Quat qrot)
+  {
+    get_molecule(i).rotate(qrot);
+  }
   
   /*
    Check to determine if any molecules are overlapping

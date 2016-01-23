@@ -280,12 +280,12 @@ public:
   }
   
   // scalar multiplication
-  MyVector<T>& operator*(T scal)
+  MyVector<T> operator*(T scal)
   {
     MyVector vout (get_nrows());
     for (int i = 0; i < get_nrows(); i++)
     {
-      vout[i] = this[i] * scal;
+      vout[i] = this->vals_[i][0] * scal;
     }
       
     return vout;

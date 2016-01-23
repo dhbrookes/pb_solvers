@@ -104,4 +104,12 @@ void Molecule::translate(Pt dr)
   }
 }
 
+void Molecule::rotate(Quat qrot)
+{
+  for (int i = 0; i < M_; i++)
+  {
+    pos_[i] = qrot.rotate_point(pos_[i]);
+  }
+}
+
 

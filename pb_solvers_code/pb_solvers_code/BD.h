@@ -50,7 +50,8 @@ public:
   
   // update the system with Brownian dynamics given forces and torques on every
   // molecule
-  void bd_update(VecOfVecs<double>::type F, VecOfVecs<double>::type tau);
+  void bd_update(VecOfVecs<double>::type F,
+                 VecOfVecs<double>::type tau);
   
 };
 

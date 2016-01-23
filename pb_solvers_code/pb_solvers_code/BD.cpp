@@ -57,23 +57,58 @@ bool BD::check_for_collision(int mol, Pt new_pt)
 
 void BD::indi_trans_update(int i, MyVector<double> fi)
 {
-  MyVector<double> vdr;
   double coeff = (transDiffConsts_[i] * dt_) / (kb_*T_);
-  vdr = fi * coeff;
+  Pt dr = Pt(fi * coeff);
   bool accept = false;
   Pt center = _sys_->get_centeri(i);
+  Pt rand, new_pt;
   while (!accept)
   {
-    Pt rand = rand_vec(0, 2 * transDiffConsts_[i] *dt_);
-    Pt dr (rand.x() + vdr[0], rand.y() + vdr[1], rand.z() + vdr[2]);
-    Pt new_pt = center + dr;
+    rand = rand_vec(0, 2 * transDiffConsts_[i] *dt_);
+    new_pt = center + (dr + rand);
     if (!check_for_collision(i, new_pt))
     {
       _sys_->translate_mol(i, dr);
       accept = true;
     }
   }
+}
+
+
+void BD::indi_rot_update(int i, MyVector<double> tau_i)
+{
+  double coeff = (rotDiffConsts_[i] * dt_) / (kb_ * T_);
+  Pt dtheta = (tau_i * coeff);
+  
+  bool accept = false;
+  Pt center = _sys_->get_centeri(i);
+  Pt rand, new_pt;
+  while (! accept)
+  {
+    rand = rand_vec(0, 2 * transDiffConsts_[i] * dt_);
+    dtheta = dtheta + rand;
+    Quat qrot (dtheta.norm(), dtheta.x(), dtheta.y(), dtheta.z());
+    new_pt = qrot.rotate_point(center);
+    if (!check_for_collision(i, new_pt))
+    {
+      _sys_->rotate_mol(i, qrot);
+      accept = true;
+    }
+  }
+}
+
+void BD::bd_update(VecOfVecs<double>::type F, VecOfVecs<double>::type tau)
+{
+  int i;
+  for (i = 0; i < _sys_->get_n(); i++)
+  {
+    indi_trans_update(i, F[i]);
+  }
+  
+  for (i = 0; i < _sys_->get_n(); i++)
+  {
+    indi_rot_update(i, tau[i]);
+  }
   
   
 }
-
