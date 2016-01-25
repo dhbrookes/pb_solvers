@@ -14,6 +14,7 @@ double preclim = 1.0e-4;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
 
 #include "ASolverUnitTest.h"
+#include "BDUnitTest.h"
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
 #include "EnergyForceUnitTest.h"

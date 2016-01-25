@@ -59,15 +59,11 @@ class EnForTest
     ASolvTest.solve_A( 1E-12 );
     ASolvTest.solve_gradA(1E-12);
     
-//    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
-//                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
-//                     const_, 2, nvals);
-    
-//    for (int n=0; n<2; n++)
-//      cout << " This is my force " << n << " : " << FoTest.get_fi(n)[0] << ", " << FoTest.get_fi(n)[1] << ", " << FoTest.get_fi(n)[2] << endl;
+    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
+                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
+                     const_, 2, nvals);
     
   }
-  
 };
 
 

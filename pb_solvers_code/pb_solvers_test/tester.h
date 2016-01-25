@@ -14,6 +14,7 @@
 #include "ASolverTest.h"
 #include "BesselCalcTest.h"
 #include "ConstantsTest.h"
+#include "EnergyForceTest.h"
 #include "ReExpCalcTest.h"
 #include "SHCalcTest.h"
 

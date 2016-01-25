@@ -28,11 +28,7 @@ protected:
   
   // random number generator object:
   mt19937 randGen_;
-  
   shared_ptr<System> _sys_;
-  
-  double kb_;
-  double T_;  // temperature
   
   // check if a molecule's new point causes it to collide with any other
   bool check_for_collision(int mol, Pt new_pt);
@@ -46,12 +42,11 @@ protected:
   
 public:
   BD(System sys, double dt, vector<double> trans_diff_consts,
-     vector<double> rot_diff_consts, double kb, double T);
+     vector<double> rot_diff_consts);
   
   // update the system with Brownian dynamics given forces and torques on every
   // molecule
-  void bd_update(VecOfVecs<double>::type F,
-                 VecOfVecs<double>::type tau);
+  void bd_update(VecOfVecs<double>::type F, VecOfVecs<double>::type tau);
   
 };
 

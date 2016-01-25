@@ -10,11 +10,9 @@
 
 
 BD::BD(System sys, double dt, vector<double> trans_diff_consts,
-   vector<double> rot_diff_consts, double kb, double T)
-:dt_(dt), transDiffConsts_(trans_diff_consts), rotDiffConsts_(rot_diff_consts),
-kb_(kb), T_(T)
+   vector<double> rot_diff_consts)
+:dt_(dt), transDiffConsts_(trans_diff_consts), rotDiffConsts_(rot_diff_consts)
 {
-
   _sys_ = make_shared<System>(sys);
   
   random_device rd;
@@ -57,7 +55,7 @@ bool BD::check_for_collision(int mol, Pt new_pt)
 
 void BD::indi_trans_update(int i, MyVector<double> fi)
 {
-  double coeff = (transDiffConsts_[i] * dt_) / (kb_*T_);
+  double coeff = transDiffConsts_[i] * dt_ * _sys_->get_consts().get_ikbt();
   Pt dr = Pt(fi * coeff);
   bool accept = false;
   Pt center = _sys_->get_centeri(i);
