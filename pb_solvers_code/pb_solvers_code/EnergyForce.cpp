@@ -97,3 +97,89 @@ void ForceCalc::calc_force()
     F_.set_val(i, inner);
   }
 }
+
+TorqueCalc::TorqueCalc(SHCalc shCalc, MyVector<VecOfMats<cmplx>::type> gradL,
+                       Constants consts, System sys,
+                       VecOfMats<cmplx>::type gamma, int p)
+: N_(sys.get_n()), p_(p), tau_(sys.get_n()), consts_(consts),
+epsS_(consts.get_dielectric_water())
+{
+  _shCalc_ = make_shared<SHCalc> (shCalc);
+  _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type > > (gradL);
+  _sys_ = make_shared<System> (sys);
+  _gamma_ = make_shared<VecOfMats<cmplx>::type > (gamma);
+}
+
+
+VecOfMats<cmplx>::type TorqueCalc::calc_H(int i)
+{
+  VecOfMats<cmplx>::type H (3);
+  
+  int mi = _sys_->get_Mi(i);
+  
+  cmplx gam, qij, rho, sh, h;
+  Pt pt;
+  MyMatrix<cmplx> gamma_i = _gamma_->operator[](i);
+  MyMatrix<cmplx> Hx (p_, 2*p_);
+  MyMatrix<cmplx> Hy (p_, 2*p_);
+  MyMatrix<cmplx> Hz (p_, 2*p_);
+  
+  
+  int j, n, m;
+  for (j = 0; j < mi; j++)
+  {
+    _shCalc_->calc_sh(pt.theta(), pt.phi());
+    for (n = 0; n < p_; n++)
+    {
+      for (m = -n; m <= n; m++)
+      {
+        gam = gamma_i(n, n);
+        qij = _sys_->get_qij(i, j);
+        pt = _sys_->get_posij(i, j);
+        rho = pt.r();
+        sh = _shCalc_->get_result(n, m);
+        h = gam * qij * pow(rho, n) * sh;
+        Hx(n, m+p_) += h * pt.x();
+        Hy(n, m+p_) += h * pt.y();
+        Hz(n, m+p_) += h * pt.z();
+      }
+    }
+  }
+  H.set_val(0, Hx);
+  H.set_val(1, Hy);
+  H.set_val(2, Hz);
+  return H;
+}
+
+
+void TorqueCalc::calc_tau()
+{
+  MyVector<cmplx> tau_i;
+  VecOfMats<cmplx>::type Hi;
+  VecOfMats<cmplx>::type gLi;
+  for (int i = 0; i < N_; i++)
+  {
+    Hi = calc_H(i);
+    tau_i = MyVector<cmplx> (3);
+    gLi = _gradL_-> operator[](i);
+    
+    
+    //perform cross product:
+    
+    tau_i.set_val(0, 1/epsS_ * (lotan_inner_prod(Hi[1], gLi[2], p_)
+                  - lotan_inner_prod(Hi[2], gLi[1], p_)));
+    
+    tau_i.set_val(1, 1/epsS_ * (lotan_inner_prod(Hi[2], gLi[0], p_)
+                  - lotan_inner_prod(Hi[0], gLi[2], p_)));
+    
+    tau_i.set_val(2, 1/epsS_ * (lotan_inner_prod(Hi[0], gLi[1], p_)
+                  - lotan_inner_prod(Hi[1], gLi[0], p_)));
+    
+    tau_.set_val(i, tau_i);
+  }
+
+}
+
+
+
+

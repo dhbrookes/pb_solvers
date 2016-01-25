@@ -11,14 +11,13 @@
 
 #include <stdio.h>
 #include <memory>
-#include "util.h"
-#include "MyMatrix.h"
 #include "ASolver.h"
 
 using namespace std;
 
+
 /*
- Class for calculating the energy of molecules in the system given 
+ Class for calculating the energy of molecules in the system given
  an ASolver object
  */
 class EnergyCalc
@@ -113,6 +112,66 @@ public:
   
   MyVector<double> get_fi(int i)     { return F_[i]; }
   VecOfVecs<double>::type get_F()    { return F_; }
+  
+};
+
+/*
+ Class for calculating the torque on every molecule in the system
+ */
+class TorqueCalc
+{
+protected:
+  
+  // outer vector has an entry for every molecule. Inner vector is the torque
+  // on that molecule
+  VecOfVecs<cmplx>::type tau_;
+  
+  shared_ptr<SHCalc> _shCalc_;
+  shared_ptr< MyVector<VecOfMats<cmplx>::type > > _gradL_;
+  
+  Constants consts_;
+  shared_ptr<System> _sys_;
+  
+  double epsS_;
+  int N_;
+  int p_;
+  
+  /*
+   Enum for the units of energy
+   */
+  
+  shared_ptr<VecOfMats<cmplx>::type> _gamma_;
+  
+  /*
+   Calculate H vector (eq 42 and 43 in Lotan 2006)
+   */
+  VecOfMats<cmplx>::type calc_H(int i);
+  
+public:
+  
+  TorqueCalc(SHCalc shCalc, MyVector<VecOfMats<cmplx>::type> gradL,
+             Constants consts, System sys, VecOfMats<cmplx>::type gamma,
+             int p);
+  
+  void calc_tau();  // fill tau_
+  
+  /*
+   Calculate inner product of two matrices as defined in equation 29 of Lotan
+   2006
+   */
+  cmplx lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p)
+  {
+    cmplx ip;
+    int n, m;
+    for (n = 0; n < p; n++)
+    {
+      for (m = -n; m <= -n; m++)
+      {
+        ip += U(n, m+p) * conj(V(n, m+p));
+      }
+    }
+    return ip;
+  }
   
 };
 
