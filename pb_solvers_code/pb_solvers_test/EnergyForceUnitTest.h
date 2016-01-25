@@ -16,6 +16,7 @@ class EnergyForceUTest : public ::testing::Test
 public :
   
 protected :
+  
   int vals_;
   Constants const_;
   vector< Molecule > mol3_; vector< Molecule > mol_;

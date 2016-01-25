@@ -75,7 +75,7 @@ void BD::indi_trans_update(int i, MyVector<double> fi)
 
 void BD::indi_rot_update(int i, MyVector<double> tau_i)
 {
-  double coeff = (rotDiffConsts_[i] * dt_) / (kb_ * T_);
+  double coeff = rotDiffConsts_[i] * dt_ * _sys_->get_consts().get_ikbt();
   Pt dtheta = (tau_i * coeff);
   
   bool accept = false;
