@@ -84,14 +84,32 @@ void System::check_for_overlap()
   double ai, aj;
   for (i = 0; i < N_; i++)
   {
+    pi = molecules_[i].get_center();
+    ai = molecules_[i].get_a();
     for (j = 0; j < N_; j++)
     {
-      pi = molecules_[i].get_center();
       pj = molecules_[j].get_center();
-      ai = molecules_[i].get_a();
       aj = molecules_[j].get_a();
       dist = pi.dist(pj);
       if (dist < (ai + aj)) throw OverlappingMoleculeException(i, j);
     }
   }
 }
+
+void Molecule::translate(Pt dr)
+{
+  for (int i = 0; i < M_; i++)
+  {
+    pos_[i] = pos_[i]+ dr;
+  }
+}
+
+void Molecule::rotate(Quat qrot)
+{
+  for (int i = 0; i < M_; i++)
+  {
+    pos_[i] = qrot.rotate_point(pos_[i]);
+  }
+}
+
+

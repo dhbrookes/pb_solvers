@@ -139,7 +139,6 @@ protected:
   /*
    Enum for the units of energy
    */
-  
   shared_ptr<VecOfMats<cmplx>::type> _gamma_;
   
   /*

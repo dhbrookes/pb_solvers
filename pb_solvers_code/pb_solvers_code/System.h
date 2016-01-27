@@ -39,7 +39,9 @@ public:
   const double get_qj(int j) const      { return qs_[j]; }
   Pt get_posj(int j) const              { return pos_[j]; }
   Pt get_center() const                 { return center_; }
-
+  
+  void translate(Pt dr);
+  void rotate(Quat qrot);
   
 };
 
@@ -67,10 +69,19 @@ public:
   const double get_Mi(int i) const { return molecules_[i].get_m(); }
   const double get_qij(int i, int j) const { return molecules_[i].get_qj(j); }
   Pt get_posij(int i, int j) { return molecules_[i].get_posj(j); }
-  const Molecule get_molecule(int i) const { return molecules_[i]; }
+  Molecule get_molecule(int i) const { return molecules_[i]; }
   Pt get_centeri(int i) { return molecules_[i].get_center(); }
   double get_radi(int i) { return molecules_[i].get_a(); }
   const double get_lambda()  { return lambda_; }
+  
+  // translate every charge in molecule i by the vector dr
+  void translate_mol(int i, Pt dr) { get_molecule(i).translate(dr); }
+  
+  // rotate every charge in molecule i
+  void rotate_mol(int i, Quat qrot)
+  {
+    get_molecule(i).rotate(qrot);
+  }
   
   /*
    Check to determine if any molecules are overlapping

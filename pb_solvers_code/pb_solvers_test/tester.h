@@ -15,6 +15,7 @@
 #include "BesselCalcTest.h"
 #include "EnergyForceTest.h"
 #include "ConstantsTest.h"
+#include "EnergyForceTest.h"
 #include "ReExpCalcTest.h"
 #include "SHCalcTest.h"
 

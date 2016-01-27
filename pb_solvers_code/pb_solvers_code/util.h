@@ -120,6 +120,12 @@ public:
   {
   }
   
+  //constructor given a vector
+  Point(MyVector<T> vec, bool sph=false)
+  :p1_(vec[0]), p2_(vec[1]), p3_(vec[2]), sph_(sph)
+  {
+  }
+  
   //arithmetic operators:
   
   //scalar multiplication
@@ -133,7 +139,7 @@ public:
     return pout;
   }
   
-  Point<T> operator+(Point<T>& other)
+  Point<T> operator+(Point<T> other)
   {
     Point<T> pout;
     if (sph_) convert_to_euclidean();
@@ -196,9 +202,101 @@ public:
     return p3_;
   }
   
+  T norm2()
+  {
+    return p1_*p1_ + p2_*p2_ + p3_*p3_;
+  }
+  
+  T norm()
+  {
+    return sqrt(norm2());
+  }
+  
+};
+
+/*
+ Class for storing quaternions, which are defined as a real part and a vector
+ part
+ */
+class Quaternion
+{
+protected:
+  double w_;  // real part
+  //imaginary coefficients:
+  double a_;
+  double b_;
+  double c_;
+  
+public:
+  typedef Quaternion Quat;
+  
+  /*
+   Construct a quaternion given all the coefficients explicitly
+   */
+  Quaternion(double w=0, double a=0, double b=0, double c=0):
+  w_(w), a_(a), b_(b), c_(c)
+  {
+  }
+  
+  /*
+   Construct a quarernion given an angle and axis of rotation
+   */
+  Quaternion(double theta, Point<double> axis)
+  {
+    w_ = cos(theta/2);
+    double scal = sin(theta/2);
+    a_ = axis.x() * scal;
+    b_ = axis.y() * scal;
+    c_ = axis.z() * scal;
+  }
+  
+  // returns the conjugate of this quarternion, which negates all complex terms
+  Quat conj()
+  {
+    return Quat(w_, -a_, -b_, -c_);
+  }
+  
+  /*
+   Right multiply this by another quarternion
+   */
+  Quat operator*(Quat rhs)
+  {
+    double t0, t1, t2, t3; // resulting coefficients
+    double q0, q1, q2, q3; // this coeffs
+    double r0, r1, r2, r3; // rhs coeffs
+    
+    q0=w_; q1=a_; q2=b_; q3=c_;
+    r0=rhs.w_; r1=rhs.a_; r2=rhs.b_; r3=rhs.c_;
+    
+    t0 = r0*q0 - r1*q1 - r2*q2 - r3*q3;
+    t1 = r0*q1 + r1*q0 - r2*q3 + r3*q2;
+    t2 = r0*q2 + r1*q3 + r2*q0 - r3*q1;
+    t3 = r0*q3 - r1*q2 + r2*q1 + r3*q0;
+    
+    return Quat(t0, t1, t2, t3);
+  }
+  
+  /*
+   Rotate a point with this quarternion. If the quarternion is q and the point
+   is p, then this returns q*p*conj(q)
+   */
+  Point<double> rotate_point(Point<double> pt)
+  {
+    //make the point a quarternion with real part=0
+    Quat p (0, pt.x(), pt.y(), pt.z());
+    Quat q_conj = conj();
+    
+    Quat result = *this * p;
+    result = result * q_conj;
+    
+    Point<double> pp (result.a_, result.b_, result.c_);
+    return pp;
+  }
+//
 };
 
 typedef complex<double> cmplx;
 typedef Point<double> Pt;
+typedef Quaternion Quat;
 
 #endif /* util_hpp */

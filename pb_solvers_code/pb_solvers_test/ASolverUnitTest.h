@@ -194,8 +194,7 @@ protected :
   double dAdy1imSing[15] = {0,0,-0.00025467424,0,0.00015056789,0,0,
     -6.5572367e-05,0,0,0,2.53063413e-05,0,0,0};
   double dAdz1imSing[15] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-  
-  
+
 } ; // end ASolverUTest
 
 
@@ -582,5 +581,6 @@ TEST_F(ASolverUTest, checkdLSing)
     }
   }
 }
+
 
 #endif
