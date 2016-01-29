@@ -223,40 +223,41 @@ void ASolver::pre_compute_gradT_A()
   cmplx sign;
   
   // relevant re-expansions (g prefix means gradient):
-  VecOfMats<cmplx>::type gT_Aij, gTA;
+  VecOfMats<cmplx>::type gTj_Ai, gTA;
   bool prev = true; //want to re-expand previous
   for (i = 0; i < N_; i++) // molecule of interest
   {
     for (j = 0; j < N_; j++) // gradient of interest
     {
-      gT_Aij = VecOfMats<cmplx>::type (3);
+      gTj_Ai = VecOfMats<cmplx>::type (3);
       for (dim = 0; dim < 3; dim++)
-        gT_Aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
+        gTj_Ai.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
       
       if (j == i)
       {
         for (k = 0; k < N_; k++) // other molecules
         {
           if ( k == i ) continue;
-          gTA  = re_expandA_gradT( i, k, prev); // grad_j T^(i,k) A^(k)
+          gTA  = re_expandA_gradT( i, k, prev); // grad_i T^(i,k) A^(k)
           
           sign = (( k < i ) ? cmplx(-1.0, 0.0) : cmplx(1.0, 0.0));
           for (dim = 0; dim < 3; dim++)
             gTA[dim] = sign*gTA[dim];
           
-          gT_Aij += gTA;
+          gTj_Ai += gTA;
         }
       }
       else if (j > i)
       {
-        gT_Aij = re_expandA_gradT( i, j, prev); // grad_j T^(i,j) A^(j)
+        gTj_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(i,j) A^(j)
         for (dim = 0; dim < 3; dim++)
-          gT_Aij[dim] = cmplx(-1.0, 0.0)*gT_Aij[dim];
+          gTj_Ai[dim] = cmplx(-1.0, 0.0)*gTj_Ai[dim];
       }
       else
-        gT_Aij = re_expandA_gradT( i, j, prev); // grad_j T^(i,j) A^(j)
-      
-      gradT_A_.set_val(i, j, gT_Aij);
+      {
+        gTj_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(i,j) A^(j)
+      }
+      gradT_A_.set_val(i, j, gTj_Ai);
     }
   }
 }
@@ -714,18 +715,18 @@ cmplx ASolver::calc_indi_e(int i, int n, int m)
 {
   cmplx e = 0.0;
   int j;
-  double q, rho;
+  double q, rho, lambda;
   for (j = 0; j < _sys_->get_Mi(i); j++)
   {
     q = _sys_->get_qij(i, j);
     rho = _sys_->get_posij(i, j).r();
+    lambda = pow(_sys_->get_lambda(), n);
     // q_ij * (rho_ij)^n * Y_(n,m)(theta_ij, phi_ij):
     cmplx all_sh_acc = all_sh[i][j](n, abs(m));
     if ( m < 0 )
       all_sh_acc = conj( all_sh_acc );
 
-    e += q * pow( rho, n ) * all_sh_acc;
-    
+    e += q * ( pow( rho, n ) / lambda ) * all_sh_acc;
   }
   return e;
 }
@@ -895,6 +896,24 @@ MyVector<VecOfMats<cmplx>::type > ASolver::calc_gradL()
   {
     inner1 = get_gradT_Aij( i, i);
     
+    for (int j = 0; j < 3; j++)
+    {
+      cout << "For precompute " << j << " of mol " << i << endl;
+      for (int n = 0; n < 5; n++)
+      {
+        for (int m = 0; m <= n; m++)
+        {
+          double  r = inner1[j](n, m+p_).real();
+          double im = inner1[j](n, m+p_).imag();
+          r  = fabs( r) > 1e-9 ?  r : 0;
+          im = fabs(im) > 1e-9 ? im : 0;
+          cout << "(" << setprecision (9) << r << "," << im << ")  ";
+        }
+        cout << endl;
+      }
+      cout << endl;
+    }
+    
     for (k = 0; k < N_; k++) // other molecules
     {
       if (k == i) continue;
@@ -958,11 +977,11 @@ void ASolver::print_Ei( int i, int p)
   {
     for (int m = 0; m <= n; m++)
     {
-      double  r = get_E_ni(i,n,m).real();
+      double  r = get_E_ni( i, n, m).real();
       double im = get_E_ni( i, n, m).imag();
       r  = fabs( r) > 1e-9 ?  r : 0;
       im = fabs(im) > 1e-9 ? im : 0;
-      cout << "(" << r << "," << im << ")  ";
+      cout << "(" << setprecision (9)  << r << "," << im << ")  ";
     }
     cout << endl;
   }
@@ -983,7 +1002,7 @@ void ASolver::print_Ai( int i, int p)
       double im = get_A_ni( i, n, m).imag();
       r  = fabs( r) > 1e-9 ?  r : 0;
       im = fabs(im) > 1e-9 ? im : 0;
-      cout << "(" << setprecision (9) << r << "," << im << ")  ";
+      cout << " (" << setprecision (9) << r << "," << im << ")  ";
     }
     cout << endl;
   }
@@ -1004,7 +1023,7 @@ void ASolver::print_dAidx( int i, int j, int p)
       double im = get_dAdx_ni(i, j, n, m).imag();
       r  = fabs( r) > 1e-9 ?  r : 0;
       im = fabs(im) > 1e-9 ? im : 0;
-      cout << "(" << setprecision (9) << r << "," << im << ")  ";
+      cout << " (" << setprecision (9) << r << "," << im << ")  ";
     }
     cout << endl;
   }
@@ -1048,7 +1067,7 @@ void ASolver::print_dAidz( int i, int j, int p)
       im = fabs(im) > 1e-9 ? im : 0;
       cout << "(" << setprecision (9) << r << "," << im << ")  ";
     }
-        cout << endl;
+    cout << endl;
   }
   cout << endl;
 }

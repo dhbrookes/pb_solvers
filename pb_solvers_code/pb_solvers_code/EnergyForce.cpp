@@ -81,7 +81,7 @@ void ForceCalc::calc_force()
       ip2 = 0.0;
       for (n = 0; n < p_; n++)
       {
-        for (m = -n; m < p_; m++)
+        for (m = -n; m <= n; m++)
         {
           unm1 = gLi[j](n, m + p_);
           vnm1 = Ai(n, m + p_);
@@ -92,6 +92,7 @@ void ForceCalc::calc_force()
           ip2 += unm2.real()*vnm2.real() + unm2.imag()*vnm2.imag();
         }
       }
+      
       inner.set_val(j, -1.0/const_.get_dielectric_water() * (ip1 + ip2));
     }
     F_.set_val(i, inner);

@@ -27,8 +27,7 @@ class CTester
 public:
 	
 	int unitTest(int argc, char * argv[])
-	{
-    
+	{    
     ASolverTest ASolvT;
     ASolvT.RunASolverTest();
     cout << "Complete ASolv test" << endl;
