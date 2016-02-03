@@ -199,7 +199,8 @@ public:
   
   double get_sval(int n, int l, int m)
   {
-    return S_[n](l, m+2*p_);
+    if ( m < 0 ) return S_[n](l, -m+2*p_);
+    else         return S_[n](l, m+2*p_);
   }
   
   double get_dsdr_val(int n, int l, int m)

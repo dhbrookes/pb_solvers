@@ -30,7 +30,7 @@ using namespace std;
 
 int main(int argc, char * argv[])
 {
-  bool test = true;
+  bool test = false;
   if (test)
   {
     cout << "Welcome to test suite" << endl;

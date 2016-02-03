@@ -163,6 +163,7 @@ public:
   VecOfMats<cmplx>::type&  get_delta()     { return delta_; }
   VecOfMats<cmplx>::type&  get_E()         { return E_; }
   VecOfMats<cmplx>::type&  get_A()         { return A_; }
+  MyMatrix<ReExpCoeffs>    get_T()         { return T_; }
   
   MyMatrix<VecOfMats<cmplx>::type > get_gradA() { return gradA_ ; }
   

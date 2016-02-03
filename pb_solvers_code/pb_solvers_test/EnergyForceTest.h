@@ -9,6 +9,8 @@
 #ifndef EnergyForceTest_h
 #define EnergyForceTest_h
 
+#include "EnergyForce.h"
+
 class EnForTest
 {
   

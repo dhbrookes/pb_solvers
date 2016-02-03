@@ -36,9 +36,8 @@ solvedA_(false)
 void ASolver::solve_A(double prec)
 {
   int MAX_POL_ROUNDS = 500;
-  prevA_ = A_;
   iter();
-  
+
   double scale_dev = (double)(p_*(p_+1)*0.5);
   double cng = scale_dev;
   int ct = 0;
@@ -101,7 +100,7 @@ void ASolver::iter()
       zj = re_expandA(i, j, prev);
       Z += zj;
     }
-
+    
     ai = delta_[i] * Z;
     ai += E_[i];
     ai = gamma_[i] * ai;
@@ -223,19 +222,19 @@ void ASolver::pre_compute_gradT_A()
   cmplx sign;
   
   // relevant re-expansions (g prefix means gradient):
-  VecOfMats<cmplx>::type gTj_Ai, gTA;
+  VecOfMats<cmplx>::type gjT_Ai, gTA;
   bool prev = true; //want to re-expand previous
   for (i = 0; i < N_; i++) // molecule of interest
   {
     for (j = 0; j < N_; j++) // gradient of interest
     {
-      gTj_Ai = VecOfMats<cmplx>::type (3);
+      gjT_Ai = VecOfMats<cmplx>::type (3);
       for (dim = 0; dim < 3; dim++)
-        gTj_Ai.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
+        gjT_Ai.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
       
       if (j == i)
       {
-        for (k = 0; k < N_; k++) // other molecules
+        for (k = 0; k < N_; k++)
         {
           if ( k == i ) continue;
           gTA  = re_expandA_gradT( i, k, prev); // grad_i T^(i,k) A^(k)
@@ -244,22 +243,24 @@ void ASolver::pre_compute_gradT_A()
           for (dim = 0; dim < 3; dim++)
             gTA[dim] = sign*gTA[dim];
           
-          gTj_Ai += gTA;
+          gjT_Ai += gTA;
         }
       }
       else if (j > i)
       {
-        gTj_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(i,j) A^(j)
+        gjT_Ai = re_expandA_gradT( i, j, prev); // grad_j T^(i,j) A^(j)
         for (dim = 0; dim < 3; dim++)
-          gTj_Ai[dim] = cmplx(-1.0, 0.0)*gTj_Ai[dim];
+          gjT_Ai[dim] = cmplx(-1.0, 0.0)*gjT_Ai[dim];
       }
       else
       {
-        gTj_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(i,j) A^(j)
+        gjT_Ai = re_expandA_gradT( i, j, prev); // grad_j T^(i,j) A^(j)
       }
-      gradT_A_.set_val(i, j, gTj_Ai);
+      gradT_A_.set_val(i, j, gjT_Ai);
     }
   }
+  
+  
 }
 
 //re-expand element j of A with element (i, j) of T and return results
@@ -410,6 +411,7 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
           inter += rval * aval;
         } // end s
         x1.set_val(n, m+p_, inter);
+          
       }
     } // end m
   } //end n
@@ -430,7 +432,7 @@ MyMatrix<cmplx> ASolver::expand_SX(int i, int j, MyMatrix<cmplx> x1,
   // fill x2:
   for (n = 0; n < p_; n++)
   {
-    for (m = 0; m <= n; m++)
+    for (m = -n; m <= n; m++)
     {
       inter  = 0;
       for (l = abs(m); l < p_; l++)
@@ -446,6 +448,27 @@ MyMatrix<cmplx> ASolver::expand_SX(int i, int j, MyMatrix<cmplx> x1,
           else sval = T_(lowI, hiJ).get_sval(l, n, m);
         }
         inter += sval * x1(l, m+p_);
+//        double  ri = inter.real(); double imi = inter.imag();
+//        //          ri  = fabs( ri) > 1e-15 ?  ri : 0; imi = fabs(imi) > 1e-15 ? imi : 0;
+//        //          if (m==0)
+//        //            cout << " inter (" << ri <<", " << imi << ") ";
+//        
+//        double  rT = sval.real();
+//        double imT = sval.imag();
+//        rT  = fabs( rT) > 1e-15 ?  rT : 0; imT = fabs(imT) > 1e-15 ? imT : 0;
+//        double  rx = x1(l, m+p_).real(); double imx = x1(l, m+p_).imag();
+//        rx  = fabs( rx) > 1e-15 ?  rx : 0; imx = fabs(imx) > 1e-15 ? imx : 0;
+//        
+//        ri = inter.real(); imi = inter.imag();
+//        ri  = fabs( ri) > 1e-15 ?  ri : 0; imi = fabs(imi) > 1e-15 ? imi : 0;
+//        
+//        if (( l == abs(m) ) && (m==-n))
+//          cout << " --- n = " << n << "--- " <<endl;
+////        if (m==0)
+//          cout << setprecision(5) << " This is n " << n << " m " << m << " and l " << l <<
+//          " \t and r  (" << rT <<", " << imT <<
+//          ") \t\t and x1  (" << rx <<", " << imx <<
+//          ") \t\t and inter (" << ri <<", " << imi << ") " <<endl;
       } // end l
       x2.set_val(n, m+p_, inter);
     } // end m
@@ -492,7 +515,29 @@ MyMatrix<cmplx> ASolver::expand_RHX(int i, int j, MyMatrix<cmplx> x2,
             rval = T_(lowI, hiJ).get_dr_dtheta_val(n, s, m);
           else
             rval = T_(lowI, hiJ).get_rval(n, s, m);
+
           inter += conj(rval) * x2(n, s+p_);
+//          double  ri = inter.real(); double imi = inter.imag();
+//          //          ri  = fabs( ri) > 1e-15 ?  ri : 0; imi = fabs(imi) > 1e-15 ? imi : 0;
+//          //          if (m==0)
+//          //            cout << " inter (" << ri <<", " << imi << ") ";
+//          
+//          double  rT = T_(lowI, hiJ).get_rval(n, s, m).real();
+//          double imT = T_(lowI, hiJ).get_rval(n, s, m).imag();
+//          rT  = fabs( rT) > 1e-15 ?  rT : 0; imT = fabs(imT) > 1e-15 ? imT : 0;
+//          double  rx = x2(n, s+p_).real(); double imx = x2(n, s+p_).imag();
+//          rx  = fabs( rx) > 1e-15 ?  rx : 0; imx = fabs(imx) > 1e-15 ? imx : 0;
+//          
+//          ri = inter.real(); imi = inter.imag();
+//          ri  = fabs( ri) > 1e-15 ?  ri : 0; imi = fabs(imi) > 1e-15 ? imi : 0;
+//          
+//          if (( s == -n ) && (m==0))
+//            cout << " --- n = " << n << "--- " <<endl;
+//          if (m==0)
+//            cout << setprecision(5) << " This is n " << n << " m " << m << " and s " << s <<
+//            " \t and r  (" << rT <<", " << imT <<
+//            ") \t\t and x2  (" << rx <<", " << imx <<
+//            ") \t\t and inter (" << ri <<", " << imi << ") " <<endl;
         } // end s
         z.set_val(n, m+p_, inter);
       }
@@ -835,10 +880,8 @@ void ASolver::init_A()
     // m goes from -n to n so you need 2*p columns:
     ai = MyMatrix<cmplx>(p_, 2*p_ + 1);
     ai = gamma_[i] * E_[i];
-    
     A_.set_val(i, ai);
   }
-  
 }
 
 // Initialize grad(A) matrix to the zero matrix
@@ -895,24 +938,6 @@ MyVector<VecOfMats<cmplx>::type > ASolver::calc_gradL()
   for (i = 0; i < N_; i++) // molecule of interest
   {
     inner1 = get_gradT_Aij( i, i);
-    
-    for (int j = 0; j < 3; j++)
-    {
-      cout << "For precompute " << j << " of mol " << i << endl;
-      for (int n = 0; n < 5; n++)
-      {
-        for (int m = 0; m <= n; m++)
-        {
-          double  r = inner1[j](n, m+p_).real();
-          double im = inner1[j](n, m+p_).imag();
-          r  = fabs( r) > 1e-9 ?  r : 0;
-          im = fabs(im) > 1e-9 ? im : 0;
-          cout << "(" << setprecision (9) << r << "," << im << ")  ";
-        }
-        cout << endl;
-      }
-      cout << endl;
-    }
     
     for (k = 0; k < N_; k++) // other molecules
     {
@@ -979,8 +1004,8 @@ void ASolver::print_Ei( int i, int p)
     {
       double  r = get_E_ni( i, n, m).real();
       double im = get_E_ni( i, n, m).imag();
-      r  = fabs( r) > 1e-9 ?  r : 0;
-      im = fabs(im) > 1e-9 ? im : 0;
+      r  = fabs( r) > 1e-15 ?  r : 0;
+      im = fabs(im) > 1e-15 ? im : 0;
       cout << "(" << setprecision (9)  << r << "," << im << ")  ";
     }
     cout << endl;
@@ -994,15 +1019,16 @@ void ASolver::print_Ei( int i, int p)
 void ASolver::print_Ai( int i, int p)
 {
   cout << "This is my A for molecule " << i << " poles " << p <<  endl;
-  for (int n = 0; n < p; n++)
+  for (int n = 0; n < 5; n++)
   {
     for (int m = 0; m <= n; m++)
     {
       double  r = get_A_ni( i, n, m).real();
       double im = get_A_ni( i, n, m).imag();
-      r  = fabs( r) > 1e-9 ?  r : 0;
-      im = fabs(im) > 1e-9 ? im : 0;
+      r  = fabs( r) > 1e-15 ?  r : 0;
+      im = fabs(im) > 1e-15 ? im : 0;
       cout << " (" << setprecision (9) << r << "," << im << ")  ";
+//      cout << "," << setprecision (9) << r ;
     }
     cout << endl;
   }
@@ -1021,8 +1047,8 @@ void ASolver::print_dAidx( int i, int j, int p)
     {
       double  r = get_dAdx_ni(i, j, n, m).real();
       double im = get_dAdx_ni(i, j, n, m).imag();
-      r  = fabs( r) > 1e-9 ?  r : 0;
-      im = fabs(im) > 1e-9 ? im : 0;
+      r  = fabs( r) > 1e-15 ?  r : 0;
+      im = fabs(im) > 1e-15 ? im : 0;
       cout << " (" << setprecision (9) << r << "," << im << ")  ";
     }
     cout << endl;
@@ -1042,8 +1068,8 @@ void ASolver::print_dAidy( int i, int j, int p)
     {
       double  r = get_dAdy_ni(i, j, n, m).real();
       double im = get_dAdy_ni(i, j, n, m).imag();
-      r  = fabs( r) > 1e-9 ?  r : 0;
-      im = fabs(im) > 1e-9 ? im : 0;
+      r  = fabs( r) > 1e-15 ?  r : 0;
+      im = fabs(im) > 1e-15 ? im : 0;
       cout << "(" << setprecision (9) << r << "," << im << ")  ";
     }
     cout << endl;
@@ -1063,8 +1089,8 @@ void ASolver::print_dAidz( int i, int j, int p)
     {
       double  r = get_dAdz_ni(i, j, n, m).real();
       double im = get_dAdz_ni(i, j, n, m).imag();
-      r  = fabs( r) > 1e-9 ?  r : 0;
-      im = fabs(im) > 1e-9 ? im : 0;
+      r  = fabs( r) > 1e-15 ?  r : 0;
+      im = fabs(im) > 1e-15 ? im : 0;
       cout << "(" << setprecision (9) << r << "," << im << ")  ";
     }
     cout << endl;
