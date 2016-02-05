@@ -301,17 +301,6 @@ void ReExpCoeffs::calc_s()
       }
     }
   }
-  
-  for (n = 1; n < p_ ; n++)
-  {
-    for (l = 0; l < p_; l++)
-    {
-      for (m = -n; m <= n; m++)
-      {
-        if ( m  < 0 ) set_sval(n, l, m, get_sval( l, n, -m));
-      }
-    }
-  }
 
 } // end calc_s
 
@@ -435,12 +424,8 @@ void ReExpCoeffs::calc_ds_dr()
   for (n = 1; n < p_ ; n++)
     for (l = 0; l < p_; l++)
       for (m = -n; m <= n; m++)
-        if (n > l) set_dsdr_val(n, l, m, pow(-1.0, n) * get_dsdr_val(l, n, m));
+        if (n > l) set_dsdr_val(n, l, m, pow(-1.0, n+l) * get_dsdr_val(l, n, m));
   
-  for (n = 1; n < p_ ; n++)
-    for (l = 0; l < p_; l++)
-      for (m = -n; m <= n; m++)
-        if ( m  < 0 ) set_dsdr_val(n, l, m, get_dsdr_val( l, n, -m));
 
 } // calc_ds_dr
 

@@ -194,18 +194,19 @@ public:
   cmplx get_rval(int n, int m, int s)
   {
     if ( m < 0 ) return conj(R_[n](-m, -s+2*p_));
-    else         return R_[n](m, s+2*p_);
+    else         return      R_[n]( m,  s+2*p_);
   }
   
   double get_sval(int n, int l, int m)
   {
     if ( m < 0 ) return S_[n](l, -m+2*p_);
-    else         return S_[n](l, m+2*p_);
+    else         return S_[n](l,  m+2*p_);
   }
   
   double get_dsdr_val(int n, int l, int m)
-  {
-    return dSdR_[n](l, m+2*p_);
+  { 
+    if ( m < 0 ) return dSdR_[n](l, -m+2*p_);
+    else         return dSdR_[n](l,  m+2*p_);
   }
   
   

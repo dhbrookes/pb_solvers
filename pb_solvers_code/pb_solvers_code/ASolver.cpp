@@ -36,7 +36,6 @@ solvedA_(false)
 void ASolver::solve_A(double prec)
 {
   int MAX_POL_ROUNDS = 500;
-  iter();
 
   double scale_dev = (double)(p_*(p_+1)*0.5);
   double cng = scale_dev;
@@ -59,10 +58,7 @@ void ASolver::solve_A(double prec)
 void ASolver::solve_gradA(double prec)
 {
   assert(solvedA_); // must solve a before this
-  
   int MAX_POL_ROUNDS = 500;
-  prevGradA_ = gradA_;
-  iter();
   
   double scale_dev = (double)(p_*(p_+1)*0.5*3.0);
   double cng = scale_dev;
@@ -116,10 +112,7 @@ void ASolver::grad_iter()
   prevGradA_ = gradA_;
   
   // relevant re-expansions (g prefix means gradient):
-  VecOfMats<cmplx>::type gTA, TgA;
-  
-  VecOfMats<cmplx>::type aij;
-  VecOfMats<cmplx>::type add;
+  VecOfMats<cmplx>::type aij, add;
   MyMatrix<cmplx> gamma_delta;
   bool prev = true; //want to re-expand previous
   for (i = 0; i < N_; i++) // molecule of interest
@@ -131,9 +124,11 @@ void ASolver::grad_iter()
         aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
       
       aij = get_gradT_Aij( i, j);
+      
       for (k = 0; k < N_; k++) // other molecules
       {
         if (k == i) continue;
+//        cout << "This is dA for i " << i << " and WRT j " << j << " and k " << k <<  endl;
         add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
         aij += add;
       }
@@ -142,6 +137,25 @@ void ASolver::grad_iter()
       aij.set_val(1, gamma_delta * aij[1]);
       aij.set_val(2, gamma_delta * aij[2]);
       gradA_.set_val(i, j, aij);
+      
+//      cout << "This is new dA for i " << i << " and WRT j " << j << endl;
+//          for (int dim=0; dim< 3; dim++)
+//          {
+//            for (int n = 0; n < 5; n++)
+//            {
+//              for (int m = 0; m <= n; m++)
+//              {
+//                double  r = aij[dim]( n, m+p_).real();
+//                double im = aij[dim]( n, m+p_).imag();
+//                r  = fabs( r) > 1e-15 ?  r : 0; im = fabs(im) > 1e-15 ? im : 0;
+//                cout << " (" << setprecision (9) << r << "," << im << ")  ";
+//                //      cout << "," << setprecision (9) << r ;
+//              }
+//              cout << endl;
+//            }
+//            cout << endl;
+//          }
+      
     }
   }
 }
@@ -242,20 +256,19 @@ void ASolver::pre_compute_gradT_A()
           sign = (( k < i ) ? cmplx(-1.0, 0.0) : cmplx(1.0, 0.0));
           for (dim = 0; dim < 3; dim++)
             gTA[dim] = sign*gTA[dim];
-          
+        
           gjT_Ai += gTA;
         }
       }
       else if (j > i)
+        gjT_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(j,i) A^(i)
+      else
       {
-        gjT_Ai = re_expandA_gradT( i, j, prev); // grad_j T^(i,j) A^(j)
+        gjT_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(j,i) A^(i)
         for (dim = 0; dim < 3; dim++)
           gjT_Ai[dim] = cmplx(-1.0, 0.0)*gjT_Ai[dim];
       }
-      else
-      {
-        gjT_Ai = re_expandA_gradT( i, j, prev); // grad_j T^(i,j) A^(j)
-      }
+
       gradT_A_.set_val(i, j, gjT_Ai);
     }
   }
@@ -292,7 +305,7 @@ VecOfMats<cmplx>::type ASolver::re_expand_gradA(int i, int j,
   x2 = expand_SX(  i, j, x1, whichS);
   z  = expand_RHX( i, j, x2, whichRH);
   Z.set_val(0, z);
-  
+
   // dA/dtheta:
   whichA = DDTHETA;
   x1 = expand_RX(  i, j, whichR, whichA, prev, wrt);
@@ -330,7 +343,7 @@ VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
   x2 = expand_SX( i, j, x1, whichS);
   z = expand_RHX( i, j, x2, whichRH);
   Z.set_val(0, z);
-  
+
   // dT/dtheta:
   whichR=BASE;
   whichS = BASE;
@@ -342,8 +355,7 @@ VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
   whichRH = BASE;
   whichR = DDTHETA;
   x1 = expand_RX(  i, j, whichR, whichA, prev);
-  x2 = (T_(lowI,hiJ).isSingular() ?
-        expand_SX(i, j, x1, whichS) : expand_SX(j, i, x1, whichS));
+  x2 = expand_SX(  i, j, x1, whichS);
   z2 = expand_RHX( i, j, x2, whichRH);
   Z.set_val(1, z1 + z2);
   
@@ -353,12 +365,11 @@ VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
   x1 = expand_RX(  i, j, whichR, whichA, prev);
   x2 = expand_SX(  i, j, x1, whichS);
   z1 = expand_RHX( i, j, x2, whichRH);
-  
+
   whichRH = BASE;
   whichR = DDPHI;
   x1 = expand_RX(  i, j, whichR, whichA, prev);
-  x2 = (T_(lowI,hiJ).isSingular() ?
-        expand_SX(i, j, x1, whichS) : expand_SX(j, i, x1, whichS));
+  x2 = expand_SX(  i, j, x1, whichS);
   z2 = expand_RHX( i, j, x2, whichRH);
   Z.set_val(2, z1 + z2);
   
@@ -377,6 +388,8 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
   lowI = i; hiJ = j;
   if ( i > j ) { lowI = j; hiJ  = i; }
 
+//  if (whichA != BASE) cout << " ------------- " << endl;
+  
   // fill X1:
   for (n = 0; n < p_; n++)
   {
@@ -408,12 +421,21 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
             rval = T_(lowI, hiJ).get_rval(n, m, s);
 
           aval = which_aval(whichA, prev, j, n, s, wrt);
+          double  r = aval.real();
+          double im = aval.imag();
+          r  = fabs( r) > 1e-15 ?  r : 0;
+          im = fabs(im) > 1e-15 ? im : 0;
+          
+//          if ((m == 0) && (whichA != BASE))
+//            cout << " (" << setprecision (9) << r << "," << im << ")  " ; //cout << " This is n " << n << " m " << m << " out " <<
+          
           inter += rval * aval;
         } // end s
+
         x1.set_val(n, m+p_, inter);
-          
       }
     } // end m
+//    if (whichA != BASE) cout << endl;
   } //end n
   return x1;
 }
@@ -448,27 +470,6 @@ MyMatrix<cmplx> ASolver::expand_SX(int i, int j, MyMatrix<cmplx> x1,
           else sval = T_(lowI, hiJ).get_sval(l, n, m);
         }
         inter += sval * x1(l, m+p_);
-//        double  ri = inter.real(); double imi = inter.imag();
-//        //          ri  = fabs( ri) > 1e-15 ?  ri : 0; imi = fabs(imi) > 1e-15 ? imi : 0;
-//        //          if (m==0)
-//        //            cout << " inter (" << ri <<", " << imi << ") ";
-//        
-//        double  rT = sval.real();
-//        double imT = sval.imag();
-//        rT  = fabs( rT) > 1e-15 ?  rT : 0; imT = fabs(imT) > 1e-15 ? imT : 0;
-//        double  rx = x1(l, m+p_).real(); double imx = x1(l, m+p_).imag();
-//        rx  = fabs( rx) > 1e-15 ?  rx : 0; imx = fabs(imx) > 1e-15 ? imx : 0;
-//        
-//        ri = inter.real(); imi = inter.imag();
-//        ri  = fabs( ri) > 1e-15 ?  ri : 0; imi = fabs(imi) > 1e-15 ? imi : 0;
-//        
-//        if (( l == abs(m) ) && (m==-n))
-//          cout << " --- n = " << n << "--- " <<endl;
-////        if (m==0)
-//          cout << setprecision(5) << " This is n " << n << " m " << m << " and l " << l <<
-//          " \t and r  (" << rT <<", " << imT <<
-//          ") \t\t and x1  (" << rx <<", " << imx <<
-//          ") \t\t and inter (" << ri <<", " << imi << ") " <<endl;
       } // end l
       x2.set_val(n, m+p_, inter);
     } // end m
@@ -499,7 +500,7 @@ MyMatrix<cmplx> ASolver::expand_RHX(int i, int j, MyMatrix<cmplx> x2,
         if (whichRH == BASE)
         {
           if (vec.theta() > M_PI/2.0)
-            z.set_val(n, m+p_, (n%2 == 0 ? x2(n,m+p_) : -x2(n,m+p_)));
+            z.set_val(n, m+p_, (n%2 == 0 ? x2(n,-m+p_) : -x2(n,-m+p_)));
           else z.set_val(n, m+p_, x2(n,m+p_));
         } else if (whichRH == DDTHETA)
           z = expand_dRdtheta_sing(lowI, hiJ, vec.theta(), x2, true);
@@ -517,27 +518,6 @@ MyMatrix<cmplx> ASolver::expand_RHX(int i, int j, MyMatrix<cmplx> x2,
             rval = T_(lowI, hiJ).get_rval(n, s, m);
 
           inter += conj(rval) * x2(n, s+p_);
-//          double  ri = inter.real(); double imi = inter.imag();
-//          //          ri  = fabs( ri) > 1e-15 ?  ri : 0; imi = fabs(imi) > 1e-15 ? imi : 0;
-//          //          if (m==0)
-//          //            cout << " inter (" << ri <<", " << imi << ") ";
-//          
-//          double  rT = T_(lowI, hiJ).get_rval(n, s, m).real();
-//          double imT = T_(lowI, hiJ).get_rval(n, s, m).imag();
-//          rT  = fabs( rT) > 1e-15 ?  rT : 0; imT = fabs(imT) > 1e-15 ? imT : 0;
-//          double  rx = x2(n, s+p_).real(); double imx = x2(n, s+p_).imag();
-//          rx  = fabs( rx) > 1e-15 ?  rx : 0; imx = fabs(imx) > 1e-15 ? imx : 0;
-//          
-//          ri = inter.real(); imi = inter.imag();
-//          ri  = fabs( ri) > 1e-15 ?  ri : 0; imi = fabs(imi) > 1e-15 ? imi : 0;
-//          
-//          if (( s == -n ) && (m==0))
-//            cout << " --- n = " << n << "--- " <<endl;
-//          if (m==0)
-//            cout << setprecision(5) << " This is n " << n << " m " << m << " and s " << s <<
-//            " \t and r  (" << rT <<", " << imT <<
-//            ") \t\t and x2  (" << rx <<", " << imx <<
-//            ") \t\t and inter (" << ri <<", " << imi << ") " <<endl;
         } // end s
         z.set_val(n, m+p_, inter);
       }
@@ -865,6 +845,7 @@ void ASolver::compute_T()
       T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
                                    besselK, reExpConsts_,
                                    kappa, _sys_->get_lambda(), true));
+    
       
     }
   }
@@ -1027,10 +1008,10 @@ void ASolver::print_Ai( int i, int p)
       double im = get_A_ni( i, n, m).imag();
       r  = fabs( r) > 1e-15 ?  r : 0;
       im = fabs(im) > 1e-15 ? im : 0;
-      cout << " (" << setprecision (9) << r << "," << im << ")  ";
-//      cout << "," << setprecision (9) << r ;
+//      cout << " (" << setprecision (9) << r << "," << im << ")  ";
+      cout << "," << setprecision (9) << im ;
     }
-    cout << endl;
+//    cout << endl;
   }
   cout << endl;
 }
