@@ -553,8 +553,8 @@ TEST_F(ASolverUTest, checkASing)
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-20);
-
+  ASolvTest.solve_A(1E-30);
+  
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
   {
@@ -695,69 +695,173 @@ TEST_F(ASolverUTest, checkASing)
 //}
 
 
-TEST_F(ASolverUTest, checkgradA)
+//TEST_F(ASolverUTest, checkgradA)
+//{
+//  mol_.clear( );
+//  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
+//    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
+//  for (int molInd = 0; molInd < 3; molInd ++ )
+//  {
+//    int M = 3;
+//    vector<double> charges(M); vector<Pt> posCharges(M);
+//    charges[0]    = 2.0; posCharges[0] = pos[molInd];
+//    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+//    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+//    
+//    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
+//    mol_.push_back( molNew );
+//  }
+//  
+//  const int vals           = 5;
+//  int nmol                 = 3;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), nvals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+//  ASolvTest.solve_A(1E-15); ASolvTest.solve_gradA(1E-36);
+//  
+////  for ( int n = 0; n < nmol; n++ )
+////  {
+////    for ( int m = 0; m < nmol; m++ )
+////    {
+////      ASolvTest.print_dAidx(m, m, 5);
+////      ASolvTest.print_dAidy(m, m, 5);
+////      ASolvTest.print_dAidz(m, m, 5);
+////    }
+////  }
+//  
+//  int ct = 0;
+//  for ( int n = 0; n < 3; n++ )
+//  {
+//    for ( int m = 0; m <= n; m++ )
+//    {
+////      if (dATrip02[ct] != 0)
+////        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 2, n, m).real()/dATrip02[ct],
+////                     1.0, preclim);
+////      if (dATrip11im[ct] != 0)
+////        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 1, n, m).imag()/dATrip11im[ct],
+////                     1.0, preclim);
+////      if (dATrip21[ct] != 0)
+////        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 1, n, m).real()/dATrip21[ct],
+////                     1.0, preclim);
+////      if (dATrip10im[ct] != 0)
+////        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 0, n, m).imag()/dATrip10im[ct],
+////                     1.0, preclim);
+//      ct++;
+//    }
+//  }
+//}
+
+TEST_F(ASolverUTest, checkgradASing)
 {
-  mol_.clear( );
-  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
-    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
-  for (int molInd = 0; molInd < 3; molInd ++ )
-  {
-    int M = 3;
-    vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0]    = 2.0; posCharges[0] = pos[molInd];
-    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
-    
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
-    mol_.push_back( molNew );
-  }
+//  mol_sing_.clear();
+//  Pt cgPosSi[2] = { Pt( 0.0, 0.0, -5.0 ), Pt( 0.0, 0.0, 0.0 ) };
+//  
+//  for (int molInd = 0; molInd < 2; molInd ++ )
+//  {
+//    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
+//    
+//    charges[0]    = 2.0;
+//    posCharges[0] = cgPosSi[molInd];
+//    
+//    Molecule molSing( M, 2.0, charges, posCharges);
+//    mol_sing_.push_back( molSing );
+//  }
   
-  const int vals           = 5;
-  int nmol                 = 3;
+  const int vals           = nvals;
+  int nmol                 = 2;
   BesselConstants bConsta  = BesselConstants( 2*vals );
   BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
   SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
   SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
+  System sys               = System( const_, mol_sing_ );
   ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
                                       sys.get_lambda(), nvals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-15); ASolvTest.solve_gradA(1E-36);
+  ASolvTest.solve_A(1E-30); ASolvTest.solve_gradA(1E-16);
   
-//  for ( int n = 0; n < nmol; n++ )
+//  for ( int m = 0; m < nmol; m++ )
 //  {
-    for ( int m = 0; m < nmol; m++ )
-    {
-      ASolvTest.print_dAidx(m, m, 5);
-      ASolvTest.print_dAidy(m, m, 5);
-      ASolvTest.print_dAidz(m, m, 5);
-    }
+//    ASolvTest.print_dAidx(m, m, 5);
+//    ASolvTest.print_dAidy(m, m, 5);
+//    ASolvTest.print_dAidz(m, m, 5);
 //  }
   
   int ct = 0;
-  for ( int n = 0; n < 3; n++ )
+  for ( int n = 0; n < 5; n++ )
   {
     for ( int m = 0; m <= n; m++ )
     {
-//      if (dATrip02[ct] != 0)
-//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 2, n, m).real()/dATrip02[ct],
-//                     1.0, preclim);
-//      if (dATrip11im[ct] != 0)
-//        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 1, n, m).imag()/dATrip11im[ct],
-//                     1.0, preclim);
-//      if (dATrip21[ct] != 0)
-//        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 1, n, m).real()/dATrip21[ct],
-//                     1.0, preclim);
-//      if (dATrip10im[ct] != 0)
-//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 0, n, m).imag()/dATrip10im[ct],
-//                     1.0, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 0, n, m).real(),
+//                  dASing00[ct], preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 0, n, m).imag(),
+//                  dASing00im[ct], preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).real(),
+//                  dASing01[ct], preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).imag(),
+//                  dASing01im[ct], preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 1, n, m).real(),
+//                  dASing11[ct], preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 1, n, m).imag(),
+//                  dASing11im[ct], preclim);
       ct++;
     }
   }
 }
 
-//TEST_F(ASolverUTest, checkgradASing)
+//TEST_F(ASolverUTest, checkL)
+//{
+//  mol_.clear( );
+//  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
+//    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
+//  for (int molInd = 0; molInd < 2; molInd ++ )
+//  {
+//    int M = 3;
+//    vector<double> charges(M); vector<Pt> posCharges(M);
+//    charges[0]    = 2.0; posCharges[0] = pos[molInd];
+//    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+//    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+//    
+//    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
+//    mol_.push_back( molNew );
+//  }
+//  const int vals           = nvals;
+//  int nmol                 = 2;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), nvals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+//  ASolvTest.solve_A(1E-20);
+//  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
+//  
+//  int ct = 0;
+//  for ( int n = 0; n < 5; n++ )
+//  {
+//    for ( int m = 0; m <= n; m++ )
+//    {
+//      EXPECT_NEAR( myL[0](n,m+nvals).real()/L0[ct],    1.0, preclim);
+//      if (L0_im[ct] != 0)
+//        EXPECT_NEAR( myL[0](n,m+nvals).imag()/L0_im[ct], 1.0, preclim);
+//      EXPECT_NEAR( myL[1](n,m+nvals).real()/L1[ct],    1.0, preclim);
+//      if (L1_im[ct] != 0)
+//        EXPECT_NEAR( myL[1](n,m+nvals).imag()/L1_im[ct], 1.0, preclim);
+//      ct++;
+//    }
+//  }
+//}
+//
+//TEST_F(ASolverUTest, checkLSing)
 //{
 //  const int vals           = nvals;
 //  int nmol                 = 2;
@@ -771,106 +875,22 @@ TEST_F(ASolverUTest, checkgradA)
 //  
 //  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
 //  ASolvTest.solve_A(1E-20);
-//  ASolvTest.solve_gradA(1E-16);
+//  
+//  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
 //  
 //  int ct = 0;
 //  for ( int n = 0; n < 5; n++ )
 //  {
 //    for ( int m = 0; m <= n; m++ )
 //    {
-//      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 0, n, m).real(),
-//                  dASing00[ct], preclim);
-//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 0, n, m).imag(),
-//                  dASing00im[ct], preclim);
-//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).real(),
-//                  dASing01[ct], preclim);
-//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).imag(),
-//                  dASing01im[ct], preclim);
-//      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 1, n, m).real(),
-//                  dASing11[ct], preclim);
-//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 1, n, m).imag(),
-//                  dASing11im[ct], preclim);
+//      EXPECT_NEAR( myL[0](n,m+nvals).real(), L0Sing[ct], preclim);
+//      EXPECT_NEAR( myL[0](n,m+nvals).imag(),          0, preclim);
+//      EXPECT_NEAR( myL[1](n,m+nvals).real(), L1Sing[ct], preclim);
+//      EXPECT_NEAR( myL[1](n,m+nvals).imag(),          0, preclim);
 //      ct++;
 //    }
 //  }
 //}
-
-TEST_F(ASolverUTest, checkL)
-{
-  mol_.clear( );
-  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
-    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
-  for (int molInd = 0; molInd < 2; molInd ++ )
-  {
-    int M = 3;
-    vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0]    = 2.0; posCharges[0] = pos[molInd];
-    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
-    
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
-    mol_.push_back( molNew );
-  }
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), nvals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-20);
-  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
-  
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-      EXPECT_NEAR( myL[0](n,m+nvals).real()/L0[ct],    1.0, preclim);
-      if (L0_im[ct] != 0)
-        EXPECT_NEAR( myL[0](n,m+nvals).imag()/L0_im[ct], 1.0, preclim);
-      EXPECT_NEAR( myL[1](n,m+nvals).real()/L1[ct],    1.0, preclim);
-      if (L1_im[ct] != 0)
-        EXPECT_NEAR( myL[1](n,m+nvals).imag()/L1_im[ct], 1.0, preclim);
-      ct++;
-    }
-  }
-}
-
-TEST_F(ASolverUTest, checkLSing)
-{
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), nvals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-20);
-  
-  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
-  
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-      EXPECT_NEAR( myL[0](n,m+nvals).real(), L0Sing[ct], preclim);
-      EXPECT_NEAR( myL[0](n,m+nvals).imag(),          0, preclim);
-      EXPECT_NEAR( myL[1](n,m+nvals).real(), L1Sing[ct], preclim);
-      EXPECT_NEAR( myL[1](n,m+nvals).imag(),          0, preclim);
-      ct++;
-    }
-  }
-}
 
 //TEST_F(ASolverUTest, checkdL)
 //{
