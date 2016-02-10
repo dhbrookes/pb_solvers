@@ -244,7 +244,6 @@ void ASolver::pre_compute_gradT_A()
   {
     for (j = 0; j < N_; j++) // gradient of interest
     {
-      cout << "This is new dA for i "<<i<<" WRT j "<<j<<endl;
       gjT_Ai = VecOfMats<cmplx>::type (3);
       for (dim = 0; dim < 3; dim++)
         gjT_Ai.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
@@ -254,8 +253,6 @@ void ASolver::pre_compute_gradT_A()
         for (k = 0; k < N_; k++)
         {
           if ( k == i ) continue;
-          cout << "This is new dA for i "<<i<<" WRT j "<<j<<" k "<<k<<endl;
-
           gTA  = re_expandA_gradT( i, k, prev); // grad_i T^(i,k) A^(k)
           
           sign = (( k < i ) ? cmplx(-1.0, 0.0) : cmplx(1.0, 0.0));
@@ -351,19 +348,19 @@ VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
 
 //cout << "This is new dA for i " << i << " and WRT j " << j << endl;
 
-    for (int n = 0; n < 5; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = z( n, m+p_).real();
-        double im = z( n, m+p_).imag();
-        r  = fabs( r) > 1e-15 ?  r : 0; im = fabs(im) > 1e-15 ? im : 0;
-        cout << " (" << setprecision (9) << r << "," << im << ")  ";
-        //      cout << "," << setprecision (9) << r ;
-      }
-      cout << endl;
-    }
-    cout << endl;
+//    for (int n = 0; n < 5; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        double  r = z( n, m+p_).real();
+//        double im = z( n, m+p_).imag();
+//        r  = fabs( r) > 1e-15 ?  r : 0; im = fabs(im) > 1e-15 ? im : 0;
+//        cout << " (" << setprecision (9) << r << "," << im << ")  ";
+//        //      cout << "," << setprecision (9) << r ;
+//      }
+//      cout << endl;
+//    }
+//    cout << endl;
   
   // dT/dtheta:
   whichR=BASE;
@@ -408,8 +405,6 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
   
   lowI = i; hiJ = j;
   if ( i > j ) { lowI = j; hiJ  = i; }
-
-//  if (whichR == DDTHETA) cout << " ------------- " << endl;
   
   // fill X1:
   for (n = 0; n < p_; n++)
@@ -430,15 +425,6 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
             x1 = expand_dRdtheta_sing(i, j, vec.theta(), false);
           else
             x1 = expand_dRdphi_sing(i, j, vec.theta(), false);
-//        double  r = x1( n, m+p_).real();
-//        double im = x1( n, m+p_).imag();
-//        r  = fabs( r) > 1e-15 ?  r : 0;
-//        im = fabs(im) > 1e-15 ? im : 0;
-//        
-//        if ((m >= 0) && (whichR == DDTHETA))
-//          cout << " (" << setprecision (9) << r << "," << im << ")  " ;
-//        //cout << " This is n " << n << " m " << m << " out " <<
-        
       } else
       {
         for (s = -n; s <= n; s++)
@@ -457,7 +443,6 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
         x1.set_val(n, m+p_, inter);
       }
     } // end m
-//    if (whichR == DDTHETA) cout << endl;
   } //end n
   return x1;
 }
@@ -573,14 +558,6 @@ MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i, int j, double theta,
       {
         x.set_val( n, m+p_, recip*T_(i,j).get_prefac_dR_val(n,m,0)*mat(n,m-1+p_)
                    + recip*T_(i,j).get_prefac_dR_val(n,m,1)*mat(n,m+1+p_));
-        
-//        double  rT = T_(i,j).get_prefac_dR_val(n,m,0);
-//        rT  = fabs( rT) > 1e-15 ?  rT : 0;
-//        double  r = mat(n,m-1+p_).real(); double im = mat(n,m-1+p_).imag();
-//        r  = fabs( r) > 1e-15 ?  r : 0; im = fabs(im) > 1e-15 ? im : 0;
-//        double  ro = x( n, m+p_).real(); double imo = x( n, m+p_).imag();
-//        ro  = fabs( ro) > 1e-15 ?  ro : 0; imo = fabs(imo) > 1e-15 ? imo : 0;
-//        cout << "this is my n " << n <<  " m " << m << "  rot sing " << setprecision (9) << rT <<"  " << " x1 (" <<  r << "," << im << ")  and out (" << ro << ", " << imo << ") " << endl;
       }
       
       x.set_val(n, n+p_,
@@ -599,14 +576,6 @@ MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i, int j, double theta,
         x.set_val( n, m+p_, recip*s*
                   (T_(i,j).get_prefac_dR_val(n,m,0)*mat(n,-m+1+p_)
                    + T_(i,j).get_prefac_dR_val(n,m,1)*mat(n,-m-1+p_)));
-      
-//      double  rT = T_(i,j).get_prefac_dR_val(n,m,0);
-//      rT  = fabs( rT) > 1e-15 ?  rT : 0;
-//      double  r = mat(n,m-1+p_).real(); double im = mat(n,m-1+p_).imag();
-//      r  = fabs( r) > 1e-15 ?  r : 0; im = fabs(im) > 1e-15 ? im : 0;
-//      double  ro = x( n, m+p_).real(); double imo = x( n, m+p_).imag();
-//      ro  = fabs( ro) > 1e-15 ?  ro : 0; imo = fabs(imo) > 1e-15 ? imo : 0;
-//      cout << "this is my n " << n <<  " m " << m << "  rot sing " << setprecision (9) << rT <<"  " << " x1 (" <<  r << "," << im << ")  and out (" << ro << ", " << imo << ") " << endl;
     }
     
       x.set_val(n,n+p_,recip*s*T_(i,j).get_prefac_dR_val(n,n,0)*mat(n,-n+1+p_));
@@ -1070,9 +1039,10 @@ void ASolver::print_dAidx( int i, int j, int p)
       double im = get_dAdx_ni(i, j, n, m).imag();
       r  = fabs( r) > 1e-15 ?  r : 0;
       im = fabs(im) > 1e-15 ? im : 0;
-      cout << " (" << setprecision (9) << r << "," << im << ")  ";
+//      cout << " (" << setprecision (9) << r << "," << im << ")  ";
+      cout << "," << setprecision (9) << im ;
     }
-    cout << endl;
+//    cout << endl;
   }
   cout << endl;
 }
@@ -1091,9 +1061,10 @@ void ASolver::print_dAidy( int i, int j, int p)
       double im = get_dAdy_ni(i, j, n, m).imag();
       r  = fabs( r) > 1e-15 ?  r : 0;
       im = fabs(im) > 1e-15 ? im : 0;
-      cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//      cout << "(" << setprecision (9) << r << "," << im << ")  ";
+      cout << "," << setprecision (9) << im ;
     }
-    cout << endl;
+//    cout << endl;
   }
   cout << endl;
 }
@@ -1112,9 +1083,10 @@ void ASolver::print_dAidz( int i, int j, int p)
       double im = get_dAdz_ni(i, j, n, m).imag();
       r  = fabs( r) > 1e-15 ?  r : 0;
       im = fabs(im) > 1e-15 ? im : 0;
-      cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//      cout << "(" << setprecision (9) << r << "," << im << ")  ";
+      cout << "," << setprecision (9) << im ;
     }
-    cout << endl;
+//    cout << endl;
   }
   cout << endl;
 }
