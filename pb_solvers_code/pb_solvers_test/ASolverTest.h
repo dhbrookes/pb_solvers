@@ -61,7 +61,6 @@ public :
     ASolvTest.solve_A( 1E-4 );
     ASolvTest.solve_gradA(1E-12);
   }
-  
 };
 
 
