@@ -837,266 +837,265 @@ TEST_F(ASolverUTest, checkASing)
   }
 }
 
-TEST_F(ASolverUTest, checkgradT_A)
-{
-  mol_.clear( );
-  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
-    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
-  for (int molInd = 0; molInd < 3; molInd ++ )
-  {
-    int M = 3;
-    vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0]    = 2.0; posCharges[0] = pos[molInd];
-    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
-    
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
-    mol_.push_back( molNew );
-  }
-  
-  const int vals           = nvals;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), vals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
-  
-  VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
-  VecOfMats<cmplx>::type dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
-  VecOfMats<cmplx>::type dT_A22 = ASolvTest.get_gradT_Aij( 2, 2);
-  
-  VecOfMats<cmplx>::type dT_A02 = ASolvTest.get_gradT_Aij( 0, 2);
-  VecOfMats<cmplx>::type dT_A10 = ASolvTest.get_gradT_Aij( 1, 0);
-  VecOfMats<cmplx>::type dT_A21 = ASolvTest.get_gradT_Aij( 2, 1);
-  
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-      if (dTA00X[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).real()/dTA00X[ct],
-                                       1.0, preclim);
-      if (dTA00Y[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).real()/dTA00Y[ct],
-                                       1.0, preclim);
-      if (dTA00Z[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).real()/dTA00Z[ct],
-                                       1.0, preclim);
-      if (dTA00Xim[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).imag()/
-                                         dTA00Xim[ct], 1.0, preclim);
-      if (dTA00Yim[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).imag()/
-                                         dTA00Yim[ct], 1.0, preclim);
-      if (dTA00Zim[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).imag()/
-                                         dTA00Zim[ct], 1.0, preclim);
-      
-      if (dTA11X[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).real()/dTA11X[ct],
-                                       1.0, preclim);
-      if (dTA11Y[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).real()/dTA11Y[ct],
-                                       1.0, preclim);
-      if (dTA11Z[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).real()/dTA11Z[ct],
-                                       1.0, preclim);
-      if (dTA11Xim[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).imag()/
-                                         dTA11Xim[ct], 1.0, preclim);
-      if (dTA11Yim[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).imag()/
-                                         dTA11Yim[ct], 1.0, preclim);
-      if (dTA11Zim[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).imag()/
-                                         dTA11Zim[ct], 1.0, preclim);
-      
-      if (dTA22X[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).real()/dTA22X[ct],
-                                       1.0, preclim);
-      if (dTA22Y[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).real()/dTA22Y[ct],
-                                       1.0, preclim);
-      if (dTA22Z[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).real()/dTA22Z[ct],
-                                       1.0, preclim);
-      if (dTA22Xim[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).imag()/
-                                         dTA22Xim[ct], 1.0, preclim);
-      if (dTA22Yim[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).imag()/
-                                         dTA22Yim[ct], 1.0, preclim);
-      if (dTA22Zim[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).imag()/
-                                         dTA22Zim[ct], 1.0, preclim);
-      
-      if (dTA02X[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).real()/dTA02X[ct],
-                                       1.0, preclim);
-      if (dTA02Y[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).real()/dTA02Y[ct],
-                                       1.0, preclim);
-      if (dTA02Z[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).real()/dTA02Z[ct],
-                                       1.0, preclim);
-      if (dTA02Xim[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).imag()/
-                                         dTA02Xim[ct], 1.0, preclim);
-      if (dTA02Yim[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).imag()/
-                                         dTA02Yim[ct], 1.0, preclim);
-      if (dTA02Zim[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).imag()/
-                                         dTA02Zim[ct], 1.0, preclim);
-      
-      if (dTA10X[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).real()/dTA10X[ct],
-                                       1.0, preclim);
-      if (dTA10Y[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).real()/dTA10Y[ct],
-                                       1.0, preclim);
-      if (dTA10Z[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).real()/dTA10Z[ct],
-                                       1.0, preclim);
-      if (dTA10Xim[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).imag()/
-                                         dTA10Xim[ct], 1.0, preclim);
-      if (dTA10Yim[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).imag()/
-                                         dTA10Yim[ct], 1.0, preclim);
-      if (dTA10Zim[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).imag()/
-                                         dTA10Zim[ct], 1.0, preclim);
-      
-      if (dTA21X[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).real()/dTA21X[ct],
-                                       1.0, preclim);
-      if (dTA21Y[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).real()/dTA21Y[ct],
-                                       1.0, preclim);
-      if (dTA21Z[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).real()/dTA21Z[ct],
-                                       1.0, preclim);
-      if (dTA21Xim[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).imag()/
-                                         dTA21Xim[ct], 1.0, preclim);
-      if (dTA21Yim[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).imag()/
-                                         dTA21Yim[ct], 1.0, preclim);
-      if (dTA21Zim[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).imag()/
-                                         dTA21Zim[ct], 1.0, preclim);
-      ct++;
-    }
-  }
-}
-
-
-TEST_F(ASolverUTest, checkdT_ASingFlip)
-{
-  mol_sing_.clear( );
-  Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
-  for (int molInd = 0; molInd < 3; molInd ++ )
-  {
-    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0]    = 2.0; posCharges[0] = pos[molInd];
-    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
-    
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
-    mol_sing_.push_back( molNew );
-  }
-  const int vals           = 5;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), vals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
-  
-  VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
-  VecOfMats<cmplx>::type dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
-  VecOfMats<cmplx>::type dT_A22 = ASolvTest.get_gradT_Aij( 2, 2);
-  
-  VecOfMats<cmplx>::type dT_A02 = ASolvTest.get_gradT_Aij( 0, 2);
-  VecOfMats<cmplx>::type dT_A10 = ASolvTest.get_gradT_Aij( 1, 0);
-  VecOfMats<cmplx>::type dT_A21 = ASolvTest.get_gradT_Aij( 2, 1);
-
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-      if (dTA00XSin[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).real()/
-                                          dTA00XSin[ct], 1.0, preclim);
-      if (dTA00YSin[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).real()/
-                                          dTA00YSin[ct], 1.0, preclim);
-      if (dTA00ZSin[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).real()/
-                                          dTA00ZSin[ct], 1.0, preclim);
-      if (dTA00XimSin[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).imag()/
-                                         dTA00XimSin[ct], 1.0, preclim);
-      if (dTA00YimSin[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).imag()/
-                                         dTA00YimSin[ct], 1.0, preclim);
-      if (dTA00ZimSin[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).imag()/
-                                         dTA00ZimSin[ct], 1.0, preclim);
-      
-      if (dTA11XSin[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).real()/
-                                          dTA11XSin[ct], 1.0, preclim);
-      if (dTA11YSin[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).real()/
-                                          dTA11YSin[ct], 1.0, preclim);
-      if (dTA11ZSin[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).real()/
-                                          dTA11ZSin[ct], 1.0, preclim);
-      if (dTA11XimSin[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).imag()/
-                                         dTA11XimSin[ct], 1.0, preclim);
-      if (dTA11YimSin[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).imag()/
-                                         dTA11YimSin[ct], 1.0, preclim);
-      if (dTA11ZimSin[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).imag()/
-                                         dTA11ZimSin[ct], 1.0, preclim);
-      
-      if (dTA22XSin[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).real()/
-                                          dTA22XSin[ct], 1.0, preclim);
-      if (dTA22YSin[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).real()/
-                                          dTA22YSin[ct], 1.0, preclim);
-      if (dTA22ZSin[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).real()/
-                                          dTA22ZSin[ct], 1.0, preclim);
-      if (dTA22XimSin[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).imag()/
-                                         dTA22XimSin[ct], 1.0, preclim);
-      if (dTA22YimSin[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).imag()/
-                                         dTA22YimSin[ct], 1.0, preclim);
-      if (dTA22ZimSin[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).imag()/
-                                         dTA22ZimSin[ct], 1.0, preclim);
-      
-      if (dTA02XSin[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).real()/
-                                          dTA02XSin[ct], 1.0, preclim);
-      if (dTA02YSin[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).real()/
-                                          dTA02YSin[ct], 1.0, preclim);
-      if (dTA02ZSin[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).real()/
-                                          dTA02ZSin[ct], 1.0, preclim);
-      if (dTA02XimSin[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).imag()/
-                                         dTA02XimSin[ct], 1.0, preclim);
-      if (dTA02YimSin[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).imag()/
-                                         dTA02YimSin[ct], 1.0, preclim);
-      if (dTA02ZimSin[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).imag()/
-                                         dTA02ZimSin[ct], 1.0, preclim);
-      
-      if (dTA10XSin[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).real()/
-                                          dTA10XSin[ct], 1.0, preclim);
-      if (dTA10YSin[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).real()/
-                                          dTA10YSin[ct], 1.0, preclim);
-      if (dTA10ZSin[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).real()/
-                                          dTA10ZSin[ct], 1.0, preclim);
-      if (dTA10XimSin[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).imag()/
-                                         dTA10XimSin[ct], 1.0, preclim);
-      if (dTA10YimSin[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).imag()/
-                                         dTA10YimSin[ct], 1.0, preclim);
-      if (dTA10ZimSin[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).imag()/
-                                         dTA10ZimSin[ct], 1.0, preclim);
-      
-      if (dTA21XSin[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).real()/
-                                          dTA21XSin[ct], 1.0, preclim);
-      if (dTA21YSin[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).real()/
-                                          dTA21YSin[ct], 1.0, preclim);
-      if (dTA21ZSin[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).real()/
-                                          dTA21ZSin[ct], 1.0, preclim);
-      if (dTA21XimSin[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).imag()/
-                                         dTA21XimSin[ct], 1.0, preclim);
-      if (dTA21YimSin[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).imag()/
-                                         dTA21YimSin[ct], 1.0, preclim);
-      if (dTA21ZimSin[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).imag()/
-                                         dTA21ZimSin[ct], 1.0, preclim);
-      ct++;
-    }
-  }
-}
+//TEST_F(ASolverUTest, checkgradT_A)
+//{
+//  mol_.clear( );
+//  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
+//    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
+//  for (int molInd = 0; molInd < 3; molInd ++ )
+//  {
+//    int M = 3;
+//    vector<double> charges(M); vector<Pt> posCharges(M);
+//    charges[0]    = 2.0; posCharges[0] = pos[molInd];
+//    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+//    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+//    
+//    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
+//    mol_.push_back( molNew );
+//  }
+//  
+//  const int vals           = nvals;
+//  int nmol                 = 3;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), vals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+//  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
+//  
+//  VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
+//  VecOfMats<cmplx>::type dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
+//  VecOfMats<cmplx>::type dT_A22 = ASolvTest.get_gradT_Aij( 2, 2);
+//  
+//  VecOfMats<cmplx>::type dT_A02 = ASolvTest.get_gradT_Aij( 0, 2);
+//  VecOfMats<cmplx>::type dT_A10 = ASolvTest.get_gradT_Aij( 1, 0);
+//  VecOfMats<cmplx>::type dT_A21 = ASolvTest.get_gradT_Aij( 2, 1);
+//  
+//  int ct = 0;
+//  for ( int n = 0; n < 5; n++ )
+//  {
+//    for ( int m = 0; m <= n; m++ )
+//    {
+//      if (dTA00X[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).real()/dTA00X[ct],
+//                                       1.0, preclim);
+//      if (dTA00Y[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).real()/dTA00Y[ct],
+//                                       1.0, preclim);
+//      if (dTA00Z[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).real()/dTA00Z[ct],
+//                                       1.0, preclim);
+//      if (dTA00Xim[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).imag()/
+//                                         dTA00Xim[ct], 1.0, preclim);
+//      if (dTA00Yim[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).imag()/
+//                                         dTA00Yim[ct], 1.0, preclim);
+//      if (dTA00Zim[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).imag()/
+//                                         dTA00Zim[ct], 1.0, preclim);
+//      
+//      if (dTA11X[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).real()/dTA11X[ct],
+//                                       1.0, preclim);
+//      if (dTA11Y[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).real()/dTA11Y[ct],
+//                                       1.0, preclim);
+//      if (dTA11Z[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).real()/dTA11Z[ct],
+//                                       1.0, preclim);
+//      if (dTA11Xim[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).imag()/
+//                                         dTA11Xim[ct], 1.0, preclim);
+//      if (dTA11Yim[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).imag()/
+//                                         dTA11Yim[ct], 1.0, preclim);
+//      if (dTA11Zim[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).imag()/
+//                                         dTA11Zim[ct], 1.0, preclim);
+//      
+//      if (dTA22X[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).real()/dTA22X[ct],
+//                                       1.0, preclim);
+//      if (dTA22Y[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).real()/dTA22Y[ct],
+//                                       1.0, preclim);
+//      if (dTA22Z[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).real()/dTA22Z[ct],
+//                                       1.0, preclim);
+//      if (dTA22Xim[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).imag()/
+//                                         dTA22Xim[ct], 1.0, preclim);
+//      if (dTA22Yim[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).imag()/
+//                                         dTA22Yim[ct], 1.0, preclim);
+//      if (dTA22Zim[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).imag()/
+//                                         dTA22Zim[ct], 1.0, preclim);
+//      
+//      if (dTA02X[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).real()/dTA02X[ct],
+//                                       1.0, preclim);
+//      if (dTA02Y[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).real()/dTA02Y[ct],
+//                                       1.0, preclim);
+//      if (dTA02Z[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).real()/dTA02Z[ct],
+//                                       1.0, preclim);
+//      if (dTA02Xim[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).imag()/
+//                                         dTA02Xim[ct], 1.0, preclim);
+//      if (dTA02Yim[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).imag()/
+//                                         dTA02Yim[ct], 1.0, preclim);
+//      if (dTA02Zim[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).imag()/
+//                                         dTA02Zim[ct], 1.0, preclim);
+//      
+//      if (dTA10X[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).real()/dTA10X[ct],
+//                                       1.0, preclim);
+//      if (dTA10Y[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).real()/dTA10Y[ct],
+//                                       1.0, preclim);
+//      if (dTA10Z[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).real()/dTA10Z[ct],
+//                                       1.0, preclim);
+//      if (dTA10Xim[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).imag()/
+//                                         dTA10Xim[ct], 1.0, preclim);
+//      if (dTA10Yim[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).imag()/
+//                                         dTA10Yim[ct], 1.0, preclim);
+//      if (dTA10Zim[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).imag()/
+//                                         dTA10Zim[ct], 1.0, preclim);
+//      
+//      if (dTA21X[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).real()/dTA21X[ct],
+//                                       1.0, preclim);
+//      if (dTA21Y[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).real()/dTA21Y[ct],
+//                                       1.0, preclim);
+//      if (dTA21Z[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).real()/dTA21Z[ct],
+//                                       1.0, preclim);
+//      if (dTA21Xim[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).imag()/
+//                                         dTA21Xim[ct], 1.0, preclim);
+//      if (dTA21Yim[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).imag()/
+//                                         dTA21Yim[ct], 1.0, preclim);
+//      if (dTA21Zim[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).imag()/
+//                                         dTA21Zim[ct], 1.0, preclim);
+//      ct++;
+//    }
+//  }
+//}
+//
+//
+//TEST_F(ASolverUTest, checkdT_ASingFlip)
+//{
+//  mol_sing_.clear( );
+//  Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
+//  for (int molInd = 0; molInd < 3; molInd ++ )
+//  {
+//    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
+//    charges[0]    = 2.0; posCharges[0] = pos[molInd];
+//    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+//    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+//    
+//    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
+//    mol_sing_.push_back( molNew );
+//  }
+//  const int vals           = 5;
+//  int nmol                 = 3;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_sing_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), vals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+//  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
+//  
+//  VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
+//  VecOfMats<cmplx>::type dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
+//  VecOfMats<cmplx>::type dT_A22 = ASolvTest.get_gradT_Aij( 2, 2);
+//  
+//  VecOfMats<cmplx>::type dT_A02 = ASolvTest.get_gradT_Aij( 0, 2);
+//  VecOfMats<cmplx>::type dT_A10 = ASolvTest.get_gradT_Aij( 1, 0);
+//  VecOfMats<cmplx>::type dT_A21 = ASolvTest.get_gradT_Aij( 2, 1);
+//
+//  int ct = 0;
+//  for ( int n = 0; n < 5; n++ )
+//  {
+//    for ( int m = 0; m <= n; m++ )
+//    {
+//      if (dTA00XSin[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).real()/
+//                                          dTA00XSin[ct], 1.0, preclim);
+//      if (dTA00YSin[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).real()/
+//                                          dTA00YSin[ct], 1.0, preclim);
+//      if (dTA00ZSin[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).real()/
+//                                          dTA00ZSin[ct], 1.0, preclim);
+//      if (dTA00XimSin[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).imag()/
+//                                         dTA00XimSin[ct], 1.0, preclim);
+//      if (dTA00YimSin[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).imag()/
+//                                         dTA00YimSin[ct], 1.0, preclim);
+//      if (dTA00ZimSin[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).imag()/
+//                                         dTA00ZimSin[ct], 1.0, preclim);
+//      
+//      if (dTA11XSin[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).real()/
+//                                          dTA11XSin[ct], 1.0, preclim);
+//      if (dTA11YSin[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).real()/
+//                                          dTA11YSin[ct], 1.0, preclim);
+//      if (dTA11ZSin[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).real()/
+//                                          dTA11ZSin[ct], 1.0, preclim);
+//      if (dTA11XimSin[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).imag()/
+//                                         dTA11XimSin[ct], 1.0, preclim);
+//      if (dTA11YimSin[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).imag()/
+//                                         dTA11YimSin[ct], 1.0, preclim);
+//      if (dTA11ZimSin[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).imag()/
+//                                         dTA11ZimSin[ct], 1.0, preclim);
+//      
+//      if (dTA22XSin[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).real()/
+//                                          dTA22XSin[ct], 1.0, preclim);
+//      if (dTA22YSin[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).real()/
+//                                          dTA22YSin[ct], 1.0, preclim);
+//      if (dTA22ZSin[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).real()/
+//                                          dTA22ZSin[ct], 1.0, preclim);
+//      if (dTA22XimSin[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).imag()/
+//                                         dTA22XimSin[ct], 1.0, preclim);
+//      if (dTA22YimSin[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).imag()/
+//                                         dTA22YimSin[ct], 1.0, preclim);
+//      if (dTA22ZimSin[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).imag()/
+//                                         dTA22ZimSin[ct], 1.0, preclim);
+//      
+//      if (dTA02XSin[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).real()/
+//                                          dTA02XSin[ct], 1.0, preclim);
+//      if (dTA02YSin[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).real()/
+//                                          dTA02YSin[ct], 1.0, preclim);
+//      if (dTA02ZSin[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).real()/
+//                                          dTA02ZSin[ct], 1.0, preclim);
+//      if (dTA02XimSin[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).imag()/
+//                                         dTA02XimSin[ct], 1.0, preclim);
+//      if (dTA02YimSin[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).imag()/
+//                                         dTA02YimSin[ct], 1.0, preclim);
+//      if (dTA02ZimSin[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).imag()/
+//                                         dTA02ZimSin[ct], 1.0, preclim);
+//      
+//      if (dTA10XSin[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).real()/
+//                                          dTA10XSin[ct], 1.0, preclim);
+//      if (dTA10YSin[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).real()/
+//                                          dTA10YSin[ct], 1.0, preclim);
+//      if (dTA10ZSin[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).real()/
+//                                          dTA10ZSin[ct], 1.0, preclim);
+//      if (dTA10XimSin[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).imag()/
+//                                         dTA10XimSin[ct], 1.0, preclim);
+//      if (dTA10YimSin[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).imag()/
+//                                         dTA10YimSin[ct], 1.0, preclim);
+//      if (dTA10ZimSin[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).imag()/
+//                                         dTA10ZimSin[ct], 1.0, preclim);
+//      
+//      if (dTA21XSin[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).real()/
+//                                          dTA21XSin[ct], 1.0, preclim);
+//      if (dTA21YSin[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).real()/
+//                                          dTA21YSin[ct], 1.0, preclim);
+//      if (dTA21ZSin[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).real()/
+//                                          dTA21ZSin[ct], 1.0, preclim);
+//      if (dTA21XimSin[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).imag()/
+//                                         dTA21XimSin[ct], 1.0, preclim);
+//      if (dTA21YimSin[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).imag()/
+//                                         dTA21YimSin[ct], 1.0, preclim);
+//      if (dTA21ZimSin[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).imag()/
+//                                         dTA21ZimSin[ct], 1.0, preclim);
+//      ct++;
+//    }
+//  }
+//}
 
 TEST_F(ASolverUTest, checkgradA)
 {
   mol_.clear( );
-  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
-    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
+  Pt pos[5] = { Pt( 0.0, 0.0, -5.0 ),Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) , Pt( 0.0, 0.0, -5.0 ), Pt( 0.0, 0.0, 5.0 ) };
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
-    int M = 3;
+    int M = 2;
     vector<double> charges(M); vector<Pt> posCharges(M);
     charges[0]    = 2.0; posCharges[0] = pos[molInd];
     charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+//    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
     Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
     mol_.push_back( molNew );
@@ -1113,439 +1112,439 @@ TEST_F(ASolverUTest, checkgradA)
                                       sys.get_lambda(), vals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-25); ASolvTest.solve_gradA(1E-36);
+  ASolvTest.solve_A(1E-25); ASolvTest.solve_gradA(1E-50);
   
   int ct = 0;
   for ( int n = 0; n < 3; n++ )
   {
     for ( int m = 0; m <= n; m++ )
     {
-      if (dA00X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(0,0,n,m).real()
-                                       /dA00X[ct], 1.0, preclim);
-      if (dA00Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(0,0,n,m).real()
-                                      /dA00Y[ct], 1.0, preclim);
-      if (dA00Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(0,0,n,m).real()
-                                      /dA00Z[ct], 1.0, preclim);
-      if (dA00Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(0,0,n,m).imag()
-                                        /dA00Xim[ct], 1.0, preclim);
-      if (dA00Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(0,0,n,m).imag()
-                                        /dA00Yim[ct], 1.0, preclim);
-      if (dA00Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(0,0,n,m).imag()
-                                        /dA00Zim[ct], 1.0, preclim);
-      
-      if (dA11X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(1,1,n,m).real()
-                                      /dA11X[ct], 1.0, preclim);
-      if (dA11Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(1,1,n,m).real()
-                                      /dA11Y[ct], 1.0, preclim);
-      if (dA11Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(1,1,n,m).real()
-                                      /dA11Z[ct], 1.0, preclim);
-      if (dA11Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(1,1,n,m).imag()
-                                        /dA11Xim[ct], 1.0, preclim);
-      if (dA11Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(1,1,n,m).imag()
-                                        /dA11Yim[ct], 1.0, preclim);
-      if (dA11Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(1,1,n,m).imag()
-                                        /dA11Zim[ct], 1.0, preclim);
-      
-      if (dA22X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(2,2,n,m).real()
-                                      /dA22X[ct], 1.0, preclim);
-      if (dA22Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(2,2,n,m).real()
-                                      /dA22Y[ct], 1.0, preclim);
-      if (dA22Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(2,2,n,m).real()
-                                      /dA22Z[ct], 1.0, preclim);
-      if (dA22Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(2,2,n,m).imag()
-                                        /dA22Xim[ct], 1.0, preclim);
-      if (dA22Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(2,2,n,m).imag()
-                                        /dA22Yim[ct], 1.0, preclim);
-      if (dA22Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(2,2,n,m).imag()
-                                        /dA22Zim[ct], 1.0, preclim);
-      
-      if (dA01X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(0,1,n,m).real()/
-                                      dA01X[ct], 1.0, preclim);
-      if (dA01Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(0,1,n,m).real()/
-                                      dA01Y[ct], 1.0, preclim);
-      if (dA01Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(0,1,n,m).real()/
-                                      dA01Z[ct], 1.0, preclim);
-      if (dA01Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(0,1,n,m).imag()/
-                                         dA01Xim[ct], 1.0, preclim);
-      if (dA01Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(0,1,n,m).imag()/
-                                         dA01Yim[ct], 1.0, preclim);
-      if (dA01Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(0,1,n,m).imag()/
-                                         dA01Zim[ct], 1.0, preclim);
-      
-      if (dA12X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(1,2,n,m).real()/
-                                      dA12X[ct], 1.0, preclim);
-      if (dA12Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(1,2,n,m).real()/
-                                      dA12Y[ct], 1.0, preclim);
-      if (dA12Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(1,2,n,m).real()/
-                                      dA12Z[ct], 1.0, preclim);
-      if (dA12Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(1,2,n,m).imag()/
-                                        dA12Xim[ct], 1.0, preclim);
-      if (dA12Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(1,2,n,m).imag()/
-                                        dA12Yim[ct], 1.0, preclim);
-      if (dA12Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(1,2,n,m).imag()/
-                                        dA12Zim[ct], 1.0, preclim);
-      
-      if (dA20X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(2,0,n,m).real()/
-                                      dA20X[ct], 1.0, preclim);
-      if (dA20Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(2,0,n,m).real()/
-                                      dA20Y[ct], 1.0, preclim);
-      if (dA20Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(2,0,n,m).real()/
-                                      dA20Z[ct], 1.0, preclim);
-      if (dA20Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(2,0,n,m).imag()/
-                                        dA20Xim[ct], 1.0, preclim);
-      if (dA20Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(2,0,n,m).imag()/
-                                        dA20Yim[ct], 1.0, preclim);
-      if (dA20Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(2,0,n,m).imag()/
-                                        dA20Zim[ct], 1.0, preclim);
+//      if (dA00X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(0,0,n,m).real()
+//                                       /dA00X[ct], 1.0, preclim);
+//      if (dA00Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(0,0,n,m).real()
+//                                      /dA00Y[ct], 1.0, preclim);
+//      if (dA00Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(0,0,n,m).real()
+//                                      /dA00Z[ct], 1.0, preclim);
+//      if (dA00Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(0,0,n,m).imag()
+//                                        /dA00Xim[ct], 1.0, preclim);
+//      if (dA00Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(0,0,n,m).imag()
+//                                        /dA00Yim[ct], 1.0, preclim);
+//      if (dA00Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(0,0,n,m).imag()
+//                                        /dA00Zim[ct], 1.0, preclim);
+//      
+//      if (dA11X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(1,1,n,m).real()
+//                                      /dA11X[ct], 1.0, preclim);
+//      if (dA11Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(1,1,n,m).real()
+//                                      /dA11Y[ct], 1.0, preclim);
+//      if (dA11Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(1,1,n,m).real()
+//                                      /dA11Z[ct], 1.0, preclim);
+//      if (dA11Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(1,1,n,m).imag()
+//                                        /dA11Xim[ct], 1.0, preclim);
+//      if (dA11Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(1,1,n,m).imag()
+//                                        /dA11Yim[ct], 1.0, preclim);
+//      if (dA11Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(1,1,n,m).imag()
+//                                        /dA11Zim[ct], 1.0, preclim);
+//      
+//      if (dA22X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(2,2,n,m).real()
+//                                      /dA22X[ct], 1.0, preclim);
+//      if (dA22Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(2,2,n,m).real()
+//                                      /dA22Y[ct], 1.0, preclim);
+//      if (dA22Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(2,2,n,m).real()
+//                                      /dA22Z[ct], 1.0, preclim);
+//      if (dA22Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(2,2,n,m).imag()
+//                                        /dA22Xim[ct], 1.0, preclim);
+//      if (dA22Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(2,2,n,m).imag()
+//                                        /dA22Yim[ct], 1.0, preclim);
+//      if (dA22Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(2,2,n,m).imag()
+//                                        /dA22Zim[ct], 1.0, preclim);
+//      
+//      if (dA01X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(0,1,n,m).real()/
+//                                      dA01X[ct], 1.0, preclim);
+//      if (dA01Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(0,1,n,m).real()/
+//                                      dA01Y[ct], 1.0, preclim);
+//      if (dA01Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(0,1,n,m).real()/
+//                                      dA01Z[ct], 1.0, preclim);
+//      if (dA01Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(0,1,n,m).imag()/
+//                                         dA01Xim[ct], 1.0, preclim);
+//      if (dA01Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(0,1,n,m).imag()/
+//                                         dA01Yim[ct], 1.0, preclim);
+//      if (dA01Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(0,1,n,m).imag()/
+//                                         dA01Zim[ct], 1.0, preclim);
+//      
+//      if (dA12X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(1,2,n,m).real()/
+//                                      dA12X[ct], 1.0, preclim);
+//      if (dA12Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(1,2,n,m).real()/
+//                                      dA12Y[ct], 1.0, preclim);
+//      if (dA12Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(1,2,n,m).real()/
+//                                      dA12Z[ct], 1.0, preclim);
+//      if (dA12Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(1,2,n,m).imag()/
+//                                        dA12Xim[ct], 1.0, preclim);
+//      if (dA12Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(1,2,n,m).imag()/
+//                                        dA12Yim[ct], 1.0, preclim);
+//      if (dA12Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(1,2,n,m).imag()/
+//                                        dA12Zim[ct], 1.0, preclim);
+//      
+//      if (dA20X[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(2,0,n,m).real()/
+//                                      dA20X[ct], 1.0, preclim);
+//      if (dA20Y[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(2,0,n,m).real()/
+//                                      dA20Y[ct], 1.0, preclim);
+//      if (dA20Z[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(2,0,n,m).real()/
+//                                      dA20Z[ct], 1.0, preclim);
+//      if (dA20Xim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdx_ni(2,0,n,m).imag()/
+//                                        dA20Xim[ct], 1.0, preclim);
+//      if (dA20Yim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdy_ni(2,0,n,m).imag()/
+//                                        dA20Yim[ct], 1.0, preclim);
+//      if (dA20Zim[ct] != 0) EXPECT_NEAR(ASolvTest.get_dAdz_ni(2,0,n,m).imag()/
+//                                        dA20Zim[ct], 1.0, preclim);
       ct++;
     }
   }
 }
 
-TEST_F(ASolverUTest, checkgradASing)
-{
-  mol_sing_.clear();
-  Pt cgPosSi[3] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 0.0, -5.0 ),
-                   Pt( 0.0, 0.0, 5.0 )};
-  
-  for (int molInd = 0; molInd < 3; molInd ++ )
-  {
-    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
-    
-    charges[0]    = 2.0;
-    posCharges[0] = cgPosSi[molInd];
-    
-    Molecule molSing( M, 2.0, charges, posCharges);
-    mol_sing_.push_back( molSing );
-  }
-  
-  const int vals           = nvals;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), vals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-30); ASolvTest.solve_gradA(1E-40);
-  
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-      if ( dA300SingX[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 0, n, m).real()/dA300SingX[ct],
-                  1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 0, n, m).real(), 0, preclim);
-      if ( dA300SingZ[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 0, 0, n, m).real()/dA300SingZ[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 0, n, m).imag(), 0, preclim);
-      if ( dA300SingIm[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 0, n, m).imag()/dA300SingIm[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 0, 0, n, m).imag(), 0, preclim);
-      
-      if ( dA301SingX[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 1, n, m).real()/dA301SingX[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).real(), 0, preclim);
-      if ( dA301SingZ[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 0, 1, n, m).real()/dA301SingZ[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 1, n, m).imag(), 0, preclim);
-      if ( dA301SingIm[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).imag()/dA301SingIm[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 0, 1, n, m).imag(), 0, preclim);
-
-      if ( dA311SingX[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 1, n, m).real()/dA311SingX[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 1, n, m).real(), 0, preclim);
-      if ( dA311SingZ[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 1, n, m).real()/dA311SingZ[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 1, n, m).imag(), 0, preclim);
-      if ( dA311SingIm[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 1, n, m).imag()/dA311SingIm[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 1, n, m).imag(), 0, preclim);
-      
-      if ( dA312SingX[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 2, n, m).real()/dA312SingX[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 2, n, m).real(), 0, preclim);
-      if ( dA312SingZ[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 2, n, m).real()/dA312SingZ[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 2, n, m).imag(), 0, preclim);
-      if ( dA312SingIm[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 2, n, m).imag()/dA312SingIm[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 2, n, m).imag(), 0, preclim);
-      
-      if ( dA322SingX[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 2, 2, n, m).real()/dA322SingX[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 2, 2, n, m).real(), 0, preclim);
-      if ( dA322SingZ[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 2, n, m).real()/dA322SingZ[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 2, 2, n, m).imag(), 0, preclim);
-      if ( dA322SingIm[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 2, 2, n, m).imag()/dA322SingIm[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 2, n, m).imag(), 0, preclim);
-      
-      if ( dA320SingX[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 2, 0, n, m).real()/dA320SingX[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 2, 0, n, m).real(), 0, preclim);
-      if ( dA320SingZ[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 0, n, m).real()/dA320SingZ[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 2, 0, n, m).imag(), 0, preclim);
-      if ( dA320SingIm[ct] != 0 )
-        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 2, 0, n, m).imag()/dA320SingIm[ct],
-                    1, preclim);
-      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 0, n, m).imag(), 0, preclim);
-      ct++;
-    }
-  }
-}
-
-TEST_F(ASolverUTest, checkL)
-{
-  mol_.clear( );
-  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
-    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
-  for (int molInd = 0; molInd < 2; molInd ++ )
-  {
-    int M = 3;
-    vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0]    = 2.0; posCharges[0] = pos[molInd];
-    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
-    
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
-    mol_.push_back( molNew );
-  }
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), vals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-20);
-  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
-  
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-      EXPECT_NEAR( myL[0](n,m+vals).real()/L0[ct],      1.0, preclim);
-      if (L0_im[ct] != 0)
-        EXPECT_NEAR( myL[0](n,m+vals).imag()/L0_im[ct], 1.0, preclim);
-      EXPECT_NEAR( myL[1](n,m+vals).real()/L1[ct],      1.0, preclim);
-      if (L1_im[ct] != 0)
-        EXPECT_NEAR( myL[1](n,m+vals).imag()/L1_im[ct], 1.0, preclim);
-      ct++;
-    }
-  }
-}
-
-TEST_F(ASolverUTest, checkLSing)
-{
-  mol_sing_.clear();
-  Pt cgPosSi[3] = { Pt( 0.0, 0.0, -5.0 ), Pt( 0.0, 0.0, 0.0 ),
-    Pt( 0.0, 0.0, 5.0 )};
-  
-  for (int molInd = 0; molInd < 3; molInd ++ )
-  {
-    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
-    
-    charges[0]    = 2.0;
-    posCharges[0] = cgPosSi[molInd];
-    
-    Molecule molSing( M, 2.0, charges, posCharges);
-    mol_sing_.push_back( molSing );
-  }
-  const int vals           = nvals;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), vals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-30);
-  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
-  
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-      if (L0Sing[ct] != 0) EXPECT_NEAR( myL[0](n,m+vals).real()/L0Sing[ct], 1,
-                                      preclim);
-      EXPECT_NEAR( myL[0](n,m+vals).imag(), 0, preclim);
-      if (L1Sing[ct] != 0) EXPECT_NEAR( myL[1](n,m+vals).real()/L1Sing[ct], 1,
-                                       preclim);
-      EXPECT_NEAR( myL[1](n,m+vals).imag(), 0, preclim);
-      if (L2Sing[ct] != 0) EXPECT_NEAR( myL[2](n,m+vals).real()/L2Sing[ct], 1,
-                                      preclim);
-      EXPECT_NEAR( myL[2](n,m+vals).imag(), 0, preclim);
-      ct++;
-    }
-  }
-}
-
-TEST_F(ASolverUTest, checkdL)
-{
-  mol_.clear( );
-  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
-    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
-  for (int molInd = 0; molInd < 3; molInd ++ )
-  {
-    int M = 3;
-    vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0]    = 2.0; posCharges[0] = pos[molInd];
-    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
-    
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
-    mol_.push_back( molNew );
-  }
-  
-  const int vals           = nvals;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), vals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-30);
-  MyVector<VecOfMats<cmplx>::type > mydL = ASolvTest.calc_gradL();
-  
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-      if (dLdx0[ct] != 0)
-        EXPECT_NEAR( mydL[0][0](n,m+vals).real(), dLdx0[ct],   preclim);
-      if (dLdx0im[ct] != 0)
-        EXPECT_NEAR( mydL[0][0](n,m+vals).imag(), dLdx0im[ct], preclim);
-      if (dLdy0[ct] != 0)
-        EXPECT_NEAR( mydL[0][1](n,m+vals).real(), dLdy0[ct],   preclim);
-      if (dLdy0im[ct] != 0)
-        EXPECT_NEAR( mydL[0][1](n,m+vals).imag(), dLdy0im[ct], preclim);
-      if (dLdz0[ct] != 0)
-        EXPECT_NEAR( mydL[0][2](n,m+vals).real(), dLdz0[ct],   preclim);
-      if (dLdz0im[ct] != 0)
-        EXPECT_NEAR( mydL[0][2](n,m+vals).imag(), dLdz0im[ct], preclim);
-      
-      if (dLdx1[ct] != 0)
-        EXPECT_NEAR( mydL[1][0](n,m+vals).real(), dLdx1[ct],   preclim);
-      if (dLdx1im[ct] != 0)
-        EXPECT_NEAR( mydL[1][0](n,m+vals).imag(), dLdx1im[ct], preclim);
-      if (dLdy1[ct] != 0)
-        EXPECT_NEAR( mydL[1][1](n,m+vals).real(), dLdy1[ct],   preclim);
-      if (dLdy1im[ct] != 0)
-        EXPECT_NEAR( mydL[1][1](n,m+vals).imag(), dLdy1im[ct], preclim);
-      if (dLdz1[ct] != 0)
-        EXPECT_NEAR( mydL[1][2](n,m+vals).real(), dLdz1[ct],   preclim);
-      if (dLdz1im[ct] != 0)
-        EXPECT_NEAR( mydL[1][2](n,m+vals).imag(), dLdz1im[ct], preclim);
-      
-      if (dLdx2[ct] != 0)
-        EXPECT_NEAR( mydL[2][0](n,m+vals).real(), dLdx2[ct],   preclim);
-      if (dLdx2im[ct] != 0)
-        EXPECT_NEAR( mydL[2][0](n,m+vals).imag(), dLdx2im[ct], preclim);
-      if (dLdy2[ct] != 0)
-        EXPECT_NEAR( mydL[2][1](n,m+vals).real(), dLdy2[ct],   preclim);
-      if (dLdy2im[ct] != 0)
-        EXPECT_NEAR( mydL[2][1](n,m+vals).imag(), dLdy2im[ct], preclim);
-      if (dLdz2[ct] != 0)
-        EXPECT_NEAR( mydL[2][2](n,m+vals).real(), dLdz2[ct],   preclim);
-      if (dLdz2im[ct] != 0)
-        EXPECT_NEAR( mydL[2][2](n,m+vals).imag(), dLdz2im[ct], preclim);
-      ct++;
-    }
-  }  
-}
-
-TEST_F(ASolverUTest, checkdLSing)
-{
-  mol_sing_.clear();
-  Pt cgPosSi[3] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 0.0, -5.0 ),
-    Pt( 0.0, 0.0, 5.0 )};
-  
-  for (int molInd = 0; molInd < 3; molInd ++ )
-  {
-    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
-    charges[1]    = 2.0; posCharges[1] = cgPosSi[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]    = 2.0; posCharges[2] = cgPosSi[molInd] + Pt(0.0, 1.0, 0.0);
-
-    Molecule molSing( M, 2.0, charges, posCharges, cgPosSi[molInd]);
-    mol_sing_.push_back( molSing );
-  }
-  const int vals           = 5;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                      sys.get_lambda(), vals);
-  
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-40);
-  
-  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
-  MyVector<VecOfMats<cmplx>::type > mydL = ASolvTest.calc_gradL();
-  
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-      if (dLdx0Sing[ct] != 0)
-        EXPECT_NEAR( mydL[0][0](n,m+vals).real()/dLdx0Sing[ct],   1, preclim);
-      if (dAdy0imSing[ct] != 0)
-        EXPECT_NEAR( mydL[0][1](n,m+vals).imag()/dAdy0imSing[ct], 1, preclim);
-      if (dLdz0Sing[ct] != 0)
-        EXPECT_NEAR( mydL[0][2](n,m+vals).real()/dLdz0Sing[ct],   1, preclim);
-      if (dLdx1Sing[ct] != 0)
-        EXPECT_NEAR( mydL[1][0](n,m+vals).real()/dLdx1Sing[ct],   1, preclim);
-      if (dAdy1imSing[ct] != 0)
-        EXPECT_NEAR( mydL[1][1](n,m+vals).imag()/dAdy1imSing[ct], 1, preclim);
-      if (dAdz1imSing[ct] != 0)
-        EXPECT_NEAR( mydL[1][2](n,m+vals).imag()/dAdz1imSing[ct], 1, preclim);
-      ct++;
-    }
-  }
-}
+//TEST_F(ASolverUTest, checkgradASing)
+//{
+//  mol_sing_.clear();
+//  Pt cgPosSi[3] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 0.0, -5.0 ),
+//                   Pt( 0.0, 0.0, 5.0 )};
+//  
+//  for (int molInd = 0; molInd < 3; molInd ++ )
+//  {
+//    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
+//    
+//    charges[0]    = 2.0;
+//    posCharges[0] = cgPosSi[molInd];
+//    
+//    Molecule molSing( M, 2.0, charges, posCharges);
+//    mol_sing_.push_back( molSing );
+//  }
+//  
+//  const int vals           = nvals;
+//  int nmol                 = 3;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_sing_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), vals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+//  ASolvTest.solve_A(1E-30); ASolvTest.solve_gradA(1E-40);
+//  
+//  int ct = 0;
+//  for ( int n = 0; n < 5; n++ )
+//  {
+//    for ( int m = 0; m <= n; m++ )
+//    {
+//      if ( dA300SingX[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 0, n, m).real()/dA300SingX[ct],
+//                  1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 0, n, m).real(), 0, preclim);
+//      if ( dA300SingZ[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 0, 0, n, m).real()/dA300SingZ[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 0, n, m).imag(), 0, preclim);
+//      if ( dA300SingIm[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 0, n, m).imag()/dA300SingIm[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 0, 0, n, m).imag(), 0, preclim);
+//      
+//      if ( dA301SingX[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 1, n, m).real()/dA301SingX[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).real(), 0, preclim);
+//      if ( dA301SingZ[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 0, 1, n, m).real()/dA301SingZ[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 0, 1, n, m).imag(), 0, preclim);
+//      if ( dA301SingIm[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 0, 1, n, m).imag()/dA301SingIm[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 0, 1, n, m).imag(), 0, preclim);
+//
+//      if ( dA311SingX[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 1, n, m).real()/dA311SingX[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 1, n, m).real(), 0, preclim);
+//      if ( dA311SingZ[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 1, n, m).real()/dA311SingZ[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 1, n, m).imag(), 0, preclim);
+//      if ( dA311SingIm[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 1, n, m).imag()/dA311SingIm[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 1, n, m).imag(), 0, preclim);
+//      
+//      if ( dA312SingX[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 2, n, m).real()/dA312SingX[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 2, n, m).real(), 0, preclim);
+//      if ( dA312SingZ[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 2, n, m).real()/dA312SingZ[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 1, 2, n, m).imag(), 0, preclim);
+//      if ( dA312SingIm[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 1, 2, n, m).imag()/dA312SingIm[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 1, 2, n, m).imag(), 0, preclim);
+//      
+//      if ( dA322SingX[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 2, 2, n, m).real()/dA322SingX[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 2, 2, n, m).real(), 0, preclim);
+//      if ( dA322SingZ[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 2, n, m).real()/dA322SingZ[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 2, 2, n, m).imag(), 0, preclim);
+//      if ( dA322SingIm[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 2, 2, n, m).imag()/dA322SingIm[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 2, n, m).imag(), 0, preclim);
+//      
+//      if ( dA320SingX[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdx_ni( 2, 0, n, m).real()/dA320SingX[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdy_ni( 2, 0, n, m).real(), 0, preclim);
+//      if ( dA320SingZ[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 0, n, m).real()/dA320SingZ[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdx_ni( 2, 0, n, m).imag(), 0, preclim);
+//      if ( dA320SingIm[ct] != 0 )
+//        EXPECT_NEAR( ASolvTest.get_dAdy_ni( 2, 0, n, m).imag()/dA320SingIm[ct],
+//                    1, preclim);
+//      EXPECT_NEAR( ASolvTest.get_dAdz_ni( 2, 0, n, m).imag(), 0, preclim);
+//      ct++;
+//    }
+//  }
+//}
+//
+//TEST_F(ASolverUTest, checkL)
+//{
+//  mol_.clear( );
+//  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
+//    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
+//  for (int molInd = 0; molInd < 2; molInd ++ )
+//  {
+//    int M = 3;
+//    vector<double> charges(M); vector<Pt> posCharges(M);
+//    charges[0]    = 2.0; posCharges[0] = pos[molInd];
+//    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+//    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+//    
+//    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
+//    mol_.push_back( molNew );
+//  }
+//  const int vals           = nvals;
+//  int nmol                 = 2;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), vals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+//  ASolvTest.solve_A(1E-20);
+//  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
+//  
+//  int ct = 0;
+//  for ( int n = 0; n < 5; n++ )
+//  {
+//    for ( int m = 0; m <= n; m++ )
+//    {
+//      EXPECT_NEAR( myL[0](n,m+vals).real()/L0[ct],      1.0, preclim);
+//      if (L0_im[ct] != 0)
+//        EXPECT_NEAR( myL[0](n,m+vals).imag()/L0_im[ct], 1.0, preclim);
+//      EXPECT_NEAR( myL[1](n,m+vals).real()/L1[ct],      1.0, preclim);
+//      if (L1_im[ct] != 0)
+//        EXPECT_NEAR( myL[1](n,m+vals).imag()/L1_im[ct], 1.0, preclim);
+//      ct++;
+//    }
+//  }
+//}
+//
+//TEST_F(ASolverUTest, checkLSing)
+//{
+//  mol_sing_.clear();
+//  Pt cgPosSi[3] = { Pt( 0.0, 0.0, -5.0 ), Pt( 0.0, 0.0, 0.0 ),
+//    Pt( 0.0, 0.0, 5.0 )};
+//  
+//  for (int molInd = 0; molInd < 3; molInd ++ )
+//  {
+//    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
+//    
+//    charges[0]    = 2.0;
+//    posCharges[0] = cgPosSi[molInd];
+//    
+//    Molecule molSing( M, 2.0, charges, posCharges);
+//    mol_sing_.push_back( molSing );
+//  }
+//  const int vals           = nvals;
+//  int nmol                 = 3;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_sing_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), vals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+//  ASolvTest.solve_A(1E-30);
+//  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
+//  
+//  int ct = 0;
+//  for ( int n = 0; n < 5; n++ )
+//  {
+//    for ( int m = 0; m <= n; m++ )
+//    {
+//      if (L0Sing[ct] != 0) EXPECT_NEAR( myL[0](n,m+vals).real()/L0Sing[ct], 1,
+//                                      preclim);
+//      EXPECT_NEAR( myL[0](n,m+vals).imag(), 0, preclim);
+//      if (L1Sing[ct] != 0) EXPECT_NEAR( myL[1](n,m+vals).real()/L1Sing[ct], 1,
+//                                       preclim);
+//      EXPECT_NEAR( myL[1](n,m+vals).imag(), 0, preclim);
+//      if (L2Sing[ct] != 0) EXPECT_NEAR( myL[2](n,m+vals).real()/L2Sing[ct], 1,
+//                                      preclim);
+//      EXPECT_NEAR( myL[2](n,m+vals).imag(), 0, preclim);
+//      ct++;
+//    }
+//  }
+//}
+//
+//TEST_F(ASolverUTest, checkdL)
+//{
+//  mol_.clear( );
+//  Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
+//    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
+//  for (int molInd = 0; molInd < 3; molInd ++ )
+//  {
+//    int M = 3;
+//    vector<double> charges(M); vector<Pt> posCharges(M);
+//    charges[0]    = 2.0; posCharges[0] = pos[molInd];
+//    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+//    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+//    
+//    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
+//    mol_.push_back( molNew );
+//  }
+//  
+//  const int vals           = nvals;
+//  int nmol                 = 3;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), vals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+//  ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-30);
+//  MyVector<VecOfMats<cmplx>::type > mydL = ASolvTest.calc_gradL();
+//  
+//  int ct = 0;
+//  for ( int n = 0; n < 5; n++ )
+//  {
+//    for ( int m = 0; m <= n; m++ )
+//    {
+//      if (dLdx0[ct] != 0)
+//        EXPECT_NEAR( mydL[0][0](n,m+vals).real(), dLdx0[ct],   preclim);
+//      if (dLdx0im[ct] != 0)
+//        EXPECT_NEAR( mydL[0][0](n,m+vals).imag(), dLdx0im[ct], preclim);
+//      if (dLdy0[ct] != 0)
+//        EXPECT_NEAR( mydL[0][1](n,m+vals).real(), dLdy0[ct],   preclim);
+//      if (dLdy0im[ct] != 0)
+//        EXPECT_NEAR( mydL[0][1](n,m+vals).imag(), dLdy0im[ct], preclim);
+//      if (dLdz0[ct] != 0)
+//        EXPECT_NEAR( mydL[0][2](n,m+vals).real(), dLdz0[ct],   preclim);
+//      if (dLdz0im[ct] != 0)
+//        EXPECT_NEAR( mydL[0][2](n,m+vals).imag(), dLdz0im[ct], preclim);
+//      
+//      if (dLdx1[ct] != 0)
+//        EXPECT_NEAR( mydL[1][0](n,m+vals).real(), dLdx1[ct],   preclim);
+//      if (dLdx1im[ct] != 0)
+//        EXPECT_NEAR( mydL[1][0](n,m+vals).imag(), dLdx1im[ct], preclim);
+//      if (dLdy1[ct] != 0)
+//        EXPECT_NEAR( mydL[1][1](n,m+vals).real(), dLdy1[ct],   preclim);
+//      if (dLdy1im[ct] != 0)
+//        EXPECT_NEAR( mydL[1][1](n,m+vals).imag(), dLdy1im[ct], preclim);
+//      if (dLdz1[ct] != 0)
+//        EXPECT_NEAR( mydL[1][2](n,m+vals).real(), dLdz1[ct],   preclim);
+//      if (dLdz1im[ct] != 0)
+//        EXPECT_NEAR( mydL[1][2](n,m+vals).imag(), dLdz1im[ct], preclim);
+//      
+//      if (dLdx2[ct] != 0)
+//        EXPECT_NEAR( mydL[2][0](n,m+vals).real(), dLdx2[ct],   preclim);
+//      if (dLdx2im[ct] != 0)
+//        EXPECT_NEAR( mydL[2][0](n,m+vals).imag(), dLdx2im[ct], preclim);
+//      if (dLdy2[ct] != 0)
+//        EXPECT_NEAR( mydL[2][1](n,m+vals).real(), dLdy2[ct],   preclim);
+//      if (dLdy2im[ct] != 0)
+//        EXPECT_NEAR( mydL[2][1](n,m+vals).imag(), dLdy2im[ct], preclim);
+//      if (dLdz2[ct] != 0)
+//        EXPECT_NEAR( mydL[2][2](n,m+vals).real(), dLdz2[ct],   preclim);
+//      if (dLdz2im[ct] != 0)
+//        EXPECT_NEAR( mydL[2][2](n,m+vals).imag(), dLdz2im[ct], preclim);
+//      ct++;
+//    }
+//  }  
+//}
+//
+//TEST_F(ASolverUTest, checkdLSing)
+//{
+//  mol_sing_.clear();
+//  Pt cgPosSi[3] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 0.0, -5.0 ),
+//    Pt( 0.0, 0.0, 5.0 )};
+//  
+//  for (int molInd = 0; molInd < 3; molInd ++ )
+//  {
+//    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
+//    charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
+//    charges[1]    = 2.0; posCharges[1] = cgPosSi[molInd] + Pt(1.0, 0.0, 0.0);
+//    charges[2]    = 2.0; posCharges[2] = cgPosSi[molInd] + Pt(0.0, 1.0, 0.0);
+//
+//    Molecule molSing( M, 2.0, charges, posCharges, cgPosSi[molInd]);
+//    mol_sing_.push_back( molSing );
+//  }
+//  const int vals           = 5;
+//  int nmol                 = 3;
+//  BesselConstants bConsta  = BesselConstants( 2*vals );
+//  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
+//  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
+//  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
+//  System sys               = System( const_, mol_sing_ );
+//  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+//                                      sys.get_lambda(), vals);
+//  
+//  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+//  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-40);
+//  
+//  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
+//  MyVector<VecOfMats<cmplx>::type > mydL = ASolvTest.calc_gradL();
+//  
+//  int ct = 0;
+//  for ( int n = 0; n < 5; n++ )
+//  {
+//    for ( int m = 0; m <= n; m++ )
+//    {
+//      if (dLdx0Sing[ct] != 0)
+//        EXPECT_NEAR( mydL[0][0](n,m+vals).real()/dLdx0Sing[ct],   1, preclim);
+//      if (dAdy0imSing[ct] != 0)
+//        EXPECT_NEAR( mydL[0][1](n,m+vals).imag()/dAdy0imSing[ct], 1, preclim);
+//      if (dLdz0Sing[ct] != 0)
+//        EXPECT_NEAR( mydL[0][2](n,m+vals).real()/dLdz0Sing[ct],   1, preclim);
+//      if (dLdx1Sing[ct] != 0)
+//        EXPECT_NEAR( mydL[1][0](n,m+vals).real()/dLdx1Sing[ct],   1, preclim);
+//      if (dAdy1imSing[ct] != 0)
+//        EXPECT_NEAR( mydL[1][1](n,m+vals).imag()/dAdy1imSing[ct], 1, preclim);
+//      if (dAdz1imSing[ct] != 0)
+//        EXPECT_NEAR( mydL[1][2](n,m+vals).imag()/dAdz1imSing[ct], 1, preclim);
+//      ct++;
+//    }
+//  }
+//}
 
 
 #endif

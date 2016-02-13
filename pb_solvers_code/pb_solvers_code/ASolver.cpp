@@ -58,25 +58,37 @@ void ASolver::solve_A(double prec)
 void ASolver::solve_gradA(double prec)
 {
   assert(solvedA_); // must solve a before this
-  int MAX_POL_ROUNDS = 500;
-  
   double scale_dev = (double)(p_*(p_+1)*0.5*3.0);
-  double cng = scale_dev;
-  int ct = 0;
+  double cng;
+  int j, ct, MAX_POL_ROUNDS = 500;
   
   pre_compute_gradT_A();
-  
-  while((cng/scale_dev) > prec)
+
+  for ( j = 0; j < N_; j++ )
   {
-    grad_iter();
-    cng = calc_grad_change();
-    if (ct > MAX_POL_ROUNDS*N_)
+    ct = 0;
+    cng = scale_dev;
+    while((cng/scale_dev) > prec)
     {
-      cout << "Polz doesn't converge! dev="<< cng << " " << ct << endl;
-      exit(0);
+      grad_iter(j);
+      cng = calc_grad_change(j);
+      if (ct > MAX_POL_ROUNDS*N_)
+      {
+        cout << "Polz doesn't converge! dev="<< cng << " " << ct << endl;
+        exit(0);
+      }
+      ct++;
     }
-    ct++;
   }
+  
+  for ( int i = 0; i < N_; i++ )
+  {
+    for ( j = 0; j < N_; j++ )
+    {
+      print_dAi(i, j, 5);
+    }
+  }
+  
 }
 
 // one iteration of numerical solution for A (eq 51 in Lotan 2006)
@@ -104,57 +116,192 @@ void ASolver::iter()
   }
 }
 
-// one iteration of numerical solution for grad(A) (eq 53 in Lotan 2006)
-void ASolver::grad_iter()
+// one iteration of numerical solution for grad(A) WRT j (eq 53 in Lotan 2006)
+void ASolver::grad_iter(int j)
 {
   // Solving for grad_j(A^(i)) by iterating through T^(i,k)
-  int i, j, k, dim;
-  prevGradA_ = gradA_;
-  
+  int i, k, dim;
+
   // relevant re-expansions (g prefix means gradient):
   VecOfMats<cmplx>::type aij, add;
   MyMatrix<cmplx> gamma_delta;
   bool prev = true; //want to re-expand previous
   for (i = 0; i < N_; i++) // molecule of interest
   {
-    for (j = 0; j < N_; j++) // gradient of interest
+    prevGradA_ = gradA_;
+    aij = VecOfMats<cmplx>::type (3);
+    for (dim = 0; dim < 3; dim++)
+      aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
+    
+    aij = get_gradT_Aij( j, i);
+    
+    cout << "DTA"  << endl;
+    for (int n = 0; n < 5; n++)
     {
-      aij = VecOfMats<cmplx>::type (3);
-      for (dim = 0; dim < 3; dim++)
-        aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
-      
-      aij = get_gradT_Aij( i, j);
-      
-      for (k = 0; k < N_; k++) // other molecules
+      for (int m = 0; m <= n; m++)
       {
-        if (k == i) continue;
-        add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
-        aij += add;
+        double  r = aij[0]( n, m+p_).real();
+        double im = aij[0]( n, m+p_).imag();
+        r  = fabs( r) > 1e-15 ?  r : 0;
+        im = fabs(im) > 1e-15 ? im : 0;
+        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+        //      cout << "," << setprecision (9) << r ;
       }
-      
-      gamma_delta = gamma_[i] * delta_[i];
-      aij.set_val(0, gamma_delta * aij[0]);
-      aij.set_val(1, gamma_delta * aij[1]);
-      aij.set_val(2, gamma_delta * aij[2]);
-      gradA_.set_val(i, j, aij);
+      cout << endl;
     }
+    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    for (int n = 0; n < 5; n++)
+    {
+      for (int m = 0; m <= n; m++)
+      {
+        double  r = aij[1]( n, m+p_).real();
+        double im = aij[1]( n, m+p_).imag();
+        r  = fabs( r) > 1e-15 ?  r : 0;
+        im = fabs(im) > 1e-15 ? im : 0;
+        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+        //      cout << "," << setprecision (9) << r ;
+      }
+      cout << endl;
+    }
+    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    for (int n = 0; n < 5; n++)
+    {
+      for (int m = 0; m <= n; m++)
+      {
+        double  r = aij[2]( n, m+p_).real();
+        double im = aij[2]( n, m+p_).imag();
+        r  = fabs( r) > 1e-15 ?  r : 0;
+        im = fabs(im) > 1e-15 ? im : 0;
+        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+        //      cout << "," << setprecision (9) << r ;
+      }
+      cout << endl;
+    }
+    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    
+    for (k = 0; k < N_; k++) // other molecules
+    {
+      if (k == i) continue;
+      cout << "This is i " <<i<<" and to J "<<j<<" and k " << k << endl;
+      print_dAi( k, j, 5);
+      
+      add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
+      aij += add;
+      
+      cout << "After Xform"  << endl;
+      for (int n = 0; n < 5; n++)
+      {
+        for (int m = 0; m <= n; m++)
+        {
+          double  r = add[0]( n, m+p_).real();
+          double im = add[0]( n, m+p_).imag();
+          r  = fabs( r) > 1e-15 ?  r : 0;
+          im = fabs(im) > 1e-15 ? im : 0;
+          cout << "(" << setprecision (9) << r << "," << im << ")  ";
+          //      cout << "," << setprecision (9) << r ;
+        }
+        cout << endl;
+      }
+      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+      for (int n = 0; n < 5; n++)
+      {
+        for (int m = 0; m <= n; m++)
+        {
+          double  r = add[1]( n, m+p_).real();
+          double im = add[1]( n, m+p_).imag();
+          r  = fabs( r) > 1e-15 ?  r : 0;
+          im = fabs(im) > 1e-15 ? im : 0;
+          cout << "(" << setprecision (9) << r << "," << im << ")  ";
+          //      cout << "," << setprecision (9) << r ;
+        }
+        cout << endl;
+      }
+      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+      for (int n = 0; n < 5; n++)
+      {
+        for (int m = 0; m <= n; m++)
+        {
+          double  r = add[2]( n, m+p_).real();
+          double im = add[2]( n, m+p_).imag();
+          r  = fabs( r) > 1e-15 ?  r : 0;
+          im = fabs(im) > 1e-15 ? im : 0;
+          cout << "(" << setprecision (9) << r << "," << im << ")  ";
+          //      cout << "," << setprecision (9) << r ;
+        }
+        cout << endl;
+      }
+      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+      
+      
+    }
+    
+    cout << "Total aij"  << endl;
+    for (int n = 0; n < 5; n++)
+    {
+      for (int m = 0; m <= n; m++)
+      {
+        double  r = aij[0]( n, m+p_).real();
+        double im = aij[0]( n, m+p_).imag();
+        r  = fabs( r) > 1e-15 ?  r : 0;
+        im = fabs(im) > 1e-15 ? im : 0;
+        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+        //      cout << "," << setprecision (9) << r ;
+      }
+      cout << endl;
+    }
+    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    for (int n = 0; n < 5; n++)
+    {
+      for (int m = 0; m <= n; m++)
+      {
+        double  r = aij[1]( n, m+p_).real();
+        double im = aij[1]( n, m+p_).imag();
+        r  = fabs( r) > 1e-15 ?  r : 0;
+        im = fabs(im) > 1e-15 ? im : 0;
+        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+        //      cout << "," << setprecision (9) << r ;
+      }
+      cout << endl;
+    }
+    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    for (int n = 0; n < 5; n++)
+    {
+      for (int m = 0; m <= n; m++)
+      {
+        double  r = aij[2]( n, m+p_).real();
+        double im = aij[2]( n, m+p_).imag();
+        r  = fabs( r) > 1e-15 ?  r : 0;
+        im = fabs(im) > 1e-15 ? im : 0;
+        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+        //      cout << "," << setprecision (9) << r ;
+      }
+      cout << endl;
+    }
+    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    
+    gamma_delta = gamma_[i] * delta_[i];
+//    aij[0] *= gamma_delta;
+    aij.set_val(0, gamma_delta * aij[0]);
+    aij.set_val(1, gamma_delta * aij[1]);
+    aij.set_val(2, gamma_delta * aij[2]);
+    gradA_.set_val(i, j, aij);
+    
+    cout << "This is mol "<< i<< " and " << j << " new dA" << endl;
+    print_dAi( i, j, 5);
   }
 }
 
-double ASolver::calc_grad_change()
+double ASolver::calc_grad_change(int wrt)
 {
   double change = 0.0;
-  int i, wrt;
+  int i;
   WhichReEx whichA;
   for (i = 0; i < 3; i++)
   {
     if (i == 0) whichA = DDR;
     else if (i == 1) whichA = DDTHETA;
     else whichA = DDPHI;
-    for (wrt = 0; wrt < N_; wrt++)
-    {
-      change += calc_change(whichA, wrt);
-    }
+    change += calc_change(whichA, wrt);
   }
   return change;
 }
@@ -369,6 +516,8 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
   lowI = i; hiJ = j;
   if ( i > j ) { lowI = j; hiJ  = i; }
   
+//  if ( whichA != BASE )  cout << "In RX"  << endl;
+  
   // fill X1:
   for (n = 0; n < p_; n++)
   {
@@ -406,9 +555,19 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
             rval = T_(lowI, hiJ).get_rval(n, m, s);
 
           aval = which_aval(whichA, prev, j, n, s, wrt);
+//          if ( ( m == 0) and ( whichA != BASE ))
+//          {
+//                double  r = aval.real();
+//                double im = aval.imag();
+//                r  = fabs( r) > 1e-15 ?  r : 0;
+//                im = fabs(im) > 1e-15 ? im : 0;
+//                cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//                //      cout << "," << setprecision (9) << r ;
+//            
+//          }
           inter += rval * aval;
         } // end s
-
+//        if ( ( m == 0) and ( whichA != BASE )) cout << endl;
         x1.set_val(n, m+p_, inter);
       }
     } // end m
@@ -1027,10 +1186,10 @@ void ASolver::print_dAidx( int i, int j, int p)
       double im = get_dAdx_ni(i, j, n, m).imag();
       r  = fabs( r) > 1e-15 ?  r : 0;
       im = fabs(im) > 1e-15 ? im : 0;
-//      cout << " (" << setprecision (9) << r << "," << im << ")  ";
-      cout << "," << setprecision (9) << r ;
+      cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//      cout << "," << setprecision (9) << r ;
     }
-//    cout << endl;
+    cout << endl;
   }
   cout << endl;
 }
@@ -1049,10 +1208,10 @@ void ASolver::print_dAidy( int i, int j, int p)
       double im = get_dAdy_ni(i, j, n, m).imag();
       r  = fabs( r) > 1e-15 ?  r : 0;
       im = fabs(im) > 1e-15 ? im : 0;
-//      cout << "(" << setprecision (9) << r << "," << im << ")  ";
-      cout << "," << setprecision (9) << r ;
+      cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//      cout << "," << setprecision (9) << r ;
     }
-//    cout << endl;
+    cout << endl;
   }
   cout << endl;
 }
@@ -1071,11 +1230,20 @@ void ASolver::print_dAidz( int i, int j, int p)
       double im = get_dAdz_ni(i, j, n, m).imag();
       r  = fabs( r) > 1e-15 ?  r : 0;
       im = fabs(im) > 1e-15 ? im : 0;
-//      cout << "(" << setprecision (9) << r << "," << im << ")  ";
-      cout << "," << setprecision (9) << r ;
+      cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//      cout << "," << setprecision (9) << r ;
     }
-//    cout << endl;
+    cout << endl;
   }
   cout << endl;
 }
 
+/*
+ Print function for dA of molecule i wrt j
+ */
+void ASolver::print_dAi( int i, int j, int p)
+{
+  print_dAidx( i, j, p);
+  print_dAidy( i, j, p);
+  print_dAidz( i, j, p);
+}

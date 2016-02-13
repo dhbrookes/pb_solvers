@@ -149,13 +149,13 @@ protected:
   void iter();
   
   // perform one iterations of the solution for grad(A) (eq53 in Lotan 2006)
-  void grad_iter();
+  void grad_iter(int j);
   
   // calculate the change in A_ from prevA_ (eq 52 in Lotan 2006)
   double calc_change(WhichReEx whichA=BASE, int wrt=-1);
   
   // sum of many calls to the above
-  double calc_grad_change();
+  double calc_grad_change(int wrt);
 
 public:
   
@@ -225,6 +225,7 @@ public:
   void print_dAidx( int i, int j, int p);
   void print_dAidy( int i, int j, int p);
   void print_dAidz( int i, int j, int p);
+  void print_dAi( int i, int j, int p);
 
   //numerically solve for A given the desired precision
   void solve_A(double prec);
