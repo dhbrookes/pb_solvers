@@ -182,7 +182,7 @@ TEST_F(EnergyForceUTest, checkEnergySing)
 //    EXPECT_NEAR( FoTest.get_fi(n)[2]/(-3.56112e-05*pow(-1.0,n)), 1, preclim);
 //  }
 //}
-//
+
 //TEST_F(EnergyForceUTest, checkForce3Cg)
 //{
 //  mol_.clear( );

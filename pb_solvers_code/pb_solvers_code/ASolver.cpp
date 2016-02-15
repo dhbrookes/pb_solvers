@@ -79,16 +79,7 @@ void ASolver::solve_gradA(double prec)
       }
       ct++;
     }
-  }
-  
-  for ( int i = 0; i < N_; i++ )
-  {
-    for ( j = 0; j < N_; j++ )
-    {
-      print_dAi(i, j, 5);
-    }
-  }
-  
+  }  
 }
 
 // one iteration of numerical solution for A (eq 51 in Lotan 2006)
@@ -135,159 +126,156 @@ void ASolver::grad_iter(int j)
     
     aij = get_gradT_Aij( j, i);
     
-    cout << "DTA"  << endl;
-    for (int n = 0; n < 5; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = aij[0]( n, m+p_).real();
-        double im = aij[0]( n, m+p_).imag();
-        r  = fabs( r) > 1e-15 ?  r : 0;
-        im = fabs(im) > 1e-15 ? im : 0;
-        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-        //      cout << "," << setprecision (9) << r ;
-      }
-      cout << endl;
-    }
-    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    for (int n = 0; n < 5; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = aij[1]( n, m+p_).real();
-        double im = aij[1]( n, m+p_).imag();
-        r  = fabs( r) > 1e-15 ?  r : 0;
-        im = fabs(im) > 1e-15 ? im : 0;
-        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-        //      cout << "," << setprecision (9) << r ;
-      }
-      cout << endl;
-    }
-    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    for (int n = 0; n < 5; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = aij[2]( n, m+p_).real();
-        double im = aij[2]( n, m+p_).imag();
-        r  = fabs( r) > 1e-15 ?  r : 0;
-        im = fabs(im) > 1e-15 ? im : 0;
-        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-        //      cout << "," << setprecision (9) << r ;
-      }
-      cout << endl;
-    }
-    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+//    cout << "DTA"  << endl;
+//    for (int n = 0; n < 5; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        double  r = aij[0]( n, m+p_).real();
+//        double im = aij[0]( n, m+p_).imag();
+//        r  = fabs( r) > 1e-15 ?  r : 0;
+//        im = fabs(im) > 1e-15 ? im : 0;
+//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//        //      cout << "," << setprecision (9) << r ;
+//      }
+//      cout << endl;
+//    }
+//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+//    for (int n = 0; n < 5; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        double  r = aij[1]( n, m+p_).real();
+//        double im = aij[1]( n, m+p_).imag();
+//        r  = fabs( r) > 1e-15 ?  r : 0;
+//        im = fabs(im) > 1e-15 ? im : 0;
+//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//        //      cout << "," << setprecision (9) << r ;
+//      }
+//      cout << endl;
+//    }
+//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+//    for (int n = 0; n < 5; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        double  r = aij[2]( n, m+p_).real();
+//        double im = aij[2]( n, m+p_).imag();
+//        r  = fabs( r) > 1e-15 ?  r : 0;
+//        im = fabs(im) > 1e-15 ? im : 0;
+//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//        //      cout << "," << setprecision (9) << r ;
+//      }
+//      cout << endl;
+//    }
+//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+
     
     for (k = 0; k < N_; k++) // other molecules
     {
       if (k == i) continue;
-      cout << "This is i " <<i<<" and to J "<<j<<" and k " << k << endl;
-      print_dAi( k, j, 5);
-      
+//      cout << "This is mol "<< i<< " and " << j << " and k " << k << endl;
+//      print_dAi( i, k, 5);
       add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
       aij += add;
       
-      cout << "After Xform"  << endl;
-      for (int n = 0; n < 5; n++)
-      {
-        for (int m = 0; m <= n; m++)
-        {
-          double  r = add[0]( n, m+p_).real();
-          double im = add[0]( n, m+p_).imag();
-          r  = fabs( r) > 1e-15 ?  r : 0;
-          im = fabs(im) > 1e-15 ? im : 0;
-          cout << "(" << setprecision (9) << r << "," << im << ")  ";
-          //      cout << "," << setprecision (9) << r ;
-        }
-        cout << endl;
-      }
-      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-      for (int n = 0; n < 5; n++)
-      {
-        for (int m = 0; m <= n; m++)
-        {
-          double  r = add[1]( n, m+p_).real();
-          double im = add[1]( n, m+p_).imag();
-          r  = fabs( r) > 1e-15 ?  r : 0;
-          im = fabs(im) > 1e-15 ? im : 0;
-          cout << "(" << setprecision (9) << r << "," << im << ")  ";
-          //      cout << "," << setprecision (9) << r ;
-        }
-        cout << endl;
-      }
-      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-      for (int n = 0; n < 5; n++)
-      {
-        for (int m = 0; m <= n; m++)
-        {
-          double  r = add[2]( n, m+p_).real();
-          double im = add[2]( n, m+p_).imag();
-          r  = fabs( r) > 1e-15 ?  r : 0;
-          im = fabs(im) > 1e-15 ? im : 0;
-          cout << "(" << setprecision (9) << r << "," << im << ")  ";
-          //      cout << "," << setprecision (9) << r ;
-        }
-        cout << endl;
-      }
-      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-      
-      
+//      cout << "After Xform"  << endl;
+//      for (int n = 0; n < 5; n++)
+//      {
+//        for (int m = 0; m <= n; m++)
+//        {
+//          double  r = add[0]( n, m+p_).real();
+//          double im = add[0]( n, m+p_).imag();
+//          r  = fabs( r) > 1e-15 ?  r : 0;
+//          im = fabs(im) > 1e-15 ? im : 0;
+//          cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//          //      cout << "," << setprecision (9) << r ;
+//        }
+//        cout << endl;
+//      }
+//      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+//      for (int n = 0; n < 5; n++)
+//      {
+//        for (int m = 0; m <= n; m++)
+//        {
+//          double  r = add[1]( n, m+p_).real();
+//          double im = add[1]( n, m+p_).imag();
+//          r  = fabs( r) > 1e-15 ?  r : 0;
+//          im = fabs(im) > 1e-15 ? im : 0;
+//          cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//          //      cout << "," << setprecision (9) << r ;
+//        }
+//        cout << endl;
+//      }
+//      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+//      for (int n = 0; n < 5; n++)
+//      {
+//        for (int m = 0; m <= n; m++)
+//        {
+//          double  r = add[2]( n, m+p_).real();
+//          double im = add[2]( n, m+p_).imag();
+//          r  = fabs( r) > 1e-15 ?  r : 0;
+//          im = fabs(im) > 1e-15 ? im : 0;
+//          cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//          //      cout << "," << setprecision (9) << r ;
+//        }
+//        cout << endl;
+//      }
+//      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
     }
     
-    cout << "Total aij"  << endl;
-    for (int n = 0; n < 5; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = aij[0]( n, m+p_).real();
-        double im = aij[0]( n, m+p_).imag();
-        r  = fabs( r) > 1e-15 ?  r : 0;
-        im = fabs(im) > 1e-15 ? im : 0;
-        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-        //      cout << "," << setprecision (9) << r ;
-      }
-      cout << endl;
-    }
-    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    for (int n = 0; n < 5; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = aij[1]( n, m+p_).real();
-        double im = aij[1]( n, m+p_).imag();
-        r  = fabs( r) > 1e-15 ?  r : 0;
-        im = fabs(im) > 1e-15 ? im : 0;
-        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-        //      cout << "," << setprecision (9) << r ;
-      }
-      cout << endl;
-    }
-    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    for (int n = 0; n < 5; n++)
-    {
-      for (int m = 0; m <= n; m++)
-      {
-        double  r = aij[2]( n, m+p_).real();
-        double im = aij[2]( n, m+p_).imag();
-        r  = fabs( r) > 1e-15 ?  r : 0;
-        im = fabs(im) > 1e-15 ? im : 0;
-        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-        //      cout << "," << setprecision (9) << r ;
-      }
-      cout << endl;
-    }
-    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+//    cout << "Total aij"  << endl;
+//    for (int n = 0; n < 5; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        double  r = aij[0]( n, m+p_).real();
+//        double im = aij[0]( n, m+p_).imag();
+//        r  = fabs( r) > 1e-15 ?  r : 0;
+//        im = fabs(im) > 1e-15 ? im : 0;
+//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//        //      cout << "," << setprecision (9) << r ;
+//      }
+//      cout << endl;
+//    }
+//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+//    for (int n = 0; n < 5; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        double  r = aij[1]( n, m+p_).real();
+//        double im = aij[1]( n, m+p_).imag();
+//        r  = fabs( r) > 1e-15 ?  r : 0;
+//        im = fabs(im) > 1e-15 ? im : 0;
+//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//        //      cout << "," << setprecision (9) << r ;
+//      }
+//      cout << endl;
+//    }
+//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+//    for (int n = 0; n < 5; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        double  r = aij[2]( n, m+p_).real();
+//        double im = aij[2]( n, m+p_).imag();
+//        r  = fabs( r) > 1e-15 ?  r : 0;
+//        im = fabs(im) > 1e-15 ? im : 0;
+//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
+//        //      cout << "," << setprecision (9) << r ;
+//      }
+//      cout << endl;
+//    }
+//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
     
     gamma_delta = gamma_[i] * delta_[i];
-//    aij[0] *= gamma_delta;
     aij.set_val(0, gamma_delta * aij[0]);
     aij.set_val(1, gamma_delta * aij[1]);
     aij.set_val(2, gamma_delta * aij[2]);
     gradA_.set_val(i, j, aij);
     
-    cout << "This is mol "<< i<< " and " << j << " new dA" << endl;
-    print_dAi( i, j, 5);
+//    cout << "This is mol "<< i<< " and " << j << " new dA" << endl;
+//    print_dAi( i, j, 5);
   }
 }
 
@@ -400,8 +388,6 @@ void ASolver::pre_compute_gradT_A()
       gradT_A_.set_val(i, j, gjT_Ai);
     }
   }
-  
-  
 }
 
 //re-expand element j of A with element (i, j) of T and return results
@@ -516,8 +502,6 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
   lowI = i; hiJ = j;
   if ( i > j ) { lowI = j; hiJ  = i; }
   
-//  if ( whichA != BASE )  cout << "In RX"  << endl;
-  
   // fill X1:
   for (n = 0; n < p_; n++)
   {
@@ -555,19 +539,9 @@ MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
             rval = T_(lowI, hiJ).get_rval(n, m, s);
 
           aval = which_aval(whichA, prev, j, n, s, wrt);
-//          if ( ( m == 0) and ( whichA != BASE ))
-//          {
-//                double  r = aval.real();
-//                double im = aval.imag();
-//                r  = fabs( r) > 1e-15 ?  r : 0;
-//                im = fabs(im) > 1e-15 ? im : 0;
-//                cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//                //      cout << "," << setprecision (9) << r ;
-//            
-//          }
+
           inter += rval * aval;
         } // end s
-//        if ( ( m == 0) and ( whichA != BASE )) cout << endl;
         x1.set_val(n, m+p_, inter);
       }
     } // end m
@@ -1187,7 +1161,6 @@ void ASolver::print_dAidx( int i, int j, int p)
       r  = fabs( r) > 1e-15 ?  r : 0;
       im = fabs(im) > 1e-15 ? im : 0;
       cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//      cout << "," << setprecision (9) << r ;
     }
     cout << endl;
   }
@@ -1209,7 +1182,6 @@ void ASolver::print_dAidy( int i, int j, int p)
       r  = fabs( r) > 1e-15 ?  r : 0;
       im = fabs(im) > 1e-15 ? im : 0;
       cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//      cout << "," << setprecision (9) << r ;
     }
     cout << endl;
   }
