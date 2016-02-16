@@ -146,7 +146,7 @@ cmplx SHCalc::get_result(const int n, const int m)
 {
   if (m < 0)
   {
-    return conj(Y_(n, m));  // complex conjugate
+    return conj(Y_(n, -m));  // complex conjugate
   }
   else
   {

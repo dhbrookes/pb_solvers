@@ -87,9 +87,9 @@ TEST_F(SpPointUTest, setGetConvert)
   EXPECT_NEAR( testPt.theta(),   0.8, preclim);
   EXPECT_NEAR( testPt.phi(),     9.7, preclim);
   
-  EXPECT_NEAR( testPt.x(),  5.73692479, preclim);
-  EXPECT_NEAR( testPt.y(),  5.90695896, preclim);
-  EXPECT_NEAR( testPt.z(), 29.15965586, preclim);
+  EXPECT_NEAR( testPt.x(),  20.91785674, preclim);
+  EXPECT_NEAR( testPt.y(),   5.90695896, preclim);
+  EXPECT_NEAR( testPt.z(), -21.11021329, preclim);
 }
 
 TEST_F(SpPointUTest, setGetConvert2)
@@ -99,9 +99,9 @@ TEST_F(SpPointUTest, setGetConvert2)
   EXPECT_NEAR( testPt.theta(), 7.5, preclim);
   EXPECT_NEAR( testPt.phi(),   3.5, preclim);
 
-  EXPECT_NEAR( testPt.x(), -0.6079693, preclim);
-  EXPECT_NEAR( testPt.y(), -1.6451733, preclim);
-  EXPECT_NEAR( testPt.z(), -4.6822834, preclim);
+  EXPECT_NEAR( testPt.x(), -4.391981755, preclim);
+  EXPECT_NEAR( testPt.y(), -1.645173297, preclim);
+  EXPECT_NEAR( testPt.z(),  1.733176589, preclim);
 }
 
 #endif /* utilUnitTest_h */

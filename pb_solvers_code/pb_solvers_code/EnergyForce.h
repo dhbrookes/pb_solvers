@@ -124,23 +124,20 @@ protected:
   
   // outer vector has an entry for every molecule. Inner vector is the torque
   // on that molecule
-  VecOfVecs<cmplx>::type tau_;
+  VecOfVecs<double>::type tau_;
   
   shared_ptr<SHCalc> _shCalc_;
+  shared_ptr<BesselCalc> _bCalc_;
   shared_ptr< MyVector<VecOfMats<cmplx>::type > > _gradL_;
   
   Constants consts_;
   shared_ptr<System> _sys_;
+  shared_ptr<VecOfMats<cmplx>::type> _gamma_;
   
   double epsS_;
   int N_;
   int p_;
-  
-  /*
-   Enum for the units of energy
-   */
-  shared_ptr<VecOfMats<cmplx>::type> _gamma_;
-  
+
   /*
    Calculate H vector (eq 42 and 43 in Lotan 2006)
    */
@@ -148,25 +145,30 @@ protected:
   
 public:
   
-  TorqueCalc(SHCalc shCalc, MyVector<VecOfMats<cmplx>::type> gradL,
-             Constants consts, System sys, VecOfMats<cmplx>::type gamma,
-             int p);
+  TorqueCalc(SHCalc shCalc, BesselCalc bCalc,
+             MyVector<VecOfMats<cmplx>::type> gradL,
+             VecOfMats<cmplx>::type gamma, Constants consts, System sys, int p);
   
   void calc_tau();  // fill tau_
+  
+  MyVector<double> get_taui(int i)     { return tau_[i]; }
+  VecOfVecs<double>::type get_Tau()    { return tau_; }
   
   /*
    Calculate inner product of two matrices as defined in equation 29 of Lotan
    2006
    */
-  cmplx lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p)
+  double lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p)
   {
-    cmplx ip;
-    int n, m;
+    double ip = 0;
+    int n, m, mT;
     for (n = 0; n < p; n++)
     {
-      for (m = -n; m <= -n; m++)
+      for (m = -n; m <= n; m++)
       {
-        ip += U(n, m+p) * conj(V(n, m+p));
+        mT = (m < 0) ? -1*m : m;
+        ip += U(n, mT+p_).real()*V(n, mT+p_).real()
+               + U(n, mT+p_).imag()*V(n, mT+p_).imag();
       }
     }
     return ip;

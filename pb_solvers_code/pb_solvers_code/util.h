@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <complex>
+#include <iostream>
 
 #include "MyMatrix.h"
 
@@ -101,9 +102,9 @@ protected:
       return; // do nothing if already euclidean
     
     T x, y, z;
-    x = p1_ * cos(p2_) * sin(p3_);
-    y = p1_ * sin(p2_) * sin(p3_);
-    z = p1_ * cos(p3_);
+    x = (abs(p1_*sin(p2_)*cos(p3_)) < 1e-15) ? 0 : p1_*sin(p2_)*cos(p3_);
+    y = (abs(p1_*sin(p2_)*sin(p3_)) < 1e-15) ? 0 : p1_*sin(p2_)*sin(p3_);
+    z = (abs(p1_*cos(p2_)) < 1e-15) ? 0 : p1_*cos(p2_);
     
     p1_ = x;
     p2_ = y;
@@ -124,6 +125,18 @@ public:
   Point(MyVector<T> vec, bool sph=false)
   :p1_(vec[0]), p2_(vec[1]), p3_(vec[2]), sph_(sph)
   {
+  }
+  
+  Point<T> operator=(Point<T> other)
+  {
+    if (this != &other) // protect against invalid self-assignment
+    {
+      p1_  = other.p1_;
+      p2_  = other.p2_;
+      p3_  = other.p3_;
+      sph_ = other.sph_;
+    }
+    return *this;
   }
   
   //arithmetic operators:
@@ -198,7 +211,7 @@ public:
   }
   const T& phi()
   {
-    if (sph_) convert_to_spherical();
+    if (!sph_) convert_to_spherical();
     return p3_;
   }
   

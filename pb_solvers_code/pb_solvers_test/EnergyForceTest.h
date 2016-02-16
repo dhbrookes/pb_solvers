@@ -65,6 +65,9 @@ class EnForTest
                      ASolvTest.calc_L(), ASolvTest.calc_gradL(),
                      const_, 2, nvals);
     
+    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
+                       ASolvTest.get_gamma(), const_, sys, vals);
+    
   }
 
 };

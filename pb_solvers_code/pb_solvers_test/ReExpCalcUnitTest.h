@@ -487,8 +487,8 @@ TEST_F(ReExpUTest, checkS0Zpt)
 
   for ( int s = 0; s < nvals; s++ )
   {
-    EXPECT_NEAR( ReExpTest.get_sval( 0, s, 0), SN0Z[s],               preclim);
-    EXPECT_NEAR( ReExpTest.get_sval( s, 0, 0), SN0Z[s] * pow(-1.0,s), preclim);
+    EXPECT_NEAR( ReExpTest.get_sval( 0, s, 0)/SN0Z[s],            1,preclim);
+    EXPECT_NEAR( ReExpTest.get_sval( s, 0, 0)/SN0Z[s]*pow(-1.0,s),1,preclim);
   }
 }
 
