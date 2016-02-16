@@ -10,6 +10,7 @@
 #define ReExpCalcUnitTest_h
 
 #include "ReExpCalc.h"
+#include <iostream>
 
 /*
  Class to test R and S constants : A, B, alpha, beta, nu and mu
@@ -242,14 +243,14 @@ protected :
   double SN0Z[nvals] = {0.970147, 4.99775, 24.99617, 124.988519, 624.958996,
     3124.840538,  15624.347650,  78122.240044,  390613.040154, 1953072.235847};
   
-  double SN0[nvals] = { 0.096100,  0.368228,  1.150332,  3.550246,  10.932428,
-    33.638947,  103.470482,  318.206275,  978.479829,  3008.591425 };
+  double SN0[nvals] = {0.0961000488, 0.36822761, 1.15033201, 3.55024645,
+    10.9324275, 33.638947, 103.470482, 318.206275, 978.47983, 3008.59143};
   
-  double SNNZ[nvals] = {0.197923, -0.599231,  1.997859,  -6.994426,  25.184186,
-    -92.352278,  343.049538,  -1286.510063,  4860.364854,  0 };
+  double SNNZ[nvals] = {0.197922989,-0.599230825,1.99785851,-6.99442583,
+    25.1841864,-92.3522778,343.049538,-1286.51006,4860.36486,0 };
   
-  double SNN[nvals] = {0.368228,-10.678925,336.57133,-11139.76822,379130.294425,
-    -13140242.678415,461300842.23576,-16349244619.17599,583715090846.38794, 0 };
+  double SNN[nvals] = {0.36822761,-10.6789251,336.571331,-11139.7682,
+    379130.295,-13140242.7,461300843,-1.63492446e+10,5.83715091e+11,0};
   
   double SMMZ[nvals] = {0.19923861,  0.48877513,  0.77332760,  1.05695152,
     1.34024129, 1.62337339, 1.90641867, 2.18941109, 2.47236893, 0.00000000 };
@@ -270,18 +271,22 @@ protected :
   double dSN0[nvals] = {-0.0147291044, -0.0927621524, -0.427157004, -1.75145258,
     -6.7329656, -24.8455948, -89.130168, -313.198839, -1083.32216, -3700.72023};
   
-  double dSNN[nvals] = {-0.00742097, 0.00269387, -0.000814434, 0.000229928,
-    -6.25908e-05, 1.66587e-05, -4.36638e-06, 1.13185e-06, -2.90947e-07, 0};
-  double dSMM[nvals] = {-0.0027338, -0.000674823, -9.03902e-05, -9.60729e-06,
-    -9.00602e-07, -7.79772e-08, -6.39082e-09, -5.03103e-10, -3.8404e-11, 0};
-  double dSML[nvals] = {-0.000178069, -2.73075e-05, -3.43353e-06, -3.79875e-07,
-    -3.84277e-08, -3.63796e-09, 0, 0, 0, 0};
-  double dSNNZ[nvals] = {-0.000613419, 0.000151081, -3.01769e-05, 5.64941e-06,
-    -1.01932e-06, 1.79722e-07, -3.11943e-08, 5.3533e-09, -9.10839e-10, 0};
-  double dSMMZ[nvals] = {-0.000185505, -3.02915e-05, -2.69623e-06, -1.90297e-07,
-    -1.18348e-08, -6.79348e-10, -3.68941e-11, -1.92387e-12, -9.72507e-14, 0};
-  double dSMLZ[nvals] = {-4.36831e-06, -4.43429e-07, -3.69119e-08, -2.70365e-09,
-    -1.81055e-10, -1.1346e-11, 0, 0, 0, 0};
+  double dSNN[nvals] = {-0.00742097219,0.00269386658,-0.00081443389,
+    0.000229928416,-6.25907958e-05,1.66587074e-05,-4.36638457e-06,
+    1.13185309e-06,-2.9094711e-07,0};
+  double dSMM[nvals] = {-0.00273380482,-0.000674822887,-9.03901527e-05,
+    -9.60728674e-06,-9.00601584e-07,-7.79771575e-08,-6.39081501e-09,
+    -5.03103237e-10,-3.84039721e-11,0};
+  double dSML[nvals] = {-0.000178068655,-2.73074988e-05,-3.43353084e-06,
+    -3.79874726e-07,-3.84277152e-08,-3.63796283e-09,0,0,0,0};
+  double dSNNZ[nvals] = {-0.000613419148,0.000151081306,-3.01768803e-05,
+    5.6494125e-06,-1.0193187e-06,1.79721615e-07,-3.11943064e-08,
+    5.35330416e-09,-9.10838997e-10,0};
+  double dSMMZ[nvals] = {-0.000185505058,-3.02915204e-05,-2.69622608e-06,
+    -1.90297198e-07,-1.18348447e-08,-6.79347587e-10,-3.68940906e-11,
+    -1.92386519e-12,-9.72507214e-14,0};
+  double dSMLZ[nvals] = {-4.36830824e-06,-4.4342876e-07,-3.69119067e-08,
+    -2.70365467e-09,-1.81055258e-10,-1.13459767e-11,0,0,0,0};
   
   virtual void SetUp()     { }
   virtual void TearDown()  { }
@@ -516,10 +521,9 @@ TEST_F(ReExpUTest, checkS0)
   
   for ( int s = 0; s < nvals; s++ )
   {
-    EXPECT_NEAR( ReExpTest.get_sval( 0, s, 0), SN0[s],               preclim);
-    EXPECT_NEAR( ReExpTest.get_sval( s, 0, 0), SN0[s] * pow(-1.0,s), preclim);
+    EXPECT_NEAR(ReExpTest.get_sval( 0, s, 0)/SN0[s],             1, preclim);
+    EXPECT_NEAR(ReExpTest.get_sval( s, 0, 0)/SN0[s]*pow(-1.0,s), 1, preclim);
   }
-  
 }
 
 TEST_F(ReExpUTest, checkSZpt)
@@ -545,11 +549,11 @@ TEST_F(ReExpUTest, checkSZpt)
   
   for ( int s = 0; s < nvals; s++ )
   {
-    EXPECT_NEAR( ReExpTest.get_sval(   s,  s+1,   0), SNNZ[s], preclim);
-    EXPECT_NEAR( ReExpTest.get_sval(   s,  s+2,   s), SMMZ[s], preclim);
-    EXPECT_NEAR( ReExpTest.get_sval( s+3,  s+4, s+1), SMLZ[s], preclim);
+    if ( SNNZ[s] != 0)
+      EXPECT_NEAR(ReExpTest.get_sval(  s, s+1,   0)/SNNZ[s], 1, preclim);
+    EXPECT_NEAR(ReExpTest.get_sval(  s, s+2,   s), SMMZ[s], preclim);
+    EXPECT_NEAR(ReExpTest.get_sval(s+3, s+4, s+1), SMLZ[s], preclim);
   }
-  
 }
 
 TEST_F(ReExpUTest, checkS)
@@ -584,7 +588,6 @@ TEST_F(ReExpUTest, checkS)
     if ( SML[s] != 0)
       EXPECT_NEAR( ReExpTest.get_sval( s+3, s+4, s+1)/SML[s], 1.0, preclim);
   }
-  
 }
 
 TEST_F(ReExpUTest, checkdRdtheta0Zpt)
@@ -662,10 +665,10 @@ TEST_F(ReExpUTest, checkdRdthetaZpt)
   
   for ( int s = 0; s < nvals; s++ )
   {
-//    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 5, s).real(),
-//                RM5Zreal[s], preclim);
-//    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 1, s).imag(),
-//                RM5Zimag, preclim);
+    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 5, s).real(),
+                RM5Zreal[s], preclim);
+    EXPECT_NEAR( ReExpTest.get_rval( nvals-1, 1, s).imag(),
+                RM5Zimag, preclim);
   }
   
 }
@@ -872,8 +875,8 @@ TEST_F(ReExpUTest, checkdSdr0)
 
   for ( int s = 0; s < nvals; s++ )
   {
-    EXPECT_NEAR(ReExpTest.get_dsdr_val(0,s,0),dSN0[s],             preclim);
-    EXPECT_NEAR(ReExpTest.get_dsdr_val(s,0,0),dSN0[s]*pow(-1.0,s), preclim);
+    EXPECT_NEAR(ReExpTest.get_dsdr_val(0,s,0)/dSN0[s],            1,preclim);
+    EXPECT_NEAR(ReExpTest.get_dsdr_val(s,0,0)/dSN0[s]*pow(-1.0,s),1,preclim);
   }
   
 }
@@ -908,7 +911,6 @@ TEST_F(ReExpUTest, checkdSdrZpt)
     if ( dSML[s] != 0)
       EXPECT_NEAR(ReExpTest.get_dsdr_val(s+3, s+4,s+1)/dSMLZ[s], 1.0, preclim);
   }
-  
 }
 
 TEST_F(ReExpUTest, checkdSdr)
@@ -941,7 +943,6 @@ TEST_F(ReExpUTest, checkdSdr)
     if ( dSML[s] != 0)
       EXPECT_NEAR( ReExpTest.get_dsdr_val(s+3, s+4,s+1)/dSML[s], 1.0, preclim);
   }
-  
 }
 
 

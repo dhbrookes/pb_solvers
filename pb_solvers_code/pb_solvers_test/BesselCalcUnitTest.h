@@ -74,9 +74,6 @@ protected :
         1.17666667e+02,   2.44333333e+02,   4.31105820e+02,
         6.77907167e+02,   9.79379768e+02,   1.32702447e+03,
         1.71109497e+03};
-    
-  //virtual void SetUp() {}
-  //virtual void TearDown() {}
 };
 
 TEST_F(BesselCalcUTest, first10)
@@ -90,10 +87,10 @@ TEST_F(BesselCalcUTest, first10)
 
   for (int i = 0; i < nvals; i++)
   {
-    EXPECT_NEAR( mBFI10[i] , i10[i] , preclim);
-    EXPECT_NEAR( mBFK10[i] , k10[i] , preclim);
-    EXPECT_NEAR( mBFI1[i]  , i1[i]  , preclim);
-    EXPECT_NEAR( mBFK1[i]  , k1[i]  , preclim);
+    EXPECT_NEAR( mBFI10[i]/i10[i], 1, preclim);
+    EXPECT_NEAR( mBFK10[i]/k10[i], 1, preclim);
+    EXPECT_NEAR( mBFI1[i]/i1[i],   1, preclim);
+    EXPECT_NEAR( mBFK1[i]/k1[i],   1, preclim);
   }
 }
 

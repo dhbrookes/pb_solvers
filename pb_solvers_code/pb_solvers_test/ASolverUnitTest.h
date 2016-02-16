@@ -54,9 +54,10 @@ protected :
   
   virtual void TearDown() {}
   
-  double ATrip0[15]   = {6.01094069,0.0141281225,1.03433512,-0.804854118,
+  double ATrip0[15]   = {6.01094069,0.0141280225,1.03433512,-0.804854118,
     1.24302352e-05,2.58107532e-05,5.8366607e-05,-0.182460812,3.82002752e-06,
-    0.23555681,0.16212821,-7.82709e-09,3.914100e-07,2.5549544e-08,0.22607375};
+    0.235556808,0.162128207,-7.8270901e-09,3.91410002e-07,
+    2.55495441e-08,0.226073754};
   double ATrip0im[15] = {0,0,1.03698189,0,0.000412418784,3.23186115e-06,0,
     -0.18242449,3.11917432e-07,-0.235553474,0,2.63554468e-06,1.04180458e-08,
     5.16522503e-07,1.02665424e-08};
@@ -108,8 +109,8 @@ protected :
   double AMul2SingF[15]   = {6.01423317,-0.542415383,1.06836766,-0.549177154,-0.028691067,0,-0.107338231,-0.165655581,0,0.235823283,0.206234945,-0.00853035235,0,-0.00029923875,0.226117093};
   double AMul2SingimF[15] = {0,0,1.06836766,0,-0.028691067,0,0,-0.165655581,0,-0.235823283,0,-0.00853035235,0,0.00029923875,0};
   
-  double A0Sing[15] = {2.08493611, 0.0595090739,0, 0.026460114, 0, 0,
-    0.00906667786, 0, 0, 0, 0.00287090794, 0, 0, 0, 0};
+  double A0Sing[15] = {2.08493624,0.0595104925,0,0.0264609804,0,0,
+    0.00906707868,0,0,0,0.00287107389,0,0,0,0};
   double A1Sing[15] = {2.08493623, -0.059510451, 0, 0.026460955, 0, 0,
     -0.00906706693, 0, 0, 0, 0.00287106903, 0, 0, 0, 0};
   
@@ -516,23 +517,23 @@ TEST_F(ASolverUTest, checkSH)
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
 
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 0, 0).real(), 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 0, 0).imag(), 0.0, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 0, 0).real(), 1.0, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 0, 0).imag(), 0.0, preclim);
 
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 5, 0).real(),-1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 5, 0).imag(), 0.0, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 5, 0).real(),-1.0, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 5, 0).imag(), 0.0, preclim);
 
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 6,-5).real(), 0.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 0, 0, 6,-5).imag(), 0.0, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 6,-5).real(), 0.0, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 6,-5).imag(), 0.0, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 0, 0).real(), 1.0, preclim);
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 0, 0).imag(), 0.0, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 0, 0).real(), 1.0, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 0, 0).imag(), 0.0, preclim);
 
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 3,-2).real(),-0.0522110883, preclim);
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 3,-2).imag(), 0.4946303982, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 3,-2).real(),-0.0522110883, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 3,-2).imag(), 0.4946288312, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 6, 5).real(), 0.3615486465, preclim);
-  EXPECT_NEAR( ASolvTest.get_SH_ij( 1, 0, 6, 5).imag(),-0.2082023636, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 6, 5).real(), 0.3615486465, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 6, 5).imag(),-0.2082023636, preclim);
 }
 
 TEST_F(ASolverUTest, checkAMulti)
@@ -542,8 +543,7 @@ TEST_F(ASolverUTest, checkAMulti)
     Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
-    int M = 3;
-    vector<double> charges(M); vector<Pt> posCharges(M);
+    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
     charges[0]    = 2.0; posCharges[0] = pos[molInd];
     charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
@@ -563,8 +563,8 @@ TEST_F(ASolverUTest, checkAMulti)
                                       sys.get_lambda(), vals);
   
   ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
-  ASolvTest.solve_A(1E-20);
-
+  ASolvTest.solve_A(1E-40);
+  
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
   {
@@ -720,8 +720,6 @@ TEST_F(ASolverUTest, checkASingMultFlip)
     }
   }
 }
-
-
 
 TEST_F(ASolverUTest, checkASing)
 {
