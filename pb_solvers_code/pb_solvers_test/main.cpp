@@ -10,7 +10,7 @@
 #include <limits.h>
 #include "gtest/gtest.h"
 
-double preclim = 1.0e-6;    //! precision limit
+double preclim = 1e-7;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
 
 #include "ASolverUnitTest.h"

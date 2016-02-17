@@ -215,15 +215,9 @@ public:
     return p3_;
   }
   
-  T norm2()
-  {
-    return p1_*p1_ + p2_*p2_ + p3_*p3_;
-  }
+  T norm2() { return p1_*p1_ + p2_*p2_ + p3_*p3_; }
   
-  T norm()
-  {
-    return sqrt(norm2());
-  }
+  T norm() { return sqrt(norm2()); }
   
 };
 
@@ -235,6 +229,7 @@ class Quaternion
 {
 protected:
   double w_;  // real part
+  
   //imaginary coefficients:
   double a_;
   double b_;
@@ -246,27 +241,56 @@ public:
   /*
    Construct a quaternion given all the coefficients explicitly
    */
-  Quaternion(double w=0, double a=0, double b=0, double c=0):
+  Quaternion(double w=1, double a=0, double b=0, double c=0, bool norm=true):
   w_(w), a_(a), b_(b), c_(c)
   {
+    if (norm) normalize();
   }
   
   /*
    Construct a quarernion given an angle and axis of rotation
    */
-  Quaternion(double theta, Point<double> axis)
+  Quaternion(double theta, Point<double> axis, bool norm=true)
   {
-    w_ = cos(theta/2);
-    double scal = sin(theta/2);
-    a_ = axis.x() * scal;
-    b_ = axis.y() * scal;
-    c_ = axis.z() * scal;
+    w_ = cos(theta/2.0);
+    double scal = sin(theta/2.0);
+    a_ = (axis.x()/axis.norm()) * scal;
+    b_ = (axis.y()/axis.norm()) * scal;
+    c_ = (axis.z()/axis.norm()) * scal;
+    if (norm) normalize();
   }
   
-  // returns the conjugate of this quarternion, which negates all complex terms
-  Quat conj()
+  /*
+   Construct a quarernion from another
+   */
+  Quaternion(const Quaternion & q)  { *this = q;  }
+
+  /*
+   Normalize the quaternion
+   */
+  void normalize()
   {
-    return Quat(w_, -a_, -b_, -c_);
+    double in_norm = 1.0/sqrt(w_*w_ + a_*a_ + b_*b_  + c_*c_);
+    w_ *= in_norm; a_ *= in_norm; b_ *= in_norm; c_ *= in_norm;
+  }
+
+  // return parts of quaternion
+  double get_w() { return w_; }
+  double get_a() { return a_; }
+  double get_b() { return b_; }
+  double get_c() { return c_; }
+  Point<double> get_imag() { return Point <double> ( a_, b_, c_); }
+  
+  // returns the conjugate of this quarternion, negates all complex terms
+  Quat conj()  { return Quat(w_, -a_, -b_, -c_); }
+  
+  /*
+   Quaternion = operator
+   */
+  Quaternion & operator=(const Quaternion & q)
+  {
+    w_ = q.w_; a_ = q.a_; b_ = q.b_; c_ = q.c_;
+    return *this;    
   }
   
   /*
@@ -281,12 +305,12 @@ public:
     q0=w_; q1=a_; q2=b_; q3=c_;
     r0=rhs.w_; r1=rhs.a_; r2=rhs.b_; r3=rhs.c_;
     
-    t0 = r0*q0 - r1*q1 - r2*q2 - r3*q3;
-    t1 = r0*q1 + r1*q0 - r2*q3 + r3*q2;
-    t2 = r0*q2 + r1*q3 + r2*q0 - r3*q1;
-    t3 = r0*q3 - r1*q2 + r2*q1 + r3*q0;
+    t0 = q0*r0 - q1*r1 - q2*r2 - q3*r3;
+    t1 = q0*r1 + q1*r0 + q2*r3 - q3*r2;
+    t2 = q0*r2 - q1*r3 + q2*r0 + q3*r1;
+    t3 = q0*r3 + q1*r2 - q2*r1 + q3*r0;
     
-    return Quat(t0, t1, t2, t3);
+    return Quat(t0, t1, t2, t3, false);
   }
   
   /*
@@ -296,7 +320,7 @@ public:
   Point<double> rotate_point(Point<double> pt)
   {
     //make the point a quarternion with real part=0
-    Quat p (0, pt.x(), pt.y(), pt.z());
+    Quat p (0, pt.x(), pt.y(), pt.z(), false);
     Quat q_conj = conj();
     
     Quat result = *this * p;

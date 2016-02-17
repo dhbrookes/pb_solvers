@@ -104,4 +104,89 @@ TEST_F(SpPointUTest, setGetConvert2)
   EXPECT_NEAR( testPt.z(),  1.733176589, preclim);
 }
 
+
+/*
+ Class for testing euclidean points
+ */
+class QuatUTest : public ::testing::Test
+{
+  public :
+  
+  protected :
+  
+  Quaternion testQuat_;
+  
+  virtual void SetUp() {}
+  virtual void TearDown() {}
+  
+};
+
+TEST_F(QuatUTest, InitVals) // test for constructors
+{
+  Quaternion testQuat;
+  EXPECT_NEAR( testQuat.get_w(), 1, preclim);
+  EXPECT_NEAR( testQuat.get_a(), 0, preclim);
+  EXPECT_NEAR( testQuat.get_b(), 0, preclim);
+  EXPECT_NEAR( testQuat.get_c(), 0, preclim);
+  
+  Quaternion testQuat1( 2.4, 4.6, 7.8, 9.2);
+  EXPECT_NEAR( testQuat1.get_w(), 0.18278586612161321, preclim);
+  EXPECT_NEAR( testQuat1.get_a(), 0.35033957673309196, preclim);
+  EXPECT_NEAR( testQuat1.get_b(), 0.59405406489524293, preclim);
+  EXPECT_NEAR( testQuat1.get_c(), 0.70067915346618392, preclim);
+  
+  Quaternion testQuat2( 2.8, Point<double>(7.6, 1.8, 11.2));
+  EXPECT_NEAR( testQuat2.get_w(), 0.16996714290024101, preclim);
+  EXPECT_NEAR( testQuat2.get_a(), 0.54850238458972622, preclim);
+  EXPECT_NEAR( testQuat2.get_b(), 0.12990845950809307, preclim);
+  EXPECT_NEAR( testQuat2.get_c(), 0.80831930360591231, preclim);
+}
+
+TEST_F(QuatUTest, Conjugate) // test for conj()
+{
+  Quaternion testQuat1( 2.4, 4.6, 7.8, 9.2);
+  EXPECT_NEAR( testQuat1.conj().get_w(),  0.18278586612161321, preclim);
+  EXPECT_NEAR( testQuat1.conj().get_a(), -0.35033957673309196, preclim);
+  EXPECT_NEAR( testQuat1.conj().get_b(), -0.59405406489524293, preclim);
+  EXPECT_NEAR( testQuat1.conj().get_c(), -0.70067915346618392, preclim);
+}
+
+TEST_F(QuatUTest, Multiply) // test for operator*(Quat rhs)
+{
+  Quaternion testQuat1( 2.4, 4.6, 7.8, 9.2);
+  Quaternion testQuat2( 2.8, Point<double>(7.6, 1.8, 11.2));
+
+  Quaternion test3 = testQuat1 * testQuat2;
+  EXPECT_NEAR( test3.get_w(), -0.804639636, preclim);
+  EXPECT_NEAR( test3.get_a(),  0.548965919, preclim);
+  EXPECT_NEAR( test3.get_b(),  0.225853046, preclim);
+  EXPECT_NEAR( test3.get_c(), -0.0134862186, preclim);
+  
+  test3 = testQuat2 * testQuat1;
+  EXPECT_NEAR( test3.get_w(), -0.804639636, preclim);
+  EXPECT_NEAR( test3.get_a(), -0.229356518, preclim);
+  EXPECT_NEAR( test3.get_b(),  0.0235771586, preclim);
+  EXPECT_NEAR( test3.get_c(),  0.547169774, preclim);
+}
+
+TEST_F(QuatUTest, Rotate) // test for rotate_point
+{
+  Quaternion testQuat1( 2.4, 4.6, 7.8, 9.2);
+  Quaternion testQuat2( 2.8, Point<double>(7.6, 1.8, 11.2));
+  
+  Point<double> point1( 0.5, 5.0, 100.4);
+  
+  Point<double> test3 = testQuat1.rotate_point( point1 );
+  cout << " This is my point " << test3.x() << " " << test3.y() << " " << test3.z() << endl;
+  EXPECT_NEAR( test3.x()/71.5519258, 1, preclim);
+  EXPECT_NEAR( test3.y()/69.9219026, 1, preclim);
+  EXPECT_NEAR( test3.z()/9.83155452, 1, preclim);
+  
+  test3 = testQuat2.rotate_point( point1 );
+    cout << " This is my point " << test3.x() << " " << test3.y() << " " << test3.z() << endl;
+  EXPECT_NEAR( test3.x()/92.6298207,  1, preclim);
+  EXPECT_NEAR( test3.y()/-1.96825623, 1, preclim);
+  EXPECT_NEAR( test3.z()/39.0032343,  1, preclim);
+}
+
 #endif /* utilUnitTest_h */

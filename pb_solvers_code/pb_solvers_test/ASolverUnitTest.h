@@ -529,11 +529,11 @@ TEST_F(ASolverUTest, checkSH)
   EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 0, 0).real(), 1.0, preclim);
   EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 0, 0).imag(), 0.0, preclim);
 
-  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 3,-2).real(),-0.0522110883, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 3,-2).real(),-0.0522108211, preclim);
   EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 3,-2).imag(), 0.4946288312, preclim);
   
-  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 6, 5).real(), 0.3615486465, preclim);
-  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 6, 5).imag(),-0.2082023636, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 6, 5).real(), 0.3615494298, preclim);
+  EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 6, 5).imag(),-0.2082030597, preclim);
 }
 
 TEST_F(ASolverUTest, checkAMulti)
