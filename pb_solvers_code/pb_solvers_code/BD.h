@@ -22,9 +22,11 @@
 class BD
 {
 protected:
-  double dt_;  // time step
   vector<double> transDiffConsts_;  // translational diffusion constants
   vector<double> rotDiffConsts_;  // rotational diffusion constants
+  
+  bool diff_; // include random kicks in dynamics
+  bool force_; // include force calcs in dynamics
   
   // random number generator object:
   mt19937 randGen_;
@@ -37,16 +39,24 @@ protected:
   void indi_trans_update(int i, MyVector<double> fi);
   void indi_rot_update(int i, MyVector<double> tau_i);
   
+  // compute timestep for BD
+  double compute_dt( double dist );
+  
+  // compute the smallest distance between two molecule centers
+  double compute_min_dist( );
+  
   // return a random vector with each element drawn from a Gaussian
   Pt rand_vec(double mean, double var);
   
 public:
-  BD(System sys, double dt, vector<double> trans_diff_consts,
-     vector<double> rot_diff_consts);
+  BD(System sys, vector<double> trans_diff_consts,
+     vector<double> rot_diff_consts, bool diff = true, bool force = true);
   
   // update the system with Brownian dynamics given forces and torques on every
   // molecule
   void bd_update(VecOfVecs<double>::type F, VecOfVecs<double>::type tau);
+  
+  System get_system() { return *_sys_; }
   
 };
 

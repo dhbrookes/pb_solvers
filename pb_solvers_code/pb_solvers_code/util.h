@@ -279,7 +279,7 @@ public:
   double get_a() { return a_; }
   double get_b() { return b_; }
   double get_c() { return c_; }
-  Point<double> get_imag() { return Point <double> ( a_, b_, c_); }
+  Point<double> get_imag() { return Point <double> ( a_, b_, c_ ); }
   
   // returns the conjugate of this quarternion, negates all complex terms
   Quat conj()  { return Quat(w_, -a_, -b_, -c_); }

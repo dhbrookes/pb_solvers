@@ -133,6 +133,7 @@ VecOfMats<cmplx>::type TorqueCalc::calc_H(int i)
     qij = _sys_->get_qij(i, j);
     Pt pt = _sys_->get_posij(i, j);
     _shCalc_->calc_sh(pt.theta(),pt.phi());
+    scale = 1.0;
     
     if (_sys_->get_ai(i) == 0)
       bessI = _bCalc_->calc_mbfI(p_, _sys_->get_consts().get_kappa()*pt.r());
@@ -142,21 +143,21 @@ VecOfMats<cmplx>::type TorqueCalc::calc_H(int i)
     for (n = 0; n < p_; n++)
     {
       gam = gamma_i(n, n);
-      scale = ( n > 0 ) ? pow( pt.r()/lambda, n ) : 1.0;
       for (m = 0; m <= n; m++)
       {
         sh = _shCalc_->get_result(n, m);
-        h = bessI[n] * qij * pt.r() * scale * sh * gam;
+        h = bessI[n] * qij * scale * sh * gam;
         Hx(n, m+p_) += h * pt.x();
         Hy(n, m+p_) += h * pt.y();
         Hz(n, m+p_) += h * pt.z();
       }
+      scale *= (pt.r()/lambda);
     }
   }
   H.set_val(0, Hx);
   H.set_val(1, Hy);
   H.set_val(2, Hz);
-
+  
   return H;
 }
 

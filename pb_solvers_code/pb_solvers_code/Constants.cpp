@@ -83,6 +83,13 @@ const double Constants::convert_int_to_jmol(double val)
   return val * (coul_num / intj_den);
 }
 
+const double Constants::convert_j_to_int(double val)
+{
+  double coul_num = E2;
+  double intj_den = PERMITTIVITY_VAC * 4.0 * PI * ANGSTROM; //IU units density
+  return val / (coul_num / intj_den);
+}
+
 const double Constants::convert_int_to_kT(double val)
 {
   double intkCal_mol = convert_int_to_kcal_mol( val );

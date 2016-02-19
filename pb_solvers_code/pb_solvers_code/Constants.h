@@ -119,6 +119,7 @@ public:
   //convert a value from international units to mol units:
   static const double convert_int_to_kcal_mol(double val);
   static const double convert_int_to_jmol(double val);
+  static const double convert_j_to_int(double val);
   const double convert_int_to_kT(double val);
   
 };

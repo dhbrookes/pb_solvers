@@ -50,6 +50,8 @@ TEST_F(ConstantsUTest, unitConv)
   
   ConstUTest_.set_temp( 298.0 );
   EXPECT_NEAR(ConstUTest_.convert_int_to_kT(1.0)/560.73826468,1,preclim);
+  
+  EXPECT_NEAR(ConstUTest_.convert_j_to_int(1.0)/4.33448425104667e+17,1,preclim);
 
 }
 

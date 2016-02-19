@@ -138,10 +138,10 @@ protected:
   int N_;
   int p_;
 
-  /*
-   Calculate H vector (eq 42 and 43 in Lotan 2006)
-   */
-  VecOfMats<cmplx>::type calc_H(int i);
+//  /*
+//   Calculate H vector (eq 42 and 43 in Lotan 2006)
+//   */
+//  VecOfMats<cmplx>::type calc_H(int i);
   
 public:
   
@@ -150,6 +150,11 @@ public:
              VecOfMats<cmplx>::type gamma, Constants consts, System sys, int p);
   
   void calc_tau();  // fill tau_
+  
+  /*
+   Calculate H vector (eq 42 and 43 in Lotan 2006)
+   */
+  VecOfMats<cmplx>::type calc_H(int i);
   
   MyVector<double> get_taui(int i)     { return tau_[i]; }
   VecOfVecs<double>::type get_Tau()    { return tau_; }

@@ -75,13 +75,10 @@ public:
   const double get_lambda()  { return lambda_; }
   
   // translate every charge in molecule i by the vector dr
-  void translate_mol(int i, Pt dr) { get_molecule(i).translate(dr); }
+  void translate_mol(int i, Pt dr) { molecules_[i].translate(dr); }
   
   // rotate every charge in molecule i
-  void rotate_mol(int i, Quat qrot)
-  {
-    get_molecule(i).rotate(qrot);
-  }
+  void rotate_mol(int i, Quat qrot) { molecules_[i].rotate(qrot); }
   
   /*
    Check to determine if any molecules are overlapping

@@ -110,11 +110,9 @@ TEST_F(SpPointUTest, setGetConvert2)
  */
 class QuatUTest : public ::testing::Test
 {
-  public :
+public :
   
-  protected :
-  
-  Quaternion testQuat_;
+protected :
   
   virtual void SetUp() {}
   virtual void TearDown() {}
@@ -140,6 +138,38 @@ TEST_F(QuatUTest, InitVals) // test for constructors
   EXPECT_NEAR( testQuat2.get_a(), 0.54850238458972622, preclim);
   EXPECT_NEAR( testQuat2.get_b(), 0.12990845950809307, preclim);
   EXPECT_NEAR( testQuat2.get_c(), 0.80831930360591231, preclim);
+  
+  Point <double> imag = testQuat2.get_imag();
+  EXPECT_NEAR( imag.x(), 0.54850238458972622, preclim);
+  EXPECT_NEAR( imag.y(), 0.12990845950809307, preclim);
+  EXPECT_NEAR( imag.z(), 0.80831930360591231, preclim);
+}
+
+TEST_F(QuatUTest, Normalize) // test for constructors
+{
+  Quaternion testQuat1( 2.4, 4.6, 7.8, 9.2, false);
+
+  EXPECT_NEAR( testQuat1.get_w(), 2.4, preclim);
+  EXPECT_NEAR( testQuat1.get_a(), 4.6, preclim);
+  EXPECT_NEAR( testQuat1.get_b(), 7.8, preclim);
+  EXPECT_NEAR( testQuat1.get_c(), 9.2, preclim);
+  
+  testQuat1.normalize();
+  EXPECT_NEAR( testQuat1.get_w(), 0.18278586612161321, preclim);
+  EXPECT_NEAR( testQuat1.get_a(), 0.35033957673309196, preclim);
+  EXPECT_NEAR( testQuat1.get_b(), 0.59405406489524293, preclim);
+  EXPECT_NEAR( testQuat1.get_c(), 0.70067915346618392, preclim);
+}
+
+TEST_F(QuatUTest, EqualsOp) // test for constructors
+{
+  Quaternion testQuat1( 2.4, 4.6, 7.8, 9.2);
+  Quaternion testQuat2 = testQuat1;
+  
+  EXPECT_NEAR( testQuat2.get_w(), 0.18278586612161321, preclim);
+  EXPECT_NEAR( testQuat2.get_a(), 0.35033957673309196, preclim);
+  EXPECT_NEAR( testQuat2.get_b(), 0.59405406489524293, preclim);
+  EXPECT_NEAR( testQuat2.get_c(), 0.70067915346618392, preclim);
 }
 
 TEST_F(QuatUTest, Conjugate) // test for conj()
@@ -173,20 +203,29 @@ TEST_F(QuatUTest, Rotate) // test for rotate_point
 {
   Quaternion testQuat1( 2.4, 4.6, 7.8, 9.2);
   Quaternion testQuat2( 2.8, Point<double>(7.6, 1.8, 11.2));
-  
   Point<double> point1( 0.5, 5.0, 100.4);
   
   Point<double> test3 = testQuat1.rotate_point( point1 );
-  cout << " This is my point " << test3.x() << " " << test3.y() << " " << test3.z() << endl;
   EXPECT_NEAR( test3.x()/71.5519258, 1, preclim);
   EXPECT_NEAR( test3.y()/69.9219026, 1, preclim);
   EXPECT_NEAR( test3.z()/9.83155452, 1, preclim);
   
   test3 = testQuat2.rotate_point( point1 );
-    cout << " This is my point " << test3.x() << " " << test3.y() << " " << test3.z() << endl;
   EXPECT_NEAR( test3.x()/92.6298207,  1, preclim);
   EXPECT_NEAR( test3.y()/-1.96825623, 1, preclim);
   EXPECT_NEAR( test3.z()/39.0032343,  1, preclim);
+  
+  Point<double> point2( 20.3, 0.0, -50.4);
+  
+  test3 = testQuat1.rotate_point( point2 );
+  EXPECT_NEAR( test3.x()/-49.649652,  1, preclim);
+  EXPECT_NEAR( test3.y()/-21.8526682, 1, preclim);
+  EXPECT_NEAR( test3.z()/3.10208817,  1, preclim);
+  
+  test3 = testQuat2.rotate_point( point2 );
+  EXPECT_NEAR( test3.x()/-53.8292857, 1, preclim);
+  EXPECT_NEAR( test3.y()/7.28346125,  1, preclim);
+  EXPECT_NEAR( test3.z()/-1.26854099, 1, preclim);
 }
 
 #endif /* utilUnitTest_h */

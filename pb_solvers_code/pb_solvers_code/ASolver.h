@@ -31,7 +31,6 @@ protected:
   VecOfMats<cmplx>::type      A_;  // solution
   VecOfMats<cmplx>::type      prevA_;  // previous value for
                                        // calculating convergence criteria
-  
   /*
    Gradient of A. Each (i, j) entry in the outer vector is grad_j(A^(i))
    The inner vectors are all of length three and represent dA/dr, dA/dtheta
@@ -159,6 +158,9 @@ protected:
 
 public:
   
+  ASolver(const int N, const int p, BesselCalc bcalc,
+          SHCalc shCalc, System sys);
+  
   VecOfMats<cmplx>::type&  get_gamma()     { return gamma_; }
   VecOfMats<cmplx>::type&  get_delta()     { return delta_; }
   VecOfMats<cmplx>::type&  get_E()         { return E_; }
@@ -216,9 +218,6 @@ public:
   
   void set_A_ni(int i, int n, int m, cmplx val)
   { (&A_[i])->set_val( n, m+p_, val);}
-  
-  ASolver(const int N, const int p, BesselCalc bcalc,
-          SHCalc shCalc, System sys);
 
   void print_Ei( int i, int p);
   void print_Ai( int i, int p);
