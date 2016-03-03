@@ -18,6 +18,23 @@
 
 using namespace std;
 
+vector<string> line_tokenize(string line, char delim)
+{
+  vector<string> v;
+  istringstream buf(line);
+  for(string token; getline(buf, token, delim); )
+  {
+    v.push_back(token);
+  }
+  return v;
+}
+
+
+string strip_quotes(string s)
+{
+  s.erase(remove( s.begin(), s.end(), '\"' ), s.end());
+  return s;
+}
 
 class CouldNotReadException: public exception
 {
