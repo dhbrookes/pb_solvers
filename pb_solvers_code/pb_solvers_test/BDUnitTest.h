@@ -235,7 +235,7 @@ TEST_F(BDUTest, TorquePos)
   dRot[0] = 0.01; dRot[1] = 0.01;
   BD BDTest( sys, dTr, dRot, false);
   
-  for (int step=0; step < 1; step ++)
+  for (int step=0; step < 10; step ++)
   {
     ASolver ASolvTest( nmol, vals, bCalcu, SHCalcu, BDTest.get_system());
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
@@ -247,12 +247,16 @@ TEST_F(BDUTest, TorquePos)
     TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
                        ASolvTest.get_gamma(), const_, sys, vals);
   
-    cout << " This is tau " << TorTest.get_taui(0)[0] << " " << TorTest.get_taui(0)[1] << " " << TorTest.get_taui(0)[2] << " " << endl;
-    cout << " This is tau 1 " << TorTest.get_taui(1)[0] << " " << TorTest.get_taui(1)[1] << " " << TorTest.get_taui(1)[2] << " " << endl;
+    double f0 = (abs(TorTest.get_taui(0)[0])<1e-15) ? 0:TorTest.get_taui(0)[0];
+    double f1 = (abs(TorTest.get_taui(0)[1])<1e-15) ? 0:TorTest.get_taui(0)[1];
+    double f2 = (abs(TorTest.get_taui(0)[2])<1e-15) ? 0:TorTest.get_taui(0)[2];
+    cout << " This is tau " << f0 << " " << f1 << " " << f2 << " " << endl;
+    f0 = (abs(TorTest.get_taui(1)[0])<1e-15) ? 0:TorTest.get_taui(1)[0];
+    f1 = (abs(TorTest.get_taui(1)[1])<1e-15) ? 0:TorTest.get_taui(1)[1];
+    f2 = (abs(TorTest.get_taui(1)[2])<1e-15) ? 0:TorTest.get_taui(1)[2];
+    cout << " This is tau " << f0 << " " << f1 << " " << f2 << " " << endl;
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
-    
-    cout << " This is Mol1 At1 " << BDTest.get_system().get_molecule(0).get_posj(1).x() << " " << BDTest.get_system().get_molecule(0).get_posj(1).y() << " " << BDTest.get_system().get_molecule(0).get_posj(1).z() << " " << endl;
   
 //    EXPECT_NEAR(BDTest.get_system().get_centeri(0).x(), 0, preclim);
 //    EXPECT_NEAR(BDTest.get_system().get_centeri(0).y(), 0, preclim);

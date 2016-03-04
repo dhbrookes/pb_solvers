@@ -30,7 +30,7 @@ using namespace std;
 
 int main(int argc, char * argv[])
 {
-  bool test = false;
+  bool test = true;
   if (test)
   {
     cout << "Welcome to test suite" << endl;
@@ -38,7 +38,7 @@ int main(int argc, char * argv[])
     allTest.unitTest( argc, argv );
   }
   
-  bool gtest = true;
+  bool gtest = false;
   if (gtest)
   {
     cout << "Now for Google Tests." << endl ;
