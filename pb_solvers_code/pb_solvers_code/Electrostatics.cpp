@@ -75,7 +75,7 @@ void Electrostatic::find_bins()
   int dim, x, y;
   
   for (dim = 0; dim<3; dim++)
-    npts_[dim] = 101;
+    npts_[dim] = 151;
   
   for (dim = 0; dim<3; dim++)
     step_[dim] = (range_max_[dim] - range_min_[dim]) / (double) npts_[dim];
@@ -131,7 +131,7 @@ void Electrostatic::print_dx( string dxname )
   
 }
 
-void Electrostatic::print_grid()
+void Electrostatic::print_grid(string dim, double value)
 {
   
   
@@ -145,6 +145,7 @@ void Electrostatic::compute_pot()
   double rad;
   
   int Nmol = _sys_->get_n();
+  double e_s = _sys_->get_consts().get_dielectric_water();
   
   for ( xct=0; xct<npts_[0]; xct++)
   {
@@ -171,7 +172,7 @@ void Electrostatic::compute_pot()
         if (cont)
           esp_[xct][yct][zct] = 0.0;
         else
-          esp_[xct][yct][zct] = compute_pot_at( pos.x(), pos.y(), pos.z());
+          esp_[xct][yct][zct] = compute_pot_at( pos.x(), pos.y(), pos.z())/e_s;
       }
     }
   }

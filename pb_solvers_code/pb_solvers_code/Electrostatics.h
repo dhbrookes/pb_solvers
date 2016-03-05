@@ -51,7 +51,7 @@ public:
   // print APBS file
   void print_dx(string ifname);
   
-  void print_grid();
+  void print_grid(string dim, double value);
   
 };
 

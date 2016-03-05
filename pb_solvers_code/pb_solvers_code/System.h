@@ -32,6 +32,7 @@ protected:
     
 public:
   Molecule(int M, double a, vector<double> qs, vector<Pt> pos);
+  Molecule(int M, vector<double> qs, vector<Pt> pos, vector<double> vwD);
   Molecule(int M, double a, vector<double> qs, vector<Pt> pos, Pt cen);
     
   const int get_m() const               { return M_; }
