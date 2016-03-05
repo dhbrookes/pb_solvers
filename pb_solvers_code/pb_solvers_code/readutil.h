@@ -18,6 +18,23 @@
 
 using namespace std;
 
+//vector<string> line_tokenize(string line, char delim)
+//{
+//  vector<string> v;
+//  istringstream buf(line);
+//  for(string token; getline(buf, token, delim); )
+//  {
+//    v.push_back(token);
+//  }
+//  return v;
+//}
+
+
+//string strip_quotes(string s)
+//{
+//  s.erase(remove( s.begin(), s.end(), '\"' ), s.end());
+//  return s;
+//}
 
 class CouldNotReadException: public exception
 {
@@ -46,22 +63,11 @@ class PQRFile
 {
 protected:
   string path_;
+  int M_;  // number of charges
   vector<Pt> pts_;
   vector<double> charges_;
   vector<double> radii_;
   vector<Pt> centers_;
-  
-public:
-  PQRFile(string path, int aprox_size=100)
-  :path_(path)
-  {
-    pts_.reserve(aprox_size);
-    charges_.reserve(aprox_size);
-    radii_.reserve(aprox_size);
-    centers_.reserve(aprox_size);
-    
-    read();
-  }
   
   void read()
   {
@@ -77,23 +83,31 @@ public:
     while (!fin.eof())
     {
       double x,y,z,c,r;
-      sscanf(&(buf[iCoord]), "%lf %lf %lf %lf %lf", &x, &y, &z, &c, &r);
-      // read in as centers that specifies dielectric boundary:
-      if (strncmp(&(buf[iCen]),"CEN",3) == 0)
+      if (strncmp(&(buf[0]),"ATOM",4) == 0)
       {
-        radii_.push_back(r);
-        centers_.push_back(Pt(x,y,z));
-        
-      }
-      
-      // read in as atoms
-      else
-      {
+        sscanf(&(buf[iCoord]), "%lf %lf %lf %lf %lf", &x, &y, &z, &c, &r);
+        // read in as centers that specifies dielectric boundary
         pts_.push_back(Pt(x,y,z));
         charges_.push_back(c);
+        radii_.push_back(r);
       }
+      
       fin.getline(buf,99);
     }
+    M_ = int(pts_.size());
+  }
+  
+public:
+  
+  PQRFile(string path, int aprox_size=100)
+  :path_(path)
+  {
+    pts_.reserve(aprox_size);
+    charges_.reserve(aprox_size);
+    radii_.reserve(aprox_size);
+    centers_.reserve(aprox_size);
+    
+    read();
   }
   
   const string get_path() const             { return path_; }
@@ -101,6 +115,7 @@ public:
   const vector<double> get_charges() const  { return charges_; }
   const vector<double> get_radii() const    { return radii_; }
   const vector<Pt> get_centers() const      { return centers_; }
+  const int get_M() const                   { return M_; }
   
 };
 
@@ -146,6 +161,6 @@ public:
   const int get_nmols() const       { return nmols_; }
   const vector<Pt> get_pts() const  { return pts_; }
 };
-
+    
 
 #endif /* readutil_h */

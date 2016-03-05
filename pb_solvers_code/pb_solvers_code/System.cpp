@@ -8,24 +8,51 @@
 
 #include "System.h"
 
-Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos, Pt cen)
-:M_(M), a_(a), qs_(qs), pos_(pos), center_(cen)
+// user specified radius and center
+Molecule::Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
+                   vector<double> vdwr, Pt cen, double drot, double dtrans)
+:type_(type), drot_(drot), dtrans_(dtrans), qs_(qs), pos_(pos), vdwr_(vdwr),
+M_((int) pos.size()),
+a_(a), center_(cen)
 {
-  // repositioning the charges WRT center of charge
-  for (int i = 0; i < M_; i++)
-  {
-    // check that the charge is encompassed by the the center and radius:
-    if (pos_[i].dist(center_) > a_)
-    {
-      throw BadCenterException(center_, a_);
-    }
-    pos_[i] = pos_[i] - center_;
-  }
+  reposition_charges();
+}
+
+// user specified radius
+Molecule::Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
+         vector<double> vdwr, double drot, double dtrans)
+:type_(type), drot_(drot), dtrans_(dtrans), qs_(qs), pos_(pos), vdwr_(vdwr),
+M_((int) pos.size()),
+a_(a)
+{
+  calc_center();
+  reposition_charges();
+}
+
+// user specified center
+Molecule::Molecule(string type, vector<double> qs, vector<Pt> pos,
+                   vector<double> vdwr, Pt cen, double drot, double dtrans)
+:type_(type), drot_(drot), dtrans_(dtrans), qs_(qs), pos_(pos), vdwr_(vdwr),
+M_((int) pos.size()),
+center_(cen)
+{
+  reposition_charges();
+  calc_a();
+}
+
+// neither the center or radius are specified
+Molecule::Molecule(string type, vector<double> qs, vector<Pt> pos,
+                   vector<double> vdwr, double drot, double dtrans)
+:type_(type), drot_(drot), dtrans_(dtrans), qs_(qs), pos_(pos), vdwr_(vdwr),
+M_((int) pos.size())
+{
+  calc_center();
+  reposition_charges();
+  calc_a();
 }
 
 
-Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos)
-:M_(M), a_(a), qs_(qs), pos_(pos)
+void Molecule::calc_center()
 {
   // calculate the center of the molecule (for now using center):
   double xc, yc, zc;
@@ -43,10 +70,29 @@ Molecule::Molecule(int M, double a, vector<double> qs, vector<Pt> pos)
   zc /= M_;
   
   center_ = Pt(xc, yc, zc);
-  
+}
+
+void Molecule::calc_a()
+{
+  a_ = 0;
+  double dist;
+  for (int i = 0; i < M_; i++)
+  {
+    dist = pos_[i].dist(center_) + vdwr_[i];
+    if (dist > a_) a_ = dist;
+  }
+}
+
+void Molecule::reposition_charges()
+{
   // repositioning the charges WRT center of charge
   for (int i = 0; i < M_; i++)
   {
+    // check that the charge is encompassed by the the center and radius:
+    if (pos_[i].dist(center_) > a_)
+    {
+      throw BadCenterException(center_, a_);
+    }
     pos_[i] = pos_[i] - center_;
   }
 }
@@ -105,7 +151,9 @@ void Molecule::rotate(Quat qrot)
 {
   for (int i = 0; i < M_; i++)
   {
-    cout << " This is new pt " << qrot.rotate_point(pos_[i]).x() << " " << qrot.rotate_point(pos_[i]).y() << " " << qrot.rotate_point(pos_[i]).z() << " " << endl;
+    cout << " This is new pt " << qrot.rotate_point(pos_[i]).x() << " " <<
+    qrot.rotate_point(pos_[i]).y() << " " <<
+    qrot.rotate_point(pos_[i]).z() << " " << endl;
     pos_[i] = qrot.rotate_point(pos_[i]);
   }
 }

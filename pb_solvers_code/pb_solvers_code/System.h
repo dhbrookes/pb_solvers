@@ -24,22 +24,56 @@ class Molecule
 {
 protected:
   
+  
+  string              type_;
+  double              drot_;  // rotational diffusion coefficient
+  double              dtrans_; // translational diffusion coefficients
   int                 M_;  // number of charges in this molecule
-  double              a_;  // radii of this molecule
+  double              a_;  // radius of this molecule
   Pt                  center_;
   vector<double>      qs_;  // magnitude of each charge in the molecule
   vector<Pt>          pos_;  // position of each charge in the molecule
+  vector<double>      vdwr_; // van der waal radius of each charge
+  
+  
+  // calculate the center of the molecule
+  void calc_center();
+  
+  // calculate the radius of the molecule
+  void calc_a();
+  
+  // reposition charges wrt the center
+  void reposition_charges();
     
 public:
-  Molecule(int M, double a, vector<double> qs, vector<Pt> pos);
-  Molecule(int M, vector<double> qs, vector<Pt> pos, vector<double> vwD);
-  Molecule(int M, double a, vector<double> qs, vector<Pt> pos, Pt cen);
+
+  // user specified radius and center
+  Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
+           vector<double> vdwr, Pt cen, double drot_=0, double dtrans=0);
+  
+  // user specified radius
+  Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
+           vector<double> vdwr, double drot_=0, double dtrans=0);
+  
+  // user specified center
+  Molecule(string type, vector<double> qs, vector<Pt> pos,
+           vector<double> vdwr, Pt cen, double drot_=0, double dtrans=0);
+  
+  // neither the center or radius are specified
+  Molecule(string type, vector<double> qs, vector<Pt> pos,
+           vector<double> vdwr, double drot_=0, double dtrans=0);
+
     
   const int get_m() const               { return M_; }
   const double get_a() const            { return a_; }
   const double get_qj(int j) const      { return qs_[j]; }
   Pt get_posj(int j) const              { return pos_[j]; }
   Pt get_center() const                 { return center_; }
+  
+  string get_type() const               { return type_; }
+  
+  double get_drot() const               { return drot_; }
+  double get_dtrans() const             { return dtrans_; }
   
   void translate(Pt dr);
   void rotate(Quat qrot);
@@ -74,6 +108,9 @@ public:
   Pt get_centeri(int i) { return molecules_[i].get_center(); }
   double get_radi(int i) { return molecules_[i].get_a(); }
   const double get_lambda()  { return lambda_; }
+  const string get_typei(int i) { return molecules_[i].get_type(); }
+  const double get_droti(int i) { return molecules_[i].get_drot(); }
+  const double get_dtransi(int i) { return molecules_[i].get_dtrans(); }
   
   // translate every charge in molecule i by the vector dr
   void translate_mol(int i, Pt dr) { molecules_[i].translate(dr); }
