@@ -15,14 +15,29 @@
 #include "System.h"
 #include "util.h"
 #include <memory>
-//#include "readutil.h"
+#include "setup.h"
+#include "readinput.h"
 #include "BD.h"
 
 using namespace std;
 
 int main(int argc, const char * argv[])
 {
-  vector<double> av (5, 1);
-  MyVector<double> a (av);
-  cout << a[2] << endl;
+  string input_file = argv[0];
+  CSetup setup ;
+  
+//  readInputFile(input_file, setup);
+  
+  Constants consts = setup.setup_constants();
+  System sys = setup.setup_system(consts);
+  
 }
+
+
+
+
+
+
+
+
+

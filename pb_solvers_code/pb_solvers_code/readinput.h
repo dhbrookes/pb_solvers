@@ -6,7 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <cstring>
-#include "readutil.h"
+//#include "readutil.h"
 #include "setup.h"
 #include "util.h"
 

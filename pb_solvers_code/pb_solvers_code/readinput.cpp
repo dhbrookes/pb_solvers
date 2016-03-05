@@ -41,17 +41,6 @@ void findLines(string fline, CSetup & inputRead)
 void findKeyword(vector<string> fline, CSetup & inputRead)
 {
   string keyword = fline[0];
-
-//  if (keyword == "system")
-//  {
-//    cout << "System command found" << endl;
-//    if(fline[1]=="nafion" || fline[1]=="multi" || fline[1] == "nam" )
-//    {
-//      inputRead.setSimType( fline[1] );
-//    }
-//    else
-//       cout << "Option not available, using default" << endl;
-
   if (keyword == "runname")
   {
     cout << "Runname command found" << endl;
@@ -67,11 +56,6 @@ void findKeyword(vector<string> fline, CSetup & inputRead)
       if (fline.size() > 3)
         inputRead.setMaxTime( atoi( fline[3].c_str() ));
     }
-//    else if ( fline[1] == "mba" )
-//    {
-////      inputRead.setNBodies( atoi( fline[2].c_str() ) ) ;
-//      inputRead.setDistance( atof( fline[2].c_str() ) ) ;
-//    }
   } else if (keyword == "omp")
   {
     cout << "OMP command found" << endl;
@@ -129,27 +113,6 @@ void findKeyword(vector<string> fline, CSetup & inputRead)
     if (typeNo > inputRead.getType()-1)
       return;
     inputRead.setTypeNPQR( typeNo, fline[2].c_str() );
-//  } else if (keyword == "imat")
-//  {
-//    cout << "IMAT command found" << endl;
-//    int typeNo = atoi(fline[1].c_str())-1;
-//    if (typeNo > inputRead.getType()-1)
-//      return;
-//    inputRead.setTypeNImat( typeNo, fline[2] );
-//  } else if (keyword == "spolDir")
-//  {
-//    cout << "SelfpolDir command found" << endl;
-//    int typeNo = atoi(fline[1].c_str())-1;
-//    if (typeNo > inputRead.getType()-1)
-//      return;
-//    inputRead.setTypeNSpolDir( typeNo, fline[2] );
-//  } else if (keyword == "spolExt")
-//  {
-//    cout << "SpolName command found" << endl;
-//    int typeNo = atoi(fline[1].c_str())-1;
-//    if (typeNo > inputRead.getType()-1)
-//      return;
-//    inputRead.setTypeNExp( typeNo, fline[2] );
   } else if (keyword == "xyz")
   {
     cout << "XYZ command found" << endl;
@@ -157,22 +120,7 @@ void findKeyword(vector<string> fline, CSetup & inputRead)
     if (typeNo > inputRead.getType()-1)
       return;
     inputRead.setTypeNXYZ( typeNo, fline[2] );
-//  } else if (keyword == "f_ext")
-//  {
-//    cout << "External force command found" << endl;
-//    inputRead.setFExt( atof(fline[1].c_str()), atof(fline[2].c_str()));
-//  } else if (keyword == "scale")
-//  {
-//    cout << "Scale command found" << endl;
-//    inputRead.setScale( atof(fline[1].c_str()));
-//  } else if (keyword == "distance")
-//  {
-//    cout << "Distance command found" << endl;
-//    inputRead.setMolDist( atof(fline[1].c_str()));
-//  } else if (keyword == "layer")
-//  {
-//    cout << "Layer command found" << endl;
-//    inputRead.setLayer( atoi(fline[1].c_str()));
+
   } else if (keyword == "random")
   {
     cout << "RNG Seed command found" << endl;
@@ -187,7 +135,7 @@ void findKeyword(vector<string> fline, CSetup & inputRead)
 // Read an input file and return parameters for various words
 /*#########################################################*/
 /*#########################################################*/
-void readInputFile(char * fname, CSetup & readIn)
+void readInputFile(string fname, CSetup readIn)
 {
   cout << "Reading Input file " << fname << endl ;
   ifstream fin(fname);
