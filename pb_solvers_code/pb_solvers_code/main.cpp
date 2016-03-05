@@ -26,7 +26,7 @@ int main(int argc, const char * argv[])
   string input_file = argv[0];
   CSetup setup ;
   
-//  readInputFile(input_file, setup);
+  readInputFile(input_file, setup);
   
   Constants consts = setup.setup_constants();
   System sys = setup.setup_system(consts);

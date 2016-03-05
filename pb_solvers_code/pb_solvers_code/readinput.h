@@ -14,7 +14,7 @@
 vector<string> split(string str, char delimiter);
 void findLines(string fline, CSetup & inputRead);
 void findKeyword(vector<string> fline, CSetup & inputRead);
-void readInputFile(char * fname, CSetup & readIn);
+void readInputFile(string fname, CSetup & readIn);
 
 #endif
 
