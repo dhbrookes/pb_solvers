@@ -135,7 +135,7 @@ void findKeyword(vector<string> fline, CSetup & inputRead)
 // Read an input file and return parameters for various words
 /*#########################################################*/
 /*#########################################################*/
-void readInputFile(string fname, CSetup readIn)
+void readInputFile(string fname, CSetup & readIn)
 {
   cout << "Reading Input file " << fname << endl ;
   ifstream fin(fname);
