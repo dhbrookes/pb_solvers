@@ -16,7 +16,6 @@
 #include "util.h"
 #include <memory>
 #include "setup.h"
-#include "readinput.h"
 #include "BD.h"
 
 using namespace std;
@@ -24,13 +23,12 @@ using namespace std;
 int main(int argc, const char * argv[])
 {
   string input_file = argv[0];
-  CSetup setup ;
+  Setup setup(input_file);
   
-//  readInputFile(input_file, setup);
-  
-  Constants consts = setup.setup_constants();
-  System sys = setup.setup_system(consts);
-  
+  Constants consts = Constants(setup);
+  System sys = System(consts, setup);
+
+
 }
 
 

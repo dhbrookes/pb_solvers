@@ -159,3 +159,22 @@ void Molecule::rotate(Quat qrot)
 }
 
 
+System::System(Constants consts, Setup setup)
+{
+  vector<Molecule> mols;
+  
+  int i, j;
+  string pqrpath;
+  for (i = 0; i < setup.get_ntype(); i++)
+  {
+    for (j = 0; j < setup.getTypeNCount(i); j++)
+    {
+      pqrpath = setup.getTypeNPQR(i)[j];
+      PQRFile pqrobj (pqrpath);
+      Molecule mol (setup.getTypeNDef(i), pqrobj.get_charges(), pqrobj.get_pts(),
+                    pqrobj.get_radii(), setup.getDrot(i), setup.getDtr(i));
+      mols.push_back(mol);
+    }
+  }
+}
+

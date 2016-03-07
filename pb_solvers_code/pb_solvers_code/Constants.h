@@ -11,6 +11,7 @@
 #define _CONSTANTS_H_
 
 #include <math.h>
+#include "Setup.h"
 
 /**
  Class for storing all relevant constants. Many have default values that are 
@@ -61,6 +62,8 @@ public:
   static const double PICO_SEC;  //!<  [ 1 ps = 1e-12 s ]
   
   Constants();
+  Constants(Setup setup);
+  
   
   //The methods below update dependent constants (called when others are set in
   //setter methods)

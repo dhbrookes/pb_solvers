@@ -36,6 +36,21 @@ patchAngle_(6.0), rotateAngle_(20.0)
 }
 
 
+/*
+ Constructor given a Setup object:
+ */
+Constants::Constants(Setup setup)
+:bDist_(100.0), qDist_(500.0), fDist_(100.0), dielectricWater_(78.0),
+dielectricProt_(4.0), saltConcentration_(0.0100), temp_(353.0), tol_(2.5),
+patchAngle_(6.0), rotateAngle_(20.0)
+{
+  set_dielectric_prot(setup.getIDiel());
+  set_dielectric_water(setup.getSDiel());
+  set_salt_concentration(setup.getSaltConc());
+  set_temp(setup.getTemp());
+  update_all();
+}
+
 void Constants::update_kbt()
 {
   KbT_ = KB * temp_;

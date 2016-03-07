@@ -11,8 +11,9 @@
 
 #include <stdio.h>
 #include <vector>
-#include "util.h"
+//#include "util.h"
 #include "Constants.h"
+#include "readutil.h"
 
 using namespace std;
 
@@ -100,6 +101,7 @@ protected:
   
 public:
   System(Constants consts, const vector<Molecule>& mols);
+  System(Constants consts, Setup setup);
     
   const Constants& get_consts() const { return consts_; }
   const int get_n() const { return N_; }
