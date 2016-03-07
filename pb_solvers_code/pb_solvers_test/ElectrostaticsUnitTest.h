@@ -23,7 +23,7 @@ class ElecTest
     mol_.clear( );
     Pt pos[2]     = { Pt( 0.0, 0.0, -8.0 ), Pt( 0,0,0 ) };
     Pt cgPos[2]   = { Pt( 0.0, 0.0, -7.0 ), Pt( 0,0,1) };
-    double cg[2] = { 5.0,  5.0};
+    double cg[2] = {-5.0, -5.0};
     double rd[2] = { 3.6,  3.6};
 
     for (int molInd = 0; molInd < 2; molInd ++ )
@@ -43,7 +43,7 @@ class ElecTest
       mol_.push_back( molNew );
     }
     
-    const int vals           = 10;
+    const int vals           = 5;
     BesselConstants bConsta( 2*vals );
     BesselCalc bCalcu( 2*vals, bConsta);
     SHCalcConstants SHConsta( 2*vals );

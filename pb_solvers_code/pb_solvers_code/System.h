@@ -47,16 +47,14 @@ protected:
   void reposition_charges();
     
 public:
-  
+
   // user specified radius and center
   Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
            vector<double> vdwr, Pt cen, double drot_=0, double dtrans=0);
   
-  
   // user specified radius
   Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
            vector<double> vdwr, double drot_=0, double dtrans=0);
-  
   
   // user specified center
   Molecule(string type, vector<double> qs, vector<Pt> pos,
