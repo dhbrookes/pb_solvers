@@ -47,6 +47,8 @@ protected:
   void reposition_charges();
     
 public:
+  
+  Molecule() { }
 
   // user specified radius and center
   Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
@@ -95,25 +97,30 @@ protected:
   vector<Molecule>             molecules_;
   Constants                    consts_;  // Constants for this system
   
+  double                       boxLength_;
+  double                       cutoff_;
+  
   const double calc_average_radius() const;
   
 public:
   System(Constants consts, const vector<Molecule>& mols);
   System(Constants consts, Setup setup);
     
-  const Constants& get_consts() const { return consts_; }
-  const int get_n() const { return N_; }
-  const double get_ai(int i) const { return molecules_[i].get_a(); }
-  const double get_Mi(int i) const { return molecules_[i].get_m(); }
-  const double get_qij(int i, int j) const { return molecules_[i].get_qj(j); }
-  Pt get_posij(int i, int j) { return molecules_[i].get_posj(j); }
-  Molecule get_molecule(int i) const { return molecules_[i]; }
-  Pt get_centeri(int i) { return molecules_[i].get_center(); }
-  double get_radi(int i) { return molecules_[i].get_a(); }
-  const double get_lambda()  { return lambda_; }
-  const string get_typei(int i) { return molecules_[i].get_type(); }
-  const double get_droti(int i) { return molecules_[i].get_drot(); }
-  const double get_dtransi(int i) { return molecules_[i].get_dtrans(); }
+  const Constants& get_consts() const       { return consts_; }
+  const int get_n() const                   { return N_; }
+  const double get_ai(int i) const          { return molecules_[i].get_a(); }
+  const double get_Mi(int i) const          { return molecules_[i].get_m(); }
+  const double get_qij(int i, int j) const  { return molecules_[i].get_qj(j); }
+  Pt get_posij(int i, int j)                { return molecules_[i].get_posj(j); }
+  Molecule get_molecule(int i) const        { return molecules_[i]; }
+  Pt get_centeri(int i) const               { return molecules_[i].get_center(); }
+  double get_radi(int i) const              { return molecules_[i].get_a(); }
+  const double get_lambda() const           { return lambda_; }
+  const string get_typei(int i) const       { return molecules_[i].get_type(); }
+  const double get_droti(int i) const       { return molecules_[i].get_drot(); }
+  const double get_dtransi(int i) const     { return molecules_[i].get_dtrans(); }
+  const double get_boxlength() const        { return boxLength_; }
+  const double get_cutoff() const           { return cutoff_; }
   
   // translate every charge in molecule i by the vector dr
   void translate_mol(int i, Pt dr) { molecules_[i].translate(dr); }
@@ -125,6 +132,14 @@ public:
    Check to determine if any molecules are overlapping
    */
   void check_for_overlap();
+  
+  // get the distance vector (Point object) between two molecules, taking into
+  // account periodic boundary conditions by returning the distance vector
+  // between the closest image of the molecule
+  Pt get_pbc_dist_vec(int i, int j);
+  
+  // given a distance vector, determine whether it is in the cutoff
+  bool less_than_cutoff(Pt v);
   
 };
 

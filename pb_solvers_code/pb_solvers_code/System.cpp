@@ -165,16 +165,52 @@ System::System(Constants consts, Setup setup)
   
   int i, j;
   string pqrpath;
+  Molecule mol;
   for (i = 0; i < setup.get_ntype(); i++)
   {
     for (j = 0; j < setup.getTypeNCount(i); j++)
     {
       pqrpath = setup.getTypeNPQR(i)[j];
       PQRFile pqrobj (pqrpath);
-      Molecule mol (setup.getTypeNDef(i), pqrobj.get_charges(), pqrobj.get_pts(),
-                    pqrobj.get_radii(), setup.getDrot(i), setup.getDtr(i));
+      if (pqrobj.get_cg())  // coarse graining is in pqr
+      {
+        mol  = Molecule(setup.getTypeNDef(i), pqrobj.get_cg_radii()[0],
+                        pqrobj.get_charges(),pqrobj.get_pts(),
+                        pqrobj.get_radii(), pqrobj.get_cg_centers()[0],
+                        setup.getDrot(i), setup.getDtr(i));
+      }
+      else
+      {
+        mol = Molecule(setup.getTypeNDef(i), pqrobj.get_charges(),
+                       pqrobj.get_pts(), pqrobj.get_radii(),
+                       setup.getDrot(i), setup.getDtr(i));
+      }
       mols.push_back(mol);
     }
   }
+}
+
+Pt System::get_pbc_dist_vec(int i, int j)
+{
+  Pt ci = get_centeri(i);
+  Pt cj = get_centeri(j);
+  Pt cj_pbc = Pt(cj.x() + boxLength_, cj.y() + boxLength_, cj.z() + boxLength_);
+  Pt v;
+  
+  if (ci.dist(cj_pbc) < ci.dist(cj))
+  {
+    v = ci - cj_pbc;
+  }
+  else
+  {
+    v = ci - cj;
+  }
+  return v;
+}
+
+bool System::less_than_cutoff(Pt v)
+{
+  if (v.norm() < cutoff_) return true;
+  else return false;
 }
 

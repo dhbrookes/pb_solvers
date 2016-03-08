@@ -66,8 +66,12 @@ protected:
   int M_;  // number of charges
   vector<Pt> pts_;
   vector<double> charges_;
-  vector<double> radii_;
-  vector<Pt> centers_;
+  vector<double> atomRadii_;
+  vector<Pt> atomCenters_;
+  
+  bool cg_;
+  vector<Pt> cgCenters_;  // coarse grain centers
+  vector<double> cgRadii_;
   
   void read()
   {
@@ -82,14 +86,25 @@ protected:
     int iCoord = 31;
     while (!fin.eof())
     {
-      double x,y,z,c,r;
+      double x, y, z, c, r;
       if (strncmp(&(buf[0]),"ATOM",4) == 0)
       {
         sscanf(&(buf[iCoord]), "%lf %lf %lf %lf %lf", &x, &y, &z, &c, &r);
         // read in as centers that specifies dielectric boundary
-        pts_.push_back(Pt(x,y,z));
-        charges_.push_back(c);
-        radii_.push_back(r);
+        if (strncmp(&(buf[iCen]),"CEN",3) == 0)
+        {
+          cg_ = true;
+          cgRadii_.push_back(r);
+          cgCenters_.push_back(Pt(x,y,z));
+        }
+        
+        // read in as atoms
+        else
+        {
+          atomCenters_.push_back(Pt(x,y,z));
+          charges_.push_back(c);
+          atomRadii_.push_back(r);
+        }
       }
       
       fin.getline(buf,99);
@@ -100,22 +115,21 @@ protected:
 public:
   
   PQRFile(string path, int aprox_size=100)
-  :path_(path)
+  :path_(path), pts_(aprox_size), charges_(aprox_size), atomRadii_(aprox_size),
+    atomCenters_(aprox_size), cgCenters_(10), cgRadii_(10), cg_(false)
   {
-    pts_.reserve(aprox_size);
-    charges_.reserve(aprox_size);
-    radii_.reserve(aprox_size);
-    centers_.reserve(aprox_size);
-    
     read();
   }
   
   const string get_path() const             { return path_; }
   const vector<Pt> get_pts() const          { return pts_; }
   const vector<double> get_charges() const  { return charges_; }
-  const vector<double> get_radii() const    { return radii_; }
-  const vector<Pt> get_centers() const      { return centers_; }
+  const vector<double> get_radii() const    { return atomRadii_; }
+  const vector<Pt> get_centers() const      { return atomCenters_; }
   const int get_M() const                   { return M_; }
+  const vector<double> get_cg_radii() const { return cgRadii_; }
+  const vector<Pt> get_cg_centers() const    { return cgCenters_; }
+  const bool get_cg() const                 { return cg_; }
   
 };
 

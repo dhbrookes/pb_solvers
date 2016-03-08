@@ -87,6 +87,7 @@ void ASolver::iter()
 {
   int i, j;
   MyMatrix<cmplx> Z, zj, ai;
+  Pt v;
   prevA_ = A_;
   bool prev = true;  // want to re-expand previous
   for (i = 0; i <  N_; i++)
@@ -96,9 +97,10 @@ void ASolver::iter()
     for (j = 0; j < N_; j++)
     {
       if (i == j) continue;
-      // v_pbc = (ci - cj).wrapped
-      // if v_pbc < sys->get_cutoff()
-      // then do the following
+      
+      v = _sys_->get_pbc_dist_vec(i, j);
+      if (! _sys_->less_than_cutoff(v) ) continue;
+      
       zj = re_expandA(i, j, prev);
       Z += zj;
     }
@@ -119,6 +121,7 @@ void ASolver::grad_iter(int j)
   // relevant re-expansions (g prefix means gradient):
   VecOfMats<cmplx>::type aij, add;
   MyMatrix<cmplx> gamma_delta;
+  Pt v;
   bool prev = true; //want to re-expand previous
   for (i = 0; i < N_; i++) // molecule of interest
   {
@@ -126,18 +129,13 @@ void ASolver::grad_iter(int j)
     aij = VecOfMats<cmplx>::type (3);
     for (dim = 0; dim < 3; dim++)
       aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
-    
-    // v_pbc = (ci - cj).wrapped
-    // if v_pbc < sys->get_cutoff()
-    // then do the following
     aij = get_gradT_Aij( j, i);
     
     for (k = 0; k < N_; k++) // other molecules
     {
       if (k == i) continue;
-      // v_pbc = (ci - cj).wrapped
-      // if v_pbc < sys->get_cutoff()
-      // then do the following
+      v = _sys_->get_pbc_dist_vec(i, j);
+      if (! _sys_->less_than_cutoff(v) ) continue;
       add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
       aij += add;
 
@@ -838,14 +836,9 @@ void ASolver::compute_T()
     for (j = i+1; j < N_; j++)
     {
       if (i == j) continue; //PBC
-      ci = _sys_->get_centeri(i);
-      cj = _sys_->get_centeri(j);
-      v = ci - cj;// PBC
-      
-      // v_pbc = (ci - cj).wrapped
-      // if v_pbc < sys->get_cutoff()
-      // then do the following
-      
+      v = _sys_-> get_pbc_dist_vec(i, j);
+      if (! _sys_->less_than_cutoff(v)) continue;
+       
       // calculate spherical harmonics for inter molecular vector:
       double kappa = _sys_->get_consts().get_kappa();
       _shCalc_->calc_sh(v.theta(), v.phi());
