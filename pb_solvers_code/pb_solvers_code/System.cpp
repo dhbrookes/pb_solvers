@@ -194,16 +194,17 @@ Pt System::get_pbc_dist_vec(int i, int j)
 {
   Pt ci = get_centeri(i);
   Pt cj = get_centeri(j);
-  Pt cj_pbc = Pt(cj.x() + boxLength_, cj.y() + boxLength_, cj.z() + boxLength_);
-  Pt v;
+//  Pt cj_pbc = Pt(cj.x() + boxLength_, cj.y() + boxLength_, cj.z() + boxLength_);
+  Pt dv  = ci - cj;
+  vector<Pt> ds (3);
   
-  if (ci.dist(cj_pbc) < ci.dist(cj))
+  ds[0] = Pt(dv.x() - round(dv.x()/boxLength_), dv.y(), dv.z());
+  ds[1] = Pt(dv.x(), dv.y() - round(dv.y()/boxLength_), dv.z());
+  ds[2] = Pt(dv.x(), dv.y(), dv.z() - round(dv.z()/boxLength_));
+  Pt v = ds[0];
+  for (int i = 1; i < 3; i++)
   {
-    v = ci - cj_pbc;
-  }
-  else
-  {
-    v = ci - cj;
+    if (ds[i].norm() < v.norm()) v = ds[i];
   }
   return v;
 }
