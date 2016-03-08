@@ -23,7 +23,6 @@ int main(int argc, const char * argv[])
   Constants consts = Constants(setup);
   System sys = System(consts, setup);
 
-
 }
 
 

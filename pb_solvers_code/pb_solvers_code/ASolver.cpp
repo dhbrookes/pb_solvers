@@ -96,6 +96,9 @@ void ASolver::iter()
     for (j = 0; j < N_; j++)
     {
       if (i == j) continue;
+      // v_pbc = (ci - cj).wrapped
+      // if v_pbc < sys->get_cutoff()
+      // then do the following
       zj = re_expandA(i, j, prev);
       Z += zj;
     }
@@ -124,149 +127,21 @@ void ASolver::grad_iter(int j)
     for (dim = 0; dim < 3; dim++)
       aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
     
+    // v_pbc = (ci - cj).wrapped
+    // if v_pbc < sys->get_cutoff()
+    // then do the following
     aij = get_gradT_Aij( j, i);
-    
-//    cout << "DTA"  << endl;
-//    for (int n = 0; n < 5; n++)
-//    {
-//      for (int m = 0; m <= n; m++)
-//      {
-//        double  r = aij[0]( n, m+p_).real();
-//        double im = aij[0]( n, m+p_).imag();
-//        r  = fabs( r) > 1e-15 ?  r : 0;
-//        im = fabs(im) > 1e-15 ? im : 0;
-//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//        //      cout << "," << setprecision (9) << r ;
-//      }
-//      cout << endl;
-//    }
-//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-//    for (int n = 0; n < 5; n++)
-//    {
-//      for (int m = 0; m <= n; m++)
-//      {
-//        double  r = aij[1]( n, m+p_).real();
-//        double im = aij[1]( n, m+p_).imag();
-//        r  = fabs( r) > 1e-15 ?  r : 0;
-//        im = fabs(im) > 1e-15 ? im : 0;
-//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//        //      cout << "," << setprecision (9) << r ;
-//      }
-//      cout << endl;
-//    }
-//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-//    for (int n = 0; n < 5; n++)
-//    {
-//      for (int m = 0; m <= n; m++)
-//      {
-//        double  r = aij[2]( n, m+p_).real();
-//        double im = aij[2]( n, m+p_).imag();
-//        r  = fabs( r) > 1e-15 ?  r : 0;
-//        im = fabs(im) > 1e-15 ? im : 0;
-//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//        //      cout << "," << setprecision (9) << r ;
-//      }
-//      cout << endl;
-//    }
-//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-
     
     for (k = 0; k < N_; k++) // other molecules
     {
       if (k == i) continue;
-//      cout << "This is mol "<< i<< " and " << j << " and k " << k << endl;
-//      print_dAi( i, k, 5);
+      // v_pbc = (ci - cj).wrapped
+      // if v_pbc < sys->get_cutoff()
+      // then do the following
       add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
       aij += add;
-      
-//      cout << "After Xform"  << endl;
-//      for (int n = 0; n < 5; n++)
-//      {
-//        for (int m = 0; m <= n; m++)
-//        {
-//          double  r = add[0]( n, m+p_).real();
-//          double im = add[0]( n, m+p_).imag();
-//          r  = fabs( r) > 1e-15 ?  r : 0;
-//          im = fabs(im) > 1e-15 ? im : 0;
-//          cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//          //      cout << "," << setprecision (9) << r ;
-//        }
-//        cout << endl;
-//      }
-//      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-//      for (int n = 0; n < 5; n++)
-//      {
-//        for (int m = 0; m <= n; m++)
-//        {
-//          double  r = add[1]( n, m+p_).real();
-//          double im = add[1]( n, m+p_).imag();
-//          r  = fabs( r) > 1e-15 ?  r : 0;
-//          im = fabs(im) > 1e-15 ? im : 0;
-//          cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//          //      cout << "," << setprecision (9) << r ;
-//        }
-//        cout << endl;
-//      }
-//      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-//      for (int n = 0; n < 5; n++)
-//      {
-//        for (int m = 0; m <= n; m++)
-//        {
-//          double  r = add[2]( n, m+p_).real();
-//          double im = add[2]( n, m+p_).imag();
-//          r  = fabs( r) > 1e-15 ?  r : 0;
-//          im = fabs(im) > 1e-15 ? im : 0;
-//          cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//          //      cout << "," << setprecision (9) << r ;
-//        }
-//        cout << endl;
-//      }
-//      cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+
     }
-    
-//    cout << "Total aij"  << endl;
-//    for (int n = 0; n < 5; n++)
-//    {
-//      for (int m = 0; m <= n; m++)
-//      {
-//        double  r = aij[0]( n, m+p_).real();
-//        double im = aij[0]( n, m+p_).imag();
-//        r  = fabs( r) > 1e-15 ?  r : 0;
-//        im = fabs(im) > 1e-15 ? im : 0;
-//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//        //      cout << "," << setprecision (9) << r ;
-//      }
-//      cout << endl;
-//    }
-//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-//    for (int n = 0; n < 5; n++)
-//    {
-//      for (int m = 0; m <= n; m++)
-//      {
-//        double  r = aij[1]( n, m+p_).real();
-//        double im = aij[1]( n, m+p_).imag();
-//        r  = fabs( r) > 1e-15 ?  r : 0;
-//        im = fabs(im) > 1e-15 ? im : 0;
-//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//        //      cout << "," << setprecision (9) << r ;
-//      }
-//      cout << endl;
-//    }
-//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-//    for (int n = 0; n < 5; n++)
-//    {
-//      for (int m = 0; m <= n; m++)
-//      {
-//        double  r = aij[2]( n, m+p_).real();
-//        double im = aij[2]( n, m+p_).imag();
-//        r  = fabs( r) > 1e-15 ?  r : 0;
-//        im = fabs(im) > 1e-15 ? im : 0;
-//        cout << "(" << setprecision (9) << r << "," << im << ")  ";
-//        //      cout << "," << setprecision (9) << r ;
-//      }
-//      cout << endl;
-//    }
-//    cout << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
     
     gamma_delta = gamma_[i] * delta_[i];
     aij.set_val(0, gamma_delta * aij[0]);
@@ -274,8 +149,6 @@ void ASolver::grad_iter(int j)
     aij.set_val(2, gamma_delta * aij[2]);
     gradA_.set_val(i, j, aij);
     
-//    cout << "This is mol "<< i<< " and " << j << " new dA" << endl;
-//    print_dAi( i, j, 5);
   }
 }
 
@@ -964,10 +837,15 @@ void ASolver::compute_T()
   {
     for (j = i+1; j < N_; j++)
     {
-      if (i == j) continue;
+      if (i == j) continue; //PBC
       ci = _sys_->get_centeri(i);
       cj = _sys_->get_centeri(j);
-      v = ci - cj;
+      v = ci - cj;// PBC
+      
+      // v_pbc = (ci - cj).wrapped
+      // if v_pbc < sys->get_cutoff()
+      // then do the following
+      
       // calculate spherical harmonics for inter molecular vector:
       double kappa = _sys_->get_consts().get_kappa();
       _shCalc_->calc_sh(v.theta(), v.phi());

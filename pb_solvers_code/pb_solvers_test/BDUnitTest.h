@@ -36,11 +36,11 @@ protected :
       vector<double> charges(1); vector<Pt> posCharges(1);
       charges[0]    = cg[molInd]; posCharges[0] = cgPos[molInd];
       
-      Molecule molNew( M, rd[molInd], charges, posCharges, pos[molInd]);
+      Molecule molNew( 'stat', rd[molInd], charges, posCharges, pos[molInd]);
       mol_.push_back( molNew );
       
       charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
-      Molecule molSing( M, 10.0, charges, posCharges);
+      Molecule molSing( 'stat', 10.0, charges, posCharges);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -64,7 +64,7 @@ TEST_F(BDUTest, ForcePos)
   {
     int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
     charges[0] = 2.0; posCharges[0] = pos[molInd];
-    Molecule molNew( M, 1.0, charges, posCharges, pos[molInd]);
+    Molecule molNew( 'stat', 1.0, charges, posCharges, pos[molInd]);
     mol_.push_back( molNew );
   }
   const int vals           = 5;
