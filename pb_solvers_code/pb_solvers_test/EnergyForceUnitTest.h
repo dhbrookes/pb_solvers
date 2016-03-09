@@ -33,17 +33,15 @@ protected :
     
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
-      int M = 1; vector<double> charges(M); vector<Pt> posCharges(M);
+      int M = 1; vector<double> charges(M);
+      vector<double> vdW(M); vector<Pt> posCharges(M);
+      charges[0]=cg[molInd]; vdW[0]=0.0; posCharges[0]=cgPos[molInd];
       
-      charges[0]    = cg[molInd]; posCharges[0] = cgPos[molInd];
-      
-      Molecule molNew( M, rd[molInd], charges, posCharges, pos[molInd]);
+      Molecule molNew( "stat",rd[molInd],charges,posCharges,vdW,pos[molInd]);
       mol_.push_back( molNew );
       
-      charges[0]    = 2.0;
-      posCharges[0] = cgPosSi[molInd];
-      
-      Molecule molSing( M, 10.0, charges, posCharges);
+      charges[0]=2.0; vdW[0] = 0.0; posCharges[0] = cgPosSi[molInd];
+      Molecule molSing( "stat", 10.0, charges, posCharges, vdW);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -68,11 +66,11 @@ TEST_F(EnergyForceUTest, checkEnergy)
   Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
-    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
+    int M = 1; vector<double> charges(M);
+    vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; vdW[0] = 0.0; posCharges[0] = pos[molInd];
     
-    charges[0] = 2.0; posCharges[0] = pos[molInd];
-    
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
     mol_.push_back( molNew );
   }
   const int vals           = nvals;
@@ -124,12 +122,13 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
-    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0]    = 2.0; posCharges[0] = pos[molInd];
-    charges[1]    = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]    = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    int M = 3; vector<double> charges(M);
+    vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0]=2.0; vdW[0]=0.0; posCharges[0]=pos[molInd];
+    charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
+    charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
     mol_sing_.push_back( molNew );
   }
   const int vals           = nvals;
@@ -158,13 +157,14 @@ TEST_F(EnergyForceUTest, checkForce)
   Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
-    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0] = 2.0; posCharges[0] = pos[molInd];
-    charges[1] = 2.0; posCharges[1] = pos[molInd] + Pt(1.0,0,0);
-    charges[2] = 2.0; posCharges[2] = pos[molInd] + Pt(0,1.0,0);
+    int M = 3; vector<double> charges(M);
+    vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0]=2.0; vdW[0]=0.0; posCharges[0]=pos[molInd];
+    charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
+    charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
-    mol_.push_back( molNew );
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
+    mol_sing_.push_back( molNew );
   }
   const int vals           = nvals;
   int nmol                 = 3;
@@ -224,13 +224,14 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
   Pt pos[2] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 0.0, -5.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
-    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0] = 2.0; posCharges[0] = pos[molInd];
-    charges[1] = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2] = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    int M = 3; vector<double> charges(M);
+    vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0]=2.0; vdW[0]=0.0; posCharges[0]=pos[molInd];
+    charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
+    charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
-    mol_.push_back( molNew );
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
+    mol_sing_.push_back( molNew );
   }
   const int vals           = 5;
   int nmol                 = 2;
@@ -268,13 +269,14 @@ TEST_F(EnergyForceUTest, checkTorque)
   Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
-    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0] = 2.0; posCharges[0] = pos[molInd];
-    charges[1] = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2] = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    int M = 3; vector<double> charges(M);
+    vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0]=2.0; vdW[0]=0.0; posCharges[0]=pos[molInd];
+    charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
+    charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
-    mol_.push_back( molNew );
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
+    mol_sing_.push_back( molNew );
   }
   const int vals           = 5;
   int nmol                 = 3;
@@ -337,12 +339,13 @@ TEST_F(EnergyForceUTest, checkTorqueSing3)
   Pt pos[3] = {Pt(0.0, 0.0, 0.0),Pt(0.0, 0.0, -5.0),Pt(0.0, 0.0, 5.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
-    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
-    charges[0] = 2.0; posCharges[0] = pos[molInd];
-    charges[1] = 2.0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2] = 2.0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    int M = 3; vector<double> charges(M);
+    vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0]=2.0; vdW[0]=0.0; posCharges[0]=pos[molInd];
+    charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
+    charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( M, 2.0, charges, posCharges, pos[molInd]);
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
     mol_sing_.push_back( molNew );
   }
 
