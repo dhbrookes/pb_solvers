@@ -66,8 +66,6 @@ public:
   Molecule(string type, vector<double> qs, vector<Pt> pos,
            vector<double> vdwr, double drot_=0, double dtrans=0);
   
-  
-    
   const int get_m() const               { return M_; }
   const double get_a() const            { return a_; }
   const double get_qj(int j) const      { return qs_[j]; }

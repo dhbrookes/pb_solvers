@@ -28,18 +28,18 @@ class ElecTest
 
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
-      int M = 3;
-      vector<double> charges(M); vector<Pt> posCharges(M);
-      charges[0]    = cg[molInd]; posCharges[0] = cgPos[molInd];
-      charges[1]    = cg[molInd]; posCharges[1] = pos[molInd]+Pt(1,0,0);
-      charges[2]    = cg[molInd]; posCharges[2] = pos[molInd]+Pt(0,1,0);
+      int M = 3; vector<double> charges(M);
+      vector<double> vdW(M); vector<Pt> posCharges(M);
+      charges[0]=cg[molInd]; vdW[0]=0.0; posCharges[0]=cgPos[molInd];
+      charges[1]=cg[molInd]; vdW[1]=0.0; posCharges[1]=pos[molInd]+Pt(1,0,0);
+      charges[2]=cg[molInd]; vdW[2]=0.0; posCharges[2]=pos[molInd]+Pt(0,1,0);
       
       cout << setprecision(5) << posCharges[0].x() << " " << posCharges[0].y() << " " << posCharges[0].z() << " " << charges[0] << " " << 0.74 << endl;
       cout << setprecision(5) << posCharges[1].x() << " " << posCharges[1].y() << " " << posCharges[1].z() << " " << charges[1] << " " << 0.74 << endl;
       cout << setprecision(5) << posCharges[2].x() << " " << posCharges[2].y() << " " << posCharges[2].z() << " " << charges[2] << " " << 0.74 << endl;
       cout << setprecision(5) << pos[molInd].x() << " " << pos[molInd].y() << " " << pos[molInd].z() << " " << 0.0 << " " << rd[molInd] << endl;
       
-      Molecule molNew( M, rd[molInd], charges, posCharges, pos[molInd]);
+      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd]);
       mol_.push_back( molNew );
     }
     
