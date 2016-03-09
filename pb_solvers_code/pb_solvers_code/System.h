@@ -103,8 +103,9 @@ protected:
   const double calc_average_radius() const;
   
 public:
-  System(Constants consts, const vector<Molecule>& mols);
-  System(Constants consts, Setup setup);
+  System(Constants consts, const vector<Molecule>& mols,
+         double cutoff=Constants::MAX_DIST, double boxlength=Constants::MAX_DIST);
+  System(Constants consts, Setup setup, double cutoff=Constants::MAX_DIST);
     
   const Constants& get_consts() const       { return consts_; }
   const int get_n() const                   { return N_; }

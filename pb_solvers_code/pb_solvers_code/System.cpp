@@ -98,15 +98,12 @@ void Molecule::reposition_charges()
 }
 
 
-System::System(Constants consts, const vector<Molecule>& mols)
-:consts_(consts), molecules_(mols), N_((int) mols.size())
+System::System(Constants consts, const vector<Molecule>& mols, double cutoff,
+               double boxlength)
+:consts_(consts), molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
+boxLength_(boxlength)
 {
-  lambda_ = 0;
-  for (int i = 0; i < N_; i++)
-  {
-    lambda_ += get_ai(i);
-  }
-  lambda_ /= N_;
+  lambda_ = calc_average_radius();
 }
 
 
@@ -159,7 +156,8 @@ void Molecule::rotate(Quat qrot)
 }
 
 
-System::System(Constants consts, Setup setup)
+System::System(Constants consts, Setup setup, double cutoff)
+:consts_(consts)
 {
   vector<Molecule> mols;
   
@@ -188,6 +186,11 @@ System::System(Constants consts, Setup setup)
       mols.push_back(mol);
     }
   }
+  N_ = (int) mols.size();
+  lambda_ = calc_average_radius();
+  
+  boxLength_ = setup.getBLen();
+  cutoff_ = cutoff;
 }
 
 Pt System::get_pbc_dist_vec(int i, int j)

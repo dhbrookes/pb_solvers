@@ -10,6 +10,9 @@ using namespace std;
 class Setup
 {
 protected:
+  
+  static const double MAX_DIST;  // maximum distance for cutoff, box length
+  
   int ompThreads_;
   double saltConc_;
   int nType_;  		// Number of different molecule types

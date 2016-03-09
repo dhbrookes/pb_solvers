@@ -60,6 +60,7 @@ public:
   static const double KCAL; //!<  [ 1 kCal = 4184 Joules ]
   static const double ANGSTROM; //!<  [ 1A = 1e-10 Meters ]
   static const double PICO_SEC;  //!<  [ 1 ps = 1e-12 s ]
+  static const double MAX_DIST;  // maximum distance for cutoff, box length
   
   Constants();
   Constants(Setup setup);

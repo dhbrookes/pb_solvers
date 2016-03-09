@@ -1,11 +1,14 @@
 #include "setup.h"
 
+
+const double Setup::MAX_DIST = 1.4e8;
+
 Setup::Setup(string infile)
 :ompThreads_( 1 ),
 saltConc_( 0.01 ),
 nType_( 2 ),
 PBCs_( 0 ),
-blen_( 1.4e8 ),
+blen_( MAX_DIST ),
 maxtime_( 1000000 ),
 ntraj_( 5 ),
 idiel_( 4.0 ),
