@@ -19,6 +19,7 @@ const int nvals = 10 ;      //! standard number of poles for testing
 #include "ConstantsUnitTest.h"
 #include "EnergyForceUnitTest.h"
 #include "MyMatrixUnitTest.h"
+#include "readutilUnitTest.h"
 #include "ReExpCalcUnitTest.h"
 #include "SHCalcUnitTest.h"
 #include "SystemUnitTest.h"

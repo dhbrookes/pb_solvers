@@ -173,14 +173,14 @@ System::System(Constants consts, Setup setup, double cutoff)
       if (pqrobj.get_cg())  // coarse graining is in pqr
       {
         mol  = Molecule(setup.getTypeNDef(i), pqrobj.get_cg_radii()[0],
-                        pqrobj.get_charges(),pqrobj.get_pts(),
+                        pqrobj.get_charges(),pqrobj.get_atom_pts(),
                         pqrobj.get_radii(), pqrobj.get_cg_centers()[0],
                         setup.getDrot(i), setup.getDtr(i));
       }
       else
       {
         mol = Molecule(setup.getTypeNDef(i), pqrobj.get_charges(),
-                       pqrobj.get_pts(), pqrobj.get_radii(),
+                       pqrobj.get_atom_pts(), pqrobj.get_radii(),
                        setup.getDrot(i), setup.getDtr(i));
       }
       mols.push_back(mol);

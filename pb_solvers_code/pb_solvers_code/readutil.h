@@ -49,12 +49,32 @@ public:
   
   virtual const char* what() const throw()
   {
-    ostringstream ss;
-    ss << "Could not read: " << path_ << endl;
-    return ss.str().c_str();
-    }
+    string ss;
+    ss = "Could not read: " + path_;
+    return ss.c_str();
+  }
 };
 
+class NotEnoughCoordsException: public exception
+{
+protected:
+  int infile_;
+  int needed_;
+  
+public:
+  NotEnoughCoordsException( int inFile, int needed)
+  :infile_(inFile), needed_(needed)
+  {
+  }
+  
+  virtual const char* what() const throw()
+  {
+    string ss;
+    ss = "File has "+to_string(infile_)+" lines, need "+to_string(needed_);
+    return ss.c_str();
+  }
+  
+};
 
 /*
  Class for reading and storing the info in .pqr files
@@ -64,7 +84,6 @@ class PQRFile
 protected:
   string path_;
   int M_;  // number of charges
-  vector<Pt> pts_;
   vector<double> charges_;
   vector<double> atomRadii_;
   vector<Pt> atomCenters_;
@@ -76,13 +95,11 @@ protected:
   void read()
   {
     ifstream fin(path_.c_str());
-    if (!fin.is_open())
-    {
-      throw CouldNotReadException(path_);
-    }
+    if (!fin.is_open()) throw CouldNotReadException(path_);
+    
     char buf[100];
     fin.getline(buf, 99);
-    int iCen = 18;
+    int iCen = 17;
     int iCoord = 31;
     while (!fin.eof())
     {
@@ -106,26 +123,28 @@ protected:
           atomRadii_.push_back(r);
         }
       }
-      
       fin.getline(buf,99);
     }
-    M_ = int(pts_.size());
+    M_ = int(atomCenters_.size());
   }
   
 public:
   
-  PQRFile(string path, int aprox_size=100)
-  :path_(path), pts_(aprox_size), charges_(aprox_size), atomRadii_(aprox_size),
-    atomCenters_(aprox_size), cgCenters_(10), cgRadii_(10), cg_(false)
+  PQRFile(string path, int approx_size=1000)
+  :path_(path), cg_(false)
   {
+    charges_.reserve(approx_size);
+    atomRadii_.reserve(approx_size);
+    atomCenters_.reserve(approx_size);
+    cgCenters_.reserve(10);
+    cgRadii_.reserve(10);
     read();
   }
   
   const string get_path() const             { return path_; }
-  const vector<Pt> get_pts() const          { return pts_; }
+  const vector<Pt> get_atom_pts() const     { return atomCenters_; }
   const vector<double> get_charges() const  { return charges_; }
   const vector<double> get_radii() const    { return atomRadii_; }
-  const vector<Pt> get_centers() const      { return atomCenters_; }
   const int get_M() const                   { return M_; }
   const vector<double> get_cg_radii() const { return cgRadii_; }
   const vector<Pt> get_cg_centers() const   { return cgCenters_; }
@@ -154,21 +173,20 @@ public:
   
   void read()
   {
+    int ctr = 0;
     string s;
     double x,y,z;
     ifstream fin (path_.c_str());
-    if (!fin.is_open())
-    {
-      throw CouldNotReadException(path_);
-    }
+    if (!fin.is_open()) throw CouldNotReadException(path_);
     
-    for (int i = 0; i < nmols_; i++)
+    while ( getline( fin, s ) && (ctr < nmols_))
     {
-      getline( fin, s );
       istringstream ss( s );
       ss >> x >> y >> z;
       pts_.push_back(Pt(x, y, z));
+      ctr++;
     }
+    if (ctr != nmols_)  throw NotEnoughCoordsException(ctr, nmols_);
   }
   
   const string get_path() const     { return path_; }
