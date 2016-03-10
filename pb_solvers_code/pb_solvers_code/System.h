@@ -24,8 +24,6 @@ using namespace std;
 class Molecule
 {
 protected:
-  
-  
   string              type_;
   double              drot_;  // rotational diffusion coefficient
   double              dtrans_; // translational diffusion coefficients
@@ -70,6 +68,7 @@ public:
   const double get_a() const            { return a_; }
   const double get_qj(int j) const      { return qs_[j]; }
   Pt get_posj(int j) const              { return pos_[j]; }
+  Pt get_posj_realspace(int j)          { return center_ + pos_[j]; }
   Pt get_center() const                 { return center_; }
   
   string get_type() const               { return type_; }
@@ -104,27 +103,28 @@ public:
   System() { }
   
   System(Constants consts, const vector<Molecule>& mols,
-         double cutoff=Constants::MAX_DIST, double boxlength=Constants::MAX_DIST);
+         double cutoff=Constants::MAX_DIST,
+         double boxlength=Constants::MAX_DIST);
   System(Constants consts, Setup setup, double cutoff=Constants::MAX_DIST);
   
   // return a copy of this system with a smaller set of molecules
   System get_subsystem(const vector<int> mol_idx);
     
-  const Constants& get_consts() const       { return consts_; }
-  const int get_n() const                   { return N_; }
-  const double get_ai(int i) const          { return molecules_[i].get_a(); }
-  const double get_Mi(int i) const          { return molecules_[i].get_m(); }
-  const double get_qij(int i, int j) const  { return molecules_[i].get_qj(j); }
-  Pt get_posij(int i, int j)                { return molecules_[i].get_posj(j); }
-  Molecule get_molecule(int i) const        { return molecules_[i]; }
-  Pt get_centeri(int i) const               { return molecules_[i].get_center(); }
-  double get_radi(int i) const              { return molecules_[i].get_a(); }
-  const double get_lambda() const           { return lambda_; }
-  const string get_typei(int i) const       { return molecules_[i].get_type(); }
-  const double get_droti(int i) const       { return molecules_[i].get_drot(); }
-  const double get_dtransi(int i) const     { return molecules_[i].get_dtrans(); }
-  const double get_boxlength() const        { return boxLength_; }
-  const double get_cutoff() const           { return cutoff_; }
+  const Constants& get_consts() const      { return consts_; }
+  const int get_n() const                  { return N_; }
+  const double get_ai(int i) const         { return molecules_[i].get_a(); }
+  const double get_Mi(int i) const         { return molecules_[i].get_m(); }
+  const double get_qij(int i, int j) const { return molecules_[i].get_qj(j); }
+  Pt get_posij(int i, int j)               { return molecules_[i].get_posj(j);}
+  Molecule get_molecule(int i) const       { return molecules_[i]; }
+  Pt get_centeri(int i) const              { return molecules_[i].get_center();}
+  double get_radi(int i) const             { return molecules_[i].get_a();}
+  const double get_lambda() const          { return lambda_; }
+  const string get_typei(int i) const      { return molecules_[i].get_type();}
+  const double get_droti(int i) const      { return molecules_[i].get_drot();}
+  const double get_dtransi(int i) const    { return molecules_[i].get_dtrans();}
+  const double get_boxlength() const       { return boxLength_; }
+  const double get_cutoff() const          { return cutoff_; }
   
   // translate every charge in molecule i by the vector dr
   void translate_mol(int i, Pt dr) { molecules_[i].translate(dr); }
@@ -145,33 +145,6 @@ public:
   // given a distance vector, determine whether it is in the cutoff
   bool less_than_cutoff(Pt v);
   
-};
-
-/*
- Exception thrown when a user-input center and radius does not encompass all
- the charges
- */
-class BadCenterException: public exception
-{
-protected:
-  double x_, y_, z_;
-  double radius_;
-  
-public:
-  BadCenterException(Pt center, double radius)
-  :x_(center.x()), y_(center.y()), z_(center.z())
-  {
-  }
-  
-  virtual const char* what() const throw()
-  {
-    ostringstream ss;
-    char buffer [50];
-    printf(buffer, "Center : (%f, %f, %f) with radius : %f do \
-           not encompass all charges", x_, y_, z_, radius_);
-    ss << buffer << endl;
-    return ss.str().c_str();
-  }
 };
 
 /*
