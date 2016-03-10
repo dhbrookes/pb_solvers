@@ -6,9 +6,6 @@
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
-#include "ASolver.h"
-#include "BesselCalc.h"
-#include "SHCalc.h"
 #include <memory>
 #include "setup.h"
 #include "BD.h"

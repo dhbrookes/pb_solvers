@@ -21,6 +21,7 @@ const int nvals = 10 ;      //! standard number of poles for testing
 #include "MyMatrixUnitTest.h"
 #include "readutilUnitTest.h"
 #include "ReExpCalcUnitTest.h"
+#include "setupUnitTest.h"
 #include "SHCalcUnitTest.h"
 #include "SystemUnitTest.h"
 #include "utilUnitTest.h"

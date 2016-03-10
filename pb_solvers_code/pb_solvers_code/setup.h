@@ -2,7 +2,7 @@
 #ifndef SETUP_H
 #define SETUP_H
 
-#include "util.h"
+#include "readutil.h"
 #include <fstream>
 
 using namespace std;
@@ -27,10 +27,9 @@ protected:
   int srand_;			// random seed
   
   vector<int> nTypenCount_; // Array for each of mol types, how many mols
-  vector<vector<double> > typeDiff_; // Dtr,Drot  each type, size [Ntype][2]
+  vector<vector<double> > typeDiff_; // Dtr, Drot each type, size [Ntype][2]
   vector<string> typeDef_; 		// For each type, type is stat, rot or move
-  vector<string> runSpecs_;	//include run type [0],
-  // pbsam/bd and the runname [1]
+  vector<string> runSpecs_;	//include run type [0] (electrost/bd) & runname [1]
   vector<vector<string> > molfnames_;  // file names
   
   double kappa_;
@@ -42,8 +41,9 @@ protected:
   void findLines(string fline);
   void findKeyword(vector<string> fline);
   
-  void setRunType( string runt ) {runSpecs_[0] = runt ;}  //'electrostat' or 'dynamics'
-  void setRunName( string runn ) {runSpecs_[1] = runn ;}
+  //'electrostat' or 'dynamics' (for RunType)
+  void setRunType( string runt ) {runSpecs_[0] = runt;}
+  void setRunName( string runn ) {runSpecs_[1] = runn;}
   void resizeVecs();
   
   void setOMP( int ompT ) { ompThreads_ = ompT ; }
@@ -76,11 +76,8 @@ protected:
   void setTypeNXYZ( int typeCount, string xyz )
   { molfnames_[typeCount][1] = xyz; }
   
-  
-  
 public:
   Setup(string infile);
-  
   
   string getRunType()              { return runSpecs_[0]; }
   string getRunName()              { return runSpecs_[1]; }

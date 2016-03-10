@@ -1,5 +1,12 @@
-#include "setup.h"
+//
+//  setup.cpp
+//  pb_solvers_code
+//
+//  Created by David Brookes on 3/9/16.
+//  Copyright © 2016 David Brookes. All rights reserved.
+//
 
+#include "setup.h"
 
 const double Setup::MAX_DIST = 1.4e8;
 
@@ -52,18 +59,14 @@ runSpecs_(2)
     }
   }
   
+  read_infile(infile);
 }
-
 
 void Setup::read_infile(string fname)
 {
   cout << "Reading Input file " << fname << endl ;
   ifstream fin(fname);
-  if (!fin.is_open())
-  {
-    cout << "Could not open file " << fname << endl;
-    exit(0);
-  }
+  if (!fin.is_open()) throw CouldNotReadException(fname);
   
   string inputLine;
   vector<vector <string> > keywordLines;

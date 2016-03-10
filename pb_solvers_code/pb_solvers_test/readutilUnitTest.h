@@ -10,7 +10,6 @@
 #define readutilUnitTest_h
 
 #include "readutil.h"
-#include <iostream>
 
 /*
  Class to test opening PQR and XYZ files
