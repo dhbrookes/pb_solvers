@@ -9,7 +9,7 @@
 #include "Electrostatics.h"
 
 Electrostatic::Electrostatic(VecOfMats<cmplx>::type A, System sys,
-                             SHCalc shCalc, BesselCalc bCalc, int p)
+                             SHCalc shCalc, BesselCalc bCalc, int p, int npts)
 : p_(p)
 {
   range_min_.resize(3);
@@ -22,10 +22,13 @@ Electrostatic::Electrostatic(VecOfMats<cmplx>::type A, System sys,
   _shCalc_ = make_shared<SHCalc> (shCalc);
   _bCalc_  = make_shared<BesselCalc> (bCalc);
   
+  for (int i = 0; i < 3; i++)
+    npts_[i] = npts;
+  
   find_range();
   find_bins();
   
-  cout << " This is my range " << range_min_[0] <<  ", " <<range_min_[1] <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", " <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", " <<step_[1] <<  ", "<<step_[2] << endl;
+  cout << " This is my range " << range_min_[0] <<  ", " <<range_min_[1] <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", " <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", " <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1] <<  ", "<<npts_[2] << endl;
   
   compute_pot();
 }
@@ -73,9 +76,6 @@ void Electrostatic::find_range()
 void Electrostatic::find_bins()
 {
   int dim, x, y;
-  
-  for (dim = 0; dim<3; dim++)
-    npts_[dim] = 151;
   
   for (dim = 0; dim<3; dim++)
     step_[dim] = (range_max_[dim] - range_min_[dim]) / (double) npts_[dim];

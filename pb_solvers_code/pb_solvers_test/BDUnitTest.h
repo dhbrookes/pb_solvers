@@ -172,14 +172,9 @@ TEST_F(BDUTest, ForceOpp)
   Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
-//    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
-//    charges[0] = 2.0*pow(-1, molInd); posCharges[0] = pos[molInd];
-//    Molecule molNew( M, 1.0, charges, posCharges, pos[molInd]);
-//    mol_.push_back( molNew );
-    
     int M = 1;
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
-    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    charges[0]=2.0*pow(-1, molInd); posCharges[0]=pos[molInd]; vdW[0]=0.0;
     
     Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd]);
     mol_.push_back( molNew );

@@ -128,7 +128,7 @@ public:
   const vector<Pt> get_centers() const      { return atomCenters_; }
   const int get_M() const                   { return M_; }
   const vector<double> get_cg_radii() const { return cgRadii_; }
-  const vector<Pt> get_cg_centers() const    { return cgCenters_; }
+  const vector<Pt> get_cg_centers() const   { return cgCenters_; }
   const bool get_cg() const                 { return cg_; }
   
 };

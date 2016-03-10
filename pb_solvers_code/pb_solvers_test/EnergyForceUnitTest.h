@@ -164,7 +164,7 @@ TEST_F(EnergyForceUTest, checkForce)
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
     Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
-    mol_sing_.push_back( molNew );
+    mol_.push_back( molNew );
   }
   const int vals           = nvals;
   int nmol                 = 3;
@@ -231,7 +231,7 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
     Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
-    mol_sing_.push_back( molNew );
+    mol_.push_back( molNew );
   }
   const int vals           = 5;
   int nmol                 = 2;
@@ -276,7 +276,7 @@ TEST_F(EnergyForceUTest, checkTorque)
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
     Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
-    mol_sing_.push_back( molNew );
+    mol_.push_back( molNew );
   }
   const int vals           = 5;
   int nmol                 = 3;

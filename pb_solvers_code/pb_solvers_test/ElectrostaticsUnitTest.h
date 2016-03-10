@@ -43,7 +43,7 @@ class ElecTest
       mol_.push_back( molNew );
     }
     
-    const int vals           = 5;
+    const int vals = 5;
     BesselConstants bConsta( 2*vals );
     BesselCalc bCalcu( 2*vals, bConsta);
     SHCalcConstants SHConsta( 2*vals );
@@ -53,10 +53,9 @@ class ElecTest
                                         sys.get_lambda(), vals);
     
     ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
-    ASolvTest.solve_A( 1E-12 );
-    ASolvTest.solve_gradA(1E-12);
+    ASolvTest.solve_A( 1E-12 ); ASolvTest.solve_gradA(1E-12);
 
-    Electrostatic EstatTest( ASolvTest.get_A(), sys, SHCalcu, bCalcu, vals);
+    Electrostatic EstatTest( ASolvTest.get_A(), sys, SHCalcu, bCalcu, vals, 10);
     EstatTest.print_dx("/Users/lfelberg/Desktop/test.dx");
   }
 };

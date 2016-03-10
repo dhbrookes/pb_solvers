@@ -197,11 +197,10 @@ Pt System::get_pbc_dist_vec(int i, int j)
 {
   Pt ci = get_centeri(i);
   Pt cj = get_centeri(j);
-//  Pt cj_pbc = Pt(cj.x() + boxLength_, cj.y() + boxLength_, cj.z() + boxLength_);
   Pt dv  = ci - cj;
   
   Pt v = Pt(dv.x() - round(dv.x()/boxLength_),
-          dv.y() - round(dv.y()/boxLength_), dv.z(),
+          dv.y() - round(dv.y()/boxLength_),
           dv.z() - round(dv.z()/boxLength_));
 
   return v;

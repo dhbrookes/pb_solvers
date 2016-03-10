@@ -31,8 +31,8 @@ runSpecs_(2)
     typeDiff_[i][1] = 0.0;
   }
   
-  typeDef_[0] = "stat";
-  typeDef_[1] = "stat";
+  typeDef_[0]  = "stat";
+  typeDef_[1]  = "stat";
   runSpecs_[0] = "pot";
   runSpecs_[1] = "test";
   

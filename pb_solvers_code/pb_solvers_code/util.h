@@ -1,5 +1,5 @@
 //
-//  util.hpp
+//  util.h
 //  pb_solvers_code
 //
 //  Created by David Brookes on 9/24/15.
@@ -336,4 +336,4 @@ typedef complex<double> cmplx;
 typedef Point<double> Pt;
 typedef Quaternion Quat;
 
-#endif /* util_hpp */
+#endif /* util_h */

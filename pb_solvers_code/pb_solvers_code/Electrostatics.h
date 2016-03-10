@@ -46,7 +46,7 @@ protected:
   
 public:
   Electrostatic(VecOfMats<cmplx>::type A, System sys,
-                SHCalc shCalc, BesselCalc bCalc, int p);
+                SHCalc shCalc, BesselCalc bCalc, int p, int npts = 150);
   
   // print APBS file
   void print_dx(string ifname);
