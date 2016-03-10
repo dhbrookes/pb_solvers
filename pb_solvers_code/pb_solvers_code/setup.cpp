@@ -8,7 +8,7 @@
 
 #include "setup.h"
 
-const double Setup::MAX_DIST = 1.4e8;
+const double Setup::MAX_DIST = 1.4e18;
 
 Setup::Setup(string infile)
 :ompThreads_( 1 ),
@@ -40,7 +40,7 @@ runSpecs_(2)
   
   typeDef_[0]  = "stat";
   typeDef_[1]  = "stat";
-  runSpecs_[0] = "pot";
+  runSpecs_[0] = "electrostatics";
   runSpecs_[1] = "test";
   
   // Initializing file locs to defaults
@@ -52,7 +52,7 @@ runSpecs_(2)
   
   for (int i=0; i<nType_; i++)
   {
-    molfnames_[i] = vector<string> ( 5);
+    molfnames_[i] = vector<string> (5);
     for (int j=0; j<molfnames_[i].size();j++)
     {
       molfnames_[i][j] = molfn[i][j];
@@ -112,7 +112,7 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "Runtype command found" << endl;
     setRunType( fline[1] );
-    if (fline[1] == "sim")
+    if (fline[1] == "dynamics")
     {
       if (fline.size() > 2)
       {
@@ -159,7 +159,7 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "Type def command found" << endl;
     int typeNo = atoi(fline[1].c_str())-1;
-    if (typeNo > getType()-1)
+    if (typeNo > getNType()-1)
       return;
     if (fline.size() > 2)
       setTypeNCount( typeNo, atoi(fline[2].c_str()) );
@@ -167,20 +167,31 @@ void Setup::findKeyword(vector<string> fline)
     {
       setTypeNDef( typeNo, fline[3].c_str() );
       if (getTypeNDef(typeNo) == "move")
+      {
         setTypeNDtr( typeNo, atof(fline[4].c_str()));
+        setTypeNDrot( typeNo, atof(fline[5].c_str()));
+      } else if (getTypeNDef(typeNo) == "rot")
+      {
+        setTypeNDtr( typeNo, 0.0);
+        setTypeNDrot( typeNo, atof(fline[4].c_str()));
+      } else
+      {
+        setTypeNDtr( typeNo, 0.0);
+        setTypeNDrot( typeNo, 0.0);
+      }
     }
   } else if (keyword == "pqr")
   {
     cout << "PQR command found" << endl;
     int typeNo = atoi(fline[1].c_str())-1;
-    if (typeNo > getType()-1)
+    if (typeNo > getNType()-1)
       return;
     setTypeNPQR( typeNo, fline[2].c_str() );
   } else if (keyword == "xyz")
   {
     cout << "XYZ command found" << endl;
     int typeNo = atoi(fline[1].c_str())-1;
-    if (typeNo > getType()-1)
+    if (typeNo > getNType()-1)
       return;
     setTypeNXYZ( typeNo, fline[2] );
     
