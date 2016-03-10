@@ -38,6 +38,8 @@ protected:
   MyVector<double> omega_;  // result of energy calculation, internal units
   
 public:
+  EnergyCalc() { }
+  
   EnergyCalc(VecOfMats<cmplx>::type A, VecOfMats<cmplx>::type L,
              Constants const_, int N, int p);
   
@@ -104,6 +106,8 @@ protected:
   VecOfVecs<double>::type F_;
   
 public:
+  ForceCalc() { }
+  
   ForceCalc(VecOfMats<cmplx>::type A, MyMatrix<VecOfMats<cmplx>::type > gradA_,
             VecOfMats<cmplx>::type L, MyVector<VecOfMats<cmplx>::type > gradL_,
             Constants con, int N, int p);
@@ -144,6 +148,7 @@ protected:
 //  VecOfMats<cmplx>::type calc_H(int i);
   
 public:
+  TorqueCalc() { }
   
   TorqueCalc(SHCalc shCalc, BesselCalc bCalc,
              MyVector<VecOfMats<cmplx>::type> gradL,

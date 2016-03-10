@@ -77,28 +77,27 @@ void ThreeBody::solveNmer( int num )
   vector< vector<int> > nmer = ( num == 2) ? dimer_ : trimer_;
   vector< Molecule > mol_temp;
   
+  EnergyCalc EnTest;
+  ForceCalc FoTest;
+  TorqueCalc TorTest;
+  System sys_temp;
+  ASolver asolv_temp;
+  
   for( i = 0; i < nmer.size(); i++)
   {
     cout << "This nmer is: ";
     mol_temp.clear();
+    sys_temp = _sys_->get_subsystem(nmer[i]);
     
-    for ( j = 0; j < num; j++)
-    {
-      cout << nmer[i][j] << " and " ;
-      mol_temp.push_back( _sys_->get_molecule(j) );
-    }
-    cout << endl;
-    System sys_temp( _sys_->get_consts(), mol_temp);
-    
-    ASolver asolv_temp( num, p_, *_besselCalc_, *_shCalc_, sys_temp);
+    asolv_temp = ASolver( num, p_, *_besselCalc_, *_shCalc_, sys_temp);
     asolv_temp.solve_A(1E-5); asolv_temp.solve_gradA(1E-5);
     
-    EnergyCalc EnTest( asolv_temp.get_A(), asolv_temp.calc_L(),
+    EnTest = EnergyCalc( asolv_temp.get_A(), asolv_temp.calc_L(),
                       _sys_->get_consts(), num, p_);
-    ForceCalc FoTest( asolv_temp.get_A(), asolv_temp.get_gradA(),
+    FoTest = ForceCalc ( asolv_temp.get_A(), asolv_temp.get_gradA(),
                      asolv_temp.calc_L(), asolv_temp.calc_gradL(),
                      _sys_->get_consts(), num, p_);
-    TorqueCalc TorTest( *_shCalc_, *_besselCalc_, asolv_temp.calc_gradL(),
+    TorTest = TorqueCalc ( *_shCalc_, *_besselCalc_, asolv_temp.calc_gradL(),
                        asolv_temp.get_gamma(), sys_temp.get_consts(),
                        sys_temp, p_);
     

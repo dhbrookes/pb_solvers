@@ -158,6 +158,8 @@ protected:
 
 public:
   
+  ASolver() { }
+  
   ASolver(const int N, const int p, BesselCalc bcalc,
           SHCalc shCalc, System sys);
   
