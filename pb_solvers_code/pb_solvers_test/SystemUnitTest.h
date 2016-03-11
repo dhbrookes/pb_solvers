@@ -172,18 +172,166 @@ TEST_F(MoleculeUTest, checkCreateCen)
   ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
 }
 
+TEST_F(MoleculeUTest, translate)
+{
+  Pt pos(-10.0,23.4,-8.7);
+  int M = 2; vector<double> charges(M); vector<double> vdW(M);
+  vector<Pt> posCharges(M);
+  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
+  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
+  
+  Molecule molNew( "rot", charges, posCharges, vdW, 0.24);
+  molNew.translate( Pt( 3.0, -4.5, 10.21));
+  
+  EXPECT_NEAR( -6.5, molNew.get_center().x(), preclim);
+  EXPECT_NEAR( 19.4, molNew.get_center().y(), preclim);
+  EXPECT_NEAR( 1.51, molNew.get_center().z(), preclim);
+  
+  EXPECT_NEAR( 0.5, molNew.get_posj(0).x(), preclim);
+  EXPECT_NEAR(-0.5, molNew.get_posj(0).y(), preclim);
+  EXPECT_NEAR( 0.0, molNew.get_posj(0).z(), preclim);
+  
+  EXPECT_NEAR(-0.5, molNew.get_posj(1).x(), preclim);
+  EXPECT_NEAR( 0.5, molNew.get_posj(1).y(), preclim);
+  EXPECT_NEAR( 0.0, molNew.get_posj(1).z(), preclim);
+  
+  EXPECT_NEAR( -6.0, molNew.get_posj_realspace(0).x(), preclim);
+  EXPECT_NEAR( 18.9, molNew.get_posj_realspace(0).y(), preclim);
+  EXPECT_NEAR( 1.51, molNew.get_posj_realspace(0).z(), preclim);
+  
+  EXPECT_NEAR( -7.0, molNew.get_posj_realspace(1).x(), preclim);
+  EXPECT_NEAR( 19.9, molNew.get_posj_realspace(1).y(), preclim);
+  EXPECT_NEAR( 1.51, molNew.get_posj_realspace(1).z(), preclim);
+}
+
+TEST_F(MoleculeUTest, rotateSimple)
+{
+  Pt pos( 0.0, 0.0, 0.0);
+  int M = 2; vector<double> charges(M); vector<double> vdW(M);
+  vector<Pt> posCharges(M);
+  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
+  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
+  
+  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0.24);
+  molNew.rotate( Quat( M_PI/2, Pt(0.0, 0.0, 1.0)));
+  
+  ASSERT_EQ( 0.0, molNew.get_center().x());
+  ASSERT_EQ( 0.0, molNew.get_center().y());
+  ASSERT_EQ( 0.0, molNew.get_center().z());
+  
+  EXPECT_NEAR( 0.0, molNew.get_posj_realspace(0).x(), preclim);
+  EXPECT_NEAR( 1.0, molNew.get_posj_realspace(0).y(), preclim);
+  EXPECT_NEAR( 0.0, molNew.get_posj_realspace(0).z(), preclim);
+  
+  EXPECT_NEAR( -1.0, molNew.get_posj_realspace(1).x(), preclim);
+  EXPECT_NEAR(  0.0, molNew.get_posj_realspace(1).y(), preclim);
+  EXPECT_NEAR(  0.0, molNew.get_posj_realspace(1).z(), preclim);
+  
+  molNew.rotate( Quat( M_PI/2, Pt(0.0, 0.0, 1.0)));
+  
+  EXPECT_NEAR(-1.0, molNew.get_posj_realspace(0).x(), preclim);
+  EXPECT_NEAR( 0.0, molNew.get_posj_realspace(0).y(), preclim);
+  EXPECT_NEAR( 0.0, molNew.get_posj_realspace(0).z(), preclim);
+  
+  EXPECT_NEAR(  0.0, molNew.get_posj_realspace(1).x(), preclim);
+  EXPECT_NEAR( -1.0, molNew.get_posj_realspace(1).y(), preclim);
+  EXPECT_NEAR(  0.0, molNew.get_posj_realspace(1).z(), preclim);
+}
+
+TEST_F(MoleculeUTest, rotate2)
+{
+  Pt pos(-10.0,23.4,-8.7);
+  int M = 2; vector<double> charges(M); vector<double> vdW(M);
+  vector<Pt> posCharges(M);
+  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
+  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
+  
+  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0.24);
+  molNew.rotate( Quat( 1.0, Pt(1.0, 1.0, 1.0)));
+  
+  ASSERT_EQ(-10.0, molNew.get_center().x());
+  ASSERT_EQ( 23.4, molNew.get_center().y());
+  ASSERT_EQ( -8.7, molNew.get_center().z());
+  
+  EXPECT_NEAR( 0.693534871, molNew.get_posj(0).x(), preclim);
+  EXPECT_NEAR( 0.639056064, molNew.get_posj(0).y(), preclim);
+  EXPECT_NEAR(-0.332590935, molNew.get_posj(0).z(), preclim);
+  
+  EXPECT_NEAR(-0.332590935, molNew.get_posj(1).x(), preclim);
+  EXPECT_NEAR( 0.693534871, molNew.get_posj(1).y(), preclim);
+  EXPECT_NEAR( 0.639056064, molNew.get_posj(1).z(), preclim);
+  
+  EXPECT_NEAR( -9.30646513, molNew.get_posj_realspace(0).x(), preclim);
+  EXPECT_NEAR( 24.03905610, molNew.get_posj_realspace(0).y(), preclim);
+  EXPECT_NEAR( -9.03259093, molNew.get_posj_realspace(0).z(), preclim);
+  
+  EXPECT_NEAR( -10.3325909, molNew.get_posj_realspace(1).x(), preclim);
+  EXPECT_NEAR( 24.09353490, molNew.get_posj_realspace(1).y(), preclim);
+  EXPECT_NEAR( -8.06094394, molNew.get_posj_realspace(1).z(), preclim);
+}
+
 class SystemUTest : public ::testing::Test
 {
 public :
   
 protected :
+  Constants const_;
+  
   virtual void SetUp() {}
   virtual void TearDown() {}
 };
 
 
+TEST_F(SystemUTest, checkOverlap)
+{
+  vector < Molecule > mol_;
+  Pt pos[2] = { Pt( 0.0, 0.0, -5.0), Pt( 0.0, 0.0, 0.0)};
+  double rad[2] = { 5.0, 3.7 };
+  for (int molInd = 0; molInd < 2; molInd ++ )
+  {
+    int M = 3; vector<double> chg(M); vector<double> vdW(M);
+    vector<Pt> poschg(M);
+    chg[0]=2.0; vdW[0]=0; poschg[0] = pos[molInd];
+    chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+    chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    
+    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd]);
+    mol_.push_back( molNew );
+  }
+  
+  try
+  {
+    System sys( const_, mol_ );
+    FAIL();
+  }
+  catch( const OverlappingMoleculeException& err )
+  {
+    // check exception
+    string error_exp = "Molecule 0 & 1 overlap";
+    EXPECT_EQ(string(err.what()), error_exp);
+  }
+}
+
 TEST_F(SystemUTest, checkVals)
 {
+  vector < Molecule > mol_;
+  Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
+  double rad[3] = { 5.0, 3.7, 8.6 };
+  for (int molInd = 0; molInd < 3; molInd ++ )
+  {
+    int M = 3; vector<double> chg(M); vector<double> vdW(M);
+    vector<Pt> poschg(M);
+    chg[0]=2.0; vdW[0]=0; poschg[0] = pos[molInd];
+    chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+    chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    
+    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd]);
+    mol_.push_back( molNew );
+  }
+  
+  System sys( const_, mol_ );
+  EXPECT_NEAR( 5.7666666667, sys.get_lambda(), preclim);
+  
   
 }
 
