@@ -117,6 +117,7 @@ boxLength_(boxlength)
 {
   check_for_overlap();
   lambda_ = calc_average_radius();
+  if (boxLength_/2. < cutoff_)  compute_cutoff();
 }
 
 System::System(Constants consts, Setup setup, double cutoff)
@@ -155,6 +156,7 @@ System::System(Constants consts, Setup setup, double cutoff)
   
   boxLength_ = setup.getBLen();
   cutoff_ = cutoff;
+  if (boxLength_/2. < cutoff_)  compute_cutoff();
 }
 
 const double System::calc_average_radius() const
@@ -166,6 +168,14 @@ const double System::calc_average_radius() const
   }
   ave  =  ave / N_;
   return ave;
+}
+
+
+void System::compute_cutoff()
+{
+  cutoff_ = boxLength_/2.0;
+  cout << " The desired cutoff is larger than half the box length";
+  cout << ". Resetting cutoff to 1/2 the boxlength: " << cutoff_ << endl;
 }
 
 

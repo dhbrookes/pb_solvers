@@ -21,6 +21,7 @@ const double Constants::KCAL = 4184.0;  //!<  [ 1 kCal = 4184 Joules ]
 const double Constants::ANGSTROM = 1e-10;  //!<  [ 1A = 1e-10 Meters ]
 const double Constants::PICO_SEC = 1e-12;  //!<  [ 1 ps = 1e-12 s ]
 const double Constants::MAX_DIST = 1.4e8;
+const double Constants::FORCE_CUTOFF = 1e2;
 
 const int Constants::MAX_NUM_POLES = 30;
 

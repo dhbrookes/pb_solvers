@@ -103,12 +103,9 @@ public:
   System() { }
   
   System(Constants consts, const vector<Molecule>& mols,
-         double cutoff=Constants::MAX_DIST,
+         double cutoff=Constants::FORCE_CUTOFF,
          double boxlength=Constants::MAX_DIST);
-  System(Constants consts, Setup setup, double cutoff=Constants::MAX_DIST);
-  
-  // return a copy of this system with a smaller set of molecules
-  System get_subsystem(const vector<int> mol_idx);
+  System(Constants consts, Setup setup, double cutoff=Constants::FORCE_CUTOFF);
     
   const Constants& get_consts() const      {return consts_;}
   const int get_n() const                  {return N_;}
@@ -127,6 +124,9 @@ public:
   const double get_cutoff() const          {return cutoff_;}
   const double get_time() const            {return t_;}
   
+  // Compute cutoff for force calcs
+  void compute_cutoff();
+  
   // Set time of simulation as what is input
   void set_time(double val) { t_ = val; }
   
@@ -136,9 +136,7 @@ public:
   // rotate every charge in molecule i
   void rotate_mol(int i, Quat qrot) { molecules_[i].rotate(qrot); }
   
-  /*
-   Check to determine if any molecules are overlapping
-   */
+  // Check to determine if any molecules are overlapping
   void check_for_overlap();
   
   // get the distance vector (Point object) between two molecules, taking into
@@ -148,6 +146,9 @@ public:
   
   // given a distance vector, determine whether it is in the cutoff
   bool less_than_cutoff(Pt v);
+  
+  // return a copy of this system with a smaller set of molecules
+  System get_subsystem(const vector<int> mol_idx);
   
 };
 

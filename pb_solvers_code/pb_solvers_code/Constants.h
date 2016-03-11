@@ -61,6 +61,7 @@ public:
   static const double ANGSTROM; //!<  [ 1A = 1e-10 Meters ]
   static const double PICO_SEC;  //!<  [ 1 ps = 1e-12 s ]
   static const double MAX_DIST;  // maximum distance for cutoff, box length
+  static const double FORCE_CUTOFF;  // default distance for cutoff
   
   Constants();
   Constants(Setup setup);
