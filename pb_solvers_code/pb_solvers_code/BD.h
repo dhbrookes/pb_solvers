@@ -22,6 +22,7 @@
 class BD
 {
 protected:
+  double dt_; // timestep (picoseconds)
   vector<double> transDiffConsts_;  // translational diffusion constants
   vector<double> rotDiffConsts_;  // rotational diffusion constants
   
