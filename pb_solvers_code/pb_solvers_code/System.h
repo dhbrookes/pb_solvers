@@ -96,6 +96,8 @@ protected:
   double                       boxLength_;
   double                       cutoff_;
   
+  double t_;  // time in a BD simulation
+  
   const double calc_average_radius() const;
   
 public:
@@ -109,21 +111,23 @@ public:
   // return a copy of this system with a smaller set of molecules
   System get_subsystem(const vector<int> mol_idx);
     
-  const Constants& get_consts() const      { return consts_; }
-  const int get_n() const                  { return N_; }
-  const double get_ai(int i) const         { return molecules_[i].get_a(); }
-  const double get_Mi(int i) const         { return molecules_[i].get_m(); }
-  const double get_qij(int i, int j) const { return molecules_[i].get_qj(j); }
-  Pt get_posij(int i, int j)               { return molecules_[i].get_posj(j);}
-  Molecule get_molecule(int i) const       { return molecules_[i]; }
-  Pt get_centeri(int i) const              { return molecules_[i].get_center();}
-  double get_radi(int i) const             { return molecules_[i].get_a();}
-  const double get_lambda() const          { return lambda_; }
-  const string get_typei(int i) const      { return molecules_[i].get_type();}
-  const double get_droti(int i) const      { return molecules_[i].get_drot();}
-  const double get_dtransi(int i) const    { return molecules_[i].get_dtrans();}
-  const double get_boxlength() const       { return boxLength_; }
-  const double get_cutoff() const          { return cutoff_; }
+  const Constants& get_consts() const       { return consts_; }
+  const int get_n() const                   { return N_; }
+  const double get_ai(int i) const          { return molecules_[i].get_a(); }
+  const double get_Mi(int i) const          { return molecules_[i].get_m(); }
+  const double get_qij(int i, int j) const  { return molecules_[i].get_qj(j); }
+  Pt get_posij(int i, int j)                { return molecules_[i].get_posj(j); }
+  Molecule get_molecule(int i) const        { return molecules_[i]; }
+  Pt get_centeri(int i) const               { return molecules_[i].get_center(); }
+  double get_radi(int i) const              { return molecules_[i].get_a(); }
+  const double get_lambda() const           { return lambda_; }
+  const string get_typei(int i) const       { return molecules_[i].get_type(); }
+  const double get_droti(int i) const       { return molecules_[i].get_drot(); }
+  const double get_dtransi(int i) const     { return molecules_[i].get_dtrans(); }
+  const double get_boxlength() const        { return boxLength_; }
+  const double get_cutoff() const           { return cutoff_; }
+  const double get_time() const             { return t_; }
+  void set_time(double val) { t_ = val; }
   
   // translate every charge in molecule i by the vector dr
   void translate_mol(int i, Pt dr) { molecules_[i].translate(dr); }

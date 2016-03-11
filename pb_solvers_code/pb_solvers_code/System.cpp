@@ -95,6 +95,47 @@ void Molecule::reposition_charges()
 }
 
 
+System::System(Constants consts, const vector<Molecule>& mols, double cutoff,
+               double boxlength)
+:consts_(consts), molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
+boxLength_(boxlength), t_(0)
+{
+  lambda_ = calc_average_radius();
+}
+
+
+const double System::calc_average_radius() const
+{
+  double ave = 0;
+  for (int i = 0; i < N_; i++)
+  {
+    ave += get_ai(i);
+  }
+  ave  =  ave / N_;
+  return ave;
+}
+
+
+void System::check_for_overlap()
+{
+  int i, j;
+  double dist;
+  Pt pi, pj;
+  double ai, aj;
+  for (i = 0; i < N_; i++)
+  {
+    pi = molecules_[i].get_center();
+    ai = molecules_[i].get_a();
+    for (j = 0; j < N_; j++)
+    {
+      pj = molecules_[j].get_center();
+      aj = molecules_[j].get_a();
+      dist = pi.dist(pj);
+      if (dist < (ai + aj)) throw OverlappingMoleculeException(i, j);
+    }
+  }
+}
+
 void Molecule::translate(Pt dr)
 {
   center_ = center_ + dr;
@@ -120,7 +161,7 @@ boxLength_(boxlength)
 }
 
 System::System(Constants consts, Setup setup, double cutoff)
-:consts_(consts)
+:consts_(consts), t_(0)
 {
   vector<Molecule> mols;
   
@@ -209,6 +250,7 @@ System System::get_subsystem(const vector<int> mol_idx)
     sub_mols[i] = molecules_[mol_idx[i]];
   }
   System subsys (consts_, sub_mols, cutoff_, boxLength_);
+  subsys.set_time(t_);
   return subsys;
 }
 

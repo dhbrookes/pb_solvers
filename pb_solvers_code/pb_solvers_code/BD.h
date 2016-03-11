@@ -48,6 +48,9 @@ protected:
   // return a random vector with each element drawn from a Gaussian
   Pt rand_vec(double mean, double var);
   
+  // update System time
+  void update_sys_time(double dt) { _sys_->set_time(_sys_->get_time() + dt); }
+  
 public:
   BD(System sys, vector<double> trans_diff_consts,
      vector<double> rot_diff_consts, bool diff = true, bool force = true);
@@ -57,6 +60,118 @@ public:
   void bd_update(VecOfVecs<double>::type F, VecOfVecs<double>::type tau);
   
   System get_system() { return *_sys_; }
+  
+};
+
+/*
+ Base class for implementing termination conditions in BD
+ */
+class BaseTerminate
+{
+public:
+  BaseTerminate() { }
+  
+  virtual const bool is_terminated(shared_ptr<System> _sys) const = 0;
+};
+
+/*
+ Class for time based termination
+ */
+class TimeTerminate : public BaseTerminate
+{
+protected:
+  double endTime_; //termination time
+  
+public:
+  TimeTerminate(double end_time)
+  :BaseTerminate(), endTime_(end_time)
+  {
+  }
+  
+  const bool is_terminated(shared_ptr<System> _sys) const
+  {
+    bool done = false;
+    if (_sys->get_time() >= endTime_) done = true;
+    return done;
+  }
+};
+
+enum CoordType { X, Y, Z, R };
+enum BoundaryType { EQ, LEQ, GEQ };
+
+/*
+ Class for coordinate based termination. This terminates based on whether
+ the specified molecule satisfies the BoundaryType condition on the CoordType
+ with the given boundary value.
+ */
+class CoordTerminate : public BaseTerminate
+{
+protected:
+  double boundaryVal_;
+  int molIdx_;
+  CoordType coordType_;
+  BoundaryType boundType_;
+  
+public:
+  CoordTerminate(int mol_idx, CoordType coord_type,
+                       BoundaryType bound_type, double bound_val)
+  :BaseTerminate(), molIdx_(mol_idx), coordType_(coord_type),
+  boundType_(bound_type), boundaryVal_(bound_val)
+  {
+  }
+  
+  const bool is_terminated(shared_ptr<System> _sys) const
+  {
+    bool done;
+    Pt mol_coord = _sys->get_centeri(molIdx_);
+    double test_val;
+    if (coordType_ == X)      test_val = mol_coord.x();
+    else if (coordType_ == Y) test_val = mol_coord.y();
+    else if (coordType_ == Z) test_val = mol_coord.z();
+    else                      test_val = mol_coord.norm();
+    
+    if (boundType_ == EQ)
+      test_val == boundaryVal_ ? done = true: done = false;
+    else if (boundType_ == LEQ)
+      test_val < boundaryVal_ ? done = true: done = false;
+    else if (boundType_ == GEQ)
+      test_val > boundaryVal_ ? done = true: done = false;
+    return done;
+  }
+};
+
+/*
+ Combine termination conditions
+ */
+
+enum HowTermCombine { ALL, ONE };
+
+class CombineTerminate : public BaseTerminate
+{
+protected:
+  vector<BaseTerminate> terms_;
+  HowTermCombine howCombine_;
+
+public:
+  CombineTerminate(vector<BaseTerminate> terms, HowTermCombine how_combine)
+  :BaseTerminate(), howCombine_(how_combine)
+  {
+  }
+  
+  const bool is_terminated(shared_ptr<System> _sys) const
+  {
+    bool done;
+    howCombine_== ALL ? done=true: done=false;
+    for (int i = 0; i < terms_.size(); i++)
+    {
+      if (terms_[i].is_terminated(_sys) == ! done)
+      {
+        done=!done;
+        break;
+      }
+    }
+    return done;
+  }
   
 };
 
