@@ -24,8 +24,6 @@ using namespace std;
 class Molecule
 {
 protected:
-  
-  
   string              type_;
   double              drot_;  // rotational diffusion coefficient
   double              dtrans_; // translational diffusion coefficients
@@ -70,6 +68,7 @@ public:
   const double get_a() const            { return a_; }
   const double get_qj(int j) const      { return qs_[j]; }
   Pt get_posj(int j) const              { return pos_[j]; }
+  Pt get_posj_realspace(int j)          { return center_ + pos_[j]; }
   Pt get_center() const                 { return center_; }
   
   string get_type() const               { return type_; }
@@ -106,7 +105,8 @@ public:
   System() { }
   
   System(Constants consts, const vector<Molecule>& mols,
-         double cutoff=Constants::MAX_DIST, double boxlength=Constants::MAX_DIST);
+         double cutoff=Constants::MAX_DIST,
+         double boxlength=Constants::MAX_DIST);
   System(Constants consts, Setup setup, double cutoff=Constants::MAX_DIST);
   
   // return a copy of this system with a smaller set of molecules
@@ -149,33 +149,6 @@ public:
   // given a distance vector, determine whether it is in the cutoff
   bool less_than_cutoff(Pt v);
   
-};
-
-/*
- Exception thrown when a user-input center and radius does not encompass all
- the charges
- */
-class BadCenterException: public exception
-{
-protected:
-  double x_, y_, z_;
-  double radius_;
-  
-public:
-  BadCenterException(Pt center, double radius)
-  :x_(center.x()), y_(center.y()), z_(center.z())
-  {
-  }
-  
-  virtual const char* what() const throw()
-  {
-    ostringstream ss;
-    char buffer [50];
-    printf(buffer, "Center : (%f, %f, %f) with radius : %f do \
-           not encompass all charges", x_, y_, z_, radius_);
-    ss << buffer << endl;
-    return ss.str().c_str();
-  }
 };
 
 /*

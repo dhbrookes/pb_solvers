@@ -21,7 +21,7 @@ public :
 protected :
   // This will change according to where you're running tests!
   string test_dir_ = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/";
-  
+
 };
 
 TEST_F(SetupUTest, checkOpen)
@@ -45,8 +45,36 @@ TEST_F(SetupUTest, readInp)
   string inp = test_dir_ + "run.1.inp";
   class Setup setTest(inp);
  
-//  ASSERT_EQ(true, PQRtest.get_cg());
+  ASSERT_EQ("dynamics", setTest.getRunType());
+  ASSERT_EQ("test1", setTest.getRunName());
 
+  ASSERT_EQ( 353, setTest.getTemp());
+  ASSERT_EQ( 0.0, setTest.getSaltConc());
+  
+  ASSERT_EQ( 1, setTest.getIDiel());
+  ASSERT_EQ( 8, setTest.getSDiel());
+  
+  ASSERT_EQ( 3, setTest.getNType());
+  
+  ASSERT_EQ(  0.000, setTest.getDtr(0));
+  ASSERT_EQ(  0.000, setTest.getDrot(0));
+  ASSERT_EQ(  0.000, setTest.getDtr(1));
+  ASSERT_EQ( 9.2e-5, setTest.getDrot(1));
+  ASSERT_EQ(  0.811, setTest.getDtr(2));
+  ASSERT_EQ( 0.5e-5, setTest.getDrot(2));
+  
+  ASSERT_EQ( "stat", setTest.getTypeNDef(0));
+  ASSERT_EQ(  "rot", setTest.getTypeNDef(1));
+  ASSERT_EQ( "move", setTest.getTypeNDef(2));
+  
+  ASSERT_EQ( "barnase.pqr", setTest.getTypeNPQR(0));
+  ASSERT_EQ( "2charge.pqr", setTest.getTypeNPQR(1));
+  ASSERT_EQ( "2charge.pqr", setTest.getTypeNPQR(2));
+  
+  ASSERT_EQ(  "lisa.xyz", setTest.getTypeNXYZ(0));
+  ASSERT_EQ( "other.xyz", setTest.getTypeNXYZ(1));
+  ASSERT_EQ(   "trd.xyz", setTest.getTypeNXYZ(2));
+  
 }
 
 

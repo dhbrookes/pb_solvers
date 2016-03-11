@@ -83,7 +83,7 @@ public:
   string getRunName()              { return runSpecs_[1]; }
   
   int getThreads()                 { return ompThreads_; }
-  int getType()                    { return nType_; }
+  int getNType()                   { return nType_; }
   int getPBCs()                    { return PBCs_; }
   double getBLen()                 { return blen_; }
   double getIDiel()                { return idiel_; }

@@ -37,7 +37,6 @@ M_((int) pos.size()),
 center_(cen)
 {
   reposition_charges();
-  calc_a();
 }
 
 // neither the center or radius are specified
@@ -48,9 +47,7 @@ M_((int) pos.size())
 {
   calc_center();
   reposition_charges();
-  calc_a();
 }
-
 
 void Molecule::calc_center()
 {
@@ -65,9 +62,9 @@ void Molecule::calc_center()
     yc += pos_[i].y();
     zc += pos_[i].z();
   }
-  xc /= M_;
-  yc /= M_;
-  zc /= M_;
+  xc /= (double) M_;
+  yc /= (double) M_;
+  zc /= (double) M_;
   
   center_ = Pt(xc, yc, zc);
 }
@@ -78,23 +75,23 @@ void Molecule::calc_a()
   double dist;
   for (int i = 0; i < M_; i++)
   {
-    dist = pos_[i].dist(center_) + vdwr_[i];
+    dist = pos_[i].norm() + vdwr_[i];
     if (dist > a_) a_ = dist;
   }
 }
 
 void Molecule::reposition_charges()
 {
+  bool recalc_a = false;
   // repositioning the charges WRT center of charge
   for (int i = 0; i < M_; i++)
   {
     // check that the charge is encompassed by the the center and radius:
-    if (pos_[i].dist(center_) > a_)
-    {
-      throw BadCenterException(center_, a_);
-    }
+    if (pos_[i].dist(center_) > a_)   recalc_a = true;
     pos_[i] = pos_[i] - center_;
   }
+  
+  if (recalc_a) calc_a();
 }
 
 
@@ -155,6 +152,13 @@ void Molecule::rotate(Quat qrot)
   }
 }
 
+System::System(Constants consts, const vector<Molecule>& mols, double cutoff,
+               double boxlength)
+:consts_(consts), molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
+boxLength_(boxlength)
+{
+  lambda_ = calc_average_radius();
+}
 
 System::System(Constants consts, Setup setup, double cutoff)
 :consts_(consts), t_(0)
@@ -193,6 +197,38 @@ System::System(Constants consts, Setup setup, double cutoff)
   cutoff_ = cutoff;
 }
 
+const double System::calc_average_radius() const
+{
+  double ave = 0;
+  for (int i = 0; i < N_; i++)
+  {
+    ave += get_ai(i);
+  }
+  ave  =  ave / N_;
+  return ave;
+}
+
+
+void System::check_for_overlap()
+{
+  int i, j;
+  double dist;
+  Pt pi, pj;
+  double ai, aj;
+  for (i = 0; i < N_; i++)
+  {
+    pi = molecules_[i].get_center();
+    ai = molecules_[i].get_a();
+    for (j = 0; j < N_; j++)
+    {
+      pj = molecules_[j].get_center();
+      aj = molecules_[j].get_a();
+      dist = pi.dist(pj);
+      if (dist < (ai + aj)) throw OverlappingMoleculeException(i, j);
+    }
+  }
+}
+
 Pt System::get_pbc_dist_vec(int i, int j)
 {
   Pt ci = get_centeri(i);
@@ -205,7 +241,6 @@ Pt System::get_pbc_dist_vec(int i, int j)
 
   return v;
 }
-
 
 System System::get_subsystem(const vector<int> mol_idx)
 {
