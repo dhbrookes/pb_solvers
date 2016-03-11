@@ -16,6 +16,7 @@
 using namespace std;
 
 
+
 /*
  Class for calculating the energy of molecules in the system given
  an ASolver object
@@ -25,7 +26,6 @@ class EnergyCalc
 protected:
   shared_ptr<VecOfMats<cmplx>::type> _A_;
   shared_ptr<VecOfMats<cmplx>::type> _L_;
-  double epsS_;  // solvent dielectric constant
   int N_;  // number of molecules
   int p_;  // max number of poles
   Constants const_;
@@ -42,6 +42,8 @@ public:
   
   EnergyCalc(VecOfMats<cmplx>::type A, VecOfMats<cmplx>::type L,
              Constants const_, int N, int p);
+  
+  EnergyCalc(ASolver asolv, Constants consts, int p);
   
   // fill omega_
   void calc_energy();
@@ -152,7 +154,8 @@ public:
   
   TorqueCalc(SHCalc shCalc, BesselCalc bCalc,
              MyVector<VecOfMats<cmplx>::type> gradL,
-             VecOfMats<cmplx>::type gamma, Constants consts, System sys, int p);
+             VecOfMats<cmplx>::type gamma, Constants consts,
+             System sys, int p);
   
   void calc_tau();  // fill tau_
   

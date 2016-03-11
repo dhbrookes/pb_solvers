@@ -42,6 +42,16 @@ void EnergyCalc::calc_energy()
   }
 }
 
+
+EnergyCalc::EnergyCalc(ASolver asolv, Constants consts, int p)
+:p_(p), const_(consts)
+{
+  _A_ = make_shared<VecOfMats<cmplx>::type> (asolv.get_A());
+  _L_ = make_shared<VecOfMats<cmplx>::type> (asolv.calc_L());
+  
+  calc_energy();
+}
+
 ForceCalc::ForceCalc(VecOfMats<cmplx>::type A,
                      MyMatrix<VecOfMats<cmplx>::type > gradA_,
                      VecOfMats<cmplx>::type L,
