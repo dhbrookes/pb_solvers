@@ -98,6 +98,8 @@ protected:
   double                       boxLength_;
   double                       cutoff_;
   
+  double t_;  // time in a BD simulation
+  
   const double calc_average_radius() const;
   
 public:
@@ -125,6 +127,8 @@ public:
   const double get_dtransi(int i) const     { return molecules_[i].get_dtrans(); }
   const double get_boxlength() const        { return boxLength_; }
   const double get_cutoff() const           { return cutoff_; }
+  const double get_time() const             { return t_; }
+  void set_time(double val) { t_ = val; }
   
   // translate every charge in molecule i by the vector dr
   void translate_mol(int i, Pt dr) { molecules_[i].translate(dr); }

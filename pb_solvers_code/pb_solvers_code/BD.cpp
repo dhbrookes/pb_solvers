@@ -102,6 +102,7 @@ void BD::indi_trans_update(int i, MyVector<double> fi)
       accept = true;
     }
   }
+  update_sys_time(dt);
 }
 
 
@@ -133,6 +134,7 @@ void BD::indi_rot_update(int i, MyVector<double> tau_i)
       accept = true;
     }
   }
+  update_sys_time(dt);
 }
 
 void BD::bd_update(VecOfVecs<double>::type F, VecOfVecs<double>::type tau)
