@@ -177,7 +177,7 @@ public:
   ReExpCoeffs() { };
   
   ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
-              ReExpCoeffsConstants consts, double kappa,
+              shared_ptr<ReExpCoeffsConstants> _consts, double kappa,
               double lambda, bool grad = false);
   
   MyVector<double> calc_SH_spec( double val ); // for singularities

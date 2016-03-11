@@ -92,12 +92,22 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
 
 ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp,
                                vector<double> besselK,
-                               ReExpCoeffsConstants consts,
+                               shared_ptr<ReExpCoeffsConstants> _consts,
                                double kappa, double lambda, bool grad)
-:p_(p), v_(v), Ytp_(Ytp), besselK_(besselK),
-kappa_(kappa), lambda_(lambda), grad_(grad)
+:p_(p),
+v_(v),
+Ytp_(Ytp),
+besselK_(besselK),
+kappa_(kappa),
+lambda_(lambda),
+grad_(grad),
+_consts_(_consts),
+R_(2*p, MyMatrix<cmplx> (2*p, 4*p)),
+S_(2*p, MyMatrix<double> (2*p, 4*p)),
+dSdR_(2*p, MyMatrix<double> (2*p, 4*p)),
+dRdTheta_(2*p, MyMatrix<cmplx> (2*p, 4*p)),
+prefacSing_(2*p, MyMatrix<double>(p, 2))
 {
-  _consts_ = make_shared<ReExpCoeffsConstants>(consts);
   if (besselK_.size() < 2 * p_)
   {
     throw BesselSizeException(p_, (int) besselK_.size());
@@ -130,12 +140,12 @@ void ReExpCoeffs::calc_dR_pre()
   int m,n;
   MyVector<double> specialSH (2*p_);
   specialSH = calc_SH_spec(1.0);
-  prefacSing_ = MyVector<MyMatrix<double> > (2*p_);
-  prefacSing_.set_val(0, MyMatrix<double> (p_, 2));
+//  prefacSing_ = MyVector<MyMatrix<double> > (2*p_);
+//  prefacSing_.set_val(0, MyMatrix<double> (p_, 2));
   
   for (n = 1; n < 2*p_-1; n++)
   {
-    prefacSing_.set_val(n, MyMatrix<double> (p_, 2));
+//    prefacSing_.set_val(n, MyMatrix<double> (p_, 2));
     prefacSing_[n](0, 0) = 0.0; prefacSing_[n](0, 1) = specialSH[n];
   }
   
@@ -195,11 +205,11 @@ void ReExpCoeffs::calc_r()
   double theta = v_.theta();
   double xi  = M_PI;
   
-  R_ = MyVector<MyMatrix<cmplx> > (2*p_); // n range of 0 to 2p-1 is needed!
+//  R_ = MyVector<MyMatrix<cmplx> > (2*p_); // n range of 0 to 2p-1 is needed!
   
   for (n = 0; n < 2 * p_-1; n++)
   {
-    R_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));//s range: -2p+1 to 2p-1 needed!
+//    R_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));//s range: -2p+1 to 2p-1 needed!
     for (s = -n; s <= n; s++)
     {
       val = get_yval(n, -s);
@@ -231,11 +241,11 @@ void ReExpCoeffs::calc_s()
   int m, n, l;
   double val;
   double r = v_.r();
-  S_ = MyVector<MyMatrix<double> > ( 2 * p_ );
-  for (n = 0; n < 2*p_; n++)
-  {
-    S_.set_val(n, MyMatrix<double> ( 2*p_, 4*p_));
-  }
+//  S_ = MyVector<MyMatrix<double> > ( 2 * p_ );
+//  for (n = 0; n < 2*p_; n++)
+//  {
+//    S_.set_val(n, MyMatrix<double> ( 2*p_, 4*p_));
+//  }
   
   for (l = 0; l < 2 * p_; l++)
   {
@@ -313,11 +323,11 @@ void ReExpCoeffs::calc_dr_dtheta()
   double phi = v_.phi();
   double theta = v_.theta();
   double xi  = M_PI;
-  dRdTheta_ = MyVector<MyMatrix<cmplx> > (2*p_);
+//  dRdTheta_ = MyVector<MyMatrix<cmplx> > (2*p_);
   
   for (n = 0; n < 2 * p_; n++)
   {
-    dRdTheta_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));
+//    dRdTheta_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));
     for (s = 0; s <= n; s++)
     {
       val = s * (cos(theta)/sin(theta)) * get_yval(n, s);
@@ -362,11 +372,11 @@ void ReExpCoeffs::calc_ds_dr()
   int m, n, l;
   double val;
   double r = v_.r();
-  dSdR_ = MyVector<MyMatrix<double> > ( 2 * p_ );
-  for (n = 0; n < 2*p_; n++)
-  {
-    dSdR_.set_val(n, MyMatrix<double> ( 2*p_, 4*p_));
-  }
+//  dSdR_ = MyVector<MyMatrix<double> > ( 2 * p_ );
+//  for (n = 0; n < 2*p_; n++)
+//  {
+//    dSdR_.set_val(n, MyMatrix<double> ( 2*p_, 4*p_));
+//  }
   
   for (l = 0; l < 2 * p_; l++)
   {

@@ -48,11 +48,10 @@ shConsts_(N, N), dubFac_(N)
   
 }
 
-SHCalc::SHCalc(const int num_vals, SHCalcConstants consts)
-:numVals_(num_vals), P_( num_vals, num_vals),
+SHCalc::SHCalc(const int num_vals, shared_ptr<SHCalcConstants> _consts)
+:numVals_(num_vals), P_( num_vals, num_vals), _consts_(_consts), 
 Y_( num_vals, num_vals)
 {
-  _consts_ = make_shared<SHCalcConstants> (consts);
   assert (_consts_->get_n() == numVals_);
 }
 

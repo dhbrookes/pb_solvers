@@ -8,17 +8,33 @@
 
 #include "ASolver.h"
 
-ASolver::ASolver(const int N, const int p, BesselCalc bcalc,
-                 SHCalc shCalc, System sys)
-:p_(p), a_avg_(sys.get_lambda()), gamma_(N),delta_(N), E_(N), N_(sys.get_n()),
-T_ (N_, N_), A_(N), gradA_(N, N), prevA_(N), prevGradA_(N, N), gradT_A_(N, N),
-reExpConsts_(sys.get_consts().get_kappa(), sys.get_lambda(), p),
-solvedA_(false)
+ASolver::ASolver(shared_ptr<BesselCalc> _bcalc,
+                  shared_ptr<SHCalc> _shCalc,
+                  shared_ptr<System> _sys,
+                  shared_ptr<Constants> _consts,
+                  const int p)
+:p_(p),
+N_(_sys->get_n()),
+a_avg_(_sys->get_lambda()),
+gamma_(_sys->get_n(), MyMatrix<cmplx> (p, p)),
+delta_(_sys->get_n(), MyMatrix<cmplx> (p, p)),
+E_(_sys->get_n(), MyMatrix<cmplx>(p, 2*p + 1)),
+A_(_sys->get_n(), MyMatrix<cmplx>(p, 2*p + 1)),
+T_ (_sys->get_n(), _sys->get_n()),
+L_(_sys_->get_n(), MyMatrix<cmplx>(p, 2*p + 1)),
+gradL_(N_),
+gradA_(_sys->get_n(), _sys->get_n()),
+prevA_(_sys->get_n(), MyMatrix<cmplx>(p, 2*p + 1)),
+prevGradA_(_sys->get_n(), _sys->get_n()),
+gradT_A_(_sys->get_n(), _sys->get_n()),
+reExpConsts_(_consts->get_kappa(), _sys->get_lambda(), p),
+solvedA_(false),
+_sys_(_sys),
+_besselCalc_(_bcalc),
+_shCalc_(_shCalc),
+_consts_(_consts)
 {
-  _sys_ = make_shared<System> (sys);
-  _besselCalc_ = make_shared<BesselCalc> (bcalc);
-  _shCalc_ = make_shared<SHCalc> (shCalc);
-  
+
   // precompute all SH:
   pre_compute_all_sh();
   
@@ -53,6 +69,7 @@ void ASolver::solve_A(double prec)
     ct++;
   }
   solvedA_ = true;
+  calc_L();
 }
 
 void ASolver::solve_gradA(double prec)
@@ -79,7 +96,8 @@ void ASolver::solve_gradA(double prec)
       }
       ct++;
     }
-  }  
+  }
+  calc_gradL();
 }
 
 // one iteration of numerical solution for A (eq 51 in Lotan 2006)
@@ -116,7 +134,7 @@ void ASolver::iter()
 void ASolver::grad_iter(int j)
 {
   // Solving for grad_j(A^(i)) by iterating through T^(i,k)
-  int i, k, dim;
+  int i, k;
 
   // relevant re-expansions (g prefix means gradient):
   VecOfMats<cmplx>::type aij, add;
@@ -126,9 +144,9 @@ void ASolver::grad_iter(int j)
   for (i = 0; i < N_; i++) // molecule of interest
   {
     prevGradA_ = gradA_;
-    aij = VecOfMats<cmplx>::type (3);
-    for (dim = 0; dim < 3; dim++)
-      aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
+    aij = VecOfMats<cmplx>::type (3, MyMatrix<cmplx>(p_,2*p_+1));
+//    for (dim = 0; dim < 3; dim++)
+//      aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
     aij = get_gradT_Aij( j, i);
     
     for (k = 0; k < N_; k++) // other molecules
@@ -696,10 +714,10 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
 cmplx ASolver::calc_indi_gamma(int i, int n)
 {
   double g;  // output
-  double kap = _sys_->get_consts().get_kappa();
+  double kap = _consts_->get_kappa();
   double ai = _sys_->get_ai(i);
-  double eps_p = _sys_->get_consts().get_dielectric_prot();
-  double eps_s = _sys_->get_consts().get_dielectric_water();
+  double eps_p = _consts_->get_dielectric_prot();
+  double eps_s = _consts_->get_dielectric_water();
   // all bessel function k
   vector<double> bk_all = _besselCalc_->calc_mbfK(n+2, kap*ai);
   double bk1 = bk_all[n];  // bessel k at n
@@ -717,10 +735,10 @@ cmplx ASolver::calc_indi_gamma(int i, int n)
 cmplx ASolver::calc_indi_delta(int i, int n)
 {
   double d;  // output
-  double kap = _sys_->get_consts().get_kappa();
+  double kap = _consts_->get_kappa();
   double ai = _sys_->get_ai(i);  // radius
-  double eps_p = _sys_->get_consts().get_dielectric_prot();
-  double eps_s = _sys_->get_consts().get_dielectric_water();
+  double eps_p = _consts_->get_dielectric_prot();
+  double eps_s = _consts_->get_dielectric_water();
   // all bessel function I:
   vector<double> bi_all = _besselCalc_->calc_mbfI(n+2, kap*ai);
   double bi1 = bi_all[n];  // bessel i at n
@@ -764,16 +782,16 @@ cmplx ASolver::calc_indi_e(int i, int n, int m)
  */
 void ASolver::compute_gamma()
 {
-  MyMatrix<cmplx> gi;
+//  MyMatrix<cmplx> gi;
   int i, j;
   for (i = 0; i < N_; i++)
   {
-    gi = MyMatrix<cmplx> (p_, p_);
+//    gi = MyMatrix<cmplx> (p_, p_);
     for(j = 0; j < p_; j++)
     {
-      gi.set_val(j, j, calc_indi_gamma(i, j));
+      gamma_[i].set_val(j, j, calc_indi_gamma(i, j));
     }
-    gamma_.set_val(i, gi);
+//    gamma_.set_val(i, gi);
   }
 }
 
@@ -784,17 +802,17 @@ void ASolver::compute_gamma()
  */
 void ASolver::compute_delta()
 {
-  MyMatrix<cmplx> di;
+//  MyMatrix<cmplx> di;
   int i, j;
   
   for (i = 0; i < N_; i++)
   {
-    di = MyMatrix<cmplx> (p_, p_);
+//    di = MyMatrix<cmplx> (p_, p_);
     for(j = 0; j < p_; j++)
     {
-      di.set_val(j, j, calc_indi_delta(i, j));
+      delta_[i].set_val(j, j, calc_indi_delta(i, j));
     }
-    delta_.set_val(i, di);
+//    delta_.set_val(i, di);
   }
 }
 
@@ -806,19 +824,19 @@ void ASolver::compute_delta()
 void ASolver::compute_E()
 {
   int i, n, m;
-  MyMatrix<cmplx> ei;
+//  MyMatrix<cmplx> ei;
   for (i = 0; i < N_; i++)
   {
     // m goes from -n to n so you need 2*p columns:
-    ei = MyMatrix<cmplx>(p_, 2*p_ + 1);
+//    ei = MyMatrix<cmplx>(p_, 2*p_ + 1);
     for (n = 0; n < p_; n++)
     {
       for (m = -n; m <= n; m++)
       {
-        ei.set_val(n, m + p_, calc_indi_e(i, n, m));
+        E_[i].set_val(n, m + p_, calc_indi_e(i, n, m));
       }
     }
-    E_.set_val(i, ei);
+//    E_.set_val(i, ei);
   }
 }
 
@@ -840,11 +858,12 @@ void ASolver::compute_T()
       if (! _sys_->less_than_cutoff(v)) continue;
        
       // calculate spherical harmonics for inter molecular vector:
-      double kappa = _sys_->get_consts().get_kappa();
+      double kappa = _consts_->get_kappa();
       _shCalc_->calc_sh(v.theta(), v.phi());
       vector<double> besselK = _besselCalc_->calc_mbfK(2*p_, kappa * v.r());
       T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
-                                   besselK, reExpConsts_,
+                                   besselK,
+                                   make_shared<ReExpCoeffsConstants>(reExpConsts_),
                                    kappa, _sys_->get_lambda(), true));
     }
   }
@@ -889,30 +908,30 @@ void ASolver::init_gradA()
 /*
  Calculate L, equation (16) of Lotan 2006
  */
-VecOfMats<cmplx>::type ASolver::calc_L()
+void ASolver::calc_L()
 {
-  VecOfMats<cmplx>::type L (N_);
+//  VecOfMats<cmplx>::type L (N_);
   
   int i, j;
   MyMatrix<cmplx> inner, expand;
   for (i = 0; i < N_; i++)
   {
-    inner = MyMatrix<cmplx> (p_, 2*p_ + 1);
+//    inner = MyMatrix<cmplx> (p_, 2*p_ + 1);
     for (j = 0; j < N_; j++)
     {
       if (j == i) continue;
       expand = re_expandA(i, j);
-      inner += expand;
+//      inner += expand;
+      L_[i] += expand;
     }
-    L.set_val(i, inner);
+//    L.set_val(i, inner);
   }
-  return L;
 }
 
-MyVector<VecOfMats<cmplx>::type > ASolver::calc_gradL()
+void ASolver::calc_gradL()
 {
   int i, k;
-  MyVector<VecOfMats<cmplx>::type > gradl (N_);
+//  MyVector<VecOfMats<cmplx>::type > gradl (N_);
   VecOfMats<cmplx>::type inner1, inner2;
   
   for (i = 0; i < N_; i++) // molecule of interest
@@ -925,9 +944,8 @@ MyVector<VecOfMats<cmplx>::type > ASolver::calc_gradL()
       inner2 = re_expand_gradA(i, k, i, false); // T^(i,k) * grad_j A^(k)
       inner1 += inner2;
     }
-    gradl.set_val(i, inner1);
+    gradL_.set_val(i, inner1);
   }
-  return gradl;
 }
 
 /*

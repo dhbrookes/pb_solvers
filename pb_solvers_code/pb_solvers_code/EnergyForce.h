@@ -28,7 +28,7 @@ protected:
   shared_ptr<VecOfMats<cmplx>::type> _L_;
   int N_;  // number of molecules
   int p_;  // max number of poles
-  Constants const_;
+  shared_ptr<Constants> _const_;
   
   /*
    Enum for the units of energy
@@ -40,10 +40,13 @@ protected:
 public:
   EnergyCalc() { }
   
-  EnergyCalc(VecOfMats<cmplx>::type A, VecOfMats<cmplx>::type L,
-             Constants const_, int N, int p);
+  EnergyCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
+             shared_ptr<VecOfMats<cmplx>::type> _L,
+             shared_ptr<Constants> _const, int N, int p);
   
-  EnergyCalc(ASolver asolv, Constants consts, int p);
+  EnergyCalc(ASolver asolv);
+  
+//  EnergyCalc(ASolver asolv, Constants consts, int p);
   
   // fill omega_
   void calc_energy();
@@ -55,34 +58,34 @@ public:
   
   // energy in kCal/mol:
   double get_omega_i_kcal(int i)
-  { return const_.convert_int_to_kcal_mol(omega_[i]); }
+  { return _const_->convert_int_to_kcal_mol(omega_[i]); }
   MyVector<double> get_omega_kcal()
   {
     MyVector<double> omeg(N_);
     for (int n = 0; n < N_; n++)
-      omeg[n] = const_.convert_int_to_kcal_mol(omega_[n]);
+      omeg[n] = _const_->convert_int_to_kcal_mol(omega_[n]);
     return omeg;
   }
   
   // energy in kT:
   double get_omega_i_kT(int i)
-  { return const_.convert_int_to_kT(omega_[i]); }
+  { return _const_->convert_int_to_kT(omega_[i]); }
   MyVector<double> get_omega_kT()
   {
     MyVector<double> omeg(N_);
     for (int n = 0; n < N_; n++)
-      omeg[n] = const_.convert_int_to_kT(omega_[n]);
+      omeg[n] = _const_->convert_int_to_kT(omega_[n]);
     return omeg;
   }
   
   // energy in joules/mol:
   double get_omega_i_jmol(int i)
-  { return const_.convert_int_to_jmol(omega_[i]); }
+  { return _const_->convert_int_to_jmol(omega_[i]); }
   MyVector<double> get_omega_jmol()
   {
     MyVector<double> omeg(N_);
     for (int n = 0; n < N_; n++)
-      omeg[n] = const_.convert_int_to_jmol(omega_[n]);
+      omeg[n] = _const_->convert_int_to_jmol(omega_[n]);
     return omeg;
   }
 };
@@ -103,16 +106,20 @@ protected:
   double epsS_;
   int N_;
   int p_;
-  Constants const_;
+  shared_ptr<Constants> _const_;
   
   VecOfVecs<double>::type F_;
   
 public:
   ForceCalc() { }
   
-  ForceCalc(VecOfMats<cmplx>::type A, MyMatrix<VecOfMats<cmplx>::type > gradA_,
-            VecOfMats<cmplx>::type L, MyVector<VecOfMats<cmplx>::type > gradL_,
-            Constants con, int N, int p);
+  ForceCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
+            shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > _gradA,
+            shared_ptr<VecOfMats<cmplx>::type> _L,
+            shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL,
+            shared_ptr<Constants> con, int N, int p);
+  
+  ForceCalc(ASolver asolv);
   
   void calc_force();  // fill F_
   
@@ -136,11 +143,11 @@ protected:
   shared_ptr<BesselCalc> _bCalc_;
   shared_ptr< MyVector<VecOfMats<cmplx>::type > > _gradL_;
   
-  Constants consts_;
+  shared_ptr<Constants> _consts_;
   shared_ptr<System> _sys_;
   shared_ptr<VecOfMats<cmplx>::type> _gamma_;
   
-  double epsS_;
+//  double epsS_;
   int N_;
   int p_;
 
@@ -152,10 +159,14 @@ protected:
 public:
   TorqueCalc() { }
   
-  TorqueCalc(SHCalc shCalc, BesselCalc bCalc,
-             MyVector<VecOfMats<cmplx>::type> gradL,
-             VecOfMats<cmplx>::type gamma, Constants consts,
-             System sys, int p);
+  TorqueCalc(shared_ptr<SHCalc> _shCalc,
+             shared_ptr<BesselCalc> _bCalc,
+             shared_ptr<MyVector<VecOfMats<cmplx>::type> > _gradL,
+             shared_ptr<VecOfMats<cmplx>::type> _gamma,
+             shared_ptr<Constants> _consts,
+             shared_ptr<System> sys, int p);
+  
+  TorqueCalc(ASolver asolv);
   
   void calc_tau();  // fill tau_
   

@@ -10,13 +10,13 @@
 #include <iostream>
 
 
-BD::BD(System sys, vector<double> trans_diff_consts,
-   vector<double> rot_diff_consts, bool diff, bool force)
+BD::BD(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+       vector<double> trans_diff_consts,
+       vector<double> rot_diff_consts,
+       bool diff, bool force)
 :transDiffConsts_(trans_diff_consts), rotDiffConsts_(rot_diff_consts),
-diff_(diff), force_(force)
+diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
 {
-  _sys_ = make_shared<System>(sys);
-  
   random_device rd;
   randGen_ = mt19937(rd());
 }
@@ -81,7 +81,7 @@ bool BD::check_for_collision(int mol, Pt new_pt)
 
 void BD::indi_trans_update(int i, MyVector<double> fi)
 {
-  double kT = _sys_->get_consts().get_kbt();
+  double kT = _consts_->get_kbt();
   double ikT_int = 1 / Constants::convert_j_to_int(kT);
   double coeff = transDiffConsts_[i] * dt_ * ikT_int;
   Pt dr = Pt(fi * coeff);
@@ -106,7 +106,7 @@ void BD::indi_trans_update(int i, MyVector<double> fi)
 
 void BD::indi_rot_update(int i, MyVector<double> tau_i)
 {
-  double kT = _sys_->get_consts().get_kbt();
+  double kT = _consts_->get_kbt();
   double ikT_int = 1 / Constants::convert_j_to_int(kT);
   double coeff = transDiffConsts_[i] * dt_ * ikT_int;
   Pt dtheta = (tau_i * coeff);
@@ -147,6 +147,5 @@ void BD::bd_update(VecOfVecs<double>::type F, VecOfVecs<double>::type tau)
   {
     if ( rotDiffConsts_[i] != 0) indi_rot_update(i, tau[i]);
   }
-  
   update_sys_time(dt_);
 }

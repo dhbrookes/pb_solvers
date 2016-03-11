@@ -90,7 +90,7 @@ protected:
   int                          N_; // number of molecules
   double                       lambda_; // average molecular radius
   vector<Molecule>             molecules_;
-  Constants                    consts_;  // Constants for this system
+//  Constants                    consts_;  // Constants for this system
   
   double                       boxLength_;
   double                       cutoff_;
@@ -102,15 +102,15 @@ protected:
 public:
   System() { }
   
-  System(Constants consts, const vector<Molecule>& mols,
+  System(const vector<Molecule>& mols,
          double cutoff=Constants::MAX_DIST,
          double boxlength=Constants::MAX_DIST);
-  System(Constants consts, Setup setup, double cutoff=Constants::MAX_DIST);
+  System(Setup setup, double cutoff=Constants::MAX_DIST);
   
   // return a copy of this system with a smaller set of molecules
   System get_subsystem(const vector<int> mol_idx);
     
-  const Constants& get_consts() const      {return consts_;}
+//  const Constants& get_consts() const      {return consts_;}
   const int get_n() const                  {return N_;}
   const double get_ai(int i) const         {return molecules_[i].get_a();}
   const double get_Mi(int i) const         {return molecules_[i].get_m();}

@@ -10,7 +10,6 @@
 
 ThreeBody::ThreeBody()
 {
-  
   dimer_.reserve(N_*N_);
   trimer_.reserve(N_*N_*N_);
   
@@ -89,17 +88,13 @@ void ThreeBody::solveNmer( int num )
     mol_temp.clear();
     sys_temp = _sys_->get_subsystem(nmer[i]);
     
-    asolv_temp = ASolver( num, p_, *_besselCalc_, *_shCalc_, sys_temp);
+    asolv_temp = ASolver(_besselCalc_, _shCalc_, make_shared<System> (sys_temp),
+                         _consts_, p_);
     asolv_temp.solve_A(1E-5); asolv_temp.solve_gradA(1E-5);
     
-    EnTest = EnergyCalc( asolv_temp.get_A(), asolv_temp.calc_L(),
-                      _sys_->get_consts(), num, p_);
-    FoTest = ForceCalc ( asolv_temp.get_A(), asolv_temp.get_gradA(),
-                     asolv_temp.calc_L(), asolv_temp.calc_gradL(),
-                     _sys_->get_consts(), num, p_);
-    TorTest = TorqueCalc ( *_shCalc_, *_besselCalc_, asolv_temp.calc_gradL(),
-                       asolv_temp.get_gamma(), sys_temp.get_consts(),
-                       sys_temp, p_);
+    EnTest = EnergyCalc(asolv_temp);
+    FoTest = ForceCalc (asolv_temp);
+    TorTest = TorqueCalc (asolv_temp);
     
     cout << "Pot, force for all: ";
     for ( j = 0; j < num; j++)

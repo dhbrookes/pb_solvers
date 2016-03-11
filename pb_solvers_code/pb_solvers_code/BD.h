@@ -143,10 +143,12 @@ protected:
   
   bool diff_; // include random kicks in dynamics
   bool force_; // include force calcs in dynamics
+  double dt_;
   
   // random number generator object:
   mt19937 randGen_;
   shared_ptr<System> _sys_;
+  shared_ptr<Constants> _consts_;
   
   // check if a molecule's new point causes it to collide with any other
   bool check_for_collision(int mol, Pt new_pt);
@@ -168,8 +170,10 @@ protected:
   void update_sys_time(double dt) { _sys_->set_time(_sys_->get_time() + dt); }
   
 public:
-  BD(System sys, vector<double> trans_diff_consts,
-     vector<double> rot_diff_consts, bool diff = true, bool force = true);
+  BD(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+     vector<double> trans_diff_consts,
+     vector<double> rot_diff_consts,
+     bool diff = true, bool force = true);
   
   // update the system with Brownian dynamics given forces and torques on every
   // molecule

@@ -29,10 +29,11 @@ protected:
 
   vector < vector < vector<double > > > esp_; // vector of ESP values
   
-  VecOfMats<cmplx>::type A_;
+  shared_ptr<VecOfMats<cmplx>::type> _A_;
   shared_ptr<System> _sys_;
   shared_ptr<SHCalc> _shCalc_;
   shared_ptr<BesselCalc> _bCalc_;
+  shared_ptr<Constants> _consts_;
   
   void find_range();
   void find_bins();
@@ -45,8 +46,12 @@ protected:
   double lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p);
   
 public:
-  Electrostatic(VecOfMats<cmplx>::type A, System sys,
-                SHCalc shCalc, BesselCalc bCalc, int p, int npts = 150);
+  Electrostatic(shared_ptr<VecOfMats<cmplx>::type> _A, shared_ptr<System> _sys,
+                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
+                shared_ptr<Constants> _consts,
+                int p, int npts = 150);
+  
+  Electrostatic(ASolver asolv, int npts=150);
   
   // print APBS file
   void print_dx(string ifname);

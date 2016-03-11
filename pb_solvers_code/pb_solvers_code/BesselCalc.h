@@ -51,7 +51,7 @@ protected:
 
 public:
   
-  BesselCalc(int N, BesselConstants consts);
+  BesselCalc(int N, shared_ptr<BesselConstants> _consts);
 
   /*
   Calculate the modified sphereical bessel functions I and K 
