@@ -172,6 +172,75 @@ TEST_F(MoleculeUTest, checkCreateCen)
   ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
 }
 
+TEST_F(MoleculeUTest, translate)
+{
+  Pt pos(-10.0,23.4,-8.7);
+  int M = 2; vector<double> charges(M); vector<double> vdW(M);
+  vector<Pt> posCharges(M);
+  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
+  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
+  
+  Molecule molNew( "rot", charges, posCharges, vdW, 0.24);
+  molNew.translate( Pt( 3.0, -4.5, 10.21));
+  
+  EXPECT_NEAR( -6.5, molNew.get_center().x(), preclim);
+  EXPECT_NEAR( 19.4, molNew.get_center().y(), preclim);
+  EXPECT_NEAR( 1.51, molNew.get_center().z(), preclim);
+  
+  EXPECT_NEAR( 0.5, molNew.get_posj(0).x(), preclim);
+  EXPECT_NEAR(-0.5, molNew.get_posj(0).y(), preclim);
+  EXPECT_NEAR( 0.0, molNew.get_posj(0).z(), preclim);
+  
+  EXPECT_NEAR(-0.5, molNew.get_posj(1).x(), preclim);
+  EXPECT_NEAR( 0.5, molNew.get_posj(1).y(), preclim);
+  EXPECT_NEAR( 0.0, molNew.get_posj(1).z(), preclim);
+  
+  EXPECT_NEAR( -6.0, molNew.get_posj_realspace(0).x(), preclim);
+  EXPECT_NEAR( 18.9, molNew.get_posj_realspace(0).y(), preclim);
+  EXPECT_NEAR( 1.51, molNew.get_posj_realspace(0).z(), preclim);
+  
+  EXPECT_NEAR( -7.0, molNew.get_posj_realspace(1).x(), preclim);
+  EXPECT_NEAR( 19.9, molNew.get_posj_realspace(1).y(), preclim);
+  EXPECT_NEAR( 1.51, molNew.get_posj_realspace(1).z(), preclim);
+}
+
+TEST_F(MoleculeUTest, rotate)
+{
+  Pt pos(-10.0,23.4,-8.7);
+  int M = 2; vector<double> charges(M); vector<double> vdW(M);
+  vector<Pt> posCharges(M);
+  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
+  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
+  
+  Molecule molNew( "rot", charges, posCharges, vdW, 0.24);
+  cout << molNew.get_a() << " " << molNew.get_posj_realspace(0).x() << " " << molNew.get_posj_realspace(0).y() << " " << molNew.get_posj_realspace(0).z() << endl;
+  cout << molNew.get_posj_realspace(1).x() << " " << molNew.get_posj_realspace(1).y() << " " << molNew.get_posj_realspace(1).z() << endl;
+  
+  molNew.rotate( Quat( 3.0, -4.5, 10.21, 43.2));
+  
+  ASSERT_EQ( -9.5, molNew.get_center().x());
+  ASSERT_EQ( 23.9, molNew.get_center().y());
+  ASSERT_EQ( -8.7, molNew.get_center().z());
+  
+  cout << molNew.get_posj_realspace(0).x() << " " << molNew.get_posj_realspace(0).y() << " " << molNew.get_posj_realspace(0).z() << endl;
+  
+//  EXPECT_NEAR( 0.5, molNew.get_posj(0).x(), preclim);
+//  EXPECT_NEAR(-0.5, molNew.get_posj(0).y(), preclim);
+//  EXPECT_NEAR( 0.0, molNew.get_posj(0).z(), preclim);
+//  
+//  EXPECT_NEAR(-0.5, molNew.get_posj(1).x(), preclim);
+//  EXPECT_NEAR( 0.5, molNew.get_posj(1).y(), preclim);
+//  EXPECT_NEAR( 0.0, molNew.get_posj(1).z(), preclim);
+//  
+//  EXPECT_NEAR( -6.0, molNew.get_posj_realspace(0).x(), preclim);
+//  EXPECT_NEAR( 18.9, molNew.get_posj_realspace(0).y(), preclim);
+//  EXPECT_NEAR( 1.51, molNew.get_posj_realspace(0).z(), preclim);
+//  
+//  EXPECT_NEAR( -7.0, molNew.get_posj_realspace(1).x(), preclim);
+//  EXPECT_NEAR( 19.9, molNew.get_posj_realspace(1).y(), preclim);
+//  EXPECT_NEAR( 1.51, molNew.get_posj_realspace(1).z(), preclim);
+}
+
 class SystemUTest : public ::testing::Test
 {
 public :

@@ -78,7 +78,6 @@ public:
   
   void translate(Pt dr);
   void rotate(Quat qrot);
-  
 };
 
 
