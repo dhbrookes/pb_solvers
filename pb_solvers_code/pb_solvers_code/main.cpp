@@ -14,11 +14,11 @@ using namespace std;
 
 int main(int argc, const char * argv[])
 {
-  string input_file = argv[0];
-  Setup setup(input_file);
-  
-  Constants consts = Constants(setup);
-  System sys = System(consts, setup);
+//  string input_file = argv[0];
+//  Setup setup(input_file);
+//  
+//  Constants consts = Constants(setup);
+//  System sys = System(consts, setup);
 
 }
 

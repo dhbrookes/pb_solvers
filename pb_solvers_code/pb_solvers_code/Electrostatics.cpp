@@ -8,19 +8,45 @@
 
 #include "Electrostatics.h"
 
-Electrostatic::Electrostatic(VecOfMats<cmplx>::type A, System sys,
-                             SHCalc shCalc, BesselCalc bCalc, int p, int npts)
-: p_(p)
+Electrostatic::Electrostatic(shared_ptr<VecOfMats<cmplx>::type> _A,
+                             shared_ptr<System> _sys,
+                             shared_ptr<SHCalc> _shCalc,
+                             shared_ptr<BesselCalc> _bCalc,
+                             shared_ptr<Constants> _consts,
+                             int p, int npts)
+: p_(p), _A_(_A), _sys_(_sys), _shCalc_(_shCalc), _bCalc_(_bCalc),
+_consts_(_consts)
 {
   range_min_.resize(3);
   range_max_.resize(3);
   npts_.resize(3);
   step_.resize(3);
   
-  A_ = A;
-  _sys_ = make_shared<System>(sys);
-  _shCalc_ = make_shared<SHCalc> (shCalc);
-  _bCalc_  = make_shared<BesselCalc> (bCalc);
+//  A_ = A;
+//  _sys_ = make_shared<System>(sys);
+//  _shCalc_ = make_shared<SHCalc> (shCalc);
+//  _bCalc_  = make_shared<BesselCalc> (bCalc);
+//  
+  for (int i = 0; i < 3; i++)
+    npts_[i] = npts;
+  
+  find_range();
+  find_bins();
+  
+  cout << " This is my range " << range_min_[0] <<  ", " <<range_min_[1] <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", " <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", " <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1] <<  ", "<<npts_[2] << endl;
+  
+  compute_pot();
+}
+
+Electrostatic::Electrostatic(ASolver asolv, int npts)
+:p_(asolv.get_p()), _A_(asolv.get_A()), _sys_(asolv.get_sys()),
+_shCalc_(asolv.get_sh()), _bCalc_(asolv.get_bessel()),
+_consts_(asolv.get_consts())
+{
+  range_min_.resize(3);
+  range_max_.resize(3);
+  npts_.resize(3);
+  step_.resize(3);
   
   for (int i = 0; i < 3; i++)
     npts_[i] = npts;
@@ -145,7 +171,7 @@ void Electrostatic::compute_pot()
   double rad;
   
   int Nmol = _sys_->get_n();
-  double e_s = _sys_->get_consts().get_dielectric_water();
+  double e_s = _consts_->get_dielectric_water();
   
   for ( xct=0; xct<npts_[0]; xct++)
   {
@@ -192,7 +218,7 @@ double Electrostatic::compute_pot_at( double x, double y, double z)
     rad    = _sys_->get_ai(mol);
     dist   = Pt(x,y,z) - center;
     localK = get_local_exp(dist);
-    pot += lotan_inner_prod( A_[mol], localK, p_);
+    pot += lotan_inner_prod( _A_->operator[](mol), localK, p_);
   }
  
   return pot;
@@ -202,7 +228,7 @@ MyMatrix<cmplx> Electrostatic::get_local_exp( Pt dist )
 {
   int n, m;
   double lambda = _sys_->get_lambda();
-  double kap    = _sys_->get_consts().get_kappa();
+  double kap    = _consts_->get_kappa();
   double expKR;
   vector<double> bessK;
   MyMatrix<cmplx> localK(p_, 2*p_);

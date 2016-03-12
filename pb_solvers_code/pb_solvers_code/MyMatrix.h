@@ -102,6 +102,24 @@ public:
   }
   
   /*
+   Fill with a default value (good for initializing memory)
+   */
+  MyMatrix(const int nrows, const int ncols, T default_val)
+  :nrows_(nrows), ncols_(ncols), vals_(nrows, ncols)
+  {
+    int i, j;
+    for (i = 0; i < nrows; i++)
+    {
+      for (j = 0; j < ncols; j++)
+      {
+        set_val(i, j, default_val);
+//        vals_[i][j] = default_val;
+      }
+    }
+    
+  }
+
+  /*
    Set the value of a coordinate in this matrix given the position (i, j)
    */
   void set_val(const int i, const int j, T val)
@@ -233,6 +251,16 @@ public:
     for (i = 0; i < vals.size(); i++)
     {
       this->vals_[i][0] = vals[0];
+    }
+  }
+  
+  MyVector(const int size, T default_val)
+  :MyMatrix<T>(size, 1)
+  {
+    int i;
+    for (i = 0; i < size; i++)
+    {
+      this->vals_[i][0] = default_val;
     }
   }
   

@@ -22,11 +22,11 @@ class ReExpTest
     Constants Cst;
     Pt testPt = Pt( 0.0, 0.0, 5.0);
     SHCalcConstants shCon( 2*nvals );
-    SHCalc shCalc( 2*nvals, shCon );
+    SHCalc shCalc( 2*nvals, make_shared<SHCalcConstants>(shCon) );
     shCalc.calc_sh( testPt.theta(), testPt.phi());
     
     BesselConstants bCon( 2*nvals );
-    BesselCalc      bCal( 2*nvals, bCon );
+    BesselCalc      bCal( 2*nvals, make_shared<BesselConstants>(bCon) );
     
     MyMatrix<cmplx> shMat = shCalc.get_full_result();
     double kap            = Cst.get_kappa();
@@ -35,7 +35,8 @@ class ReExpTest
 
     vector<double> besselK = bCal.calc_mbfK(2*nvals, kap*testPt.r());
     
-    ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK, reExpConsts,
+    ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
+                          make_shared<ReExpCoeffsConstants> (reExpConsts),
                           kap, lambda, true );
     
   }

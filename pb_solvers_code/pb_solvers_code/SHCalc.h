@@ -75,8 +75,9 @@ protected:
   //  at every n, m (store in this.P_)
   
 public:
+  SHCalc() {}
   
-  SHCalc(const int num_vals, SHCalcConstants consts);
+  SHCalc(const int num_vals, shared_ptr<SHCalcConstants> _consts);
   
   // calculate the spherical harmonics at every n, m  (store in this.Y_)
   void calc_sh(const double theta, const double phi);

@@ -28,18 +28,19 @@ class CTester
 public:
 	
 	int unitTest(int argc, char * argv[])
-	{    
+	{
+    BesselConstantsTest BCT;
+    BCT.TestBesselConstants();
+    cout << "Complete Bessel constant test" << endl;
+    
+    BesselCalcTest BCalcT;
+    BCalcT.TestBesselCalc();
+    cout << "Complete Bessel calculation test" << endl;
+    
+    
     ASolverTest ASolvT;
     ASolvT.RunASolverTest();
     cout << "Complete ASolv test" << endl;
-    
-		BesselConstantsTest BCT;
-		BCT.TestBesselConstants();
-    cout << "Complete Bessel test" << endl;
-		
-		BesselCalcTest BCalcT;
-		BCalcT.TestBesselCalc();
-    cout << "Complete SH test" << endl;
     
     ConstantsTest ConT;
     ConT.TestConstants();

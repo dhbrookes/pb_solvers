@@ -301,7 +301,7 @@ TEST_F(SystemUTest, checkOverlap)
   
   try
   {
-    System sys( const_, mol_ );
+    System sys( mol_ );
     FAIL();
   }
   catch( const OverlappingMoleculeException& err )
@@ -330,7 +330,7 @@ TEST_F(SystemUTest, checkVals)
     mol_.push_back( molNew );
   }
   
-  System sys( const_, mol_, cutoff );
+  System sys( mol_, cutoff );
   EXPECT_NEAR( 5.7666666667, sys.get_lambda(), preclim);
   EXPECT_NEAR( cutoff/sys.get_cutoff(), 1.0, preclim);
   
@@ -386,7 +386,7 @@ TEST_F(SystemUTest, changeCutoff)
     mol_.push_back( molNew );
   }
   
-  System sys( const_, mol_, cutoff, boxl );
+  System sys( mol_, cutoff, boxl );
   EXPECT_NEAR( (boxl/2.0)/sys.get_cutoff(), 1.0, preclim);
 }
 
@@ -411,7 +411,7 @@ TEST_F(SystemUTest, makeSubsystem)
   }
   
   subInd[0] = 1; subInd[1] = 2;
-  System sys( const_, mol_, cutoff, boxl );
+  System sys( mol_, cutoff, boxl );
   sys.set_time( 1.435);
   
   System sub = sys.get_subsystem(subInd);
@@ -448,7 +448,7 @@ TEST_F(SystemUTest, PBCcheck)
     mol_.push_back( molNew );
   }
 
-  System sys( const_, mol_, cutoff, boxl );
+  System sys( mol_, cutoff, boxl );
   
 }
 

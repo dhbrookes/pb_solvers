@@ -8,13 +8,18 @@
 
 #include "EnergyForce.h"
 
-EnergyCalc::EnergyCalc(VecOfMats<cmplx>::type A, VecOfMats<cmplx>::type L,
-                       Constants con, int N, int p)
-:N_(N), const_(con), omega_(N), p_(p)
+EnergyCalc::EnergyCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
+                       shared_ptr<VecOfMats<cmplx>::type> _L,
+                       shared_ptr<Constants> _const, int N, int p)
+:N_(N), _const_(_const), omega_(N), p_(p), _A_(_A), _L_(_L)
 {
-  _A_ = make_shared<VecOfMats<cmplx>::type> (A);
-  _L_ = make_shared<VecOfMats<cmplx>::type> (L);
-  
+  calc_energy();
+}
+
+EnergyCalc::EnergyCalc(ASolver asolv)
+:_A_(asolv.get_A()), _L_(asolv.get_L()), _const_(asolv.get_consts()),
+N_(asolv.get_N()), p_(asolv.get_p())
+{
   calc_energy();
 }
 
@@ -38,23 +43,26 @@ void EnergyCalc::calc_energy()
         ip += unm.real()*vnm.real() + unm.imag()*vnm.imag();
       }
     }
-    omega_.set_val(i, ip * (1/const_.get_dielectric_water()));
+    omega_.set_val(i, ip * (1/_const_->get_dielectric_water()));
   }
 }
 
-ForceCalc::ForceCalc(VecOfMats<cmplx>::type A,
-                     MyMatrix<VecOfMats<cmplx>::type > gradA_,
-                     VecOfMats<cmplx>::type L,
-                     MyVector<VecOfMats<cmplx>::type > gradL_,
-                     Constants con, int N, int p)
-:N_(N), const_(con), F_(N), p_(p)
+ForceCalc::ForceCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
+                     shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > _gradA,
+                     shared_ptr<VecOfMats<cmplx>::type> _L,
+                     shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL,
+                     shared_ptr<Constants> _con, int N, int p)
+:N_(N), _const_(_con), F_(N), p_(p), _gradA_(_gradA), _A_(_A), _L_(_L),
+_gradL_(_gradL)
 {
-  _A_ = make_shared<VecOfMats<cmplx>::type> (A);
-  _L_ = make_shared<VecOfMats<cmplx>::type> (L);
-  
-  _gradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type> > (gradA_);
-  _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type> > (gradL_);
-  
+  calc_force();
+}
+
+ForceCalc::ForceCalc(ASolver asolv)
+:_A_(asolv.get_A()), _gradA_(asolv.get_gradA()), _L_(asolv.get_L()),
+_gradL_(asolv.get_gradL()), _const_(asolv.get_consts()), N_(asolv.get_N()),
+p_(asolv.get_p())
+{
   calc_force();
 }
 
@@ -93,25 +101,31 @@ void ForceCalc::calc_force()
         }
       }
       
-      inner.set_val(j, -1.0/const_.get_dielectric_water() * (ip1 + ip2));
+      inner.set_val(j, -1.0/_const_->get_dielectric_water() * (ip1 + ip2));
     }
     F_.set_val(i, inner);
   }
 }
 
-TorqueCalc::TorqueCalc(SHCalc shCalc, BesselCalc bCalc,
-                       MyVector<VecOfMats<cmplx>::type> gradL,
-                       VecOfMats<cmplx>::type gamma,
-                       Constants consts, System sys, int p)
-: N_(sys.get_n()), p_(p), tau_(sys.get_n()), consts_(consts),
-epsS_(consts.get_dielectric_water())
+TorqueCalc::TorqueCalc(shared_ptr<SHCalc> _shCalc,
+                       shared_ptr<BesselCalc> _bCalc,
+                       shared_ptr<MyVector<VecOfMats<cmplx>::type> > _gradL,
+                       shared_ptr<VecOfMats<cmplx>::type> _gamma,
+                       shared_ptr<Constants> _consts,
+                       shared_ptr<System> _sys, int p)
+: N_(_sys->get_n()), p_(p), tau_(_sys->get_n()), _consts_(_consts),
+_shCalc_(_shCalc), _bCalc_(_bCalc), _gradL_(_gradL), _gamma_(_gamma)
 {
-  _shCalc_ = make_shared<SHCalc> (shCalc);
-  _bCalc_  = make_shared<BesselCalc> (bCalc);
-  _gradL_  = make_shared<MyVector<VecOfMats<cmplx>::type > > (gradL);
-  _gamma_ = make_shared<VecOfMats<cmplx>::type > (gamma);
-  _sys_    = make_shared<System> (sys);
-  
+  calc_tau();
+}
+
+TorqueCalc::TorqueCalc(ASolver asolv)
+:N_(asolv.get_N()), p_(asolv.get_p()), tau_(asolv.get_N()),
+_consts_(asolv.get_consts()), _shCalc_(asolv.get_sh()),
+_bCalc_(asolv.get_bessel()),
+_gamma_(asolv.get_gamma()),
+_sys_(asolv.get_sys())
+{
   calc_tau();
 }
 
@@ -136,7 +150,7 @@ VecOfMats<cmplx>::type TorqueCalc::calc_H(int i)
     scale = 1.0;
     
     if (_sys_->get_ai(i) == 0)
-      bessI = _bCalc_->calc_mbfI(p_, _sys_->get_consts().get_kappa()*pt.r());
+      bessI = _bCalc_->calc_mbfI(p_, _consts_->get_kappa()*pt.r());
     else
       bessI = _bCalc_->calc_mbfI(p_, 0.0);
 
@@ -174,13 +188,16 @@ void TorqueCalc::calc_tau()
     gLi   = _gradL_-> operator[](i);
     
     //perform cross product:
-    tau_i.set_val(0, 1/epsS_ * (lotan_inner_prod(gLi[1], Hi[2], p_)
+    tau_i.set_val(0, 1/_consts_->get_dielectric_water()
+                  * (lotan_inner_prod(gLi[1], Hi[2], p_)
                   - lotan_inner_prod(gLi[2], Hi[1], p_)));
     
-    tau_i.set_val(1, 1/epsS_ * (lotan_inner_prod(gLi[2], Hi[0], p_)
+    tau_i.set_val(1, 1/_consts_->get_dielectric_water() *
+                  (lotan_inner_prod(gLi[2], Hi[0], p_)
                   - lotan_inner_prod(gLi[0], Hi[2], p_)));
     
-    tau_i.set_val(2, 1/epsS_ * (lotan_inner_prod(gLi[0], Hi[1], p_)
+    tau_i.set_val(2, 1/_consts_->get_dielectric_water() *
+                  (lotan_inner_prod(gLi[0], Hi[1], p_)
                   - lotan_inner_prod(gLi[1], Hi[0], p_)));
     
     tau_.set_val(i, tau_i);

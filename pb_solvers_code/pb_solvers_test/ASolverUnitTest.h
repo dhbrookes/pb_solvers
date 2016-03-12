@@ -425,17 +425,19 @@ protected :
 
 TEST_F(ASolverUTest, checkGamma)
 {
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
 
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1).real(),  1.463995711, preclim);
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5).real(),  1.760111936, preclim);
@@ -446,17 +448,19 @@ TEST_F(ASolverUTest, checkGamma)
 
 TEST_F(ASolverUTest, checkDelta)
 {
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1).real(),   0.87554313, preclim);
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5).real(),   0.06832297, preclim);
@@ -468,17 +472,19 @@ TEST_F(ASolverUTest, checkDelta)
 
 TEST_F(ASolverUTest, checkE)
 {
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   
   EXPECT_NEAR(ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
   EXPECT_NEAR(ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
@@ -501,17 +507,19 @@ TEST_F(ASolverUTest, checkE)
 
 TEST_F(ASolverUTest, checkSH)
 {
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
 
   EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 0, 0).real(), 1.0, preclim);
   EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 0, 0).imag(), 0.0, preclim);
@@ -548,17 +556,19 @@ TEST_F(ASolverUTest, checkAMulti)
     mol_.push_back( molNew );
   }
   
-  const int vals           = nvals;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40);
   
   int ct = 0;
@@ -586,17 +596,19 @@ TEST_F(ASolverUTest, checkAMulti)
 
 TEST_F(ASolverUTest, checkA)
 {
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-20);
 
   int ct = 0;
@@ -632,16 +644,18 @@ TEST_F(ASolverUTest, checkASingMult)
   }
   
   const int vals           = 5;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40);
   
   int ct = 0;
@@ -681,16 +695,18 @@ TEST_F(ASolverUTest, checkASingMultFlip)
   }
   
   const int vals           = 5;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40);
   
   int ct = 0;
@@ -721,17 +737,19 @@ TEST_F(ASolverUTest, checkASingMultFlip)
 
 TEST_F(ASolverUTest, checkASing)
 {
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-30);
   
   int ct = 0;
@@ -765,17 +783,19 @@ TEST_F(ASolverUTest, checkgradT_A)
     mol_.push_back( molNew );
   }
   
-  const int vals           = nvals;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
   
   VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
@@ -889,17 +909,19 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
     Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
     mol_sing_.push_back( molNew );
   }
-  const int vals           = 5;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
   
   VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
@@ -1013,17 +1035,19 @@ TEST_F(ASolverUTest, checkgradA)
     mol_.push_back( molNew );
   }
   
-  const int vals           = 5;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = 5;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-25); ASolvTest.solve_gradA(1E-50);
   
   int ct = 0;
@@ -1129,16 +1153,18 @@ TEST_F(ASolverUTest, checkgradASing)
     mol_sing_.push_back( molNew );
   }
   const int vals           = 5;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
 
   int ct = 0;
@@ -1280,30 +1306,32 @@ TEST_F(ASolverUTest, checkL)
     Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
     mol_.push_back( molNew );
   }
-  const int vals           = nvals;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40);
-  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
+  shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
   {
     for ( int m = 0; m <= n; m++ )
     {
-      EXPECT_NEAR( myL[0](n,m+vals).real()/L0[ct],      1.0, preclim);
+      EXPECT_NEAR( myL->operator[](0)(n,m+vals).real()/L0[ct], 1.0, preclim);
       if (L0_im[ct] != 0)
-        EXPECT_NEAR( myL[0](n,m+vals).imag()/L0_im[ct], 1.0, preclim);
-      EXPECT_NEAR( myL[1](n,m+vals).real()/L1[ct],      1.0, preclim);
+        EXPECT_NEAR(myL->operator[](0)(n,m+vals).imag()/L0_im[ct],1.0,preclim);
+      EXPECT_NEAR( myL->operator[](1)(n,m+vals).real()/L1[ct], 1.0, preclim);
       if (L1_im[ct] != 0)
-        EXPECT_NEAR( myL[1](n,m+vals).imag()/L1_im[ct], 1.0, preclim);
+        EXPECT_NEAR(myL->operator[](1)(n,m+vals).imag()/L1_im[ct],1.0,preclim);
       ct++;
     }
   }
@@ -1324,37 +1352,40 @@ TEST_F(ASolverUTest, checkLSing)
     Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
     mol_sing_.push_back( molNew );
   }
-  const int vals           = 5;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  const int vals = nvals;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40);
-  VecOfMats<cmplx>::type myL = ASolvTest.calc_L();
+  shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
   {
     for ( int m = 0; m <= n; m++ )
     {
-      if (L0Sing[ct] != 0) EXPECT_NEAR( myL[0](n,m+vals).real()/L0Sing[ct], 1,
-                                      preclim);
+      if (L0Sing[ct] != 0) EXPECT_NEAR( myL->operator[](0)(n,m+vals).real()/
+                                       L0Sing[ct], 1,preclim);
       if (L0SingIm[ct] != 0)
-        EXPECT_NEAR( myL[0](n,m+vals).imag()/L0SingIm[ct], 1, preclim);
-      if (L1Sing[ct] != 0) EXPECT_NEAR( myL[1](n,m+vals).real()/L1Sing[ct], 1,
-                                       preclim);
+        EXPECT_NEAR(myL->operator[](0)(n,m+vals).imag()/L0SingIm[ct],1,preclim);
+      if (L1Sing[ct] != 0)
+        EXPECT_NEAR(myL->operator[](1)(n,m+vals).real()/L1Sing[ct], 1,preclim);
       if (L1SingIm[ct] != 0)
-        EXPECT_NEAR( myL[1](n,m+vals).imag()/L1SingIm[ct], 1, preclim);
-      if (L2Sing[ct] != 0) EXPECT_NEAR( myL[2](n,m+vals).real()/L2Sing[ct], 1,
-                                      preclim);
+        EXPECT_NEAR(myL->operator[](1)(n,m+vals).imag()/L1SingIm[ct],
+                    1, preclim);
+      if (L2Sing[ct] != 0)
+        EXPECT_NEAR(myL->operator[](2)(n,m+vals).real()/L2Sing[ct], 1,preclim);
       if (L2SingIm[ct] != 0)
-        EXPECT_NEAR( myL[2](n,m+vals).imag()/L2SingIm[ct], 1,preclim);
+        EXPECT_NEAR(myL->operator[](2)(n,m+vals).imag()/L2SingIm[ct],1,preclim);
       ct++;
     }
   }
@@ -1378,18 +1409,20 @@ TEST_F(ASolverUTest, checkdL)
   }
   
   const int vals           = 5;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-30);
-  MyVector<VecOfMats<cmplx>::type > mydL = ASolvTest.calc_gradL();
+  shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
 
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -1397,43 +1430,61 @@ TEST_F(ASolverUTest, checkdL)
     for ( int m = 0; m <= n; m++ )
     {
       if (dLdx0[ct] != 0)
-        EXPECT_NEAR( mydL[0][0](n,m+vals).real()/dLdx0[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[0](n,m+vals).real()/dLdx0[ct],
+                    1, preclim);
       if (dLdx0im[ct] != 0)
-        EXPECT_NEAR( mydL[0][0](n,m+vals).imag()/dLdx0im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[0](n,m+vals).imag()/dLdx0im[ct],
+                    1, preclim);
       if (dLdy0[ct] != 0)
-        EXPECT_NEAR( mydL[0][1](n,m+vals).real()/dLdy0[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[1](n,m+vals).real()/dLdy0[ct],
+                    1, preclim);
       if (dLdy0im[ct] != 0)
-        EXPECT_NEAR( mydL[0][1](n,m+vals).imag()/dLdy0im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[1](n,m+vals).imag()/dLdy0im[ct],
+                    1, preclim);
       if (dLdz0[ct] != 0)
-        EXPECT_NEAR( mydL[0][2](n,m+vals).real()/dLdz0[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[2](n,m+vals).real()/dLdz0[ct],
+                    1, preclim);
       if (dLdz0im[ct] != 0)
-        EXPECT_NEAR( mydL[0][2](n,m+vals).imag()/dLdz0im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[2](n,m+vals).imag()/dLdz0im[ct],
+                    1, preclim);
       
       if (dLdx1[ct] != 0)
-        EXPECT_NEAR( mydL[1][0](n,m+vals).real()/dLdx1[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[0](n,m+vals).real()/dLdx1[ct],
+                    1, preclim);
       if (dLdx1im[ct] != 0)
-        EXPECT_NEAR( mydL[1][0](n,m+vals).imag()/dLdx1im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[0](n,m+vals).imag()/dLdx1im[ct],
+                    1, preclim);
       if (dLdy1[ct] != 0)
-        EXPECT_NEAR( mydL[1][1](n,m+vals).real()/dLdy1[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[1](n,m+vals).real()/dLdy1[ct],
+                    1, preclim);
       if (dLdy1im[ct] != 0)
-        EXPECT_NEAR( mydL[1][1](n,m+vals).imag()/dLdy1im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[1](n,m+vals).imag()/dLdy1im[ct],
+                    1, preclim);
       if (dLdz1[ct] != 0)
-        EXPECT_NEAR( mydL[1][2](n,m+vals).real()/dLdz1[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[2](n,m+vals).real()/dLdz1[ct],
+                    1, preclim);
       if (dLdz1im[ct] != 0)
-        EXPECT_NEAR( mydL[1][2](n,m+vals).imag()/dLdz1im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[2](n,m+vals).imag()/dLdz1im[ct],
+                    1, preclim);
       
       if (dLdx2[ct] != 0)
-        EXPECT_NEAR( mydL[2][0](n,m+vals).real()/dLdx2[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[0](n,m+vals).real()/dLdx2[ct],
+                    1, preclim);
       if (dLdx2im[ct] != 0)
-        EXPECT_NEAR( mydL[2][0](n,m+vals).imag()/dLdx2im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[0](n,m+vals).imag()/dLdx2im[ct],
+                    1, preclim);
       if (dLdy2[ct] != 0)
-        EXPECT_NEAR( mydL[2][1](n,m+vals).real()/dLdy2[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[1](n,m+vals).real()/dLdy2[ct],
+                    1, preclim);
       if (dLdy2im[ct] != 0)
-        EXPECT_NEAR( mydL[2][1](n,m+vals).imag()/dLdy2im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[1](n,m+vals).imag()/dLdy2im[ct],
+                    1, preclim);
       if (dLdz2[ct] != 0)
-        EXPECT_NEAR( mydL[2][2](n,m+vals).real()/dLdz2[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[2](n,m+vals).real()/dLdz2[ct],
+                    1, preclim);
       if (dLdz2im[ct] != 0)
-        EXPECT_NEAR( mydL[2][2](n,m+vals).imag()/dLdz2im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[2](n,m+vals).imag()/dLdz2im[ct],
+                    1, preclim);
       ct++;
     }
   }  
@@ -1447,12 +1498,6 @@ TEST_F(ASolverUTest, checkdLSing)
   
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
-//    int M = 3; vector<double> charges(M); vector<Pt> posCharges(M);
-//    charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
-//    charges[1]    = 2.0; posCharges[1] = cgPosSi[molInd] + Pt(1.0, 0.0, 0.0);
-//    charges[2]    = 2.0; posCharges[2] = cgPosSi[molInd] + Pt(0.0, 1.0, 0.0);
-//
-//    Molecule molSing( M, 2.0, charges, posCharges, cgPosSi[molInd]);
     int M = 3; vector<double> charges(M); vector<double> vdW(M);
     vector<Pt> posCharges(M);
     charges[0]=2.0; vdW[0]=0; posCharges[0]=cgPosSi[molInd];
@@ -1463,18 +1508,20 @@ TEST_F(ASolverUTest, checkdLSing)
     mol_sing_.push_back( molSing );
   }
   const int vals           = 5;
-  int nmol                 = 3;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  ASolver ASolvTest        = ASolver( nmol, vals, bCalcu, SHCalcu, sys);
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    make_shared<System> (sys),
+                    make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-40);
-  MyVector<VecOfMats<cmplx>::type > mydL = ASolvTest.calc_gradL();
+  shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -1482,29 +1529,41 @@ TEST_F(ASolverUTest, checkdLSing)
     for ( int m = 0; m <= n; m++ )
     {
       if (dLdx0Sing[ct] != 0)
-        EXPECT_NEAR( mydL[0][0](n,m+vals).real()/dLdx0Sing[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[0](n,m+vals).real()/dLdx0Sing[ct],
+                    1, preclim);
       if (dLdy0Sing[ct] != 0)
-        EXPECT_NEAR( mydL[0][1](n,m+vals).real()/dLdy0Sing[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[1](n,m+vals).real()/dLdy0Sing[ct],
+                    1, preclim);
       if (dLdz0Sing[ct] != 0)
-        EXPECT_NEAR( mydL[0][2](n,m+vals).real()/dLdz0Sing[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[2](n,m+vals).real()/dLdz0Sing[ct],
+                    1, preclim);
       if (dLdx0imSing[ct] != 0)
-        EXPECT_NEAR( mydL[0][0](n,m+vals).imag()/dLdx0imSing[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[0](n,m+vals).imag()/dLdx0imSing[ct],
+                    1, preclim);
       if (dLdy0imSing[ct] != 0)
-        EXPECT_NEAR( mydL[0][1](n,m+vals).imag()/dLdy0imSing[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[1](n,m+vals).imag()/dLdy0imSing[ct],
+                    1, preclim);
       if (dLdz0imSing[ct] != 0)
-        EXPECT_NEAR( mydL[0][2](n,m+vals).imag()/dLdz0imSing[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[2](n,m+vals).imag()/dLdz0imSing[ct],
+                    1, preclim);
       if (dLdx1Sing[ct] != 0)
-        EXPECT_NEAR( mydL[1][0](n,m+vals).real()/dLdx1Sing[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[0](n,m+vals).real()/dLdx1Sing[ct],
+                    1, preclim);
       if (dLdy1Sing[ct] != 0)
-        EXPECT_NEAR( mydL[1][1](n,m+vals).real()/dLdy1Sing[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[1](n,m+vals).real()/dLdy1Sing[ct],
+                    1, preclim);
       if (dLdz1Sing[ct] != 0)
-        EXPECT_NEAR( mydL[1][2](n,m+vals).real()/dLdz1Sing[ct],   1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[2](n,m+vals).real()/dLdz1Sing[ct],
+                    1, preclim);
       if (dLdx1imSing[ct] != 0)
-        EXPECT_NEAR( mydL[1][0](n,m+vals).imag()/dLdx1imSing[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[0](n,m+vals).imag()/dLdx1imSing[ct],
+                    1, preclim);
       if (dLdy1imSing[ct] != 0)
-        EXPECT_NEAR( mydL[1][1](n,m+vals).imag()/dLdy1imSing[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[1](n,m+vals).imag()/dLdy1imSing[ct],
+                    1, preclim);
       if (dLdz1imSing[ct] != 0)
-        EXPECT_NEAR( mydL[1][2](n,m+vals).imag()/dLdz1imSing[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[2](n,m+vals).imag()/dLdz1imSing[ct],
+                    1, preclim);
       ct++;
     }
   }

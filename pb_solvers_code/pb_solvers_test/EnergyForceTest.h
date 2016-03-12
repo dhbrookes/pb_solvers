@@ -46,23 +46,22 @@ class EnForTest
     
     const int vals           = 10;
     BesselConstants bConsta( 2*vals );
-    BesselCalc bCalcu( 2*vals, bConsta);
+    BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
     SHCalcConstants SHConsta( 2*vals );
-    SHCalc SHCalcu( 2*vals, SHConsta );
-    System sys( const_, mol_ );
-    ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
-                                        sys.get_lambda(), nvals);
+    SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+    System sys( mol_ );
+    ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
+                                        sys.get_lambda(), vals);
     
-    ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
+    ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                      make_shared<SHCalc> (SHCalcu),
+                      make_shared<System> (sys),
+                      make_shared<Constants> (const_), vals);
     ASolvTest.solve_A( 1E-12 );
     ASolvTest.solve_gradA(1E-12);
 
-    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
-                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
-                     const_, 2, nvals);
-    
-    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
-                       ASolvTest.get_gamma(), const_, sys, vals);
+    ForceCalc FoTest( ASolvTest );
+    TorqueCalc TorTest( ASolvTest );
     
   }
 

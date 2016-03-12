@@ -45,17 +45,20 @@ class ElecTest
     
     const int vals = 5;
     BesselConstants bConsta( 2*vals );
-    BesselCalc bCalcu( 2*vals, bConsta);
+    BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
     SHCalcConstants SHConsta( 2*vals );
-    SHCalc SHCalcu( 2*vals, SHConsta );
-    System sys( const_, mol_ );
-    ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+    SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+    System sys( mol_ );
+    ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                         sys.get_lambda(), vals);
     
-    ASolver ASolvTest( 2, vals, bCalcu, SHCalcu, sys);
+    ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                      make_shared<SHCalc> (SHCalcu),
+                      make_shared<System> (sys),
+                      make_shared<Constants> (const_), vals);
     ASolvTest.solve_A( 1E-12 ); ASolvTest.solve_gradA(1E-12);
 
-    Electrostatic EstatTest( ASolvTest.get_A(), sys, SHCalcu, bCalcu, vals, 10);
+    Electrostatic EstatTest( ASolvTest, 10);
     EstatTest.print_dx("/Users/lfelberg/Desktop/test.dx");
   }
 };

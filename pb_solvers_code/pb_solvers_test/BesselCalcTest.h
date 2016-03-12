@@ -53,7 +53,8 @@ public:
 		const int nPol = 10;
 		double precLim = 1.0e-4;
 		BesselConstants BConst = BesselConstants( nPol );
-		BesselCalc bConstTest = BesselCalc( nPol,  BConst );
+		BesselCalc bConstTest = BesselCalc( nPol,
+                                       make_shared<BesselConstants> (BConst) );
 		
 		// for z = 1.0 and z = 10.0, calculated from python pbam_unit_test.py
 		double i1[] = {1.17520119e+00,   1.10363832e+00,   1.07344305e+00,

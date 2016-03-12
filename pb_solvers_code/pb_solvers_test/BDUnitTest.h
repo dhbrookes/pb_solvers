@@ -71,31 +71,35 @@ TEST_F(BDUTest, ForcePos)
     mol_.push_back( molNew );
   }
   const int vals           = 5;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  vector<double> dTr(nmol); vector<double> dRot(nmol);
+  vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
   dTr[0]  = 0.0;  dTr[1]  = 0.01;
   dRot[0] = 0.0; dRot[1] = 0.0;
-  BD BDTest( sys, dTr, dRot, false);
+  BD BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+            dTr, dRot, false);
   
   for (int step=0; step < 10; step ++)
   {
-    ASolver ASolvTest( nmol, vals, bCalcu, SHCalcu, BDTest.get_system());
+    ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                      make_shared<SHCalc> (SHCalcu),
+                      make_shared<System> (sys),
+                      make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
-    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
-                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
-                     const_, nmol, vals);
-    
-    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
-                       ASolvTest.get_gamma(), const_, sys, vals);
+    ForceCalc FoTest( ASolvTest);
+    TorqueCalc TorTest( ASolvTest);
+//    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
+//                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
+//                     const_, nmol, vals);
+//    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
+//                       ASolvTest.get_gamma(), const_, sys, vals);
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
     
@@ -127,31 +131,35 @@ TEST_F(BDUTest, ForcePosZ)
     mol_.push_back( molNew );
   }
   const int vals           = 5;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  vector<double> dTr(nmol); vector<double> dRot(nmol);
+  vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
   dTr[0]  = 0.0;  dTr[1]  = 0.01;
   dRot[0] = 0.0; dRot[1] = 0.0;
-  BD BDTest( sys, dTr, dRot, false);
+  BD BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+            dTr, dRot, false);
   
   for (int step=0; step < 10; step ++)
   {
-    ASolver ASolvTest( nmol, vals, bCalcu, SHCalcu, BDTest.get_system());
+    ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                      make_shared<SHCalc> (SHCalcu),
+                      make_shared<System> (sys),
+                      make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
-    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
-                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
-                     const_, nmol, vals);
-    
-    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
-                       ASolvTest.get_gamma(), const_, sys, vals);
+    ForceCalc FoTest( ASolvTest);
+    TorqueCalc TorTest( ASolvTest);
+//    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
+//                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
+//                     const_, nmol, vals);
+//    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
+//                       ASolvTest.get_gamma(), const_, sys, vals);
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
     
@@ -180,31 +188,38 @@ TEST_F(BDUTest, ForceOpp)
     mol_.push_back( molNew );
   }
   const int vals           = 5;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  vector<double> dTr(nmol); vector<double> dRot(nmol);
+  
+  
+  vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
   dTr[0]  = 0.0;  dTr[1]  = 0.01;
   dRot[0] = 0.0; dRot[1] = 0.0;
-  BD BDTest( sys, dTr, dRot, false);
+  BD BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+            dTr, dRot, false);
   
   for (int step=0; step < 10; step ++)
   {
-    ASolver ASolvTest( nmol, vals, bCalcu, SHCalcu, BDTest.get_system());
+    ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                      make_shared<SHCalc> (SHCalcu),
+                      make_shared<System> (sys),
+                      make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
-    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
-                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
-                     const_, nmol, vals);
+    ForceCalc FoTest( ASolvTest);
+    TorqueCalc TorTest( ASolvTest);
     
-    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
-                       ASolvTest.get_gamma(), const_, sys, vals);
+//    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
+//                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
+//                     const_, nmol, vals);
+//    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
+//                       ASolvTest.get_gamma(), const_, sys, vals);
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
     
@@ -233,31 +248,36 @@ TEST_F(BDUTest, TorquePos)
     mol_.push_back( molNew );
   }
   const int vals           = 5;
-  int nmol                 = 2;
-  BesselConstants bConsta  = BesselConstants( 2*vals );
-  BesselCalc bCalcu        = BesselCalc( 2*vals, bConsta );
-  SHCalcConstants SHConsta = SHCalcConstants( 2*vals );
-  SHCalc SHCalcu           = SHCalc( 2*vals, SHConsta );
-  System sys               = System( const_, mol_ );
-  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  vector<double> dTr(nmol); vector<double> dRot(nmol);
+  vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
   dTr[0]  = 0.01;  dTr[1]  = 0.01;
   dRot[0] = 0.01; dRot[1] = 0.01;
-  BD BDTest( sys, dTr, dRot, false);
+  BD BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+            dTr, dRot, false);
   
   for (int step=0; step < 10; step ++)
   {
-    ASolver ASolvTest( nmol, vals, bCalcu, SHCalcu, BDTest.get_system());
+    ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                      make_shared<SHCalc> (SHCalcu),
+                      make_shared<System> (sys),
+                      make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
-    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
-                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
-                     const_, nmol, vals);
-    
-    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
-                       ASolvTest.get_gamma(), const_, sys, vals);
+    ForceCalc FoTest( ASolvTest);
+    TorqueCalc TorTest( ASolvTest);
+//    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
+//                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
+//                     const_, nmol, vals);
+//    
+//    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
+//                       ASolvTest.get_gamma(), const_, sys, vals);
   
     double f0 = (abs(TorTest.get_taui(0)[0])<1e-15) ? 0:TorTest.get_taui(0)[0];
     double f1 = (abs(TorTest.get_taui(0)[1])<1e-15) ? 0:TorTest.get_taui(0)[1];
@@ -304,7 +324,7 @@ TEST_F(BDUTest, TorquePos)
 //  ReExpCoeffsConstants re_exp_consts (sys.get_consts().get_kappa(),
 //                                      sys.get_lambda(), vals);
 //  
-//  vector<double> dTr(nmol); vector<double> dRot(nmol);
+//  vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
 //  dTr[0]  = 0.0;  dTr[1]  = 0.01;
 //  dRot[0] = 0.0; dRot[1] = 0.01;
 //  BD BDTest( sys, dTr, dRot, false);

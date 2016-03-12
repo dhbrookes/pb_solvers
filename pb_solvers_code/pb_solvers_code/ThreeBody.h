@@ -36,6 +36,7 @@ protected:
   shared_ptr<BesselCalc>      _besselCalc_;
   shared_ptr<System>          _sys_;  // system data (radii, charges, etc.)
   shared_ptr<SHCalc>          _shCalc_;
+  shared_ptr<Constants>       _consts_;
   
 private:
   ThreeBody();

@@ -50,8 +50,9 @@ protected:
   shared_ptr<BesselConstants>  _consts_;  // recursion constants Lotan 2006 eq3
 
 public:
+  BesselCalc() {}
   
-  BesselCalc(int N, BesselConstants consts);
+  BesselCalc(int N, shared_ptr<BesselConstants> _consts);
 
   /*
   Calculate the modified sphereical bessel functions I and K 

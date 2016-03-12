@@ -110,9 +110,9 @@ void Molecule::rotate(Quat qrot)
   }
 }
 
-System::System(Constants consts, const vector<Molecule>& mols, double cutoff,
+System::System(const vector<Molecule>& mols, double cutoff,
                double boxlength)
-:consts_(consts), molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
+:molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
 boxLength_(boxlength)
 {
   check_for_overlap();
@@ -120,8 +120,8 @@ boxLength_(boxlength)
   if (boxLength_/2. < cutoff_)  compute_cutoff();
 }
 
-System::System(Constants consts, Setup setup, double cutoff)
-:consts_(consts), t_(0)
+System::System(Setup setup, double cutoff)
+:t_(0)
 {
   vector<Molecule> mols;
   
@@ -219,7 +219,7 @@ System System::get_subsystem(const vector<int> mol_idx)
   {
     sub_mols[i] = molecules_[mol_idx[i]];
   }
-  System subsys (consts_, sub_mols, cutoff_, boxLength_);
+  System subsys (sub_mols, cutoff_, boxLength_);
   subsys.set_time(t_);
   return subsys;
 }

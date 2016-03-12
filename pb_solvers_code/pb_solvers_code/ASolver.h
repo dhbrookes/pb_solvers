@@ -53,12 +53,16 @@ protected:
   double                  a_avg_;  // the average radius of particles in syst
   VecOfMats<cmplx>::type      E_;
   VecOfMats<cmplx>::type      gamma_, delta_;
+  VecOfMats<cmplx>::type      L_;
+  MyVector<VecOfMats<cmplx>::type > gradL_;
+  
   
   ReExpCoeffsConstants        reExpConsts_;
 
   shared_ptr<BesselCalc>      _besselCalc_;
   shared_ptr<System>          _sys_;  // system data (radii, charges, etc.)
   shared_ptr<SHCalc>          _shCalc_;
+  shared_ptr<Constants>       _consts_;
   
   // re expansion coefficients calculated for every inter molecular vector
   MyMatrix<ReExpCoeffs>  T_;
@@ -160,19 +164,67 @@ public:
   
   ASolver() { }
   
-  ASolver(const int N, const int p, BesselCalc bcalc,
-          SHCalc shCalc, System sys);
+  ASolver(shared_ptr<BesselCalc> _bcalc,
+          shared_ptr<SHCalc> shCalc,
+          shared_ptr<System> _sys,
+          shared_ptr<Constants> _consts,
+          const int p=Constants::MAX_NUM_POLES);
   
-  VecOfMats<cmplx>::type&  get_gamma()     { return gamma_; }
-  VecOfMats<cmplx>::type&  get_delta()     { return delta_; }
-  VecOfMats<cmplx>::type&  get_E()         { return E_; }
-  VecOfMats<cmplx>::type&  get_A()         { return A_; }
-  MyMatrix<ReExpCoeffs>    get_T()         { return T_; }
+//  void reset_all
   
-  MyMatrix<VecOfMats<cmplx>::type > get_gradA() { return gradA_ ; }
+  shared_ptr<VecOfMats<cmplx>::type>  get_gamma()
+  {
+    return make_shared<VecOfMats<cmplx>::type> (gamma_);
+  }
   
-  VecOfMats<cmplx>::type calc_L();
-  MyVector<VecOfMats<cmplx>::type > calc_gradL();
+  shared_ptr<VecOfMats<cmplx>::type>  get_delta()
+  {
+    return make_shared<VecOfMats<cmplx>::type> (delta_);
+  }
+  
+  shared_ptr<VecOfMats<cmplx>::type>  get_E()
+  {
+    return make_shared<VecOfMats<cmplx>::type> (E_);
+  }
+  
+  shared_ptr<VecOfMats<cmplx>::type>  get_A()
+  {
+    return make_shared<VecOfMats<cmplx>::type> (A_);
+  }
+  
+  shared_ptr<MyMatrix<ReExpCoeffs> >   get_T()
+  {
+    return make_shared<MyMatrix<ReExpCoeffs> > (T_);
+  }
+  
+  shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > get_gradA()
+  {
+    return make_shared<MyMatrix<VecOfMats<cmplx>::type > > (gradA_) ;
+  }
+  
+  shared_ptr<MyVector<VecOfMats<cmplx>::type > > get_gradL()
+  {
+    return make_shared<MyVector<VecOfMats<cmplx>::type > > (gradL_) ;
+  }
+  
+  shared_ptr<VecOfMats<cmplx>::type>  get_L()
+  {
+    return make_shared<VecOfMats<cmplx>::type> (L_);
+  }
+  
+  
+  
+  int get_p() { return p_; }
+  int get_N() { return N_; }
+  
+  shared_ptr<BesselCalc> get_bessel() { return _besselCalc_; }
+  shared_ptr<System> get_sys()        { return _sys_; }
+  shared_ptr<SHCalc> get_sh()         { return _shCalc_; }
+  shared_ptr<Constants> get_consts()  { return _consts_; }
+  
+  
+  void calc_L();
+  void calc_gradL();
   
   cmplx get_gamma_ni( int i, int n)        { return gamma_[i]( n, n); }
   cmplx get_delta_ni( int i, int n)        { return delta_[i]( n, n); }

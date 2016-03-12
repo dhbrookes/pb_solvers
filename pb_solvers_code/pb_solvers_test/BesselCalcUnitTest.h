@@ -48,7 +48,10 @@ TEST_F(BesselConstUTest, first10)
 class BesselCalcUTest : public ::testing::Test
 {
 public:
-  BesselCalcUTest() : bConstTest_( nvals ), bCalcTest_( nvals, bConstTest_) {}
+  BesselCalcUTest() : bConstTest_( nvals )
+  {
+    BesselCalc bCalcTest_( nvals, make_shared<BesselConstants> (bConstTest_));
+  }
   
 protected :
   BesselConstants bConstTest_;
