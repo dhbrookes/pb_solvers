@@ -209,7 +209,7 @@ public:
   
   shared_ptr<VecOfMats<cmplx>::type>  get_L()
   {
-    return make_shared<VecOfMats<cmplx>::type> (L_);
+    return make_shared<VecOfMats<cmplx>::type> (A_);
   }
   
   

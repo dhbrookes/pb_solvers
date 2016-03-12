@@ -112,8 +112,8 @@ public:
     {
       for (j = 0; j < ncols; j++)
       {
-        set_val(i, j, default_val);
-//        vals_[i][j] = default_val;
+//        set_val(i, j, default_val);
+        vals_[i][j] = default_val;
       }
     }
     

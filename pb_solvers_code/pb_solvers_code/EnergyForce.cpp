@@ -61,7 +61,7 @@ _gradL_(_gradL)
 ForceCalc::ForceCalc(ASolver asolv)
 :_A_(asolv.get_A()), _gradA_(asolv.get_gradA()), _L_(asolv.get_L()),
 _gradL_(asolv.get_gradL()), _const_(asolv.get_consts()), N_(asolv.get_N()),
-p_(asolv.get_p())
+p_(asolv.get_p()), F_(asolv.get_N())
 {
   calc_force();
 }
@@ -124,7 +124,8 @@ TorqueCalc::TorqueCalc(ASolver asolv)
 _consts_(asolv.get_consts()), _shCalc_(asolv.get_sh()),
 _bCalc_(asolv.get_bessel()),
 _gamma_(asolv.get_gamma()),
-_sys_(asolv.get_sys())
+_sys_(asolv.get_sys()),
+_gradL_(asolv.get_gradL())
 {
   calc_tau();
 }
