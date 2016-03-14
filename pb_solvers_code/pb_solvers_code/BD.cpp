@@ -113,7 +113,8 @@ void BD::indi_rot_update(int i, MyVector<double> tau_i)
   double f0 = (abs(tau_i[0])<1e-15) ? 0:tau_i[0];
   double f1 = (abs(tau_i[1])<1e-15) ? 0:tau_i[1];
   double f2 = (abs(tau_i[2])<1e-15) ? 0:tau_i[2];
-  cout << " Mol " << i << " Dtr " << rotDiffConsts_[i] <<" dt " << dt_ << " & ikt " << ikT_int <<  " Taui " << f0 << "  " << f1 << "  " << f2 << endl;
+  cout << " Mol " << i << " Dtr " << rotDiffConsts_[i] <<" dt " << dt_
+  << " & ikt " << ikT_int << " Taui " << f0 << "  " << f1 << "  " << f2 << endl;
   bool accept = false;
   Pt center = _sys_->get_centeri(i);
   Pt rand, new_pt;
@@ -122,7 +123,8 @@ void BD::indi_rot_update(int i, MyVector<double> tau_i)
     rand = (diff_) ? rand_vec(0,2*rotDiffConsts_[i]*dt_) : Pt(0.0,0.0,0.0);
     dtheta = dtheta + rand;
     Quat qrot (dtheta.norm(), dtheta.x(), dtheta.y(), dtheta.z());
-    cout << " This is my quat " << qrot.get_w() << " a " << qrot.get_a() << " b " << qrot.get_b() << " c " << qrot.get_c() << endl;
+    cout << " This is my quat " << qrot.get_w() << " a " << qrot.get_a()
+    << " b " << qrot.get_b() << " c " << qrot.get_c() << endl;
     
     new_pt = qrot.rotate_point(center);
     if (!check_for_collision(i, new_pt))

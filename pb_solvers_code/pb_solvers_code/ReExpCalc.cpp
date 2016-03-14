@@ -9,8 +9,8 @@
 #include "ReExpCalc.h"
 #include <iostream>
 
-ReExpCoeffsConstants::ReExpCoeffsConstants(double kappa,
-                                           double lambda, int p)
+ReExpCoeffsConstants::ReExpCoeffsConstants(const double &kappa,
+                                           const double &lambda, const int &p)
 : kappa_(kappa), lambda_(lambda), p_(p),
 a_(2*p, 4*p), b_(2*p, 4*p),
 alpha_(2*p, 4*p), beta_(2*p, 4*p),
@@ -43,7 +43,6 @@ void ReExpCoeffsConstants::calc_a_and_b()
     }
   }
 }
-
 
 void ReExpCoeffsConstants::calc_alpha_and_beta()
 {

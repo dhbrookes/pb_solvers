@@ -85,13 +85,14 @@ TEST_F(SHConstUTest, SHConsTest)
 class SHCalcUTest : public ::testing::Test
 {
   protected :
-  SHCalcConstants SHConstTest_;
+  shared_ptr<SHCalcConstants> _SHConstTest_;
   SHCalc SHCalcTest_;
   
 public:
-  SHCalcUTest( ) : SHConstTest_(10)
+  SHCalcUTest( )
   {
-    SHCalc SHCalcTest_(10, make_shared<SHCalcConstants> (SHConstTest_));
+    shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
+    SHCalc SHCalcTest_(10, _SHConstTest_);
   }
 };
 

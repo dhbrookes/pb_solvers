@@ -116,7 +116,6 @@ public:
         vals_[i][j] = default_val;
       }
     }
-    
   }
 
   /*
@@ -360,7 +359,7 @@ public:
  So to get a matrix of matrices containing ints you would write:
  
  MatofMats<int>::type my_mat;
- 
+
  */
 template <typename T>
 struct MatOfMats

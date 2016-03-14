@@ -28,18 +28,15 @@ class ASolver
 {
 protected:
   
-  VecOfMats<cmplx>::type      A_;  // solution
-  VecOfMats<cmplx>::type      prevA_;  // previous value for
-                                       // calculating convergence criteria
+  shared_ptr<VecOfMats<cmplx>::type>      _A_, _prevA_;  // solution
+  
   /*
    Gradient of A. Each (i, j) entry in the outer vector is grad_j(A^(i))
    The inner vectors are all of length three and represent dA/dr, dA/dtheta
    and dA/dphi, respectively. This can only be calculated once A has been
    solved for
    */
-  MyMatrix<VecOfMats<cmplx>::type > gradT_A_;
-  MyMatrix<VecOfMats<cmplx>::type > gradA_;
-  MyMatrix<VecOfMats<cmplx>::type > prevGradA_;
+  shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > _gradT_A_, _gradA_, _prevGradA_;
   
   /*
    enum for telling the ReExpCoeffs which values to retrieve
@@ -51,14 +48,10 @@ protected:
   int                         N_;  // number of molecules
   int                         p_;  // max value for n (2*numVals_ usually)
   double                  a_avg_;  // the average radius of particles in syst
-  VecOfMats<cmplx>::type      E_;
-  VecOfMats<cmplx>::type      gamma_, delta_;
-  VecOfMats<cmplx>::type      L_;
-  MyVector<VecOfMats<cmplx>::type > gradL_;
-  
-  
-  ReExpCoeffsConstants        reExpConsts_;
 
+  shared_ptr<VecOfMats<cmplx>::type>      _gamma_, _delta_, _E_, _L_;
+  shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL_;
+  shared_ptr<ReExpCoeffsConstants>        _reExpConsts_;
   shared_ptr<BesselCalc>      _besselCalc_;
   shared_ptr<System>          _sys_;  // system data (radii, charges, etc.)
   shared_ptr<SHCalc>          _shCalc_;
@@ -81,6 +74,9 @@ protected:
   // calculate on index of inner delta matrix
   cmplx calc_indi_delta(int i, int n);
   cmplx calc_indi_e(int i, int n, int m);
+  
+  void copy_to_prevA(); // copy contents of _A_ to _prevA_
+  void copy_to_prevGradA();
   
   // pre-compute spherical harmonics matrices for every charge in the system
   void pre_compute_all_sh();
@@ -170,49 +166,13 @@ public:
           shared_ptr<Constants> _consts,
           const int p=Constants::MAX_NUM_POLES);
   
-//  void reset_all
-  
-  shared_ptr<VecOfMats<cmplx>::type>  get_gamma()
-  {
-    return make_shared<VecOfMats<cmplx>::type> (gamma_);
-  }
-  
-  shared_ptr<VecOfMats<cmplx>::type>  get_delta()
-  {
-    return make_shared<VecOfMats<cmplx>::type> (delta_);
-  }
-  
-  shared_ptr<VecOfMats<cmplx>::type>  get_E()
-  {
-    return make_shared<VecOfMats<cmplx>::type> (E_);
-  }
-  
-  shared_ptr<VecOfMats<cmplx>::type>  get_A()
-  {
-    return make_shared<VecOfMats<cmplx>::type> (A_);
-  }
-  
-  shared_ptr<MyMatrix<ReExpCoeffs> >   get_T()
-  {
-    return make_shared<MyMatrix<ReExpCoeffs> > (T_);
-  }
-  
-  shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > get_gradA()
-  {
-    return make_shared<MyMatrix<VecOfMats<cmplx>::type > > (gradA_) ;
-  }
-  
-  shared_ptr<MyVector<VecOfMats<cmplx>::type > > get_gradL()
-  {
-    return make_shared<MyVector<VecOfMats<cmplx>::type > > (gradL_) ;
-  }
-  
-  shared_ptr<VecOfMats<cmplx>::type>  get_L()
-  {
-    return make_shared<VecOfMats<cmplx>::type> (A_);
-  }
-  
-  
+  shared_ptr<VecOfMats<cmplx>::type>  get_gamma() { return _gamma_; }
+  shared_ptr<VecOfMats<cmplx>::type>  get_delta() { return _delta_; }
+  shared_ptr<VecOfMats<cmplx>::type>  get_E()     { return _E_; }
+  shared_ptr<VecOfMats<cmplx>::type>  get_A()     { return _A_; }
+  shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > get_gradA() {return _gradA_ ; }
+  shared_ptr<MyVector<VecOfMats<cmplx>::type > > get_gradL() {return _gradL_ ; }
+  shared_ptr<VecOfMats<cmplx>::type>  get_L() {return  _L_; }
   
   int get_p() { return p_; }
   int get_N() { return N_; }
@@ -222,56 +182,54 @@ public:
   shared_ptr<SHCalc> get_sh()         { return _shCalc_; }
   shared_ptr<Constants> get_consts()  { return _consts_; }
   
-  
   void calc_L();
   void calc_gradL();
   
-  cmplx get_gamma_ni( int i, int n)        { return gamma_[i]( n, n); }
-  cmplx get_delta_ni( int i, int n)        { return delta_[i]( n, n); }
+  cmplx get_gamma_ni( int i, int n)        { return _gamma_->operator[](i)( n, n); }
+  cmplx get_delta_ni( int i, int n)        { return _delta_->operator[](i)( n, n); }
+  cmplx get_SH_ij(int i, int j, int n, int m) { return all_sh[i][j]( n, abs(m)); }
+  cmplx get_E_ni(int i, int n, int m)      { return _E_->operator[](i)( n, m+p_ ); }
+  cmplx get_A_ni(int i, int n, int m)      { return _A_->operator[](i)( n, m+p_ ); }
+  cmplx get_prevA_ni(int i, int n, int m)  { return _prevA_->operator[](i)( n, m+p_ ); }
   
-  cmplx get_SH_ij(int i, int j, int n, int m)
-                                           { return all_sh[i][j]( n, abs(m)); }
-  cmplx get_E_ni(int i, int n, int m)      { return E_[ i ]( n, m+p_ ); }
-  cmplx get_A_ni(int i, int n, int m)      { return A_[ i ]( n, m+p_ ); }
-  cmplx get_prevA_ni(int i, int n, int m)  { return prevA_[ i ]( n, m+p_ ); }
-  
-  VecOfMats<cmplx>::type get_gradT_Aij( int i, int j) {return gradT_A_(i,j);}
+  VecOfMats<cmplx>::type get_gradT_Aij( int i, int j) {return _gradT_A_->operator()(i,j);}
   
   // convert derivs in matrix to cartesian
   VecOfMats<cmplx>::type conv_to_cart(VecOfMats<cmplx>::type dZ, int i, int j);
   
   // get elements of grad_j(A^(i))
   cmplx get_dAdr_ni(int i, int j, int n, int m)
-  { return gradA_(i, j)[0](n, m+p_);}
+  { return _gradA_->operator()(i, j)[0](n, m+p_);}
   cmplx get_dAdtheta_ni(int i, int j, int n, int m)
-  { return gradA_(i, j)[1](n, m+p_);}
+  { return _gradA_->operator()(i, j)[1](n, m+p_);}
   cmplx get_dAdphi_ni(int i, int j, int n, int m)
-  { return gradA_(i, j)[2](n, m+p_);}
+  { return _gradA_->operator()(i, j)[2](n, m+p_);}
   
   cmplx get_prev_dAdr_ni(int i, int j, int n, int m)
-  { return prevGradA_(i, j)[0](n, m+p_);}
+  { return _prevGradA_->operator()(i, j)[0](n, m+p_);}
   cmplx get_prev_dAdtheta_ni(int i, int j, int n, int m)
-  { return prevGradA_(i, j)[1](n, m+p_);}
+  { return _prevGradA_->operator()(i, j)[1](n, m+p_);}
   cmplx get_prev_dAdphi_ni(int i, int j, int n, int m)
-  { return prevGradA_(i, j)[2](n, m+p_);}
+  { return _prevGradA_->operator()(i, j)[2](n, m+p_);}
   
   // get elements of grad_j(A^(i))
   cmplx get_dAdx_ni(int i, int j, int n, int m)
-  { return gradA_(i, j)[0](n, m+p_);}
+  { return _gradA_->operator()(i, j)[0](n, m+p_);}
   cmplx get_dAdy_ni(int i, int j, int n, int m)
-  { return gradA_(i, j)[1](n, m+p_);}
+  { return _gradA_->operator()(i, j)[1](n, m+p_);}
   cmplx get_dAdz_ni(int i, int j, int n, int m)
-  { return gradA_(i, j)[2](n, m+p_);}
+  { return _gradA_->operator()(i, j)[2](n, m+p_);}
   
   cmplx get_prev_dAdx_ni(int i, int j, int n, int m)
-  { return prevGradA_(i, j)[0](n, m+p_);}
+  { return _prevGradA_->operator()(i, j)[0](n, m+p_);}
   cmplx get_prev_dAdy_ni(int i, int j, int n, int m)
-  { return prevGradA_(i, j)[1](n, m+p_);}
+  { return _prevGradA_->operator()(i, j)[1](n, m+p_);}
   cmplx get_prev_dAdz_ni(int i, int j, int n, int m)
-  { return prevGradA_(i, j)[2](n, m+p_);}
+  { return _prevGradA_->operator()(i, j)[2](n, m+p_);}
   
   void set_A_ni(int i, int n, int m, cmplx val)
-  { (&A_[i])->set_val( n, m+p_, val);}
+  {
+    _A_->operator[](i).set_val( n, m+p_, val);}
 
   void print_Ei( int i, int p);
   void print_Ai( int i, int p);

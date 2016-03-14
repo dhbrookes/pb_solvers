@@ -57,6 +57,9 @@ public:
 protected :
   shared_ptr<BesselConstants> _bConstTest_;
   BesselCalc bCalcTest_;
+  
+  virtual void SetUp() { }
+  virtual void TearDown() { }
  
   // for z = 1.0 and z = 10.0, calculated from python pbam_unit_test.py
   double i1[10] = {1.17520119e+00,   1.10363832e+00,   1.07344305e+00,

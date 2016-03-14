@@ -91,7 +91,7 @@ public:
   
   ReExpCoeffsConstants() { }
 
-  ReExpCoeffsConstants(double kappa, double lambda, int p);
+  ReExpCoeffsConstants(double const& kappa, double const& lambda, int const &p);
   
   double get_a_val(int n, int m)  { return a_(n, m + 2*p_); }
   double get_b_val(int n, int m)  { return b_(n, m + 2*p_); }

@@ -22,18 +22,17 @@ _consts_(_consts)
   npts_.resize(3);
   step_.resize(3);
   
-//  A_ = A;
-//  _sys_ = make_shared<System>(sys);
-//  _shCalc_ = make_shared<SHCalc> (shCalc);
-//  _bCalc_  = make_shared<BesselCalc> (bCalc);
-//  
   for (int i = 0; i < 3; i++)
     npts_[i] = npts;
   
   find_range();
   find_bins();
   
-  cout << " This is my range " << range_min_[0] <<  ", " <<range_min_[1] <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", " <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", " <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1] <<  ", "<<npts_[2] << endl;
+  cout << " This is my range " << range_min_[0] <<  ", " <<range_min_[1]
+  <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", "
+  <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", "
+  <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1]
+  <<  ", "<<npts_[2] << endl;
   
   compute_pot();
 }
@@ -54,7 +53,11 @@ _consts_(asolv.get_consts())
   find_range();
   find_bins();
   
-  cout << " This is my range " << range_min_[0] <<  ", " <<range_min_[1] <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", " <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", " <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1] <<  ", "<<npts_[2] << endl;
+  cout << " This is my range " << range_min_[0] <<  ", " <<range_min_[1]
+  <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", "
+  <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", "
+  <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1]
+  <<  ", "<<npts_[2] << endl;
   
   compute_pot();
 }

@@ -16,24 +16,27 @@ ASolver::ASolver(shared_ptr<BesselCalc> _bcalc,
 :p_(p),
 N_(_sys->get_n()),
 a_avg_(_sys->get_lambda()),
-gamma_(_sys->get_n(), MyMatrix<cmplx> (p, p)),
-delta_(_sys->get_n(), MyMatrix<cmplx> (p, p)),
-E_(_sys->get_n(), MyMatrix<cmplx>(p, 2*p + 1)),
-A_(_sys->get_n(), MyMatrix<cmplx>(p, 2*p + 1)),
 T_ (_sys->get_n(), _sys->get_n()),
-L_(_sys->get_n(), MyMatrix<cmplx>(p, 2*p + 1)),
-gradL_(N_),
-gradA_(_sys->get_n(), _sys->get_n()),
-prevA_(_sys->get_n(), MyMatrix<cmplx>(p, 2*p + 1)),
-prevGradA_(_sys->get_n(), _sys->get_n()),
-gradT_A_(_sys->get_n(), _sys->get_n()),
-reExpConsts_(_consts->get_kappa(), _sys->get_lambda(), p),
 solvedA_(false),
 _sys_(_sys),
 _besselCalc_(_bcalc),
 _shCalc_(_shCalc),
 _consts_(_consts)
 {
+ 
+
+  _reExpConsts_ = make_shared<ReExpCoeffsConstants>(_consts_->get_kappa(),
+                                                    _sys_->get_lambda(), p_);
+  _gamma_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p, p));
+  _delta_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p, p));
+  _E_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p, 2*p+1));
+  _L_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p, 2*p+1));
+  _A_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p, 2*p+1));
+  _prevA_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p, 2*p+1));
+  _gradT_A_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
+  _gradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
+  _prevGradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
+  _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type > >(N_);
 
   // precompute all SH:
   pre_compute_all_sh();
@@ -100,13 +103,33 @@ void ASolver::solve_gradA(double prec)
   calc_gradL();
 }
 
+
+void ASolver::copy_to_prevA()
+{
+  for (int i=0; i < _A_->get_nrows(); i++)
+  {
+    _prevA_->set_val(i, _A_->operator[](i));
+  }
+}
+
+void ASolver::copy_to_prevGradA()
+{
+  for (int i=0; i < _A_->get_nrows(); i++)
+  {
+    for (int j = 0; j < _gradA_->get_ncols(); j++)
+    {
+      _prevGradA_->set_val(i, j, _gradA_->operator()(i, j));
+    }
+  }
+}
+
 // one iteration of numerical solution for A (eq 51 in Lotan 2006)
 void ASolver::iter()
 {
   int i, j;
   MyMatrix<cmplx> Z, zj, ai;
   Pt v;
-  prevA_ = A_;
+  copy_to_prevA();
   bool prev = true;  // want to re-expand previous
   for (i = 0; i <  N_; i++)
   {
@@ -123,10 +146,10 @@ void ASolver::iter()
       Z += zj;
     }
     
-    ai = delta_[i] * Z;
-    ai += E_[i];
-    ai = gamma_[i] * ai;
-    A_.set_val(i, ai);
+    ai = _delta_->operator[](i) * Z;
+    ai += _E_->operator[](i);
+    ai = _gamma_->operator[](i) * ai;
+    _A_->set_val(i, ai);
   }
 }
 
@@ -143,7 +166,7 @@ void ASolver::grad_iter(int j)
   bool prev = true; //want to re-expand previous
   for (i = 0; i < N_; i++) // molecule of interest
   {
-    prevGradA_ = gradA_;
+    copy_to_prevGradA();
     aij = VecOfMats<cmplx>::type (3, MyMatrix<cmplx>(p_,2*p_+1));
 //    for (dim = 0; dim < 3; dim++)
 //      aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
@@ -159,11 +182,11 @@ void ASolver::grad_iter(int j)
 
     }
     
-    gamma_delta = gamma_[i] * delta_[i];
+    gamma_delta = _gamma_->operator[](i) * _delta_->operator[](i);
     aij.set_val(0, gamma_delta * aij[0]);
     aij.set_val(1, gamma_delta * aij[1]);
     aij.set_val(2, gamma_delta * aij[2]);
-    gradA_.set_val(i, j, aij);
+    _gradA_->set_val(i, j, aij);
     
   }
 }
@@ -274,7 +297,7 @@ void ASolver::pre_compute_gradT_A()
           gjT_Ai[dim] = cmplx(-1.0, 0.0)*gjT_Ai[dim];
       }
 
-      gradT_A_.set_val(i, j, gjT_Ai);
+      _gradT_A_->set_val(i, j, gjT_Ai);
     }
   }
 }
@@ -536,7 +559,7 @@ MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i,int j,double theta,bool ham)
   int lowI, hiJ;
   lowI = i; hiJ = j;
   if ( i > j )  { lowI = j; hiJ  = i; }
-  return expand_dRdtheta_sing(lowI, hiJ, theta, prevA_[j], ham);
+  return expand_dRdtheta_sing(lowI, hiJ, theta, _prevA_->operator[](j), ham);
 }
 
 MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i, int j, double theta,
@@ -591,7 +614,7 @@ MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i,int j, double theta, bool ham)
   int lowI, hiJ;
   lowI = i; hiJ = j;
   if ( i > j )  { lowI = j; hiJ  = i; }
-  return expand_dRdphi_sing(lowI, hiJ, theta, prevA_[j], ham);
+  return expand_dRdphi_sing(lowI, hiJ, theta, _prevA_->operator[](j), ham);
 }
 
 MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i, int j, double theta,
@@ -782,16 +805,13 @@ cmplx ASolver::calc_indi_e(int i, int n, int m)
  */
 void ASolver::compute_gamma()
 {
-//  MyMatrix<cmplx> gi;
   int i, j;
   for (i = 0; i < N_; i++)
   {
-//    gi = MyMatrix<cmplx> (p_, p_);
     for(j = 0; j < p_; j++)
     {
-      gamma_[i].set_val(j, j, calc_indi_gamma(i, j));
+      _gamma_->operator[](i).set_val(j, j, calc_indi_gamma(i, j));
     }
-//    gamma_.set_val(i, gi);
   }
 }
 
@@ -802,17 +822,14 @@ void ASolver::compute_gamma()
  */
 void ASolver::compute_delta()
 {
-//  MyMatrix<cmplx> di;
   int i, j;
   
   for (i = 0; i < N_; i++)
   {
-//    di = MyMatrix<cmplx> (p_, p_);
     for(j = 0; j < p_; j++)
     {
-      delta_[i].set_val(j, j, calc_indi_delta(i, j));
+      _delta_->operator[](i).set_val(j, j, calc_indi_delta(i, j));
     }
-//    delta_.set_val(i, di);
   }
 }
 
@@ -824,19 +841,16 @@ void ASolver::compute_delta()
 void ASolver::compute_E()
 {
   int i, n, m;
-//  MyMatrix<cmplx> ei;
   for (i = 0; i < N_; i++)
   {
     // m goes from -n to n so you need 2*p columns:
-//    ei = MyMatrix<cmplx>(p_, 2*p_ + 1);
     for (n = 0; n < p_; n++)
     {
       for (m = -n; m <= n; m++)
       {
-        E_[i].set_val(n, m + p_, calc_indi_e(i, n, m));
+        _E_->operator[](i).set_val(n, m + p_, calc_indi_e(i, n, m));
       }
     }
-//    E_.set_val(i, ei);
   }
 }
 
@@ -862,7 +876,7 @@ void ASolver::compute_T()
       _shCalc_->calc_sh(v.theta(), v.phi());
       vector<double> besselK = _besselCalc_->calc_mbfK(2*p_, kappa * v.r());
       T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
-                    besselK, make_shared<ReExpCoeffsConstants>(reExpConsts_),
+                    besselK, _reExpConsts_,
                     kappa, _sys_->get_lambda(), true));
     }
   }
@@ -877,8 +891,8 @@ void ASolver::init_A()
   {
     // m goes from -n to n so you need 2*p columns:
     ai = MyMatrix<cmplx>(p_, 2*p_ + 1);
-    ai = gamma_[i] * E_[i];
-    A_.set_val(i, ai);
+    ai = _gamma_->operator[](i) * _E_->operator[](i);
+    _A_->set_val(i, ai);
   }
 }
 
@@ -898,7 +912,7 @@ void ASolver::init_gradA()
         wrt = MyMatrix<cmplx>(p_, 2*p_ + 1);
         ga_ij.set_val(k, wrt);
       }
-      gradA_.set_val(i, j, ga_ij);
+      _gradA_->set_val(i, j, ga_ij);
     }
   }
 }
@@ -909,28 +923,22 @@ void ASolver::init_gradA()
  */
 void ASolver::calc_L()
 {
-//  VecOfMats<cmplx>::type L (N_);
-  
   int i, j;
   MyMatrix<cmplx> inner, expand;
   for (i = 0; i < N_; i++)
   {
-//    inner = MyMatrix<cmplx> (p_, 2*p_ + 1);
     for (j = 0; j < N_; j++)
     {
       if (j == i) continue;
       expand = re_expandA(i, j);
-//      inner += expand;
-      L_[i] += expand;
+      _L_->operator[](i) += expand;
     }
-//    L.set_val(i, inner);
   }
 }
 
 void ASolver::calc_gradL()
 {
   int i, k;
-//  MyVector<VecOfMats<cmplx>::type > gradl (N_);
   VecOfMats<cmplx>::type inner1, inner2;
   
   for (i = 0; i < N_; i++) // molecule of interest
@@ -943,7 +951,7 @@ void ASolver::calc_gradL()
       inner2 = re_expand_gradA(i, k, i, false); // T^(i,k) * grad_j A^(k)
       inner1 += inner2;
     }
-    gradL_.set_val(i, inner1);
+    _gradL_->set_val(i, inner1);
   }
 }
 

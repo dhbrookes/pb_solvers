@@ -37,8 +37,6 @@ public:
   
 };
 
-
-
 /*
  Calculator class for modified bessel functions (spherical and standard)
  */

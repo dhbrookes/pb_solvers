@@ -742,7 +742,7 @@ TEST_F(ASolverUTest, checkASing)
   BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
   SHCalcConstants SHConsta( 2*vals );
   SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
+  System sys( mol_sing_ );
   ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   

@@ -25,7 +25,6 @@ const double Constants::FORCE_CUTOFF = 1e2;
 
 const int Constants::MAX_NUM_POLES = 30;
 
-
 /*
  Constructor sets default values of independent constants
  */
@@ -36,7 +35,6 @@ patchAngle_(6.0), rotateAngle_(20.0)
 {
 	update_all();
 }
-
 
 /*
  Constructor given a Setup object:
