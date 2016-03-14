@@ -48,13 +48,14 @@ TEST_F(BesselConstUTest, first10)
 class BesselCalcUTest : public ::testing::Test
 {
 public:
-  BesselCalcUTest() : bConstTest_( nvals )
+  BesselCalcUTest()
   {
-    BesselCalc bCalcTest_( nvals, make_shared<BesselConstants> (bConstTest_));
+    _bConstTest_ = make_shared<BesselConstants> (nvals);
+    BesselCalc bCalcTest_( nvals, _bConstTest_);
   }
   
 protected :
-  BesselConstants bConstTest_;
+  shared_ptr<BesselConstants> _bConstTest_;
   BesselCalc bCalcTest_;
  
   // for z = 1.0 and z = 10.0, calculated from python pbam_unit_test.py

@@ -26,6 +26,7 @@ BesselConstants::BesselConstants(const int N)
 BesselCalc::BesselCalc(int N, shared_ptr<BesselConstants> _consts)
 : numVals_(N), _consts_(_consts)
 {
+//  _consts_ = make_shared<BesselConstants> (consts);
   assert (_consts_->get_n() == numVals_);
 }
 
