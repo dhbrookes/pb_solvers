@@ -175,6 +175,10 @@ public:
      vector<double> rot_diff_consts,
      bool diff = true, bool force = true);
   
+  // Constructor where diffusion constants are read from system:
+  BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+         bool diff = true, bool force = true);
+  
   // update the system with Brownian dynamics given forces and torques on every
   // molecule
   void bd_update(shared_ptr<VecOfVecs<double>::type> _F,
@@ -183,6 +187,32 @@ public:
   shared_ptr<System> get_system() { return _sys_; }
   
 };
+
+
+/*
+ Class for running a full BD simulation
+ */
+class BDRun
+{
+protected:
+  shared_ptr<BDStep> _stepper_;
+  shared_ptr<ASolver> _asolver_;
+  shared_ptr<ForceCalc> _fCalc_;
+  shared_ptr<TorqueCalc> _torCalc_;
+  shared_ptr<BaseTerminate> _terminator_;
+  int maxIter_;
+  double prec_;
+  
+public:
+  BDRun(shared_ptr<ASolver> _asolv, shared_ptr<BaseTerminate> _terminator,
+        shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+        bool diff = true, bool force = true, int maxiter=1000,
+        double prec=0.0001);
+  
+  void run();
+};
+
+
 
 
 #endif /* BD_h */

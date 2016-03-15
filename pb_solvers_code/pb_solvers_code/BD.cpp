@@ -21,6 +21,22 @@ diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
   randGen_ = mt19937(rd());
 }
 
+BDStep::BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+               bool diff, bool force)
+:transDiffConsts_(_sys->get_n()), rotDiffConsts_(_sys->get_n()),
+diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
+{
+  for (int i = 0; i < _sys_->get_n(); i++)
+  {
+    transDiffConsts_[i] = _sys_->get_dtransi(i);
+    rotDiffConsts_[i] = _sys_->get_droti(i);
+  }
+  
+  random_device rd;
+  randGen_ = mt19937(rd());
+}
+
+
 double BDStep::compute_dt( double dist )
 {
   double DISTCUTOFF_TIME = 20.0;
@@ -151,4 +167,43 @@ void BDStep::bd_update(shared_ptr<VecOfVecs<double>::type> _F,
     if ( rotDiffConsts_[i] != 0) indi_rot_update(i, _tau->operator[](i));
   }
   update_sys_time(dt_);
+}
+
+
+BDRun::BDRun(shared_ptr<ASolver> _asolv,
+             shared_ptr<BaseTerminate> _terminator, shared_ptr<System> _sys,
+             shared_ptr<Constants> _consts,
+             bool diff, bool force, int maxiter, double prec)
+:maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
+{
+  _fCalc_ = make_shared<ForceCalc>(_asolv);
+  _torCalc_ = make_shared<TorqueCalc>(_asolv);
+  _stepper_ = make_shared<BDStep> (_sys, _consts, diff, force);
+  
+}
+
+
+void BDRun::run()
+{
+  
+  int i = 0;
+  bool term = false;
+  while (i < maxIter_ and !term)
+  {
+    _asolver_->reset_all(_stepper_->get_system());
+    _asolver_->solve_A(prec_);
+    _asolver_->solve_gradA(prec_);
+    
+    _fCalc_->calc_force();
+    _torCalc_->calc_tau();
+    
+    _stepper_->bd_update(_fCalc_->get_F(), _torCalc_->get_Tau());
+    if (_terminator_->is_terminated(_stepper_->get_system()))
+    {
+      term = true;
+    }
+    i++;
+  }
+  
+  
 }

@@ -22,7 +22,7 @@ EnergyCalc::EnergyCalc(shared_ptr<ASolver> _asolv)
 N_(_asolv->get_N()), p_(_asolv->get_p())
 {
   _omega_ = make_shared<MyVector<double> > (N_);
-  calc_energy();
+//  calc_energy();
 }
 
 void EnergyCalc::calc_energy()
@@ -67,7 +67,7 @@ _gradL_(_asolv->get_gradL()), _const_(_asolv->get_consts()),
 N_(_asolv->get_N()), p_(_asolv->get_p())
 {
   _F_ = make_shared<VecOfVecs<double>::type > (N_, MyVector<double> (3));
-  calc_force();
+//  calc_force();
 }
 
 
@@ -133,7 +133,7 @@ _sys_(_asolv->get_sys()),
 _gradL_(_asolv->get_gradL())
 {
   _tau_ = make_shared<VecOfVecs<double>::type > (N_, MyVector<double> (3));
-  calc_tau();
+//  calc_tau();
 }
 
 

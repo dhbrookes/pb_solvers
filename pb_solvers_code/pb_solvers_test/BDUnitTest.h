@@ -95,6 +95,8 @@ TEST_F(BDUTest, ForcePos)
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
+    FoTest.calc_force();
+    TorTest.calc_tau();
 //    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
 //                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
 //                     const_, nmol, vals);
@@ -155,6 +157,8 @@ TEST_F(BDUTest, ForcePosZ)
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
+    FoTest.calc_force();
+    TorTest.calc_tau();
 //    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
 //                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
 //                     const_, nmol, vals);
@@ -215,6 +219,9 @@ TEST_F(BDUTest, ForceOpp)
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
     
+    FoTest.calc_force();
+    TorTest.calc_tau();
+    
 //    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
 //                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
 //                     const_, nmol, vals);
@@ -272,6 +279,8 @@ TEST_F(BDUTest, TorquePos)
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
+    FoTest.calc_force();
+    TorTest.calc_tau();
 //    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
 //                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
 //                     const_, nmol, vals);
