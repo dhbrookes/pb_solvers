@@ -13,18 +13,18 @@
 double preclim = 1e-7;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
 
-//#include "ASolverUnitTest.h"
-//#include "BDUnitTest.h"
+#include "ASolverUnitTest.h"
+#include "BDUnitTest.h"
 #include "BesselCalcUnitTest.h"
-//#include "ConstantsUnitTest.h"
-//#include "EnergyForceUnitTest.h"
-//#include "MyMatrixUnitTest.h"
+#include "ConstantsUnitTest.h"
+#include "EnergyForceUnitTest.h"
+#include "MyMatrixUnitTest.h"
 //#include "readutilUnitTest.h"
-//#include "ReExpCalcUnitTest.h"
+#include "ReExpCalcUnitTest.h"
 //#include "setupUnitTest.h"
 #include "SHCalcUnitTest.h"
-//#include "SystemUnitTest.h"
-//#include "utilUnitTest.h"
+#include "SystemUnitTest.h"
+#include "utilUnitTest.h"
 
 #include "tester.h"
 

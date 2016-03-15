@@ -18,7 +18,7 @@ EnergyCalc::EnergyCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
 
 EnergyCalc::EnergyCalc(ASolver asolv)
 :_A_(asolv.get_A()), _L_(asolv.get_L()), _const_(asolv.get_consts()),
-N_(asolv.get_N()), p_(asolv.get_p())
+N_(asolv.get_N()), p_(asolv.get_p()), omega_(asolv.get_N())
 {
   calc_energy();
 }

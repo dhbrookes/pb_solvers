@@ -91,13 +91,13 @@ class SHCalcUTest : public ::testing::Test
 public:
   SHCalcUTest( )
   {
-    shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
-    SHCalc SHCalcTest_(10, _SHConstTest_);
   }
 };
 
 TEST_F(SHCalcUTest, legendre_0)
 {
+  shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
+  SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( 0.0, 0.0 );
   
   EXPECT_NEAR( SHCalcTest_.get_legendre_result(        0, 0), 1.0, preclim);
@@ -108,6 +108,8 @@ TEST_F(SHCalcUTest, legendre_0)
 
 TEST_F(SHCalcUTest, legendre_pi3)
 {
+  shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
+  SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( M_PI/3.0, 0.0 );
   double largeLeg = -9.44242865e+06;
   
@@ -120,6 +122,8 @@ TEST_F(SHCalcUTest, legendre_pi3)
 
 TEST_F(SHCalcUTest, legendre_2pi3)
 {
+  shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
+  SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( 2.0*M_PI/3.0, 0.0 );
   double largeLeg = -9.44242865e+06;
   
@@ -132,6 +136,8 @@ TEST_F(SHCalcUTest, legendre_2pi3)
 
 TEST_F(SHCalcUTest, legendre_pi)
 {
+  shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
+  SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( M_PI, 0.0 );
   
   EXPECT_NEAR( SHCalcTest_.get_legendre_result(        0, 0), 1.0, preclim);
@@ -142,6 +148,8 @@ TEST_F(SHCalcUTest, legendre_pi)
 
 TEST_F(SHCalcUTest, sphHarm_t0p0)
 {
+  shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
+  SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( 0.0, 0.0 );
   
   EXPECT_NEAR( SHCalcTest_.get_result( 0, 0).real(), 1.0, preclim);
@@ -153,6 +161,8 @@ TEST_F(SHCalcUTest, sphHarm_t0p0)
 
 TEST_F(SHCalcUTest, sphHarm_t05p05)
 {
+  shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
+  SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( 0.5, 0.5 );
   
   EXPECT_NEAR( SHCalcTest_.get_result( 5, 0).real(),-0.16928726, preclim);

@@ -909,7 +909,7 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
     Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
     mol_sing_.push_back( molNew );
   }
-  const int vals = nvals;
+  const int vals = 5;
   BesselConstants bConsta( 2*vals );
   BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
   SHCalcConstants SHConsta( 2*vals );
@@ -1352,7 +1352,7 @@ TEST_F(ASolverUTest, checkLSing)
     Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
     mol_sing_.push_back( molNew );
   }
-  const int vals = nvals;
+  const int vals = 5;
   BesselConstants bConsta( 2*vals );
   BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
   SHCalcConstants SHConsta( 2*vals );

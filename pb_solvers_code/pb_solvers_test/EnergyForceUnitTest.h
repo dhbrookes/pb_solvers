@@ -78,13 +78,13 @@ TEST_F(EnergyForceUTest, checkEnergy)
   BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
   SHCalcConstants SHConsta( 2*vals );
   SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
+  shared_ptr<System> sys = make_shared<System>( mol_ );
   ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+                                      sys->get_lambda(), vals);
   
   ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                     make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
+                    sys,
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-20);
   
@@ -102,7 +102,7 @@ TEST_F(EnergyForceUTest, checkEnergySing)
   BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
   SHCalcConstants SHConsta( 2*vals );
   SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
+  System sys( mol_sing_ );
   ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
@@ -114,7 +114,7 @@ TEST_F(EnergyForceUTest, checkEnergySing)
   
   EnergyCalc EnTest( ASolvTest );
   
-  for (int n=0; n<mol_.size(); n++)
+  for (int n=0; n<mol_sing_.size(); n++)
     EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.000573165, preclim);
 }
 
@@ -138,7 +138,7 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
   BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
   SHCalcConstants SHConsta( 2*vals );
   SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
+  System sys( mol_sing_ );
   ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
@@ -201,7 +201,7 @@ TEST_F(EnergyForceUTest, checkForceSing)
   BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
   SHCalcConstants SHConsta( 2*vals );
   SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
+  System sys( mol_sing_ );
   ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
@@ -352,7 +352,7 @@ TEST_F(EnergyForceUTest, checkTorqueSing3)
   BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
   SHCalcConstants SHConsta( 2*vals );
   SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
+  System sys( mol_sing_ );
   ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   

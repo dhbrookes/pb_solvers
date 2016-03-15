@@ -339,7 +339,7 @@ TEST_F(ReExpUTest, checkSingPrefactor)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCo),
-                        kap, lambda );
+                        kap, lambda , true);
 
   int ct = 0;
   for ( int s = 1; s < 5; s++ )

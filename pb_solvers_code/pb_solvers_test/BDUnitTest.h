@@ -89,7 +89,7 @@ TEST_F(BDUTest, ForcePos)
   {
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
-                      make_shared<System> (sys),
+                      make_shared<System> (BDTest.get_system()),
                       make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
@@ -149,7 +149,7 @@ TEST_F(BDUTest, ForcePosZ)
   {
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
-                      make_shared<System> (sys),
+                      make_shared<System> (BDTest.get_system()),
                       make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
@@ -208,7 +208,7 @@ TEST_F(BDUTest, ForceOpp)
   {
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
-                      make_shared<System> (sys),
+                      make_shared<System> (BDTest.get_system()),
                       make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     

@@ -50,8 +50,7 @@ class BesselCalcUTest : public ::testing::Test
 public:
   BesselCalcUTest()
   {
-    _bConstTest_ = make_shared<BesselConstants> (nvals);
-    BesselCalc bCalcTest_( nvals, _bConstTest_);
+    
   }
   
 protected :
@@ -86,7 +85,8 @@ protected :
 TEST_F(BesselCalcUTest, first10)
 {
  // BesselCalcUTest bcut = BesselCalcUTest() ;
-  
+  _bConstTest_ = make_shared<BesselConstants> (nvals);
+  BesselCalc bCalcTest_( nvals, _bConstTest_);
   const vector<double> mBFI10 = bCalcTest_.calc_mbfI( nvals, 10.0 );
   const vector<double> mBFK10 = bCalcTest_.calc_mbfK( nvals, 10.0 );
   const vector<double> mBFI1  = bCalcTest_.calc_mbfI( nvals,  1.0 );
