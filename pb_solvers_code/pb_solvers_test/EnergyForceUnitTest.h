@@ -18,7 +18,7 @@ public :
 protected :
   
   int vals_;
-  Constants const_;
+  shared_ptr<Constants> const_;
   vector< Molecule > mol3_; vector< Molecule > mol_;
   vector< Molecule > mol_sing_;
   
@@ -62,7 +62,9 @@ protected :
 
 TEST_F(EnergyForceUTest, checkEnergy)
 {
+  shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_.clear( );
+  
   Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -74,21 +76,17 @@ TEST_F(EnergyForceUTest, checkEnergy)
     mol_.push_back( molNew );
   }
   const int vals           = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  shared_ptr<System> sys = make_shared<System>( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys->get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    sys,
-                    make_shared<Constants> (const_), vals);
-  ASolvTest.solve_A(1E-20);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  ASolvTest->solve_A(1E-20);
   
-  EnergyCalc EnTest( make_shared<ASolver> (ASolvTest));
+  EnergyCalc EnTest(ASolvTest);
   EnTest.calc_energy();
 
   EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.00117849131, preclim);
@@ -98,22 +96,19 @@ TEST_F(EnergyForceUTest, checkEnergy)
 
 TEST_F(EnergyForceUTest, checkEnergySing)
 {
+  shared_ptr<Constants> const_ = make_shared<Constants>();
   const int vals           = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
-  ASolvTest.solve_A(1E-20);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  ASolvTest->solve_A(1E-20);
   
-  EnergyCalc EnTest( make_shared<ASolver> (ASolvTest));
+  EnergyCalc EnTest(ASolvTest);
   EnTest.calc_energy();
   for (int n=0; n<mol_sing_.size(); n++)
     EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.000573165, preclim);
@@ -121,6 +116,7 @@ TEST_F(EnergyForceUTest, checkEnergySing)
 
 TEST_F(EnergyForceUTest, checkEnergySingMulti)
 {
+  shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_sing_.clear( );
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
@@ -135,21 +131,17 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
     mol_sing_.push_back( molNew );
   }
   const int vals           = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
-  ASolvTest.solve_A(1E-20);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  ASolvTest->solve_A(1E-20);
   
-  EnergyCalc EnTest( make_shared<ASolver> (ASolvTest) );
+  EnergyCalc EnTest(ASolvTest);
   EnTest.calc_energy();
   for (int n=0; n<mol_.size(); n++)
     EXPECT_NEAR( EnTest.get_omega_i_int(n)/MolTripSing[n], 1, preclim);
@@ -157,6 +149,7 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
 
 TEST_F(EnergyForceUTest, checkForce)
 {
+  shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_.clear( );
   Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
@@ -171,21 +164,16 @@ TEST_F(EnergyForceUTest, checkForce)
     mol_.push_back( molNew );
   }
   const int vals           = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
-  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-40);
-  
-  ForceCalc FoTest( make_shared<ASolver> (ASolvTest) );
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  ASolvTest->solve_A(1E-40); ASolvTest->solve_gradA(1E-40);
+  ForceCalc FoTest(ASolvTest);
   FoTest.calc_force();
   for (int n=0; n<mol_.size(); n++)
   {
@@ -197,22 +185,19 @@ TEST_F(EnergyForceUTest, checkForce)
 
 TEST_F(EnergyForceUTest, checkForceSing)
 {
+  shared_ptr<Constants> const_ = make_shared<Constants>();
   const int vals           = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
-  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-40);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  ASolvTest->solve_A(1E-40); ASolvTest->solve_gradA(1E-40);
   
-  ForceCalc FoTest( make_shared<ASolver> (ASolvTest) );
+  ForceCalc FoTest(ASolvTest);
   FoTest.calc_force();
   for (int n=0; n<2; n++)
   {
@@ -224,6 +209,7 @@ TEST_F(EnergyForceUTest, checkForceSing)
 
 TEST_F(EnergyForceUTest, checkForce3Cg)
 {
+  shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_.clear( );
   Pt pos[2] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 0.0, -5.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
@@ -238,22 +224,18 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
     mol_.push_back( molNew );
   }
   const int vals           = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
-  ASolvTest.solve_A(1E-30); ASolvTest.solve_gradA(1E-30);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  ASolvTest->solve_A(1E-30); ASolvTest->solve_gradA(1E-30);
 
-  EnergyCalc EnTest( make_shared<ASolver> (ASolvTest));
-  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+  EnergyCalc EnTest(ASolvTest);
+  ForceCalc FoTest(ASolvTest);
   EnTest.calc_energy();
   FoTest.calc_force();
   EXPECT_NEAR( EnTest.get_omega_i_int(0)/0.0845178625, 1, preclim);
@@ -269,6 +251,7 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
 
 TEST_F(EnergyForceUTest, checkTorque)
 {
+  shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_.clear( );
   Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
@@ -283,22 +266,18 @@ TEST_F(EnergyForceUTest, checkTorque)
     mol_.push_back( molNew );
   }
   const int vals           = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
-  ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  ASolvTest->solve_A(1E-20); ASolvTest->solve_gradA(1E-20);
   
-  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
-  TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
+  ForceCalc FoTest(ASolvTest);
+  TorqueCalc TorTest( ASolvTest);
   FoTest.calc_force();
   TorTest.calc_tau();
   for (int n=0; n<3; n++)
@@ -311,23 +290,20 @@ TEST_F(EnergyForceUTest, checkTorque)
 
 TEST_F(EnergyForceUTest, checkTorqueSing)
 {
+  shared_ptr<Constants> const_ = make_shared<Constants>();
   const int vals           = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
-  ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  ASolvTest->solve_A(1E-20); ASolvTest->solve_gradA(1E-20);
   
-  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
-  TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
+  ForceCalc FoTest(ASolvTest);
+  TorqueCalc TorTest(ASolvTest);
   FoTest.calc_force();
   TorTest.calc_tau();
   for (int n=0; n<mol_.size(); n++)
@@ -337,6 +313,7 @@ TEST_F(EnergyForceUTest, checkTorqueSing)
 
 TEST_F(EnergyForceUTest, checkTorqueSing3)
 {
+  shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_sing_.clear( );
   Pt pos[3] = {Pt(0.0, 0.0, 0.0),Pt(0.0, 0.0, -5.0),Pt(0.0, 0.0, 5.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
@@ -352,22 +329,18 @@ TEST_F(EnergyForceUTest, checkTorqueSing3)
   }
 
   const int vals           = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
-  ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  ASolvTest->solve_A(1E-20); ASolvTest->solve_gradA(1E-20);
   
-  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
-  TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
+  ForceCalc FoTest(ASolvTest);
+  TorqueCalc TorTest(ASolvTest);
   FoTest.calc_force();
   TorTest.calc_tau();
   EXPECT_NEAR( TorTest.get_taui(0)[0], 0.0, 1e-14);

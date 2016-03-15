@@ -18,12 +18,14 @@ public :
 protected :
   
   int vals_;
-  Constants const_;
+  shared_ptr<Constants> const_;
   vector< Molecule > mol_;
   vector< Molecule > mol_sing_;
   
   virtual void SetUp()
   {
+    const_ = make_shared<Constants>();
+    
     mol_.clear( );
     Pt pos[2]     = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
     Pt cgPos[2]   = { Pt( 0.0, 0.0, -5.5 ), Pt( 11.0, 6.9, 24.3 ) };
@@ -426,18 +428,13 @@ protected :
 TEST_F(ASolverUTest, checkGamma)
 {
   const int vals = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
 
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1).real(),  1.463995711, preclim);
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5).real(),  1.760111936, preclim);
@@ -449,18 +446,13 @@ TEST_F(ASolverUTest, checkGamma)
 TEST_F(ASolverUTest, checkDelta)
 {
   const int vals = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1).real(),   0.87554313, preclim);
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5).real(),   0.06832297, preclim);
@@ -473,18 +465,13 @@ TEST_F(ASolverUTest, checkDelta)
 TEST_F(ASolverUTest, checkE)
 {
   const int vals = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   
   EXPECT_NEAR(ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
   EXPECT_NEAR(ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
@@ -508,18 +495,13 @@ TEST_F(ASolverUTest, checkE)
 TEST_F(ASolverUTest, checkSH)
 {
   const int vals = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
 
   EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 0, 0).real(), 1.0, preclim);
   EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 0, 0).imag(), 0.0, preclim);
@@ -557,18 +539,13 @@ TEST_F(ASolverUTest, checkAMulti)
   }
   
   const int vals = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-40);
   
   int ct = 0;
@@ -597,18 +574,13 @@ TEST_F(ASolverUTest, checkAMulti)
 TEST_F(ASolverUTest, checkA)
 {
   const int vals = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-20);
 
   int ct = 0;
@@ -644,18 +616,13 @@ TEST_F(ASolverUTest, checkASingMult)
   }
   
   const int vals           = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-40);
   
   int ct = 0;
@@ -695,18 +662,13 @@ TEST_F(ASolverUTest, checkASingMultFlip)
   }
   
   const int vals           = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-40);
   
   int ct = 0;
@@ -738,18 +700,13 @@ TEST_F(ASolverUTest, checkASingMultFlip)
 TEST_F(ASolverUTest, checkASing)
 {
   const int vals = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-30);
   
   int ct = 0;
@@ -784,18 +741,13 @@ TEST_F(ASolverUTest, checkgradT_A)
   }
   
   const int vals = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
   
   VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
@@ -910,18 +862,13 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
     mol_sing_.push_back( molNew );
   }
   const int vals = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
   
   VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
@@ -1036,18 +983,13 @@ TEST_F(ASolverUTest, checkgradA)
   }
   
   const int vals = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-25); ASolvTest.solve_gradA(1E-50);
   
   int ct = 0;
@@ -1153,18 +1095,13 @@ TEST_F(ASolverUTest, checkgradASing)
     mol_sing_.push_back( molNew );
   }
   const int vals           = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
 
   int ct = 0;
@@ -1307,18 +1244,13 @@ TEST_F(ASolverUTest, checkL)
     mol_.push_back( molNew );
   }
   const int vals = nvals;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-40);
   shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   int ct = 0;
@@ -1353,18 +1285,13 @@ TEST_F(ASolverUTest, checkLSing)
     mol_sing_.push_back( molNew );
   }
   const int vals = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-40);
   shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   
@@ -1409,18 +1336,13 @@ TEST_F(ASolverUTest, checkdL)
   }
   
   const int vals           = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-30);
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
 
@@ -1508,18 +1430,13 @@ TEST_F(ASolverUTest, checkdLSing)
     mol_sing_.push_back( molSing );
   }
   const int vals           = 5;
-  BesselConstants bConsta( 2*vals );
-  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-  SHCalcConstants SHConsta( 2*vals );
-  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-  System sys( mol_sing_ );
-  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                      sys.get_lambda(), vals);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                    make_shared<SHCalc> (SHCalcu),
-                    make_shared<System> (sys),
-                    make_shared<Constants> (const_), vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-40);
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
   

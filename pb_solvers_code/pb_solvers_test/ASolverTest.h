@@ -17,7 +17,7 @@ class ASolverTest
 public :
   void RunASolverTest()
   {
-    Constants const_;
+    shared_ptr<Constants> const_ = make_shared<Constants>();
     vector< Molecule > mol_;
     vector< Molecule > mol_sing_;
     
@@ -46,18 +46,13 @@ public :
     }
     
     const int vals           = 10;
-    BesselConstants bConsta( 2*vals );
-    BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
-    SHCalcConstants SHConsta( 2*vals );
-    SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
-    System sys( mol_ );
-    ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
-                                        sys.get_lambda(), vals);
-
-    ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
-                      make_shared<SHCalc> (SHCalcu),
-                      make_shared<System> (sys),
-                      make_shared<Constants> (const_), vals);
+    shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+    shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+    shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+    shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+    shared_ptr<System> sys = make_shared<System>(mol_);
+    
+    ASolver ASolvTest (bCalcu, SHCalcu, sys, const_, vals);
     ASolvTest.solve_A( 1E-4 );
     ASolvTest.solve_gradA(1E-12);
   }

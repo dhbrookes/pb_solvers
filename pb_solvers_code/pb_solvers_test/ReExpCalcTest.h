@@ -21,22 +21,22 @@ class ReExpTest
   {
     Constants Cst;
     Pt testPt = Pt( 0.0, 0.0, 5.0);
-    SHCalcConstants shCon( 2*nvals );
-    SHCalc shCalc( 2*nvals, make_shared<SHCalcConstants>(shCon) );
+//    SHCalcConstants shCon( 2*nvals );
+    SHCalc shCalc( 2*nvals, make_shared<SHCalcConstants>(2*nvals) );
     shCalc.calc_sh( testPt.theta(), testPt.phi());
     
-    BesselConstants bCon( 2*nvals );
-    BesselCalc      bCal( 2*nvals, make_shared<BesselConstants>(bCon) );
+//    BesselConstants bCon( 2*nvals );
+    BesselCalc      bCal( 2*nvals, make_shared<BesselConstants>(2*nvals) );
     
     MyMatrix<cmplx> shMat = shCalc.get_full_result();
     double kap            = Cst.get_kappa();
     double lambda         = 5.0;
-    ReExpCoeffsConstants reExpConsts (kap, lambda, nvals);
+//    ReExpCoeffsConstants reExpConsts (kap, lambda, nvals);
 
     vector<double> besselK = bCal.calc_mbfK(2*nvals, kap*testPt.r());
     
     ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
-                          make_shared<ReExpCoeffsConstants> (reExpConsts),
+                          make_shared<ReExpCoeffsConstants> (kap, lambda, nvals),
                           kap, lambda, true );
     
   }
