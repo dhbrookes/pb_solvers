@@ -88,7 +88,7 @@ TEST_F(EnergyForceUTest, checkEnergy)
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-20);
   
-  EnergyCalc EnTest( ASolvTest );
+  EnergyCalc EnTest( make_shared<ASolver> (ASolvTest));
 
   EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.00117849131, preclim);
   EXPECT_NEAR( EnTest.get_omega_i_int(1), 0.00199508625, preclim);
@@ -112,7 +112,7 @@ TEST_F(EnergyForceUTest, checkEnergySing)
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-20);
   
-  EnergyCalc EnTest( ASolvTest );
+  EnergyCalc EnTest( make_shared<ASolver> (ASolvTest));
   
   for (int n=0; n<mol_sing_.size(); n++)
     EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.000573165, preclim);
@@ -148,7 +148,7 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-20);
   
-  EnergyCalc EnTest( ASolvTest );
+  EnergyCalc EnTest( make_shared<ASolver> (ASolvTest) );
   
   for (int n=0; n<mol_.size(); n++)
     EXPECT_NEAR( EnTest.get_omega_i_int(n)/MolTripSing[n], 1, preclim);
@@ -184,7 +184,7 @@ TEST_F(EnergyForceUTest, checkForce)
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-40);
   
-  ForceCalc FoTest( ASolvTest );
+  ForceCalc FoTest( make_shared<ASolver> (ASolvTest) );
   
   for (int n=0; n<mol_.size(); n++)
   {
@@ -211,7 +211,7 @@ TEST_F(EnergyForceUTest, checkForceSing)
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-40);
   
-  ForceCalc FoTest( ASolvTest );
+  ForceCalc FoTest( make_shared<ASolver> (ASolvTest) );
 
   for (int n=0; n<2; n++)
   {
@@ -251,8 +251,8 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-30); ASolvTest.solve_gradA(1E-30);
 
-  EnergyCalc EnTest( ASolvTest);
-  ForceCalc FoTest( ASolvTest);
+  EnergyCalc EnTest( make_shared<ASolver> (ASolvTest));
+  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
   
   EXPECT_NEAR( EnTest.get_omega_i_int(0)/0.0845178625, 1, preclim);
   EXPECT_NEAR( FoTest.get_fi(0)[0], 0, 1e-12);
@@ -295,8 +295,8 @@ TEST_F(EnergyForceUTest, checkTorque)
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
   
-  ForceCalc FoTest( ASolvTest);
-  TorqueCalc TorTest( ASolvTest);
+  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+  TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
   
   for (int n=0; n<3; n++)
   {
@@ -323,8 +323,8 @@ TEST_F(EnergyForceUTest, checkTorqueSing)
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
   
-  ForceCalc FoTest( ASolvTest);
-  TorqueCalc TorTest( ASolvTest);
+  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+  TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
   
   for (int n=0; n<mol_.size(); n++)
     for (int dim=0; dim<3; dim++)
@@ -362,8 +362,8 @@ TEST_F(EnergyForceUTest, checkTorqueSing3)
                     make_shared<Constants> (const_), vals);
   ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
   
-  ForceCalc FoTest( ASolvTest);
-  TorqueCalc TorTest( ASolvTest);
+  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+  TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
 
   EXPECT_NEAR( TorTest.get_taui(0)[0], 0.0, 1e-14);
   EXPECT_NEAR( TorTest.get_taui(0)[1], 0.0, 1e-14);

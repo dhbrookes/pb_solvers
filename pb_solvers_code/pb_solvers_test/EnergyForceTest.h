@@ -60,8 +60,8 @@ class EnForTest
     ASolvTest.solve_A( 1E-12 );
     ASolvTest.solve_gradA(1E-12);
 
-    ForceCalc FoTest( ASolvTest );
-    TorqueCalc TorTest( ASolvTest );
+    ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+    TorqueCalc TorTest( make_shared<ASolver> (ASolvTest) );
     
   }
 

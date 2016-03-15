@@ -52,11 +52,11 @@ class ElecTest
     ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                         sys.get_lambda(), vals);
     
-    ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+    shared_ptr<ASolver> ASolvTest = make_shared<ASolver>(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
                       make_shared<System> (sys),
                       make_shared<Constants> (const_), vals);
-    ASolvTest.solve_A( 1E-12 ); ASolvTest.solve_gradA(1E-12);
+    ASolvTest->solve_A( 1E-12 ); ASolvTest->solve_gradA(1E-12);
 
     Electrostatic EstatTest( ASolvTest, 10);
     EstatTest.print_dx("/Users/lfelberg/Desktop/test.dx");

@@ -82,19 +82,19 @@ TEST_F(BDUTest, ForcePos)
   vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
   dTr[0]  = 0.0;  dTr[1]  = 0.01;
   dRot[0] = 0.0; dRot[1] = 0.0;
-  BD BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+  BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
             dTr, dRot, false);
   
   for (int step=0; step < 10; step ++)
   {
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
-                      make_shared<System> (BDTest.get_system()),
+                      BDTest.get_system(),
                       make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
-    ForceCalc FoTest( ASolvTest);
-    TorqueCalc TorTest( ASolvTest);
+    ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+    TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
 //    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
 //                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
 //                     const_, nmol, vals);
@@ -103,13 +103,13 @@ TEST_F(BDUTest, ForcePos)
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
     
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).x(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).y(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).z(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(1).x(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(1).y()
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).x(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).z(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(1).x(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(1).y()
                 /BD1Force[step], 1.0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).z(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).z(), 0, preclim);
   }
 }
 
@@ -142,19 +142,19 @@ TEST_F(BDUTest, ForcePosZ)
   vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
   dTr[0]  = 0.0;  dTr[1]  = 0.01;
   dRot[0] = 0.0; dRot[1] = 0.0;
-  BD BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+  BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
             dTr, dRot, false);
   
   for (int step=0; step < 10; step ++)
   {
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
-                      make_shared<System> (BDTest.get_system()),
+                      BDTest.get_system(),
                       make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
-    ForceCalc FoTest( ASolvTest);
-    TorqueCalc TorTest( ASolvTest);
+    ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+    TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
 //    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
 //                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
 //                     const_, nmol, vals);
@@ -164,12 +164,12 @@ TEST_F(BDUTest, ForcePosZ)
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
     
     
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).x(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).y(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).z(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(1).x(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).y(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(1).z()
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).x(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).z(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(1).x(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(1).z()
                 /BD1Force[step], 1.0, preclim);
   }
 }
@@ -201,19 +201,19 @@ TEST_F(BDUTest, ForceOpp)
   vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
   dTr[0]  = 0.0;  dTr[1]  = 0.01;
   dRot[0] = 0.0; dRot[1] = 0.0;
-  BD BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+  BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
             dTr, dRot, false);
   
   for (int step=0; step < 10; step ++)
   {
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
-                      make_shared<System> (BDTest.get_system()),
+                      BDTest.get_system(), 
                       make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
-    ForceCalc FoTest( ASolvTest);
-    TorqueCalc TorTest( ASolvTest);
+    ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+    TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
     
 //    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
 //                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
@@ -223,13 +223,13 @@ TEST_F(BDUTest, ForceOpp)
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
     
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).x(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).y(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).z(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(1).x(), 0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(1).y()
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).x(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).z(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(1).x(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(1).y()
                 /BD1NegFo[step], 1.0, preclim);
-    EXPECT_NEAR(BDTest.get_system().get_centeri(0).z(), 0, preclim);
+    EXPECT_NEAR(BDTest.get_system()->get_centeri(0).z(), 0, preclim);
   }
 }
 
@@ -259,7 +259,7 @@ TEST_F(BDUTest, TorquePos)
   vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
   dTr[0]  = 0.01;  dTr[1]  = 0.01;
   dRot[0] = 0.01; dRot[1] = 0.01;
-  BD BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+  BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
             dTr, dRot, false);
   
   for (int step=0; step < 10; step ++)
@@ -270,8 +270,8 @@ TEST_F(BDUTest, TorquePos)
                       make_shared<Constants> (const_), vals);
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
-    ForceCalc FoTest( ASolvTest);
-    TorqueCalc TorTest( ASolvTest);
+    ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+    TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
 //    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
 //                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
 //                     const_, nmol, vals);

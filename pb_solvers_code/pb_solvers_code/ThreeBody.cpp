@@ -80,7 +80,7 @@ void ThreeBody::solveNmer( int num )
   ForceCalc FoTest;
   TorqueCalc TorTest;
   System sys_temp;
-  ASolver asolv_temp;
+  shared_ptr<ASolver> asolv_temp;
   
   for( i = 0; i < nmer.size(); i++)
   {
@@ -88,9 +88,11 @@ void ThreeBody::solveNmer( int num )
     mol_temp.clear();
     sys_temp = _sys_->get_subsystem(nmer[i]);
     
-    asolv_temp = ASolver(_besselCalc_, _shCalc_, make_shared<System> (sys_temp),
-                         _consts_, p_);
-    asolv_temp.solve_A(1E-5); asolv_temp.solve_gradA(1E-5);
+    shared_ptr<ASolver> asolv_temp = make_shared<ASolver>(_besselCalc_,
+                                                         _shCalc_,
+                                                         make_shared<System> (sys_temp),
+                                                         _consts_, p_);
+    asolv_temp->solve_A(1E-5); asolv_temp->solve_gradA(1E-5);
     
     EnTest = EnergyCalc(asolv_temp);
     FoTest = ForceCalc (asolv_temp);

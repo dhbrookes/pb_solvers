@@ -51,7 +51,7 @@ public:
                 shared_ptr<Constants> _consts,
                 int p, int npts = 150);
   
-  Electrostatic(ASolver asolv, int npts=150);
+  Electrostatic(shared_ptr<ASolver> _asolv, int npts=150);
   
   // print APBS file
   void print_dx(string ifname);

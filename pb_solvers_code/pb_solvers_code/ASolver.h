@@ -245,6 +245,11 @@ public:
   // must solve for A before this
   void solve_gradA(double prec);
   
+  /*
+   Reset all relevant members given a new system
+   */
+  void reset_all(shared_ptr<System> _sys);
+  
 }; // End ASolver
 
 #endif /* ASolver_h */

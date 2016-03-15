@@ -10,7 +10,7 @@
 #include <iostream>
 
 
-BD::BD(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+BDStep::BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
        vector<double> trans_diff_consts,
        vector<double> rot_diff_consts,
        bool diff, bool force)
@@ -21,7 +21,7 @@ diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
   randGen_ = mt19937(rd());
 }
 
-double BD::compute_dt( double dist )
+double BDStep::compute_dt( double dist )
 {
   double DISTCUTOFF_TIME = 20.0;
   if ( dist - DISTCUTOFF_TIME > 0 )
@@ -30,7 +30,7 @@ double BD::compute_dt( double dist )
     return 2.0;
 }
 
-double BD::compute_min_dist( )
+double BDStep::compute_min_dist( )
 {
   int i, j;
   Pt pt1, pt2;
@@ -47,7 +47,7 @@ double BD::compute_min_dist( )
   return minDist;
 }
 
-Pt BD::rand_vec(double mean, double var)
+Pt BDStep::rand_vec(double mean, double var)
 {
   normal_distribution<double> dist (mean, sqrt(var));
   Pt pout = Pt(dist(randGen_), dist(randGen_), dist(randGen_));
@@ -55,7 +55,7 @@ Pt BD::rand_vec(double mean, double var)
 }
 
 
-bool BD::check_for_collision(int mol, Pt new_pt)
+bool BDStep::check_for_collision(int mol, Pt new_pt)
 {
   bool collision = false;
   int j;
@@ -79,7 +79,7 @@ bool BD::check_for_collision(int mol, Pt new_pt)
   return collision;
 }
 
-void BD::indi_trans_update(int i, MyVector<double> fi)
+void BDStep::indi_trans_update(int i, MyVector<double> fi)
 {
   double kT = _consts_->get_kbt();
   double ikT_int = 1 / Constants::convert_j_to_int(kT);
@@ -104,7 +104,7 @@ void BD::indi_trans_update(int i, MyVector<double> fi)
 }
 
 
-void BD::indi_rot_update(int i, MyVector<double> tau_i)
+void BDStep::indi_rot_update(int i, MyVector<double> tau_i)
 {
   double kT = _consts_->get_kbt();
   double ikT_int = 1 / Constants::convert_j_to_int(kT);
@@ -135,19 +135,20 @@ void BD::indi_rot_update(int i, MyVector<double> tau_i)
   }
 }
 
-void BD::bd_update(VecOfVecs<double>::type F, VecOfVecs<double>::type tau)
+void BDStep::bd_update(shared_ptr<VecOfVecs<double>::type> _F,
+                   shared_ptr<VecOfVecs<double>::type> _tau)
 {
   int i;
   dt_ = compute_dt(compute_min_dist());
   
   for (i = 0; i < _sys_->get_n(); i++)
   {
-    if ( transDiffConsts_[i] != 0) indi_trans_update(i, F[i]);
+    if ( transDiffConsts_[i] != 0) indi_trans_update(i, _F->operator[](i));
   }
   
   for (i = 0; i < _sys_->get_n(); i++)
   {
-    if ( rotDiffConsts_[i] != 0) indi_rot_update(i, tau[i]);
+    if ( rotDiffConsts_[i] != 0) indi_rot_update(i, _tau->operator[](i));
   }
   update_sys_time(dt_);
 }

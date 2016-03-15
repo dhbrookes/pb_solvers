@@ -37,10 +37,10 @@ _consts_(_consts)
   compute_pot();
 }
 
-Electrostatic::Electrostatic(ASolver asolv, int npts)
-:p_(asolv.get_p()), _A_(asolv.get_A()), _sys_(asolv.get_sys()),
-_shCalc_(asolv.get_sh()), _bCalc_(asolv.get_bessel()),
-_consts_(asolv.get_consts())
+Electrostatic::Electrostatic(shared_ptr<ASolver> _asolv, int npts)
+:p_(_asolv->get_p()), _A_(_asolv->get_A()), _sys_(_asolv->get_sys()),
+_shCalc_(_asolv->get_sh()), _bCalc_(_asolv->get_bessel()),
+_consts_(_asolv->get_consts())
 {
   range_min_.resize(3);
   range_max_.resize(3);

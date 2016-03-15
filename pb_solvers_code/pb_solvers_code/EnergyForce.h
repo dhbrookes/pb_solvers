@@ -35,7 +35,7 @@ protected:
    */
   enum WhichUnit { INTER, KCALMOL, KT, JMOL };
   
-  MyVector<double> omega_;  // result of energy calculation, internal units
+  shared_ptr<MyVector<double> > _omega_;  // result of energy calculation, internal units
   
 public:
   EnergyCalc() { }
@@ -44,7 +44,7 @@ public:
              shared_ptr<VecOfMats<cmplx>::type> _L,
              shared_ptr<Constants> _const, int N, int p);
   
-  EnergyCalc(ASolver asolv);
+  EnergyCalc(shared_ptr<ASolver> _asolv);
   
 //  EnergyCalc(ASolver asolv, Constants consts, int p);
   
@@ -52,40 +52,41 @@ public:
   void calc_energy();
   
   // get the energy for a specific molecule:
-  double get_omega_i_int(int i)  { return omega_[i]; }
+  double get_omega_i_int(int i)  { return _omega_->operator[](i); }
   // get all energy:
-  MyVector<double> get_omega_int() { return omega_; }
+  shared_ptr<MyVector<double> > get_omega_int() { return _omega_; }
   
   // energy in kCal/mol:
   double get_omega_i_kcal(int i)
-  { return _const_->convert_int_to_kcal_mol(omega_[i]); }
+  { return _const_->convert_int_to_kcal_mol(_omega_->operator[](i)); }
+  
   MyVector<double> get_omega_kcal()
   {
     MyVector<double> omeg(N_);
     for (int n = 0; n < N_; n++)
-      omeg[n] = _const_->convert_int_to_kcal_mol(omega_[n]);
+      omeg[n] = _const_->convert_int_to_kcal_mol(_omega_->operator[](n));
     return omeg;
   }
   
   // energy in kT:
   double get_omega_i_kT(int i)
-  { return _const_->convert_int_to_kT(omega_[i]); }
+  { return _const_->convert_int_to_kT(_omega_->operator[](i)); }
   MyVector<double> get_omega_kT()
   {
     MyVector<double> omeg(N_);
     for (int n = 0; n < N_; n++)
-      omeg[n] = _const_->convert_int_to_kT(omega_[n]);
+      omeg[n] = _const_->convert_int_to_kT(_omega_->operator[](n));
     return omeg;
   }
   
   // energy in joules/mol:
   double get_omega_i_jmol(int i)
-  { return _const_->convert_int_to_jmol(omega_[i]); }
+  { return _const_->convert_int_to_jmol(_omega_->operator[](i)); }
   MyVector<double> get_omega_jmol()
   {
     MyVector<double> omeg(N_);
     for (int n = 0; n < N_; n++)
-      omeg[n] = _const_->convert_int_to_jmol(omega_[n]);
+      omeg[n] = _const_->convert_int_to_jmol(_omega_->operator[](n));
     return omeg;
   }
 };
@@ -108,7 +109,7 @@ protected:
   int p_;
   shared_ptr<Constants> _const_;
   
-  VecOfVecs<double>::type F_;
+  shared_ptr<VecOfVecs<double>::type> _F_;
   
 public:
   ForceCalc() { }
@@ -119,12 +120,12 @@ public:
             shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL,
             shared_ptr<Constants> con, int N, int p);
   
-  ForceCalc(ASolver asolv);
+  ForceCalc(shared_ptr<ASolver> _asolv);
   
   void calc_force();  // fill F_
   
-  MyVector<double> get_fi(int i)     { return F_[i]; }
-  VecOfVecs<double>::type get_F()    { return F_; }
+  MyVector<double> get_fi(int i)     { return _F_->operator[](i); }
+  shared_ptr<VecOfVecs<double>::type> get_F()    { return _F_; }
   
 };
 
@@ -137,7 +138,7 @@ protected:
   
   // outer vector has an entry for every molecule. Inner vector is the torque
   // on that molecule
-  VecOfVecs<double>::type tau_;
+  shared_ptr<VecOfVecs<double>::type> _tau_;
   
   shared_ptr<SHCalc> _shCalc_;
   shared_ptr<BesselCalc> _bCalc_;
@@ -166,7 +167,7 @@ public:
              shared_ptr<Constants> _consts,
              shared_ptr<System> sys, int p);
   
-  TorqueCalc(ASolver asolv);
+  TorqueCalc(shared_ptr<ASolver> _asolv);
   
   void calc_tau();  // fill tau_
   
@@ -175,8 +176,8 @@ public:
    */
   VecOfMats<cmplx>::type calc_H(int i);
   
-  MyVector<double> get_taui(int i)     { return tau_[i]; }
-  VecOfVecs<double>::type get_Tau()    { return tau_; }
+  MyVector<double> get_taui(int i)     { return _tau_->operator[](i); }
+  shared_ptr<VecOfVecs<double>::type > get_Tau()    { return _tau_; }
   
   /*
    Calculate inner product of two matrices as defined in equation 29 of Lotan

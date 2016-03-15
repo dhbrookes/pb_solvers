@@ -133,9 +133,9 @@ public:
 };
 
 /*
- Class for implementing Brownian Dynamics on a a system
+ Class for performing a brownian dynamics step
  */
-class BD
+class BDStep
 {
 protected:
   vector<double> transDiffConsts_;  // translational diffusion constants
@@ -170,19 +170,19 @@ protected:
   void update_sys_time(double dt) { _sys_->set_time(_sys_->get_time() + dt); }
   
 public:
-  BD(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+  BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
      vector<double> trans_diff_consts,
      vector<double> rot_diff_consts,
      bool diff = true, bool force = true);
   
   // update the system with Brownian dynamics given forces and torques on every
   // molecule
-  void bd_update(VecOfVecs<double>::type F, VecOfVecs<double>::type tau);
+  void bd_update(shared_ptr<VecOfVecs<double>::type> _F,
+                 shared_ptr<VecOfVecs<double>::type> _tau);
   
-  System get_system() { return *_sys_; }
+  shared_ptr<System> get_system() { return _sys_; }
   
 };
-
 
 
 #endif /* BD_h */
