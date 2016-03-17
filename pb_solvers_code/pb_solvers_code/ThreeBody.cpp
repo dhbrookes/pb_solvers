@@ -76,7 +76,7 @@ void ThreeBody::solveNmer( int num )
   vector< vector<int> > nmer = ( num == 2) ? dimer_ : trimer_;
   vector< Molecule > mol_temp;
 
-  shared_ptr<System> _sysTemp = make_shared<System>(nmer[0]);
+  shared_ptr<System> _sysTemp = make_shared<System>(_sys_->get_subsystem(nmer[0]));
   shared_ptr<ASolver> _asolvTemp = make_shared<ASolver>(_besselCalc_, _shCalc_,
                                                         _sysTemp, _consts_, p_);
   shared_ptr<EnergyCalc> _enCalc = make_shared<EnergyCalc>(_asolvTemp);
@@ -88,7 +88,7 @@ void ThreeBody::solveNmer( int num )
   {
     cout << "This nmer is: ";
     mol_temp.clear();
-    _sysTemp = make_shared<System>(nmer[0]);
+    _sysTemp = make_shared<System>(_sys_->get_subsystem(nmer[0]));
     
     _asolvTemp->reset_all(_sysTemp);
     

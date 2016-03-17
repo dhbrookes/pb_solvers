@@ -159,6 +159,13 @@ System::System(Setup setup, double cutoff)
   if (boxLength_/2. < cutoff_)  compute_cutoff();
 }
 
+System::System(const System& sys)
+:molecules_(sys.molecules_), N_(sys.N_), cutoff_(sys.get_cutoff()),
+boxLength_(sys.get_boxlength())
+{
+  set_time(sys.t_);
+}
+
 const double System::calc_average_radius() const
 {
   double ave = 0;
