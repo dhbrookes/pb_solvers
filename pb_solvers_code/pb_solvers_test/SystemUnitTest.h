@@ -312,6 +312,35 @@ TEST_F(SystemUTest, checkOverlap)
   }
 }
 
+TEST_F(SystemUTest, checkPBCOverlap)
+{
+  vector < Molecule > mol_; const int nMol = 3;
+  Pt pos[nMol] = { Pt( 0.0, 0.0, -5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
+  for (int molInd = 0; molInd < nMol; molInd ++ )
+  {
+    int M = 3; vector<double> chg(M); vector<double> vdW(M);
+    vector<Pt> poschg(M);
+    chg[0]=2.0; vdW[0]=0.1; poschg[0] = pos[molInd];
+    chg[1]=2.0; vdW[1]=0.1; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+    chg[2]=2.0; vdW[2]=0.1; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    
+    Molecule molNew( "stat", chg, poschg, vdW, pos[molInd]);
+    mol_.push_back( molNew );
+  }
+  
+  try
+  {
+    System sys( mol_, 20.0, 10.0 );
+    FAIL();
+  }
+  catch( const OverlappingMoleculeException& err )
+  {
+    // check exception
+    string error_exp = "Molecule 1 & 2 overlap";
+    EXPECT_EQ(string(err.what()), error_exp);
+  }
+}
+
 TEST_F(SystemUTest, checkVals)
 {
   vector < Molecule > mol_;
@@ -371,8 +400,8 @@ TEST_F(SystemUTest, changeCutoff)
 {
   vector < Molecule > mol_;
   double cutoff = 45.876;
-  double boxl   =  5.876;
-  Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
+  double boxl   = 55.876;
+  Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,17.8,15.0) };
   double rad[3] = { 5.0, 3.7, 8.6 };
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -434,8 +463,8 @@ TEST_F(SystemUTest, PBCcheck)
   vector < Molecule > mol_;
   double cutoff =  5.00;
   double boxl   = 20.00;
-  Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
-  double rad[3] = { 5.0, 3.7, 8.6 };
+  Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,17.8,15.0) };
+  double rad[3] = { 1.0, 1.7, 1.6 };
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
     int M = 3; vector<double> chg(M); vector<double> vdW(M);
@@ -449,8 +478,23 @@ TEST_F(SystemUTest, PBCcheck)
   }
 
   System sys( mol_, cutoff, boxl );
+  Pt dis01 = sys.get_pbc_dist_vec(0, 1);
+  EXPECT_NEAR(  10/dis01.x(), 1.0, preclim);
+  EXPECT_NEAR(-7.8/dis01.y(), 1.0, preclim);
+  EXPECT_NEAR(  10/dis01.z(), 1.0, preclim);
   
+  Pt dis02 = sys.get_pbc_dist_vec(0, 2);
+  EXPECT_NEAR( -10/dis02.x(), 1.0, preclim);
+  EXPECT_NEAR( 2.2/dis02.y(), 1.0, preclim);
+  EXPECT_NEAR(   0,     dis02.z(), preclim);
+  
+  Pt dis12 = sys.get_pbc_dist_vec(1, 2);
+  EXPECT_NEAR( 0.0,  dis12.x(), preclim);
+  EXPECT_NEAR(  10/dis12.y(), 1.0, preclim);
+  EXPECT_NEAR( -10/dis12.z(), 1.0, preclim);
+
 }
+
 
 
 #endif /* SystemUnitTest_h */

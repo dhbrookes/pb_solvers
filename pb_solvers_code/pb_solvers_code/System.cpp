@@ -182,18 +182,14 @@ void System::compute_cutoff()
 void System::check_for_overlap()
 {
   int i, j;
-  double dist;
-  Pt pi, pj;
-  double ai, aj;
+  double dist, ai, aj;
   for (i = 0; i < N_; i++)
   {
-    pi = molecules_[i].get_center();
     ai = molecules_[i].get_a();
     for (j = i+1; j < N_; j++)
     {
-      pj = molecules_[j].get_center();
       aj = molecules_[j].get_a();
-      dist = pi.dist(pj);
+      dist = get_pbc_dist_vec(i, j).norm();
       if (dist < (ai + aj)) throw OverlappingMoleculeException(i, j);
     }
   }
@@ -204,10 +200,10 @@ Pt System::get_pbc_dist_vec(int i, int j)
   Pt ci = get_centeri(i);
   Pt cj = get_centeri(j);
   Pt dv  = ci - cj;
-  
-  Pt v = Pt(dv.x() - round(dv.x()/boxLength_),
-          dv.y() - round(dv.y()/boxLength_),
-          dv.z() - round(dv.z()/boxLength_));
+
+  Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
+          dv.y() - round(dv.y()/boxLength_)*boxLength_,
+          dv.z() - round(dv.z()/boxLength_)*boxLength_);
 
   return v;
 }
