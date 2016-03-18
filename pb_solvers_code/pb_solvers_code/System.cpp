@@ -103,9 +103,6 @@ void Molecule::rotate(Quat qrot)
 {
   for (int i = 0; i < M_; i++)
   {
-    cout << " This is new pt " << qrot.rotate_point(pos_[i]).x() << " " <<
-    qrot.rotate_point(pos_[i]).y() << " " <<
-    qrot.rotate_point(pos_[i]).z() << " " << endl;
     pos_[i] = qrot.rotate_point(pos_[i]);
   }
 }

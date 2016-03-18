@@ -10,7 +10,6 @@
 #define ASolver_h
 
 #include <stdio.h>
-#include <iomanip>
 #include <iostream>
 #include "MyMatrix.h"
 #include "BesselCalc.h"
