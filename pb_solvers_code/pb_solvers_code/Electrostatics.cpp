@@ -160,10 +160,60 @@ void Electrostatic::print_dx( string dxname )
   
 }
 
-void Electrostatic::print_grid(string dim, double value)
+void Electrostatic::print_grid(Axis axis, double value, string fname)
 {
+  int idx = round((value-range_min_[axis]) / step_[axis]);
+  vector<vector<double> > grid ;
+  int i, j;
+  if (axis ==  X)
+  {
+    grid = vector<vector<double> > (npts_[1], vector<double> (npts_[2]));
+    for (i = 0; i < grid.size(); i++)
+    {
+      for (j = 0; j < grid[0].size(); j++)
+      {
+        grid[i][j] = esp_[idx][i][j];
+      }
+    }
+  }
   
+  if (axis ==  Y)
+  {
+    grid = vector<vector<double> > (npts_[0], vector<double> (npts_[2]));
+    for (i = 0; i < grid.size(); i++)
+    {
+      for (j = 0; j < grid[0].size(); j++)
+      {
+        grid[i][j] = esp_[i][idx][j];
+      }
+    }
+  }
   
+  if (axis ==  Z)
+  {
+    grid = vector<vector<double> > (npts_[0], vector<double> (npts_[1]));
+    for (i = 0; i < grid.size(); i++)
+    {
+      for (j = 0; j < grid[0].size(); j++)
+      {
+        grid[i][j] = esp_[i][j][idx];
+      }
+    }
+  }
+  
+  ofstream f;
+  int ct = 0;
+  f.open(fname);
+  for (i = 0; grid.size(); i++)
+  {
+    for (j = 0; grid[0].size(); j++)
+    {
+      f << grid[i][j] << "  ";
+      ct++;
+      if ((ct % 3) == 0) f << "\n";
+    }
+  }
+  f.close();
 }
 
 void Electrostatic::compute_pot()

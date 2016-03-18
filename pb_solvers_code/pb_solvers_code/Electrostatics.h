@@ -14,6 +14,8 @@
 #include <fstream>
 #include "ASolver.h"
 
+enum Axis {X, Y, Z};
+
 /*
  Class for printing out electrostatics of system
  */
@@ -27,7 +29,7 @@ protected:
   vector<int> npts_;   // number of grid pts in each dimension
   vector<double> step_;  // step of grid in each dimension
 
-  vector < vector < vector<double > > > esp_; // vector of ESP values
+  vector<vector<vector<double > > > esp_; // vector of ESP values
   
   shared_ptr<VecOfMats<cmplx>::type> _A_;
   shared_ptr<System> _sys_;
@@ -56,7 +58,7 @@ public:
   // print APBS file
   void print_dx(string ifname);
   
-  void print_grid(string dim, double value);
+  void print_grid(Axis axis, double value, string fname);
   
 };
 
