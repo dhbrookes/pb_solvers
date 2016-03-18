@@ -105,7 +105,7 @@ public:
          double cutoff=Constants::FORCE_CUTOFF,
          double boxlength=Constants::MAX_DIST);
   
-  System(const System& sys);
+//  System(const System& sys);
   
   System(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
   

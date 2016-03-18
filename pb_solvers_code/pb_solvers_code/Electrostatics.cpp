@@ -165,7 +165,7 @@ void Electrostatic::print_grid(Axis axis, double value, string fname)
   int idx = round((value-range_min_[axis]) / step_[axis]);
   vector<vector<double> > grid ;
   int i, j;
-  if (axis ==  X)
+  if (axis ==  Xdim)
   {
     grid = vector<vector<double> > (npts_[1], vector<double> (npts_[2]));
     for (i = 0; i < grid.size(); i++)
@@ -177,7 +177,7 @@ void Electrostatic::print_grid(Axis axis, double value, string fname)
     }
   }
   
-  if (axis ==  Y)
+  if (axis ==  Ydim)
   {
     grid = vector<vector<double> > (npts_[0], vector<double> (npts_[2]));
     for (i = 0; i < grid.size(); i++)
@@ -189,7 +189,7 @@ void Electrostatic::print_grid(Axis axis, double value, string fname)
     }
   }
   
-  if (axis ==  Z)
+  if (axis ==  Zdim)
   {
     grid = vector<vector<double> > (npts_[0], vector<double> (npts_[1]));
     for (i = 0; i < grid.size(); i++)

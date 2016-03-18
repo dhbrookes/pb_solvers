@@ -14,7 +14,7 @@
 #include <fstream>
 #include "ASolver.h"
 
-enum Axis {X, Y, Z};
+enum Axis {Xdim, Ydim, Zdim};
 
 /*
  Class for printing out electrostatics of system
