@@ -10,11 +10,8 @@
 #define BD_h
 
 #include <stdio.h>
-#include "System.h"
-#include "util.h"
 #include <random>
 #include <memory>
-#include "ASolver.h"
 #include "EnergyForce.h"
 
 /*
@@ -144,6 +141,7 @@ protected:
   bool diff_; // include random kicks in dynamics
   bool force_; // include force calcs in dynamics
   double dt_;
+  double min_dist_;
   
   // random number generator object:
   mt19937 randGen_;
@@ -158,10 +156,10 @@ protected:
   void indi_rot_update(int i, MyVector<double> tau_i);
   
   // compute timestep for BD
-  double compute_dt( double dist );
+  double compute_dt( );
   
   // compute the smallest distance between two molecule centers
-  double compute_min_dist( );
+  void compute_min_dist( );
   
   // return a random vector with each element drawn from a Gaussian
   Pt rand_vec(double mean, double var);
@@ -185,6 +183,8 @@ public:
                  shared_ptr<VecOfVecs<double>::type> _tau);
   
   shared_ptr<System> get_system() { return _sys_; }
+  double get_dt()                 { return dt_; }
+  double get_min_dist()           { return min_dist_; }
   
 };
 

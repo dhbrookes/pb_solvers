@@ -3,7 +3,6 @@
 #define SETUP_H
 
 #include "readutil.h"
-#include <fstream>
 
 using namespace std;
 

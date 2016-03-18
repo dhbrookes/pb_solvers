@@ -9,15 +9,8 @@
 #ifndef ASolver_h
 #define ASolver_h
 
-#include <stdio.h>
-#include <iostream>
-#include "MyMatrix.h"
-#include "BesselCalc.h"
-#include "Constants.h"
 #include "ReExpCalc.h"
-#include "SHCalc.h"
 #include "System.h"
-#include "util.h"
 
 /*
  This class is designed to compute the vector A defined in Equation 22 

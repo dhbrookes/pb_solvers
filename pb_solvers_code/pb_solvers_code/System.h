@@ -9,10 +9,7 @@
 #ifndef System_hpp
 #define System_hpp
 
-#include <stdio.h>
-#include <vector>
 #include "Constants.h"
-#include "readutil.h"
 
 using namespace std;
 

@@ -7,8 +7,6 @@
 //
 
 #include "BD.h"
-#include <iostream>
-
 
 BDStep::BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
        vector<double> trans_diff_consts,
@@ -37,16 +35,16 @@ diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
 }
 
 
-double BDStep::compute_dt( double dist )
+double BDStep::compute_dt( )
 {
   double DISTCUTOFF_TIME = 20.0;
-  if ( dist - DISTCUTOFF_TIME > 0 )
-    return 2.0 + ( dist - DISTCUTOFF_TIME )/15.0;
+  if ( min_dist_ - DISTCUTOFF_TIME > 0 )
+    return 2.0 + ( min_dist_ - DISTCUTOFF_TIME )/15.0;
   else
     return 2.0;
 }
 
-double BDStep::compute_min_dist( )
+void BDStep::compute_min_dist( )
 {
   int i, j;
   Pt pt1, pt2;
@@ -55,12 +53,12 @@ double BDStep::compute_min_dist( )
   {
     for (j = i+1; j < _sys_->get_n(); j++)
     {
-      pt1 = _sys_->get_centeri(i); pt2 = _sys_->get_centeri(j);
-      newD = pt1.dist(pt2);
+      newD = _sys_->get_pbc_dist_vec(i, j).norm();
       if (newD < minDist) minDist = newD;
     }
   }
-  return minDist;
+  
+  min_dist_ = minDist;
 }
 
 Pt BDStep::rand_vec(double mean, double var)
@@ -155,7 +153,8 @@ void BDStep::bd_update(shared_ptr<VecOfVecs<double>::type> _F,
                    shared_ptr<VecOfVecs<double>::type> _tau)
 {
   int i;
-  dt_ = compute_dt(compute_min_dist());
+  compute_min_dist();
+  dt_ = compute_dt();
   
   for (i = 0; i < _sys_->get_n(); i++)
   {
@@ -185,7 +184,6 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
 
 void BDRun::run()
 {
-  
   int i = 0;
   bool term = false;
   while (i < maxIter_ and !term)

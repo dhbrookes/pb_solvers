@@ -9,9 +9,6 @@
 #ifndef Electrostatics_h
 #define Electrostatics_h
 
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
 #include "ASolver.h"
 
 enum Axis {Xdim, Ydim, Zdim};

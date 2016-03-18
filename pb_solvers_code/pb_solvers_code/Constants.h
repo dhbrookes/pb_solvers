@@ -10,7 +10,6 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
-#include <math.h>
 #include "Setup.h"
 
 /**

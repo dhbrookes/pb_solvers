@@ -152,8 +152,6 @@ void ASolver::grad_iter(int j)
   {
     copy_to_prevGradA();
     aij = VecOfMats<cmplx>::type (3, MyMatrix<cmplx>(p_,2*p_+1));
-//    for (dim = 0; dim < 3; dim++)
-//      aij.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
     aij = get_gradT_Aij( j, i);
     
     for (k = 0; k < N_; k++) // other molecules
@@ -163,7 +161,6 @@ void ASolver::grad_iter(int j)
       if (! _sys_->less_than_cutoff(v) ) continue;
       add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
       aij += add;
-
     }
     
     gamma_delta = _gamma_->operator[](i) * _delta_->operator[](i);
@@ -245,6 +242,7 @@ void ASolver::pre_compute_gradT_A()
 {
   // Solving for grad_j(A^(i)) by iterating through T^(i,k)
   int i, j, k, dim;
+  Pt vij, vik;
   cmplx sign;
   
   // relevant re-expansions (g prefix means gradient):
@@ -254,6 +252,7 @@ void ASolver::pre_compute_gradT_A()
   {
     for (j = 0; j < N_; j++) // gradient of interest
     {
+      vij = _sys_->get_pbc_dist_vec(i, j);
       gjT_Ai = VecOfMats<cmplx>::type (3);
       for (dim = 0; dim < 3; dim++)
         gjT_Ai.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
@@ -263,6 +262,9 @@ void ASolver::pre_compute_gradT_A()
         for (k = 0; k < N_; k++)
         {
           if ( k == i ) continue;
+          vik = _sys_->get_pbc_dist_vec(i, k);
+          if (! _sys_->less_than_cutoff(vik) ) continue;
+          
           gTA  = re_expandA_gradT( i, k, prev); // grad_i T^(i,k) A^(k)
           
           sign = (( k < i ) ? cmplx(-1.0, 0.0) : cmplx(1.0, 0.0));
@@ -272,9 +274,9 @@ void ASolver::pre_compute_gradT_A()
           gjT_Ai += gTA;
         }
       }
-      else if (j > i)
+      else if ((j > i) && (_sys_->less_than_cutoff(vij) ))
         gjT_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(j,i) A^(i)
-      else
+      else if (_sys_->less_than_cutoff(vij) )
       {
         gjT_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(j,i) A^(i)
         for (dim = 0; dim < 3; dim++)
@@ -593,7 +595,7 @@ MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i, int j, double theta,
   return x;
 }
 
-MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i,int j, double theta, bool ham)
+MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i,int j,double theta,bool ham)
 {
   int lowI, hiJ;
   lowI = i; hiJ = j;
@@ -908,12 +910,16 @@ void ASolver::init_gradA()
 void ASolver::calc_L()
 {
   int i, j;
+  Pt v;
   MyMatrix<cmplx> inner, expand;
   for (i = 0; i < N_; i++)
   {
     for (j = 0; j < N_; j++)
     {
       if (j == i) continue;
+      v = _sys_->get_pbc_dist_vec(i, j);
+      if (! _sys_->less_than_cutoff(v) ) continue;
+      
       expand = re_expandA(i, j);
       _L_->operator[](i) += expand;
     }
@@ -923,6 +929,7 @@ void ASolver::calc_L()
 void ASolver::calc_gradL()
 {
   int i, k;
+  Pt v;
   VecOfMats<cmplx>::type inner1, inner2;
   
   for (i = 0; i < N_; i++) // molecule of interest
@@ -932,6 +939,9 @@ void ASolver::calc_gradL()
     for (k = 0; k < N_; k++) // other molecules
     {
       if (k == i) continue;
+      v = _sys_->get_pbc_dist_vec(i, k);
+      if (! _sys_->less_than_cutoff(v) ) continue;
+      
       inner2 = re_expand_gradA(i, k, i, false); // T^(i,k) * grad_j A^(k)
       inner1 += inner2;
     }
@@ -1112,11 +1122,9 @@ void ASolver::reset_all(shared_ptr<System> _sys)
   _E_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
   _L_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
   _A_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
-  _prevA_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
+  _prevA_ = make_shared<VecOfMats<cmplx>::type>(N_,MyMatrix<cmplx>(p_,2*p_+1));
   _gradT_A_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
   _gradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
   _prevGradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
   _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type > >(N_);
-  
-
 }

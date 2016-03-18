@@ -9,7 +9,6 @@
 #ifndef BesselCalc_h
 #define BesselCalc_h
 
-#include <stdio.h>
 #include <vector>
 #include <assert.h>
 #include <memory>

@@ -9,12 +9,8 @@
 #ifndef ReExpCalc_h
 #define ReExpCalc_h
 
-#include "Constants.h"
 #include "BesselCalc.h"
 #include "SHCalc.h"
-#include "MyMatrix.h"
-#include "util.h"
-
 
 using namespace std;
 

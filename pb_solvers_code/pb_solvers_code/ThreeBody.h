@@ -9,7 +9,6 @@
 #ifndef ThreeBody_h
 #define ThreeBody_h
 
-#include <stdio.h>
 #include "EnergyForce.h"
 
 /*

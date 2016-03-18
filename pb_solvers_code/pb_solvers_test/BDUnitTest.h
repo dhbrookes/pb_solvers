@@ -10,7 +10,6 @@
 #define BDUnitTest_h
 
 #include "BD.h"
-#include "EnergyForce.h"
 
 class BDUTest : public ::testing::Test
 {
@@ -110,6 +109,134 @@ protected :
 } ; // end BDUTest
 
 // Test random vector? test check for collision, trans update, rot update
+TEST_F(BDUTest, dtTest)
+{
+  mol_.clear( );
+  Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0)};
+  for (int molInd = 0; molInd < 2; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd]);
+    mol_.push_back( molNew );
+  }
+  const int vals           = 5;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
+                                      sys.get_lambda(), vals);
+  
+  vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
+  dTr[0]  = 0.0;  dTr[1]  = 0.01; dRot[0] = 0.0; dRot[1] = 0.0;
+  BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+                dTr, dRot, false);
+  
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    BDTest.get_system(),
+                    make_shared<Constants> (const_), vals);
+  ASolvTest.solve_A(1E-4); ASolvTest.solve_gradA(1E-4);
+  
+  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+  TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
+  FoTest.calc_force(); TorTest.calc_tau();
+  
+  BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+  
+  EXPECT_NEAR(BDTest.get_dt()/2.0, 1.0, preclim);
+}
+
+TEST_F(BDUTest, dtLargeTest)
+{
+  mol_.clear( );
+  Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(-10.0, 7.8, 25.0)};
+  for (int molInd = 0; molInd < 2; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd]);
+    mol_.push_back( molNew );
+  }
+  const int vals           = 5;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_ );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
+                                      sys.get_lambda(), vals);
+  
+  vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
+  dTr[0]  = 0.0;  dTr[1]  = 0.01; dRot[0] = 0.0; dRot[1] = 0.0;
+  BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+                dTr, dRot, false);
+  
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    BDTest.get_system(),
+                    make_shared<Constants> (const_), vals);
+  ASolvTest.solve_A(1E-4); ASolvTest.solve_gradA(1E-4);
+  
+  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+  TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
+  FoTest.calc_force(); TorTest.calc_tau();
+  
+  BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+  
+  EXPECT_NEAR(BDTest.get_dt()/2.535522526, 1.0, preclim);
+}
+
+TEST_F(BDUTest, distPBCTest)
+{
+  mol_.clear( );
+  Pt pos[2] = {Pt(0.0, 0.0, 0.0), Pt(-25.0, 55.8, 21.0)};
+  for (int molInd = 0; molInd < 2; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd]);
+    mol_.push_back( molNew );
+  }
+  double cutoff  = 10.00;
+  double boxl    = 20.00;
+  const int vals = 5;
+  BesselConstants bConsta( 2*vals );
+  BesselCalc bCalcu( 2*vals, make_shared<BesselConstants>(bConsta) );
+  SHCalcConstants SHConsta( 2*vals );
+  SHCalc SHCalcu( 2*vals, make_shared<SHCalcConstants>(SHConsta) );
+  System sys( mol_, cutoff, boxl );
+  ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
+                                      sys.get_lambda(), vals);
+  
+  vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
+  dTr[0]  = 0.0;  dTr[1]  = 0.01; dRot[0] = 0.0; dRot[1] = 0.0;
+  BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
+                dTr, dRot, false);
+  
+  ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
+                    make_shared<SHCalc> (SHCalcu),
+                    BDTest.get_system(),
+                    make_shared<Constants> (const_), vals);
+  ASolvTest.solve_A(1E-4); ASolvTest.solve_gradA(1E-4);
+  
+  ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
+  TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
+  FoTest.calc_force(); TorTest.calc_tau();
+  
+  BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+  
+  EXPECT_NEAR(BDTest.get_dt()/2.0, 1.0, preclim);
+}
+
 
 TEST_F(BDUTest, ForcePos)
 {
@@ -134,8 +261,7 @@ TEST_F(BDUTest, ForcePos)
                                       sys.get_lambda(), vals);
   
   vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
-  dTr[0]  = 0.0;  dTr[1]  = 0.01;
-  dRot[0] = 0.0; dRot[1] = 0.0;
+  dTr[0]  = 0.0;  dTr[1]  = 0.01; dRot[0] = 0.0; dRot[1] = 0.0;
   BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
             dTr, dRot, false);
   
@@ -149,13 +275,7 @@ TEST_F(BDUTest, ForcePos)
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
-    FoTest.calc_force();
-    TorTest.calc_tau();
-//    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
-//                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
-//                     const_, nmol, vals);
-//    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
-//                       ASolvTest.get_gamma(), const_, sys, vals);
+    FoTest.calc_force(); TorTest.calc_tau();
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
     
@@ -175,10 +295,6 @@ TEST_F(BDUTest, ForcePosZ)
   Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 0.0, 5.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
-//    int M = 1; vector<double> charges(1); vector<Pt> posCharges(1);
-//    charges[0] = 2.0; posCharges[0] = pos[molInd];
-//    Molecule molNew( M, 1.0, charges, posCharges, pos[molInd]);
-//    mol_.push_back( molNew );
     int M = 1;
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
@@ -196,8 +312,7 @@ TEST_F(BDUTest, ForcePosZ)
                                       sys.get_lambda(), vals);
   
   vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
-  dTr[0]  = 0.0;  dTr[1]  = 0.01;
-  dRot[0] = 0.0; dRot[1] = 0.0;
+  dTr[0]  = 0.0;  dTr[1]  = 0.01; dRot[0] = 0.0; dRot[1] = 0.0;
   BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
             dTr, dRot, false);
   
@@ -211,16 +326,9 @@ TEST_F(BDUTest, ForcePosZ)
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
-    FoTest.calc_force();
-    TorTest.calc_tau();
-//    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
-//                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
-//                     const_, nmol, vals);
-//    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
-//                       ASolvTest.get_gamma(), const_, sys, vals);
+    FoTest.calc_force(); TorTest.calc_tau();
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
-    
     
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).x(), 0, preclim);
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
@@ -254,11 +362,8 @@ TEST_F(BDUTest, ForceOpp)
   ReExpCoeffsConstants re_exp_consts (const_.get_kappa(),
                                       sys.get_lambda(), vals);
   
-  
-  
   vector<double> dTr(mol_.size()); vector<double> dRot(mol_.size());
-  dTr[0]  = 0.0;  dTr[1]  = 0.01;
-  dRot[0] = 0.0; dRot[1] = 0.0;
+  dTr[0]  = 0.0;  dTr[1]  = 0.01;   dRot[0] = 0.0; dRot[1] = 0.0;
   BDStep BDTest( make_shared<System> (sys), make_shared<Constants> (const_),
             dTr, dRot, false);
   
@@ -272,15 +377,8 @@ TEST_F(BDUTest, ForceOpp)
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
-    
-    FoTest.calc_force();
-    TorTest.calc_tau();
-    
-//    ForceCalc FoTest( ASolvTest.get_A(), ASolvTest.get_gradA(),
-//                     ASolvTest.calc_L(), ASolvTest.calc_gradL(),
-//                     const_, nmol, vals);
-//    TorqueCalc TorTest( SHCalcu, bCalcu, ASolvTest.calc_gradL(),
-//                       ASolvTest.get_gamma(), const_, sys, vals);
+
+    FoTest.calc_force();  TorTest.calc_tau();
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
     
@@ -335,7 +433,6 @@ TEST_F(BDUTest, TorquePos)
 
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
   
-
     EXPECT_NEAR(BDTest.get_system()->get_posij(0, 0).x()/BDTor0x[step],
                 1.0, preclim);
     EXPECT_NEAR(BDTest.get_system()->get_posij(0, 0).y()/BDTor0y[step],
@@ -447,8 +544,6 @@ TEST_F(BDUTest, TorqueOpp)
                 1.0, preclim);
     EXPECT_NEAR(BDTest.get_system()->get_posij(2, 2).z()/BD3Tor22z[step],
                 1.0, preclim);
-
-    
   }
 }
 

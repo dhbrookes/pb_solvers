@@ -9,14 +9,11 @@
 #ifndef SHCalc_h
 #define SHCalc_h
 
-#include <stdio.h>
 #include <complex>
 #include <vector>
-#include <math.h>
 #include <assert.h>
 #include "Constants.h"
 #include "MyMatrix.h"
-#include "util.h"
 
 using namespace std;
 
