@@ -15,6 +15,8 @@
 #include <sstream>
 #include <cstring>
 
+#include <string>
+
 using namespace std;
 
 class CouldNotReadException: public exception

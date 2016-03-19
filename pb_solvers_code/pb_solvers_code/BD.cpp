@@ -202,6 +202,4 @@ void BDRun::run()
     }
     i++;
   }
-  
-  
 }

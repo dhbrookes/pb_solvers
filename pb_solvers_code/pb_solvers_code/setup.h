@@ -34,6 +34,8 @@ protected:
   double kappa_;
   double iKbT_;
   
+  string units_; // the units desired for output
+  
   // input file reading methods:
   void read_infile(string infile);
   vector<string> split(string str, char delim);
@@ -43,6 +45,7 @@ protected:
   //'electrostat' or 'dynamics' (for RunType)
   void setRunType( string runt ) {runSpecs_[0] = runt;}
   void setRunName( string runn ) {runSpecs_[1] = runn;}
+  void setUnits( string units )  {units_ = units;}
   void resizeVecs();
   
   void setOMP( int ompT ) { ompThreads_ = ompT ; }
@@ -80,6 +83,7 @@ public:
   
   string getRunType()              { return runSpecs_[0]; }
   string getRunName()              { return runSpecs_[1]; }
+  string getUnits()                { return units_; }
   
   int getThreads()                 { return ompThreads_; }
   int getNType()                   { return nType_; }

@@ -26,6 +26,8 @@ const int nvals = 10 ;      //! standard number of poles for testing
 #include "SystemUnitTest.h"
 #include "utilUnitTest.h"
 
+#include "ElectrostaticsUnitTest.h"
+
 #include "tester.h"
 
 using namespace std;

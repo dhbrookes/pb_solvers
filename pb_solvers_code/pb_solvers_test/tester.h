@@ -13,7 +13,6 @@
 #include <iostream>
 #include "ASolverTest.h"
 #include "BesselCalcTest.h"
-#include "ElectrostaticsUnitTest.h"
 #include "EnergyForceTest.h"
 #include "ConstantsTest.h"
 #include "EnergyForceTest.h"
@@ -37,7 +36,6 @@ public:
     BCalcT.TestBesselCalc();
     cout << "Complete Bessel calculation test" << endl;
     
-    
     ASolverTest ASolvT;
     ASolvT.RunASolverTest();
     cout << "Complete ASolv test" << endl;
@@ -45,10 +43,6 @@ public:
     ConstantsTest ConT;
     ConT.TestConstants();
     cout << "Complete Constant test" << endl;
-    
-    ElecTest ElecT;
-    ElecT.RunElecTest();
-    cout << "Complete Electrostatic test" << endl;
     
     EnForTest EnForT;
     EnForT.RunEnForTest();

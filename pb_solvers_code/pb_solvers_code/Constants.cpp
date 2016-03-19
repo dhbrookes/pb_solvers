@@ -28,10 +28,10 @@ const int Constants::MAX_NUM_POLES = 30;
 /*
  Constructor sets default values of independent constants
  */
-Constants::Constants()
+Constants::Constants(Units units)
 :bDist_(100.0), qDist_(500.0), fDist_(100.0), dielectricWater_(78.0),
 dielectricProt_(4.0), saltConcentration_(0.0100), temp_(353.0), tol_(2.5),
-patchAngle_(6.0), rotateAngle_(20.0)
+patchAngle_(6.0), rotateAngle_(20.0), units_(units)
 {
 	update_all();
 }
@@ -44,6 +44,7 @@ Constants::Constants(Setup setup)
 dielectricProt_(4.0), saltConcentration_(0.0100), temp_(353.0), tol_(2.5),
 patchAngle_(6.0), rotateAngle_(20.0)
 {
+  set_units(setup.getUnits());
   set_dielectric_prot(setup.getIDiel());
   set_dielectric_water(setup.getSDiel());
   set_salt_concentration(setup.getSaltConc());
@@ -82,6 +83,34 @@ void Constants::update_all()
   update_rotate_size();
   update_kbt();
   update_rotate_size();
+}
+
+void Constants::set_units( string units )
+{
+  units_ = INTERNAL;
+  
+  if (units == "kcalmol")   units_ = KCALMOL;
+  else if (units == "jmol") units_ = JMOL;
+  else if (units == "kT")   units_ = kT;
+}
+
+string Constants::get_units( )
+{
+  if (units_ == KCALMOL) return "kcalmol" ;
+  else if (units_ == JMOL) return "jmol";
+  else if (units_ == kT) return "kT";
+  return "internal";
+}
+
+const double Constants::get_conv_factor()
+{
+  double conversion_factor = 1.0;
+  
+  if (units_ == KCALMOL)   conversion_factor = convert_int_to_kcal_mol(1.0);
+  else if (units_ == JMOL) conversion_factor = convert_int_to_jmol(1.0);
+  else if (units_ == kT)   conversion_factor = convert_int_to_kT(1.0);
+  
+  return conversion_factor;
 }
 
 const double Constants::convert_int_to_kcal_mol(double val)

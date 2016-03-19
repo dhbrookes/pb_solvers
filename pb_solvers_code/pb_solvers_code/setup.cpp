@@ -43,6 +43,8 @@ runSpecs_(2)
   runSpecs_[0] = "electrostatics";
   runSpecs_[1] = "test";
   
+  units_ = "internal";
+  
   // Initializing file locs to defaults
   // pqr fname, imat path, spol path, spol name
   vector<vector<string> > molfn = {{"../Config/test1.pqr", "../Imat/test1/",
@@ -199,6 +201,10 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "RNG Seed command found" << endl;
     setRand( atoi(fline[1].c_str()) );
+  } else if (keyword == "units")
+  {
+    cout << "Units command found" << endl;
+    setUnits( fline[1].c_str() );
   } else
     cout << "Keyword not found, read in as " << fline[0] << endl;
 }

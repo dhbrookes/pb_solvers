@@ -25,15 +25,14 @@ _consts_(_consts)
   for (int i = 0; i < 3; i++)
     npts_[i] = npts;
   
+  grid_.resize(npts);
+  for (int i = 0; i < grid_.size(); i++)
+    grid_[i].resize(npts);
+  
   find_range();
   find_bins();
   
-  cout << " This is my range " << range_min_[0] <<  ", " <<range_min_[1]
-  <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", "
-  <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", "
-  <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1]
-  <<  ", "<<npts_[2] << endl;
-  
+  compute_units();
   compute_pot();
 }
 
@@ -50,10 +49,17 @@ _consts_(_asolv->get_consts())
   for (int i = 0; i < 3; i++)
     npts_[i] = npts;
   
+  grid_.resize(npts);
+  for (int i = 0; i < grid_.size(); i++)
+    grid_[i].resize(npts);
+  
   find_range();
   find_bins();
   
-  cout << " This is my range " << range_min_[0] <<  ", " <<range_min_[1]
+  compute_units();
+  
+  cout << " This is units " << units_ << " my range " << range_min_[0]
+  <<  ", " <<range_min_[1]
   <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", "
   <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", "
   <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1]
@@ -118,14 +124,22 @@ void Electrostatic::find_bins()
   }
 }
 
+void Electrostatic::compute_units()
+{
+  units_ = _consts_->get_conv_factor();
+}
+
 void Electrostatic::print_dx( string dxname )
 {
   ofstream dx;
+  char pot[20];
   int xct, yct, zct;
   int ct = 0;
   
   dx.open(dxname);
-  dx << "# Data from PBAM Rad run \n# My runname is " << dxname << endl;
+  dx << "# Data from PBAM Electrostat run" << endl;
+  dx << "# My runname is " << dxname << " and units " ;
+  dx << _consts_->get_units() <<  endl;
   dx << "object 1 class gridpositions counts " << npts_[0]
      << " " << npts_[1] << " " << npts_[2] << endl;
   dx << "origin " << range_min_[0] << " " << range_min_[1]
@@ -144,7 +158,8 @@ void Electrostatic::print_dx( string dxname )
     {
       for ( zct=0; zct<npts_[2]; zct++)
       {
-        dx << esp_[xct][yct][zct] << "  ";
+        sprintf( pot, "%10.7e  ", esp_[xct][yct][zct]);
+        dx << pot;
         ct++;
         if ((ct % 3) == 0) dx << "\n";
       }
@@ -162,56 +177,54 @@ void Electrostatic::print_dx( string dxname )
 
 void Electrostatic::print_grid(Axis axis, double value, string fname)
 {
-  int idx = round((value-range_min_[axis]) / step_[axis]);
-  vector<vector<double> > grid ;
   int i, j;
-  if (axis ==  Xdim)
-  {
-    grid = vector<vector<double> > (npts_[1], vector<double> (npts_[2]));
-    for (i = 0; i < grid.size(); i++)
-    {
-      for (j = 0; j < grid[0].size(); j++)
-      {
-        grid[i][j] = esp_[idx][i][j];
-      }
-    }
-  }
-  
-  if (axis ==  Ydim)
-  {
-    grid = vector<vector<double> > (npts_[0], vector<double> (npts_[2]));
-    for (i = 0; i < grid.size(); i++)
-    {
-      for (j = 0; j < grid[0].size(); j++)
-      {
-        grid[i][j] = esp_[i][idx][j];
-      }
-    }
-  }
-  
-  if (axis ==  Zdim)
-  {
-    grid = vector<vector<double> > (npts_[0], vector<double> (npts_[1]));
-    for (i = 0; i < grid.size(); i++)
-    {
-      for (j = 0; j < grid[0].size(); j++)
-      {
-        grid[i][j] = esp_[i][j][idx];
-      }
-    }
-  }
-  
   ofstream f;
-  int ct = 0;
-  f.open(fname);
-  for (i = 0; grid.size(); i++)
-  {
-    for (j = 0; grid[0].size(); j++)
+  char pot[20], ax = 'x';
+  vector<double> org(2), delta(2);
+  int idx = round((value-range_min_[axis]) / step_[axis]);
+
+  for (i = 0; i < grid_.size(); i++)
+    for (j = 0; j < grid_[0].size(); j++)
     {
-      f << grid[i][j] << "  ";
-      ct++;
-      if ((ct % 3) == 0) f << "\n";
+      if (axis ==  Xdim)      grid_[i][j] = esp_[idx][i][j];
+      else if (axis ==  Ydim) grid_[i][j] = esp_[i][idx][j];
+      else if (axis ==  Zdim) grid_[i][j] = esp_[i][j][idx];
     }
+  
+  if ( axis == Xdim )
+  {
+    org[0] = range_min_[1]; org[1] = range_min_[2];
+    delta[0] = step_[1]; delta[1] = step_[2];
+    ax = 'x';
+  }
+  else if ( axis == Ydim )
+  {
+    org[0] = range_min_[0]; org[1] = range_min_[2];
+    delta[0] = step_[0]; delta[1] = step_[2];
+    ax = 'y';
+  } else
+  {
+    org[0] = range_min_[0]; org[1] = range_min_[1];
+    delta[0] = step_[0]; delta[1] = step_[1];
+    ax = 'z';
+  }
+  
+  f.open(fname);
+  f << "# Data from PBAM Electrostat run\n# My runname is " << fname << endl;
+  f << "units " << _consts_->get_units() <<  endl;
+  f << "grid " << grid_.size() << " " << grid_[0].size() << endl;
+  f << "axis " << ax << " " << value << endl;
+  f << "origin " << org[0] << " " << org[1] << endl;
+  f << "delta " << delta[0] << " " << delta[1] << endl;
+  
+  for (i = 0; i < grid_.size(); i++)
+  {
+    for (j = 0; j < grid_[0].size(); j++)
+    {
+      sprintf( pot, "%12.7f  ", grid_[i][j]);
+      f << pot;
+    }
+    f << "\n";
   }
   f.close();
 }
@@ -251,13 +264,13 @@ void Electrostatic::compute_pot()
         if (cont)
           esp_[xct][yct][zct] = 0.0;
         else
-          esp_[xct][yct][zct] = compute_pot_at( pos.x(), pos.y(), pos.z())/e_s;
+          esp_[xct][yct][zct] = (units_*compute_pot_at(pos))/e_s;
       }
     }
   }
 }
 
-double Electrostatic::compute_pot_at( double x, double y, double z)
+double Electrostatic::compute_pot_at( Pt point )
 {
 
   int mol, Nmol      = _sys_->get_n();
@@ -269,7 +282,7 @@ double Electrostatic::compute_pot_at( double x, double y, double z)
   {
     center = _sys_->get_centeri(mol);
     rad    = _sys_->get_ai(mol);
-    dist   = Pt(x,y,z) - center;
+    dist   = point - center;
     localK = get_local_exp(dist);
     pot += lotan_inner_prod( _A_->operator[](mol), localK, p_);
   }

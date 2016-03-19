@@ -28,7 +28,7 @@ protected:
    and dA/dphi, respectively. This can only be calculated once A has been
    solved for
    */
-  shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > _gradT_A_, _gradA_, _prevGradA_;
+  shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > _gradT_A_,_gradA_,_prevGradA_;
   
   /*
    enum for telling the ReExpCoeffs which values to retrieve
@@ -177,14 +177,16 @@ public:
   void calc_L();
   void calc_gradL();
   
-  cmplx get_gamma_ni( int i, int n)        { return _gamma_->operator[](i)( n, n); }
-  cmplx get_delta_ni( int i, int n)        { return _delta_->operator[](i)( n, n); }
-  cmplx get_SH_ij(int i, int j, int n, int m) { return all_sh[i][j]( n, abs(m)); }
-  cmplx get_E_ni(int i, int n, int m)      { return _E_->operator[](i)( n, m+p_ ); }
-  cmplx get_A_ni(int i, int n, int m)      { return _A_->operator[](i)( n, m+p_ ); }
-  cmplx get_prevA_ni(int i, int n, int m)  { return _prevA_->operator[](i)( n, m+p_ ); }
+  cmplx get_gamma_ni( int i, int n)       {return _gamma_->operator[](i)(n,n);}
+  cmplx get_delta_ni( int i, int n)       {return _delta_->operator[](i)(n,n);}
+  cmplx get_SH_ij(int i, int j, int n, int m) {return all_sh[i][j](n,abs(m));}
+  cmplx get_E_ni(int i, int n, int m)     {return _E_->operator[](i)(n,m+p_);}
+  cmplx get_A_ni(int i, int n, int m)     {return _A_->operator[](i)(n,m+p_);}
+  cmplx get_prevA_ni(int i, int n, int m)
+        {return _prevA_->operator[](i)(n,m+p_ ); }
   
-  VecOfMats<cmplx>::type get_gradT_Aij( int i, int j) {return _gradT_A_->operator()(i,j);}
+  VecOfMats<cmplx>::type get_gradT_Aij( int i, int j)
+        {return _gradT_A_->operator()(i,j);}
   
   // convert derivs in matrix to cartesian
   VecOfMats<cmplx>::type conv_to_cart(VecOfMats<cmplx>::type dZ, int i, int j);
@@ -220,8 +222,7 @@ public:
   { return _prevGradA_->operator()(i, j)[2](n, m+p_);}
   
   void set_A_ni(int i, int n, int m, cmplx val)
-  {
-    _A_->operator[](i).set_val( n, m+p_, val);}
+  {_A_->operator[](i).set_val( n, m+p_, val);}
 
   void print_Ei( int i, int p);
   void print_Ai( int i, int p);

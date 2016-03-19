@@ -12,6 +12,8 @@
 
 #include "Setup.h"
 
+enum Units { INTERNAL, KCALMOL, JMOL, kT };
+
 /**
  Class for storing all relevant constants. Many have default values that are 
  defined inline.
@@ -42,6 +44,9 @@ protected:
   double kappa_;  //!< Inverse debye length [1/A]
   double patchSize_;  //(cos(PATCH_ANGLE * M_PI / 180.0))
   double rotateSize_;  //(cos(ROTATE_ANGLE * M_PI / 180.0))
+  
+  // Enum for units of the system
+  Units units_;
     
 public:
     
@@ -62,9 +67,8 @@ public:
   static const double MAX_DIST;  // maximum distance for cutoff, box length
   static const double FORCE_CUTOFF;  // default distance for cutoff
   
-  Constants();
+  Constants(Units units = INTERNAL);
   Constants(Setup setup);
-  
   
   //The methods below update dependent constants (called when others are set in
   //setter methods)
@@ -73,6 +77,8 @@ public:
   void update_patch_size();
   void update_rotate_size();
   void update_all(); // calls all of the above methods
+  
+  void set_units( string units );
   
   //Setter methods. Some call update methods if necessary
   void set_b_dist(double val)                 { bDist_ = val; }
@@ -119,6 +125,9 @@ public:
   const double get_kappa() const              { return kappa_; }
   const double get_patch_size() const         { return patchSize_; }
   const double get_rotate_size() const        { return rotateSize_; }
+  string get_units();
+  
+  const double get_conv_factor();
   
   //convert a value from international units to mol units:
   static const double convert_int_to_kcal_mol(double val);

@@ -20,6 +20,7 @@ class Electrostatic
 {
 protected:
   int p_; // Npoles
+  double units_; // A conversion factor to user desired units
   
   vector<double> range_min_;  // Origin of grid in each dim
   vector<double> range_max_;  // Origin of grid in each dim
@@ -27,6 +28,7 @@ protected:
   vector<double> step_;  // step of grid in each dimension
 
   vector<vector<vector<double > > > esp_; // vector of ESP values
+  vector<vector<double > > grid_;  // 2D cross section of ESP
   
   shared_ptr<VecOfMats<cmplx>::type> _A_;
   shared_ptr<System> _sys_;
@@ -37,8 +39,10 @@ protected:
   void find_range();
   void find_bins();
   
+  void compute_units();
+  
   void compute_pot();
-  double compute_pot_at( double x, double y, double z);
+  double compute_pot_at( Pt point );
   
   MyMatrix<cmplx> get_local_exp( Pt dist );
   
@@ -55,7 +59,17 @@ public:
   // print APBS file
   void print_dx(string ifname);
   
+  // print Grid file, given an axis and a value on that axis
   void print_grid(Axis axis, double value, string fname);
+  
+  // return potential grid
+  vector<vector<vector<double > > > get_potential() { return esp_; }
+  vector<vector<double > > get_pot2d()              { return grid_; }
+  
+  vector<double> get_mins()  { return range_min_; }
+  vector<double> get_maxs()  { return range_max_; }
+  vector<int> get_npts()     { return npts_; }
+  vector<double> get_bins()  { return step_; }
   
 };
 
