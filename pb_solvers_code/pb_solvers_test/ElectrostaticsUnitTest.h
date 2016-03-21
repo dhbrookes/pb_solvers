@@ -333,6 +333,28 @@ TEST_F(ElecUTest, printPOTZ)
   }
 }
 
+TEST_F(ElecUTest, printPOT)
+{
+  const int vals = 5;
+  Constants const_( INTERNAL );
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        make_shared<Constants>
+                                                        (const_), vals);
+  ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
+  
+//  Electrostatic EstatTest( ASolvTest, 111);
+//  double val = 0; char pot[50];
+//  sprintf(pot, "/Users/lfelberg/Desktop/pot_x_%.2f.dat", val);
+//  EstatTest.print_grid(Xdim, val, string(pot));
+//  
+//  EXPECT_TRUE( 0 == 0);
+}
+
 
 
 #endif /* ElectrostaticsUnitTest_h */

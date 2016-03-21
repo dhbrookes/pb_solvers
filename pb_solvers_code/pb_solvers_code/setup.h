@@ -20,6 +20,9 @@ protected:
   int maxtime_;
   int ntraj_;
   
+  string axis_;  // For potential print, axis desired
+  double axLoc_; // Location along given axis
+  
   double idiel_;
   double sdiel_;  // dielectric constant win molecule and of solvent
   double temp_;
@@ -55,6 +58,9 @@ protected:
   void setPBCT( int pbc ){ PBCs_ = pbc; }
   void setBoxl( double boxl ){ blen_ = boxl; }
   void setMaxTime( int maxt ){ maxtime_ = maxt; }
+  
+  void setAxis( string axis ){ axis_ = axis; }
+  void setAxLoc( double axLoc ){ axLoc = axLoc; }
   
   void setIDiel( double idiel ) { idiel_ = idiel; }
   void setSDiel( double sdiel ) { sdiel_ = sdiel;}

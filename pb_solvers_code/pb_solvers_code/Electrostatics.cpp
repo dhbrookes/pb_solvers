@@ -14,8 +14,8 @@ Electrostatic::Electrostatic(shared_ptr<VecOfMats<cmplx>::type> _A,
                              shared_ptr<BesselCalc> _bCalc,
                              shared_ptr<Constants> _consts,
                              int p, int npts)
-: p_(p), _A_(_A), _sys_(_sys), _shCalc_(_shCalc), _bCalc_(_bCalc),
-_consts_(_consts)
+: p_(p), pot_min_(0), pot_max_(0), _A_(_A), _sys_(_sys), _shCalc_(_shCalc),
+_bCalc_(_bCalc), _consts_(_consts)
 {
   range_min_.resize(3);
   range_max_.resize(3);
@@ -37,9 +37,9 @@ _consts_(_consts)
 }
 
 Electrostatic::Electrostatic(shared_ptr<ASolver> _asolv, int npts)
-:p_(_asolv->get_p()), _A_(_asolv->get_A()), _sys_(_asolv->get_sys()),
-_shCalc_(_asolv->get_sh()), _bCalc_(_asolv->get_bessel()),
-_consts_(_asolv->get_consts())
+:p_(_asolv->get_p()), pot_min_(0), pot_max_(0), _A_(_asolv->get_A()),
+_sys_(_asolv->get_sys()), _shCalc_(_asolv->get_sh()),
+_bCalc_(_asolv->get_bessel()), _consts_(_asolv->get_consts())
 {
   range_min_.resize(3);
   range_max_.resize(3);
@@ -189,6 +189,9 @@ void Electrostatic::print_grid(Axis axis, double value, string fname)
       if (axis ==  Xdim)      grid_[i][j] = esp_[idx][i][j];
       else if (axis ==  Ydim) grid_[i][j] = esp_[i][idx][j];
       else if (axis ==  Zdim) grid_[i][j] = esp_[i][j][idx];
+      
+      if (grid_[i][j] < pot_min_)      pot_min_ = grid_[i][j];
+      else if (grid_[i][j] > pot_max_) pot_max_ = grid_[i][j];
     }
   
   if ( axis == Xdim )
@@ -208,7 +211,7 @@ void Electrostatic::print_grid(Axis axis, double value, string fname)
     delta[0] = step_[0]; delta[1] = step_[1];
     ax = 'z';
   }
-  
+
   f.open(fname);
   f << "# Data from PBAM Electrostat run\n# My runname is " << fname << endl;
   f << "units " << _consts_->get_units() <<  endl;
@@ -216,6 +219,7 @@ void Electrostatic::print_grid(Axis axis, double value, string fname)
   f << "axis " << ax << " " << value << endl;
   f << "origin " << org[0] << " " << org[1] << endl;
   f << "delta " << delta[0] << " " << delta[1] << endl;
+  f << "maxmin " << pot_max_ << " " << pot_min_ << endl;
   
   for (i = 0; i < grid_.size(); i++)
   {
@@ -239,6 +243,7 @@ void Electrostatic::compute_pot()
   int Nmol = _sys_->get_n();
   double e_s = _consts_->get_dielectric_water();
   
+  // Parallel here!
   for ( xct=0; xct<npts_[0]; xct++)
   {
     cout  << range_min_[0]+xct*step_[0] << " ..  " << endl ;
