@@ -25,27 +25,34 @@ N_(_asolv->get_N()), p_(_asolv->get_p())
 //  calc_energy();
 }
 
+double EnergyCalc::calc_ei(int i)
+{
+  double ei;
+  int n, m;
+  cmplx unm, vnm;
+  MyMatrix<cmplx> Li = _L_->operator[](i);
+  MyMatrix<cmplx> Ai = _A_->operator[](i);
+  
+  // calculate inner product (as defined in eq 29 of Lotan 2006):
+  ei = 0.0;
+  for (n = 0; n < p_; n++)
+  {
+    for (m = -n; m <= n; m++)
+    {
+      unm = Li(n, m + p_);
+      vnm = Ai(n, m + p_);
+      ei += unm.real()*vnm.real() + unm.imag()*vnm.imag();
+    }
+  }
+  ei *= (1/_const_->get_dielectric_water());
+  return ei;
+}
+
 void EnergyCalc::calc_energy()
 {
-  int i, n, m; cmplx unm, vnm; double ip; MyMatrix<cmplx> Li, Ai;
-  
-  for (i = 0; i < N_; i++)
+  for (int i = 0; i < N_; i++)
   {
-    Li = _L_->operator[](i);
-    Ai = _A_->operator[](i);
-    
-    // calculate inner product (as defined in eq 29 of Lotan 2006):
-    ip = 0.0;
-    for (n = 0; n < p_; n++)
-    {
-      for (m = -n; m <= n; m++)
-      {
-        unm = Li(n, m + p_);
-        vnm = Ai(n, m + p_);
-        ip += unm.real()*vnm.real() + unm.imag()*vnm.imag();
-      }
-    }
-    _omega_->set_val(i, ip * (1/_const_->get_dielectric_water()));
+    _omega_->set_val(i, calc_ei(i));
   }
 }
 
@@ -70,44 +77,51 @@ N_(_asolv->get_N()), p_(_asolv->get_p())
 //  calc_force();
 }
 
-
-void ForceCalc::calc_force()
+MyVector<double> ForceCalc::calc_fi(int i)
 {
-  int i, j, n, m;
+  int j, n, m;
   cmplx unm1, vnm1, unm2, vnm2;
   double ip1, ip2;
   VecOfMats<cmplx>::type gLi, gAi;
   MyMatrix<cmplx> Li, Ai;
-  MyVector<double> inner;
-  for (i = 0; i < N_; i++)
+  MyVector<double> fi;
+
+  Li = _L_->operator[](i);
+  Ai = _A_->operator[](i);
+  
+  gLi = _gradL_->operator[](i);
+  gAi = _gradA_->operator()(i, i);
+  fi = MyVector<double> (3);
+  for (j = 0; j < 3; j++)  // for each component of the gradient
   {
-    Li = _L_->operator[](i);
-    Ai = _A_->operator[](i);
-    
-    gLi = _gradL_->operator[](i);
-    gAi = _gradA_->operator()(i, i);
-    inner = MyVector<double> (3);
-    for (j = 0; j < 3; j++)  // for each component of the gradient
+    ip1 = 0.0;
+    ip2 = 0.0;
+    for (n = 0; n < p_; n++)
     {
-      ip1 = 0.0;
-      ip2 = 0.0;
-      for (n = 0; n < p_; n++)
+      for (m = -n; m <= n; m++)
       {
-        for (m = -n; m <= n; m++)
-        {
-          unm1 = gLi[j](n, m + p_);
-          vnm1 = Ai(n, m + p_);
-          ip1 += unm1.real()*vnm1.real() + unm1.imag()*vnm1.imag();
-          
-          unm2 = Li(n, m + p_);
-          vnm2 = gAi[j](n, m + p_);
-          ip2 += unm2.real()*vnm2.real() + unm2.imag()*vnm2.imag();
-        }
+        unm1 = gLi[j](n, m + p_);
+        vnm1 = Ai(n, m + p_);
+        ip1 += unm1.real()*vnm1.real() + unm1.imag()*vnm1.imag();
+        
+        unm2 = Li(n, m + p_);
+        vnm2 = gAi[j](n, m + p_);
+        ip2 += unm2.real()*vnm2.real() + unm2.imag()*vnm2.imag();
       }
-      
-      inner.set_val(j, -1.0/_const_->get_dielectric_water() * (ip1 + ip2));
     }
-    _F_->set_val(i, inner);
+    
+    fi.set_val(j, -1.0/_const_->get_dielectric_water() * (ip1 + ip2));
+  }
+  return fi;
+
+}
+
+
+void ForceCalc::calc_force()
+{
+  for (int i = 0; i < N_; i++)
+  {
+    _F_->set_val(i, calc_fi(i));
   }
 }
 
@@ -183,31 +197,44 @@ VecOfMats<cmplx>::type TorqueCalc::calc_H(int i)
 }
 
 
-void TorqueCalc::calc_tau()
+MyVector<double> TorqueCalc::calc_tau_i(int i)
 {
   MyVector<double> tau_i;
   VecOfMats<cmplx>::type Hi;
   VecOfMats<cmplx>::type gLi;
+
+  Hi    = calc_H(i);
+  tau_i = MyVector<double> (3);
+  gLi   = _gradL_-> operator[](i);
+  
+  //perform cross product:
+  tau_i.set_val(0, 1/_consts_->get_dielectric_water()
+                * (lotan_inner_prod(gLi[1], Hi[2], p_)
+                   - lotan_inner_prod(gLi[2], Hi[1], p_)));
+  
+  tau_i.set_val(1, 1/_consts_->get_dielectric_water() *
+                (lotan_inner_prod(gLi[2], Hi[0], p_)
+                 - lotan_inner_prod(gLi[0], Hi[2], p_)));
+  
+  tau_i.set_val(2, 1/_consts_->get_dielectric_water() *
+                (lotan_inner_prod(gLi[0], Hi[1], p_)
+                 - lotan_inner_prod(gLi[1], Hi[0], p_)));
+  return tau_i;
+}
+
+void TorqueCalc::calc_tau()
+{
   for (int i = 0; i < N_; i++)
   {
-    Hi    = calc_H(i);
-    tau_i = MyVector<double> (3);
-    gLi   = _gradL_-> operator[](i);
-    
-    //perform cross product:
-    tau_i.set_val(0, 1/_consts_->get_dielectric_water()
-                  * (lotan_inner_prod(gLi[1], Hi[2], p_)
-                  - lotan_inner_prod(gLi[2], Hi[1], p_)));
-    
-    tau_i.set_val(1, 1/_consts_->get_dielectric_water() *
-                  (lotan_inner_prod(gLi[2], Hi[0], p_)
-                  - lotan_inner_prod(gLi[0], Hi[2], p_)));
-    
-    tau_i.set_val(2, 1/_consts_->get_dielectric_water() *
-                  (lotan_inner_prod(gLi[0], Hi[1], p_)
-                  - lotan_inner_prod(gLi[1], Hi[0], p_)));
-    
-    _tau_->set_val(i, tau_i);
+    _tau_->set_val(i, calc_tau_i(i));
   }
+}
+
+
+PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv)
+{
+  _eCalc_ = make_shared<EnergyCalc>(_asolv);
+  _fCalc_ = make_shared<ForceCalc>(_asolv);
+  _torCalc_ = make_shared<TorqueCalc>(_asolv);
 }
 

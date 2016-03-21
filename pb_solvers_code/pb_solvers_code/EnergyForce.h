@@ -33,7 +33,7 @@ protected:
   /*
    Enum for the units of energy
    */
-  enum WhichUnit { INTER, KCALMOL, KT, JMOL };
+
   
   shared_ptr<MyVector<double> > _omega_;  // result of energy calculation, internal units
   
@@ -50,6 +50,9 @@ public:
   
   // fill omega_
   void calc_energy();
+  
+  // calculate energy of one molecule
+  double calc_ei(int i);
   
   // get the energy for a specific molecule:
   double get_omega_i_int(int i)  { return _omega_->operator[](i); }
@@ -124,6 +127,9 @@ public:
   
   void calc_force();  // fill F_
   
+  // calculate force on one molecule
+  MyVector<double> calc_fi(int i);
+  
   MyVector<double> get_fi(int i)     { return _F_->operator[](i); }
   shared_ptr<VecOfVecs<double>::type> get_F()    { return _F_; }
   
@@ -171,6 +177,9 @@ public:
   
   void calc_tau();  // fill tau_
   
+  // calculate torque on one molecule
+  MyVector<double> calc_tau_i(int i);
+  
   /*
    Calculate H vector (eq 42 and 43 in Lotan 2006)
    */
@@ -199,6 +208,49 @@ public:
     return ip;
   }
   
+};
+
+/*
+ Class for calculating energy force and torque in one place
+ */
+
+class PhysCalc
+{
+protected:
+  shared_ptr<EnergyCalc> _eCalc_;
+  shared_ptr<ForceCalc> _fCalc_;
+  shared_ptr<TorqueCalc> _torCalc_;
+  
+  shared_ptr<MyVector<double> > _omega2_; // energy in proper units
+  
+public:
+  
+  // constructor just requires an asolver
+  PhysCalc(shared_ptr<ASolver> _asolv);
+  
+  MyVector<double> calc_force_i(int i)  { return _fCalc_->calc_fi(i); }
+  MyVector<double> calc_tau_i(int i)    { return _torCalc_->calc_tau_i(i); }
+  MyVector<double> calc_ei(int i)       { return _eCalc_->calc_ei(i); }
+  
+  void calc_force()   { _fCalc_->calc_force(); }
+  void calc_energy()  { _eCalc_->calc_energy(); }
+  void calc_torque()  { _torCalc_->calc_tau(); }
+  
+  shared_ptr<VecOfVecs<double>::type > get_Tau() { return _torCalc_->get_Tau(); }
+  shared_ptr<VecOfVecs<double>::type> get_F()    { return _fCalc_->get_F(); }
+  // get energy given the units
+  shared_ptr<MyVector<double> > get_omega(Units units=INTERNAL)
+  {
+    if (units==INTERNAL)
+      _omega2_ = _eCalc_->get_omega_int();
+    else if (units == KCALMOL)
+      _omega2_ = make_shared<MyVector<double> >(_eCalc_->get_omega_kcal());
+    else if (units == JMOL)
+      _omega2_ = make_shared<MyVector<double> >(_eCalc_->get_omega_jmol());
+    else if (units == kT)
+      _omega2_ = make_shared<MyVector<double> >(_eCalc_->get_omega_kT());
+    return _omega2_;
+  }
 };
 
 #endif /* EnergyForce_h */
