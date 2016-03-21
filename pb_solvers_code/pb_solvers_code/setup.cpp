@@ -124,6 +124,16 @@ void Setup::findKeyword(vector<string> fline)
       {
         setMaxTime( atoi( fline[3].c_str() ));
       }
+    } else if (fline[1] == "potential")
+    {
+      if (fline.size() > 2)
+      {
+        setAxis( fline[2].c_str() );
+      }
+      else if (fline.size() > 3)
+      {
+        setAxLoc( atof( fline[3].c_str() ));
+      }
     }
   } else if (keyword == "omp")
   {

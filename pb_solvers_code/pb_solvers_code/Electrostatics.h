@@ -22,6 +22,9 @@ protected:
   int p_; // Npoles
   double units_; // A conversion factor to user desired units
   
+  double pot_min_; // A minimum value of the pot
+  double pot_max_; // A max value of the potential
+  
   vector<double> range_min_;  // Origin of grid in each dim
   vector<double> range_max_;  // Origin of grid in each dim
   vector<int> npts_;   // number of grid pts in each dimension
