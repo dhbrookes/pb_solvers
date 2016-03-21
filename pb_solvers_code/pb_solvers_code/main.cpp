@@ -9,6 +9,7 @@
 #include <memory>
 #include "setup.h"
 #include "BD.h"
+#include "ThreeBody.h"
 
 using namespace std;
 

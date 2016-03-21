@@ -212,17 +212,17 @@ Pt System::get_pbc_dist_vec(int i, int j)
   return v;
 }
 
-System System::get_subsystem(const vector<int> mol_idx)
-{
-  vector<Molecule> sub_mols (mol_idx.size());
-  for (int i = 0; i < mol_idx.size(); i++)
-  {
-    sub_mols[i] = molecules_[mol_idx[i]];
-  }
-  System subsys (sub_mols, cutoff_, boxLength_);
-  subsys.set_time(t_);
-  return subsys;
-}
+//System System::get_subsystem(const vector<int> mol_idx)
+//{
+//  vector<Molecule> sub_mols (mol_idx.size());
+//  for (int i = 0; i < mol_idx.size(); i++)
+//  {
+//    sub_mols[i] = molecules_[mol_idx[i]];
+//  }
+//  System subsys (sub_mols, cutoff_, boxLength_);
+//  subsys.set_time(t_);
+//  return subsys;
+//}
 
 bool System::less_than_cutoff(Pt v)
 {

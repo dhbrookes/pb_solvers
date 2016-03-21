@@ -69,6 +69,20 @@ void ThreeBody::generatePairsTrips()
 } //end cutoffTBD
 
 
+shared_ptr<System> ThreeBody::make_subsystem(vector<int> mol_idx)
+{
+  vector<Molecule> sub_mols (mol_idx.size());
+  for (int i = 0; i < mol_idx.size(); i++)
+  {
+    sub_mols[i] = _sys_->get_molecule(mol_idx[i]);
+  }
+  
+  shared_ptr<System> _subsys = make_shared<System>(sub_mols, _sys_->get_cutoff(),
+                                                  _sys_->get_boxlength());
+  _subsys -> set_time(_sys_->get_time());
+  return _subsys;
+}
+
 // Three body approximation computation
 void ThreeBody::solveNmer( int num )
 {
@@ -76,7 +90,7 @@ void ThreeBody::solveNmer( int num )
   vector< vector<int> > nmer = ( num == 2) ? dimer_ : trimer_;
   vector< Molecule > mol_temp;
 
-  shared_ptr<System> _sysTemp = make_shared<System>(_sys_->get_subsystem(nmer[0]));
+  shared_ptr<System> _sysTemp = make_subsystem(nmer[0]);
   shared_ptr<ASolver> _asolvTemp = make_shared<ASolver>(_besselCalc_, _shCalc_,
                                                         _sysTemp, _consts_, p_);
   shared_ptr<EnergyCalc> _enCalc = make_shared<EnergyCalc>(_asolvTemp);
@@ -87,8 +101,7 @@ void ThreeBody::solveNmer( int num )
   for( i = 0; i < nmer.size(); i++)
   {
     cout << "This nmer is: ";
-    mol_temp.clear();
-    _sysTemp = make_shared<System>(_sys_->get_subsystem(nmer[0]));
+    shared_ptr<System> _sysTemp = make_subsystem(nmer[i]);
     
     _asolvTemp->reset_all(_sysTemp);
     

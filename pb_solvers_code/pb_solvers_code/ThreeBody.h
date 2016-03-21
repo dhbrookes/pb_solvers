@@ -45,6 +45,8 @@ private:
   // Solve the N body problem, only 2 or 3 right now
   void solveNmer( int num);
   
+  shared_ptr<System> make_subsystem(vector<int> mol_idx);
+  
 };
 
 #endif /* ThreeBody_h */
