@@ -107,7 +107,7 @@ public:
   System(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
   
   // return a copy of this system with a smaller set of molecules
-  System get_subsystem(const vector<int> mol_idx);
+//  System get_subsystem(const vector<int> mol_idx);
   
   const int get_n() const                  {return N_;}
   const double get_ai(int i) const         {return molecules_[i].get_a();}
