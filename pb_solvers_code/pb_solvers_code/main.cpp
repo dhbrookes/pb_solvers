@@ -13,20 +13,38 @@
 
 using namespace std;
 
-int main_dynamics( Setup setup, Constants consts, System sys)
+int main_dynamics( int poles, Setup setup, Constants consts, System sys)
+{
+
+  
+}
+
+int main_electrostatics( int poles, Setup setup, Constants consts, System sys)
 {
   
   
 }
 
-int main_electrostatics( Setup setup, Constants consts, System sys)
+int main_energyforce( int poles, Setup setup, Constants consts, System sys)
 {
+  int i, j;
+  vector< Molecule > molecules;
+  
+  for ( i = 0; i < setup.getNType(); i++ )
   
   
-}
-
-int main_energyforce( Setup setup, Constants consts, System sys)
-{
+  shared_ptr<Constants> const_ = make_shared<Constants>(setup);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(molecules);
+  
+  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        const_, vals);
+  
+  PhysCalc calcEnFoTo( ASolv);
+  
   
   
 }
@@ -40,12 +58,14 @@ int main(int argc, const char * argv[])
   Constants consts = Constants(setup);
   System sys = System(consts, setup);
   
+  int poles = 10;
+  
   if ( setup.getRunType() == "dynamics")
-    main_dynamics( consts, sys);
+    main_dynamics( poles, setup, consts, sys);
   else if ( setup.getRunType() == "potential")
-    main_electrostatics( consts, sys);
+    main_electrostatics( poles, setup, consts, sys);
   else if ( setup.getRunType() == "energyforce")
-    main_energyforce( consts, sys)
+    main_energyforce( poles, setup, consts, sys)
   else
     cout << "Runtype not recognized! See manual for options" << endl;
     

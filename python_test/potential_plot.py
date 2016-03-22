@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 '''
 Program to plot a 2D version of the ESP from PB-AM
 '''
-fileName='pot_x_0.00.dat'
-outFile='pot_x_0.00.jpg'
+fileName='pot_z_0.00.dat'
+outFile='pot_z_0.00.jpg'
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):

@@ -30,7 +30,6 @@ protected:
   vector<Pt>          pos_;  // position of each charge in the molecule
   vector<double>      vdwr_; // van der waal radius of each charge
   
-  
   // calculate the center of the molecule
   void calc_center();
   

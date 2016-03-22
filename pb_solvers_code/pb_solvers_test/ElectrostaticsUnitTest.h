@@ -335,24 +335,41 @@ TEST_F(ElecUTest, printPOTZ)
 
 TEST_F(ElecUTest, printPOT)
 {
+  vector<Molecule> mol_sing_;
+  Pt pos[12] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0),
+            Pt( 5.0, 0.0, 0.0 ),Pt( 5.0, 0.0, -5.0 ),Pt( 5.0, 0.0, 5.0),
+            Pt( -5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, -5.0 ),Pt( -5.0, 0.0, 5.0),
+            Pt( 5.0, 5.0, 0.0 ),Pt( 5.0, 5.0, -5.0 ),Pt( 5.0, 5.0, 5.0),};
+  for (int molInd = 0; molInd < 12; molInd ++ )
+  {
+    int M = 3; vector<double> charges(M); vector<double> vdW(M);
+    vector<Pt> posCharges(M);
+    charges[0]=2.0*pow(-1,molInd);vdW[0]=0;posCharges[0]=pos[molInd];
+    charges[1]=2.0*pow(-1,molInd);vdW[1]=0;posCharges[1]=pos[molInd]+Pt(1.0, 0.0, 0.0);
+    charges[2]=2.0*pow(-1,molInd);vdW[2]=0;posCharges[2]=pos[molInd]+Pt(0.0, 1.0, 0.0);
+    
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
+    mol_sing_.push_back( molNew );
+  }
+  
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<System> sys = make_shared<System>(mol_sing_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
   
-//  Electrostatic EstatTest( ASolvTest, 111);
-//  double val = 0; char pot[50];
-//  sprintf(pot, "/Users/lfelberg/Desktop/pot_x_%.2f.dat", val);
-//  EstatTest.print_grid(Xdim, val, string(pot));
-//  
-//  EXPECT_TRUE( 0 == 0);
+  Electrostatic EstatTest( ASolvTest, 111);
+  double val = 0; char pot[50];
+  sprintf(pot, "/Users/lfelberg/Desktop/pot_z_%.2f.dat", val);
+  EstatTest.print_grid(Zdim, val, string(pot));
+  
+  EXPECT_TRUE( 0 == 0);
 }
 
 
