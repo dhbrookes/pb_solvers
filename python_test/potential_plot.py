@@ -87,7 +87,7 @@ elif ax == 'z':
     xla = r'$X \, (\AA)$'; yla = r'$Y \, (\AA)$'
 
 esp[ esp == 0.0] = None
-
+ 
 dispPlot( org, dl, len(esp[0]), esp, mx, mn, titl,
                 xlab = xla, ylab = yla,
                 outFile=outFile)

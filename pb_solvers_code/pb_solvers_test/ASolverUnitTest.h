@@ -73,6 +73,23 @@ protected :
   double ATrip2im[15] = {0,0,1.03341635,0,0.000184134752,3.80938095e-05,0,
     -0.182482137,9.60094345e-06,-0.235542368,0,1.19249837e-06,-1.80475738e-06,
     2.8073034e-07,2.10915172e-06};
+  
+  double ATripPBC3[15] = {6.01060565,1.7911869e-16,1.03422506,-0.805960634,6.04422072e-17,0,-7.74056204e-17,-0.182461408,0,0.235556664,0.162125951,-2.21982325e-17,0,1.95770009e-17,0.226073838};
+  double ATripPBC3im[15] = {0,0,1.03422506,0,6.04422072e-17,6.04422072e-17,0,-0.182461408,4.32675923e-33,-0.235556664,0,-2.21982325e-17,-1.04643472e-17,-1.95770009e-17,-2.76860602e-17};
+  
+  double APBCTrip0[15]   = {6.01105542,-0.00074451012,1.03428935,-0.80430679,0.000926503077,7.23059366e-05,-1.26250549e-05,-0.182464792,-2.83937838e-07,0.235556133,0.162128461,6.99600862e-06,1.36983475e-06,-7.4788967e-07,0.226073548};
+  double APBCTrip0im[15] = {};
+  double APBCTrip1[15]   = {6.01083506,-0.0103527557,1.03144083,-0.805073567,0.000467065091,3.623056e-05,-4.96995897e-05,-0.182508586,-6.13429469e-06,0.23555845,0.162127705,3.76497861e-06,7.18712557e-07,-3.3326665e-07,0.226073712};
+  double APBCTrip1im[15] = {};
+  double APBCTrip2[15]   = {6.01082591,0.00960836601,1.03707364,-0.80519449,0.000459081726,3.60474528e-05,3.70745736e-05,-0.182417611,5.8505518e-06,0.235554346,0.162126705,3.22663862e-06,6.50256324e-07,-4.14147247e-07,0.226073674};
+  double APBCTrip2im[15] = {};
+  
+  double APBCoutside[15]   = {6.01060565,1.7911869e-16,1.03422506,-0.805960634,
+    6.04422072e-17,0,-7.74056204e-17,-0.182461408,0,0.235556664,0.162125951,
+    -2.21982325e-17,0,1.95770009e-17,0.226073838};
+  double APBCoutsideim[15] = {0,0,1.03422506,0,6.04422072e-17,6.04422072e-17,0,
+    -0.182461408,0,-0.235556664,0,-2.21982325e-17,-1.04643472e-17,
+    -1.95770009e-17,-2.76860602e-17};
 
   double A0[15] = {5.06502332,-0.459077988,-0.000488586514,0.0313638895,
     -0.0001113252,-2.2608511e-05,-0.00206626713,-1.20922746e-05,-5.8562079e-06,
@@ -565,6 +582,169 @@ TEST_F(ASolverUTest, checkAMulti)
                     1.0, preclim);
       if (ATrip2im[ct] != 0)
         EXPECT_NEAR(ASolvTest.get_A_ni(2, n, m).imag()/ATrip2im[ct],
+                    1.0, preclim);
+      ct++;
+    }
+  }
+}
+
+
+TEST_F(ASolverUTest, checkAMultiPBC)
+{
+  mol_.clear( );
+  Pt pos[4] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0),
+                Pt(-10.0,7.8,25.0), Pt( 100, 100, 100)};
+  for (int molInd = 0; molInd < 4; molInd ++ )
+  {
+    int M = 3; vector<double> charges(M); vector<double> vdW(M);
+    vector<Pt> posCharges(M);
+    charges[0]=2.0; vdW[0]=0; posCharges[0] = pos[molInd];
+    charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+    charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
+    mol_.push_back( molNew );
+  }
+  
+  const int vals = nvals;
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_, 85, 175);
+  
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolvTest.solve_A(1E-40);
+  
+  int ct = 0;
+  for ( int n = 0; n < 5; n++ )
+  {
+    for ( int m = 0; m <= n; m++ )
+    {
+      EXPECT_NEAR(ASolvTest.get_A_ni(0, n, m).real()/ATrip0[ct], 1.0, preclim);
+      EXPECT_NEAR(ASolvTest.get_A_ni(1, n, m).real()/ATrip1[ct], 1.0, preclim);
+      EXPECT_NEAR(ASolvTest.get_A_ni(2, n, m).real()/ATrip2[ct], 1.0, preclim);
+      
+      if (ATripPBC3[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(3, n, m).real()/ATripPBC3[ct],
+                    1.0,preclim);
+      
+      if (ATrip0im[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(0, n, m).imag()/ATrip0im[ct],
+                    1.0, preclim);
+      if (ATrip1im[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(1, n, m).imag()/ATrip1im[ct],
+                    1.0, preclim);
+      if (ATrip2im[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(2, n, m).imag()/ATrip2im[ct],
+                    1.0, preclim);
+      if (ATripPBC3im[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(3, n, m).imag()/ATripPBC3im[ct],
+                    1.0, preclim);
+      ct++;
+    }
+  }
+}
+
+TEST_F(ASolverUTest, checkAPBC)
+{
+  mol_.clear( );
+  Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(10.0,7.8,25.0), Pt(-10.0,-7.8,-25.0)};
+  for (int molInd = 0; molInd < 3; molInd ++ )
+  {
+    int M = 3; vector<double> charges(M); vector<double> vdW(M);
+    vector<Pt> posCharges(M);
+    charges[0]=2.0; vdW[0]=0; posCharges[0] = pos[molInd];
+    charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+    charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
+    mol_.push_back( molNew );
+  }
+  
+  const int vals = nvals;
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_, 40, 175);
+  
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolvTest.solve_A(1E-40);
+
+  int ct = 0;
+  for ( int n = 0; n < 5; n++ )
+  {
+    for ( int m = 0; m <= n; m++ )
+    {
+      EXPECT_NEAR(1.0, 1.0, preclim);
+      EXPECT_NEAR(ASolvTest.get_A_ni(0,n,m).real()/APBCTrip0[ct],1.0,preclim);
+      EXPECT_NEAR(ASolvTest.get_A_ni(1,n,m).real()/APBCTrip1[ct],1.0,preclim);
+      EXPECT_NEAR(ASolvTest.get_A_ni(2,n,m).real()/APBCTrip2[ct],1.0,preclim);
+      
+      if (APBCTrip0im[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(0, n, m).imag()/APBCTrip0im[ct],
+                    1.0, preclim);
+      if (APBCTrip1im[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(1, n, m).imag()/APBCTrip1im[ct],
+                    1.0, preclim);
+      if (APBCTrip2im[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(2, n, m).imag()/APBCTrip2im[ct],
+                    1.0, preclim);
+      ct++;
+    }
+  }
+}
+
+TEST_F(ASolverUTest, checkAPBCoutside)
+{
+  mol_.clear( );
+  Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(10.0,7.8,25.0), Pt(-10.0,-7.8,-25.0)};
+  for (int molInd = 0; molInd < 3; molInd ++ )
+  {
+    int M = 3; vector<double> charges(M); vector<double> vdW(M);
+    vector<Pt> posCharges(M);
+    charges[0]=2.0; vdW[0]=0; posCharges[0] = pos[molInd];
+    charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
+    charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
+    
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
+    mol_.push_back( molNew );
+  }
+  
+  const int vals = nvals;
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol_, 25, 150);
+  
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolvTest.solve_A(1E-40);
+  
+  int ct = 0;
+  for ( int n = 0; n < 5; n++ )
+  {
+    for ( int m = 0; m <= n; m++ )
+    {
+      if (APBCoutside[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(0, n, m).real()/APBCoutside[ct],
+                    1.0, preclim);
+      if (APBCoutside[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(1, n, m).real()/APBCoutside[ct],
+                    1.0, preclim);
+      if (APBCoutside[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(2, n, m).real()/APBCoutside[ct],
+                    1.0, preclim);
+
+      if (APBCoutsideim[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(0, n, m).imag()/APBCoutsideim[ct],
+                    1.0, preclim);
+      if (APBCoutsideim[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(1, n, m).imag()/APBCoutsideim[ct],
+                    1.0, preclim);
+      if (APBCoutsideim[ct] != 0)
+        EXPECT_NEAR(ASolvTest.get_A_ni(2, n, m).imag()/APBCoutsideim[ct],
                     1.0, preclim);
       ct++;
     }
