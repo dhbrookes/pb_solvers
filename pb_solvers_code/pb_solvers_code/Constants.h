@@ -125,6 +125,7 @@ public:
   const double get_kappa() const              { return kappa_; }
   const double get_patch_size() const         { return patchSize_; }
   const double get_rotate_size() const        { return rotateSize_; }
+  Units get_unitsEnum()                       { return units_; }
   string get_units();
   
   const double get_conv_factor();

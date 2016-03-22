@@ -22,17 +22,6 @@ _shCalc_(_shCalc),
 _consts_(_consts)
 {
   reset_all(_sys);
-  // precompute all SH:
-  pre_compute_all_sh();
-  
-  //precompute gamma, delta, E and T:
-  compute_T();
-  compute_gamma();
-  compute_delta();
-  compute_E();
-  
-  init_A();
-  init_gradA();
 }
 
 // perform many iterations of the solution for A
@@ -1127,4 +1116,16 @@ void ASolver::reset_all(shared_ptr<System> _sys)
   _gradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
   _prevGradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
   _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type > >(N_);
+
+  // precompute all SH:
+  pre_compute_all_sh();
+  
+  //precompute gamma, delta, E and T:
+  compute_T();
+  compute_gamma();
+  compute_delta();
+  compute_E();
+  
+  init_A();
+  init_gradA();
 }

@@ -20,8 +20,13 @@ protected:
   int maxtime_;
   int ntraj_;
   
-  string axis_;  // For potential print, axis desired
-  double axLoc_; // Location along given axis
+  // for electrostatics runtype
+  vector< string> potOutfnames_; // Vector of outfiles, [0] = dx, rest = grid
+  
+  int gridPts_; // number of voxels to compute for each dim
+  int gridCt_; // number of grid files to write
+  vector<string> axis_;  // For grid print, axis desired
+  vector<double> axLoc_; // Location along given axis
   
   double idiel_;
   double sdiel_;  // dielectric constant win molecule and of solvent
@@ -45,12 +50,23 @@ protected:
   void findLines(string fline);
   void findKeyword(vector<string> fline);
   
-  //'electrostat' or 'dynamics' (for RunType)
+  //'electrostatics' or 'dynamics' (for RunType)
   void setRunType( string runt ) {runSpecs_[0] = runt;}
   void setRunName( string runn ) {runSpecs_[1] = runn;}
   void setUnits( string units )  {units_ = units;}
   void resizeVecs();
   
+  // setting values for electrostatics run
+  void setDXoutName( string dx) { potOutfnames_[0] = dx;}
+  void setGridOutName( int i, string grid) { potOutfnames_[i] = grid;}
+  
+  void setGridPts( int gridP ) { gridPts_ = gridP; }
+  void setGridCt( int gridC ) { gridCt_ = gridC; }
+  void setGridAx( int i, string ax) { axis_[i-1] = ax;}
+  void setGridAxLoc( int i, double axLoc) { axLoc_[i-1] = axLoc;}
+  
+  
+  //
   void setOMP( int ompT ) { ompThreads_ = ompT ; }
   void setSaltCon( double saltCon )
   { saltConc_ = saltCon; }
@@ -58,9 +74,6 @@ protected:
   void setPBCT( int pbc ){ PBCs_ = pbc; }
   void setBoxl( double boxl ){ blen_ = boxl; }
   void setMaxTime( int maxt ){ maxtime_ = maxt; }
-  
-  void setAxis( string axis ){ axis_ = axis; }
-  void setAxLoc( double axLoc ){ axLoc = axLoc; }
   
   void setIDiel( double idiel ) { idiel_ = idiel; }
   void setSDiel( double sdiel ) { sdiel_ = sdiel;}
@@ -91,6 +104,17 @@ public:
   string getRunName()              { return runSpecs_[1]; }
   string getUnits()                { return units_; }
   
+  // electrostatics
+  string getDXoutName(  ) { return potOutfnames_[0];}
+  string getGridOutName( int i ) { return potOutfnames_[i+1];}
+  
+  int getGridPts() { return gridPts_; }
+  int getGridCt() { return gridCt_; }
+  string getGridAx( int i ) { return axis_[i];}
+  double getGridAxLoc( int i ) { return axLoc_[i];}
+  
+  
+  //
   int getThreads()                 { return ompThreads_; }
   int getNType()                   { return nType_; }
   int getPBCs()                    { return PBCs_; }

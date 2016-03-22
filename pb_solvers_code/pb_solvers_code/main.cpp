@@ -9,63 +9,108 @@
 #include <memory>
 #include "setup.h"
 #include "BD.h"
+#include "Electrostatics.h"
 #include "ThreeBody.h"
 
 using namespace std;
 
-int main_dynamics( int poles, Setup setup, Constants consts, System sys)
+int main_dynamics( int poles, double tol, Setup setup,
+                  Constants consts, shared_ptr<System> sys)
 {
-
-  
-}
-
-int main_electrostatics( int poles, Setup setup, Constants consts, System sys)
-{
-  
-  
-}
-
-int main_energyforce( int poles, Setup setup, Constants consts, System sys)
-{
-  int i, j;
-  vector< Molecule > molecules;
-  
-  for ( i = 0; i < setup.getNType(); i++ )
-  
-  
-  shared_ptr<Constants> const_ = make_shared<Constants>(setup);
+  shared_ptr<Constants> constant = make_shared<Constants>(setup);
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(molecules);
   
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
-                                                        const_, vals);
+                                                    constant, poles);
+  ASolv->solve_A(tol); ASolv->solve_gradA(tol);
   
-  PhysCalc calcEnFoTo( ASolv);
+  ASolv->print_Ai(0, poles);
   
+  shared_ptr<TimeTerminate> term_by_time = make_shared<TimeTerminate> ( 100);
+  BDRun dynamic_run( ASolv, term_by_time);
   
+  dynamic_run.run();
   
+  return 0;
+}
+
+int main_electrostatics( int poles, double tol, Setup setup,
+                        Constants consts, shared_ptr<System> sys)
+{
+  int i;
+  
+  shared_ptr<Constants> constant = make_shared<Constants>(setup);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
+  
+  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                    constant, poles);
+  ASolv->solve_A(tol); ASolv->solve_gradA(tol);
+  Electrostatic Estat( ASolv, setup.getGridPts());
+  
+  if ( setup.getDXoutName() != "" )
+    Estat.print_dx( setup.getDXoutName());
+  
+  for ( i = 0; i < setup.getGridCt(); i++ )
+  {
+    Estat.print_grid(setup.getGridAx(i), setup.getGridAxLoc(i),
+                     setup.getGridOutName(i));
+  }
+
+  return 0;
+}
+
+
+// Main to solve for A and then print energies forces and torques
+int main_energyforce( int poles, double tol, Setup setup,
+                     Constants consts, shared_ptr<System> sys)
+{
+  shared_ptr<Constants> constant = make_shared<Constants>(setup);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
+  
+  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                        constant, poles);
+  ASolv->solve_A(tol); ASolv->solve_gradA(tol);
+  PhysCalc calcEnFoTo( ASolv, constant->get_unitsEnum());
+  calcEnFoTo.calc_all();
+  calcEnFoTo.print_all();
+  
+  return 0;
 }
 
 
 int main(int argc, const char * argv[])
 {
-  string input_file = argv[0];
-  Setup setup(input_file);
+  string input_file = "/Users/lfelberg/Desktop/test/";
+//  input_file += "energyforce_test/run.energyforce.inp";//argv[0];
+//  input_file += "electrostatic_test/run.electrostatic.inp";
+  input_file += "dynamics_test/run.dynamics.inp";
+  
+  
+  // To do later
+//  shared_ptr<Setup> setp = make_shared<Setup>(input_file);
+  Setup setp(input_file);
 
-  Constants consts = Constants(setup);
-  System sys = System(consts, setup);
+  Constants consts = Constants(setp);
+  shared_ptr<System> sys = make_shared<System>(setp);
   
   int poles = 10;
+  double solv_tol = 1e-5;
   
-  if ( setup.getRunType() == "dynamics")
-    main_dynamics( poles, setup, consts, sys);
-  else if ( setup.getRunType() == "potential")
-    main_electrostatics( poles, setup, consts, sys);
-  else if ( setup.getRunType() == "energyforce")
-    main_energyforce( poles, setup, consts, sys)
+  if ( setp.getRunType() == "dynamics")
+    main_dynamics( poles, solv_tol, setp, consts, sys);
+  else if ( setp.getRunType() == "electrostatics")
+    main_electrostatics( poles, solv_tol, setp, consts, sys);
+  else if ( setp.getRunType() == "energyforce")
+    main_energyforce( poles, solv_tol, setp, consts, sys);
   else
     cout << "Runtype not recognized! See manual for options" << endl;
     

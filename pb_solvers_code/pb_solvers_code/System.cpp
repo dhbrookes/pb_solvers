@@ -122,38 +122,42 @@ System::System(Setup setup, double cutoff)
 {
   vector<Molecule> mols;
   
-  int i, j;
+  int i, j, chg;
   string pqrpath;
   Molecule mol;
   for (i = 0; i < setup.get_ntype(); i++)
   {
+    PQRFile pqrI (setup.getTypeNPQR(i));
+    XYZFile xyzI (setup.getTypeNXYZ(i), setup.getTypeNCount(i));
     for (j = 0; j < setup.getTypeNCount(i); j++)
     {
-      pqrpath = setup.getTypeNPQR(i)[j];
-      PQRFile pqrobj (pqrpath);
-      if (pqrobj.get_cg())  // coarse graining is in pqr
+      if (pqrI.get_cg())  // coarse graining is in pqr
       {
-        mol  = Molecule(setup.getTypeNDef(i), pqrobj.get_cg_radii()[0],
-                        pqrobj.get_charges(),pqrobj.get_atom_pts(),
-                        pqrobj.get_radii(), pqrobj.get_cg_centers()[0],
+        mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
+                        pqrI.get_charges(),pqrI.get_atom_pts(),
+                        pqrI.get_radii(), xyzI.get_pts()[j],
                         setup.getDrot(i), setup.getDtr(i));
       }
       else
       {
-        mol = Molecule(setup.getTypeNDef(i), pqrobj.get_charges(),
-                       pqrobj.get_atom_pts(), pqrobj.get_radii(),
+        vector<Pt> repos_charges(pqrI.get_M());
+        for ( chg = 0; chg < pqrI.get_M(); chg ++)
+          repos_charges[chg] = pqrI.get_atom_pts()[chg] + xyzI.get_pts()[j];
+        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
+                       repos_charges, pqrI.get_radii(),
+                       xyzI.get_pts()[j],
                        setup.getDrot(i), setup.getDtr(i));
       }
-      mols.push_back(mol);
+      molecules_.push_back(mol);
     }
   }
-  N_ = (int) mols.size();
-  check_for_overlap();
-  lambda_ = calc_average_radius();
-  
+  N_ = (int) molecules_.size();
   boxLength_ = setup.getBLen();
   cutoff_ = cutoff;
+  
   if (boxLength_/2. < cutoff_)  compute_cutoff();
+  check_for_overlap();
+  lambda_ = calc_average_radius();
 }
 
 //System::System(const System& sys)
@@ -223,6 +227,15 @@ Pt System::get_pbc_dist_vec(int i, int j)
 //  subsys.set_time(t_);
 //  return subsys;
 //}
+
+vector<Pt> System::get_allcenter() const
+{
+  vector< Pt> mol_cen(N_);
+  for ( int i = 0; i < N_; i++)
+    mol_cen[i] = molecules_[i].get_center();
+  
+  return mol_cen;
+}
 
 bool System::less_than_cutoff(Pt v)
 {

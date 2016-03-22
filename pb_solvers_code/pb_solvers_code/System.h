@@ -114,6 +114,7 @@ public:
   const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
   Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
   Molecule get_molecule(int i) const       {return molecules_[i];}
+  vector<Pt> get_allcenter() const;
   Pt get_centeri(int i) const              {return molecules_[i].get_center();}
   double get_radi(int i) const             {return molecules_[i].get_a();}
   const double get_lambda() const          {return lambda_;}

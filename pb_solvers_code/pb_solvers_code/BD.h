@@ -205,9 +205,8 @@ protected:
   
 public:
   BDRun(shared_ptr<ASolver> _asolv, shared_ptr<BaseTerminate> _terminator,
-        shared_ptr<System> _sys, shared_ptr<Constants> _consts,
         bool diff = true, bool force = true, int maxiter=1000,
-        double prec=0.0001);
+        double prec=1e-4);
   
   void run();
 };

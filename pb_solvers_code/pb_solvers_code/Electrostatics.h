@@ -63,7 +63,7 @@ public:
   void print_dx(string ifname);
   
   // print Grid file, given an axis and a value on that axis
-  void print_grid(Axis axis, double value, string fname);
+  void print_grid(string axis, double value, string fname);
   
   // return potential grid
   vector<vector<vector<double > > > get_potential() { return esp_; }

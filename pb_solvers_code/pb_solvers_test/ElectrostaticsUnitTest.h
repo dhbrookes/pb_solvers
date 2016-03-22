@@ -217,7 +217,7 @@ TEST_F(ElecUTest, checkPOTZ)
   double val = -17.23;
   char pot[50];
   sprintf(pot, "/Users/lfelberg/Desktop/pot_z_%.2f.dat", val);
-  EstatTest.print_grid(Zdim, val, string(pot));
+  EstatTest.print_grid("z", val, string(pot));
   
   vector<vector<double > > p2d = EstatTest.get_pot2d();
   
@@ -250,7 +250,7 @@ TEST_F(ElecUTest, printPOTX)
   double val = 1;
   char pot[50];
   sprintf(pot, "/Users/lfelberg/Desktop/pot_x_%.2f.dat", val);
-  EstatTest.print_grid(Xdim, val, string(pot));
+  EstatTest.print_grid("x", val, string(pot));
   
   string inputLine;
   ifstream fin(pot);
@@ -284,7 +284,7 @@ TEST_F(ElecUTest, printPOTY)
   double val = 10;
   char pot[50];
   sprintf(pot, "/Users/lfelberg/Desktop/pot_y_%.2f.dat", val);
-  EstatTest.print_grid(Ydim, val, string(pot));
+  EstatTest.print_grid("y", val, string(pot));
   
   string inputLine;
   ifstream fin(pot);
@@ -318,7 +318,7 @@ TEST_F(ElecUTest, printPOTZ)
   double val = -17.23;
   char pot[50];
   sprintf(pot, "/Users/lfelberg/Desktop/pot_z_%.2f.dat", val);
-  EstatTest.print_grid(Zdim, val, string(pot));
+  EstatTest.print_grid("z", val, string(pot));
   
   string inputLine;
   ifstream fin(pot);
@@ -364,10 +364,10 @@ TEST_F(ElecUTest, printPOT)
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
   
-  Electrostatic EstatTest( ASolvTest, 111);
+  Electrostatic EstatTest( ASolvTest, 11);
   double val = 0; char pot[50];
   sprintf(pot, "/Users/lfelberg/Desktop/pot_z_%.2f.dat", val);
-  EstatTest.print_grid(Zdim, val, string(pot));
+  EstatTest.print_grid("z", val, string(pot));
   
   EXPECT_TRUE( 0 == 0);
 }

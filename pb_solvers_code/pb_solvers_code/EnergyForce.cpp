@@ -231,10 +231,63 @@ void TorqueCalc::calc_tau()
 }
 
 
-PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv)
+PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv, Units unit)
+: N_(_asolv->get_N())
 {
   _eCalc_ = make_shared<EnergyCalc>(_asolv);
   _fCalc_ = make_shared<ForceCalc>(_asolv);
   _torCalc_ = make_shared<TorqueCalc>(_asolv);
+  
+  mol_pos_ = _asolv->get_sys()->get_allcenter();
+  
+  if (unit==INTERNAL)
+  {
+    unit_ = "Internal";
+    unit_conv_ = 1.0;
+  } else if (unit == KCALMOL)
+  {
+    unit_  = "kCal/Mol";
+    unit_conv_ = _asolv->get_consts()->convert_int_to_kcal_mol(1.0);
+  } else if (unit == JMOL)
+  {
+    unit_  = "Joules/Mol";
+    unit_conv_ = _asolv->get_consts()->convert_int_to_jmol(1.0);
+  } else if (unit == kT)
+  {
+    unit_  = "kT";
+    unit_conv_ = _asolv->get_consts()->convert_int_to_kT(1.0);
+  }
+}
+
+void PhysCalc::print_all()
+{
+  int i, j;
+  MyVector<double> force_i, torque_i;
+  double force_norm, torque_norm;
+  
+  cout << "My units are " << unit_ << endl;
+  
+  for ( i = 0; i < N_; i++)
+  {
+    force_norm = 0;
+    torque_norm = 0;
+    cout << "MOLECULE #" << i + 1 << endl;
+    cout << "\tPOSITION: [" << mol_pos_[i].x() << ", " << mol_pos_[i].y();
+    cout << ", " << mol_pos_[i].z() << "]" << endl;
+    cout << "\tENERGY: " << unit_conv_ * get_omega()->operator[](i) << endl;
+    force_i = get_forcei(i); torque_i = get_taui(i);
+    for ( j = 0; j < 3; j++)
+    {
+      force_i[j] *= unit_conv_;
+      torque_i[j] *= unit_conv_;
+      force_norm += force_i[j] * force_i[j];
+      torque_norm += torque_i[j] * torque_i[j];
+    }
+    cout << "\tFORCE: " << sqrt(force_norm) << " ";
+    cout << force_i[0] << " " << force_i[1] << " " << force_i[2] << endl;
+    cout << "\tTORQUE: " << sqrt(torque_norm) << " ";
+    cout << torque_i[0] << " " << torque_i[1] << " " << torque_i[2] << endl;
+  }
+  
 }
 

@@ -170,14 +170,16 @@ void BDStep::bd_update(shared_ptr<VecOfVecs<double>::type> _F,
 
 
 BDRun::BDRun(shared_ptr<ASolver> _asolv,
-             shared_ptr<BaseTerminate> _terminator, shared_ptr<System> _sys,
-             shared_ptr<Constants> _consts,
+             shared_ptr<BaseTerminate> _terminator, 
              bool diff, bool force, int maxiter, double prec)
 :maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
 {
-  _fCalc_ = make_shared<ForceCalc>(_asolv);
-  _torCalc_ = make_shared<TorqueCalc>(_asolv);
-  _stepper_ = make_shared<BDStep> (_sys, _consts, diff, force);
+  _fCalc_ = make_shared<ForceCalc>(_asolver_);
+  _torCalc_ = make_shared<TorqueCalc>(_asolver_);
+  _stepper_ = make_shared<BDStep> (_asolver_->get_sys(),
+                                   _asolver_->get_consts(), diff, force);
+  
+  cout << "In BDRun this is asolver poles " << _asolver_->get_p() << endl;
   
 }
 
@@ -188,6 +190,10 @@ void BDRun::run()
   bool term = false;
   while (i < maxIter_ and !term)
   {
+    cout << "This is molecule 1 pos " ;
+    cout << _asolver_->get_sys()->get_centeri(0).x() << ", ";
+    cout << _asolver_->get_sys()->get_centeri(0).y() << ", ";
+    cout << _asolver_->get_sys()->get_centeri(0).z() << endl;
     _asolver_->reset_all(_stepper_->get_system());
     _asolver_->solve_A(prec_);
     _asolver_->solve_gradA(prec_);

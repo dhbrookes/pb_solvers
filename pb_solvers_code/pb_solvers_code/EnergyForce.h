@@ -29,14 +29,9 @@ protected:
   int N_;  // number of molecules
   int p_;  // max number of poles
   shared_ptr<Constants> _const_;
-  
-  /*
-   Enum for the units of energy
-   */
 
-  
-  shared_ptr<MyVector<double> > _omega_;  // result of energy calculation, internal units
-  
+  // result of energy calculation, internal units
+  shared_ptr<MyVector<double> > _omega_;
 public:
   EnergyCalc() { }
   
@@ -217,6 +212,11 @@ public:
 class PhysCalc
 {
 protected:
+  int N_; // number of particles
+  double unit_conv_; // Conversion factor for units
+  string unit_; // String of the type of units
+  vector<Pt> mol_pos_;
+  
   shared_ptr<EnergyCalc> _eCalc_;
   shared_ptr<ForceCalc> _fCalc_;
   shared_ptr<TorqueCalc> _torCalc_;
@@ -226,7 +226,7 @@ protected:
 public:
   
   // constructor just requires an asolver
-  PhysCalc(shared_ptr<ASolver> _asolv);
+  PhysCalc(shared_ptr<ASolver> _asolv, Units unit = INTERNAL);
   
   MyVector<double> calc_force_i(int i)  { return _fCalc_->calc_fi(i); }
   MyVector<double> calc_tau_i(int i)    { return _torCalc_->calc_tau_i(i); }
@@ -235,22 +235,19 @@ public:
   void calc_force()   { _fCalc_->calc_force(); }
   void calc_energy()  { _eCalc_->calc_energy(); }
   void calc_torque()  { _torCalc_->calc_tau(); }
+  void calc_all()     { calc_energy(); calc_force(); calc_torque(); }
+  
+  void print_all();
   
   shared_ptr<VecOfVecs<double>::type > get_Tau() { return _torCalc_->get_Tau(); }
   shared_ptr<VecOfVecs<double>::type> get_F()    { return _fCalc_->get_F(); }
   // get energy given the units
-  shared_ptr<MyVector<double> > get_omega(Units units=INTERNAL)
-  {
-    if (units==INTERNAL)
-      _omega2_ = _eCalc_->get_omega_int();
-    else if (units == KCALMOL)
-      _omega2_ = make_shared<MyVector<double> >(_eCalc_->get_omega_kcal());
-    else if (units == JMOL)
-      _omega2_ = make_shared<MyVector<double> >(_eCalc_->get_omega_jmol());
-    else if (units == kT)
-      _omega2_ = make_shared<MyVector<double> >(_eCalc_->get_omega_kT());
-    return _omega2_;
-  }
+  shared_ptr<MyVector<double> > get_omega() {return _eCalc_->get_omega_int();}
+  
+  MyVector<double> get_taui(int i) { return _torCalc_->get_taui(i); }
+  MyVector<double> get_forcei(int i) { return _fCalc_->get_fi(i); }
+  double get_omegai(int i) {return _eCalc_->get_omega_i_int(i);}
+
 };
 
 #endif /* EnergyForce_h */

@@ -175,48 +175,54 @@ void Electrostatic::print_dx( string dxname )
   
 }
 
-void Electrostatic::print_grid(Axis axis, double value, string fname)
+void Electrostatic::print_grid(string axis, double value, string fname)
 {
-  int i, j;
+  int i, j, idx;
   ofstream f;
-  char pot[20], ax = 'x';
+  char pot[20];
   vector<double> org(2), delta(2);
-  int idx = round((value-range_min_[axis]) / step_[axis]);
 
   for (i = 0; i < grid_.size(); i++)
     for (j = 0; j < grid_[0].size(); j++)
     {
-      if (axis ==  Xdim)      grid_[i][j] = esp_[idx][i][j];
-      else if (axis ==  Ydim) grid_[i][j] = esp_[i][idx][j];
-      else if (axis ==  Zdim) grid_[i][j] = esp_[i][j][idx];
+      if (axis ==  "x")
+      {
+        idx = round((value-range_min_[0]) / step_[0]);
+        grid_[i][j] = esp_[idx][i][j];
+      } else if (axis ==  "y")
+      {
+        idx = round((value-range_min_[1]) / step_[1]);
+        grid_[i][j] = esp_[i][idx][j];
+      } else
+      {
+        idx = round((value-range_min_[2]) / step_[2]);
+        grid_[i][j] = esp_[i][j][idx];
+      }
       
       if (grid_[i][j] < pot_min_)      pot_min_ = grid_[i][j];
       else if (grid_[i][j] > pot_max_) pot_max_ = grid_[i][j];
     }
   
-  if ( axis == Xdim )
+  if ( axis == "x" )
   {
     org[0] = range_min_[1]; org[1] = range_min_[2];
     delta[0] = step_[1]; delta[1] = step_[2];
-    ax = 'x';
   }
-  else if ( axis == Ydim )
+  else if ( axis == "y" )
   {
     org[0] = range_min_[0]; org[1] = range_min_[2];
     delta[0] = step_[0]; delta[1] = step_[2];
-    ax = 'y';
   } else
   {
     org[0] = range_min_[0]; org[1] = range_min_[1];
     delta[0] = step_[0]; delta[1] = step_[1];
-    ax = 'z';
   }
 
   f.open(fname);
   f << "# Data from PBAM Electrostat run\n# My runname is " << fname << endl;
   f << "units " << _consts_->get_units() <<  endl;
   f << "grid " << grid_.size() << " " << grid_[0].size() << endl;
-  f << "axis " << ax << " " << value << endl;
+  f << "axis " << axis << " " << value << endl;
   f << "origin " << org[0] << " " << org[1] << endl;
   f << "delta " << delta[0] << " " << delta[1] << endl;
   f << "maxmin " << pot_max_ << " " << pot_min_ << endl;

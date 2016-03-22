@@ -11,13 +11,16 @@
 const double Setup::MAX_DIST = 1.4e18;
 
 Setup::Setup(string infile)
-:ompThreads_( 1 ),
+:
+ompThreads_( 1 ),
 saltConc_( 0.01 ),
 nType_( 2 ),
 PBCs_( 0 ),
 blen_( MAX_DIST ),
 maxtime_( 1000000 ),
 ntraj_( 5 ),
+gridPts_( 30 ),
+gridCt_(0),
 idiel_( 4.0 ),
 sdiel_( 78.0 ),
 temp_( 298.0 ),
@@ -42,6 +45,9 @@ runSpecs_(2)
   typeDef_[1]  = "stat";
   runSpecs_[0] = "electrostatics";
   runSpecs_[1] = "test";
+  
+  potOutfnames_.resize(2);
+  potOutfnames_[0] = "";
   
   units_ = "internal";
   
@@ -124,17 +130,29 @@ void Setup::findKeyword(vector<string> fline)
       {
         setMaxTime( atoi( fline[3].c_str() ));
       }
-    } else if (fline[1] == "potential")
+    } else if (fline[1] == "electrostatics")
     {
       if (fline.size() > 2)
       {
-        setAxis( fline[2].c_str() );
-      }
-      else if (fline.size() > 3)
-      {
-        setAxLoc( atof( fline[3].c_str() ));
+        setGridPts( atoi( fline[2].c_str() ));
       }
     }
+  } else if (keyword == "dx")
+  {
+    cout << "DX command found" << endl;
+    setDXoutName( fline[1].c_str());
+  } else if (keyword == "gridct")
+  {
+    cout << "Grid count command found" << endl;
+    setGridCt( atoi(fline[1].c_str()));
+    axis_.resize( gridCt_); axLoc_.resize(gridCt_);
+    potOutfnames_.resize(gridCt_+1);
+  } else if (keyword == "grid2D")
+  {
+    cout << "Grid command found" << endl;
+    setGridOutName( atoi(fline[1].c_str()), fline[2].c_str());
+    setGridAx( atoi(fline[1].c_str()), fline[3].c_str());
+    setGridAxLoc( atoi(fline[1].c_str()), atof(fline[4].c_str()));
   } else if (keyword == "omp")
   {
     cout << "OMP command found" << endl;

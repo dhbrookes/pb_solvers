@@ -125,7 +125,7 @@ public:
   }
   
   const string get_path() const             { return path_; }
-  const vector<Pt> get_atom_pts() const     { return atomCenters_; }
+  vector<Pt> get_atom_pts() const           { return atomCenters_; }
   const vector<double> get_charges() const  { return charges_; }
   const vector<double> get_radii() const    { return atomRadii_; }
   const int get_M() const                   { return M_; }
@@ -174,7 +174,7 @@ public:
   
   const string get_path() const     { return path_; }
   const int get_nmols() const       { return nmols_; }
-  const vector<Pt> get_pts() const  { return pts_; }
+  vector<Pt> get_pts() const        { return pts_; }
 };
     
 
