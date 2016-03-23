@@ -934,7 +934,7 @@ void ASolver::calc_gradL()
       inner2 = re_expand_gradA(i, k, i, false); // T^(i,k) * grad_j A^(k)
       inner1 += inner2;
     }
-    _gradL_->set_val(i, inner1);
+    _gradL_->operator[](i) = inner1;
   }
 }
 

@@ -8,7 +8,12 @@
 
 #include "ThreeBody.h"
 
-ThreeBody::ThreeBody()
+ThreeBody::ThreeBody( shared_ptr<ASolver> _asolver, double cutoff )
+: N_(_asolver->get_N()), p_(_asolver->get_p()), cutoffTBD_(cutoff),
+_besselCalc_(_asolver->get_bessel()),
+_shCalc_(_asolver->get_sh()),
+_consts_(_asolver->get_consts()),
+_sys_(_asolver->get_sys())
 {
   dimer_.reserve(N_*N_);
   trimer_.reserve(N_*N_*N_);
@@ -49,21 +54,9 @@ void ThreeBody::generatePairsTrips()
   // Resizing vectors for saving energy/force vals
   energy_di_.resize( dimer_.size());
   force_di_.resize( dimer_.size());
-  for ( i = 0; i < dimer_.size(); i++)
-  {
-    energy_di_[i].resize(2);
-    force_di_[i].resize(2);
-  }
   
-  energy_tri_.resize( trimer_.size());
-  force_tri_.resize( trimer_.size());
-  for ( i = 0; i < trimer_.size(); i++)
-  {
-    energy_tri_[i].resize(3);
-    force_tri_[i].resize(3);
-  }
-  
-  cout << "Cutoffs implemented, using " << cutoffTBD_ << endl;
+  if ( cutoffTBD_ < 1e37 )
+    cout << "Cutoffs implemented, using " << cutoffTBD_ << endl;
   cout << "Max # of di: "  << M2 << " Act used: " << dimer_.size() <<endl;
   cout << "Max # of tri: " << M3 << " Act used: " << trimer_.size() <<endl;
 } //end cutoffTBD
@@ -77,7 +70,7 @@ shared_ptr<System> ThreeBody::make_subsystem(vector<int> mol_idx)
     sub_mols[i] = _sys_->get_molecule(mol_idx[i]);
   }
   
-  shared_ptr<System> _subsys = make_shared<System>(sub_mols, _sys_->get_cutoff(),
+  shared_ptr<System> _subsys = make_shared<System>(sub_mols,_sys_->get_cutoff(),
                                                   _sys_->get_boxlength());
   _subsys -> set_time(_sys_->get_time());
   return _subsys;
@@ -87,7 +80,7 @@ shared_ptr<System> ThreeBody::make_subsystem(vector<int> mol_idx)
 void ThreeBody::solveNmer( int num )
 {
   int i, j;
-  vector< vector<int> > nmer = ( num == 2) ? dimer_ : trimer_;
+  vector< vector<int> > nmer = ( num == 2 ) ? dimer_ : trimer_;
   vector< Molecule > mol_temp;
 
   shared_ptr<System> _sysTemp = make_subsystem(nmer[0]);
@@ -115,8 +108,9 @@ void ThreeBody::solveNmer( int num )
     cout << "Pot, force for all: ";
     for ( j = 0; j < num; j++)
     {
-      cout << _enCalc->get_omega_i_int(j) << "\t" << _fCalc->get_fi(i)[0]
-           << ", " << _fCalc->get_fi(i)[1]<< ", " << _fCalc->get_fi(i)[2]<< "\t";
+      cout << _enCalc->get_omega_i_int(j) << "\t" << _fCalc->get_fi(i)[0];
+      cout << ", " << _fCalc->get_fi(i)[1]<< ", ";
+      cout << _fCalc->get_fi(i)[2]<< "\t";
       if ( num == 2 )
       {
         energy_di_[i][j] = _enCalc->get_omega_i_int(j);

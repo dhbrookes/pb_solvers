@@ -26,10 +26,8 @@ int main_dynamics( int poles, double tol, Setup setup,
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                     constant, poles);
   ASolv->solve_A(tol); ASolv->solve_gradA(tol);
-  
-  ASolv->print_Ai(0, poles);
-  
-  shared_ptr<TimeTerminate> term_by_time = make_shared<TimeTerminate> ( 100);
+
+  shared_ptr<TimeTerminate> term_by_time = make_shared<TimeTerminate> ( 10);
   BDRun dynamic_run( ASolv, term_by_time);
   
   dynamic_run.run();
@@ -52,6 +50,8 @@ int main_electrostatics( int poles, double tol, Setup setup,
                                                     constant, poles);
   ASolv->solve_A(tol); ASolv->solve_gradA(tol);
   Electrostatic Estat( ASolv, setup.getGridPts());
+  
+  cout << "This is my DX name " << setup.getDXoutName() << endl;
   
   if ( setup.getDXoutName() != "" )
     Estat.print_dx( setup.getDXoutName());
@@ -91,9 +91,8 @@ int main(int argc, const char * argv[])
 {
   string input_file = "/Users/lfelberg/Desktop/test/";
 //  input_file += "energyforce_test/run.energyforce.inp";//argv[0];
-//  input_file += "electrostatic_test/run.electrostatic.inp";
-  input_file += "dynamics_test/run.dynamics.inp";
-  
+  input_file += "electrostatic_test/run.electrostatic.inp";
+//  input_file += "dynamics_test/run.dynamics.inp";
   
   // To do later
 //  shared_ptr<Setup> setp = make_shared<Setup>(input_file);
@@ -116,9 +115,4 @@ int main(int argc, const char * argv[])
     
   return 0;
 }
-
-
-
-
-
 

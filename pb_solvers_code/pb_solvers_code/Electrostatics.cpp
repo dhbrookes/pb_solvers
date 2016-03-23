@@ -37,7 +37,8 @@ _bCalc_(_bCalc), _consts_(_consts)
 }
 
 Electrostatic::Electrostatic(shared_ptr<ASolver> _asolv, int npts)
-:p_(_asolv->get_p()), pot_min_(0), pot_max_(0), _A_(_asolv->get_A()),
+:p_(_asolv->get_p()), pot_min_(0), pot_max_(0),
+lam_(_asolv->get_sys()->get_lambda()), _A_(_asolv->get_A()),
 _sys_(_asolv->get_sys()), _shCalc_(_asolv->get_sh()),
 _bCalc_(_asolv->get_bessel()), _consts_(_asolv->get_consts())
 {
@@ -58,7 +59,7 @@ _bCalc_(_asolv->get_bessel()), _consts_(_asolv->get_consts())
   
   compute_units();
   
-  cout << " This is units " << units_ << " my range " << range_min_[0]
+  cout << setprecision(9) <<" This is units " << units_ << " my range " << range_min_[0]
   <<  ", " <<range_min_[1]
   <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", "
   <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", "
@@ -102,8 +103,8 @@ void Electrostatic::find_range()
   
   for (dim = 0; dim<3; dim++)
   {
-    range_min_[dim] = min[dim] - 10.0;
-    range_max_[dim] = max[dim] + 10.0;
+    range_min_[dim] = min[dim] - lam_;
+    range_max_[dim] = max[dim] + lam_;
   }
 }
 
@@ -181,6 +182,19 @@ void Electrostatic::print_grid(string axis, double value, string fname)
   ofstream f;
   char pot[20];
   vector<double> org(2), delta(2);
+  
+  if (( axis == "x" ) and (value < range_min_[0]))
+    throw ValueOutOfRange( axis, value, range_min_[0] );
+  if (( axis == "x" ) and (value > range_max_[0]))
+    throw ValueOutOfRange( axis, value, range_max_[0] );
+  if (( axis == "y" ) and (value < range_min_[1]))
+    throw ValueOutOfRange( axis, value, range_min_[1] );
+  if (( axis == "y" ) and (value > range_max_[1]))
+    throw ValueOutOfRange( axis, value, range_max_[1] );
+  if (( axis == "z" ) and (value < range_min_[2]))
+    throw ValueOutOfRange( axis, value, range_min_[2] );
+  if (( axis == "z" ) and (value > range_max_[2]))
+    throw ValueOutOfRange( axis, value, range_max_[2] );
 
   for (i = 0; i < grid_.size(); i++)
     for (j = 0; j < grid_[0].size(); j++)

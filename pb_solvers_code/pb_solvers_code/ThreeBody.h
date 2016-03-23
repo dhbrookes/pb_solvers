@@ -37,8 +37,8 @@ protected:
   shared_ptr<SHCalc>          _shCalc_;
   shared_ptr<Constants>       _consts_;
   
-private:
-  ThreeBody();
+public:
+  ThreeBody( shared_ptr<ASolver> _asolver, double cutoff = 1e48 );
   
   void generatePairsTrips();
   
@@ -46,6 +46,9 @@ private:
   void solveNmer( int num);
   
   shared_ptr<System> make_subsystem(vector<int> mol_idx);
+  
+  vector<vector<int > > getDimers()  { return dimer_; }
+  vector<vector<int > > getTrimers() { return trimer_; }
   
 };
 

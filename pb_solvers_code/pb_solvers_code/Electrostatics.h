@@ -11,7 +11,33 @@
 
 #include "ASolver.h"
 
-enum Axis {Xdim, Ydim, Zdim};
+
+// Exception class to ensure that molecule
+class ValueOutOfRange: public exception
+{
+protected:
+  string ax_;
+  double value_;
+  double range_;
+  
+public:
+  ValueOutOfRange( string ax, double val, double ran)
+  :ax_(ax), value_(val), range_(ran)
+  {
+  }
+  
+  virtual const char* what() const throw()
+  {
+    string ss;
+    ss = ax_ + " value " + to_string(value_)+ " out of range. It is";
+    if (value_ < range_)
+      ss += " less than ";
+    else
+      ss += " greater than ";
+    ss += to_string(range_);
+    return ss.c_str();
+  }
+};
 
 /*
  Class for printing out electrostatics of system
@@ -24,6 +50,8 @@ protected:
   
   double pot_min_; // A minimum value of the pot
   double pot_max_; // A max value of the potential
+  
+  double lam_; // Average radius of molecules in system
   
   vector<double> range_min_;  // Origin of grid in each dim
   vector<double> range_max_;  // Origin of grid in each dim

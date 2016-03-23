@@ -17,6 +17,7 @@ const int nvals = 10 ;      //! standard number of poles for testing
 #include "BDUnitTest.h"
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
+#include "ElectrostaticsUnitTest.h"
 #include "EnergyForceUnitTest.h"
 #include "MyMatrixUnitTest.h"
 #include "readutilUnitTest.h"
@@ -24,9 +25,8 @@ const int nvals = 10 ;      //! standard number of poles for testing
 #include "setupUnitTest.h"
 #include "SHCalcUnitTest.h"
 #include "SystemUnitTest.h"
+#include "ThreeBodyUnitTest.h"
 #include "utilUnitTest.h"
-
-#include "ElectrostaticsUnitTest.h"
 
 #include "tester.h"
 

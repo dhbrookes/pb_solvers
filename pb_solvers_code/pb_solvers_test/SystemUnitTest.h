@@ -418,45 +418,7 @@ TEST_F(SystemUTest, changeCutoff)
   System sys( mol_, cutoff, boxl );
   EXPECT_NEAR( (boxl/2.0)/sys.get_cutoff(), 1.0, preclim);
 }
-//
-//TEST_F(SystemUTest, makeSubsystem)
-//{
-//  vector <int> subInd(2);
-//  vector < Molecule > mol_;
-//  double cutoff =  45.876;
-//  double boxl   = 105.876;
-//  Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
-//  double rad[3] = { 5.0, 3.7, 8.6 };
-//  for (int molInd = 0; molInd < 3; molInd ++ )
-//  {
-//    int M = 3; vector<double> chg(M); vector<double> vdW(M);
-//    vector<Pt> poschg(M);
-//    chg[0]=2.0; vdW[0]=0; poschg[0] = pos[molInd];
-//    chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-//    chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
-//    
-//    Molecule molNew( "rot", rad[molInd], chg, poschg, vdW, pos[molInd]);
-//    mol_.push_back( molNew );
-//  }
-//  
-//  subInd[0] = 1; subInd[1] = 2;
-//  System sys( mol_, cutoff, boxl );
-//  sys.set_time( 1.435);
-//  
-//  System sub = sys.get_subsystem(subInd);
-//  
-//  EXPECT_NEAR( 6.15, sub.get_lambda(), preclim);
-//  EXPECT_NEAR( cutoff/sub.get_cutoff(), 1.0, preclim);
-//  
-//  EXPECT_NEAR( 1.435/sub.get_time(), 1.0, preclim);
-//  
-//  EXPECT_EQ(sub.less_than_cutoff(Pt( 5.3, 0.34,  -2.13)), true);
-//  EXPECT_EQ(sub.less_than_cutoff(Pt(25.3,79.34, -12.13)), false);
-//  
-//  EXPECT_EQ(sub.get_typei(0), "rot");
-//  EXPECT_EQ(sub.get_n(), 2);
-//  
-//}
+
 
 TEST_F(SystemUTest, PBCcheck)
 {
@@ -494,7 +456,5 @@ TEST_F(SystemUTest, PBCcheck)
   EXPECT_NEAR( -10/dis12.z(), 1.0, preclim);
 
 }
-
-
 
 #endif /* SystemUnitTest_h */
