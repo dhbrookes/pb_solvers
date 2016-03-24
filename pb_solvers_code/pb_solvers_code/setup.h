@@ -41,6 +41,8 @@ protected:
   vector<string> runSpecs_;	//include run type [0] (electrost/bd) & runname [1]
   vector<vector<string> > molfnames_;  // file names
   
+  vector<string> mbdfile_loc_; // location of names for manybd data output
+  
   double kappa_;
   double iKbT_;
   
@@ -67,6 +69,9 @@ protected:
   void setGridAx( int i, string ax) { axis_[i-1] = ax;}
   void setGridAxLoc( int i, double axLoc) { axLoc_[i-1] = axLoc;}
   
+  // setting details for 3bd
+  void set2BDLoc( string fileloc ) { mbdfile_loc_[0] = fileloc;}
+  void set3BDLoc( string fileloc ) { mbdfile_loc_[1] = fileloc;}
   
   //
   void setOMP( int ompT ) { ompThreads_ = ompT ; }
@@ -116,6 +121,10 @@ public:
   string getGridAx( int i ) { return axis_[i];}
   double getGridAxLoc( int i ) { return axLoc_[i];}
   
+  // threebody
+  string get2BDLoc()               { return mbdfile_loc_[0]; }
+  string get3BDLoc()               { return mbdfile_loc_[1]; }
+  vector<string> getMBDLoc()       { return mbdfile_loc_; }
   
   //
   int getThreads()                 { return ompThreads_; }

@@ -23,6 +23,8 @@ protected:
   
   double cutoffTBD_;  // distance for cutoff of tbd approx
   
+  Units unit_; // String value of units
+  
   vector<vector<int > > dimer_;   // list of all pairs by their index #
   vector<vector<int > > trimer_;  // list of all triplets by their index #
   
@@ -50,13 +52,18 @@ protected:
   void generatePairsTrips();
   
 public:
-  ThreeBody( shared_ptr<ASolver> _asolver, double cutoff = 1e48 );
+  ThreeBody(shared_ptr<ASolver> _asolver, Units unt = INTERNAL,
+            double cutoff = 1e48 );
   
   // Solve the N body problem, only 2 or 3 right now
-  void solveNmer( int num, string outfile, double preclim = 1e-4);
+  void solveNmer( int num, double preclim = 1e-4);
+  
+  void printNmer( int num, string outfile);
   
   void calcTBDEnForTor( );
   void calcTwoBDEnForTor( );
+  
+  void printTBDEnForTor( vector<string> outfile );
   
   vector<vector<int > > getDimers()  { return dimer_; }
   vector<vector<int > > getTrimers() { return trimer_; }

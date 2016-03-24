@@ -8,7 +8,7 @@
 
 #include "ThreeBody.h"
 
-ThreeBody::ThreeBody( shared_ptr<ASolver> _asolver, double cutoff )
+ThreeBody::ThreeBody( shared_ptr<ASolver> _asolver, Units unt, double cutoff )
 : N_(_asolver->get_N()), p_(_asolver->get_p()), cutoffTBD_(cutoff),
 _besselCalc_(_asolver->get_bessel()),
 _shCalc_(_asolver->get_sh()),
@@ -16,11 +16,12 @@ _consts_(_asolver->get_consts()),
 _sys_(_asolver->get_sys()),
 energy_approx_(N_, 0),
 force_approx_(N_, Pt(0,0,0)),
-torque_approx_(N_, Pt(0,0,0))
+torque_approx_(N_, Pt(0,0,0)),
+unit_(unt)
 {
   dimer_.reserve(N_*N_);
   trimer_.reserve(N_*N_*N_);
-
+  
   generatePairsTrips();
 }
 
@@ -98,22 +99,16 @@ shared_ptr<System> ThreeBody::make_subsystem(vector<int> mol_idx)
 }
 
 // Two or three body approximation computation
-void ThreeBody::solveNmer( int num, string outfile, double preclim )
+void ThreeBody::solveNmer( int num, double preclim )
 {
   int i, j;
-  ofstream nmer_deets;
-  double dist;
-  vector< double > print_all(4);
   shared_ptr<vector<vector<int> > > nmer = (( num == 2 ) ?
                               make_shared<vector<vector<int> > >(dimer_) :
                               make_shared<vector<vector<int> > >(trimer_));
   vector< Molecule > mol_temp;
-
   shared_ptr<System> _sysTemp = make_subsystem(nmer->operator[](0));
   shared_ptr<ASolver> _asolvTemp = make_shared<ASolver>(_besselCalc_, _shCalc_,
                                                         _sysTemp, _consts_, p_);
-  
-  if ( outfile != "") nmer_deets.open( outfile );
   
   for( i = 0; i < nmer->size(); i++)
   {
@@ -123,49 +118,24 @@ void ThreeBody::solveNmer( int num, string outfile, double preclim )
     _asolvTemp->solve_A(preclim);
     _asolvTemp->solve_gradA(preclim);
     
-    PhysCalc phys_all( _asolvTemp);
+    PhysCalc phys_all( _asolvTemp, unit_);
     phys_all.calc_all();
     
     for ( j = 0; j < num; j++)
     {
-      if ( outfile != "")
-      {
-        if (num == 2 ) dist = _sysTemp->get_pbc_dist_vec(0, 1).norm();
-        else
-        {
-          vector<double> dists(3);
-          dists[0] = _sysTemp->get_pbc_dist_vec(0, 1).norm();
-          dists[1] = _sysTemp->get_pbc_dist_vec(0, 2).norm();
-          dists[2] = _sysTemp->get_pbc_dist_vec(1, 2).norm();
-          sort( dists.begin(), dists.end());
-          dist = dists[0] + dists[1];
-        }
-        print_all[0] = ((abs(phys_all.get_omegai(j))<1e-15) ?
-                        0 : phys_all.get_omegai(j));
-        print_all[1] = ((abs(phys_all.get_forcei(j)[0])<1e-15) ?
-                        0 : phys_all.get_forcei(j)[0]);
-        print_all[2] = ((abs(phys_all.get_forcei(j)[1])<1e-15) ?
-                        0 : phys_all.get_forcei(j)[1]);
-        print_all[3] = ((abs(phys_all.get_forcei(j)[2])<1e-15) ?
-                        0 : phys_all.get_forcei(j)[2]);
-        nmer_deets << dist << "\t" << print_all[0] << "\t" << print_all[1];
-        nmer_deets << ", " << print_all[2] << ", "<< print_all[3] << endl;
-      }
       if ( num == 2 )
       {
-        energy_di_[i][j] = phys_all.get_omegai(j);
-        force_di_[i][j] = phys_all.get_forcei(j);
-        torque_di_[i][j] = phys_all.get_taui(j);
+        energy_di_[i][j] = phys_all.get_omegai_conv(j);
+        force_di_[i][j] = phys_all.get_forcei_conv(j);
+        torque_di_[i][j] = phys_all.get_taui_conv(j);
       } else
       {
-        energy_tri_[i][j] = phys_all.get_omegai(j);
-        force_tri_[i][j] = phys_all.get_forcei(j);
-        torque_tri_[i][j] = phys_all.get_taui(j);
+        energy_tri_[i][j] = phys_all.get_omegai_conv(j);
+        force_tri_[i][j] = phys_all.get_forcei_conv(j);
+        torque_tri_[i][j] = phys_all.get_taui_conv(j);
       }
     }
   }
-  
-  if ( outfile != "")  nmer_deets.close();
   
   cout << num << "mers done " << endl;
 }
@@ -229,6 +199,88 @@ void ThreeBody::calcTBDEnForTor( )
     } // end j
   } // end i
 }
+
+void ThreeBody::printTBDEnForTor( vector<string> outfile )
+{
+  int j;
+  for ( j = 0; j < N_; j++)
+  {
+    cout << "This is mol " << j << endl;
+    cout << " Energy: " << get_energyi_approx(j) << "\t";
+    cout << " Force: " << get_forcei_approx(j).norm() << "\t [";
+    cout << get_forcei_approx(j).x();
+    cout << ", " << get_forcei_approx(j).y()<< ", ";
+    cout << get_forcei_approx(j).z()<< "]"<< endl;
+  }
+  
+  if ( outfile[0] != "") printNmer( 2, outfile[0]);
+  if ( outfile[1] != "") printNmer( 3, outfile[1]);
+}
+
+void ThreeBody::printNmer( int num, string outfile)
+{
+  int i, j;
+  ofstream nmer_deets;
+  double dist, en_nrm;
+  Pt fo_nrm;
+  vector< double > print_all(4);
+  vector<int>  mol(3);
+  shared_ptr<vector<vector<int> > > nmer = (( num == 2 ) ?
+                                            make_shared<vector<vector<int> > >(dimer_) :
+                                            make_shared<vector<vector<int> > >(trimer_));
+  
+  shared_ptr<vector<vector<double > > > en = ( num == 2 ) ?
+  make_shared<vector<vector<double> > >(energy_di_) :
+  make_shared<vector<vector<double > > >(energy_tri_);
+  shared_ptr<vector<vector<Pt> > > frc = (( num == 2 ) ?
+                                          make_shared<vector<vector<Pt> > >(force_di_) :
+                                          make_shared<vector<vector<Pt> > >(force_tri_));
+  shared_ptr<vector<vector<Pt> > > tor = (( num == 2 ) ?
+                                          make_shared<vector<vector<Pt> > >(torque_di_) :
+                                          make_shared<vector<vector<Pt> > >(torque_tri_));
+  
+  nmer_deets.open( outfile );
+  
+  for( i = 0; i < nmer->size(); i++)
+  {
+    mol[0] = nmer->operator[](i)[0];
+    mol[1] = nmer->operator[](i)[1];
+    mol[2] = nmer->operator[](i)[2];
+    if (num == 2 ) dist = _sys_->get_pbc_dist_vec(mol[0], mol[1]).norm();
+    else
+    {
+      vector<double> dists(3);
+      Pt com = (_sys_->get_centeri(mol[0]) + _sys_->get_centeri(mol[1]) +
+                _sys_->get_centeri(mol[1]))*(1/3.);
+      dists[0] = _sys_->get_centeri(mol[0]).dist(com);
+      //_sysTemp->get_pbc_dist_vec(0, 1).norm();
+      dists[1] = _sys_->get_centeri(mol[1]).dist(com);
+      //_sysTemp->get_pbc_dist_vec(0, 2).norm();
+      dists[2] = _sys_->get_centeri(mol[2]).dist(com);
+      //_sysTemp->get_pbc_dist_vec(1, 2).norm();
+      //sort( dists.begin(), dists.end());
+      dist = dists[0] + dists[1] + dists[2];
+    }
+    for ( j = 0; j < num; j++)
+    {
+      en_nrm = 1.0; //energy_approx_[mol[j]];
+      fo_nrm = Pt( 1, 1, 1); //force_approx_[mol[j]];
+      print_all[0] = ((abs(en->operator[](i)[j]/en_nrm)<1e-15) ?
+                      0 : en->operator[](i)[j]/en_nrm);
+      print_all[1] = ((abs(frc->operator[](i)[j].x()/fo_nrm.x())<1e-15) ?
+                      0 : frc->operator[](i)[j].x()/fo_nrm.x());
+      print_all[2] = ((abs(frc->operator[](i)[j].y()/fo_nrm.y())<1e-15) ?
+                      0 : frc->operator[](i)[j].y()/fo_nrm.y());
+      print_all[3] = ((abs(frc->operator[](i)[j].z()/fo_nrm.z())<1e-15) ?
+                      0 : frc->operator[](i)[j].z()/fo_nrm.z());
+      nmer_deets << dist << "\t" << print_all[0] << "\t" << print_all[1];
+      nmer_deets << ", " << print_all[2] << ", "<< print_all[3] << endl;
+    }
+  }
+  
+  nmer_deets.close();
+}
+
 
 // Two body approximation
 void ThreeBody::calcTwoBDEnForTor( )

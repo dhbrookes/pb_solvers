@@ -131,18 +131,18 @@ System::System(Setup setup, double cutoff)
     XYZFile xyzI (setup.getTypeNXYZ(i), setup.getTypeNCount(i));
     for (j = 0; j < setup.getTypeNCount(i); j++)
     {
+      vector<Pt> repos_charges(pqrI.get_M());
+      for ( chg = 0; chg < pqrI.get_M(); chg ++)
+        repos_charges[chg] = pqrI.get_atom_pts()[chg] + xyzI.get_pts()[j];
       if (pqrI.get_cg())  // coarse graining is in pqr
       {
         mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
-                        pqrI.get_charges(),pqrI.get_atom_pts(),
+                        pqrI.get_charges(), repos_charges,
                         pqrI.get_radii(), xyzI.get_pts()[j],
                         setup.getDrot(i), setup.getDtr(i));
       }
       else
       {
-        vector<Pt> repos_charges(pqrI.get_M());
-        for ( chg = 0; chg < pqrI.get_M(); chg ++)
-          repos_charges[chg] = pqrI.get_atom_pts()[chg] + xyzI.get_pts()[j];
         mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
                        repos_charges, pqrI.get_radii(),
                        xyzI.get_pts()[j],
@@ -237,7 +237,9 @@ void System::write_to_pqr(string outfile)
     for ( j = 0; j < get_Mi(i); j++)
     {
       sprintf(pqrlin,"%6d  C   CHG A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,i,
-              get_posij(i, j).x(), get_posij(i, j).y(), get_posij(i, j).z(),
+              get_posijreal(i, j).x(),
+              get_posijreal(i, j).y(),
+              get_posijreal(i, j).z(),
               get_qij(i, j), get_radij(i, j));
       pqr_out << "ATOM " << pqrlin << endl;
       ct++;

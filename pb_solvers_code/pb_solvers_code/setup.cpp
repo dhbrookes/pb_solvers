@@ -29,7 +29,8 @@ nTypenCount_(2),
 typeDef_(2),
 typeDiff_(2),
 molfnames_(2),
-runSpecs_(2)
+runSpecs_(2),
+mbdfile_loc_(2)
 {
   nTypenCount_[0] = 1;
   nTypenCount_[1] = 1;
@@ -48,6 +49,9 @@ runSpecs_(2)
   
   potOutfnames_.resize(2);
   potOutfnames_[0] = "";
+  
+  mbdfile_loc_[0] = "";
+  mbdfile_loc_[1] = "";
   
   units_ = "internal";
   
@@ -153,6 +157,14 @@ void Setup::findKeyword(vector<string> fline)
     setGridOutName( atoi(fline[1].c_str()), fline[2].c_str());
     setGridAx( atoi(fline[1].c_str()), fline[3].c_str());
     setGridAxLoc( atoi(fline[1].c_str()), atof(fline[4].c_str()));
+  } else if (keyword == "3bdloc")
+  {
+    cout << "3BD loc command found" << endl;
+    set3BDLoc(fline[1].c_str());
+  } else if (keyword == "2bdloc")
+  {
+    cout << "2BD loc command found" << endl;
+    set2BDLoc(fline[1].c_str());
   } else if (keyword == "omp")
   {
     cout << "OMP command found" << endl;

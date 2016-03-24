@@ -97,11 +97,12 @@ int main_bodyapprox( int poles, double tol, Setup setup,
   
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                     constant, poles);
-  ThreeBody threeBodTest( ASolv );
+  ThreeBody threeBodTest( ASolv, constant->get_unitsEnum() );
   
-  threeBodTest.solveNmer(2, "/Users/lfelberg/Desktop/2mer.dat");
-  threeBodTest.solveNmer(3, "/Users/lfelberg/Desktop/3mer.dat");
+  threeBodTest.solveNmer(2);
+  threeBodTest.solveNmer(3);
   threeBodTest.calcTBDEnForTor();
+  threeBodTest.printTBDEnForTor(setup.getMBDLoc());
   
   return 0;
 }
@@ -109,10 +110,10 @@ int main_bodyapprox( int poles, double tol, Setup setup,
 
 int main(int argc, const char * argv[])
 {
-//  string input_file = argv[1];
-  string input_file = "/Users/lfelberg/Desktop/test/";
+  string input_file = argv[1];
+//  string input_file = "/Users/lfelberg/Desktop/test/";
 //  input_file += "energyforce_test/run.energyforce.inp";//argv[1];
-  input_file += "electrostatic_test/run.electrostatic.inp";
+//  input_file += "electrostatic_test/run.electrostatic.inp";
 //  input_file += "dynamics_test/run.dynamics.inp";
 //  input_file += "manybodyapprox_test/run.manybodyapprox.inp";
   

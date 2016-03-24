@@ -237,13 +237,20 @@ public:
   
   void print_all();
   
-  shared_ptr<VecOfVecs<double>::type > get_Tau() { return _torCalc_->get_Tau(); }
-  shared_ptr<VecOfVecs<double>::type> get_F()    { return _fCalc_->get_F(); }
+  shared_ptr<VecOfVecs<double>::type > get_Tau() { return _torCalc_->get_Tau();}
+  shared_ptr<VecOfVecs<double>::type> get_F()    { return _fCalc_->get_F();}
   shared_ptr<MyVector<double> > get_omega() {return _eCalc_->get_omega_int();}
   
   MyVector<double> get_taui(int i) { return _torCalc_->get_taui(i); }
   MyVector<double> get_forcei(int i) { return _fCalc_->get_fi(i); }
   double get_omegai(int i) {return _eCalc_->get_omega_i_int(i);}
+  
+  MyVector<double> get_taui_conv(int i)
+  { return _torCalc_->get_taui(i)*unit_conv_; }
+  MyVector<double> get_forcei_conv(int i)
+  { return _fCalc_->get_fi(i)*unit_conv_; }
+  double get_omegai_conv(int i)
+  {return _eCalc_->get_omega_i_int(i)*unit_conv_;}
 
 };
 

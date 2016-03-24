@@ -178,7 +178,8 @@ void Electrostatic::print_dx( string dxname )
 
 void Electrostatic::print_grid(string axis, double value, string fname)
 {
-  int i, j, idx;
+  int i, j, idx = 0;
+  double v_act;
   ofstream f;
   char pot[20];
   vector<double> org(2), delta(2);
@@ -203,6 +204,7 @@ void Electrostatic::print_grid(string axis, double value, string fname)
       {
         idx = round((value-range_min_[0]) / step_[0]);
         grid_[i][j] = esp_[idx][i][j];
+        
       } else if (axis ==  "y")
       {
         idx = round((value-range_min_[1]) / step_[1]);
@@ -221,22 +223,25 @@ void Electrostatic::print_grid(string axis, double value, string fname)
   {
     org[0] = range_min_[1]; org[1] = range_min_[2];
     delta[0] = step_[1]; delta[1] = step_[2];
+    v_act = idx * step_[0] + range_min_[0];
   }
   else if ( axis == "y" )
   {
     org[0] = range_min_[0]; org[1] = range_min_[2];
     delta[0] = step_[0]; delta[1] = step_[2];
+    v_act = idx * step_[1] + range_min_[1];
   } else
   {
     org[0] = range_min_[0]; org[1] = range_min_[1];
     delta[0] = step_[0]; delta[1] = step_[1];
+    v_act = idx * step_[2] + range_min_[2];
   }
 
   f.open(fname);
   f << "# Data from PBAM Electrostat run\n# My runname is " << fname << endl;
   f << "units " << _consts_->get_units() <<  endl;
   f << "grid " << grid_.size() << " " << grid_[0].size() << endl;
-  f << "axis " << axis << " " << value << endl;
+  f << "axis " << axis << " " << v_act << endl;
   f << "origin " << org[0] << " " << org[1] << endl;
   f << "delta " << delta[0] << " " << delta[1] << endl;
   f << "maxmin " << pot_max_ << " " << pot_min_ << endl;

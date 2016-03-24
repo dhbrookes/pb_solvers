@@ -89,6 +89,7 @@ elif ax == 'z':
 
 esp[ esp == 0.0] = None
  
-dispPlot( org, dl, len(esp[0]), esp, mx, mn, titl,
+dispPlot( org, dl, len(esp[0]), np.transpose(esp), 
+                mx, mn, titl,
                 xlab = xla, ylab = yla,
                 outFile=outFile)
