@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  23 MAR 2016 17:39
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  24 MAR 2016 15:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -557,7 +557,7 @@ e
 \openout2 = `chapters/titlepg.aux'.
 
 
-(./chapters/titlepg.tex <./figures/cover.png, id=44, 249.5724pt x 246.1998pt>
+(./chapters/titlepg.tex <./figures/cover.png, id=60, 249.5724pt x 246.1998pt>
 File: ./figures/cover.png Graphic file (type png)
 
 <use ./figures/cover.png>
@@ -634,8 +634,6 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 (./chapters/intro.tex
 Chapter 1.
-Missing character: There is no Ã in font cmr10!
-Missing character: There is no ¼ in font cmr10!
 [2
 
 
@@ -656,642 +654,779 @@ Underfull \hbox (badness 10000) in paragraph at lines 24--25
 
 
 
-]
-Underfull \hbox (badness 10000) in paragraph at lines 59--60
+] [4]
+Underfull \hbox (badness 10000) in paragraph at lines 78--79
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 61--63
+Underfull \hbox (badness 10000) in paragraph at lines 80--82
 
  []
 
 \colthree=\skip68
 \coltwo=\skip69
 
-LaTeX Warning: Command \textless invalid in math mode on input line 78.
+LaTeX Warning: Command \textless invalid in math mode on input line 97.
 
-LaTeX Font Info:    Try loading font information for OML+cmr on input line 78.
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 97.
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10.95> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 78.
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 97.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 78.
+LaTeX Warning: Command \textless invalid in math mode on input line 97.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 78.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 97.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 78.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 97.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 78.
+LaTeX Warning: Command \textless invalid in math mode on input line 97.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 78.
+LaTeX Warning: Command \textless invalid in math mode on input line 97.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 78.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 97.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 78.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 97.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 79.
+LaTeX Warning: Command \textless invalid in math mode on input line 98.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 79.
+LaTeX Warning: Command \textless invalid in math mode on input line 98.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 79.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 98.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 79.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 98.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 79.
+LaTeX Warning: Command \textless invalid in math mode on input line 98.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 79.
+LaTeX Warning: Command \textless invalid in math mode on input line 98.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 79.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 98.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 79.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 98.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 80.
+LaTeX Warning: Command \textless invalid in math mode on input line 99.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 80.
+LaTeX Warning: Command \textless invalid in math mode on input line 99.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 80.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 99.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 80.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 99.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 80.
+LaTeX Warning: Command \textless invalid in math mode on input line 99.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 80.
+LaTeX Warning: Command \textless invalid in math mode on input line 99.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 80.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 99.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 80.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 99.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 81.
+LaTeX Warning: Command \textless invalid in math mode on input line 100.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 81.
+LaTeX Warning: Command \textless invalid in math mode on input line 100.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 81.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 100.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 81.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 100.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 81.
+LaTeX Warning: Command \textless invalid in math mode on input line 100.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 81.
+LaTeX Warning: Command \textless invalid in math mode on input line 100.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 81.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 100.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 81.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 100.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 82.
+LaTeX Warning: Command \textless invalid in math mode on input line 101.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 82.
+LaTeX Warning: Command \textless invalid in math mode on input line 101.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 82.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 101.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 82.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 101.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 82.
+LaTeX Warning: Command \textless invalid in math mode on input line 101.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 82.
+LaTeX Warning: Command \textless invalid in math mode on input line 101.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 82.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 101.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 82.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 101.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 83.
+LaTeX Warning: Command \textless invalid in math mode on input line 102.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 83.
+LaTeX Warning: Command \textless invalid in math mode on input line 102.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 83.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 102.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 83.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 102.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 83.
+LaTeX Warning: Command \textless invalid in math mode on input line 102.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 83.
+LaTeX Warning: Command \textless invalid in math mode on input line 102.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 83.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 102.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 83.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 102.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 84.
+LaTeX Warning: Command \textless invalid in math mode on input line 103.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 84.
+LaTeX Warning: Command \textless invalid in math mode on input line 103.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 84.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 103.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 84.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 103.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 84.
+LaTeX Warning: Command \textless invalid in math mode on input line 103.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 84.
+LaTeX Warning: Command \textless invalid in math mode on input line 103.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 84.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 103.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 84.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 103.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 85.
+LaTeX Warning: Command \textless invalid in math mode on input line 104.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 85.
+LaTeX Warning: Command \textless invalid in math mode on input line 104.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 85.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 104.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 85.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 104.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 85.
+LaTeX Warning: Command \textless invalid in math mode on input line 104.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 85.
+LaTeX Warning: Command \textless invalid in math mode on input line 104.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 85.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 104.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 85.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 104.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 86.
+LaTeX Warning: Command \textless invalid in math mode on input line 105.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 86.
+LaTeX Warning: Command \textless invalid in math mode on input line 105.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 86.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 105.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 86.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 105.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 86.
+LaTeX Warning: Command \textless invalid in math mode on input line 105.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 86.
+LaTeX Warning: Command \textless invalid in math mode on input line 105.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 86.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 105.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 86.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 105.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 87.
+LaTeX Warning: Command \textless invalid in math mode on input line 106.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 87.
+LaTeX Warning: Command \textless invalid in math mode on input line 106.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 87.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 106.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 87.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 106.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 87.
+LaTeX Warning: Command \textless invalid in math mode on input line 106.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 87.
+LaTeX Warning: Command \textless invalid in math mode on input line 106.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 87.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 106.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 87.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 106.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 88--88
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
 []$[][][]$ $[][][]$
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 88--88
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
 [][][]$
  []
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 88.
+LaTeX Warning: Command \textless invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 88.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 107.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 90.
+LaTeX Warning: Command \textless invalid in math mode on input line 109.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 90.
+LaTeX Warning: Command \textless invalid in math mode on input line 109.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 90.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 109.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 90.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 109.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 90.
+LaTeX Warning: Command \textless invalid in math mode on input line 109.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 90.
+LaTeX Warning: Command \textless invalid in math mode on input line 109.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 90.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 109.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 90.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 109.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 91.
+LaTeX Warning: Command \textless invalid in math mode on input line 110.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 91.
+LaTeX Warning: Command \textless invalid in math mode on input line 110.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 91.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 110.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 91.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 110.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 91.
+LaTeX Warning: Command \textless invalid in math mode on input line 110.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 91.
+LaTeX Warning: Command \textless invalid in math mode on input line 110.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 91.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 110.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 91.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 110.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 92.
+LaTeX Warning: Command \textless invalid in math mode on input line 111.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 92.
+LaTeX Warning: Command \textless invalid in math mode on input line 111.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 92.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 111.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 92.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 111.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 92.
+LaTeX Warning: Command \textless invalid in math mode on input line 111.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 92.
+LaTeX Warning: Command \textless invalid in math mode on input line 111.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 92.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 111.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 92.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 111.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textless invalid in math mode on input line 93.
+LaTeX Warning: Command \textless invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-LaTeX Warning: Command \textgreater invalid in math mode on input line 93.
+LaTeX Warning: Command \textgreater invalid in math mode on input line 112.
 
 
-Overfull \hbox (72.25403pt too wide) in paragraph at lines 76--98
+LaTeX Warning: Command \textless invalid in math mode on input line 115.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 115.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 115.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 115.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 115.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 115.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 115.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 115.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 116.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 116.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 116.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 116.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 116.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 116.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 116.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 116.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+Underfull \hbox (badness 1552) in paragraph at lines 117--117
+[]$[][][]$ $[][][]$
+ []
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textless invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+LaTeX Warning: Command \textgreater invalid in math mode on input line 117.
+
+
+Overfull \hbox (72.25403pt too wide) in paragraph at lines 95--120
 [][] 
  []
 
-[4
+[5
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 101--102
+Underfull \hbox (badness 10000) in paragraph at lines 123--124
+
+ []
+
+[6]
+Underfull \hbox (badness 10000) in paragraph at lines 125--127
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 103--105
+Underfull \hbox (badness 10000) in paragraph at lines 128--129
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 106--107
-
- []
-
-[5]
-Underfull \hbox (badness 10000) in paragraph at lines 108--109
+Underfull \hbox (badness 10000) in paragraph at lines 130--131
 
  []
 
 Missing character: There is no â in font cmr10!
 Missing character: There is no € in font cmr10!
 Missing character: There is no ¦ in font cmr10!
-[6])
+[7])
 No file doc_main.bbl.
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 154.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 154.
@@ -1300,31 +1435,35 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 154.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 154.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 154.
 Package rerunfilecheck Info: File `doc_main.out' has not changed.
-(rerunfilecheck)             Checksum: 893E7D3EF474CB5043A947EE9B61497D;661.
+(rerunfilecheck)             Checksum: D68B45863A5C362A7F08A6F0B84F37A4;905.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 154.
  ) 
 Here is how much of TeX's memory you used:
- 9805 strings out of 493089
- 143330 string characters out of 6134842
- 246278 words of memory out of 5000000
- 13093 multiletter control sequences out of 15000+600000
- 10021 words of font info for 39 fonts, out of 8000000 for 9000
+ 9847 strings out of 493089
+ 143798 string characters out of 6134842
+ 248278 words of memory out of 5000000
+ 13116 multiletter control sequences out of 15000+600000
+ 15013 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 33i,12n,53p,1154b,341s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 33i,12n,53p,1057b,341s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
 /usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
 usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></us
 r/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/
+local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/
 local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/lo
-cal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local
-/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/
-texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on doc_main.pdf (8 pages, 750367 bytes).
+cal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local
+/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/te
+xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texli
+ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texliv
+e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/
+2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on doc_main.pdf (9 pages, 791447 bytes).
 PDF statistics:
- 144 PDF objects out of 1000 (max. 8388607)
- 120 compressed objects within 2 object streams
- 21 named destinations out of 1000 (max. 500000)
- 86 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 187 PDF objects out of 1000 (max. 8388607)
+ 158 compressed objects within 2 object streams
+ 27 named destinations out of 1000 (max. 500000)
+ 118 words of extra memory for PDF output out of 10000 (max. 10000000)
 

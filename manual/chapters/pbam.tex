@@ -1,5 +1,5 @@
 
-\chapter{Poisson-Boltzmann Analytical Model (PB-AM)}
+\chapter{Theory}
 
 
 
@@ -23,14 +23,33 @@ Exploiting fast-multipole methods, this boundary value problem can be reduced to
 
 A(i) represents the effective multipole expansion of the charge distributions of molecule (i). E(i) is the free charge distribution of molecule (i). $\Gamma$ is a dielectric boundary-crossing operator, $\Delta$ a cavity polarization operator, T an operator that transforms the multipole expansion to a local coordinate frame.  More details on the method are available in Lotan, Head-Gordon (2006). \\
 
-From this formulation, computation of the interaction energies ($\Omega^{(i)}$) is given as follows:
+\subsection{Physical Calculations}
+
+From the above formulation, computation of the interaction energies ($\Omega^{(i)}$) is given as follows:
 
 \[\Omega^{(i)}=\frac{1}{\epsilon_s}  \langle  T \cdot A^{(i) } ,  A^{(i) } \rangle \]
 
 Where $\langle  M, N \rangle$ denotes the inner product. When energy is computed, forces follow as:
 
-\[ F_i = \nabla_i \Omega^{(i)}=\frac{1}{\epsilon_s} [ \langle \nabla_i \,T \cdot A^{(i) } ,  A^{(i) } \rangle +  \langle T \cdot A^{(i) } ,   \nabla_i \, A^{(i) } \rangle ]\]
+\[ \textbf{F}^{(i)} = \nabla_i \Omega^{(i)}=\frac{1}{\epsilon_s} [ \langle \nabla_i \,T \cdot A^{(i) } ,  A^{(i) } \rangle +  \langle T \cdot A^{(i) } ,   \nabla_i \, A^{(i) } \rangle ]\]
 
+
+% Additonally, the torque $\tau^{(i)}_j$ on molecule $i$ due to a charge $q^{(i)}_j$ is calculated as follows:
+The method to calculate the torque $\boldsymbol{\tau}^{(i)}$ on molecule is outside the scope of this manual, but is discussed extensively in Lotan, Head-Gordon (2006).
+
+\subsection{Brownian Dynamics}
+
+Brownian dynamics simulations are implemented by treating each molecule as a Brownian particle experiencing a conservative force $\textbf{F}^{(i)}$ and torque $\boldsymbol{\tau}^{(i)}$, as well as friction and random force due to the solvent. The translation $\Delta r_i$ and rotation $\Delta \theta_i$ for a time step $\Delta t$ are then given by
+
+\[\Delta r^{(i)} = \frac{D_{i, trans} \Delta t}{k_B T} \textbf{F}^{(i)} + \textbf{S}_i(\Delta t)\]
+\[\Delta \theta^{(i)} = \frac{D_{i, rot} \Delta t}{k_B T} \boldsymbol{\tau}^{(i)} + \boldsymbol{\Theta}_i(\Delta t)\]
+
+where $D_{i, trans}$ and $D_{i, rot}$ are the translation and rotational diffusion coefficients for molecule $i$, respectively and $\textbf{S}_i(\Delta t)$ and $\boldsymbol{\Theta}_i(\Delta t)$ are the stochastic components of translation and rotation, respectively, which have the following properties:
+
+\[\langle \textbf{S}_i \rangle=0, \qquad \langle \textbf{S}_i^2 \rangle=2D_{i, trans}\Delta t\]
+\[\langle \boldsymbol{\Theta}_i \rangle=0, \qquad \langle \boldsymbol{\Theta}_i^2 \rangle=2D_{i, rot}\Delta t\]
+
+\subsection{Electrostatics}
 
 \clearpage
 
@@ -93,6 +112,9 @@ Each keyword is described in the table below, along with its associated paramete
 \T grid2d & \parbox[t]{\coltwo}{\param{idx} \param{fname} \param{axis} \param{val} } & \parbox[t]{\colthree}{For electrostatics. Set attributes of a grid output where \param{idx} is the integer id of this grid, which can be 1 to \param{ct} (above). Will write output of calculations for a cross section along \param{axis} (\texttt{x}, \texttt{y}, or \texttt{z}) at \param{value}.\B} \\
 \hline
 \T runtype dynamics & & \parbox[t]{\colthree}{Will perform a brownian dynamics run.\B}  \\
+\T termct & \param{ct} & \parbox[t]{\colthree}{Set number of termination conditions to \param{ct}.}  \\
+\T termcombine & \param{andor} & \parbox[t]{\colthree}{Set how termination conditions will be combined. \param{andor} should be \texttt{and} or \texttt{or}.} \\
+\T term & \parbox[t]{\coltwo}{\param{idx} \param{type} \param{val}} & \parbox[t]{\colthree}{Set attributes of a termination condition where \param{idx} is the integer id of this condition, which can be 1 to \param{ct} (above). \param{type} can be \texttt{time}, \texttt{x}, \texttt{y}, \texttt{z}, or \texttt{r} and \param{val} is the value where the simulation will terminate. \B} \\
 \hline
   \end{tabular}
 

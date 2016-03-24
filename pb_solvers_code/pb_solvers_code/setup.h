@@ -28,12 +28,16 @@ protected:
   vector<string> axis_;  // For grid print, axis desired
   vector<double> axLoc_; // Location along given axis
   
+  int numTerm_;  //number of termination conditions
+  vector<string> termtype_; // type of each termination ('time', 'x', 'y', 'z' or 'r')
+  vector<double> termvals_; // value for each termination condition
+  bool andCombine_;  //if true, termination conditions will combine with 'and', otherwise with 'or'
+  
   double idiel_;
   double sdiel_;  // dielectric constant win molecule and of solvent
   double temp_;
   int srand_;			// random seed
   bool orientRand_; // flag for creating random orientations for mols
-  
   
   vector<int> nTypenCount_; // Array for each of mol types, how many mols
   vector<vector<double> > typeDiff_; // Dtr, Drot each type, size [Ntype][2]
@@ -68,6 +72,20 @@ protected:
   void setGridCt( int gridC ) { gridCt_ = gridC; }
   void setGridAx( int i, string ax) { axis_[i-1] = ax;}
   void setGridAxLoc( int i, double axLoc) { axLoc_[i-1] = axLoc;}
+  
+  //dynamics settings
+  void set_numterms(int n) { numTerm_ = n; }
+  void add_termcond(string type, double val)
+  {
+    termtype_.push_back(type);
+    termvals_.push_back(val);
+  }
+  
+  void set_term_combine(string type)
+  {
+    if (type=="and") andCombine_ = true;
+    else andCombine_ = false;
+  }
   
   // setting details for 3bd
   void set2BDLoc( string fileloc ) { mbdfile_loc_[0] = fileloc;}
@@ -126,7 +144,6 @@ public:
   string get3BDLoc()               { return mbdfile_loc_[1]; }
   vector<string> getMBDLoc()       { return mbdfile_loc_; }
   
-  //
   int getThreads()                 { return ompThreads_; }
   int getNType()                   { return nType_; }
   int getPBCs()                    { return PBCs_; }

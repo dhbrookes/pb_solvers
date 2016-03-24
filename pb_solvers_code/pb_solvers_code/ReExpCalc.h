@@ -33,7 +33,6 @@ virtual const char* what() const throw()
        2 * p_ <<" but is:  " << besselSize_ << endl;
   return ss.str().c_str();
 }
-
 };
 
 
@@ -56,7 +55,6 @@ public:
     "It is supposed to be: " << 2 * p_ <<" but is:  " << shSize_ << endl;
     return ss.str().c_str();
   }
-  
 };
 
 

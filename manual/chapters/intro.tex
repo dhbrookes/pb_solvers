@@ -13,20 +13,13 @@ under a GPL license.
 
 
 
-\section{PB-AM} The first general analytical solution for computing the screened electrostatic interaction between large numbers of macromolecules of arbitrarily complex charge distributions, assuming they are well described by spherical low dielectric cavities in a higher dielectric medium in the presence of a Debye-Hückel treatment of salt. The method exploits multipole expansion theory for the screened Coulomb potential such that it can describe direct charge-charge interactions and all higher-order cavity polarization effects between low dielectric spherical cavities containing their charges, while treating these higher order terms correctly at all separation distances. The analytical solution is general to arbitrary numbers of macromolecules, is efficient to compute, provides for the first time the ability to provide new benchmarks for other numerical solutions to the linearized Poisson-Boltzmann equation. A number of utilities are described below that use PB-AM results.
+\section{PB-AM} The first general analytical solution for computing the screened electrostatic interaction between large numbers of macromolecules of arbitrarily complex charge distributions, assuming they are well described by spherical low dielectric cavities in a higher dielectric medium in the presence of a Debye-H{\"u}ckel treatment of salt. The method exploits multipole expansion theory for the screened Coulomb potential such that it can describe direct charge-charge interactions and all higher-order cavity polarization effects between low dielectric spherical cavities containing their charges, while treating these higher order terms correctly at all separation distances. The analytical solution is general to arbitrary numbers of macromolecules, is efficient to compute, provides for the first time the ability to provide new benchmarks for other numerical solutions to the linearized Poisson-Boltzmann equation. A number of utilities are described below that use PB-AM results.
 
+\section{Physical Calculations} The PB-AM results allow for fast calculation of physically important quantities. Specifically this program can calculate the energy of, and the force and torque applied to each molecule. These results may be written into a file or printed to the terminal.
 
-\section{Brownian Dynamics}
+\section{Brownian Dynamics} This package also implements dynamics simulations using the Brownian protocol developed by Ermak and McCammon\footnote{Ermak, D. L.; McCammon, J. A. \textit{J. Chem. Phys.} 1978, \textit{69}, 1352\---1360.}. At each time step, the translation and rotation due to the applied force and torque, respectively, are calculated and added to random components of motion. The user can specify spatial and temporal termination conditions for the simulation and write the trajectory to specified files.
 
 \section{Electrostatics}
-
-% \section{PB-SAM} is a new numerical approach to solving the linearized Poisson Boltzmann equation by representing the macromolecule surface as a collection of spheres in which the surface charges can then be iteratively solved by the PB-AM analytical multipole method. Our Poisson Boltzmann semi-analytical method, PB-SAM, realizes better accuracy, more flexible memory management, and at reduced cost relative to either finite difference or boundary element method PBE solvers. In addition, we have extend the applicability of the PB-SAM approach by deriving force and torque expressions that fully account for mutual polarization in both the zero and first order derivative of the surface charges, that we have embedded into a Brownian dynamics scheme to look at electrostatic-driven mesoscale assembly and kinetics. This allows for the simulation of protein concentration effects and crowding conditions on the biomolecular rate of under wither a Northrup-Allison-McCammon approach in addition to our new formulation of rates using periodic boundary conditions and evaluated through mean first passage times. 
-
-
-
-
-% \section{MC-PB-SAM} The PB-SAM approach renders the molecular surface as a collection of overlapping spheres whose resolution is controlled by the sphere size used. The solvent excluded molecular surface (SES) is determined and the resulting SES and PQR files are inputs into MC-PB-SAM program to discretized the macromolecule(s) into spheres. At each iteration, this program uses a greedy Monte Carlo algorithm to search for a sphere center that encompasses the largest number of fixed partial charges. Charges within this sphere center are then removed, and the search is repeated with the remaining charges. A stipulated tolerance controls how far from the SES the sphere surface can protrude. 
-
 
 
 

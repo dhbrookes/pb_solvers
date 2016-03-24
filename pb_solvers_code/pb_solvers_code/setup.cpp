@@ -30,7 +30,9 @@ typeDef_(2),
 typeDiff_(2),
 molfnames_(2),
 runSpecs_(2),
-mbdfile_loc_(2)
+mbdfile_loc_(2),
+termvals_(2),
+termtype_(2)
 {
   nTypenCount_[0] = 1;
   nTypenCount_[1] = 1;
@@ -191,6 +193,21 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "Solvent dielectric command found" << endl;
     setSDiel( atof(fline[1].c_str()) );
+  }else if (keyword == "termct")
+  {
+    cout << "Termination count command found" << endl;
+    set_numterms(atoi(fline[1].c_str()));
+    cout << "done with termination count" << endl;
+  } else if (keyword == "termcombine")
+  {
+    cout << "Termination combine command found" << endl;
+    set_term_combine(fline[1]);
+    cout << "done with termination condition" << endl;
+  } else if (keyword == "term")
+  {
+    cout << "Termination condition command found" << endl;
+    add_termcond(fline[2], atof(fline[3].c_str()));
+    cout << "done with termination condition" << endl;
   } else if (keyword == "attypes")
   {
     cout << "Atom Types command found" << endl;
