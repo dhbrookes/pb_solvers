@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <algorithm>
 #include <complex>
 #include <iostream>
 #include <iomanip>
@@ -312,6 +313,18 @@ public:
     t3 = q0*r3 + q1*r2 - q2*r1 + q3*r0;
     
     return Quat(t0, t1, t2, t3, false);
+  }
+  
+  Quat chooseRandom()
+  {
+    double s = drand48();
+    double sig1 = sqrt(1.0-s);
+    double sig2 = sqrt(s);
+    double t1 = 2.0*drand48()*M_PI;
+    double t2 = 2.0*drand48()*M_PI;
+    Quat Q(cos(t2)*sig2, sin(t1)*sig1, cos(t1)*sig1, sin(t2)*sig2);
+    
+    return Q;
   }
   
   /*

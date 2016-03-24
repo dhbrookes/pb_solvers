@@ -225,6 +225,10 @@ void Setup::findKeyword(vector<string> fline)
       return;
     setTypeNXYZ( typeNo, fline[2] );
     
+  } else if (keyword == "randorient")
+  {
+    cout << "Random orientation command found" << endl;
+    setRandOrient();
   } else if (keyword == "random")
   {
     cout << "RNG Seed command found" << endl;

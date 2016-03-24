@@ -160,13 +160,6 @@ System::System(Setup setup, double cutoff)
   lambda_ = calc_average_radius();
 }
 
-//System::System(const System& sys)
-//:molecules_(sys.molecules_), N_(sys.N_), cutoff_(sys.get_cutoff()),
-//boxLength_(sys.get_boxlength())
-//{
-//  set_time(sys.t_);
-//}
-
 const double System::calc_average_radius() const
 {
   double ave = 0;
@@ -216,18 +209,6 @@ Pt System::get_pbc_dist_vec(int i, int j)
   return v;
 }
 
-//System System::get_subsystem(const vector<int> mol_idx)
-//{
-//  vector<Molecule> sub_mols (mol_idx.size());
-//  for (int i = 0; i < mol_idx.size(); i++)
-//  {
-//    sub_mols[i] = molecules_[mol_idx[i]];
-//  }
-//  System subsys (sub_mols, cutoff_, boxLength_);
-//  subsys.set_time(t_);
-//  return subsys;
-//}
-
 vector<Pt> System::get_allcenter() const
 {
   vector< Pt> mol_cen(N_);
@@ -243,3 +224,29 @@ bool System::less_than_cutoff(Pt v)
   else return false;
 }
 
+void System::write_to_pqr(string outfile)
+{
+  int i, j, ct = 0;
+  ofstream pqr_out;
+  char pqrlin[400];
+  
+  pqr_out.open( outfile );
+  
+  for ( i = 0; i < N_; i++ )
+  {
+    for ( j = 0; j < get_Mi(i); j++)
+    {
+      sprintf(pqrlin,"%6d  C   CHG A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,i,
+              get_posij(i, j).x(), get_posij(i, j).y(), get_posij(i, j).z(),
+              get_qij(i, j), get_radij(i, j));
+      pqr_out << "ATOM " << pqrlin << endl;
+      ct++;
+    }
+    sprintf(pqrlin,"%6d  X   CEN A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,i,
+            get_centeri(i).x(), get_centeri(i).y(), get_centeri(i).z(),
+            0.0, get_radi(i));
+    pqr_out << "ATOM " << pqrlin << endl;
+    ct++;
+  }
+  
+}

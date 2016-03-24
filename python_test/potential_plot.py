@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 '''
 Program to plot a 2D version of the ESP from PB-AM
 '''
-#fileName='/Users/lfelberg/Desktop/test/electrostatic_test/out.x.0.dat'
-fileName='/Users/lfelberg/Desktop/pot_z_0.00.dat'
-outFile='/Users/lfelberg/Desktop/pot_z_0.00.jpg'
+fileName='/Users/lfelberg/Desktop/test/electrostatic_test/out.x.0.dat'
+#fileName='/Users/lfelberg/Desktop/pot_z_0.00.dat'
+outFile='/Users/lfelberg/Desktop/pot_x_0.00.jpg'
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):

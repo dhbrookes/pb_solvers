@@ -32,6 +32,8 @@ protected:
   double sdiel_;  // dielectric constant win molecule and of solvent
   double temp_;
   int srand_;			// random seed
+  bool orientRand_; // flag for creating random orientations for mols
+  
   
   vector<int> nTypenCount_; // Array for each of mol types, how many mols
   vector<vector<double> > typeDiff_; // Dtr, Drot each type, size [Ntype][2]
@@ -79,6 +81,7 @@ protected:
   void setSDiel( double sdiel ) { sdiel_ = sdiel;}
   void setTemp( double temp ) { temp_ = temp;}
   void setRand( int rand ) { srand_ = rand; }
+  void setRandOrient()          { orientRand_ = true; }
   void setNTraj( int ntraj ){ ntraj_ = ntraj; }
   void setKappa( double kappa ) { kappa_ = kappa; }
   
@@ -134,6 +137,8 @@ public:
   double getKappa()                { return kappa_; }
   double getIKbT()                 { return iKbT_; }
   int get_ntype()                  { return nType_; }
+  
+  bool get_randOrient()            { return orientRand_; }
   
 };
 

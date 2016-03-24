@@ -62,6 +62,7 @@ public:
   const int get_m() const               { return M_; }
   const double get_a() const            { return a_; }
   const double get_qj(int j) const      { return qs_[j]; }
+  const double get_radj(int j) const    { return vdwr_[j]; }
   Pt get_posj(int j) const              { return pos_[j]; }
   Pt get_posj_realspace(int j)          { return center_ + pos_[j]; }
   Pt get_center() const                 { return center_; }
@@ -101,18 +102,15 @@ public:
          double cutoff=Constants::FORCE_CUTOFF,
          double boxlength=Constants::MAX_DIST);
   
-//  System(const System& sys);
-  
   System(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
-  
-  // return a copy of this system with a smaller set of molecules
-//  System get_subsystem(const vector<int> mol_idx);
   
   const int get_n() const                  {return N_;}
   const double get_ai(int i) const         {return molecules_[i].get_a();}
   const double get_Mi(int i) const         {return molecules_[i].get_m();}
   const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
+  const double get_radij(int i, int j) const {return molecules_[i].get_radj(j);}
   Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
+  Pt get_posijreal(int i, int j) {return molecules_[i].get_posj_realspace(j);}
   Molecule get_molecule(int i) const       {return molecules_[i];}
   vector<Pt> get_allcenter() const;
   Pt get_centeri(int i) const              {return molecules_[i].get_center();}
@@ -147,6 +145,9 @@ public:
   
   // given a distance vector, determine whether it is in the cutoff
   bool less_than_cutoff(Pt v);
+  
+  // write current system to PQR file
+  void write_to_pqr( string outfile );
   
 };
 

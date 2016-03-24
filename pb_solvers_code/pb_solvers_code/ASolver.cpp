@@ -27,7 +27,7 @@ _consts_(_consts)
 // perform many iterations of the solution for A
 void ASolver::solve_A(double prec)
 {
-  int MAX_POL_ROUNDS = 500;
+  int MAX_POL_ROUNDS = 1000;
 
   double scale_dev = (double)(p_*(p_+1)*0.5);
   double cng = scale_dev;
@@ -53,7 +53,7 @@ void ASolver::solve_gradA(double prec)
   assert(solvedA_); // must solve a before this
   double scale_dev = (double)(p_*(p_+1)*0.5*3.0);
   double cng;
-  int j, ct, MAX_POL_ROUNDS = 500;
+  int j, ct, MAX_POL_ROUNDS = 1000;
   
   pre_compute_gradT_A();
 

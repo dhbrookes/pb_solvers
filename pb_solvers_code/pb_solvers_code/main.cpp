@@ -86,13 +86,35 @@ int main_energyforce( int poles, double tol, Setup setup,
   return 0;
 }
 
+int main_bodyapprox( int poles, double tol, Setup setup,
+                  Constants consts, shared_ptr<System> sys)
+{
+  shared_ptr<Constants> constant = make_shared<Constants>(setup);
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
+  
+  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
+                                                    constant, poles);
+  ThreeBody threeBodTest( ASolv );
+  
+  threeBodTest.solveNmer(2, "/Users/lfelberg/Desktop/2mer.dat");
+  threeBodTest.solveNmer(3, "/Users/lfelberg/Desktop/3mer.dat");
+  threeBodTest.calcTBDEnForTor();
+  
+  return 0;
+}
+
 
 int main(int argc, const char * argv[])
 {
+//  string input_file = argv[1];
   string input_file = "/Users/lfelberg/Desktop/test/";
-//  input_file += "energyforce_test/run.energyforce.inp";//argv[0];
+//  input_file += "energyforce_test/run.energyforce.inp";//argv[1];
   input_file += "electrostatic_test/run.electrostatic.inp";
 //  input_file += "dynamics_test/run.dynamics.inp";
+//  input_file += "manybodyapprox_test/run.manybodyapprox.inp";
   
   // To do later
 //  shared_ptr<Setup> setp = make_shared<Setup>(input_file);
@@ -101,8 +123,18 @@ int main(int argc, const char * argv[])
   Constants consts = Constants(setp);
   shared_ptr<System> sys = make_shared<System>(setp);
   
+  if (setp.get_randOrient())
+  {
+    int i;
+    for ( i = 0; i < sys->get_n(); i++)
+      sys->rotate_mol(i, Quat().chooseRandom());
+  }
+  
+  // writing initial configuration out
+  sys->write_to_pqr( setp.getRunName() + ".pqr");
+  
   int poles = 10;
-  double solv_tol = 1e-5;
+  double solv_tol = 1e-4;
   
   if ( setp.getRunType() == "dynamics")
     main_dynamics( poles, solv_tol, setp, consts, sys);
@@ -110,6 +142,8 @@ int main(int argc, const char * argv[])
     main_electrostatics( poles, solv_tol, setp, consts, sys);
   else if ( setp.getRunType() == "energyforce")
     main_energyforce( poles, solv_tol, setp, consts, sys);
+  else if ( setp.getRunType() == "bodyapprox")
+    main_bodyapprox( poles, solv_tol, setp, consts, sys);
   else
     cout << "Runtype not recognized! See manual for options" << endl;
     

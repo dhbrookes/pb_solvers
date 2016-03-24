@@ -221,8 +221,6 @@ protected:
   shared_ptr<ForceCalc> _fCalc_;
   shared_ptr<TorqueCalc> _torCalc_;
   
-  shared_ptr<MyVector<double> > _omega2_; // energy in proper units
-  
 public:
   
   // constructor just requires an asolver
@@ -241,7 +239,6 @@ public:
   
   shared_ptr<VecOfVecs<double>::type > get_Tau() { return _torCalc_->get_Tau(); }
   shared_ptr<VecOfVecs<double>::type> get_F()    { return _fCalc_->get_F(); }
-  // get energy given the units
   shared_ptr<MyVector<double> > get_omega() {return _eCalc_->get_omega_int();}
   
   MyVector<double> get_taui(int i) { return _torCalc_->get_taui(i); }

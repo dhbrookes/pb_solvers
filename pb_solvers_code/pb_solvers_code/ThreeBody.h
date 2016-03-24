@@ -32,23 +32,42 @@ protected:
   vector<vector< Pt > > force_di_;
   vector<vector< Pt > > force_tri_;
   
+  vector<vector< Pt > > torque_di_;
+  vector<vector< Pt > > torque_tri_;
+  
+  vector<double> energy_approx_;
+  vector< Pt >   force_approx_;
+  vector< Pt >   torque_approx_;
+  
   shared_ptr<BesselCalc>      _besselCalc_;
   shared_ptr<System>          _sys_;  // system data (radii, charges, etc.)
   shared_ptr<SHCalc>          _shCalc_;
   shared_ptr<Constants>       _consts_;
   
+  shared_ptr<System> make_subsystem(vector<int> mol_idx);
+  
+  int find_di( int i, int j);
+  void generatePairsTrips();
+  
 public:
   ThreeBody( shared_ptr<ASolver> _asolver, double cutoff = 1e48 );
   
-  void generatePairsTrips();
-  
   // Solve the N body problem, only 2 or 3 right now
-  void solveNmer( int num);
+  void solveNmer( int num, string outfile, double preclim = 1e-4);
   
-  shared_ptr<System> make_subsystem(vector<int> mol_idx);
+  void calcTBDEnForTor( );
+  void calcTwoBDEnForTor( );
   
   vector<vector<int > > getDimers()  { return dimer_; }
   vector<vector<int > > getTrimers() { return trimer_; }
+  
+  vector<double> get_energy_approx() { return energy_approx_; }
+  vector<Pt> get_force_approx()      { return force_approx_; }
+  vector<Pt> get_torque_approx()     { return torque_approx_; }
+  
+  double get_energyi_approx( int i) { return energy_approx_[i]; }
+  Pt get_forcei_approx( int i)      { return force_approx_[i]; }
+  Pt get_torquei_approx( int i)     { return torque_approx_[i]; }
   
 };
 
