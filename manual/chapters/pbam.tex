@@ -1,0 +1,126 @@
+
+\chapter{Poisson-Boltzmann Analytical Model (PB-AM)}
+
+
+
+\section{The Model}
+
+
+
+\subsection{PB-AM formulation}
+
+PB-AM is an analytical solution to the linearized Poisson-Boltzmann equations for multiple spherical objects of arbitrary charge distribution in an ionic solution.  The linearized Poisson-Boltzmann equation is given as:
+
+\[ \nabla [\epsilon(r) \nabla\phi(r)] - \epsilon(r) \kappa^2\phi(r) = 4 \pi \rho(r) \] %∇[ϵ(r)∇Φ(r)]-ϵ(r) κ^2 Φ(r)=4πρ(r)
+
+\[ \phi_{out}^{(i)}= \phi_{out}^{(i)} \biggr |_{r=a_i } \]
+
+\[\epsilon_s \frac{\partial \phi_{out}^{(i)}}{\partial r} =   \epsilon_s \frac{\partial \phi_{out}^{(i)}}{\partial r} \biggr |_{r=a_i } \]
+
+Exploiting fast-multipole methods, this boundary value problem can be reduced to the following system of linear equations.  
+
+\[ A = \Gamma \cdot (\Delta \cdot T \cdot A + E) \]
+
+A(i) represents the effective multipole expansion of the charge distributions of molecule (i). E(i) is the free charge distribution of molecule (i). $\Gamma$ is a dielectric boundary-crossing operator, $\Delta$ a cavity polarization operator, T an operator that transforms the multipole expansion to a local coordinate frame.  More details on the method are available in Lotan, Head-Gordon (2006). \\
+
+From this formulation, computation of the interaction energies ($\Omega^{(i)}$) is given as follows:
+
+\[\Omega^{(i)}=\frac{1}{\epsilon_s}  \langle  T \cdot A^{(i) } ,  A^{(i) } \rangle \]
+
+Where $\langle  M, N \rangle$ denotes the inner product. When energy is computed, forces follow as:
+
+\[ F_i = \nabla_i \Omega^{(i)}=\frac{1}{\epsilon_s} [ \langle \nabla_i \,T \cdot A^{(i) } ,  A^{(i) } \rangle +  \langle T \cdot A^{(i) } ,   \nabla_i \, A^{(i) } \rangle ]\]
+
+
+\clearpage
+
+
+\section{Installation}
+
+\subsection{PB-AM Installation}
+
+TODO
+
+% To install PB-AM from the source code, first pull the latest version from the github/bitbucket site and type the following into the command line: \\
+% \begin{lstlisting}[style = MyBash]
+% >> make mpe
+% \end{lstlisting}
+% This should make the executable, mpe, and place it in the bin directory of the source code
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PB-AM: Example input files and input file information}
+
+\subsubsection{Program option}
+
+The program executable requires an input file as a command line parameter. The input file contains the various arguments and parameters that one may wish to set when running the program. Each line of the input file contains a keyword followed by a variable number of whitespace-delimited parameters, e.g.: \\
+
+\texttt{keyword1\qquad param1\qquad param2} \\
+\texttt{keyword2\qquad param1\qquad param2\qquad param3} \\
+
+Each keyword is described in the table below, along with its associated parameters.
+
+
+\newcommand{\param}[1]{$\textless\texttt{#1}\textgreater$}
+\newcommand\T{\rule{0pt}{3.5ex}}       % Top strut
+\newcommand\B{\rule[-2ex]{0pt}{0pt}}
+
+\newlength{\colthree}
+\setlength{\colthree}{10.1cm}
+\newlength{\coltwo}
+\setlength{\coltwo}{2.9cm}
+
+\begin{tabular}{ c | l | l  }
+    \textbf{Keyword} & \textbf{Parameters} & \textbf{Description} \\ \hline
+\T runname & \param{name} & \parbox[t]{\colthree}{\param{name} is desired internal name of this run.} \\
+\T pqr & \param{fpath} & \parbox[t]{\colthree}{Provide input PQR file at \param{fpath}.} \\
+\T xyz & \param{fpath} & \parbox[t]{\colthree}{Provide input XYZ file at \param{fpath}.} \\
+\T salt & \param{con} & \parbox[t]{\colthree}{Set salt concentration in the system to \param{con}.}\\
+\T temp & \param{T} & \parbox[t]{\colthree}{Set system temperature to \param{T}}\\
+\T idiel & \param{ival} & \parbox[t]{\colthree}{Set the interior dielectric constant to \param{ival}.} \\
+\T sdiel & \param{sval} & \parbox[t]{\colthree}{Set the interior dielectric constant to \param{sval}.} \\
+\T pbc & \param{boxlength} & \parbox[t]{\colthree}{Set size of periodic box to \param{boxlength}.}\\
+\T random & \param{seed} & \parbox[t]{\colthree}{Seed the internal random number generator with \param{seed}.} \\
+\T attypes & \param{numtypes} & \parbox[t]{\colthree}{Set the number of different atom types to \param{numtypes}.}\\
+\T type & \parbox[t]{\coltwo}{\param{idx} \param{ct} \param{movetype} \param{dtr} \param{drot}} & \parbox[t]{\colthree}{Set attributes of an atom type, where \param{idx} is the integer id of this type, which can be 1 to \param{numtypes} (above). \param{ct} is the number of atoms of this type in the system and \param{movetype} describes the way this type is allowed to move in a dynamics run (\texttt{move}, \texttt{rot}, or \texttt{stat}). If \param{movetype} is \texttt{move}, then a translational diffusion coefficient \param{dtr} and a rotational diffusional coefficient \param{drot} are required. If \param{movetype} is \texttt{rot} then just \param{drot} is required. \B}\\
+\hline
+\T runtype electrostatics & \param{gridpts} & \parbox[t]{\colthree}{Will run electrostatics calculations. \param{gridpts} is an optional integer describing the number of evenly spaced points in each dimension to perform calculations on.}\\
+\T dx & \param{fname} & \parbox[t]{\colthree}{For electrostatics. Will write the results of electrostatics calculations for every 3D grid point to \param{fname}.} \\
+\T gridct & \param{ct} & \parbox[t]{\colthree}{For electrostatics. \param{ct} is the number of 2D grids to output.} \\
+\T grid2d & \parbox[t]{\coltwo}{\param{idx} \param{fname} \param{axis} \param{val} } & \parbox[t]{\colthree}{For electrostatics. Set attributes of a grid output where \param{idx} is the integer id of this grid, which can be 1 to \param{ct} (above). Will write output of calculations for a cross section along \param{axis} (\texttt{x}, \texttt{y}, or \texttt{z}) at \param{value}.\B} \\
+\hline
+\T runtype dynamics & & \parbox[t]{\colthree}{Will perform a brownian dynamics run.\B}  \\
+\hline
+  \end{tabular}
+
+\subsubsection{System inputs}
+
+From the single mpe executable, multiple types of calculations can be performed. Generally, all the programs require a computation flag, and a PDB or PQR file name.  If a PDB file is chosen the input is read and atoms are assigned partial charges according to the file charges\_OPLS, located in each of the test directories. A PQR file can be generated from the online site or the software can be downloaded:  \\
+
+http://nbcr-222.ucsd.edu/pdb2pqr\_1.9.0/  \\
+http://www.poissonboltzmann.org/docs/pdb2pqr-installation/ \\
+
+It may also be formatted manually. The general format of a PQR file is as follows, and is whitespace-delimited: \\
+
+\textbf{recName  serial  atName  resName  chainID  resNum  X  Y  Z  charge rad }\\
+
+  \begin{tabular}{ c | l  }
+    \textbf{Delimiter} & \textbf{Description} \\ \hline
+recName 	&	A string that should either be ATOM or HETATM. \\
+serial 	&	An integer that provides the atom index \\
+atName 	&	A string that provides the atom name.\\
+resName	&	A string that provides the residue name. \\
+chainID	&	An optional string that provides the chain ID of the atom.\\
+residueNumber  & An integer that provides the residue index.\\
+X Y Z	& Three floats that provide the atomic coordinates.\\
+charge	& A float that provides the atomic charge (in electrons). \\
+Rad		& A float that provides the atomic radius (in \AA…).\\
+    \hline
+  \end{tabular}
+
+
+\clearpage
+
