@@ -87,8 +87,6 @@ if ax == 'y':
 elif ax == 'z':
     xla = r'$X \, (\AA)$'; yla = r'$Y \, (\AA)$'
 
-esp[ esp == 0.0] = None
- 
 dispPlot( org, dl, len(esp[0]), np.transpose(esp), 
                 mx, mn, titl,
                 xlab = xla, ylab = yla,

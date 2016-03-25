@@ -292,7 +292,7 @@ void Electrostatic::compute_pot()
         }
         
         if (cont)
-          esp_[xct][yct][zct] = 0.0;
+          esp_[xct][yct][zct] = NAN;
         else
           esp_[xct][yct][zct] = (units_*compute_pot_at(pos))/e_s;
       }
