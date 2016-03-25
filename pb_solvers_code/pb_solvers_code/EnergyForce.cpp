@@ -232,7 +232,7 @@ void TorqueCalc::calc_tau()
 
 
 PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv, Units unit)
-: N_(_asolv->get_N())
+: N_(_asolv->get_N()), kbod_approx_(false)
 {
   _eCalc_ = make_shared<EnergyCalc>(_asolv);
   _fCalc_ = make_shared<ForceCalc>(_asolv);
@@ -240,6 +240,17 @@ PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv, Units unit)
   
   mol_pos_ = _asolv->get_sys()->get_allcenter();
   
+  compute_units(_asolv->get_consts(), unit);
+}
+
+PhysCalc::PhysCalc(shared_ptr<ThreeBody> _tbd, int nbod, Units unit)
+{
+  
+}
+
+
+void PhysCalc::compute_units( shared_ptr<Constants> cst, Units unit)
+{
   if (unit==INTERNAL)
   {
     unit_ = "Internal";
@@ -247,16 +258,17 @@ PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv, Units unit)
   } else if (unit == KCALMOL)
   {
     unit_  = "kCal/Mol";
-    unit_conv_ = _asolv->get_consts()->convert_int_to_kcal_mol(1.0);
+    unit_conv_ = cst->convert_int_to_kcal_mol(1.0);
   } else if (unit == JMOL)
   {
     unit_  = "Joules/Mol";
-    unit_conv_ = _asolv->get_consts()->convert_int_to_jmol(1.0);
+    unit_conv_ = cst->convert_int_to_jmol(1.0);
   } else if (unit == kT)
   {
     unit_  = "kT";
-    unit_conv_ = _asolv->get_consts()->convert_int_to_kT(1.0);
+    unit_conv_ = cst->convert_int_to_kT(1.0);
   }
+  
 }
 
 void PhysCalc::print_all()

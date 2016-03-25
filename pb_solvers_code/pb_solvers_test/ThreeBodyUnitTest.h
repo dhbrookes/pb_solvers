@@ -281,7 +281,7 @@ TEST_F(TBDUTest, threeBD)
   vector<vector<Pt > > fr = threeBodTest.getTrFo();
   vector<vector<Pt > > to = threeBodTest.getTrTo();
   
-  int j;  
+  int j;
   for ( j = 0; j < en.size(); j++)
   {
     if ( en[j][0] != 0) EXPECT_NEAR( en[j][0]/nrgTr7[j*3], 1.0, preclim);
