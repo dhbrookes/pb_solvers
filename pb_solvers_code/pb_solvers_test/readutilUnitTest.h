@@ -19,14 +19,12 @@ class ReadUtilUTest : public ::testing::Test
 public :
   
 protected :
-  // This will change according to where you're running tests!
-  string test_dir_ = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/";
-  
+
 };
 
 TEST_F(ReadUtilUTest, checkPQRExceptions)
 {
-  string path = test_dir_ + "none.pqr";
+  string path = test_dir_loc + "none.pqr";
   try
   {
     PQRFile PQRtest(path, 10);
@@ -42,7 +40,7 @@ TEST_F(ReadUtilUTest, checkPQRExceptions)
 
 TEST_F(ReadUtilUTest, readPQR)
 {
-  string PQR = test_dir_ + "2charge.pqr";
+  string PQR = test_dir_loc + "2charge.pqr";
   PQRFile PQRtest(PQR, 10);
   vector<Pt> my_atoms = PQRtest.get_atom_pts();
   vector<Pt> my_cents = PQRtest.get_cg_centers();
@@ -72,7 +70,7 @@ TEST_F(ReadUtilUTest, readPQR)
 
 TEST_F(ReadUtilUTest, readPQRNoCen)
 {
-  string PQR = test_dir_ + "2charge_nocen.pqr";
+  string PQR = test_dir_loc + "2charge_nocen.pqr";
   PQRFile PQRtest(PQR, 10);
   vector<Pt> my_atoms = PQRtest.get_atom_pts();
   
@@ -96,7 +94,7 @@ TEST_F(ReadUtilUTest, readPQRNoCen)
 
 TEST_F(ReadUtilUTest, checkXYZExceptions)
 {
-  string path = test_dir_ + "none.xyz";
+  string path = test_dir_loc + "none.xyz";
   try
   {
     PQRFile XYZtest(path, 10);
@@ -112,7 +110,7 @@ TEST_F(ReadUtilUTest, checkXYZExceptions)
 
 TEST_F(ReadUtilUTest, checkXYZExceptionShort)
 {
-  string xyz = test_dir_ + "2charge_short.xyz";
+  string xyz = test_dir_loc + "2charge_short.xyz";
   try
   {
     XYZFile XYZtest(xyz, 10);
@@ -129,7 +127,7 @@ TEST_F(ReadUtilUTest, checkXYZExceptionShort)
 
 TEST_F(ReadUtilUTest, readXYZ)
 {
-  string xyz = test_dir_ + "2charge.xyz";
+  string xyz = test_dir_loc + "2charge.xyz";
   XYZFile XYZtest(xyz, 10);
   
   ASSERT_EQ(  10, XYZtest.get_nmols());

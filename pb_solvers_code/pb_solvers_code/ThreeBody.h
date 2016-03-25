@@ -68,6 +68,15 @@ public:
   vector<vector<int > > getDimers()  { return dimer_; }
   vector<vector<int > > getTrimers() { return trimer_; }
   
+  vector<vector<double > > getDiEn() { return energy_di_; }
+  vector<vector<double > > getTrEn() { return energy_tri_; }
+  
+  vector<vector<Pt > > getDiFo()     { return force_di_; }
+  vector<vector<Pt > > getTrFo()     { return force_tri_; }
+  
+  vector<vector<Pt > > getDiTo()     { return torque_di_; }
+  vector<vector<Pt > > getTrTo()     { return torque_tri_; }
+  
   vector<double> get_energy_approx() { return energy_approx_; }
   vector<Pt> get_force_approx()      { return force_approx_; }
   vector<Pt> get_torque_approx()     { return torque_approx_; }

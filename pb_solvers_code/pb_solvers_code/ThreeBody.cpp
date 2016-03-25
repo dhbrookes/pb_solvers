@@ -225,19 +225,19 @@ void ThreeBody::printNmer( int num, string outfile)
   Pt fo_nrm;
   vector< double > print_all(4);
   vector<int>  mol(3);
-  shared_ptr<vector<vector<int> > > nmer = (( num == 2 ) ?
-                                            make_shared<vector<vector<int> > >(dimer_) :
-                                            make_shared<vector<vector<int> > >(trimer_));
+  shared_ptr<vector<vector<int> > > nmer = ( num == 2 ) ?
+                                  make_shared<vector<vector<int> > >(dimer_) :
+                                  make_shared<vector<vector<int> > >(trimer_);
   
   shared_ptr<vector<vector<double > > > en = ( num == 2 ) ?
   make_shared<vector<vector<double> > >(energy_di_) :
   make_shared<vector<vector<double > > >(energy_tri_);
-  shared_ptr<vector<vector<Pt> > > frc = (( num == 2 ) ?
-                                          make_shared<vector<vector<Pt> > >(force_di_) :
-                                          make_shared<vector<vector<Pt> > >(force_tri_));
-  shared_ptr<vector<vector<Pt> > > tor = (( num == 2 ) ?
-                                          make_shared<vector<vector<Pt> > >(torque_di_) :
-                                          make_shared<vector<vector<Pt> > >(torque_tri_));
+  shared_ptr<vector<vector<Pt> > > frc = ( num == 2 ) ?
+                            make_shared<vector<vector<Pt> > >(force_di_) :
+                            make_shared<vector<vector<Pt> > >(force_tri_);
+  shared_ptr<vector<vector<Pt> > > tor = ( num == 2 ) ?
+                            make_shared<vector<vector<Pt> > >(torque_di_) :
+                            make_shared<vector<vector<Pt> > >(torque_tri_);
   
   nmer_deets.open( outfile );
   
