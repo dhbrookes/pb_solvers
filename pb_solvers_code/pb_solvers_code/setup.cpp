@@ -288,3 +288,40 @@ void Setup::resizeVecs()
   }
 } // end resizeVecs
 
+void Setup::check_inputs()
+{
+  vector<string> problems;
+  if (typeDiff_.size() < nType_ )
+  {
+    problems.push_back("Number of molecular input type parameters is less \
+                       than the specified number of molecule types");
+  }
+  if (typeDef_.size() < nType_)
+  {
+    problems.push_back("Number of movement types is less \
+                        than the specified number of molecule types");
+  }
+  if (molfnames_.size() < nType_)
+  {
+    problems.push_back("Number of provided configuration files is less than the\
+                       specified number of molecular types");
+  }
+  if (runSpecs_[0] == "electrostatics")
+  {
+    if (axis_.size() < gridCt_ || axLoc_.size() < gridCt_)
+    {
+      problems.push_back("Number grids provided is less than specified \
+                          grid count");
+    }
+  }
+  if (runSpecs_[0] == "dynamics")
+  {
+    if (termtype_.size() < numTerm_ || termtype_.size() < numTerm_)
+    {
+      problems.push_back("Number of termination conditions provided is less \
+                              than specified termination count");
+    }
+  }
+  if (problems.size() > 0) throw BadInputException(problems);
+}
+

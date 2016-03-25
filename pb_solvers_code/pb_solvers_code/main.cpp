@@ -59,7 +59,6 @@ int main_electrostatics( int poles, double tol, Setup setup,
     Estat.print_grid(setup.getGridAx(i), setup.getGridAxLoc(i),
                      setup.getGridOutName(i));
   }
-
   return 0;
 }
 
@@ -118,9 +117,24 @@ int main(int argc, const char * argv[])
   // To do later
 //  shared_ptr<Setup> setp = make_shared<Setup>(input_file);
   Setup setp(input_file);
+  //check inputs:
+  try {
+    setp.check_inputs();
+  } catch (const BadInputException& ex) {
+    cout << ex.what() << endl;
+  }
 
   Constants consts = Constants(setp);
-  shared_ptr<System> sys = make_shared<System>(setp);
+  shared_ptr<System> sys;
+  try {
+    shared_ptr<System> sys = make_shared<System>(setp);
+  } catch(const OverlappingMoleculeException& ex1)
+  {
+    cout << "Provided system has overlapping molecules. Please provide a correct system."<< endl;
+  } catch (const NotEnoughCoordsException& ex2)
+  {
+    cout << ex2.what() << endl;
+  }
   
   if (setp.get_randOrient())
   {

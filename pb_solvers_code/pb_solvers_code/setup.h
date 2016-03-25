@@ -84,7 +84,8 @@ protected:
   void set_term_combine(string type)
   {
     if (type=="and") andCombine_ = true;
-    else andCombine_ = false;
+    else if (type=="or") andCombine_ = false;
+    else andCombine_ = true;
   }
   
   // setting details for 3bd
@@ -166,6 +167,32 @@ public:
   
   bool get_randOrient()            { return orientRand_; }
   
+  // check input arguments and throw BadInputException if they dont check out
+  void check_inputs();
+  
+};
+
+class BadInputException: public exception
+{
+protected:
+  vector<string> problems_;
+  
+public:
+  BadInputException(vector<string> problems)
+  :problems_(problems)
+  {
+  }
+  
+  virtual const char* what() const throw()
+  {
+    string ss;
+    ss = "The following problems were found in your input file:\n";
+    for (int i = 0; i < problems_.size(); i++)
+    {
+      ss += to_string(i) + ": " + problems_[i] + "\n";
+    }
+    return ss.c_str();
+  }
 };
 
 #endif

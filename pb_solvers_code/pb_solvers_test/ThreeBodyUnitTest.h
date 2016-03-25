@@ -160,8 +160,8 @@ TEST_F(TBDUTest, computeGroupsCutoff)
   vector<vector<int > > dim = threeBodTest.getDimers();
   vector<vector<int > > tri = threeBodTest.getTrimers();
   
-  EXPECT_TRUE( dim.size() == 20 );
-  EXPECT_TRUE( tri.size() == 60 );
+  threeBodTest.solveNmer(2, 1e-4);
+  threeBodTest.calcTwoBDEnForTor();
   
   int j;
   for ( j = 0; j < dim.size(); j++)
@@ -274,7 +274,11 @@ TEST_F(TBDUTest, threeBD)
                                                         make_shared<Constants>
                                                         (const_), vals);
   ThreeBody threeBodTest( ASolvTest );
-  threeBodTest.solveNmer(2); threeBodTest.solveNmer(3);
+  vector<vector<int > > dim = threeBodTest.getDimers();
+  vector<vector<int > > tri = threeBodTest.getTrimers();
+  
+  threeBodTest.solveNmer(2, 1e-4);
+  threeBodTest.solveNmer(3, 1e-4);
   threeBodTest.calcTBDEnForTor();
   
   vector<vector<double > > en = threeBodTest.getTrEn();
@@ -413,7 +417,11 @@ TEST_F(TBDUTest, threeBDfor7)
                                                         make_shared<Constants>
                                                         (const_), vals);
   ThreeBody threeBodTest( ASolvTest );
-  threeBodTest.solveNmer(2, 1e-5); threeBodTest.solveNmer(3, 1e-5);
+  vector<vector<int > > dim = threeBodTest.getDimers();
+  vector<vector<int > > tri = threeBodTest.getTrimers();
+  
+  threeBodTest.solveNmer(2, 1e-4);
+  threeBodTest.solveNmer(3, 1e-4);
   threeBodTest.calcTBDEnForTor();
   
   shared_ptr<ASolver> aSolvall = make_shared<ASolver> (bCalcu, SHCalcu, sys,
@@ -442,6 +450,7 @@ TEST_F(TBDUTest, threeBDfor7)
     if ( threeBodTest.get_torquei_approx(j).z() != 0)
       EXPECT_NEAR( threeBodTest.get_torquei_approx(j).z()/toz7[j],1.0,preclim);
   }
+  cout << endl;
 }
 
 #endif /* ThreeBodyUnitTest_h */
