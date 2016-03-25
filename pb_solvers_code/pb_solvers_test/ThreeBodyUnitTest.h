@@ -131,7 +131,7 @@ TEST_F(TBDUTest, twoBD)
   vector<vector<int > > dim = threeBodTest.getDimers();
   vector<vector<int > > tri = threeBodTest.getTrimers();
   
-  threeBodTest.solveNmer(2, "");
+  threeBodTest.solveNmer(2, 1e-4);
   threeBodTest.calcTwoBDEnForTor();
   
   int j;
@@ -200,8 +200,8 @@ TEST_F(TBDUTest, threeBD)
   vector<vector<int > > dim = threeBodTest.getDimers();
   vector<vector<int > > tri = threeBodTest.getTrimers();
   
-  threeBodTest.solveNmer(2, "");
-  threeBodTest.solveNmer(3, "");
+  threeBodTest.solveNmer(2, 1e-4);
+  threeBodTest.solveNmer(3, 1e-4);
   threeBodTest.calcTBDEnForTor();
   
   int j;
@@ -269,8 +269,8 @@ TEST_F(TBDUTest, threeBDfor3)
   vector<vector<int > > dim = threeBodTest.getDimers();
   vector<vector<int > > tri = threeBodTest.getTrimers();
   
-  threeBodTest.solveNmer(2, "");
-  threeBodTest.solveNmer(3, "");
+  threeBodTest.solveNmer(2, 1e-4);
+  threeBodTest.solveNmer(3, 1e-4);
   threeBodTest.calcTBDEnForTor();
   
   int j;

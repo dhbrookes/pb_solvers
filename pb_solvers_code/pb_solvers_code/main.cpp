@@ -120,6 +120,12 @@ int main(int argc, const char * argv[])
   // To do later
 //  shared_ptr<Setup> setp = make_shared<Setup>(input_file);
   Setup setp(input_file);
+  //check inputs:
+  try {
+    setp.check_inputs();
+  } catch (const BadInputException& ex) {
+    cout << ex.what() << endl;
+  }
 
   Constants consts = Constants(setp);
   shared_ptr<System> sys = make_shared<System>(setp);
