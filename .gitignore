@@ -3,6 +3,10 @@
 *.o
 *.a
 
+## PBAM output ignores
+*.dx 
+*.dat
+
 ## Latex ignores
 *.aux
 *.log

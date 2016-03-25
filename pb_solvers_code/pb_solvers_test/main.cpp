@@ -10,8 +10,11 @@
 #include <limits.h>
 #include "gtest/gtest.h"
 
+using namespace std;
+
 double preclim = 1e-7;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
+string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/";
 
 #include "ASolverUnitTest.h"
 #include "BDUnitTest.h"
@@ -29,8 +32,6 @@ const int nvals = 10 ;      //! standard number of poles for testing
 #include "utilUnitTest.h"
 
 #include "tester.h"
-
-using namespace std;
 
 int main(int argc, char * argv[])
 {
