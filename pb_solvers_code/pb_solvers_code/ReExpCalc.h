@@ -127,7 +127,7 @@ protected:
    0 <= l <= poles
    -n <= m <= n
    */
-  VecOfMats<double>::type  S_;
+  VecOfMats<double>::type S_;
   
   /*
    The useful derivatives are S with respect to r and R with respect to

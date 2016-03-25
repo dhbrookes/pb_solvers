@@ -208,7 +208,6 @@ public:
 /*
  Class for calculating energy force and torque in one place
  */
-
 class PhysCalc
 {
 protected:

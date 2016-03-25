@@ -299,7 +299,6 @@ TEST_F(TBDUTest, threeBDfor3)
     cout << ", " << calcphys.get_forcei(j)[1]<< ", ";
     cout << calcphys.get_forcei(j)[2]<< "\t" << endl;
   }
-  
   cout << endl;
 }
 
