@@ -2,3 +2,10 @@
 *.xcodeproj/
 *.o
 *.a
+
+## Latex ignores
+*.aux
+*.log
+*.synctex.gz
+*.out
+

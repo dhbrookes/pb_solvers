@@ -51,8 +51,6 @@ int main_electrostatics( int poles, double tol, Setup setup,
   ASolv->solve_A(tol); ASolv->solve_gradA(tol);
   Electrostatic Estat( ASolv, setup.getGridPts());
   
-  cout << "This is my DX name " << setup.getDXoutName() << endl;
-  
   if ( setup.getDXoutName() != "" )
     Estat.print_dx( setup.getDXoutName());
   
