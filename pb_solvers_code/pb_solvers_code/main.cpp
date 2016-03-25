@@ -130,7 +130,8 @@ int main(int argc, const char * argv[])
     shared_ptr<System> sys = make_shared<System>(setp);
   } catch(const OverlappingMoleculeException& ex1)
   {
-    cout << "Provided system has overlapping molecules. Please provide a correct system."<< endl;
+    cout << "Provided system has overlapping molecules. ";
+    cout << "Please provide a correct system."<< endl;
   } catch (const NotEnoughCoordsException& ex2)
   {
     cout << ex2.what() << endl;

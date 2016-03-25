@@ -420,16 +420,9 @@ TEST_F(TBDUTest, threeBDfor7)
   vector<vector<int > > dim = threeBodTest.getDimers();
   vector<vector<int > > tri = threeBodTest.getTrimers();
   
-  threeBodTest.solveNmer(2, 1e-4);
-  threeBodTest.solveNmer(3, 1e-4);
+  threeBodTest.solveNmer(2, 1e-5);
+  threeBodTest.solveNmer(3, 1e-5);
   threeBodTest.calcTBDEnForTor();
-  
-  shared_ptr<ASolver> aSolvall = make_shared<ASolver> (bCalcu, SHCalcu, sys,
-                                                       make_shared<Constants>
-                                                       (const_), vals);
-  aSolvall->solve_A(1e-4); aSolvall->solve_gradA(1e-4);
-  PhysCalc calcphys( aSolvall);
-  calcphys.calc_all();
   
   int j;
   for ( j = 0; j < num; j++)

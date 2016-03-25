@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <memory>
 #include "ASolver.h"
-#include "ThreeBody.h"
 
 using namespace std;
 
@@ -215,8 +214,6 @@ protected:
   string unit_; // String of the type of units
   vector<Pt> mol_pos_;
   
-  bool kbod_approx_;
-  
   shared_ptr<EnergyCalc> _eCalc_;
   shared_ptr<ForceCalc> _fCalc_;
   shared_ptr<TorqueCalc> _torCalc_;
@@ -227,9 +224,6 @@ public:
   
   // constructor just requires an asolver
   PhysCalc(shared_ptr<ASolver> _asolv, Units unit = INTERNAL);
-  
-  // constructor with threebody object
-  PhysCalc(shared_ptr<ThreeBody> _tbd, int nbod, Units unit = INTERNAL);
   
   MyVector<double> calc_force_i(int i)  { return _fCalc_->calc_fi(i); }
   MyVector<double> calc_tau_i(int i)    { return _torCalc_->calc_tau_i(i); }

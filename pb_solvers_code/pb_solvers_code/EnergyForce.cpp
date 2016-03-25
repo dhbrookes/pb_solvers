@@ -232,7 +232,7 @@ void TorqueCalc::calc_tau()
 
 
 PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv, Units unit)
-: N_(_asolv->get_N()), kbod_approx_(false)
+: N_(_asolv->get_N())
 {
   _eCalc_ = make_shared<EnergyCalc>(_asolv);
   _fCalc_ = make_shared<ForceCalc>(_asolv);
@@ -242,12 +242,6 @@ PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv, Units unit)
   
   compute_units(_asolv->get_consts(), unit);
 }
-
-PhysCalc::PhysCalc(shared_ptr<ThreeBody> _tbd, int nbod, Units unit)
-{
-  
-}
-
 
 void PhysCalc::compute_units( shared_ptr<Constants> cst, Units unit)
 {
