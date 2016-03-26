@@ -178,11 +178,7 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
   _torCalc_ = make_shared<TorqueCalc>(_asolver_);
   _stepper_ = make_shared<BDStep> (_asolver_->get_sys(),
                                    _asolver_->get_consts(), diff, force);
-  
-  cout << "In BDRun this is asolver poles " << _asolver_->get_p() << endl;
-  
 }
-
 
 void BDRun::run()
 {

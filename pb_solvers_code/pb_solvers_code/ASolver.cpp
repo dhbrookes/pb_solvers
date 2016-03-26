@@ -21,6 +21,18 @@ _besselCalc_(_bcalc),
 _shCalc_(_shCalc),
 _consts_(_consts)
 {
+  _gamma_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, p_));
+  _delta_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, p_));
+  _E_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
+  _A_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
+  _prevA_ = make_shared<VecOfMats<cmplx>::type>(N_,MyMatrix<cmplx>(p_,2*p_+1));
+  _L_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
+  _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type > >(N_);
+  
+  _gradT_A_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
+  _gradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
+  _prevGradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
+  
   reset_all(_sys);
 }
 
@@ -73,6 +85,7 @@ void ASolver::solve_gradA(double prec)
       ct++;
     }
   }
+  
   calc_gradL();
 }
 
@@ -900,9 +913,10 @@ void ASolver::calc_L()
 {
   int i, j;
   Pt v;
-  MyMatrix<cmplx> inner, expand;
+  MyMatrix<cmplx> expand;
   for (i = 0; i < N_; i++)
   {
+    _L_->operator[](i) = MyMatrix<cmplx> (p_, 2*p_+1);
     for (j = 0; j < N_; j++)
     {
       if (j == i) continue;
@@ -924,7 +938,6 @@ void ASolver::calc_gradL()
   for (i = 0; i < N_; i++) // molecule of interest
   {
     inner1 = get_gradT_Aij( i, i);
-    
     for (k = 0; k < N_; k++) // other molecules
     {
       if (k == i) continue;
@@ -1102,21 +1115,32 @@ void ASolver::print_dAi( int i, int j, int p)
 
 void ASolver::reset_all(shared_ptr<System> _sys)
 {
-  _sys_ = shared_ptr<System>(_sys);
+  _sys_ = _sys;
   T_  = MyMatrix<ReExpCoeffs>(_sys->get_n(), _sys->get_n());
   _reExpConsts_ = make_shared<ReExpCoeffsConstants>(_consts_->get_kappa(),
                                                     _sys_->get_lambda(), p_);
-  _gamma_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, p_));
-  _delta_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, p_));
-  _E_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
-  _L_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
-  _A_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
-  _prevA_ = make_shared<VecOfMats<cmplx>::type>(N_,MyMatrix<cmplx>(p_,2*p_+1));
-  _gradT_A_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
-  _gradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
-  _prevGradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
-  _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type > >(N_);
-
+  int n, n1;
+  for ( n = 0; n < N_; n++ )
+  {
+    _gamma_->operator[](n) = MyMatrix<cmplx> (p_, p_);
+    _delta_->operator[](n) = MyMatrix<cmplx> (p_, p_);
+    _A_->operator[](n) = MyMatrix<cmplx> (p_, 2*p_+1);
+    _E_->operator[](n) = MyMatrix<cmplx> (p_, 2*p_+1);
+    _prevA_->operator[](n) = MyMatrix<cmplx> (p_, 2*p_+1);
+    
+    for ( n1 = 0; n1 < N_; n1++ )
+    {
+      _gradT_A_->operator()(n, n1) = VecOfMats<cmplx>::type
+          (3, MyMatrix<cmplx> (p_, 2*p_+1));
+      _gradA_->operator()(n, n1) = VecOfMats<cmplx>::type
+          (3, MyMatrix<cmplx> (p_, 2*p_+1));
+      _prevGradA_->operator()(n, n1) = VecOfMats<cmplx>::type
+          (3, MyMatrix<cmplx> (p_, 2*p_+1));
+    }
+  }
+  
+  solvedA_ = false;
+  
   // precompute all SH:
   pre_compute_all_sh();
   
