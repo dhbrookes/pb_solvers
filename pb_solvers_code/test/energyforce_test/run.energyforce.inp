@@ -1,0 +1,15 @@
+runname energyforce2
+runtype energyforce
+
+salt 0.01
+temp 353
+idiel 4 
+sdiel 78
+
+attypes 1
+
+units jmol
+
+type 1 2
+pqr 1 /Users/lfelberg/Desktop/test/energyforce_test/single_charge.pqr
+xyz 1 /Users/lfelberg/Desktop/test/energyforce_test/positions_2.xyz
