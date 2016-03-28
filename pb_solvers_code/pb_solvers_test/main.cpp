@@ -14,7 +14,7 @@ using namespace std;
 
 double preclim = 1e-7;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
-string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/";
+string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/gtest/";
 
 #include "ASolverUnitTest.h"
 #include "BDUnitTest.h"
@@ -35,6 +35,7 @@ string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/";
 
 int main(int argc, char * argv[])
 {
+
   bool test = true;
   if (test)
   {
@@ -50,5 +51,7 @@ int main(int argc, char * argv[])
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
   }
+  
+
   
 }

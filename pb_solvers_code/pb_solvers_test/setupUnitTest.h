@@ -19,14 +19,12 @@ class SetupUTest : public ::testing::Test
 public :
   
 protected :
-  // This will change according to where you're running tests!
-  string test_dir_ = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/";
 
 };
 
 TEST_F(SetupUTest, checkOpen)
 {
-  string path = test_dir_ + "none.inp";
+  string path = test_dir_loc + "none.inp";
   try
   {
     class Setup setTest(path);
@@ -42,7 +40,7 @@ TEST_F(SetupUTest, checkOpen)
 
 TEST_F(SetupUTest, readInp)
 {
-  string inp = test_dir_ + "run.1.inp";
+  string inp = test_dir_loc + "run.1.inp";
   class Setup setTest(inp);
  
   ASSERT_EQ("dynamics", setTest.getRunType());

@@ -159,10 +159,7 @@ TEST_F(TBDUTest, computeGroupsCutoff)
   ThreeBody threeBodTest( ASolvTest, INTERNAL, 7.5 );
   vector<vector<int > > dim = threeBodTest.getDimers();
   vector<vector<int > > tri = threeBodTest.getTrimers();
-  
-  threeBodTest.solveNmer(2, 1e-4);
-  threeBodTest.calcTwoBDEnForTor();
-  
+
   int j;
   for ( j = 0; j < dim.size(); j++)
   {

@@ -1,0 +1,22 @@
+runname dynam2
+runtype dynamics 70
+
+units jmol
+salt 0.01
+temp 353
+idiel 4 
+sdiel 78
+
+gridct 1
+
+grid2D 1 /Users/lfelberg/Desktop/test/dynamics_test/out.x.0.dat x 0
+
+
+attypes 2
+type 1 1 move 0.01 0.001
+pqr 1 /Users/lfelberg/Desktop/test/dynamics_test/single_charge.pqr
+xyz 1 /Users/lfelberg/Desktop/test/dynamics_test/positions_1.xyz
+
+type 2 1 move 0.01 0.001
+pqr 2 /Users/lfelberg/Desktop/test/dynamics_test/single_charge.pqr
+xyz 2 /Users/lfelberg/Desktop/test/dynamics_test/positions_2.xyz

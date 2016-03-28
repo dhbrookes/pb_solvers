@@ -3,6 +3,10 @@
 *.o
 *.a
 
+# executable ignores
+bin
+
+
 ## PBAM output ignores
 *.dx 
 *.dat

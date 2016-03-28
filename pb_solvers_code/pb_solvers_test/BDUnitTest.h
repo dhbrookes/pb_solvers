@@ -547,4 +547,39 @@ TEST_F(BDUTest, TorqueOpp)
   }
 }
 
+TEST_F(BDUTest, BDrun)
+{
+//  vector<Molecule> mol;
+//  const int ml = 2;
+//  Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
+//  for (int mi = 0; mi < ml; mi ++ )
+//  {
+//    int M = 3; vector<double> charges(M);
+//    vector<double> vdW(M); vector<Pt> posCharges(M);
+//    charges[0] = 7.0; posCharges[0] = pos[mi];
+//    charges[1] = 7.0; posCharges[1] = pos[mi]+Pt(1,0,0);
+//    charges[2] = 7.0; posCharges[2] = pos[mi]+Pt(0,1,0);
+//    vdW[0]=0.0; vdW[1]=0.0; vdW[2]=0.0;
+//    Molecule molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi], 0, 0.1);
+//    mol.push_back( molNew );
+//  }
+//  const int vals = 5;
+//  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+//  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+//  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+//  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+//  shared_ptr<System> sys = make_shared<System>(mol);
+//  shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
+//
+//  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
+//  BDRun BDTest( ASolvTest, term, false);
+//  BDTest.run();
+//  
+//  for (int step=0; step < 10; step ++)
+//  {
+//    //    cout <<setprecision(9)<< BDTest.get_system()->get_posij(2, 2).z() << ",";
+//    //    cout <<BDTest.get_system()->get_posij(0, 2).y() << ", " <<BDTest.get_system()->get_posij(0, 2).z() << " " << endl;
+//  }
+}
+
 #endif /* BDUnitTest_h */
