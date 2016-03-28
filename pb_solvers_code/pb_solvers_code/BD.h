@@ -152,8 +152,8 @@ protected:
   bool check_for_collision(int mol, Pt new_pt);
   
   // updates on individual molecules:
-  void indi_trans_update(int i, MyVector<double> fi);
-  void indi_rot_update(int i, MyVector<double> tau_i);
+  void indi_trans_update(int i, Pt fi);
+  void indi_rot_update(int i, Pt tau_i);
   
   // compute timestep for BD
   double compute_dt( );
@@ -179,8 +179,8 @@ public:
   
   // update the system with Brownian dynamics given forces and torques on every
   // molecule
-  void bd_update(shared_ptr<VecOfVecs<double>::type> _F,
-                 shared_ptr<VecOfVecs<double>::type> _tau);
+  void bd_update(shared_ptr<vector<Pt> > _F,
+                 shared_ptr<vector<Pt> > _tau);
   
   shared_ptr<System> get_system() { return _sys_; }
   double get_dt()                 { return dt_; }
@@ -197,15 +197,16 @@ class BDRun
 protected:
   shared_ptr<BDStep> _stepper_;
   shared_ptr<ASolver> _asolver_;
-  shared_ptr<ForceCalc> _fCalc_;
-  shared_ptr<TorqueCalc> _torCalc_;
+  shared_ptr<BasePhysCalc> _physCalc_;
   shared_ptr<BaseTerminate> _terminator_;
   int maxIter_;
   double prec_;
   
 public:
+  // num is the number of bodies to perform calculations on (2, 3 or all).
+  // If num=0, then the equations will be solved exactly
   BDRun(shared_ptr<ASolver> _asolv, shared_ptr<BaseTerminate> _terminator,
-        bool diff = true, bool force = true, int maxiter=1000,
+        int num=0, bool diff = true, bool force = true, int maxiter=1000,
         double prec=1e-4);
   
   void run();

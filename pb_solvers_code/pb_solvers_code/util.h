@@ -141,6 +141,23 @@ public:
     return *this;
   }
   
+  T operator[](int i)
+  {
+    if (i == 0) return p1_;
+    else if (i == 1) return p2_;
+    else if (i == 2) return p3_;
+    else return T();
+  }
+  
+  void set_x(T val) { convert_to_euclidean(); p1_ = val; }
+  void set_y(T val) { convert_to_euclidean(); p2_ = val; }
+  void set_z(T val) { convert_to_euclidean(); p3_ = val; }
+  
+  void set_r(T val) { convert_to_spherical(); p1_ = val; }
+  void set_theta(T val) { convert_to_spherical(); p2_ = val; }
+  void set_phi(T val) { convert_to_spherical(); p3_ = val; }
+  
+//  
   //arithmetic operators:
   
   //scalar multiplication

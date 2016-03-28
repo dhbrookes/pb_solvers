@@ -93,7 +93,7 @@ bool BDStep::check_for_collision(int mol, Pt new_pt)
   return collision;
 }
 
-void BDStep::indi_trans_update(int i, MyVector<double> fi)
+void BDStep::indi_trans_update(int i, Pt fi)
 {
   double kT = _consts_->get_kbt();
   double ikT_int = 1 / Constants::convert_j_to_int(kT);
@@ -118,7 +118,7 @@ void BDStep::indi_trans_update(int i, MyVector<double> fi)
 }
 
 
-void BDStep::indi_rot_update(int i, MyVector<double> tau_i)
+void BDStep::indi_rot_update(int i, Pt tau_i)
 {
   Pt rand, new_pt;
   Quat qrot;
@@ -149,8 +149,8 @@ void BDStep::indi_rot_update(int i, MyVector<double> tau_i)
   }
 }
 
-void BDStep::bd_update(shared_ptr<VecOfVecs<double>::type> _F,
-                   shared_ptr<VecOfVecs<double>::type> _tau)
+void BDStep::bd_update(shared_ptr<vector<Pt> > _F,
+                   shared_ptr<vector<Pt> > _tau)
 {
   int i;
   compute_min_dist();
@@ -170,12 +170,13 @@ void BDStep::bd_update(shared_ptr<VecOfVecs<double>::type> _F,
 
 
 BDRun::BDRun(shared_ptr<ASolver> _asolv,
-             shared_ptr<BaseTerminate> _terminator, 
+             shared_ptr<BaseTerminate> _terminator, int num,
              bool diff, bool force, int maxiter, double prec)
 :maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
 {
-  _fCalc_ = make_shared<ForceCalc>(_asolver_);
-  _torCalc_ = make_shared<TorqueCalc>(_asolver_);
+  if (num == 0) _physCalc_ = make_shared<PhysCalc>(_asolv);
+  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolv, num);
+  
   _stepper_ = make_shared<BDStep> (_asolver_->get_sys(),
                                    _asolver_->get_consts(), diff, force);
   
@@ -198,10 +199,10 @@ void BDRun::run()
     _asolver_->solve_A(prec_);
     _asolver_->solve_gradA(prec_);
     
-    _fCalc_->calc_force();
-    _torCalc_->calc_tau();
+    _physCalc_->calc_force();
+    _physCalc_->calc_torque();
     
-    _stepper_->bd_update(_fCalc_->get_F(), _torCalc_->get_Tau());
+    _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {
       term = true;

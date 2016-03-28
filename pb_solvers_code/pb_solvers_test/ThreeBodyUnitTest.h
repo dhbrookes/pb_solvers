@@ -9,7 +9,7 @@
 #ifndef ThreeBodyUnitTest_h
 #define ThreeBodyUnitTest_h
 
-#include "ThreeBody.h"
+//#include "ThreeBody.h"
 
 class TBDUTest : public ::testing::Test
 {
