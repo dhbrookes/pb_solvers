@@ -121,7 +121,6 @@ System::System(Setup setup, double cutoff)
 :t_(0)
 {
   vector<Molecule> mols;
-  
   int i, j, chg;
   string pqrpath;
   Molecule mol;
@@ -132,8 +131,10 @@ System::System(Setup setup, double cutoff)
     for (j = 0; j < setup.getTypeNCount(i); j++)
     {
       vector<Pt> repos_charges(pqrI.get_M());
+      Pt com = pqrI.get_cg_centers()[0];
+      Pt move = xyzI.get_pts()[j] + com * -1.0;
       for ( chg = 0; chg < pqrI.get_M(); chg ++)
-        repos_charges[chg] = pqrI.get_atom_pts()[chg] + xyzI.get_pts()[j];
+        repos_charges[chg] = pqrI.get_atom_pts()[chg] + move;
       if (pqrI.get_cg())  // coarse graining is in pqr
       {
         mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],

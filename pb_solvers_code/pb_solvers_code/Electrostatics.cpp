@@ -238,6 +238,7 @@ void Electrostatic::print_grid(string axis, double value, string fname)
   }
 
   f.open(fname);
+  v_act = (abs(v_act) < 1e-12) ? 0 : v_act;
   f << "# Data from PBAM Electrostat run\n# My runname is " << fname << endl;
   f << "units " << _consts_->get_units() <<  endl;
   f << "grid " << grid_.size() << " " << grid_[0].size() << endl;

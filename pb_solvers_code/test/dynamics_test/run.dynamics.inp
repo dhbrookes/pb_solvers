@@ -7,9 +7,9 @@ temp 353
 idiel 4 
 sdiel 78
 
-gridct 1
-
-grid2D 1 /Users/lfelberg/Desktop/test/dynamics_test/out.x.0.dat x 0
+termct 1
+termcombine or
+term 1 time 40
 
 
 attypes 2

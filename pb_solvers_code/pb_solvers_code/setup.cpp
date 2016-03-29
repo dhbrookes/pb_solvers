@@ -32,7 +32,8 @@ molfnames_(2),
 runSpecs_(2),
 mbdfile_loc_(2),
 termvals_(2),
-termtype_(2)
+termtype_(2),
+andCombine_(false)
 {
   nTypenCount_[0] = 1;
   nTypenCount_[1] = 1;
@@ -206,7 +207,16 @@ void Setup::findKeyword(vector<string> fline)
   } else if (keyword == "term")
   {
     cout << "Termination condition command found" << endl;
-    add_termcond(fline[2], atof(fline[3].c_str()));
+    string type = fline[2];
+    double val = atof(fline[3].c_str());
+    vector<int> mol_idx;
+    if (type == "contact")
+    {
+      mol_idx.push_back(atoi(fline[4].c_str()));
+      mol_idx.push_back(atoi(fline[5].c_str()));
+    }
+    else  mol_idx.push_back(atoi(fline[4].c_str()));
+    add_termcond(fline[2], mol_idx, val);
     cout << "done with termination condition" << endl;
   } else if (keyword == "attypes")
   {

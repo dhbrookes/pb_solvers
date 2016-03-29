@@ -29,7 +29,8 @@ protected:
   vector<double> axLoc_; // Location along given axis
   
   int numTerm_;  //number of termination conditions
-  vector<string> termtype_; // type of each termination ('time', 'x', 'y', 'z' or 'r')
+  vector<string> termtype_; // type of each term ('time', 'x', 'y', 'z' or 'r')
+  vector<vector<int> > termmols_; // vector of molecule ids
   vector<double> termvals_; // value for each termination condition
   bool andCombine_;  //if true, termination conditions will combine with 'and', otherwise with 'or'
   
@@ -75,9 +76,10 @@ protected:
   
   //dynamics settings
   void set_numterms(int n) { numTerm_ = n; }
-  void add_termcond(string type, double val)
+  void add_termcond(string type, vector<int> mol_idx, double val)
   {
     termtype_.push_back(type);
+    termmols_.push_back(mol_idx);
     termvals_.push_back(val);
   }
   
@@ -85,7 +87,7 @@ protected:
   {
     if (type=="and") andCombine_ = true;
     else if (type=="or") andCombine_ = false;
-    else andCombine_ = true;
+    else andCombine_ = false;
   }
   
   // setting details for 3bd
@@ -139,6 +141,14 @@ public:
   int getGridCt() { return gridCt_; }
   string getGridAx( int i ) { return axis_[i];}
   double getGridAxLoc( int i ) { return axLoc_[i];}
+  
+  // Dynamics termination conds
+  int get_numterms( )              { return numTerm_; }
+  string get_termtype( int i)      { return termtype_[i]; }
+  vector<int> get_termMolIDX( int i) { return termmols_[i]; }
+  double get_termval( int i)       { return termvals_[i];}
+  bool get_andCombine( )           { return andCombine_; }
+  
   
   // threebody
   string get2BDLoc()               { return mbdfile_loc_[0]; }

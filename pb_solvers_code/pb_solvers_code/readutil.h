@@ -80,8 +80,9 @@ protected:
     ifstream fin(path_.c_str());
     if (!fin.is_open()) throw CouldNotReadException(path_);
     
-    char buf[100];
-    fin.getline(buf, 99);
+    char buf[600];
+    fin.getline(buf, 599);
+    Pt cent( 0.0, 0.0, 0.0);
     int iCen = 17;
     int iCoord = 31;
     while (!fin.eof())
@@ -104,11 +105,13 @@ protected:
           atomCenters_.push_back(Pt(x,y,z));
           charges_.push_back(c);
           atomRadii_.push_back(r);
+          cent = cent + Pt(x,y,z);
         }
       }
       fin.getline(buf,99);
     }
     M_ = int(atomCenters_.size());
+    if (cg_ == false) cgCenters_.push_back( cent * (1./(double) M_));
   }
   
 public:

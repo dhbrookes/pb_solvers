@@ -10,13 +10,13 @@
 #include "setup.h"
 #include "BD.h"
 #include "Electrostatics.h"
-#include "ThreeBody.h"
 
 using namespace std;
 
 int main_dynamics( int poles, double tol, Setup setup,
                   Constants consts, shared_ptr<System> sys)
 {
+  int i;
   shared_ptr<Constants> constant = make_shared<Constants>(setup);
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
@@ -25,10 +25,40 @@ int main_dynamics( int poles, double tol, Setup setup,
   
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                     constant, poles);
-  ASolv->solve_A(tol); ASolv->solve_gradA(tol);
-
-  shared_ptr<TimeTerminate> term_by_time = make_shared<TimeTerminate> ( 10);
-  BDRun dynamic_run( ASolv, term_by_time);
+  
+  vector<BaseTerminate> terms(setup.get_numterms());
+  for (i = 0; i < setup.get_numterms(); i++)
+  {
+    string type = setup.get_termtype(i);
+    string bdtype = type.substr(1,2);
+    double val = setup.get_termval(i);
+    BoundaryType btype = ( bdtype == "<=" ) ? LEQ : GEQ;
+    
+    if ( type == "contact" )
+    {
+      terms[i] = ContactTerminate( setup.get_termMolIDX(i), val);
+    } else if (type.substr(0,1) == "x")
+    {
+      terms[i] = CoordTerminate( setup.get_termMolIDX(i)[0], X, btype, val);
+    } else if (type.substr(0,1) == "y")
+    {
+      terms[i] = CoordTerminate( setup.get_termMolIDX(i)[0], Y, btype, val);
+    } else if (type.substr(0,1) == "z")
+    {
+      terms[i] = CoordTerminate( setup.get_termMolIDX(i)[0], Z, btype, val);
+    } else if (type.substr(0,1) == "r")
+    {
+      terms[i] = CoordTerminate( setup.get_termMolIDX(i)[0], R, btype, val);
+    } else if (type == "time")
+    {
+      terms[i] = TimeTerminate( val);
+    } else cout << "Termination type not recognized!" << endl;
+  }
+  
+  HowTermCombine com = (setup.get_andCombine() ? ALL : ONE);
+  
+  auto term_conds = make_shared<CombineTerminate> (terms, com);
+  BDRun dynamic_run( ASolv, term_conds);
   
   dynamic_run.run();
   
@@ -108,26 +138,27 @@ int main_bodyapprox( int poles, double tol, Setup setup,
 int main(int argc, const char * argv[])
 {
   string input_file = argv[1];
-//  string input_file = "/Users/lfelberg/Desktop/test/";
+//  string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/";
 //  input_file += "energyforce_test/run.energyforce.inp";//argv[1];
 //  input_file += "electrostatic_test/run.electrostatic.inp";
 //  input_file += "dynamics_test/run.dynamics.inp";
 //  input_file += "manybodyapprox_test/run.manybodyapprox.inp";
-  
-  // To do later
-//  shared_ptr<Setup> setp = make_shared<Setup>(input_file);
+
   Setup setp(input_file);
+  
   //check inputs:
   try {
     setp.check_inputs();
-  } catch (const BadInputException& ex) {
+  } catch (const BadInputException& ex)
+  {
     cout << ex.what() << endl;
   }
+  cout << "All inputs okay " << endl;
 
   Constants consts = Constants(setp);
   shared_ptr<System> sys;
   try {
-    shared_ptr<System> sys = make_shared<System>(setp);
+    sys = make_shared<System>(setp);
   } catch(const OverlappingMoleculeException& ex1)
   {
     cout << "Provided system has overlapping molecules. ";
@@ -136,6 +167,7 @@ int main(int argc, const char * argv[])
   {
     cout << ex2.what() << endl;
   }
+  cout << "Molecule setup okay " << endl;
   
   if (setp.get_randOrient())
   {
@@ -146,6 +178,7 @@ int main(int argc, const char * argv[])
   
   // writing initial configuration out
   sys->write_to_pqr( setp.getRunName() + ".pqr");
+  cout << "Written config" << endl;
   
   int poles = 10;
   double solv_tol = 1e-4;
