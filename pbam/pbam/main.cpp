@@ -13,49 +13,48 @@
 
 using namespace std;
 
-int main_dynamics( int poles, double tol, Setup setup,
-                  Constants consts, shared_ptr<System> sys)
+int main_dynamics( int poles, double tol, shared_ptr<Setup> setup,
+                  shared_ptr<Constants> consts, shared_ptr<System> sys)
 {
   int i;
-  shared_ptr<Constants> constant = make_shared<Constants>(setup);
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
   
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
-                                                    constant, poles);
+                                                    consts, poles);
   
-  vector<BaseTerminate> terms(setup.get_numterms());
-  for (i = 0; i < setup.get_numterms(); i++)
+  vector<BaseTerminate> terms(setup->get_numterms());
+  for (i = 0; i < setup->get_numterms(); i++)
   {
-    string type = setup.get_termtype(i);
+    string type = setup->get_termtype(i);
     string bdtype = type.substr(1,2);
-    double val = setup.get_termval(i);
+    double val = setup->get_termval(i);
     BoundaryType btype = ( bdtype == "<=" ) ? LEQ : GEQ;
     
     if ( type == "contact" )
     {
-      terms[i] = ContactTerminate( setup.get_termMolIDX(i), val);
+      terms[i] = ContactTerminate( setup->get_termMolIDX(i), val);
     } else if (type.substr(0,1) == "x")
     {
-      terms[i] = CoordTerminate( setup.get_termMolIDX(i)[0], X, btype, val);
+      terms[i] = CoordTerminate( setup->get_termMolIDX(i)[0], X, btype, val);
     } else if (type.substr(0,1) == "y")
     {
-      terms[i] = CoordTerminate( setup.get_termMolIDX(i)[0], Y, btype, val);
+      terms[i] = CoordTerminate( setup->get_termMolIDX(i)[0], Y, btype, val);
     } else if (type.substr(0,1) == "z")
     {
-      terms[i] = CoordTerminate( setup.get_termMolIDX(i)[0], Z, btype, val);
+      terms[i] = CoordTerminate( setup->get_termMolIDX(i)[0], Z, btype, val);
     } else if (type.substr(0,1) == "r")
     {
-      terms[i] = CoordTerminate( setup.get_termMolIDX(i)[0], R, btype, val);
+      terms[i] = CoordTerminate( setup->get_termMolIDX(i)[0], R, btype, val);
     } else if (type == "time")
     {
       terms[i] = TimeTerminate( val);
     } else cout << "Termination type not recognized!" << endl;
   }
   
-  HowTermCombine com = (setup.get_andCombine() ? ALL : ONE);
+  HowTermCombine com = (setup->get_andCombine() ? ALL : ONE);
   
   auto term_conds = make_shared<CombineTerminate> (terms, com);
   BDRun dynamic_run( ASolv, term_conds);
@@ -65,100 +64,86 @@ int main_dynamics( int poles, double tol, Setup setup,
   return 0;
 }
 
-int main_electrostatics( int poles, double tol, Setup setup,
-                        Constants consts, shared_ptr<System> sys)
+int main_electrostatics( int poles, double tol, shared_ptr<Setup> setup,
+                        shared_ptr<Constants> consts, shared_ptr<System> sys)
 {
   int i;
-  
-  shared_ptr<Constants> constant = make_shared<Constants>(setup);
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
   
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
-                                                    constant, poles);
+                                                    consts, poles);
   ASolv->solve_A(tol); ASolv->solve_gradA(tol);
-  Electrostatic Estat( ASolv, setup.getGridPts());
+  Electrostatic Estat( ASolv, setup->getGridPts());
   
-  if ( setup.getDXoutName() != "" )
-    Estat.print_dx( setup.getDXoutName());
+  if ( setup->getDXoutName() != "" )
+    Estat.print_dx( setup->getDXoutName());
   
-  for ( i = 0; i < setup.getGridCt(); i++ )
+  for ( i = 0; i < setup->getGridCt(); i++ )
   {
-    Estat.print_grid(setup.getGridAx(i), setup.getGridAxLoc(i),
-                     setup.getGridOutName(i));
+    Estat.print_grid(setup->getGridAx(i), setup->getGridAxLoc(i),
+                     setup->getGridOutName(i));
   }
   return 0;
 }
 
 
 // Main to solve for A and then print energies forces and torques
-int main_energyforce( int poles, double tol, Setup setup,
-                     Constants consts, shared_ptr<System> sys)
+int main_energyforce( int poles, double tol, shared_ptr<Setup> setup,
+                     shared_ptr<Constants> consts, shared_ptr<System> sys)
 {
-  shared_ptr<Constants> constant = make_shared<Constants>(setup);
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
   
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
-                                                        constant, poles);
+                                                        consts, poles);
   ASolv->solve_A(tol); ASolv->solve_gradA(tol);
-  PhysCalc calcEnFoTo( ASolv, constant->get_unitsEnum());
+  PhysCalc calcEnFoTo( ASolv, consts->get_unitsEnum());
   calcEnFoTo.calc_all();
   calcEnFoTo.print_all();
   
   return 0;
 }
 
-int main_bodyapprox( int poles, double tol, Setup setup,
-                  Constants consts, shared_ptr<System> sys)
+int main_bodyapprox( int poles, double tol, shared_ptr<Setup> setup,
+                  shared_ptr<Constants> consts, shared_ptr<System> sys)
 {
-  shared_ptr<Constants> constant = make_shared<Constants>(setup);
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
   
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
-                                                    constant, poles);
-  ThreeBody threeBodTest( ASolv, constant->get_unitsEnum() );
+                                                    consts, poles);
+  ThreeBody threeBodTest( ASolv, consts->get_unitsEnum() );
   
   threeBodTest.solveNmer(2);
   threeBodTest.solveNmer(3);
   threeBodTest.calcTBDEnForTor();
-  threeBodTest.printTBDEnForTor(setup.getMBDLoc());
+  threeBodTest.printTBDEnForTor(setup->getMBDLoc());
   
   return 0;
 }
 
-
-int main(int argc, const char * argv[])
+// Function to get and check inputs from file
+void get_check_inputs(shared_ptr<Setup> &setFile, shared_ptr<System> &syst,
+                           shared_ptr<Constants> &consts)
 {
-  string input_file = argv[1];
-//  string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/";
-//  input_file += "energyforce_test/run.energyforce.inp";//argv[1];
-//  input_file += "electrostatic_test/run.electrostatic.inp";
-//  input_file += "dynamics_test/run.dynamics.inp";
-//  input_file += "manybodyapprox_test/run.manybodyapprox.inp";
-
-  Setup setp(input_file);
-  
-  //check inputs:
   try {
-    setp.check_inputs();
+    setFile->check_inputs();
   } catch (const BadInputException& ex)
   {
     cout << ex.what() << endl;
   }
   cout << "All inputs okay " << endl;
-
-  Constants consts = Constants(setp);
-  shared_ptr<System> sys;
+  
+  consts = make_shared<Constants>(*setFile);
   try {
-    sys = make_shared<System>(setp);
+    syst = make_shared<System>(*setFile);
   } catch(const OverlappingMoleculeException& ex1)
   {
     cout << "Provided system has overlapping molecules. ";
@@ -169,28 +154,39 @@ int main(int argc, const char * argv[])
   }
   cout << "Molecule setup okay " << endl;
   
-  if (setp.get_randOrient())
+  if (setFile->get_randOrient())
   {
-    int i;
-    for ( i = 0; i < sys->get_n(); i++)
-      sys->rotate_mol(i, Quat().chooseRandom());
+    for ( int i = 0; i < syst->get_n(); i++)
+      syst->rotate_mol(i, Quat().chooseRandom());
   }
   
   // writing initial configuration out
-  sys->write_to_pqr( setp.getRunName() + ".pqr");
+  syst->write_to_pqr( setFile->getRunName() + ".pqr");
   cout << "Written config" << endl;
-  
+
+}
+
+int main(int argc, const char * argv[])
+{
+  string input_file = argv[1];
+
   int poles = 10;
   double solv_tol = 1e-4;
   
-  if ( setp.getRunType() == "dynamics")
-    main_dynamics( poles, solv_tol, setp, consts, sys);
-  else if ( setp.getRunType() == "electrostatics")
-    main_electrostatics( poles, solv_tol, setp, consts, sys);
-  else if ( setp.getRunType() == "energyforce")
-    main_energyforce( poles, solv_tol, setp, consts, sys);
-  else if ( setp.getRunType() == "bodyapprox")
-    main_bodyapprox( poles, solv_tol, setp, consts, sys);
+  auto setp = make_shared<Setup>(input_file);
+  auto syst = make_shared<System> ();
+  auto consts = make_shared<Constants> ();
+  
+  get_check_inputs( setp, syst, consts);
+  
+  if ( setp->getRunType() == "dynamics")
+    main_dynamics( poles, solv_tol, setp, consts, syst);
+  else if ( setp->getRunType() == "electrostatics")
+    main_electrostatics( poles, solv_tol, setp, consts, syst);
+  else if ( setp->getRunType() == "energyforce")
+    main_energyforce( poles, solv_tol, setp, consts, syst);
+  else if ( setp->getRunType() == "bodyapprox")
+    main_bodyapprox( poles, solv_tol, setp, consts, syst);
   else
     cout << "Runtype not recognized! See manual for options" << endl;
     

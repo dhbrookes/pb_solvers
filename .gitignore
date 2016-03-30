@@ -5,6 +5,7 @@
 
 # executable ignores
 bin
+build
 
 
 ## PBAM output ignores

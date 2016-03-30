@@ -11,5 +11,5 @@ attypes 1
 units jmol
 
 type 1 2
-pqr 1 /Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/energyforce_test/single_charge.pqr
-xyz 1 /Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/energyforce_test/positions_2.xyz
+pqr 1 single_charge.pqr
+xyz 1 positions_2.xyz
