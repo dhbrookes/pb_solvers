@@ -3,11 +3,7 @@
 
 
 
-\section{The Model}
-
-
-
-\subsection{PB-AM formulation}
+\section{PB-AM formulation}
 
 PB-AM is an analytical solution to the linearized Poisson-Boltzmann equations for multiple spherical objects of arbitrary charge distribution in an ionic solution.  The linearized Poisson-Boltzmann equation is given as:
 
@@ -54,26 +50,30 @@ where $D_{i, trans}$ and $D_{i, rot}$ are the translation and rotational diffusi
 \clearpage
 
 
+\chapter{Use}
+
 \section{Installation}
 
-\subsection{PB-AM Installation}
+To install this program, first download the source code from the GitHub repository: \\
 
-TODO
+\hspace{1cm}\texttt{>> git clone https://github.com/davas301/pb\_solvers.git} \\
 
-% To install PB-AM from the source code, first pull the latest version from the github/bitbucket site and type the following into the command line: \\
-% \begin{lstlisting}[style = MyBash]
-% >> make mpe
-% \end{lstlisting}
-% This should make the executable, mpe, and place it in the bin directory of the source code
+Then navigate to the directory \texttt{pb\_solvers/pbam}. From here, make a \texttt{build} directory, use CMake to create a make file and then make the program.  This is done as follows: \\
+
+\hspace{1cm}\texttt{>> cd pb\_solvers/pbam} 
+
+\hspace{1cm}\texttt{>> cmake ..} 
+
+\hspace{1cm}\texttt{>> make install} \\
 
 
-
+An executable named \texttt{pbam} will now be in \texttt{pb\_solvers/bin}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{PB-AM: Example input files and input file information}
+\section{PB-AM: Example input files and input file information}
 
-\subsubsection{Program option}
+\subsubsection{Input Files}
 
 The program executable requires an input file as a command line parameter. The input file contains the various arguments and parameters that one may wish to set when running the program. Each line of the input file contains a keyword followed by a variable number of whitespace-delimited parameters, e.g.: \\
 
@@ -120,7 +120,7 @@ Each keyword is described in the table below, along with its associated paramete
 
 \subsubsection{System inputs}
 
-From the single mpe executable, multiple types of calculations can be performed. Generally, all the programs require a computation flag, and a PDB or PQR file name.  If a PDB file is chosen the input is read and atoms are assigned partial charges according to the file charges\_OPLS, located in each of the test directories. A PQR file can be generated from the online site or the software can be downloaded:  \\
+All the options above require a PQR file name. A PQR file can be generated from a PDB file using the PDB2PQR program, available as a web server or for download at: \\
 
 http://nbcr-222.ucsd.edu/pdb2pqr\_1.9.0/  \\
 http://www.poissonboltzmann.org/docs/pdb2pqr-installation/ \\
