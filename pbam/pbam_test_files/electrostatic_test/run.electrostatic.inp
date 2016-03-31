@@ -1,4 +1,4 @@
-runname /Users/lfelberg/Desktop/test/electrostatic_test/electrostatic
+runname electrostatic
 runtype electrostatics 140
 
 units kT
@@ -9,17 +9,17 @@ sdiel 78
 
 #randorient
 
-#dx /Users/lfelberg/Desktop/test/electrostatic_test/out.dx
+dx out.dx
 
 gridct 1
-grid2D 1 /Users/lfelberg/Desktop/test/electrostatic_test/out.x.0.dat x 0
+grid2D 1 out.x.0.dat x 0
 
 
 attypes 2
 type 1 2
-pqr 1 /Users/lfelberg/Desktop/test/electrostatic_test/single_charge.pqr
-xyz 1 /Users/lfelberg/Desktop/test/electrostatic_test/positions_2.xyz
+pqr 1 single_charge.pqr
+xyz 1 positions_2.xyz
 
 type 2 2
-pqr 2 /Users/lfelberg/Desktop/test/electrostatic_test/pos_charge.pqr
-xyz 2 /Users/lfelberg/Desktop/test/electrostatic_test/positions_pos.xyz
+pqr 2 pos_charge.pqr
+xyz 2 positions_pos.xyz

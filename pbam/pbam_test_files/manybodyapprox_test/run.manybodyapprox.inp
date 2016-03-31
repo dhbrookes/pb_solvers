@@ -1,8 +1,8 @@
-runname /Users/lfelberg/Desktop/test/manybodyapprox_test/bodyapprox53
+runname bodyapprox53
 runtype bodyapprox
 
-3bdloc /Users/lfelberg/Desktop/test/manybodyapprox_test/3bd53.dat
-2bdloc /Users/lfelberg/Desktop/test/manybodyapprox_test/2bd53.dat
+3bdloc 3bd53.dat
+2bdloc 2bd53.dat
 
 salt 0.15
 temp 298
@@ -16,5 +16,5 @@ attypes 1
 units kT
 
 type 1 53
-pqr 1 /Users/lfelberg/Desktop/test/manybodyapprox_test/single_charge.pqr
-xyz 1 /Users/lfelberg/Desktop/test/manybodyapprox_test/positions.xyz
+pqr 1 single_charge.pqr
+xyz 1 positions.xyz

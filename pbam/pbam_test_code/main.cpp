@@ -14,10 +14,9 @@ using namespace std;
 
 double preclim = 1e-7;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
-string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/gtest/";
+string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pbam/pbam_test_files/gtest/";
 
 #include "ASolverUnitTest.h"
-#include "BDUnitTest.h"
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
 #include "ElectrostaticsUnitTest.h"
@@ -28,8 +27,10 @@ string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pb_solvers_code/test/gte
 #include "setupUnitTest.h"
 #include "SHCalcUnitTest.h"
 #include "SystemUnitTest.h"
-#include "ThreeBodyUnitTest.h"
+//#include "ThreeBodyUnitTest.h"
 #include "utilUnitTest.h"
+
+#include "BDUnitTest.h"
 
 #include "tester.h"
 

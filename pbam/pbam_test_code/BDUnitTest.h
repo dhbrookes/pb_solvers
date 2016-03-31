@@ -105,6 +105,16 @@ protected :
     -0.000809695912,-0.00100490659,-0.0011972749,-0.00138684841,-0.0015736946,
     -0.00175790403,-0.00193959316};
   
+  double bdRun10[2] = {-3.77575521, 9.77575521};
+  
+  double bdRun30x[2] = {-0.634593964,0.634593964};
+  double bdRun30y[2] = {-20.8011211,26.8011211};
+
+  double bdRun30Rot[2][3][3] = {{{0,0,0},{-0.542519466,-0.704545378,
+    0.457480534},{0.457480534,-0.704545378,-0.542519466}}, {{0,0,0},
+      {-0.542519459,0.704545379,0.457480541},{0.457480541,0.704545379,
+        -0.542519459}}};
+  
   virtual void TearDown() {}
 } ; // end BDUTest
 
@@ -547,39 +557,121 @@ TEST_F(BDUTest, TorqueOpp)
   }
 }
 
-TEST_F(BDUTest, BDrun)
+TEST_F(BDUTest, BDrunTimeTermY)
 {
-//  vector<Molecule> mol;
-//  const int ml = 2;
-//  Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
-//  for (int mi = 0; mi < ml; mi ++ )
-//  {
-//    int M = 3; vector<double> charges(M);
-//    vector<double> vdW(M); vector<Pt> posCharges(M);
-//    charges[0] = 7.0; posCharges[0] = pos[mi];
-//    charges[1] = 7.0; posCharges[1] = pos[mi]+Pt(1,0,0);
-//    charges[2] = 7.0; posCharges[2] = pos[mi]+Pt(0,1,0);
-//    vdW[0]=0.0; vdW[1]=0.0; vdW[2]=0.0;
-//    Molecule molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi], 0, 0.1);
-//    mol.push_back( molNew );
-//  }
-//  const int vals = 5;
-//  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
-//  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
-//  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
-//  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-//  shared_ptr<System> sys = make_shared<System>(mol);
-//  shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
-//
-//  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
-//  BDRun BDTest( ASolvTest, term, false);
-//  BDTest.run();
-//  
-//  for (int step=0; step < 10; step ++)
-//  {
-//    //    cout <<setprecision(9)<< BDTest.get_system()->get_posij(2, 2).z() << ",";
-//    //    cout <<BDTest.get_system()->get_posij(0, 2).y() << ", " <<BDTest.get_system()->get_posij(0, 2).z() << " " << endl;
-//  }
+  vector<Molecule> mol;
+  const int ml = 2;
+  Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
+  for (int mi = 0; mi < ml; mi ++ )
+  {
+    int M = 1; vector<double> charges(M);
+    vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 7.0; posCharges[0] = pos[mi]; vdW[0]=0.0;
+    Molecule molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi], 0, 0.1);
+    mol.push_back( molNew );
+  }
+  const int vals = 5;
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
+
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
+  BDRun BDTest( ASolvTest, term, 0, false, true, 1e7, 1e-20);
+  BDTest.run();
+  
+  EXPECT_NEAR(sys->get_time()/10, 1, preclim);
+  for (int mi = 0; mi < ml; mi ++ )
+  {
+    EXPECT_NEAR(sys->get_centeri(mi).x(), 0, preclim);
+    EXPECT_NEAR(sys->get_centeri(mi).y()/bdRun10[mi], 1, preclim);
+    EXPECT_NEAR(sys->get_centeri(mi).z(), 0, preclim);
+  }
+}
+
+TEST_F(BDUTest, BDrunTimeTermXY)
+{
+  vector<Molecule> mol;
+  const int ml = 2;
+  Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
+  for (int mi = 0; mi < ml; mi ++ )
+  {
+    int M = 3; vector<double> charges(M);
+    vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 7.0; posCharges[0] = pos[mi]; vdW[0]=0.0;
+    charges[1] = 7.0; posCharges[1] = pos[mi]+Pt(1,0,0); vdW[1]=0.0;
+    charges[2] = 7.0; posCharges[2] = pos[mi]+Pt(0,1,0); vdW[2]=0.0;
+    Molecule molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi], 0, 0.1);
+    mol.push_back( molNew );
+  }
+  const int vals = 5;
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
+  
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
+  BDRun BDTest( ASolvTest, term, 0, false, true, 1e7, 1e-20);
+  BDTest.run();
+  
+  EXPECT_NEAR(sys->get_time()/31.361344, 1, preclim);
+  
+  for (int mi = 0; mi < ml; mi ++ )
+  {
+    EXPECT_NEAR(sys->get_centeri(mi).x()/bdRun30x[mi], 1, preclim);
+    EXPECT_NEAR(sys->get_centeri(mi).y()/bdRun30y[mi], 1, preclim);
+    EXPECT_NEAR(sys->get_centeri(mi).z(), 0, preclim);
+  }
+}
+
+TEST_F(BDUTest, BDrunTimeTermRot)
+{
+  vector<Molecule> mol;
+  const int ml = 2;
+  Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
+  for (int mi = 0; mi < ml; mi ++ )
+  {
+    int M = 3; vector<double> charges(M);
+    vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 7.0; posCharges[0] = pos[mi]; vdW[0]=0.0;
+    charges[1] = 7.0; posCharges[1] = pos[mi]+Pt(0,0,1); vdW[1]=0.0;
+    charges[2] = 7.0; posCharges[2] = pos[mi]+Pt(1,0,0); vdW[2]=0.0;
+    Molecule molNew( "rot", 2.0, charges, posCharges, vdW, pos[mi], 0.1, 0.0);
+    mol.push_back( molNew );
+  }
+  const int vals = 5;
+  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
+  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
+  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
+  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
+  shared_ptr<System> sys = make_shared<System>(mol);
+  shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
+  
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
+  BDRun BDTest( ASolvTest, term, 0, false, true, 1e7, 1e-30);
+  BDTest.run();
+  
+  for (int mi = 0; mi < ml; mi ++ )
+  {
+    EXPECT_NEAR(sys->get_centeri(mi).x(), 0, preclim);
+    if ( pos[mi].y() != 0)
+      EXPECT_NEAR(sys->get_centeri(mi).y()/pos[mi].y(), 1, preclim);
+    EXPECT_NEAR(sys->get_centeri(mi).z(), 0, preclim);
+    
+    for (int j=0; j < sys->get_Mi(mi); j++)
+    {
+      if (bdRun30Rot[mi][j][0] != 0)
+        EXPECT_NEAR(sys->get_posij(mi,j).x()/bdRun30Rot[mi][j][0],1,preclim);
+      if (bdRun30Rot[mi][j][1] != 0)
+        EXPECT_NEAR(sys->get_posij(mi,j).y()/bdRun30Rot[mi][j][1],1,preclim);
+      if (bdRun30Rot[mi][j][2] != 0)
+        EXPECT_NEAR(sys->get_posij(mi,j).z()/bdRun30Rot[mi][j][2],1,preclim);
+    }
+  }
 }
 
 #endif /* BDUnitTest_h */

@@ -12,6 +12,7 @@
 #include <complex>
 #include <vector>
 #include <assert.h>
+#include <memory>
 #include "Constants.h"
 #include "MyMatrix.h"
 

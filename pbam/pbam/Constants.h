@@ -10,7 +10,7 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
-#include "Setup.h"
+#include "setup.h"
 
 enum Units { INTERNAL, KCALMOL, JMOL, kT };
 

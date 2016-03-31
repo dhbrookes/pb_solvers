@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 '''
 Program to plot a 2D version of the ESP from PB-AM
 '''
-fileName='/Users/lfelberg/PBSAM/pb_solvers/'
-fileName+= 'pb_solvers_code/test/electro_barnase_test/barnase.x.-20.dat'
-outFile='/Users/lfelberg/Desktop/barn_pbam_x_-20.jpg'
+dirName='/Users/lfelberg/PBSAM/pb_solvers/'
+fileName = dirName + 'pbam/pbam_test_files/electro_barnase_test/barnase.z.0.dat'
+outFile= dirName + 'python_test/APBS_compare/barn_pbam_z_0.00.jpg'
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):
@@ -47,7 +47,7 @@ def dispPlot( org, bn, count, potential,
                 xlab = r'$X \AA$', ylab = r'$Y \, (\AA)$',
                 lege = '', outFile = None ):
     """Plots the colormap of potential plot, 2D"""
-    fig = plt.figure(1, figsize = (4.5, 4)); 
+    fig = plt.figure(1, figsize = (5, 4)); 
     ax = fig.add_subplot(1,1,1)
 
     nbins = len(potential[0])
@@ -60,10 +60,12 @@ def dispPlot( org, bn, count, potential,
     plt.pcolor(X, Y, potential, vmin=mn+0.1*mn, vmax=mx)
     plt.colorbar()
 
-    xl, yl = 27, 33
-    ax.set_xlim([-29.10, 25.49])
-    ax.set_ylim([-33.84, 30.2])
-    #ax.set_ylim([-27, Y[-1]])
+    xl = [-28.0, 32.5]
+    yl = [-29.10, 25.49]
+    zl = [-33.84, 30.2]
+    ax.set_xlim(xl)
+    ax.set_ylim(yl)
+
     plt.title(title, fontsize = 13);
     ax.set_ylabel(ylab, fontsize = 10); 
     ax.set_xlabel(xlab, fontsize = 10)

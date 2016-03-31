@@ -15,6 +15,8 @@ Molecule::Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
 M_((int) pos.size()),
 a_(a), center_(cen)
 {
+  if ((type == "stat") or (type == "rot"))  dtrans_ = 0.0;
+  if (type == "stat") drot_ = 0.0;
   reposition_charges();
 }
 
@@ -25,6 +27,7 @@ Molecule::Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
 M_((int) pos.size()),
 a_(a)
 {
+  set_Dtr_Drot(type);
   calc_center();
   reposition_charges();
 }
@@ -36,6 +39,7 @@ Molecule::Molecule(string type, vector<double> qs, vector<Pt> pos,
 M_((int) pos.size()),
 center_(cen)
 {
+  set_Dtr_Drot(type);
   reposition_charges();
 }
 
@@ -45,8 +49,16 @@ Molecule::Molecule(string type, vector<double> qs, vector<Pt> pos,
 :type_(type), drot_(drot), dtrans_(dtrans), qs_(qs), pos_(pos), vdwr_(vdwr),
 M_((int) pos.size())
 {
+  set_Dtr_Drot(type);
   calc_center();
   reposition_charges();
+}
+
+
+void Molecule::set_Dtr_Drot(string type)
+{
+  if ((type == "stat") or (type == "rot"))  dtrans_ = 0.0;
+  if (type == "stat") drot_ = 0.0;
 }
 
 void Molecule::calc_center()
@@ -110,7 +122,7 @@ void Molecule::rotate(Quat qrot)
 System::System(const vector<Molecule>& mols, double cutoff,
                double boxlength)
 :molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
-boxLength_(boxlength)
+boxLength_(boxlength), t_(0)
 {
   check_for_overlap();
   lambda_ = calc_average_radius();

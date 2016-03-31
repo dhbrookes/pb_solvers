@@ -187,10 +187,11 @@ void BDRun::run()
   bool term = false;
   while (i < maxIter_ and !term)
   {
-    cout << "This is molecule 1 pos " ;
-    cout << _asolver_->get_sys()->get_centeri(0).x() << ", ";
-    cout << _asolver_->get_sys()->get_centeri(0).y() << ", ";
-    cout << _asolver_->get_sys()->get_centeri(0).z() << endl;
+//    cout << "This is my pt ";
+//    cout << _asolver_->get_sys()->get_centeri(0).x() << ",";
+//    cout << _asolver_->get_sys()->get_centeri(0).y() << ",";
+//    cout << _asolver_->get_sys()->get_centeri(0).z() << endl;
+    
     _asolver_->reset_all(_stepper_->get_system());
     _asolver_->solve_A(prec_);
     _asolver_->solve_gradA(prec_);
@@ -199,6 +200,12 @@ void BDRun::run()
     _physCalc_->calc_torque();
     
     _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
+    
+//    cout << "This is my pt ";
+//    cout << _asolver_->get_sys()->get_centeri(0).x() << ",";
+//    cout << _asolver_->get_sys()->get_centeri(0).y() << ",";
+//    cout << _asolver_->get_sys()->get_centeri(0).z() << endl;
+//    
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {
       term = true;

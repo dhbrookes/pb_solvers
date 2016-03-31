@@ -14,9 +14,9 @@ term 1 time 40
 
 attypes 2
 type 1 1 move 0.01 0.001
-pqr 1 /Users/lfelberg/Desktop/test/dynamics_test/single_charge.pqr
-xyz 1 /Users/lfelberg/Desktop/test/dynamics_test/positions_1.xyz
+pqr 1 single_charge.pqr
+xyz 1 positions_1.xyz
 
 type 2 1 move 0.01 0.001
-pqr 2 /Users/lfelberg/Desktop/test/dynamics_test/single_charge.pqr
-xyz 2 /Users/lfelberg/Desktop/test/dynamics_test/positions_2.xyz
+pqr 2 single_charge.pqr
+xyz 2 positions_2.xyz
