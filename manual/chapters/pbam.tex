@@ -56,22 +56,26 @@ where $D_{i, trans}$ and $D_{i, rot}$ are the translation and rotational diffusi
 
 To install this program, first download the source code from the GitHub repository: \\
 
-\hspace{1cm}\texttt{>> git clone https://github.com/davas301/pb\_solvers.git} \\
+\hspace{1cm}\texttt{\$ git clone https://github.com/davas301/pb\_solvers.git} \\
 
-Then navigate to the directory \texttt{pb\_solvers/pbam}. From here, make a \texttt{build} directory, use CMake to create a make file and then make the program.  This is done as follows: \\
+Then navigate to the directory \texttt{pb\_solvers/pbam}. From here, make a \texttt{build} and \texttt{bin} directory, use CMake to create a make file and then make the program.  This is done as follows: \\
 
-\hspace{1cm}\texttt{>> cd pb\_solvers/pbam} 
+\hspace{1cm}\texttt{\$ cd pb\_solvers/pbam} 
 
-\hspace{1cm}\texttt{>> cmake ..} 
+\hspace{1cm}\texttt{\$ mkdir build bin}
 
-\hspace{1cm}\texttt{>> make install} \\
+\hspace{1cm}\texttt{\$ cd build}
+
+\hspace{1cm}\texttt{\$ cmake ..} 
+
+\hspace{1cm}\texttt{\$ make install} \\
 
 
 An executable named \texttt{pbam} will now be in \texttt{pb\_solvers/bin}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{PB-AM: Example input files and input file information}
+\section{Input Information}
 
 \subsubsection{Input Files}
 
@@ -113,8 +117,8 @@ Each keyword is described in the table below, along with its associated paramete
 \hline
 \T runtype dynamics & & \parbox[t]{\colthree}{Will perform a brownian dynamics run.\B}  \\
 \T termct & \param{ct} & \parbox[t]{\colthree}{Set number of termination conditions to \param{ct}.}  \\
-\T termcombine & \param{andor} & \parbox[t]{\colthree}{Set how termination conditions will be combined. \param{andor} should be \texttt{and} or \texttt{or}.} \\
-\T term & \parbox[t]{\coltwo}{\param{idx} \param{type} \param{val}} & \parbox[t]{\colthree}{Set attributes of a termination condition where \param{idx} is the integer id of this condition, which can be 1 to \param{ct} (above). \param{type} can be \texttt{time}, \texttt{x}, \texttt{y}, \texttt{z}, or \texttt{r} and \param{val} is the value where the simulation will terminate. \B} \\
+\T termcombine & \param{andor} & \parbox[t]{\colthree}{Set how termination conditions will be combined. \param{andor} should be \texttt{and} or \texttt{or}. Default is \texttt{or}.} \\
+\T term & \parbox[t]{\coltwo}{\param{idx} \param{type} \param{val} \param{mols}} & \parbox[t]{\colthree}{Set attributes of a termination condition where \param{idx} is the integer id of this condition, which can be 1 to \param{ct} (above). \param{type} can be \texttt{time}, \texttt{contact},  \texttt{x<=}, \texttt{y<=}, \texttt{z<=}, or \texttt{r<=} (or the \texttt{>=} equivalents of these), \param{val} is the value where the simulation will terminate and \param{mols} is a whitespace-delimited list of molecular indices that this condition applies to (\texttt{contact} requires 2, \texttt{time} requires 0, and all else require 1). \B} \\
 \hline
   \end{tabular}
 
@@ -127,19 +131,19 @@ http://www.poissonboltzmann.org/docs/pdb2pqr-installation/ \\
 
 It may also be formatted manually. The general format of a PQR file is as follows, and is whitespace-delimited: \\
 
-\textbf{recName  serial  atName  resName  chainID  resNum  X  Y  Z  charge rad }\\
+\texttt{recName  serial  atName  resName  chainID  resNum  X  Y  Z  charge rad }\\
 
   \begin{tabular}{ c | l  }
-    \textbf{Delimiter} & \textbf{Description} \\ \hline
-recName 	&	A string that should either be ATOM or HETATM. \\
-serial 	&	An integer that provides the atom index \\
-atName 	&	A string that provides the atom name.\\
-resName	&	A string that provides the residue name. \\
-chainID	&	An optional string that provides the chain ID of the atom.\\
-residueNumber  & An integer that provides the residue index.\\
-X Y Z	& Three floats that provide the atomic coordinates.\\
-charge	& A float that provides the atomic charge (in electrons). \\
-Rad		& A float that provides the atomic radius (in \AA…).\\
+    \textbf{Parameter} & \textbf{Description} \\ \hline
+\texttt{recName} 	&	A string that should either be ATOM or HETATM. \\
+\texttt{serial} 	&	An integer that provides the atom index \\
+\texttt{atName} 	&	A string that provides the atom name.\\
+\texttt{resName}	&	A string that provides the residue name. \\
+\texttt{chainID}	&	An optional string that provides the chain ID of the atom.\\
+\texttt{residueNumber}  & An integer that provides the residue index.\\
+\texttt{X Y Z}	& Three floats that provide the atomic coordinates.\\
+\texttt{charge}	& A float that provides the atomic charge (in electrons). \\
+\texttt{Rad}		& A float that provides the atomic radius (in \AA…).\\
     \hline
   \end{tabular}
 
