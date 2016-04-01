@@ -9,6 +9,7 @@
 #ifndef System_hpp
 #define System_hpp
 
+#include <map>
 #include "Constants.h"
 
 using namespace std;
@@ -20,7 +21,9 @@ using namespace std;
 class Molecule
 {
 protected:
-  string              type_;
+  string              moveType_;
+  int                 type_; // int index of type of molecule, 0 based
+  int                 typeIdx_; // int index of mol within given type_, 0 based
   double              drot_;  // rotational diffusion coefficient
   double              dtrans_; // translational diffusion coefficients
   int                 M_;  // number of charges in this molecule
@@ -44,23 +47,27 @@ protected:
     
 public:
   
-  Molecule() { }
+  Molecule() {}
 
   // user specified radius and center
-  Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
-           vector<double> vdwr, Pt cen, double drot_=0, double dtrans=0);
+  Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
+           vector<double> vdwr, Pt cen, int type, int typeIdx,
+           double drot_=0, double dtrans=0);
   
   // user specified radius
-  Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
-           vector<double> vdwr, double drot_=0, double dtrans=0);
+  Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
+           vector<double> vdwr, int type, int typeIdx,
+           double drot_=0, double dtrans=0);
   
   // user specified center
-  Molecule(string type, vector<double> qs, vector<Pt> pos,
-           vector<double> vdwr, Pt cen, double drot_=0, double dtrans=0);
+  Molecule(string movetype, vector<double> qs, vector<Pt> pos,
+           vector<double> vdwr, Pt cen, int type, int typeIdx,
+           double drot_=0, double dtrans=0);
   
   // neither the center or radius are specified
-  Molecule(string type, vector<double> qs, vector<Pt> pos,
-           vector<double> vdwr, double drot_=0, double dtrans=0);
+  Molecule(string movetype, vector<double> qs, vector<Pt> pos,
+           vector<double> vdwr, int type, int typeIdx,
+           double drot_=0, double dtrans=0);
   
   const int get_m() const               { return M_; }
   const double get_a() const            { return a_; }
@@ -70,7 +77,9 @@ public:
   Pt get_posj_realspace(int j)          { return center_ + pos_[j]; }
   Pt get_center() const                 { return center_; }
   
-  string get_type() const               { return type_; }
+  string get_move_type() const          { return moveType_; }
+  int get_type() const                  { return type_; }
+  int get_type_idx() const              { return typeIdx_; }
   
   double get_drot() const               { return drot_; }
   double get_dtrans() const             { return dtrans_; }
@@ -96,6 +105,10 @@ protected:
   
   double t_;  // time in a BD simulation
   
+  int                          ntype_;  //count of unique molecule types
+  vector<int>                  typect_; //count of molecule of each unique type
+  map<vector<int>, int>        typeIdxToIdx_;
+  
   const double calc_average_radius() const;
   
 public:
@@ -108,6 +121,8 @@ public:
   System(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
   
   const int get_n() const                  {return N_;}
+  const int get_ntype()                    {return ntype_;}
+  const int get_typect(int i)              {return typect_[i];}
   const double get_ai(int i) const         {return molecules_[i].get_a();}
   const double get_Mi(int i) const         {return molecules_[i].get_m();}
   const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
@@ -119,12 +134,18 @@ public:
   Pt get_centeri(int i) const              {return molecules_[i].get_center();}
   double get_radi(int i) const             {return molecules_[i].get_a();}
   const double get_lambda() const          {return lambda_;}
-  const string get_typei(int i) const      {return molecules_[i].get_type();}
+  const string get_typei(int i) const    {return molecules_[i].get_move_type();}
   const double get_droti(int i) const      {return molecules_[i].get_drot();}
   const double get_dtransi(int i) const    {return molecules_[i].get_dtrans();}
   const double get_boxlength() const       {return boxLength_;}
   const double get_cutoff() const          {return cutoff_;}
   const double get_time() const            {return t_;}
+  
+  const int get_mol_global_idx(int type, int ty_idx)
+  {
+    vector<int> keys = {type, ty_idx};
+    return typeIdxToIdx_[keys];
+  }
   
   // Compute cutoff for force calcs
   void compute_cutoff();

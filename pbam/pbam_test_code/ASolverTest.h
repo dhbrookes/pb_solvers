@@ -36,12 +36,13 @@ public :
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0] = cg[molInd]; posCharges[0] = cgPos[molInd]; vdW[0] = 0.0;
       
-      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd]);
+      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+                      molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
       
-      Molecule molSing( "stat", 10.0, charges, posCharges, vdW);
+      Molecule molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
     

@@ -37,7 +37,8 @@ protected :
       charges[1]=cg[molInd]; vdW[1]=0.0; posCharges[1]=pos[molInd]+Pt(1,0,0);
       charges[2]=cg[molInd]; vdW[2]=0.0; posCharges[2]=pos[molInd]+Pt(0,1,0);
 
-      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd]);
+      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+                      molInd, 0);
       mol_.push_back( molNew );
     }
   } // end SetUp
@@ -412,7 +413,8 @@ TEST_F(ElecUTest, printPOT)
     charges[1]=-2.0; vdW[1]=0;posCharges[1]=pos[molInd]+Pt(1.0, 0.0, 0.0);
     charges[2]=2.0;  vdW[2]=0;posCharges[2]=pos[molInd]+Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]);
+    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                    molInd, 0);
     mol_sing_.push_back( molNew );
   }
   

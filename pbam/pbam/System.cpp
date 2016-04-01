@@ -9,47 +9,55 @@
 #include "System.h"
 
 // user specified radius and center
-Molecule::Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
-                   vector<double> vdwr, Pt cen, double drot, double dtrans)
-:type_(type), drot_(drot), dtrans_(dtrans), qs_(qs), pos_(pos), vdwr_(vdwr),
+Molecule::Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
+                   vector<double> vdwr, Pt cen, int type, int typeIdx,
+                   double drot, double dtrans)
+:moveType_(movetype), drot_(drot), dtrans_(dtrans),
+qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
 M_((int) pos.size()),
 a_(a), center_(cen)
 {
-  if ((type == "stat") or (type == "rot"))  dtrans_ = 0.0;
-  if (type == "stat") drot_ = 0.0;
+  if ((movetype == "stat") or (movetype == "rot"))  dtrans_ = 0.0;
+  if (movetype == "stat") drot_ = 0.0;
   reposition_charges();
 }
 
 // user specified radius
-Molecule::Molecule(string type, double a, vector<double> qs, vector<Pt> pos,
-         vector<double> vdwr, double drot, double dtrans)
-:type_(type), drot_(drot), dtrans_(dtrans), qs_(qs), pos_(pos), vdwr_(vdwr),
+Molecule::Molecule(string movetype, double a, vector<double> qs,
+                   vector<Pt> pos, vector<double> vdwr, int type, int typeIdx,
+                   double drot, double dtrans)
+:moveType_(movetype), drot_(drot), dtrans_(dtrans),
+qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
 M_((int) pos.size()),
 a_(a)
 {
-  set_Dtr_Drot(type);
+  set_Dtr_Drot(movetype);
   calc_center();
   reposition_charges();
 }
 
 // user specified center
-Molecule::Molecule(string type, vector<double> qs, vector<Pt> pos,
-                   vector<double> vdwr, Pt cen, double drot, double dtrans)
-:type_(type), drot_(drot), dtrans_(dtrans), qs_(qs), pos_(pos), vdwr_(vdwr),
+Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
+                   vector<double> vdwr, Pt cen, int type, int typeIdx,
+                   double drot, double dtrans)
+:moveType_(movetype), drot_(drot), dtrans_(dtrans),
+qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
 M_((int) pos.size()),
 center_(cen)
 {
-  set_Dtr_Drot(type);
+  set_Dtr_Drot(movetype);
   reposition_charges();
 }
 
 // neither the center or radius are specified
-Molecule::Molecule(string type, vector<double> qs, vector<Pt> pos,
-                   vector<double> vdwr, double drot, double dtrans)
-:type_(type), drot_(drot), dtrans_(dtrans), qs_(qs), pos_(pos), vdwr_(vdwr),
+Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
+                   vector<double> vdwr,  int type, int typeIdx,
+                   double drot, double dtrans)
+:moveType_(movetype), drot_(drot), dtrans_(dtrans),
+qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
 M_((int) pos.size())
 {
-  set_Dtr_Drot(type);
+  set_Dtr_Drot(movetype);
   calc_center();
   reposition_charges();
 }
@@ -124,24 +132,46 @@ System::System(const vector<Molecule>& mols, double cutoff,
 :molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
 boxLength_(boxlength), t_(0)
 {
+  int i, j, k, maxi = 0;
+  vector<int> maxj, keys(2);
+  for ( k = 0; k < N_; k++)
+  {
+    i = molecules_[k].get_type();
+    j = molecules_[k].get_type_idx();
+    keys = {i,j};
+    typeIdxToIdx_[keys] = k;
+    maxi = ( maxi > i ) ? maxi : i;
+    
+    if ( i >= maxj.size() ) maxj.push_back(0);
+    maxj[i] = ( maxj[i] > j ) ? maxj[i] : j;
+  }
+  
+  maxi++;
+  for ( j = 0; j < maxj.size(); j++) maxj[j]++;
+  
+  ntype_ = maxi;
+  typect_ = maxj;
+  
   check_for_overlap();
   lambda_ = calc_average_radius();
   if (boxLength_/2. < cutoff_)  compute_cutoff();
 }
 
 System::System(Setup setup, double cutoff)
-:t_(0)
+:t_(0), ntype_(setup.get_ntype()), typect_(setup.get_type_nct())
 {
   vector<Molecule> mols;
-  int i, j, chg;
+  int chg, i, j, k=0;
   string pqrpath;
   Molecule mol;
+  vector<int> keys(2);
   for (i = 0; i < setup.get_ntype(); i++)
   {
     PQRFile pqrI (setup.getTypeNPQR(i));
     XYZFile xyzI (setup.getTypeNXYZ(i), setup.getTypeNCount(i));
     for (j = 0; j < setup.getTypeNCount(i); j++)
     {
+      keys = { i, j };
       vector<Pt> repos_charges(pqrI.get_M());
       Pt com = pqrI.get_cg_centers()[0];
       Pt move = xyzI.get_pts()[j] + com * -1.0;
@@ -162,8 +192,10 @@ System::System(Setup setup, double cutoff)
                        setup.getDrot(i), setup.getDtr(i));
       }
       molecules_.push_back(mol);
-    }
-  }
+      typeIdxToIdx_[keys] = k;
+      k++;
+    } // end j
+  } // end i
   N_ = (int) molecules_.size();
   boxLength_ = setup.getBLen();
   cutoff_ = cutoff;

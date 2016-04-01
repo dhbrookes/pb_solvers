@@ -157,6 +157,8 @@ public:
   
   int getThreads()                 { return ompThreads_; }
   int getNType()                   { return nType_; }
+  int get_ntype()                  { return nType_; } // repeat
+  vector<int> get_type_nct()       { return nTypenCount_;}
   int getPBCs()                    { return PBCs_; }
   double getBLen()                 { return blen_; }
   double getIDiel()                { return idiel_; }
@@ -173,7 +175,6 @@ public:
   string getTypeNXYZ(int type)     { return molfnames_[type][1]; }
   double getKappa()                { return kappa_; }
   double getIKbT()                 { return iKbT_; }
-  int get_ntype()                  { return nType_; }
   
   bool get_randOrient()            { return orientRand_; }
   
