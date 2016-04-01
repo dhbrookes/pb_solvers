@@ -212,4 +212,65 @@ TEST_F(TermUTest, zGETerm)
   EXPECT_EQ( term->is_terminated( sys), true);
 }
 
+
+// Checking z<= termination class with many molecule of one type
+TEST_F(TermUTest, zLETermManyType)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  vector<int> typ = { 0, 0, 1};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], molInd);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol );
+  auto term = make_shared<CoordTerminate>(0, Z, LEQ, -50);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(100, 0, -500));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(1, Pt(-45, -10, -55));
+  EXPECT_EQ( term->is_terminated( sys), true);
+}
+
+// Checking z>= termination class
+TEST_F(TermUTest, xGETermManyType)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    0, molInd);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol );
+  auto term = make_shared<CoordTerminate>(1, X, GEQ, 29.4);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-5, 10.4, 20));
+
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-5, 0.5, 9.7));
+  EXPECT_EQ( term->is_terminated( sys), false);
+
+  sys->translate_mol(1, Pt(35, 0.5, 9.7));
+  EXPECT_EQ( term->is_terminated( sys), true);
+}
+
 #endif /* TerminateUnitTest_h */

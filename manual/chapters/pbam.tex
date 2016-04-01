@@ -47,9 +47,9 @@ where $D_{i, trans}$ and $D_{i, rot}$ are the translation and rotational diffusi
 
 \subsection{Electrostatics}
 
-In a similar manner to the interaction energy calculations in the Physical Calculations section, the electrostatics computes the potential at any point in space exterior to the molecules as the interaction energy 
+In a similar manner to the interaction energy calculations in the Physical Calculations section, the electrostatics computes the potential at any point in space exterior to the molecules, \textbf{r}, as the inner product of all the solved effective multipole expansions \(A^{(j)}\) with a local multipole expansion of a single positive charge at position, \textbf{r}.
 
-\[\Phi_{out}(r)= \frac{1}{\epsilon_s} \left \langle \sum_{j = 1}^N  T \cdot A^{(j) } ,  A(r)  \right \rangle \]
+\[\Phi_{out}(\textbf{r})= \frac{1}{\epsilon_s} \left \langle \sum_{j = 1}^N  T \cdot A^{(j) } , \,  A(\textbf{r})  \right \rangle \]
 
 \clearpage
 
@@ -100,6 +100,7 @@ Each keyword is described in the table below, along with its associated paramete
 \newlength{\coltwo}
 \setlength{\coltwo}{2.9cm}
 
+%\begin{tabular}{ c l m{4cm} | m{3cm}  }
 \begin{tabular}{ c | l | l  }
     \textbf{Keyword} & \textbf{Parameters} & \textbf{Description} \\ \hline
 \T runname & \param{name} & \parbox[t]{\colthree}{\param{name} is desired internal name of this run.} \\
@@ -108,18 +109,27 @@ Each keyword is described in the table below, along with its associated paramete
 \T salt & \param{con} & \parbox[t]{\colthree}{Set salt concentration in the system to \param{con}.}\\
 \T temp & \param{T} & \parbox[t]{\colthree}{Set system temperature to \param{T}}\\
 \T idiel & \param{ival} & \parbox[t]{\colthree}{Set the interior dielectric constant to \param{ival}.} \\
-\T sdiel & \param{sval} & \parbox[t]{\colthree}{Set the interior dielectric constant to \param{sval}.} \\
+\T sdiel & \param{sval} & \parbox[t]{\colthree}{Set the solvent dielectric constant to \param{sval}.} \\
 \T pbc & \param{boxlength} & \parbox[t]{\colthree}{Set size of periodic box to \param{boxlength}.}\\
 \T random & \param{seed} & \parbox[t]{\colthree}{Seed the internal random number generator with \param{seed}.} \\
 \T attypes & \param{numtypes} & \parbox[t]{\colthree}{Set the number of different atom types to \param{numtypes}.}\\
 \T type & \parbox[t]{\coltwo}{\param{idx} \param{ct} \param{movetype} \param{dtr} \param{drot}} & \parbox[t]{\colthree}{Set attributes of an atom type, where \param{idx} is the integer id of this type, which can be 1 to \param{numtypes} (above). \param{ct} is the number of atoms of this type in the system and \param{movetype} describes the way this type is allowed to move in a dynamics run (\texttt{move}, \texttt{rot}, or \texttt{stat}). If \param{movetype} is \texttt{move}, then a translational diffusion coefficient \param{dtr} and a rotational diffusional coefficient \param{drot} are required. If \param{movetype} is \texttt{rot} then just \param{drot} is required. \B}\\
-\hline
+\end{tabular}
+
+
+\setlength{\colthree}{8.1cm}
+\setlength{\coltwo}{2.9cm}
+
+%\begin{tabular}{ c l m{4cm} | m{3cm}  }
+\begin{tabular}{ c | l | l}
+    \textbf{Keyword} & \textbf{Parameters} & \textbf{Description} \\ \hline
+
 \T runtype electrostatics & \param{gridpts} & \parbox[t]{\colthree}{Will run electrostatics calculations. \param{gridpts} is an optional integer describing the number of evenly spaced points in each dimension to perform calculations on.}\\
-\T dx & \param{fname} & \parbox[t]{\colthree}{For electrostatics. Will write the results of electrostatics calculations for every 3D grid point to \param{fname}.} \\
+\T dx & \param{fname} & \parbox[t]{\colthree}{For electrostatics. Will write the results of electrostatics calculations for every 3D grid point to \param{fname}, in the same output format as APBS dx file.} \\
 \T gridct & \param{ct} & \parbox[t]{\colthree}{For electrostatics. \param{ct} is the number of 2D grids to output.} \\
 \T grid2d & \parbox[t]{\coltwo}{\param{idx} \param{fname} \param{axis} \param{val} } & \parbox[t]{\colthree}{For electrostatics. Set attributes of a grid output where \param{idx} is the integer id of this grid, which can be 1 to \param{ct} (above). Will write output of calculations for a cross section along \param{axis} (\texttt{x}, \texttt{y}, or \texttt{z}) at \param{value}.\B} \\
 \hline
-\T runtype dynamics & & \parbox[t]{\colthree}{Will perform a brownian dynamics run.\B}  \\
+\T runtype dynamics &  \param{outname}  \param{ntraj} & \parbox[t]{\colthree}{Will perform a brownian dynamics run. A directory where trajectory information will be stored in and the number of trajectories is required.\B}  \\
 \T termct & \param{ct} & \parbox[t]{\colthree}{Set number of termination conditions to \param{ct}.}  \\
 \T termcombine & \param{andor} & \parbox[t]{\colthree}{Set how termination conditions will be combined. \param{andor} should be \texttt{and} or \texttt{or}. Default is \texttt{or}.} \\
 \T term & \parbox[t]{\coltwo}{\param{idx} \param{type} \param{val} \param{mols}} & \parbox[t]{\colthree}{Set attributes of a termination condition where \param{idx} is the integer id of this condition, which can be 1 to \param{ct} (above). \param{type} can be \texttt{time}, \texttt{contact},  \texttt{x<=}, \texttt{y<=}, \texttt{z<=}, or \texttt{r<=} (or the \texttt{>=} equivalents of these), \param{val} is the value where the simulation will terminate and \param{mols} is a whitespace-delimited list of molecular indices that this condition applies to (\texttt{contact} requires 2, \texttt{time} requires 0, and all else require 1). \B} \\
@@ -147,7 +157,7 @@ It may also be formatted manually. The general format of a PQR file is as follow
 \texttt{residueNumber}  & An integer that provides the residue index.\\
 \texttt{X Y Z}	& Three floats that provide the atomic coordinates.\\
 \texttt{charge}	& A float that provides the atomic charge (in electrons). \\
-\texttt{Rad}		& A float that provides the atomic radius (in \AA…).\\
+\texttt{Rad}		& A float that provides the atomic radius (in \AA).\\
     \hline
   \end{tabular}
 

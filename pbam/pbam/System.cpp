@@ -151,6 +151,9 @@ boxLength_(boxlength), t_(0)
   
   ntype_ = maxi;
   typect_ = maxj;
+  cout << "There are "<<ntype_<<" types ";
+  for ( j = 0; j < maxj.size(); j++) cout << " and " << typect_[0]<<" of " << j;
+  cout << endl;
   
   check_for_overlap();
   lambda_ = calc_average_radius();

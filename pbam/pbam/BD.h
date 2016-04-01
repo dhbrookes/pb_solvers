@@ -124,10 +124,8 @@ public:
       else if (coordType_ == Z) test_val = mol_coord.z();
       else                      test_val = mol_coord.norm();
       
-      if (boundType_ == LEQ)
-        test_val <= boundaryVal_ ? done = true: done = false;
-      else if (boundType_ == GEQ)
-        test_val >= boundaryVal_ ? done = true: done = false;
+      if ((boundType_ == LEQ) && (test_val <= boundaryVal_))      return true;
+      else if ((boundType_ == GEQ) && (test_val >= boundaryVal_)) return true;
     }
     return done;
   }
@@ -155,7 +153,7 @@ public:
   const bool is_terminated(shared_ptr<System> _sys) const
   {
     bool done;
-    howCombine_== ALL ? done=true: done=false;
+    howCombine_== ALL ? done=true : done=false;
     for (int i = 0; i < terms_.size(); i++)
     {
       if (terms_[i].is_terminated(_sys) == ! done)
