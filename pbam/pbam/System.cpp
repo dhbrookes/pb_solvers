@@ -15,10 +15,9 @@ Molecule::Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
 :moveType_(movetype), drot_(drot), dtrans_(dtrans),
 qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
 M_((int) pos.size()),
-a_(a), center_(cen)
+a_(a), center_(cen), unwrappedCenter_(cen)
 {
-  if ((movetype == "stat") or (movetype == "rot"))  dtrans_ = 0.0;
-  if (movetype == "stat") drot_ = 0.0;
+  set_Dtr_Drot(movetype);
   reposition_charges();
 }
 
@@ -43,7 +42,7 @@ Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
 :moveType_(movetype), drot_(drot), dtrans_(dtrans),
 qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
 M_((int) pos.size()),
-center_(cen)
+center_(cen), unwrappedCenter_(cen)
 {
   set_Dtr_Drot(movetype);
   reposition_charges();
@@ -87,6 +86,7 @@ void Molecule::calc_center()
   zc /= (double) M_;
   
   center_ = Pt(xc, yc, zc);
+  unwrappedCenter_ = center_;
 }
 
 void Molecule::calc_a()
@@ -114,9 +114,14 @@ void Molecule::reposition_charges()
   if (recalc_a) calc_a();
 }
 
-void Molecule::translate(Pt dr)
+void Molecule::translate(Pt dr, double boxlen)
 {
-  center_ = center_ + dr;
+  Pt dv  = center_ + dr;
+  
+  unwrappedCenter_ = unwrappedCenter_ + dr; // unwrapped position
+  center_ = Pt(dv.x() - round(dv.x()/boxlen)*boxlen,
+            dv.y() - round(dv.y()/boxlen)*boxlen,
+            dv.z() - round(dv.z()/boxlen)*boxlen);
 }
 
 void Molecule::rotate(Quat qrot)
@@ -151,9 +156,6 @@ boxLength_(boxlength), t_(0)
   
   ntype_ = maxi;
   typect_ = maxj;
-  cout << "There are "<<ntype_<<" types ";
-  for ( j = 0; j < maxj.size(); j++) cout << " and " << typect_[0]<<" of " << j;
-  cout << endl;
   
   check_for_overlap();
   lambda_ = calc_average_radius();
@@ -298,5 +300,34 @@ void System::write_to_pqr(string outfile)
     pqr_out << "ATOM " << pqrlin << endl;
     ct++;
   }
+}
+
+void System::write_to_xyz(ofstream & xyz_out)
+{
+  int i, j, ct = 0;
+  int at_tot = 0;
+  char xyzlin[400];
   
+  for ( i = 0; i < N_; i++ )
+    for ( j = 0; j < get_Mi(i); j++)
+      at_tot++;
+  at_tot += N_; // for adding CG centers
+  
+  
+  xyz_out << "Atoms" << endl;
+  xyz_out << at_tot << endl;
+  for ( i = 0; i < N_; i++ )
+  {
+    for ( j = 0; j < get_Mi(i); j++)
+    {
+      sprintf(xyzlin,"%5d %8.3f %8.3f %8.3f", ct, get_posijreal(i, j).x(),
+              get_posijreal(i, j).y(), get_posijreal(i, j).z());
+      xyz_out << xyzlin << endl;
+      ct++;
+    }
+    sprintf(xyzlin,"%5d %8.3f %8.3f %8.3f", ct, get_centeri(i).x(),
+            get_centeri(i).y(), get_centeri(i).z());
+    xyz_out << xyzlin << endl;
+    ct++;
+  }
 }

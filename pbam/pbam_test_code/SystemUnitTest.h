@@ -181,7 +181,7 @@ TEST_F(MoleculeUTest, translate)
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
   Molecule molNew( "rot", charges, posCharges, vdW, 0, 0, 0.24);
-  molNew.translate( Pt( 3.0, -4.5, 10.21));
+  molNew.translate( Pt( 3.0, -4.5, 10.21), 1e48);
   
   EXPECT_NEAR( -6.5, molNew.get_center().x(), preclim);
   EXPECT_NEAR( 19.4, molNew.get_center().y(), preclim);

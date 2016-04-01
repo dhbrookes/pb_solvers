@@ -2,9 +2,32 @@
 //  BD.h
 //  pb_solvers_code
 //
-//  Created by David Brookes on 1/20/16.
-//  Copyright © 2016 David Brookes. All rights reserved.
-//
+/*
+Copyright (c) 2015, Teresa Head-Gordon, Lisa Felberg, Enghui Yap, David Brookes
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+* Neither the name of UC Berkeley nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 #ifndef BD_h
 #define BD_h
@@ -56,8 +79,9 @@ public:
         idx2 = _sys->get_mol_global_idx( mol2_, j);
 
         double mol_c2c = _sys->get_pbc_dist_vec(idx1, idx2).norm();
-    
-        if (mol_c2c <= dist_contact_) return true;
+        double a1 = _sys->get_ai(idx1);
+        double a2 = _sys->get_ai(idx2);
+        if (mol_c2c <= (dist_contact_+a1+a2)) return true;
       }
     }
     return false;
@@ -114,10 +138,11 @@ public:
   const bool is_terminated(shared_ptr<System> _sys) const
   {
     bool done = false;
-    int i;
+    int i, idx;
     for ( i = 0; i < _sys->get_typect(molIdx_); i++)
     {
-      Pt mol_coord = _sys->get_centeri(_sys->get_mol_global_idx( molIdx_, i));
+      idx = _sys->get_mol_global_idx( molIdx_, i);
+      Pt mol_coord = _sys->get_unwrapped_center(idx);
       double test_val;
       if (coordType_ == X)      test_val = mol_coord.x();
       else if (coordType_ == Y) test_val = mol_coord.y();
@@ -135,18 +160,17 @@ public:
 /*
  Combine termination conditions
  */
-
 enum HowTermCombine { ALL, ONE };
 
-class CombineTerminate : public BaseTerminate
+class CombineTerminate: public BaseTerminate
 {
 protected:
-  vector<BaseTerminate> terms_;
+  vector<shared_ptr<BaseTerminate> > terms_;
   HowTermCombine howCombine_;
   
 public:
-  CombineTerminate(vector<BaseTerminate> terms, HowTermCombine how_combine)
-  :BaseTerminate(), howCombine_(how_combine)
+  CombineTerminate(vector<shared_ptr<BaseTerminate> > terms, HowTermCombine how_combine)
+  :BaseTerminate(), terms_(terms), howCombine_(how_combine)
   {
   }
   
@@ -156,7 +180,7 @@ public:
     howCombine_== ALL ? done=true : done=false;
     for (int i = 0; i < terms_.size(); i++)
     {
-      if (terms_[i].is_terminated(_sys) == ! done)
+      if (terms_[i]->is_terminated(_sys) == ! done)
       {
         done=!done;
         break;
@@ -164,7 +188,6 @@ public:
     }
     return done;
   }
-  
 };
 
 /*
@@ -247,7 +270,7 @@ public:
         int num=0, bool diff = true, bool force = true, int maxiter=1000,
         double prec=1e-4);
   
-  void run();
+  void run(string xyzfile = "test.xyz");
 };
 
 

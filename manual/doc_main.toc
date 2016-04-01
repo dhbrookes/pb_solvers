@@ -19,6 +19,6 @@
 \contentsline {section}{\numberline {3.1}Installation}{6}{section.3.1}
 \contentsline {section}{\numberline {3.2}Input Information}{6}{section.3.2}
 \contentsline {subsubsection}{Input Files}{6}{subsubsection*.2}
-\contentsline {subsubsection}{System inputs}{8}{subsubsection*.3}
+\contentsline {subsubsection}{System inputs: PQR and XYZ Files}{9}{subsubsection*.3}
 \gdef \the@ipfilectr {}
 \contentsfinish 

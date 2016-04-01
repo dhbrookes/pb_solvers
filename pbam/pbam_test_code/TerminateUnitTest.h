@@ -212,14 +212,13 @@ TEST_F(TermUTest, zGETerm)
   EXPECT_EQ( term->is_terminated( sys), true);
 }
 
-
 // Checking z<= termination class with many molecule of one type
 TEST_F(TermUTest, zLETermManyType)
 {
   const int nmol = 3;
   vector<Molecule> mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
-  vector<int> typ = { 0, 0, 1};
+  vector<int> typ = { 0, 0, 1}; vector<int> typind = { 0, 1, 0};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
     int M = 1;
@@ -227,7 +226,7 @@ TEST_F(TermUTest, zLETermManyType)
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
     Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
-                    typ[molInd], molInd);
+                    typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
   
@@ -241,12 +240,12 @@ TEST_F(TermUTest, zLETermManyType)
   EXPECT_EQ( term->is_terminated( sys), true);
 }
 
-// Checking z>= termination class
+// Checking z>= termination class for many instances of one type
 TEST_F(TermUTest, xGETermManyType)
 {
   const int nmol = 3;
   vector<Molecule> mol;
-  vector<int> typ = { 1, 0, 1};
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
@@ -255,7 +254,7 @@ TEST_F(TermUTest, xGETermManyType)
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
     Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
-                    0, molInd);
+                    typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
   
@@ -264,13 +263,480 @@ TEST_F(TermUTest, xGETermManyType)
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(-5, 10.4, 20));
-
+  
   EXPECT_EQ( term->is_terminated( sys), false);
-  sys->translate_mol(2, Pt(-5, 0.5, 9.7));
+  sys->translate_mol(1, Pt(35, 0.5, 9.7));
   EXPECT_EQ( term->is_terminated( sys), false);
+  
+  sys->translate_mol(2, Pt(35, 0.5, 9.7));
+  EXPECT_EQ( term->is_terminated( sys), true);
+}
 
+// Checking x<= class for many instances of one type with PBCs
+TEST_F(TermUTest, xLETermManyTypePBC)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol, 20, 40 );
+  auto term = make_shared<CoordTerminate>(0, X, LEQ, -29.4);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-4.5, 9.5, 0));
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(1, Pt(-10, -10.5, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(-38, -44, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), true);
+}
+
+// Checking y>= class for many instances of one type with PBCs
+TEST_F(TermUTest, yGETermManyTypePBC)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol, 20, 40 );
+  auto term = make_shared<CoordTerminate>(1, Y, GEQ, 39.4);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-4.5, 9.5, 0));
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(1, Pt(-21, -10.5, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  
+  sys->translate_mol(0, Pt(28, 24, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(0, Pt(18, 44, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), true);
+}
+
+
+// Checking r termination class
+TEST_F(TermUTest, rTermType)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    molInd, 0);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol );
+  auto term = make_shared<CoordTerminate>(1, R, GEQ, 29.4);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-5, 10.4, 20));
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(0, Pt(35, 0.5, 9.7));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  
   sys->translate_mol(1, Pt(35, 0.5, 9.7));
   EXPECT_EQ( term->is_terminated( sys), true);
 }
+
+// Checking r termination class for many instances of one type
+TEST_F(TermUTest, rTermManyType)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol );
+  auto term = make_shared<CoordTerminate>(1, R, GEQ, 29.4);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-5, 1.4, 5));
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(1, Pt(35, 0.5, 9.7));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  
+  sys->translate_mol(2, Pt(35, 0.5, 9.7));
+  EXPECT_EQ( term->is_terminated( sys), true);
+}
+
+// Checking r class for many instances of one type with PBCs
+TEST_F(TermUTest, rTermManyTypePBC)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol, 20, 40 );
+  auto term = make_shared<CoordTerminate>(1, R, GEQ, 29.4);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-4.5, 9.5, 0));
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(1, Pt(10, -10.5, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(38, -44, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  
+  sys->translate_mol(2, Pt(-4.5, 9.5, 0));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-14.5, 9.5, 0));
+  EXPECT_EQ( term->is_terminated( sys), true);
+}
+
+
+// Checking contact termination class
+TEST_F(TermUTest, contTermType)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    molInd, 0);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol );
+  vector<int> cont_pair = { 1, 2};
+  auto term = make_shared<ContactTerminate>(cont_pair, 1.0);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(0, Pt(-5, 10.4, 20));
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-5, 0.0, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(0, -2.5, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), true);
+}
+
+// Checking contact class for many instances of one type
+TEST_F(TermUTest, contTermManyType)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol );
+  vector<int> cont_pair = { 0, 1};
+  auto term = make_shared<ContactTerminate>(cont_pair, 1.0);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-2.5, 0, 0));
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(1, Pt(0, -0.5, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(0, -1.5, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), true);
+}
+
+// Checking contact class for many instances of one type with PBCs
+TEST_F(TermUTest, contTermManyTypePBC)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol, 20, 40 );
+  vector<int> cont_pair = { 0, 1};
+  auto term = make_shared<ContactTerminate>(cont_pair, 1.0);
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-24.5, 19.5, 0));
+  
+  EXPECT_EQ( term->is_terminated( sys), false);
+  sys->translate_mol(1, Pt(10, -10.5, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(8, -14, 0.0));
+  EXPECT_EQ( term->is_terminated( sys), true);
+
+}
+
+
+// Checking contact + time class combined with OR
+TEST_F(TermUTest, combineTermORPBC)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol, 20, 40 );
+  vector<int> cont_pair = { 0, 1};
+  vector<shared_ptr<BaseTerminate > > all_term;
+  all_term.push_back(make_shared<ContactTerminate>(cont_pair, 1.0));
+  all_term.push_back(make_shared<TimeTerminate>(100.0));
+  
+  CombineTerminate combine(all_term, ONE);
+  
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-24.5, 19.5, 0));
+  
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  sys->translate_mol(1, Pt(10, -10.5, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(8, -14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), true);
+  
+  sys->translate_mol(1, Pt(8, -14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->set_time( 40);
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->set_time( 102.1);
+  EXPECT_EQ( combine.is_terminated( sys), true);
+}
+
+
+// Checking contact + time class combined with AND
+TEST_F(TermUTest, combineTermANDPBC)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol, 20, 40 );
+  vector<int> cont_pair = { 0, 1};
+  vector<shared_ptr<BaseTerminate > > all_term;
+  all_term.push_back(make_shared<ContactTerminate>(cont_pair, 1.0));
+  all_term.push_back(make_shared<TimeTerminate>(100.0));
+  
+  CombineTerminate combine(all_term, ALL);
+  
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  sys->translate_mol(2, Pt(-24.5, 19.5, 0));
+  
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  sys->translate_mol(1, Pt(10, -10.5, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(8, -14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(8, -14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->set_time( 40);
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->set_time( 102.1);
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(-8, 14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), true);
+}
+
+// Checking x<= + contact + time class combined with AND
+TEST_F(TermUTest, combineTerm3ORPBC)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol, 20, 40 );
+  vector<int> cont_pair = { 0, 1};
+  vector<shared_ptr<BaseTerminate > > all_term;
+  all_term.push_back(make_shared<ContactTerminate>(cont_pair, 1.0));
+  all_term.push_back(make_shared<CoordTerminate>(1, X, LEQ, -20.4));
+  all_term.push_back(make_shared<TimeTerminate>(100.0));
+  
+  CombineTerminate combine(all_term, ONE);
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(0, Pt(-24.5, 19.5, 0));
+  EXPECT_EQ( combine.is_terminated( sys), true);
+  
+  sys->translate_mol(0, Pt( 24.5, 19.5, 0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(10, -10.5, 0.0));
+  sys->translate_mol(2, Pt(-25, 19.5, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(8, -14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), true);
+  
+  sys->translate_mol(1, Pt(8, -14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->set_time( 102.1);
+  EXPECT_EQ( combine.is_terminated( sys), true);
+  
+  sys->set_time( 40);
+  EXPECT_EQ( combine.is_terminated( sys), false);
+}
+
+// Checking x<= + contact + time class combined with AND
+TEST_F(TermUTest, combineTerm3ANDPBC)
+{
+  const int nmol = 3;
+  vector<Molecule> mol;
+  vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
+  Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
+  for (int molInd = 0; molInd < nmol; molInd ++ )
+  {
+    int M = 1;
+    vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
+    charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
+    
+    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                    typ[molInd], typind[molInd]);
+    mol.push_back( molNew );
+  }
+  
+  auto sys = make_shared<System> ( mol, 20, 40 );
+  vector<int> cont_pair = { 0, 1};
+  vector<shared_ptr<BaseTerminate > > all_term;
+  all_term.push_back(make_shared<ContactTerminate>(cont_pair, 1.0));
+  all_term.push_back(make_shared<CoordTerminate>(1, X, LEQ, -20.4));
+  all_term.push_back(make_shared<TimeTerminate>(100.0));
+  
+  CombineTerminate combine(all_term, ALL);
+  
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  sys->translate_mol(0, Pt(-24.5, 19.5, 0));
+  EXPECT_EQ( all_term[1]->is_terminated( sys), true);
+  
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  sys->translate_mol(1, Pt(10, -10.5, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(8, -14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(8, -14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->set_time( 40);
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->translate_mol(1, Pt(-8, 14, 0.0));
+  EXPECT_EQ( combine.is_terminated( sys), false);
+  
+  sys->set_time( 102.1);
+  EXPECT_EQ( combine.is_terminated( sys), true);
+}
+
 
 #endif /* TerminateUnitTest_h */

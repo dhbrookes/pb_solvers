@@ -509,8 +509,6 @@ TEST_F(BDUTest, TorqueOpp)
     FoTest.calc_force(); TorTest.calc_tau();
     
     BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
-//    cout <<setprecision(9)<< BDTest.get_system()->get_posij(2, 2).z() << ",";
-//    cout <<BDTest.get_system()->get_posij(0, 2).y() << ", " <<BDTest.get_system()->get_posij(0, 2).z() << " " << endl;
 
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).x(), 0, preclim);
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
