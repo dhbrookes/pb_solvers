@@ -30,11 +30,11 @@ TEST_F(MoleculeUTest, checkUserSpecRadCent)
   charges[1]=2.0; vdW[1]=0; posCharges[1] = pos + Pt(1.0, 0.0, 0.0);
   charges[2]=2.0; vdW[2]=0; posCharges[2] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos);
+  Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos, 0, 0);
   
   ASSERT_EQ(      3, molNew.get_m());
   ASSERT_EQ(    2.0, molNew.get_a());
-  ASSERT_EQ( "stat", molNew.get_type());
+  ASSERT_EQ( "stat", molNew.get_move_type());
   ASSERT_EQ(    0.0, molNew.get_drot());
   ASSERT_EQ(    0.0, molNew.get_dtrans());
   
@@ -69,11 +69,11 @@ TEST_F(MoleculeUTest, checkUserSpecRad)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "move", 13.7, charges, posCharges, vdW, 0.04, 0.34);
+  Molecule molNew( "move", 13.7, charges, posCharges, vdW,  0, 0, 0.04, 0.34);
   
   ASSERT_EQ(      2, molNew.get_m());
   ASSERT_EQ(   13.7, molNew.get_a());
-  ASSERT_EQ( "move", molNew.get_type());
+  ASSERT_EQ( "move", molNew.get_move_type());
   ASSERT_EQ(   0.04, molNew.get_drot());
   ASSERT_EQ(   0.34, molNew.get_dtrans());
   
@@ -106,10 +106,10 @@ TEST_F(MoleculeUTest, checkUserSpecCent)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0.24);
+  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
   
   ASSERT_EQ(    2, molNew.get_m());
-  ASSERT_EQ("rot", molNew.get_type());
+  ASSERT_EQ("rot", molNew.get_move_type());
   ASSERT_EQ( 0.24, molNew.get_drot());
   ASSERT_EQ( 0.00, molNew.get_dtrans());
   EXPECT_NEAR( 7.32, molNew.get_a(), preclim);
@@ -143,10 +143,10 @@ TEST_F(MoleculeUTest, checkCreateCen)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, 0.24);
+  Molecule molNew( "rot", charges, posCharges, vdW, 0, 0, 0.24);
   
   ASSERT_EQ(    2, molNew.get_m());
-  ASSERT_EQ("rot", molNew.get_type());
+  ASSERT_EQ("rot", molNew.get_move_type());
   ASSERT_EQ( 0.24, molNew.get_drot());
   ASSERT_EQ( 0.00, molNew.get_dtrans());
   EXPECT_NEAR( 7.0271067811865, molNew.get_a(), preclim);
@@ -180,7 +180,7 @@ TEST_F(MoleculeUTest, translate)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, 0.24);
+  Molecule molNew( "rot", charges, posCharges, vdW, 0, 0, 0.24);
   molNew.translate( Pt( 3.0, -4.5, 10.21));
   
   EXPECT_NEAR( -6.5, molNew.get_center().x(), preclim);
@@ -212,7 +212,7 @@ TEST_F(MoleculeUTest, rotateSimple)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0.24);
+  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
   molNew.rotate( Quat( M_PI/2, Pt(0.0, 0.0, 1.0)));
   
   ASSERT_EQ( 0.0, molNew.get_center().x());
@@ -246,7 +246,7 @@ TEST_F(MoleculeUTest, rotate2)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0.24);
+  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
   molNew.rotate( Quat( 1.0, Pt(1.0, 1.0, 1.0)));
   
   ASSERT_EQ(-10.0, molNew.get_center().x());
@@ -295,7 +295,8 @@ TEST_F(SystemUTest, checkOverlap)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd]);
+    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+                    molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -324,7 +325,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
     chg[1]=2.0; vdW[1]=0.1; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0.1; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", chg, poschg, vdW, pos[molInd]);
+    Molecule molNew( "stat", chg, poschg, vdW, pos[molInd], molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -355,7 +356,8 @@ TEST_F(SystemUTest, checkVals)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd]);
+    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+                    molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -411,7 +413,8 @@ TEST_F(SystemUTest, changeCutoff)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd]);
+    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+                    molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -435,7 +438,8 @@ TEST_F(SystemUTest, PBCcheck)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "rot", rad[molInd], chg, poschg, vdW, pos[molInd]);
+    Molecule molNew( "rot", rad[molInd], chg, poschg, vdW, pos[molInd],
+                    molInd, 0);
     mol_.push_back( molNew );
   }
 

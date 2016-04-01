@@ -31,6 +31,7 @@ string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pbam/pbam_test_files/gte
 #include "utilUnitTest.h"
 
 #include "BDUnitTest.h"
+#include "TerminateUnitTest.h"
 
 #include "tester.h"
 

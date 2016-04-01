@@ -29,26 +29,38 @@ public:
 };
 
 /*
- Class for contact based termination
+ Class for contact based termination. This terminates based on whether
+ the specified molecule molecule pair is within a given cutoff of each other
  */
 class ContactTerminate : public BaseTerminate
 {
 protected:
-  double dist_; //termination time
+  double dist_contact_; //termination time
   int mol1_;
   int mol2_;
   
 public:
   ContactTerminate(vector<int> mol, double distance)
-  :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), dist_(distance)
+  :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), dist_contact_(distance)
   {
   }
   
   const bool is_terminated(shared_ptr<System> _sys) const
   {
-    bool done = false;
-    if (_sys->get_pbc_dist_vec(mol1_, mol2_).norm() <= dist_) done = true;
-    return done;
+    int i, j, idx1, idx2;
+    for ( i = 0; i < _sys->get_typect(mol1_); i++)
+    {
+      for ( j = 0; j < _sys->get_typect(mol2_); j++)
+      {
+        idx1 = _sys->get_mol_global_idx( mol1_, i);
+        idx2 = _sys->get_mol_global_idx( mol2_, j);
+
+        double mol_c2c = _sys->get_pbc_dist_vec(idx1, idx2).norm();
+    
+        if (mol_c2c <= dist_contact_) return true;
+      }
+    }
+    return false;
   }
 };
 
@@ -101,48 +113,26 @@ public:
   
   const bool is_terminated(shared_ptr<System> _sys) const
   {
-    bool done;
-    Pt mol_coord = _sys->get_centeri(molIdx_);
-    double test_val;
-    if (coordType_ == X)      test_val = mol_coord.x();
-    else if (coordType_ == Y) test_val = mol_coord.y();
-    else if (coordType_ == Z) test_val = mol_coord.z();
-    else                      test_val = mol_coord.norm();
-    
-    if (boundType_ == LEQ)
-      test_val < boundaryVal_ ? done = true: done = false;
-    else if (boundType_ == GEQ)
-      test_val > boundaryVal_ ? done = true: done = false;
+    bool done = false;
+    int i;
+    for ( i = 0; i < _sys->get_typect(molIdx_); i++)
+    {
+      Pt mol_coord = _sys->get_centeri(_sys->get_mol_global_idx( molIdx_, i));
+      double test_val;
+      if (coordType_ == X)      test_val = mol_coord.x();
+      else if (coordType_ == Y) test_val = mol_coord.y();
+      else if (coordType_ == Z) test_val = mol_coord.z();
+      else                      test_val = mol_coord.norm();
+      
+      if (boundType_ == LEQ)
+        test_val <= boundaryVal_ ? done = true: done = false;
+      else if (boundType_ == GEQ)
+        test_val >= boundaryVal_ ? done = true: done = false;
+    }
     return done;
   }
 };
 
-/*
- Class for contact based termination. This terminates based on whether
- the specified molecule molecule pair is within a given cutoff of each other
- */
-class ContTerminate : public BaseTerminate
-{
-protected:
-  double boundaryVal_;
-  int mol1_;
-  int mol2_;
-  double dist_contact_;
-  
-public:
-  ContTerminate(int mol_1, int mol_2, double dist)
-  :BaseTerminate(), mol1_(mol_1), mol2_(mol_2), dist_contact_(dist)
-  {
-  }
-  
-  const bool is_terminated(shared_ptr<System> _sys) const
-  {
-    double mol_c2c = _sys->get_pbc_dist_vec(mol1_, mol2_).norm();
-    
-    if (mol_c2c <= dist_contact_) return true;
-    else return false;
-  }
-};
 
 /*
  Combine termination conditions

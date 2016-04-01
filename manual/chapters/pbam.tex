@@ -23,7 +23,7 @@ A(i) represents the effective multipole expansion of the charge distributions of
 
 From the above formulation, computation of the interaction energies ($\Omega^{(i)}$) is given as follows:
 
-\[\Omega^{(i)}=\frac{1}{\epsilon_s}  \langle  T \cdot A^{(i) } ,  A^{(i) } \rangle \]
+\[\Omega^{(i)}=\frac{1}{\epsilon_s} \left \langle \sum_{j \ne i}^N  T \cdot A^{(j) } ,  A^{(i) } \right \rangle \]
 
 Where $\langle  M, N \rangle$ denotes the inner product. When energy is computed, forces follow as:
 
@@ -46,6 +46,10 @@ where $D_{i, trans}$ and $D_{i, rot}$ are the translation and rotational diffusi
 \[\langle \boldsymbol{\Theta}_i \rangle=0, \qquad \langle \boldsymbol{\Theta}_i^2 \rangle=2D_{i, rot}\Delta t\]
 
 \subsection{Electrostatics}
+
+In a similar manner to the interaction energy calculations in the Physical Calculations section, the electrostatics computes the potential at any point in space exterior to the molecules as the interaction energy 
+
+\[\Phi_{out}(r)= \frac{1}{\epsilon_s} \left \langle \sum_{j = 1}^N  T \cdot A^{(j) } ,  A(r)  \right \rangle \]
 
 \clearpage
 
