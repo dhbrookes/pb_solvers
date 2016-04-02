@@ -49,6 +49,11 @@ public:
   {
     return false;
   }
+  
+  virtual string get_how_term(shared_ptr<System> _sys)
+  {
+    return "";
+  }
 };
 
 /*
@@ -61,11 +66,16 @@ protected:
   double dist_contact_; //termination time
   int mol1_;
   int mol2_;
+  string how_term_;
   
 public:
   ContactTerminate(vector<int> mol, double distance)
   :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), dist_contact_(distance)
   {
+    char buff[400];
+    sprintf(buff, "System has fulfilled condition: Type %d and Type %d are \
+            within %5.2f;\t", mol1_, mol2_, dist_contact_);
+    how_term_ = buff;
   }
   
   const bool is_terminated(shared_ptr<System> _sys) const
@@ -86,6 +96,8 @@ public:
     }
     return false;
   }
+  
+  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
 };
 
 
@@ -96,11 +108,15 @@ class TimeTerminate : public BaseTerminate
 {
 protected:
   double endTime_; //termination time
+  string how_term_;
   
 public:
   TimeTerminate(double end_time)
   :BaseTerminate(), endTime_(end_time)
   {
+    char buff[400];
+    sprintf(buff, "System has fulfilled condition: time >= %7.1f;\t", endTime_);
+    how_term_ = buff;
   }
   
   const bool is_terminated(shared_ptr<System> _sys) const
@@ -109,6 +125,8 @@ public:
     if (_sys->get_time() >= endTime_) done = true;
     return done;
   }
+  
+  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
 };
 
 enum CoordType { X, Y, Z, R };
@@ -126,6 +144,7 @@ protected:
   int molIdx_;
   CoordType coordType_;
   BoundaryType boundType_;
+  string how_term_;
   
 public:
   CoordTerminate(int mol_idx, CoordType coord_type,
@@ -133,6 +152,17 @@ public:
   :BaseTerminate(), molIdx_(mol_idx), coordType_(coord_type),
   boundType_(bound_type), boundaryVal_(bound_val)
   {
+    char buff[400];
+    string cord = "r", eq = ">=";
+    if (coordType_ == X)      cord = "x";
+    else if (coordType_ == Y) cord = "y";
+    else if (coordType_ == Z) cord = "z";
+    
+    if (boundType_ == LEQ)    eq   = "<=";
+    
+    sprintf(buff, "Molecule type %d has fulfilled condition: %s %s %5.2f;\t",
+            molIdx_, cord.c_str(), eq.c_str(), boundaryVal_);
+    how_term_ = buff;
   }
   
   const bool is_terminated(shared_ptr<System> _sys) const
@@ -154,6 +184,8 @@ public:
     }
     return done;
   }
+  
+  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
 };
 
 
@@ -187,6 +219,21 @@ public:
       }
     }
     return done;
+  }
+  
+  string get_how_term(shared_ptr<System> _sys)
+  {
+    string how_term = "";
+    bool done;
+    howCombine_== ALL ? done=true : done=false;
+    for (int i = 0; i < terms_.size(); i++)
+    {
+      if (terms_[i]->is_terminated(_sys) == true)
+      {
+        how_term += terms_[i]->get_how_term(_sys);
+      }
+    }
+    return how_term;
   }
 };
 
@@ -260,6 +307,9 @@ protected:
   shared_ptr<ASolver> _asolver_;
   shared_ptr<BasePhysCalc> _physCalc_;
   shared_ptr<BaseTerminate> _terminator_;
+  
+  string outfname_; //outputfile
+  
   int maxIter_;
   double prec_;
   
@@ -267,10 +317,10 @@ public:
   // num is the number of bodies to perform calculations on (2, 3 or all).
   // If num=0, then the equations will be solved exactly
   BDRun(shared_ptr<ASolver> _asolv, shared_ptr<BaseTerminate> _terminator,
-        int num=0, bool diff = true, bool force = true, int maxiter=1000,
-        double prec=1e-4);
+        string outfname, int num=0, bool diff = true, bool force = true,
+        int maxiter=1000, double prec=1e-4);
   
-  void run(string xyzfile = "test.xyz");
+  void run(string xyzfile = "test.xyz", string statfile = "stats.dat");
 };
 
 

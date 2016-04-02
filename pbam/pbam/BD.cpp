@@ -170,24 +170,25 @@ void BDStep::bd_update(shared_ptr<vector<Pt> > _F,
 
 
 BDRun::BDRun(shared_ptr<ASolver> _asolv,
-             shared_ptr<BaseTerminate> _terminator, int num,
+             shared_ptr<BaseTerminate> _terminator, string outfname, int num,
              bool diff, bool force, int maxiter, double prec)
 :maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
 {
-  if (num == 0) _physCalc_ = make_shared<PhysCalc>(_asolv);
-  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolv, num);
+  if (num == 0) _physCalc_ = make_shared<PhysCalc>(_asolv, outfname);
+  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolv, num, outfname);
   
   _stepper_ = make_shared<BDStep> (_asolver_->get_sys(),
                                    _asolver_->get_consts(), diff, force);
 }
 
-void BDRun::run(string xyzfile)
+void BDRun::run(string xyzfile, string statfile)
 {
   int i = 0;
   int WRITEFREQ = 10;
   bool term = false;
-  ofstream xyz_out;
+  ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
+  stats.open(statfile);
   
   while (i < maxIter_ and !term)
   {
@@ -200,14 +201,20 @@ void BDRun::run(string xyzfile)
     
     _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
 
-    if ((i % WRITEFREQ) == 0 ) _stepper_->get_system()->write_to_xyz(xyz_out);
+    if ((i % WRITEFREQ) == 0 )
+    {
+      _stepper_->get_system()->write_to_xyz(xyz_out);
+      _physCalc_->print_all();
+    }
     
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {
       term = true;
+      stats << _terminator_->get_how_term(_stepper_->get_system());
     }
     i++;
   }
   
   xyz_out.close();
+  stats.close();
 }

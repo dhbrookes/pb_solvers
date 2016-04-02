@@ -107,6 +107,8 @@ Each keyword is described in the table below, along with its associated paramete
 \T attypes & \param{numtypes} & \parbox[t]{\colthree}{Set the number of different atom types to \param{numtypes}.}\\
 \T pqr & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this xyz file. Provide input PQR file at \param{fpath}.} \\
 \T xyz & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this xyz file. Provide input XYZ file at \param{fpath}.} \\
+\T randorient &  & \parbox[t]{\colthree}{If you want your molecules to be randomly rotated, use this flag} \\
+\T units & \param{units} & \parbox[t]{\colthree}{Set the units of output to \param{units}. The current options are: \texttt{jmol} (Joules/mole), \texttt{kT} and \texttt{kcalmol} (kCal/mole).}\\
 \T salt & \param{con} & \parbox[t]{\colthree}{Set salt concentration in the system to \param{con}.}\\
 \T temp & \param{T} & \parbox[t]{\colthree}{Set system temperature to \param{T}}\\
 \T idiel & \param{ival} & \parbox[t]{\colthree}{Set the interior dielectric constant to \param{ival}.} \\
@@ -167,10 +169,7 @@ It may also be formatted manually. The general format of a PQR file is as follow
     \hline
   \end{tabular}
 
-\medskip
-\medskip
-\medskip
-\medskip
+\medskip\medskip\medskip \medskip
 
 The \textbf{XYZ} file simply specifies the desired molecule centers for a given molecule type. \\
 
@@ -182,10 +181,72 @@ The \textbf{XYZ} file simply specifies the desired molecule centers for a given 
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Example files and outputs}
 
 \section{Physical calculations}
 
+\textbf{Example physical calculations runfile} \\
+
+name:  \texttt{run.energyforce.inp}:
+\begin{lstlisting}[style = MyBash]
+runtype energyforce
+runname energyforce.2sp.jmol.out
+
+units jmol
+salt 0.01
+temp 353
+idiel 4 
+sdiel 78
+
+attypes 1
+type 1 2
+pqr 1 single_charge.pqr
+xyz 1 positions_2.xyz
+\end{lstlisting}
+\medskip
+
+The files for PQR and XYZ are: 
+
+name:  \texttt{single\_charge.pqr}:
+\begin{lstlisting}[style = MyBash]
+ATOM      1  N   NTR     0       1.000   0.000   0.000 -1.0000 3.7300
+ATOM      1  N   NTR     0       0.000   1.000   0.000 -1.0000 6.3200
+\end{lstlisting}
+
+\medskip
+
+name:  \texttt{positions\_2.xyz}:
+\begin{lstlisting}[style = MyBash]
+-10.0  23.4  -8.7
+  0.0   0.0  -2.5
+\end{lstlisting}
+\medskip
+
+To run: 
+\begin{lstlisting}[style = MyBash]
+$$ ../../bin/pbam run.energyforce.inp
+\end{lstlisting}
+\medskip
+
+And the resulting file: 
+
+name: \texttt{energyforce.2sp.jmol.out}:
+\begin{lstlisting}[style = MyBash]
+My units are Joules/Mol
+MOLECULE #1
+        POSITION: [-10, 23.4, -8.7]
+        ENERGY: 1328.86
+        FORCE: 1.19858e+08, [-36.6012 1.19858e+08 -1.65408e-05]
+        TORQUE: 1.78426e+06, [1.28425 1.78426e+06 1.9978e-06]
+MOLECULE #2
+        POSITION: [0, 0, -2.5]
+        ENERGY: 1328.86
+        FORCE: 1.19858e+08, [36.6012 -1.19858e+08 1.65408e-05]
+        TORQUE: 1.78354e+06, [1.28372 1.78354e+06 1.99699e-06]
+\end{lstlisting}
 
 
 \section{Brownian Dynamics}
@@ -195,10 +256,131 @@ The \textbf{XYZ} file simply specifies the desired molecule centers for a given 
 
 \section{Electrostatics}
 
+\textbf{Example electrostatics runfile} \\
+
+name:  \texttt{run.electrostatic.inp}:
+\begin{lstlisting}[style = MyBash]
+runtype electrostatics 140
+runname electrostatic
+
+units kT
+salt 0.01
+temp 298
+idiel 4 
+sdiel 78
+
+dx out.dx
+
+gridct 2
+grid2D 1 out.x.0.dat x 0
+grid2D 2 out.x.-1.dat x -1
+
+attypes 2
+type 1 2
+pqr 1 single_charge.pqr
+xyz 1 positions_2.xyz
+
+type 2 2
+pqr 2 pos_charge.pqr
+xyz 2 positions_pos.xyz
+\end{lstlisting}
+\medskip
+
+The files for PQR and XYZ files are: 
+
+name:  \texttt{single\_charge.pqr}:
+\begin{lstlisting}[style = MyBash]
+ATOM      1  N   NTR     0       0.000   1.000   0.000  4.0000 0.3200
+ATOM      1  N   NTR     0       0.000   0.000  -1.000  4.0000 0.3200
+ATOM      1  X   CEN     0       0.000   0.000   0.000  0.0000 2.0000
+\end{lstlisting}
+
+\medskip
+
+name:  \texttt{positions\_2.xyz}:
+\begin{lstlisting}[style = MyBash]
+  0.0   0.0  -5.0
+  0.0   0.0   5.0
+\end{lstlisting}
+\medskip
+
+name:  \texttt{pos\_charge.pqr}:
+\begin{lstlisting}[style = MyBash]
+ATOM      1  N   NTR     0       0.000   1.000   0.000 -4.0000 0.3200
+ATOM      1  N   NTR     0       0.000   0.000  -1.000 -4.0000 0.3200
+ATOM      1  X   CEN     0       0.000   0.000   0.000  0.0000 2.0000
+\end{lstlisting}
+
+\medskip
+
+name:  \texttt{positions\_pos.xyz}:
+\begin{lstlisting}[style = MyBash]
+  0.0   5.0   0.0
+  0.0  -5.0   0.0
+\end{lstlisting}
+\medskip
+
+To run: 
+\begin{lstlisting}[style = MyBash]
+$$ ../../bin/pbam run.electrostatic.inp
+\end{lstlisting}
+\medskip
+
+And the resulting files: 
+
+name: \texttt{out.dx}:
+\begin{lstlisting}[style = MyBash]
+# Data from PBAM Electrostat run
+# My runname is out.dx and units kT
+object 1 class gridpositions counts 140 140 140
+origin -4 -9 -9
+delta 0.0571429 0.0e+00 0.0e+00
+delta 0.0e00 0.128571 0.0e+00
+delta 0.0e00 0.0e+00 0.128571
+object 2 class gridconnections counts 140 140 140
+object 3 class array type double rank 0 items 2744000 data follows
+2.7203115e-01  3.0271755e-01  3.3459723e-01  
+3.6769040e-01  4.0201595e-01  4.3759129e-01 
+.....
+-1.3185519e-01  -1.5849252e-01  -1.8359631e-01
+-2.0722087e-01  -2.2942006e-01  -2.5024714e-01
+-2.6975467e-01  -2.8799442e-01
+attribute "dep" string "positions"
+object "regular positions regular connections" class field
+component "positions" value 1
+component "connections" value 2
+component "data" value 3
+\end{lstlisting}
+\medskip
+
+name: \texttt{out.x.0.dat}:
+\begin{lstlisting}[style = MyBash]
+# Data from PBAM Electrostat run
+# My runname is out.x.0.dat
+units kT
+grid 140 140 
+axis x 0 
+origin -9 -9
+delta 0.128571 0.128571
+maxmin 39.23 -39.23
+   0.3605004     0.4030045     0.4474874     0.4940082     0.5426260     0.5933995
+\end{lstlisting}
 
 
+\chapter{Common Errors}
 
+\section{Segmentation Fault while reading input file}
+Our file reader is not very robust.
+Make sure there is only a single space between keywords and options.
+Make sure that all options are specified for a given keyword.
 
+\section{Initial configuration errors}
+Many issues may arise if your molecules are overlapping, which is not allowed in the PB solvers' models.
+The center of the molecule will be placed at the positions given by each XYZ file.
+Check the printed out PQR file for the initial configuration, which you can load into VMD.
+Try changing the xyz file(s).
+This error may also appear if the box length specified with the pbc keyword is too small.
+Try increasing the box length.
 
 
 

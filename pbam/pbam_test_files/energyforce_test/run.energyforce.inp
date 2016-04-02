@@ -1,15 +1,13 @@
-runname energyforce2
 runtype energyforce
+runname energyforce.2sp.jmol.out
 
+units jmol
 salt 0.01
 temp 353
 idiel 4 
 sdiel 78
 
 attypes 1
-
-units jmol
-
 type 1 2
 pqr 1 single_charge.pqr
 xyz 1 positions_2.xyz

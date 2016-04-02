@@ -587,7 +587,7 @@ TEST_F(BDUTest, BDrunTimeTermY)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
 
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
-  BDRun BDTest( ASolvTest, term, 0, false, true, 1e7, 1e-20);
+  BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
   BDTest.run();
   
   EXPECT_NEAR(sys->get_time()/10, 1, preclim);
@@ -624,7 +624,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
   
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
-  BDRun BDTest( ASolvTest, term, 0, false, true, 1e7, 1e-20);
+  BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
   BDTest.run();
   
   EXPECT_NEAR(sys->get_time()/31.361344, 1, preclim);
@@ -662,7 +662,7 @@ TEST_F(BDUTest, BDrunTimeTermRot)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
   
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
-  BDRun BDTest( ASolvTest, term, 0, false, true, 1e7, 1e-30);
+  BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-30);
   BDTest.run();
   
   for (int mi = 0; mi < ml; mi ++ )

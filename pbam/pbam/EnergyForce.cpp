@@ -347,7 +347,7 @@ void ThreeBody::solveNmer( int num, double preclim )
     _asolvTemp->solve_A(preclim);
     _asolvTemp->solve_gradA(preclim);
     
-    PhysCalc phys_all( _asolvTemp, unit_);
+    PhysCalc phys_all( _asolvTemp, outfname_, unit_);
     phys_all.calc_all();
     
     for ( j = 0; j < num; j++)
@@ -432,14 +432,26 @@ void ThreeBody::calcTBDEnForTor( )
 void ThreeBody::printTBDEnForTor( vector<string> outfile )
 {
   int j;
+  streambuf * buf;
+  ofstream of;
+  
+  if(outfname_ != "")
+  {
+    of.open(outfname_);
+    buf = of.rdbuf();
+  } else {
+    buf = cout.rdbuf();
+  }
+  
+  ostream out(buf);
   for ( j = 0; j < N_; j++)
   {
-    cout << "This is mol " << j << endl;
-    cout << " Energy: " << get_energyi_approx(j) << "\t";
-    cout << " Force: " << get_forcei_approx(j).norm() << "\t [";
-    cout << get_forcei_approx(j).x();
-    cout << ", " << get_forcei_approx(j).y()<< ", ";
-    cout << get_forcei_approx(j).z()<< "]"<< endl;
+    out << "This is mol " << j << endl;
+    out << " Energy: " << get_energyi_approx(j) << "\t";
+    out << " Force: " << get_forcei_approx(j).norm() << "\t [";
+    out << get_forcei_approx(j).x();
+    out << ", " << get_forcei_approx(j).y()<< ", ";
+    out << get_forcei_approx(j).z()<< "]"<< endl;
   }
   
   if ( outfile[0] != "") printNmer( 2, outfile[0]);
@@ -535,8 +547,8 @@ void ThreeBody::calcTwoBDEnForTor( )
 }
 
 
-PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv, Units unit)
-: N_(_asolv->get_N()), BasePhysCalc()
+PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv, string outfname, Units unit)
+: N_(_asolv->get_N()), outfname_(outfname), BasePhysCalc()
 {
   _eCalc_ = make_shared<EnergyCalc>(_asolv);
   _fCalc_ = make_shared<ForceCalc>(_asolv);
@@ -574,17 +586,28 @@ void PhysCalc::print_all()
   int i, j;
   Pt force_i, torque_i;
   double force_norm, torque_norm;
+  streambuf * buf;
+  ofstream of;
   
-  cout << "My units are " << unit_ << endl;
+  if(outfname_ != "")
+  {
+    of.open(outfname_);
+    buf = of.rdbuf();
+  } else {
+    buf = cout.rdbuf();
+  }
+  
+  ostream out(buf);
+  out << "My units are " << unit_ << endl;
   
   for ( i = 0; i < N_; i++)
   {
     force_norm = 0;
     torque_norm = 0;
-    cout << "MOLECULE #" << i + 1 << endl;
-    cout << "\tPOSITION: [" << mol_pos_[i].x() << ", " << mol_pos_[i].y();
-    cout << ", " << mol_pos_[i].z() << "]" << endl;
-    cout << "\tENERGY: " << unit_conv_ * get_omega()->operator[](i) << endl;
+    out << "MOLECULE #" << i + 1 << endl;
+    out << "\tPOSITION: [" << mol_pos_[i].x() << ", " << mol_pos_[i].y();
+    out << ", " << mol_pos_[i].z() << "]" << endl;
+    out << "\tENERGY: " << unit_conv_ * get_omega()->operator[](i) << endl;
     force_i = get_forcei(i); torque_i = get_taui(i);
     for ( j = 0; j < 3; j++)
     {
@@ -610,18 +633,19 @@ void PhysCalc::print_all()
         torque_norm += torque_i.y() * torque_i.y();
       }
     }
-    cout << "\tFORCE: " << sqrt(force_norm) << " ";
-    cout << force_i.x() << " " << force_i.y() << " " << force_i.z() << endl;
-    cout << "\tTORQUE: " << sqrt(torque_norm) << " ";
-    cout << torque_i.x() << " " << torque_i.y() << " " << torque_i.z() << endl;
+    out << "\tFORCE: " << sqrt(force_norm) << ", [";
+    out << force_i.x() <<" " << force_i.y() << " " << force_i.z()<< "]"<<endl;
+    out << "\tTORQUE: " << sqrt(torque_norm) << ", [";
+    out << torque_i.x() << " " << torque_i.y()<<" "<<torque_i.z()<< "]"<<endl;
   }
   
 }
 
 
 ThreeBodyPhysCalc::ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num,
-                                     Units unit, double cutoff)
-:BasePhysCalc(), ThreeBody(_asolv, unit, cutoff), solved_(false), num_(num)
+                                     string outfname, Units unit, double cutoff)
+:BasePhysCalc(), ThreeBody(_asolv, unit, cutoff), solved_(false), num_(num),
+outfname_(outfname)
 {
 }
 

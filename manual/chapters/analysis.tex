@@ -1,0 +1,124 @@
+
+\chapter{Analysis Tools}
+
+\section{Viewing PQR in VMD}
+
+%Load \<yourfile\>\.all\.pqr
+Load pqr file
+\begin{lstlisting}[style = MyBash]
+>> set selall [atomselect top "all"]
+\end{lstlisting}
+
+To center the pqr
+\begin{lstlisting}[style = MyBash]
+>> $selall moveby {-x -y -z}
+\end{lstlisting}
+where x, y, and z are half the box length
+
+Graphical representations:
+To view the charges inside the CG center, from the toolbar, select Graphics \textgreater \,
+Representations. In the selected atoms, type
+\begin{lstlisting}[style = MyBash]
+not name X
+\end{lstlisting}
+
+Change the coloring method to Charge, and the Drawing Method to VDW. Then select the 
+Create Rep button, and in the selected atoms, type 
+\begin{lstlisting}[style = MyBash]
+not name X
+\end{lstlisting}
+
+ Change the Drawing Method to VDW and the Material to Transparent. 
+ The Graphical Representations and final images are in figure below.
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{minipage}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{vmd_graph_rep}
+    \caption{Graphics}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.65\textwidth}
+    \includegraphics[width=\textwidth]{vmd_4sp}
+    \caption{Final view}
+  \end{minipage}
+\end{figure}
+
+\section{Viewing Electrostatics in VMD}
+
+To load electrostatic results: File \textgreater \, New Molecule. In the window that appears, toggle the \textit{Load files for:} 
+to select the currently loaded PQR file. Then select \textit{Browse} to find the location of the dx file. Once found, hit 
+the \textit{Load} button and let the dx file load.
+
+ \clearpage
+
+%\section{Mean First Passage Time (MFPT)}
+%
+%collect FPT from complete.dat
+%\begin{lstlisting}[style = MyBash]
+%	>> cat <yourpath>/complete.dat | awk '{print $7}' >  fpt.txt
+%\end{lstlisting}
+%run lognorm.py 
+%\begin{lstlisting}[style = MyBash]
+%	>> python lognorm.py  <yourpath>/fpt.txt
+%\end{lstlisting}
+%The final line of the output gives average and standard deviation for first passage times
+%based on the lognormal probability distribution.
+%The other lines output shape parameters describing the skew and kurtosis of the PDF
+%It can also plot the histogram of FPT.
+%
+%
+%To Do : get diffusion constant from fpt.txt as well
+
+
+\section{ESP plots}
+run with pot option in BD input file
+with a file which contains a list of z positions at which to calculate ESP
+(only capable of xy cross section at the moment)
+copy .out and esp\_plot.py to Desktop
+Change filename within .py file, may need to adjust vmin and vmax in .py for color scale
+\begin{lstlisting}[style = MyBash]
+>> python esp_plot.py
+\end{lstlisting}
+
+creates .pdf
+
+To do: automatically read in trajectory and calculate ESP at those points
+	cross-section through xz and yz planes
+	ESP on the spheres' surfaces
+	
+	
+	
+%\section{Comparison of Displacement Due to Electrostatics versus Diffusion}	
+%
+%Because Brownian dynamics directly calculated displacements, 
+%it is easier to compare relative displacements rather than relative forces.
+%
+%Separate the displacements due to Electrostatics and Diffusion into their own files.
+%In the same directory as bdtest.out :
+%\begin{lstlisting}[style = MyBash]
+%	>> bash cfDisplacements.sh
+%\end{lstlisting}
+%Currently set to use only the final completed trajectory in bdtest.out
+%This creates two files : dispES.out and dispRand.out
+%In the same directory:
+%\begin{lstlisting}[style = MyBash]
+%	>> python avgDisp.py
+%\end{lstlisting}
+%This outputs the average displacement in Angstroms due to electrostatics and diffusion, in that order.
+%
+%
+%
+%\section{Length Scaling of FPT}
+%
+%How does the MFPT change with arbitrary choice of length scale?
+%
+%\begin{lstlisting}[style = MyBash]
+%	>> bash lengthScale.sh
+%\end{lstlisting}
+%
+%This script re-analyzes the trajectory for FPT with distances of 10, 20, ... \AA{}.
+
+
+
+

@@ -259,6 +259,8 @@ protected:
   shared_ptr<SHCalc>          _shCalc_;
   shared_ptr<Constants>       _consts_;
   
+  string outfname_;
+  
   shared_ptr<System> make_subsystem(vector<int> mol_idx);
   
   int find_di( int i, int j);
@@ -341,12 +343,14 @@ protected:
   shared_ptr<ForceCalc> _fCalc_;
   shared_ptr<TorqueCalc> _torCalc_;
   
+  string outfname_; // where you want the info printed to
+  
   void compute_units( shared_ptr<Constants> cst, Units unit);
   
 public:
   
   // constructor just requires an asolver
-  PhysCalc(shared_ptr<ASolver> _asolv, Units unit = INTERNAL);
+  PhysCalc(shared_ptr<ASolver> _asolv, string outfname, Units unit = INTERNAL);
   
   Pt calc_force_i(int i)  { return _fCalc_->calc_fi(i); }
   Pt calc_tau_i(int i)    { return _torCalc_->calc_tau_i(i); }
@@ -382,9 +386,10 @@ protected:
 //  shared_ptr<ThreeBody> _threeBody_;
   bool solved_;  // whether the three body problem has been solved
   int num_;  // number of bodies (2 or 3 right now)
+  string outfname_;
   
 public:
-  ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num=3,
+  ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num=3, string outfname = "",
                     Units unit = INTERNAL, double cutoff=1e48);
   
   void calc_force() { if (!solved_) solveNmer(num_); solved_ = true; }

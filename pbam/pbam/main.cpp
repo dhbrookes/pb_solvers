@@ -39,7 +39,7 @@ using namespace std;
 int main_dynamics( int poles, double tol, shared_ptr<Setup> setup,
                   shared_ptr<Constants> consts, shared_ptr<System> sys)
 {
-  int i;
+  int i, traj;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
@@ -48,7 +48,7 @@ int main_dynamics( int poles, double tol, shared_ptr<Setup> setup,
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                     consts, poles);
   
-  vector<BaseTerminate> terms(setup->get_numterms());
+  vector<shared_ptr<BaseTerminate > >  terms(setup->get_numterms());
   for (i = 0; i < setup->get_numterms(); i++)
   {
     string type = setup->get_termtype(i);
@@ -58,30 +58,44 @@ int main_dynamics( int poles, double tol, shared_ptr<Setup> setup,
     
     if ( type == "contact" )
     {
-      terms[i] = ContactTerminate( setup->get_termMolIDX(i), val);
+      terms[i] = make_shared<ContactTerminate>( setup->get_termMolIDX(i), val);
     } else if (type.substr(0,1) == "x")
     {
-      terms[i] = CoordTerminate( setup->get_termMolIDX(i)[0], X, btype, val);
+      terms[i] = make_shared<CoordTerminate>( setup->get_termMolIDX(i)[0],
+                                             X, btype, val);
     } else if (type.substr(0,1) == "y")
     {
-      terms[i] = CoordTerminate( setup->get_termMolIDX(i)[0], Y, btype, val);
+      terms[i] = make_shared<CoordTerminate>( setup->get_termMolIDX(i)[0],
+                                             Y, btype, val);
     } else if (type.substr(0,1) == "z")
     {
-      terms[i] = CoordTerminate( setup->get_termMolIDX(i)[0], Z, btype, val);
+      terms[i] = make_shared<CoordTerminate>( setup->get_termMolIDX(i)[0],
+                                             Z, btype, val);
     } else if (type.substr(0,1) == "r")
     {
-      terms[i] = CoordTerminate( setup->get_termMolIDX(i)[0], R, btype, val);
+      terms[i] = make_shared<CoordTerminate>( setup->get_termMolIDX(i)[0],
+                                             R, btype, val);
     } else if (type == "time")
     {
-      terms[i] = TimeTerminate( val);
+      terms[i] = make_shared<TimeTerminate>( val);
     } else cout << "Termination type not recognized!" << endl;
   }
   
-  HowTermCombine com = (setup->get_andCombine() ? ALL : ONE);
-  auto term_conds = make_shared<CombineTerminate> (terms, com);
-  BDRun dynamic_run( ASolv, term_conds);
-  
-  dynamic_run.run();
+  for (traj = 0; traj < setup->getNTraj(); traj++)
+  {
+    char buff[100], outb[100];
+    sprintf( buff, "%s_%d.xyz", setup->getRunName().c_str(), traj);
+    string xyztraj = buff;
+    sprintf( outb, "%s_%d.dat", setup->getRunName().c_str(), traj);
+    string outfile = outb;
+    
+    string stats = setup->getRunName();
+    HowTermCombine com = (setup->get_andCombine() ? ALL : ONE);
+    auto term_conds = make_shared<CombineTerminate> (terms, com);
+    BDRun dynamic_run( ASolv, term_conds, outfile);
+    
+    dynamic_run.run(xyztraj, outfile);
+  }
   
   return 0;
 }
@@ -124,7 +138,7 @@ int main_energyforce( int poles, double tol, shared_ptr<Setup> setup,
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         consts, poles);
   ASolv->solve_A(tol); ASolv->solve_gradA(tol);
-  PhysCalc calcEnFoTo( ASolv, consts->get_unitsEnum());
+  PhysCalc calcEnFoTo( ASolv, setup->getRunName(), consts->get_unitsEnum());
   calcEnFoTo.calc_all();
   calcEnFoTo.print_all();
   
