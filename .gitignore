@@ -11,6 +11,8 @@ build
 ## PBAM output ignores
 *.dx 
 *.dat
+dyn_*
+*.stat
 
 ## Latex ignores
 *.aux

@@ -41,8 +41,7 @@ Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
                    double drot, double dtrans)
 :moveType_(movetype), drot_(drot), dtrans_(dtrans),
 qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()),
-center_(cen), unwrappedCenter_(cen)
+M_((int) pos.size()), center_(cen), unwrappedCenter_(cen)
 {
   set_Dtr_Drot(movetype);
   reposition_charges();
@@ -107,7 +106,7 @@ void Molecule::reposition_charges()
   for (int i = 0; i < M_; i++)
   {
     // check that the charge is encompassed by the the center and radius:
-    if (pos_[i].dist(center_) > a_)   recalc_a = true;
+    if (pos_[i].dist(center_)+vdwr_[i] > a_)   recalc_a = true;
     pos_[i] = pos_[i] - center_;
   }
   
@@ -186,14 +185,14 @@ System::System(Setup setup, double cutoff)
       {
         mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
                         pqrI.get_charges(), repos_charges,
-                        pqrI.get_radii(), xyzI.get_pts()[j],
+                        pqrI.get_radii(), xyzI.get_pts()[j], i, j,
                         setup.getDrot(i), setup.getDtr(i));
       }
       else
       {
         mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
                        repos_charges, pqrI.get_radii(),
-                       xyzI.get_pts()[j],
+                       xyzI.get_pts()[j], i, j,
                        setup.getDrot(i), setup.getDtr(i));
       }
       molecules_.push_back(mol);
@@ -274,6 +273,24 @@ bool System::less_than_cutoff(Pt v)
   else return false;
 }
 
+void System::reset_positions( vector<string> xyzfiles )
+{
+  int i, j, k;
+  vector<int> keys(2);
+  for (i = 0; i < ntype_; i++)
+  {
+    XYZFile xyzI (xyzfiles[i], typect_[i]);
+    for (j = 0; j < typect_[i]; j++)
+    {
+      keys = { i, j};
+      k = typeIdxToIdx_[keys];
+      Pt dist_to_new = get_centeri(k) - xyzI.get_pts()[j];
+      molecules_[k].translate(dist_to_new*-1, boxLength_);
+    }
+  }
+  
+}
+
 void System::write_to_pqr(string outfile)
 {
   int i, j, ct = 0;
@@ -304,8 +321,7 @@ void System::write_to_pqr(string outfile)
 
 void System::write_to_xyz(ofstream & xyz_out)
 {
-  int i, j, ct = 0;
-  int at_tot = 0;
+  int i, j, at_tot = 0;
   char xyzlin[400];
   
   for ( i = 0; i < N_; i++ )
@@ -313,21 +329,18 @@ void System::write_to_xyz(ofstream & xyz_out)
       at_tot++;
   at_tot += N_; // for adding CG centers
   
-  
-  xyz_out << "Atoms" << endl;
   xyz_out << at_tot << endl;
+  xyz_out << "Atoms" << endl;
   for ( i = 0; i < N_; i++ )
   {
     for ( j = 0; j < get_Mi(i); j++)
     {
-      sprintf(xyzlin,"%5d %8.3f %8.3f %8.3f", ct, get_posijreal(i, j).x(),
+      sprintf(xyzlin,"N %8.3f %8.3f %8.3f", get_posijreal(i, j).x(),
               get_posijreal(i, j).y(), get_posijreal(i, j).z());
       xyz_out << xyzlin << endl;
-      ct++;
     }
-    sprintf(xyzlin,"%5d %8.3f %8.3f %8.3f", ct, get_centeri(i).x(),
+    sprintf(xyzlin,"X %8.3f %8.3f %8.3f", get_centeri(i).x(),
             get_centeri(i).y(), get_centeri(i).z());
     xyz_out << xyzlin << endl;
-    ct++;
   }
 }

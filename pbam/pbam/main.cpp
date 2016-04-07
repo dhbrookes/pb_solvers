@@ -58,43 +58,61 @@ int main_dynamics( int poles, double tol, shared_ptr<Setup> setup,
     
     if ( type == "contact" )
     {
+      cout << "Contact termination found for molecules ";
+      cout << setup->get_termMolIDX(i)[0] << " and ";
+      cout << setup->get_termMolIDX(i)[1] << " at a distance " << val << endl;
       terms[i] = make_shared<ContactTerminate>( setup->get_termMolIDX(i), val);
     } else if (type.substr(0,1) == "x")
     {
+      cout << type << " termination found for molecule ";
+      cout << setup->get_termMolIDX(i)[0] << " at a distance " << val << endl;
       terms[i] = make_shared<CoordTerminate>( setup->get_termMolIDX(i)[0],
                                              X, btype, val);
     } else if (type.substr(0,1) == "y")
     {
+      cout << type << " termination found for molecule ";
+      cout << setup->get_termMolIDX(i)[0] << " at a distance " << val << endl;
       terms[i] = make_shared<CoordTerminate>( setup->get_termMolIDX(i)[0],
                                              Y, btype, val);
     } else if (type.substr(0,1) == "z")
     {
+      cout << type << " termination found for molecule ";
+      cout << setup->get_termMolIDX(i)[0] << " at a distance " << val << endl;
       terms[i] = make_shared<CoordTerminate>( setup->get_termMolIDX(i)[0],
                                              Z, btype, val);
     } else if (type.substr(0,1) == "r")
     {
+      cout << type << " termination found for molecule ";
+      cout << setup->get_termMolIDX(i)[0] << " at a distance " << val << endl;
       terms[i] = make_shared<CoordTerminate>( setup->get_termMolIDX(i)[0],
                                              R, btype, val);
     } else if (type == "time")
     {
+      cout << "Time termination found, at time (ps) " << val << endl;
       terms[i] = make_shared<TimeTerminate>( val);
     } else cout << "Termination type not recognized!" << endl;
   }
   
+  cout << "Done making termination conds " << endl;
+  HowTermCombine com = (setup->get_andCombine() ? ALL : ONE);
+  auto term_conds = make_shared<CombineTerminate> (terms, com);
+  
+  char buff[100], outb[100];
+  sprintf( outb, "%s.stat", setup->getRunName().c_str());
+  string statfile = outb;
+  
   for (traj = 0; traj < setup->getNTraj(); traj++)
   {
-    char buff[100], outb[100];
     sprintf( buff, "%s_%d.xyz", setup->getRunName().c_str(), traj);
     string xyztraj = buff;
     sprintf( outb, "%s_%d.dat", setup->getRunName().c_str(), traj);
     string outfile = outb;
     
     string stats = setup->getRunName();
-    HowTermCombine com = (setup->get_andCombine() ? ALL : ONE);
-    auto term_conds = make_shared<CombineTerminate> (terms, com);
+    sys->reset_positions( setup->get_trajn_xyz(traj));
     BDRun dynamic_run( ASolv, term_conds, outfile);
-    
-    dynamic_run.run(xyztraj, outfile);
+    dynamic_run.run(xyztraj, statfile);
+    cout << "Done with trajectory " << traj << endl;
   }
   
   return 0;
@@ -174,6 +192,7 @@ void get_check_inputs(shared_ptr<Setup> &setFile, shared_ptr<System> &syst,
   } catch (const BadInputException& ex)
   {
     cout << ex.what() << endl;
+    exit(0);
   }
   cout << "All inputs okay " << endl;
   
@@ -184,9 +203,11 @@ void get_check_inputs(shared_ptr<Setup> &setFile, shared_ptr<System> &syst,
   {
     cout << "Provided system has overlapping molecules. ";
     cout << "Please provide a correct system."<< endl;
+    exit(0);
   } catch (const NotEnoughCoordsException& ex2)
   {
     cout << ex2.what() << endl;
+    exit(0);
   }
   cout << "Molecule setup okay " << endl;
   
@@ -205,6 +226,7 @@ void get_check_inputs(shared_ptr<Setup> &setFile, shared_ptr<System> &syst,
 int main(int argc, const char * argv[])
 {
   string input_file = argv[1];
+//  string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbam/pbam_test_files/dynamics_test/run.dyn.hard.refs";
 
   int poles = 10;
   double solv_tol = 1e-4;

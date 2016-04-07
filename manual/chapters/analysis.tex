@@ -34,7 +34,7 @@ not name X
 \begin{figure}[!htbp]
   \centering
   \begin{minipage}[b]{0.3\textwidth}
-    \includegraphics[width=\textwidth]{vmd_graph_rep}
+    \includegraphics[width=\textwidth]{vmd_graph_rep_pqr}
     \caption{Graphics}
   \end{minipage}
   \hfill
@@ -49,6 +49,19 @@ not name X
 To load electrostatic results: File \textgreater \, New Molecule. In the window that appears, toggle the \textit{Load files for:} 
 to select the currently loaded PQR file. Then select \textit{Browse} to find the location of the dx file. Once found, hit 
 the \textit{Load} button and let the dx file load.
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{minipage}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{vmd_graph_rep_dx}
+    \caption{DX Graphics}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.65\textwidth}
+    \includegraphics[width=\textwidth]{vmd_4sp_dx}
+    \caption{DX representation}
+  \end{minipage}
+\end{figure}
 
  \clearpage
 
@@ -72,22 +85,41 @@ the \textit{Load} button and let the dx file load.
 
 
 \section{ESP plots}
-run with pot option in BD input file
-with a file which contains a list of z positions at which to calculate ESP
-(only capable of xy cross section at the moment)
-copy .out and esp\_plot.py to Desktop
-Change filename within .py file, may need to adjust vmin and vmax in .py for color scale
+From the electrostatic option in PB-AM, a file is created with the following format: \\
+
 \begin{lstlisting}[style = MyBash]
->> python esp_plot.py
+# Data from PBAM Electrostat run
+# My runname is barnase.x.0.dat
+units kT
+grid 200 200 
+axis x 0 
+origin -51.2204 -51.2204
+delta 0.512204 0.512204
+maxmin 1.35396 0
+   0.2352107     0.2360552     0.2368904     0.2377159
 \end{lstlisting}
 
-creates .pdf
+\medskip
+
+In our \texttt{tools} directory we have provided a python script for plotting this potential.
+Change filename within .py file, and the desired output name.
+\begin{lstlisting}[style = MyBash]
+>> python potential_plot
+\end{lstlisting}
+
+\medskip
+
+creates a JPG file of the cross sectioned potential, like the one given below:
+
+\begin{figure}[!htbp]
+  \centering
+    \includegraphics[scale=0.3]{pot_x_0}
+    \caption{Potential plot}
+\end{figure}
 
 To do: automatically read in trajectory and calculate ESP at those points
 	cross-section through xz and yz planes
 	ESP on the spheres' surfaces
-	
-	
 	
 %\section{Comparison of Displacement Due to Electrostatics versus Diffusion}	
 %

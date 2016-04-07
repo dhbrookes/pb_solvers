@@ -159,7 +159,7 @@ void ASolver::grad_iter(int j)
     for (k = 0; k < N_; k++) // other molecules
     {
       if (k == i) continue;
-      v = _sys_->get_pbc_dist_vec(i, j);
+      v = _sys_->get_pbc_dist_vec(i, k);
       if (! _sys_->less_than_cutoff(v) ) continue;
       add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
       aij += add;

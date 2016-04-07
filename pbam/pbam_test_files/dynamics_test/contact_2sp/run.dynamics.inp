@@ -1,5 +1,5 @@
 runtype dynamics 2
-runname dyn_cont_barn
+runname dyn_contact
 
 salt 0.01
 temp 298
@@ -8,15 +8,15 @@ sdiel 78
 
 termct 1
 termcombine or
-term 1 contact 2.5 1 2
+term 1 contact 1.5 1 2
 
 attypes 2
-type 1 2 move 0.015 0.000045
-pqr 1 1BRS_chainA.pqr
+type 1 3 move 0.01 0.001
+pqr 1 pos_charge.pqr
 xyz 1 1 pos_1_1.xyz
 xyz 1 2 pos_1_2.xyz
 
-type 2 2 move 0.015 0.000045
-pqr 2 1BRS_chainD.pqr
+type 2 4 move 0.01 0.001
+pqr 2 neg_charge.pqr
 xyz 2 1 pos_2_1.xyz
 xyz 2 2 pos_2_2.xyz

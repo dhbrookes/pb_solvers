@@ -73,7 +73,8 @@ protected:
   vector<vector<double> > typeDiff_; // Dtr, Drot each type, size [Ntype][2]
   vector<string> typeDef_; 		// For each type, type is stat, rot or move
   vector<string> runSpecs_;	//include run type [0] (electrost/bd) & runname [1]
-  vector<vector<string> > molfnames_;  // file names
+  vector<string> pqr_names_;  // PQR file names
+  vector<vector<string> > xyz_names_;  // XYZ file names
   
   vector<string> mbdfile_loc_; // location of names for manybd data output
   
@@ -105,11 +106,18 @@ protected:
   
   //dynamics settings
   void set_numterms(int n) { numTerm_ = n; }
-  void add_termcond(string type, vector<int> mol_idx, double val)
+  void resize_termcond(int n)
   {
-    termtype_.push_back(type);
-    termmols_.push_back(mol_idx);
-    termvals_.push_back(val);
+    termtype_.resize(n);
+    termmols_.resize(n);
+    for ( int i = 0; i < n; i++) termmols_[i].resize(2);
+    termvals_.resize(n);
+  }
+  void add_termcond(int i, string type, vector<int> mol_idx, double val)
+  {
+    termtype_[i] = type;
+    for (int n = 0; n < 2; n++) termmols_[i][n] = mol_idx[n];
+    termvals_[i] = val;
   }
   
   void set_term_combine(string type)
@@ -150,10 +158,10 @@ protected:
   { typeDiff_[typeCount][1] = dRot; }
   
   void setTypeNPQR( int typeCount, string pqr )
-  { molfnames_[typeCount][0] = pqr; }
+  { pqr_names_[typeCount] = pqr; }
   
-  void setTypeNXYZ( int typeCount, string xyz )
-  { molfnames_[typeCount][1] = xyz; }
+  void setTypeNXYZ( int typeCount, int traj, string xyz )
+  { xyz_names_[typeCount][traj] = xyz; }
   
 public:
   Setup(string infile);
@@ -200,8 +208,16 @@ public:
   double getDrot( int n )          { return typeDiff_[n][1]; }
   int getTypeNCount(int type)      { return nTypenCount_[type]; }
   string getTypeNDef(int type)     { return typeDef_[type]; }
-  string getTypeNPQR(int type)     { return molfnames_[type][0]; }
-  string getTypeNXYZ(int type)     { return molfnames_[type][1]; }
+  string getTypeNPQR(int type)     { return pqr_names_[type]; }
+  string getTypeNXYZ(int type, int traj) { return xyz_names_[type][traj]; }
+  vector<string> get_trajn_xyz(int traj)
+  {
+    vector<string> traj_xyz;
+    for (int i = 0; i < nType_; i ++) traj_xyz.push_back(xyz_names_[i][traj]);
+    return traj_xyz;
+  }
+  
+  string getTypeNXYZ(int type)     { return xyz_names_[type][0]; }
   double getKappa()                { return kappa_; }
   double getIKbT()                 { return iKbT_; }
   

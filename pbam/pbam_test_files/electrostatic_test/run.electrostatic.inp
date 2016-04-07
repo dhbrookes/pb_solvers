@@ -1,4 +1,4 @@
-runtype electrostatics 140
+runtype electrostatics 130
 runname electrostatic
 
 units kT

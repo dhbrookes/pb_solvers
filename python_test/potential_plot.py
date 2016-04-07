@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 Program to plot a 2D version of the ESP from PB-AM
 '''
 dirName='/Users/lfelberg/PBSAM/pb_solvers/'
-fileName = dirName + 'pbam/pbam_test_files/electro_barnase_test/barnase.z.0.dat'
-outFile= dirName + 'python_test/APBS_compare/barn_pbam_z_0.00.jpg'
+fileName = dirName + 'pbam/pbam_test_files/electrostatic_test/out.x.0.dat'
+outFile= dirName + 'pbam/out.4sp.jpg'
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):
@@ -60,11 +60,11 @@ def dispPlot( org, bn, count, potential,
     plt.pcolor(X, Y, potential, vmin=mn+0.1*mn, vmax=mx)
     plt.colorbar()
 
-    xl = [-28.0, 32.5]
-    yl = [-29.10, 25.49]
-    zl = [-33.84, 30.2]
-    ax.set_xlim(xl)
-    ax.set_ylim(yl)
+    #xl = [-28.0, 32.5]      # for comparing w APBS
+    #yl = [-29.10, 25.49]
+    #zl = [-33.84, 30.2]
+    ax.set_xlim([X[0], X[-1]])
+    ax.set_ylim([Y[0], Y[-1]])
 
     plt.title(title, fontsize = 13);
     ax.set_ylabel(ylab, fontsize = 10); 
@@ -91,7 +91,7 @@ if ax == 'y':
 elif ax == 'z':
     xla = r'$X \, (\AA)$'; yla = r'$Y \, (\AA)$'
 
-dispPlot( org, dl, len(esp[0]), np.transpose(esp), 
+dispPlot( org, dl, len(esp[0]), esp, 
                 mx, mn, titl,
                 xlab = xla, ylab = yla,
                 outFile=outFile)

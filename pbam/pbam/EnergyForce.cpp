@@ -591,7 +591,7 @@ void PhysCalc::print_all()
   
   if(outfname_ != "")
   {
-    of.open(outfname_);
+    of.open(outfname_, fstream::in | fstream::out | fstream::app);
     buf = of.rdbuf();
   } else {
     buf = cout.rdbuf();

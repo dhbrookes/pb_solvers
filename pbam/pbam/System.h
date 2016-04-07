@@ -199,6 +199,9 @@ public:
   // given a distance vector, determine whether it is in the cutoff
   bool less_than_cutoff(Pt v);
   
+  // reset positions with input xyz file
+  void reset_positions( vector<string> xyzfiles );
+  
   // write current system to PQR file
   void write_to_pqr( string outfile );
   

@@ -28,7 +28,8 @@ srand_( (unsigned)time(NULL) ),
 nTypenCount_(2),
 typeDef_(2),
 typeDiff_(2),
-molfnames_(2),
+pqr_names_(2),
+xyz_names_(2),
 runSpecs_(2),
 mbdfile_loc_(2),
 termvals_(2),
@@ -60,18 +61,14 @@ andCombine_(false)
   
   // Initializing file locs to defaults
   // pqr fname, imat path, spol path, spol name
-  vector<vector<string> > molfn = {{"../Config/test1.pqr", "../Imat/test1/",
-    "../Selfpol/test1", "test1_p30.0", "../Config/test1.xyz"},
-    {"../Config/test2.pqr", "../Imat/test2/",
-      "../Selfpol/test2", "test2_p30.0", "../Config/test2.xyz"}};
+  vector<vector<string> > molfn = {{"../Config/test1.pqr",
+    "../Config/test1.xyz"}, {"../Config/test2.pqr", "../Config/test2.xyz"}};
   
   for (int i=0; i<nType_; i++)
   {
-    molfnames_[i] = vector<string> (5);
-    for (int j=0; j<molfnames_[i].size();j++)
-    {
-      molfnames_[i][j] = molfn[i][j];
-    }
+    pqr_names_[i] = molfn[i][0];
+    xyz_names_[i].resize(1);
+    xyz_names_[i][0] = molfn[i][1];
   }
   
   read_infile(infile);
@@ -198,26 +195,25 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "Termination count command found" << endl;
     set_numterms(atoi(fline[1].c_str()));
-    cout << "done with termination count" << endl;
+    resize_termcond(atoi(fline[1].c_str()));
   } else if (keyword == "termcombine")
   {
     cout << "Termination combine command found" << endl;
     set_term_combine(fline[1]);
-    cout << "done with termination condition" << endl;
   } else if (keyword == "term")
   {
     cout << "Termination condition command found" << endl;
+    int idx = atoi(fline[1].c_str()) - 1;
     string type = fline[2];
     double val = atof(fline[3].c_str());
-    vector<int> mol_idx;
+    vector<int> mol_idx(2);
     if (type == "contact")
     {
-      mol_idx.push_back(atoi(fline[4].c_str()));
-      mol_idx.push_back(atoi(fline[5].c_str()));
+      mol_idx[0] = atoi(fline[4].c_str()) - 1;
+      mol_idx[1] = atoi(fline[5].c_str()) - 1;
     }
-    else  mol_idx.push_back(atoi(fline[4].c_str()));
-    add_termcond(fline[2], mol_idx, val);
-    cout << "done with termination condition" << endl;
+    else  mol_idx[0] = atoi(fline[4].c_str()) - 1;
+    add_termcond(idx, fline[2], mol_idx, val);
   } else if (keyword == "attypes")
   {
     cout << "Atom Types command found" << endl;
@@ -259,10 +255,21 @@ void Setup::findKeyword(vector<string> fline)
   } else if (keyword == "xyz")
   {
     cout << "XYZ command found" << endl;
-    int typeNo = atoi(fline[1].c_str())-1;
+    string xyz;
+    int traj, typeNo = atoi(fline[1].c_str())-1;
+    
+    if ( fline.size() == 4 )
+    {
+      traj = atoi(fline[2].c_str())-1;
+      xyz = fline[3];
+    } else
+    {
+      traj = 0;
+      xyz = fline[2];
+    }
     if (typeNo > getNType()-1)
       return;
-    setTypeNXYZ( typeNo, fline[2] );
+    setTypeNXYZ( typeNo, traj, xyz );
     
   } else if (keyword == "randorient")
   {
@@ -282,6 +289,7 @@ void Setup::findKeyword(vector<string> fline)
 
 void Setup::resizeVecs()
 {
+  int ntraj= (getRunType() == "dynamics") ? getNTraj() : 1;
   nTypenCount_.resize(nType_);
   typeDef_.resize(nType_);
 
@@ -291,11 +299,10 @@ void Setup::resizeVecs()
     typeDiff_[i].resize(2);
   }
 
-  molfnames_.resize(nType_);
-  for(int i = 0; i < nType_; i++)
-  {
-    molfnames_[i].resize(5);
-  }
+  pqr_names_.resize(nType_);
+  xyz_names_.resize(nType_);
+  for(int i = 0; i < nType_; i++)   xyz_names_[i].resize(ntraj);
+
 } // end resizeVecs
 
 void Setup::check_inputs()
@@ -311,10 +318,21 @@ void Setup::check_inputs()
     problems.push_back("Number of movement types is less \
                         than the specified number of molecule types");
   }
-  if (molfnames_.size() < nType_)
+  if (pqr_names_.size() < nType_)
   {
-    problems.push_back("Number of provided configuration files is less than the\
+    problems.push_back("Number of provided PQR files is less than the\
                        specified number of molecular types");
+  }
+  if (xyz_names_.size() < nType_)
+  {
+    problems.push_back("Number of provided XYZ files is less than the\
+                       specified number of molecular types");
+    for (int i = 0; i < nType_; i++)
+      if (xyz_names_[i].size() < ntraj_)
+      {
+        problems.push_back("Number of provided XYZ files is less than the\
+                           specified number of trajectories");
+      }
   }
   if (runSpecs_[0] == "electrostatics")
   {

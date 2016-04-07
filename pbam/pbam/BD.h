@@ -73,9 +73,9 @@ public:
   :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), dist_contact_(distance)
   {
     char buff[400];
-    sprintf(buff, "System has fulfilled condition: Type %d and Type %d are \
-            within %5.2f;\t", mol1_, mol2_, dist_contact_);
-    how_term_ = buff;
+    sprintf(buff, "Type %d and Type %d are within %5.2f;\t",
+            mol1_, mol2_, dist_contact_);
+    how_term_ = "System has fulfilled condition: " + string(buff);
   }
   
   const bool is_terminated(shared_ptr<System> _sys) const
@@ -318,7 +318,7 @@ public:
   // If num=0, then the equations will be solved exactly
   BDRun(shared_ptr<ASolver> _asolv, shared_ptr<BaseTerminate> _terminator,
         string outfname, int num=0, bool diff = true, bool force = true,
-        int maxiter=1000, double prec=1e-4);
+        int maxiter=1e8, double prec=1e-4);
   
   void run(string xyzfile = "test.xyz", string statfile = "stats.dat");
 };

@@ -1,0 +1,22 @@
+runtype dynamics 2
+runname dyn_dist
+
+salt 0.01
+temp 298
+idiel 4 
+sdiel 78
+
+termct 1
+termcombine or
+term 1 r>= 45 2
+
+attypes 2
+type 1 1 rot 0.001
+pqr 1 single_charge.pqr
+xyz 1 1 pos_org.xyz
+xyz 1 2 pos_org.xyz
+
+type 2 1 move 0.01 0.001
+pqr 2 single_charge.pqr
+xyz 2 1 pos_2_1.xyz
+xyz 2 2 pos_2_2.xyz

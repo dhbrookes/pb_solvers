@@ -184,14 +184,20 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
 void BDRun::run(string xyzfile, string statfile)
 {
   int i = 0;
-  int WRITEFREQ = 10;
+  int WRITEFREQ = 100;
   bool term = false;
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
-  stats.open(statfile);
+  stats.open(statfile, fstream::in | fstream::out | fstream::app);
   
   while (i < maxIter_ and !term)
   {
+    if ((i % WRITEFREQ) == 0 )
+    {
+      _stepper_->get_system()->write_to_xyz(xyz_out);
+      _physCalc_->print_all();
+    }
+    
     _asolver_->reset_all(_stepper_->get_system());
     _asolver_->solve_A(prec_);
     _asolver_->solve_gradA(prec_);
@@ -201,19 +207,18 @@ void BDRun::run(string xyzfile, string statfile)
     
     _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
 
-    if ((i % WRITEFREQ) == 0 )
-    {
-      _stepper_->get_system()->write_to_xyz(xyz_out);
-      _physCalc_->print_all();
-    }
-    
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {
       term = true;
+      _stepper_->get_system()->write_to_xyz(xyz_out);
       stats << _terminator_->get_how_term(_stepper_->get_system());
+      stats << " at time (ps) " << _stepper_->get_system()->get_time() << endl;
     }
     i++;
   }
+  
+  if ( i >= maxIter_ )
+    stats << "System has gone over max number of BD iterations" << endl;
   
   xyz_out.close();
   stats.close();

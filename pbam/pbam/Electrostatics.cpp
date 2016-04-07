@@ -136,6 +136,8 @@ void Electrostatic::print_dx( string dxname )
   char pot[20];
   int xct, yct, zct;
   int ct = 0;
+  double out, pot_max_ = 0;
+  double pot_min_ = 0;
   
   dx.open(dxname);
   dx << "# Data from PBAM Electrostat run" << endl;
@@ -159,10 +161,15 @@ void Electrostatic::print_dx( string dxname )
     {
       for ( zct=0; zct<npts_[2]; zct++)
       {
-        sprintf( pot, "%10.7e  ", esp_[xct][yct][zct]);
+        out = ((esp_[xct][yct][zct] != esp_[xct][yct][zct])
+                ? 0.0 : esp_[xct][yct][zct]);
+        sprintf( pot, "%8.6f ", out);
         dx << pot;
         ct++;
-        if ((ct % 3) == 0) dx << "\n";
+        if ((ct % 5) == 0) dx << "\n";
+        
+        if (esp_[xct][yct][zct] < pot_min_)      pot_min_ = esp_[xct][yct][zct];
+        else if (esp_[xct][yct][zct] > pot_max_) pot_max_ = esp_[xct][yct][zct];
       }
     }
   }
@@ -173,6 +180,9 @@ void Electrostatic::print_dx( string dxname )
   dx << "component \"connections\" value 2" << endl;
   dx << "component \"data\" value 3" << endl;
   dx.close();
+  
+  cout << "This is min " << pot_min_ << endl;
+  cout << "This is max " << pot_max_ << endl;
   
 }
 
