@@ -111,10 +111,9 @@ protected :
   double bdRun30x[2] = {-0.634593964,0.634593964};
   double bdRun30y[2] = {-20.8011211,26.8011211};
 
-  double bdRun30Rot[2][3][3] = {{{0,0,0},{-0.542519466,-0.704545378,
-    0.457480534},{0.457480534,-0.704545378,-0.542519466}}, {{0,0,0},
-      {-0.542519459,0.704545379,0.457480541},{0.457480541,0.704545379,
-        -0.542519459}}};
+  double bdRun30Rot[2][3][3] = {{{0,0,0},{-0.800362355,0.565300727,0.199637645},{0.199637645, 0.565300727, -0.800362355}}, {{0,0,0},
+      {-0.800362773, -0.565300282, 0.199637227},{0.199637227, -0.565300282,
+        -0.800362773}}};
   
   virtual void TearDown() {}
 } ; // end BDUTest
@@ -584,7 +583,8 @@ TEST_F(BDUTest, BDrunTimeTermY)
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol);
-  shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
+  auto ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys,
+                                        make_shared<Constants> (const_), vals);
 
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
@@ -621,7 +621,8 @@ TEST_F(BDUTest, BDrunTimeTermXY)
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol);
-  shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
+  auto ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys,
+                                  make_shared<Constants> (const_), vals);
   
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
@@ -659,7 +660,8 @@ TEST_F(BDUTest, BDrunTimeTermRot)
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol);
-  shared_ptr<ASolver> ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys, make_shared<Constants> (const_), vals);
+  auto ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys,
+                                        make_shared<Constants> (const_), vals);
   
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-30);

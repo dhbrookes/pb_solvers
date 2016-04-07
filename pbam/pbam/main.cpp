@@ -228,10 +228,10 @@ void get_check_inputs(shared_ptr<Setup> &setFile, shared_ptr<System> &syst,
 
 int main(int argc, const char * argv[])
 {
-  string input_file = argv[1];
-//  string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbam/pbam_test_files/dynamics_test/run.dyn.hard.refs";
+//  string input_file = argv[1];
+  string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbam/pbam_test_files/dynamics_test/contact_1BRS_nam/run.dyn.hard.refs";
 
-  int poles = 10;
+  int poles = 5;
   double solv_tol = 1e-4;
   
   auto setp = make_shared<Setup>(input_file);

@@ -184,7 +184,7 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
 void BDRun::run(string xyzfile, string statfile)
 {
   int i = 0;
-  int WRITEFREQ = 100;
+  int WRITEFREQ = 500;
   bool term = false;
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
@@ -195,7 +195,7 @@ void BDRun::run(string xyzfile, string statfile)
     if ((i % WRITEFREQ) == 0 )
     {
       _stepper_->get_system()->write_to_xyz(xyz_out);
-      _physCalc_->print_all();
+      if (i != 0)  _physCalc_->print_all();
     }
     
     _asolver_->reset_all(_stepper_->get_system());

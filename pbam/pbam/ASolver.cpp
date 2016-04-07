@@ -33,6 +33,9 @@ _consts_(_consts)
   _gradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
   _prevGradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
   
+  _allSh_ = make_shared<vector<vector<MyMatrix<cmplx> > > > (N_,
+                                      vector<MyMatrix<cmplx>> (N_));
+  
   reset_all(_sys);
 }
 
@@ -691,11 +694,9 @@ cmplx ASolver::which_aval(WhichReEx whichA, bool prev, int i, int n,
  */
 void ASolver::pre_compute_all_sh()
 {
-  all_sh.reserve(N_);
   int i;
-  
   for (i = 0; i < N_; i++)
-    all_sh.push_back(calc_mol_sh(_sys_->get_molecule(i)));
+    (*_allSh_)[i] = calc_mol_sh(_sys_->get_molecule(i));
 }
 
 /*
@@ -777,7 +778,7 @@ cmplx ASolver::calc_indi_e(int i, int n, int m)
     rho = _sys_->get_posij(i, j).r();
     lambda = pow(_sys_->get_lambda(), n);
     // q_ij * (rho_ij)^n * Y_(n,m)(theta_ij, phi_ij):
-    cmplx all_sh_acc = all_sh[i][j](n, abs(m));
+    cmplx all_sh_acc = (*_allSh_)[i][j](n, abs(m));
     if ( m < 0 )
       all_sh_acc = conj( all_sh_acc );
 
@@ -1128,6 +1129,9 @@ void ASolver::reset_all(shared_ptr<System> _sys)
     _E_->operator[](n) = MyMatrix<cmplx> (p_, 2*p_+1);
     _prevA_->operator[](n) = MyMatrix<cmplx> (p_, 2*p_+1);
     
+    _allSh_->operator[](n) = vector<MyMatrix<cmplx>>
+                              (N_, MyMatrix<cmplx> (2*p_, 2*p_));
+    
     for ( n1 = 0; n1 < N_; n1++ )
     {
       _gradT_A_->operator()(n, n1) = VecOfMats<cmplx>::type
@@ -1136,6 +1140,7 @@ void ASolver::reset_all(shared_ptr<System> _sys)
           (3, MyMatrix<cmplx> (p_, 2*p_+1));
       _prevGradA_->operator()(n, n1) = VecOfMats<cmplx>::type
           (3, MyMatrix<cmplx> (p_, 2*p_+1));
+      
     }
   }
   

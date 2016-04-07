@@ -79,7 +79,7 @@ protected:
   // pre-computed spherical harmonics matrices for every charge in the system
   // inner vector is all SH for all the charges in a molecule.
   // Outer vector is every molecule
-  vector<vector<MyMatrix<cmplx> > > all_sh;
+  shared_ptr<vector<vector<MyMatrix<cmplx> > > > _allSh_;
   
   // calculate the SH for all charges in a molecule
   vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol);
@@ -203,7 +203,8 @@ public:
   
   cmplx get_gamma_ni( int i, int n)       {return _gamma_->operator[](i)(n,n);}
   cmplx get_delta_ni( int i, int n)       {return _delta_->operator[](i)(n,n);}
-  cmplx get_SH_ij(int i, int j, int n, int m) {return all_sh[i][j](n,abs(m));}
+  cmplx get_SH_ij(int i, int j, int n, int m)
+  {return (*_allSh_)[i][j](n,abs(m));}
   cmplx get_E_ni(int i, int n, int m)     {return _E_->operator[](i)(n,m+p_);}
   cmplx get_A_ni(int i, int n, int m)     {return _A_->operator[](i)(n,m+p_);}
   cmplx get_prevA_ni(int i, int n, int m)
