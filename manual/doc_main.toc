@@ -32,6 +32,7 @@
 \contentsline {chapter}{\numberline {6}Analysis Tools}{14}{chapter.6}
 \contentsline {section}{\numberline {6.1}Viewing PQR in VMD}{14}{section.6.1}
 \contentsline {section}{\numberline {6.2}Viewing Electrostatics in VMD}{14}{section.6.2}
-\contentsline {section}{\numberline {6.3}ESP plots}{16}{section.6.3}
+\contentsline {section}{\numberline {6.3}2D ESP plots}{16}{section.6.3}
+\contentsline {section}{\numberline {6.4}3D ESP plots}{16}{section.6.4}
 \gdef \the@ipfilectr {}
 \contentsfinish 

@@ -112,6 +112,9 @@ public:
   // print APBS file
   void print_dx(string ifname);
   
+  // print out 3D heatmap data for surface of each sphere
+  void print_3d_heat( string td_name );
+
   // print Grid file, given an axis and a value on that axis
   void print_grid(string axis, double value, string fname);
   

@@ -1,4 +1,4 @@
-runtype electrostatics 130
+runtype electrostatics 150
 runname electrostatic
 
 units kT
@@ -9,12 +9,14 @@ sdiel 78
 
 dx out.dx
 
+3dmap electro_map.out
+
 gridct 1
 grid2D 1 out.x.0.dat x 0
 
 attypes 2
 type 1 2
-pqr 1 single_charge.pqr
+pqr 1 neg_charge.pqr
 xyz 1 positions_2.xyz
 
 type 2 2

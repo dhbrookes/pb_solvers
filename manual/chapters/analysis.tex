@@ -84,7 +84,7 @@ the \textit{Load} button and let the dx file load.
 %To Do : get diffusion constant from fpt.txt as well
 
 
-\section{ESP plots}
+\section{2D ESP plots}
 From the electrostatic option in PB-AM, a file is created with the following format: \\
 
 \begin{lstlisting}[style = MyBash]
@@ -117,9 +117,36 @@ creates a JPG file of the cross sectioned potential, like the one given below:
     \caption{Potential plot}
 \end{figure}
 
-To do: automatically read in trajectory and calculate ESP at those points
-	cross-section through xz and yz planes
-	ESP on the spheres' surfaces
+\section{3D ESP plots}
+From the electrostatic option in PB-AM, a file is created with the following format: \\
+
+\begin{lstlisting}[style = MyBash]
+# Data from PBAM Electrostat run
+# My runname is electro_map.out and units kT
+grid 10 10 10
+origin -4 -9 -9
+delta 0.8 1.8 1.8
+  0.00000   0.00000  -2.90000 -5.899581 
+\end{lstlisting}
+
+\medskip
+
+In our \texttt{tools} directory we have provided a python script for plotting this potential.
+Change filename within .py file, and the desired output name.
+\begin{lstlisting}[style = MyBash]
+>> python plot_3d_surf
+\end{lstlisting}
+
+\medskip
+
+creates a JPG file of the cross sectioned potential, like the one given below:
+
+\begin{figure}[!htbp]
+  \centering
+    \includegraphics[scale=0.4]{4sp_surf}
+    \caption{Molecule surface potential plot}
+\end{figure}
+
 	
 %\section{Comparison of Displacement Due to Electrostatics versus Diffusion}	
 %

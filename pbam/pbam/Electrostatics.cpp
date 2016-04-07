@@ -183,7 +183,47 @@ void Electrostatic::print_dx( string dxname )
   
   cout << "This is min " << pot_min_ << endl;
   cout << "This is max " << pot_max_ << endl;
+}
+
+void Electrostatic::print_3d_heat( string td_name )
+{
+  ofstream ht;
+  char pot[500];
+  Pt center, pos;
+  int xct, yct, mol, Nmol = _sys_->get_n();
+  double rad, lat, lon, ptl, npt = 80;
+  double e_s = _consts_->get_dielectric_water();
   
+  ht.open(td_name);
+  ht << "# Data from PBAM Electrostat run" << endl;
+  ht << "# My runname is " << td_name << " and units " ;
+  ht << _consts_->get_units() <<  endl;
+  ht << "grid " << npts_[0] << " " << npts_[1] << " " << npts_[2] << endl;
+  ht << "origin " << range_min_[0] << " " << range_min_[1]
+     << " " << range_min_[2] << endl;
+  ht << "delta " << step_[0] << " " << step_[1] << " " << step_[2] << endl;
+
+  for ( mol = 0; mol < Nmol; mol++)
+  {
+    center = _sys_->get_centeri(mol);
+    rad    = _sys_->get_radi(mol);
+    for (xct = 0; xct < npt; xct++)
+    {
+      lon = (xct+0.1) * (M_PI/npt);
+      for (yct = 0; yct < npt; yct++)
+      {
+        lat = (yct+0.1) * 2 * (M_PI/npt);
+        pos = Pt( rad+0.1, lon, lat, true) + center;
+        ptl = (units_*compute_pot_at(pos))/e_s;
+
+        sprintf(pot, "%9.5f %9.5f %9.5f %8.6f ", 
+                pos.x(), pos.y(), pos.z(), ptl);
+        ht << pot << endl;
+      }
+    }
+  }
+  
+  ht.close();
 }
 
 void Electrostatic::print_grid(string axis, double value, string fname)

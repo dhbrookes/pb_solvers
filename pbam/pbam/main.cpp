@@ -135,6 +135,10 @@ int main_electrostatics( int poles, double tol, shared_ptr<Setup> setup,
   if ( setup->getDXoutName() != "" )
     Estat.print_dx( setup->getDXoutName());
   
+  if ( setup->get_3dmap_name() != "" )
+    Estat.print_3d_heat( setup->get_3dmap_name());
+  
+  for ( i = 0; i < setup->getGridCt(); i++ )
   for ( i = 0; i < setup->getGridCt(); i++ )
   {
     Estat.print_grid(setup->getGridAx(i), setup->getGridAxLoc(i),
@@ -220,7 +224,6 @@ void get_check_inputs(shared_ptr<Setup> &setFile, shared_ptr<System> &syst,
   // writing initial configuration out
   syst->write_to_pqr( setFile->getRunName() + ".pqr");
   cout << "Written config" << endl;
-
 }
 
 int main(int argc, const char * argv[])

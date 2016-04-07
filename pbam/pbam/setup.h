@@ -57,11 +57,12 @@ protected:
   vector<string> axis_;  // For grid print, axis desired
   vector<double> axLoc_; // Location along given axis
   
+  // for dynamics runs
   int numTerm_;  //number of termination conditions
   vector<string> termtype_; // type of each term ('time', 'x', 'y', 'z' or 'r')
   vector<vector<int> > termmols_; // vector of molecule ids
   vector<double> termvals_; // value for each termination condition
-  bool andCombine_;  //if true, termination conditions will combine with 'and', otherwise with 'or'
+  bool andCombine_;  //if true, term conds will combine w 'and', otherwise 'or'
   
   double idiel_;
   double sdiel_;  // dielectric constant win molecule and of solvent
@@ -97,7 +98,8 @@ protected:
   
   // setting values for electrostatics run
   void setDXoutName( string dx) { potOutfnames_[0] = dx;}
-  void setGridOutName( int i, string grid) { potOutfnames_[i] = grid;}
+  void set_3dmap_name( string ht) { potOutfnames_[1] = ht;}
+  void setGridOutName( int i, string grid) { potOutfnames_[i+1] = grid;}
   
   void setGridPts( int gridP ) { gridPts_ = gridP; }
   void setGridCt( int gridC ) { gridCt_ = gridC; }
@@ -171,8 +173,9 @@ public:
   string getUnits()                { return units_; }
   
   // electrostatics
-  string getDXoutName(  ) { return potOutfnames_[0];}
-  string getGridOutName( int i ) { return potOutfnames_[i+1];}
+  string getDXoutName(  )  { return potOutfnames_[0];}
+  string get_3dmap_name( ) { return potOutfnames_[1];}
+  string getGridOutName( int i ) { return potOutfnames_[i+2];}
   
   int getGridPts() { return gridPts_; }
   int getGridCt() { return gridCt_; }

@@ -51,8 +51,10 @@ andCombine_(false)
   runSpecs_[0] = "electrostatics";
   runSpecs_[1] = "test";
   
-  potOutfnames_.resize(2);
+  potOutfnames_.resize(3);
   potOutfnames_[0] = "";
+  potOutfnames_[1] = "";
+  potOutfnames_[2] = "";
   
   mbdfile_loc_[0] = "";
   mbdfile_loc_[1] = "";
@@ -145,12 +147,16 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "DX command found" << endl;
     setDXoutName( fline[1].c_str());
+  } else if (keyword == "3dmap")
+  {
+    cout << "3D map command found" << endl;
+    set_3dmap_name( fline[1].c_str());
   } else if (keyword == "gridct")
   {
     cout << "Grid count command found" << endl;
     setGridCt( atoi(fline[1].c_str()));
     axis_.resize( gridCt_); axLoc_.resize(gridCt_);
-    potOutfnames_.resize(gridCt_+1);
+    potOutfnames_.resize(gridCt_+2);
   } else if (keyword == "grid2D")
   {
     cout << "Grid command found" << endl;
@@ -204,6 +210,11 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "Termination condition command found" << endl;
     int idx = atoi(fline[1].c_str()) - 1;
+    if (idx > get_numterms()-1)
+    {
+      cout << "WARNING: trying to add more term types than specified" << endl;
+      return;
+    }
     string type = fline[2];
     double val = atof(fline[3].c_str());
     vector<int> mol_idx(2);
@@ -225,7 +236,10 @@ void Setup::findKeyword(vector<string> fline)
     cout << "Type def command found" << endl;
     int typeNo = atoi(fline[1].c_str())-1;
     if (typeNo > getNType()-1)
+    {
+      cout << "WARNING: trying to add more mol types than specified" << endl;
       return;
+    }
     if (fline.size() > 2)
       setTypeNCount( typeNo, atoi(fline[2].c_str()) );
     if (fline.size() > 3)
