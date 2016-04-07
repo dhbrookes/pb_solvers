@@ -1,5 +1,5 @@
-runname barn
 runtype electrostatics 200
+runname barn.out
 
 units kT
 salt 0.0

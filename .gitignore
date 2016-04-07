@@ -13,6 +13,7 @@ build
 *.dat
 dyn_*
 *.stat
+*.out.pqr
 
 ## Latex ignores
 *.aux
@@ -20,3 +21,5 @@ dyn_*
 *.synctex.gz
 *.out
 
+## Files for work on APBS comparison
+APBS_compare/
