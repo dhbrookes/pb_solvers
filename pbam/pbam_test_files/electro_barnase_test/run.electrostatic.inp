@@ -1,4 +1,4 @@
-runtype electrostatics 200
+runtype electrostatics 20
 runname barn.out
 
 units kT
@@ -11,9 +11,11 @@ sdiel 78
 
 #dx barnase_pbam.dx
 
-gridct 2
-grid2D 1 barnase.y.0.dat y 0
-grid2D 2 barnase.z.0.dat z 0
+3dmap barn_map.out
+
+#gridct 2
+#grid2D 1 barnase.y.0.dat y 0
+#grid2D 2 barnase.z.0.dat z 0
 
 attypes 1
 type 1 1

@@ -268,9 +268,9 @@ void Setup::findKeyword(vector<string> fline)
     setTypeNPQR( typeNo, fline[2].c_str() );
   } else if (keyword == "xyz")
   {
-    cout << "XYZ command found" << endl;
     string xyz;
     int traj, typeNo = atoi(fline[1].c_str())-1;
+    cout << "XYZ command found" << endl;
     
     if ( fline.size() == 4 )
     {

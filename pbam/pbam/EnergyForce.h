@@ -326,6 +326,9 @@ public:
   virtual Pt get_taui(int i) { return Pt(); }
   virtual Pt get_forcei(int i) { return Pt (); }
   virtual double get_omegai(int i) {return 0; }
+  
+  virtual Pt get_moli_pos(int i) { return Pt(); }
+  
 };
 
 /*
@@ -337,7 +340,7 @@ protected:
   int N_; // number of particles
   double unit_conv_; // Conversion factor for units
   string unit_; // String of the type of units
-  vector<Pt> mol_pos_;
+  shared_ptr<System> _sys_; // System
   
   shared_ptr<EnergyCalc> _eCalc_;
   shared_ptr<ForceCalc> _fCalc_;
@@ -377,6 +380,8 @@ public:
   { return _fCalc_->get_fi(i)*unit_conv_; }
   double get_omegai_conv(int i)
   {return _eCalc_->get_omega_i_int(i)*unit_conv_;}
+  
+  Pt get_moli_pos( int i) { return _sys_->get_centeri(i); }
 
 };
 

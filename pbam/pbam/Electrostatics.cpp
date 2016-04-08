@@ -191,7 +191,7 @@ void Electrostatic::print_3d_heat( string td_name )
   char pot[500];
   Pt center, pos;
   int xct, yct, mol, Nmol = _sys_->get_n();
-  double rad, lat, lon, ptl, npt = 80;
+  double rad, lat, lon, ptl, npt;
   double e_s = _consts_->get_dielectric_water();
   
   ht.open(td_name);
@@ -207,6 +207,7 @@ void Electrostatic::print_3d_heat( string td_name )
   {
     center = _sys_->get_centeri(mol);
     rad    = _sys_->get_radi(mol);
+    npt    = rad/0.1;
     for (xct = 0; xct < npt; xct++)
     {
       lon = (xct+0.1) * (M_PI/npt);

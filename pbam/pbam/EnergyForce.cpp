@@ -554,7 +554,7 @@ PhysCalc::PhysCalc(shared_ptr<ASolver> _asolv, string outfname, Units unit)
   _fCalc_ = make_shared<ForceCalc>(_asolv);
   _torCalc_ = make_shared<TorqueCalc>(_asolv);
   
-  mol_pos_ = _asolv->get_sys()->get_allcenter();
+  _sys_ = _asolv->get_sys();
   
   compute_units(_asolv->get_consts(), unit);
 }
@@ -588,6 +588,7 @@ void PhysCalc::print_all()
   double force_norm, torque_norm;
   streambuf * buf;
   ofstream of;
+  vector<Pt> mol_pos = _sys_->get_allcenter();
   
   if(outfname_ != "")
   {
@@ -598,15 +599,15 @@ void PhysCalc::print_all()
   }
   
   ostream out(buf);
-  out << "My units are " << unit_ << endl;
+  out << "My units are " << unit_ << ". Time: " << _sys_->get_time() << endl;
   
   for ( i = 0; i < N_; i++)
   {
     force_norm = 0;
     torque_norm = 0;
     out << "MOLECULE #" << i + 1 << endl;
-    out << "\tPOSITION: [" << mol_pos_[i].x() << ", " << mol_pos_[i].y();
-    out << ", " << mol_pos_[i].z() << "]" << endl;
+    out << "\tPOSITION: [" << mol_pos[i].x() << ", " << mol_pos[i].y();
+    out << ", " << mol_pos[i].z() << "]" << endl;
     out << "\tENERGY: " << unit_conv_ * get_omega()->operator[](i) << endl;
     force_i = get_forcei(i); torque_i = get_taui(i);
     for ( j = 0; j < 3; j++)

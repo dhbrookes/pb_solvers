@@ -23,16 +23,17 @@
 \contentsline {chapter}{\numberline {4}Example files and outputs}{10}{chapter.4}
 \contentsline {section}{\numberline {4.1}Physical calculations}{10}{section.4.1}
 \contentsline {section}{\numberline {4.2}Brownian Dynamics}{11}{section.4.2}
-\contentsline {section}{\numberline {4.3}Electrostatics}{11}{section.4.3}
-\contentsline {chapter}{\numberline {5}Common Errors}{13}{chapter.5}
-\contentsline {section}{\numberline {5.1}Segmentation Fault while reading input file}{13}{section.5.1}
-\contentsline {section}{\numberline {5.2}Initial configuration errors}{13}{section.5.2}
+\contentsline {section}{\numberline {4.3}Electrostatics}{12}{section.4.3}
+\contentsline {chapter}{\numberline {5}Common Errors}{15}{chapter.5}
+\contentsline {section}{\numberline {5.1}Errors while reading input file}{15}{section.5.1}
+\contentsline {section}{\numberline {5.2}Segmentation Fault while reading input file}{15}{section.5.2}
+\contentsline {section}{\numberline {5.3}Initial configuration errors}{15}{section.5.3}
 \gdef \the@ipfilectr {}
 \gdef \the@ipfilectr {@-5}
-\contentsline {chapter}{\numberline {6}Analysis Tools}{14}{chapter.6}
-\contentsline {section}{\numberline {6.1}Viewing PQR in VMD}{14}{section.6.1}
-\contentsline {section}{\numberline {6.2}Viewing Electrostatics in VMD}{14}{section.6.2}
-\contentsline {section}{\numberline {6.3}2D ESP plots}{16}{section.6.3}
-\contentsline {section}{\numberline {6.4}3D ESP plots}{16}{section.6.4}
+\contentsline {chapter}{\numberline {6}Analysis Tools}{16}{chapter.6}
+\contentsline {section}{\numberline {6.1}Viewing PQR in VMD}{16}{section.6.1}
+\contentsline {section}{\numberline {6.2}Viewing Electrostatics in VMD}{16}{section.6.2}
+\contentsline {section}{\numberline {6.3}2D ESP plots}{18}{section.6.3}
+\contentsline {section}{\numberline {6.4}3D ESP plots}{18}{section.6.4}
 \gdef \the@ipfilectr {}
 \contentsfinish 

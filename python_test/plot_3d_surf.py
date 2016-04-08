@@ -8,7 +8,7 @@ Program to plot a 3D version of the ESP from PB-AM
 '''
 dirName='/Users/lfelberg/'
 fileName = dirName + 'PBSAM/pb_solvers/pbam/'
-fileName += 'pbam_test_files/electrostatic_test/electro_map.out'
+fileName += 'pbam_test_files/electro_barnase_test/barn_map.out'
 outFile= dirName + 'Desktop/out.surf'
 
 #-----------------------------------------------------------------------
@@ -55,7 +55,7 @@ def dispPlot( org, bn, xv, yv, zv, potential,
                                 #(max(potential)-min(potential)))
     #colors.set_clim(vmin = min(potential),
                             #vmax = max(potential))
-    
+
     colmap = cm.ScalarMappable(cmap=cm.jet)
     colmap.set_array(potential)
 

@@ -174,8 +174,8 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
              bool diff, bool force, int maxiter, double prec)
 :maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
 {
-  if (num == 0) _physCalc_ = make_shared<PhysCalc>(_asolv, outfname);
-  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolv, num, outfname);
+  if (num == 0) _physCalc_ = make_shared<PhysCalc>(_asolver_, outfname);
+  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolver_, num, outfname);
   
   _stepper_ = make_shared<BDStep> (_asolver_->get_sys(),
                                    _asolver_->get_consts(), diff, force);
@@ -210,7 +210,9 @@ void BDRun::run(string xyzfile, string statfile)
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {
       term = true;
+      // Printing out details at end
       _stepper_->get_system()->write_to_xyz(xyz_out);
+      _physCalc_->print_all();
       stats << _terminator_->get_how_term(_stepper_->get_system());
       stats << " at time (ps) " << _stepper_->get_system()->get_time() << endl;
     }

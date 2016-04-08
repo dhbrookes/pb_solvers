@@ -330,7 +330,7 @@ void System::write_to_xyz(ofstream & xyz_out)
   at_tot += N_; // for adding CG centers
   
   xyz_out << at_tot << endl;
-  xyz_out << "Atoms" << endl;
+  xyz_out << "Atoms. Timestep (ps): " << t_ << endl;
   for ( i = 0; i < N_; i++ )
   {
     for ( j = 0; j < get_Mi(i); j++)

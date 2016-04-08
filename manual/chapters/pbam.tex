@@ -129,6 +129,7 @@ Each keyword is described in the table below, along with its associated paramete
 
 \T runtype electrostatics & \param{gridpts} & \parbox[t]{\colthree}{Will run electrostatics calculations. \param{gridpts} is an optional integer describing the number of evenly spaced points in each dimension to perform calculations on.}\\
 \T dx & \param{fname} & \parbox[t]{\colthree}{For electrostatics. Will write the results of electrostatics calculations for every 3D grid point to \param{fname}, in the same output format as APBS dx file.} \\
+\T 3dmap & \param{fname} & \parbox[t]{\colthree}{For electrostatics. Will write the results of electrostatics calculations for points on the surface of the molecules in the system.} \\
 \T gridct & \param{ct} & \parbox[t]{\colthree}{For electrostatics. \param{ct} is the number of 2D grids to output.} \\
 \T grid2d & \parbox[t]{\coltwo}{\param{idx} \param{fname} \param{axis} \param{val} } & \parbox[t]{\colthree}{For electrostatics. Set attributes of a grid output where \param{idx} is the integer id of this grid, which can be 1 to \param{ct} (above). Will write output of calculations for a cross section along \param{axis} (\texttt{x}, \texttt{y}, or \texttt{z}) at \param{value}.\B} \\
 \hline
@@ -251,7 +252,109 @@ MOLECULE #2
 
 \section{Brownian Dynamics}
 
+\textbf{Example dynamics runfile} \\
 
+name:  \texttt{run.dynamics.inp}:
+\begin{lstlisting}[style = MyBash]
+runtype dynamics 2
+runname dyn_cont_barn
+
+salt 0.01
+temp 298
+idiel 4 
+sdiel 78
+
+termct 1
+termcombine or
+term 1 contact 2.5 1 2
+
+attypes 2
+type 1 2 move 0.015 0.000045
+pqr 1 1BRS_chainA.pqr
+xyz 1 1 pos_1_1.xyz
+xyz 1 2 pos_1_2.xyz
+
+type 2 2 move 0.015 0.000045
+pqr 2 1BRS_chainD.pqr
+xyz 2 1 pos_2_1.xyz
+xyz 2 2 pos_2_2.xyz
+\end{lstlisting}
+\medskip
+
+The files for PQR (first 5 lines) and XYZ files for the first trajectories are: 
+
+name:  \texttt{1BRS\_chainA.pqr}:
+\begin{lstlisting}[style = MyBash]
+ATOM   1700  N    ALA B   1      20.757 52.394 30.692     0.1414  1.8240
+ATOM   1702  CA   ALA B   1      20.602 52.680 29.268     0.0962  1.9080
+ATOM   1703  C    ALA B   1      19.286 52.138 28.675     0.6163  1.9080
+ATOM   1704  O    ALA B   1      18.578 51.351 29.318    -0.5722  1.6612
+ATOM   1705  CB   ALA B   1      21.739 52.033 28.476    -0.0597  1.9080
+\end{lstlisting}
+
+\medskip
+
+name:  \texttt{pos\_1\_1.xyz}:
+\begin{lstlisting}[style = MyBash]
+61.25 61.25 61.25
+-26.25 61.25 -26.25
+\end{lstlisting}
+\medskip
+
+name:  \texttt{1BRS\_chainD.pqr}:
+\begin{lstlisting}[style = MyBash]
+ATOM      1  N    LYS D   1      48.330 40.393  9.798     0.0966  1.8240
+ATOM      2  CA   LYS D   1      47.401 39.287  9.370    -0.0015  1.9080
+ATOM      3  C    LYS D   1      47.507 38.911  7.890     0.7214  1.9080
+ATOM      4  O    LYS D   1      47.126 39.582  6.905    -0.6013  1.6612
+ATOM      5  CB   LYS D   1      45.995 39.632  9.817     0.0212  1.9080
+\end{lstlisting}
+
+\medskip
+
+name:  \texttt{pos\_2\_1.xyz}:
+\begin{lstlisting}[style = MyBash]
+-26.25 61.25 61.25
+61.25 -26.25 61.25
+\end{lstlisting}
+\medskip
+
+To run: 
+\begin{lstlisting}[style = MyBash]
+$$ ../../bin/pbam run.dynamics.inp
+\end{lstlisting}
+\medskip
+
+And the resulting files: 
+
+dyn\_cont\_barn\_[traj#].xyz : 
+
+dyn\_cont\_barn\_[traj#].dat : 
+
+name: \texttt{dyn\_cont\_barn\_0.xyz}: VMD readable XYZ file that shows the trajectory of molecules in the system. The time that is snapshot was printed from is given on the same line as the word Atom. The atoms of your input file are currently labeled N, and the coarse-grain center is labeled "X" in the first column of the XYZ file.
+\begin{lstlisting}[style = MyBash]
+3135
+Atoms. Timestep (ps): 0
+N   -7.241   -0.530   18.703
+N   -6.015   -0.503   17.910
+N   -5.784    0.840   17.188
+N   -6.682    1.690   17.128
+N   -6.066   -1.580   16.827
+N   -7.519   -1.481   18.863
+N   -7.084   -0.079   19.584
+\end{lstlisting}
+\medskip
+
+name: \texttt{dyn\_cont\_barn\_[traj#].dat}:
+\begin{lstlisting}[style = MyBash]
+Statistics from simulation printed out at the same time as each XYZ snapshot.
+\end{lstlisting}
+\medskip
+
+name: \texttt{out.x.0.dat}:
+\begin{lstlisting}[style = MyBash]
+
+\end{lstlisting}
 
 
 \section{Electrostatics}
@@ -270,6 +373,8 @@ idiel 4
 sdiel 78
 
 dx out.dx
+
+3dmap electro_map.out
 
 gridct 2
 grid2D 1 out.x.0.dat x 0
@@ -353,6 +458,18 @@ component "data" value 3
 \end{lstlisting}
 \medskip
 
+name: \texttt{electro\_map.out}:
+\begin{lstlisting}[style = MyBash]
+# Data from PBAM Electrostat run
+# My runname is electro_map.out and units kT
+grid 10 10 10
+origin -4 -9 -9
+delta 0.8 1.8 1.8
+  0.00825   0.00006  -2.90002 -5.899956 
+  0.00822   0.00071  -2.90002 -5.902602 
+\end{lstlisting}
+\medskip
+
 name: \texttt{out.x.0.dat}:
 \begin{lstlisting}[style = MyBash]
 # Data from PBAM Electrostat run
@@ -368,6 +485,12 @@ maxmin 39.23 -39.23
 
 
 \chapter{Common Errors}
+
+\section{Errors while reading input file}
+Our file reader catches some errors, like files not exisiting or
+being unable to open them. Look at the verbose stream of the
+program to make sure all your flags are being caught, and check the
+stream for errors as well.
 
 \section{Segmentation Fault while reading input file}
 Our file reader is not very robust.
