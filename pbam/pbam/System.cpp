@@ -249,12 +249,24 @@ Pt System::get_pbc_dist_vec(int i, int j)
 {
   Pt ci = get_centeri(i);
   Pt cj = get_centeri(j);
-  Pt dv  = ci - cj;
+  return get_pbc_dist_vec_base(ci, cj);
+//  Pt dv  = ci - cj;
+//
+//  Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
+//          dv.y() - round(dv.y()/boxLength_)*boxLength_,
+//          dv.z() - round(dv.z()/boxLength_)*boxLength_);
+//
+//  return v;
+}
 
+Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
+{
+  Pt dv  = p1 - p2;
+  
   Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
-          dv.y() - round(dv.y()/boxLength_)*boxLength_,
-          dv.z() - round(dv.z()/boxLength_)*boxLength_);
-
+            dv.y() - round(dv.y()/boxLength_)*boxLength_,
+            dv.z() - round(dv.z()/boxLength_)*boxLength_);
+  
   return v;
 }
 

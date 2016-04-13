@@ -196,6 +196,10 @@ public:
   // between the closest image of the molecule
   Pt get_pbc_dist_vec(int i, int j);
   
+  // get distance vector between any two points taking into account periodic
+  // boundary conditions
+  Pt get_pbc_dist_vec_base(Pt p1, Pt p2);
+  
   // given a distance vector, determine whether it is in the cutoff
   bool less_than_cutoff(Pt v);
   

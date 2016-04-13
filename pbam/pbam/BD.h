@@ -100,6 +100,62 @@ public:
   string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
 };
 
+class ContactTerminate2 : public BaseTerminate
+{
+protected:
+  int mol1_;
+  int mol2_;
+  
+  vector<vector<int> > atPairs_;  // vector of size two vectors (atom index from each molecule type)
+  vector<double> dists_;  // min distance between the above pairs
+  
+public:
+  ContactTerminate2(vector<int> mol, vector<vector<int> > atpairs,
+                    vector<double> dists)
+  :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
+  dists_(dists)
+  {
+    
+  }
+  
+  const bool is_terminated(shared_ptr<System> _sys) const
+  {
+    int i, j, k, idx1, idx2;
+    Pt cen1, cen2, pos1, pos2;
+    double d;
+    
+    for ( i = 0; i < _sys->get_typect(mol1_); i++)
+    {
+      for ( j = 0; j < _sys->get_typect(mol2_); j++)
+      {
+        idx1 = _sys->get_mol_global_idx( mol1_, i);
+        idx2 = _sys->get_mol_global_idx( mol2_, j);
+        
+        cen1 = _sys->get_centeri(idx1);
+        cen2 = _sys->get_centeri(idx2);
+        
+        bool contact = true;
+        
+        for (k = 0; k < atPairs_.size(); k++)
+        {
+          pos1 = _sys->get_posij(idx1, atPairs_[k][0]);
+          pos2 = _sys->get_posij(idx2, atPairs_[k][1]);
+          
+          pos1 = pos1 + cen1;
+          pos2 = pos2 + cen2;
+          
+          d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
+          
+          if (d > dists_[k]) contact = false;
+        }
+        if (contact) return true;
+      }
+    }
+    return false;
+  }
+  
+};
+
 
 /*
  Class for time based termination
