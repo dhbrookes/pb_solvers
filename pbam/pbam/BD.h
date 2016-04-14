@@ -106,14 +106,16 @@ protected:
   int mol1_;
   int mol2_;
   
+  double pad_; // distance between spheres if contact distance cannot be met
+  
   vector<vector<int> > atPairs_;  // vector of size two vectors (atom index from each molecule type)
   vector<double> dists_;  // min distance between the above pairs
   
 public:
   ContactTerminate2(vector<int> mol, vector<vector<int> > atpairs,
-                    vector<double> dists)
+                    vector<double> dists, double pad)
   :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
-  dists_(dists)
+  dists_(dists), pad_(pad)
   {
     
   }
@@ -122,7 +124,9 @@ public:
   {
     int i, j, k, idx1, idx2;
     Pt cen1, cen2, pos1, pos2;
-    double d;
+    double a1, a2;
+    double d, dcon;
+    double sphdist1, sphdist2;  // distance of atom to edge of sphere
     
     for ( i = 0; i < _sys->get_typect(mol1_); i++)
     {
@@ -134,19 +138,42 @@ public:
         cen1 = _sys->get_centeri(idx1);
         cen2 = _sys->get_centeri(idx2);
         
+        a1 = _sys->get_ai(idx1);
+        a2 = _sys->get_ai(idx2);
+        
         bool contact = true;
         
         for (k = 0; k < atPairs_.size(); k++)
         {
+          dcon = dists_[k];
+          
           pos1 = _sys->get_posij(idx1, atPairs_[k][0]);
           pos2 = _sys->get_posij(idx2, atPairs_[k][1]);
           
+          sphdist1 = a1 - (pos1 - cen1).norm();
+          sphdist2 = a2 - (pos2 - cen2).norm();
+          
+          // if sum of distances to edge of the spheres is > contact distance,
+          // then contact can never happen and the new position is closest
+          // point on edge of sphere and new contact distance is pad
+          if ( (sphdist1 + sphdist2) > dcon)
+          {
+            pos1 = pos1 + pos1 * (sphdist1/a1); // project onto sphere surface
+            pos2 = pos2 + pos2 * (sphdist2/a2);
+            dcon = pad_;
+          }
+          
+          // get position of atoms relative to box
+          // (as opposed to center of molecule)
           pos1 = pos1 + cen1;
           pos2 = pos2 + cen2;
           
           d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
           
-          if (d > dists_[k]) contact = false;
+          if (d > dcon)
+          {
+            contact = false;
+          }
         }
         if (contact) return true;
       }
