@@ -19,7 +19,7 @@
 \contentsline {section}{\numberline {3.1}Installation}{6}{section.3.1}
 \contentsline {section}{\numberline {3.2}Input Information}{6}{section.3.2}
 \contentsline {subsubsection}{Input Files}{6}{subsubsection*.2}
-\contentsline {subsubsection}{System inputs: PQR and XYZ Files}{9}{subsubsection*.3}
+\contentsline {subsubsection}{System inputs: PQR, XYZ, and Contact files}{9}{subsubsection*.3}
 \contentsline {chapter}{\numberline {4}Example files and outputs}{10}{chapter.4}
 \contentsline {section}{\numberline {4.1}Physical calculations}{10}{section.4.1}
 \contentsline {section}{\numberline {4.2}Brownian Dynamics}{11}{section.4.2}

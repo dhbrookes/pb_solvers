@@ -59,9 +59,11 @@ protected:
   
   // for dynamics runs
   int numTerm_;  //number of termination conditions
-  vector<string> termtype_; // type of each term ('time', 'x', 'y', 'z' or 'r')
+  vector<string> termtype_; // type of each term ('time', 'x', 'y', 'z', 'r' or 'contact')
   vector<vector<int> > termmols_; // vector of molecule ids
   vector<double> termvals_; // value for each termination condition
+  vector<string> confiles_;  // contact files for contact termination conditions
+  vector<double> conpads_;  // pads for contact termination conditions
   bool andCombine_;  //if true, term conds will combine w 'and', otherwise 'or'
   
   double idiel_;
@@ -187,6 +189,8 @@ public:
   string get_termtype( int i)      { return termtype_[i]; }
   vector<int> get_termMolIDX( int i) { return termmols_[i]; }
   double get_termval( int i)       { return termvals_[i];}
+  string get_confile(int j)        { return confiles_[j]; }
+  double get_conpad(int j)         { return conpads_[j]; }
   bool get_andCombine( )           { return andCombine_; }
   
   

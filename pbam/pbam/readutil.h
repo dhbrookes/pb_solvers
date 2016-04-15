@@ -82,6 +82,60 @@ public:
   
 };
 
+
+/*
+ Class for storing information in a contact file (for dynamics termination)
+ */
+class ContactFile
+{
+protected:
+  string path_;
+  int moltype1_;
+  int moltype2_;
+  
+  vector<vector<int> > atPairs_;  // vector of size-two vectors (atom index from each molecule type)
+  vector<double> dists_;  // min distance between the above pairs
+  
+  
+  void read()
+  {
+    ifstream file(path_.c_str());
+    if (!file.is_open()) throw CouldNotReadException(path_);
+    string line;
+    
+    vector<int> pair (2);
+    int mol1, mol2, at1, at2;
+    double dist;
+    while (getline(file, line))
+    {
+      stringstream linestream(line);
+      
+      linestream >> mol1 >> at1 >> mol2 >> at2 >> dist;
+      moltype1_ = mol1;
+      moltype2_ = mol2;
+      
+      pair[0] = at1;
+      pair[1] = at2;
+      atPairs_.push_back(pair);
+      dists_.push_back(dist);
+    }
+  }
+  
+public:
+  ContactFile(string path)
+  :path_(path)
+  {
+    read();
+  }
+  
+  const string get_path() const                   { return path_; }
+  const int get_moltype1() const                  { return moltype1_; }
+  const int get_moltype2() const                  { return moltype2_; }
+  const vector<vector<int> > get_at_pairs() const { return atPairs_; }
+  const vector<double> get_dists() const          { return dists_; }
+  
+};
+
 /*
  Class for reading and storing the info in .pqr files
  */
