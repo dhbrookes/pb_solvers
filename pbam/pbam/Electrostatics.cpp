@@ -312,25 +312,26 @@ void Electrostatic::print_grid(string axis, double value, string fname)
 
 void Electrostatic::compute_pot()
 {
-  int mol, xct, yct, zct;
-  Pt center, pos;
-  bool cont;
-  double rad;
-  
   int Nmol = _sys_->get_n();
   double e_s = _consts_->get_dielectric_water();
-  
-  // Parallel here!
-  for ( xct=0; xct<npts_[0]; xct++)
+  clock_t t;
+  t = clock();
+  #pragma omp parallel for
+  for ( int xct=0; xct<npts_[0]; xct++)
   {
     cout  << range_min_[0]+xct*step_[0] << " ..  " << endl ;
-    for ( yct=0; yct<npts_[1]; yct++)
+    for (int yct=0; yct<npts_[1]; yct++)
     {
-      for ( zct=0; zct<npts_[2]; zct++)
+      for ( int zct=0; zct<npts_[2]; zct++)
       {
+        Pt center, pos;
+        bool cont;
+        double rad;
         cont = false;
+        int mol;
         for ( mol = 0; mol < Nmol; mol++)
         {
+          
           center = _sys_->get_centeri(mol);
           rad    = _sys_->get_radi(mol);
           pos = Pt(range_min_[0]+xct*step_[0], range_min_[1]+yct*step_[1],
@@ -342,14 +343,19 @@ void Electrostatic::compute_pot()
             break;
           }
         }
-        
+        #pragma omp critical
+        {
         if (cont)
           esp_[xct][yct][zct] = NAN;
         else
           esp_[xct][yct][zct] = (units_*compute_pot_at(pos))/e_s;
+        }
       }
     }
   }
+  t = clock() - t;
+  printf ("compute_pot() took me %lu clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
+  
 }
 
 double Electrostatic::compute_pot_at( Pt point )

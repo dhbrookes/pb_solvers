@@ -32,6 +32,9 @@
 #define Electrostatics_h
 
 #include "ASolver.h"
+#include <time.h> 
+//#include <omp.h>
+
 
 
 // Exception class to ensure that molecule
