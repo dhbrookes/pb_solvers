@@ -327,11 +327,7 @@ $$ ../../bin/pbam run.dynamics.inp
 
 And the resulting files: 
 
-dyn\_cont\_barn\_[traj#].xyz : 
-
-dyn\_cont\_barn\_[traj#].dat : 
-
-name: \texttt{dyn\_cont\_barn\_0.xyz}: VMD readable XYZ file that shows the trajectory of molecules in the system. The time that is snapshot was printed from is given on the same line as the word Atom. The atoms of your input file are currently labeled N, and the coarse-grain center is labeled "X" in the first column of the XYZ file.
+name: \texttt{dyn\_cont\_barn\_[traj\#].xyz}: VMD readable XYZ file that shows the trajectory of molecules in the system. The time that is snapshot was printed from is given on the same line as the word Atom. The atoms of your input file are currently labeled N, and the coarse-grain center is labeled "X" in the first column of the XYZ file.
 \begin{lstlisting}[style = MyBash]
 3135
 Atoms. Timestep (ps): 0
@@ -345,15 +341,29 @@ N   -7.084   -0.079   19.584
 \end{lstlisting}
 \medskip
 
-name: \texttt{dyn\_cont\_barn\_[traj#].dat}:
+name: \texttt{dyn\_cont\_barn\_[traj\#].dat}: Statistics from simulation printed out at the same time as each XYZ snapshot. The energy is not computed and should be ignored.
 \begin{lstlisting}[style = MyBash]
-Statistics from simulation printed out at the same time as each XYZ snapshot.
+My units are Internal. Time (ps) 500.4
+MOLECULE #1
+	POSITION: [0, 0, 0]
+	ENERGY: 0
+	FORCE: 3.39124e-06, [1.69863e-06 2.07547e-06 6.5356e-07]
+	TORQUE: 2.55224e-05, [-2.11728e-05 1.00774e-05 3.08631e-05]
+MOLECULE #2
+	POSITION: [87.211, 43.861, 21.691]
+	ENERGY: 0
+	FORCE: 3.65373e-06, [-1.87502e-06 -2.21744e-06 -7.27314e-07]
+	TORQUE: 1.91656e-05, [8.14396e-06 -1.22678e-05 1.56284e-05]
 \end{lstlisting}
 \medskip
 
-name: \texttt{out.x.0.dat}:
+name: \texttt{dyn\_nam\_barn.stat }: Details about how each simulation has terminated and the time at which this occurred.
 \begin{lstlisting}[style = MyBash]
-
+Molecule type 1 has fulfilled condition: r >= 500.00;	 at time (ps) 1.32367e+06
+Molecule type 1 has fulfilled condition: r >= 500.00;	 at time (ps) 1.15712e+06
+System has fulfilled condition: Type 0 and Type 1 are within  2.50;	 at time (ps) 1.90603e+06
+Molecule type 1 has fulfilled condition: r >= 500.00;	 at time (ps) 2.18533e+06
+System has fulfilled condition: Type 0 and Type 1 are within  2.50;	 at time (ps) 1.59066e+06
 \end{lstlisting}
 
 
