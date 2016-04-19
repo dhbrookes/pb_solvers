@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <random>
 #include <memory>
 #include "EnergyForce.h"
+#include "readutil.h"
 
 /*
  Base class for implementing termination conditions in BD
@@ -117,7 +118,12 @@ public:
   :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
   dists_(dists), pad_(pad)
   {
-    
+  }
+  
+  ContactTerminate2(ContactFile confile, double pad)
+  :pad_(pad), mol1_(confile.get_moltype1()), mol2_(confile.get_moltype2()),
+  atPairs_(confile.get_at_pairs()), dists_(confile.get_dists())
+  {
   }
   
   const bool is_terminated(shared_ptr<System> _sys) const
@@ -150,16 +156,16 @@ public:
           pos1 = _sys->get_posij(idx1, atPairs_[k][0]);
           pos2 = _sys->get_posij(idx2, atPairs_[k][1]);
           
-          sphdist1 = a1 - (pos1 - cen1).norm();
-          sphdist2 = a2 - (pos2 - cen2).norm();
+          sphdist1 = a1 - pos1.norm();
+          sphdist2 = a2 - pos2.norm();
           
           // if sum of distances to edge of the spheres is > contact distance,
           // then contact can never happen and the new position is closest
           // point on edge of sphere and new contact distance is pad
           if ( (sphdist1 + sphdist2) > dcon)
           {
-            pos1 = pos1 + pos1 * (sphdist1/a1); // project onto sphere surface
-            pos2 = pos2 + pos2 * (sphdist2/a2);
+            pos1 = pos1 * (a1/pos1.norm()); // project onto sphere surface
+            pos2 = pos2 * (a2/pos2.norm());
             dcon = pad_;
           }
           

@@ -19,24 +19,24 @@
 \contentsline {section}{\numberline {3.1}Installation}{6}{section.3.1}
 \contentsline {section}{\numberline {3.2}Input Information}{6}{section.3.2}
 \contentsline {subsubsection}{Input Files}{6}{subsubsection*.2}
-\contentsline {subsubsection}{System inputs: PQR and XYZ Files}{9}{subsubsection*.3}
-\contentsline {chapter}{\numberline {4}Example files and outputs}{10}{chapter.4}
-\contentsline {section}{\numberline {4.1}Physical calculations}{10}{section.4.1}
-\contentsline {section}{\numberline {4.2}Brownian Dynamics}{11}{section.4.2}
-\contentsline {section}{\numberline {4.3}Electrostatics}{12}{section.4.3}
-\contentsline {chapter}{\numberline {5}Common Errors}{15}{chapter.5}
-\contentsline {section}{\numberline {5.1}Errors while reading input file}{15}{section.5.1}
-\contentsline {section}{\numberline {5.2}Segmentation Fault while reading input file}{15}{section.5.2}
-\contentsline {section}{\numberline {5.3}Initial configuration errors}{15}{section.5.3}
+\contentsline {subsubsection}{System inputs: PQR, XYZ, and Contact files}{10}{subsubsection*.3}
+\contentsline {chapter}{\numberline {4}Example files and outputs}{11}{chapter.4}
+\contentsline {section}{\numberline {4.1}Physical calculations}{11}{section.4.1}
+\contentsline {section}{\numberline {4.2}Brownian Dynamics}{12}{section.4.2}
+\contentsline {section}{\numberline {4.3}Electrostatics}{13}{section.4.3}
+\contentsline {chapter}{\numberline {5}Common Errors}{16}{chapter.5}
+\contentsline {section}{\numberline {5.1}Errors while reading input file}{16}{section.5.1}
+\contentsline {section}{\numberline {5.2}Segmentation Fault while reading input file}{16}{section.5.2}
+\contentsline {section}{\numberline {5.3}Initial configuration errors}{16}{section.5.3}
 \gdef \the@ipfilectr {}
 \gdef \the@ipfilectr {@-5}
-\contentsline {chapter}{\numberline {6}Analysis Tools}{16}{chapter.6}
-\contentsline {section}{\numberline {6.1}Viewing PQR in VMD}{16}{section.6.1}
-\contentsline {section}{\numberline {6.2}Dynamics tools}{16}{section.6.2}
-\contentsline {subsection}{\numberline {6.2.1}Viewing Dynamics in VMD}{16}{subsection.6.2.1}
-\contentsline {section}{\numberline {6.3}Electrostatics tools}{16}{section.6.3}
-\contentsline {subsection}{\numberline {6.3.1}Viewing Electrostatics in VMD}{16}{subsection.6.3.1}
-\contentsline {subsection}{\numberline {6.3.2}2D ESP plots}{18}{subsection.6.3.2}
-\contentsline {subsection}{\numberline {6.3.3}3D ESP plots}{18}{subsection.6.3.3}
+\contentsline {chapter}{\numberline {6}Analysis Tools}{17}{chapter.6}
+\contentsline {section}{\numberline {6.1}Viewing PQR in VMD}{17}{section.6.1}
+\contentsline {section}{\numberline {6.2}Dynamics tools}{17}{section.6.2}
+\contentsline {subsection}{\numberline {6.2.1}Viewing Dynamics in VMD}{17}{subsection.6.2.1}
+\contentsline {section}{\numberline {6.3}Electrostatics tools}{17}{section.6.3}
+\contentsline {subsection}{\numberline {6.3.1}Viewing Electrostatics in VMD}{17}{subsection.6.3.1}
+\contentsline {subsection}{\numberline {6.3.2}2D ESP plots}{19}{subsection.6.3.2}
+\contentsline {subsection}{\numberline {6.3.3}3D ESP plots}{19}{subsection.6.3.3}
 \gdef \the@ipfilectr {}
 \contentsfinish 

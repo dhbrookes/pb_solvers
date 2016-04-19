@@ -100,7 +100,6 @@ Each keyword is described in the table below, along with its associated paramete
 \newlength{\coltwo}
 \setlength{\coltwo}{2.9cm}
 
-%\begin{tabular}{ c l m{4cm} | m{3cm}  }
 \begin{tabular}{ c | l | l  }
     \textbf{Keyword} & \textbf{Parameters} & \textbf{Description} \\ \hline
 \T runname & \param{name} & \parbox[t]{\colthree}{\param{name} is desired internal name of this run.} \\
@@ -123,29 +122,44 @@ Each keyword is described in the table below, along with its associated paramete
 \setlength{\colthree}{8.1cm}
 \setlength{\coltwo}{2.5cm}
 
-%\begin{tabular}{ c l m{4cm} | m{3cm}  }
 \begin{tabular}{ c | l | l}
     \textbf{Keyword} & \textbf{Parameters} & \textbf{Description} \\ \hline
 
-\T runtype electrostatics & \param{gridpts} & \parbox[t]{\colthree}{Will run electrostatics calculations. \param{gridpts} is an optional integer describing the number of evenly spaced points in each dimension to perform calculations on.}\\
-\T dx & \param{fname} & \parbox[t]{\colthree}{For electrostatics. Will write the results of electrostatics calculations for every 3D grid point to \param{fname}, in the same output format as APBS dx file.} \\
-\T 3dmap & \param{fname} & \parbox[t]{\colthree}{For electrostatics. Will write the results of electrostatics calculations for points on the surface of the molecules in the system.} \\
-\T gridct & \param{ct} & \parbox[t]{\colthree}{For electrostatics. \param{ct} is the number of 2D grids to output.} \\
+\T runtype electrostatics & \param{gridpts} & \parbox[t]{\colthree}{Will run electrostatics calculations. \param{gridpts} is an optional integer describing the number of evenly spaced points in each dimension to perform calculations on.\B}\\
+
+\T dx & \param{fname} & \parbox[t]{\colthree}{For electrostatics. Will write the results of electrostatics calculations for every 3D grid point to \param{fname}, in the same output format as APBS dx file.\B} \\
+
+\T 3dmap & \param{fname} & \parbox[t]{\colthree}{For electrostatics. Will write the results of electrostatics calculations for points on the surface of the molecules in the system.\B} \\
+
+\T gridct & \param{ct} & \parbox[t]{\colthree}{For electrostatics. \param{ct} is the number of 2D grids to output.\B} \\
+
 \T grid2d & \parbox[t]{\coltwo}{\param{idx} \param{fname} \param{axis} \param{val} } & \parbox[t]{\colthree}{For electrostatics. Set attributes of a grid output where \param{idx} is the integer id of this grid, which can be 1 to \param{ct} (above). Will write output of calculations for a cross section along \param{axis} (\texttt{x}, \texttt{y}, or \texttt{z}) at \param{value}.\B} \\
+
 \hline
+  \end{tabular}
+  
+  
+  \begin{tabular}{ c | l | l}
+    \textbf{Keyword} & \textbf{Parameters} & \textbf{Description} \\ \hline
 \T runtype dynamics & \parbox[t]{\coltwo}{ \param{outname}  \param{ntraj}} & \parbox[t]{\colthree}{Will perform a brownian dynamics run. A directory where trajectory information will be stored in and the number of trajectories is required.\B}  \\
+
 \T termct & \param{ct} & \parbox[t]{\colthree}{Set number of termination conditions to \param{ct}.}  \\
+
 \T termcombine & \param{andor} & \parbox[t]{\colthree}{Set how termination conditions will be combined. \param{andor} should be \texttt{and} or \texttt{or}. Default is \texttt{or}.} \\
-\T term & \parbox[t]{\coltwo}{\param{idx} \param{type} \param{val} \param{mols}} & \parbox[t]{\colthree}{Set attributes of a termination condition where \param{idx} is the integer id of this condition, which can be 1 to \param{ct} (above). \param{type} can be \texttt{time}, \texttt{contact},  \texttt{x<=}, \texttt{y<=}, \texttt{z<=}, or \texttt{r<=} (or the \texttt{>=} equivalents of these), \param{val} is the value where the simulation will terminate and \param{mols} is a whitespace-delimited list of molecular indices that this condition applies to (\texttt{contact} requires 2, \texttt{time} requires 0, and all else require 1). \B} \\
+
+\T term & \parbox[t]{\coltwo}{\param{idx} \param{type} \param{val} \param{mols}} & \parbox[t]{\colthree}{Set attributes of a termination condition where \param{idx} is the integer id of this condition, which can be 1 to \param{ct} (above). \param{type} can be \texttt{time},  \texttt{x<=}, \texttt{y<=}, \texttt{z<=}, or \texttt{r<=} (or the \texttt{>=} equivalents of these), \param{val} is the value where the simulation will terminate and \param{mols} is a whitespace-delimited list of molecular indices that this condition applies to (\texttt{time} requires 0, and all else require 1). \B} \\
+
+\T term \param{idx} contact & \parbox[t]{\coltwo}{\param{confile} \param{pad}} & \parbox[t]{\colthree}{Set attributes of contact termination condition, where \param{idx} is the integer id of this condition, \param{confile} is a path to a file containing the contact information, and \param{pad} specifies a correction for the case when the contact distance cannot be reached due to the spherical assumption of the model. See below for more info. \B} \\
+
 \T xyz & \parbox[t]{\coltwo}{\param{idx} \param{trajidx} \param{fpath} }& \parbox[t]{\colthree}{\param{idx} is the molecule index for this xyz file. Provide input XYZ file at \param{fpath}. For the dynamics run, a starting configuration is needed for each trajectory for all the molecule types, so there should be \param{ntraj} xyz lines for each molecule, the trajectory number denoted by \param{trajidx}. \B} \\
 \hline
 \T runtype energyforce &  \param{outfilename} & \parbox[t]{\colthree}{Will calculate the interaction energy, the forces and torques for the system input. \param{outfilename} is a filename that you would like the information printed to. If none is entered, the information will be printed to the command line.\B}  \\
 \hline
   \end{tabular}
-  
-  \clearpage
 
-\subsubsection{System inputs: PQR and XYZ Files}
+\clearpage
+
+\subsubsection{System inputs: PQR, XYZ, and Contact files}
 
 All the options above require a \textbf{PQR} file name. A PQR file can be generated from a PDB file using the PDB2PQR program, available as a web server or for download at: \\
 
@@ -177,6 +191,17 @@ The \textbf{XYZ} file simply specifies the desired molecule centers for a given 
 \texttt{mol1X  mol1Y  mol1Z }\\
 \texttt{mol2X  mol2Y  mol2Z }\\
 \texttt{mol3X  mol3Y  mol3Z }\\
+
+\textbf{Contact} files describe contacts between two molecular types. Generally this information is used to determine if a dynamics 
+simulation should be terminated (e.g. terminate a simulation after two proteins have docked). The contact file contains lines with the format: \\
+
+\texttt{mol1  at1 mol2 at2 dist}\\
+
+where \texttt{mol1} and \texttt{mol2} are indices of the molecular types, \texttt{at1} is the index of an atom from the first 
+molecular type, \texttt{at2} is the index of an atom from the second molecular type and \texttt{dist} is the maximum distance between
+the two atoms that defines the contact.  Note that sometimes these distances cannot be reached due to the assumption in this model that 
+the molecule is spherical. To correct for this case, one must specify a \"pad\"  distance that is defined as the maximum distance between 
+the radial projections of the atoms onto the surface of their respective spheres that defines a contact.
 
 \clearpage
 
@@ -328,6 +353,7 @@ $$ ../../bin/pbam run.dynamics.inp
 And the resulting files: 
 
 name: \texttt{dyn\_cont\_barn\_[traj\#].xyz}: VMD readable XYZ file that shows the trajectory of molecules in the system. The time that is snapshot was printed from is given on the same line as the word Atom. The atoms of your input file are currently labeled N, and the coarse-grain center is labeled "X" in the first column of the XYZ file.
+
 \begin{lstlisting}[style = MyBash]
 3135
 Atoms. Timestep (ps): 0
@@ -342,6 +368,7 @@ N   -7.084   -0.079   19.584
 \medskip
 
 name: \texttt{dyn\_cont\_barn\_[traj\#].dat}: Statistics from simulation printed out at the same time as each XYZ snapshot. The energy is not computed and should be ignored.
+
 \begin{lstlisting}[style = MyBash]
 My units are Internal. Time (ps) 500.4
 MOLECULE #1

@@ -39,7 +39,7 @@ using namespace std;
 int main_dynamics( int poles, double tol, shared_ptr<Setup> setup,
                   shared_ptr<Constants> consts, shared_ptr<System> sys)
 {
-  int i, traj;
+  int i, j, traj;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
@@ -59,9 +59,15 @@ int main_dynamics( int poles, double tol, shared_ptr<Setup> setup,
     if ( type == "contact" )
     {
       cout << "Contact termination found for molecules ";
-      cout << setup->get_termMolIDX(i)[0] << " and ";
-      cout << setup->get_termMolIDX(i)[1] << " at a distance " << val << endl;
-      terms[i] = make_shared<ContactTerminate>( setup->get_termMolIDX(i), val);
+      string conpath = setup->get_confile(j);
+      double pad = setup->get_conpad(j);
+      ContactFile confile (conpath);
+      
+      auto conterm = make_shared<ContactTerminate>(confile, pad);
+//      cout << setup->get_termMolIDX(i)[0] << " and ";
+//      cout << setup->get_termMolIDX(i)[1] << " at a distance " << val << endl;
+//      terms[i] = make_shared<ContactTerminate>( setup->get_termMolIDX(i), val);
+      j += 1;  // j is index of contact termconditions
     } else if (type.substr(0,1) == "x")
     {
       cout << type << " termination found for molecule ";

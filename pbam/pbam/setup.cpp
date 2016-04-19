@@ -220,11 +220,20 @@ void Setup::findKeyword(vector<string> fline)
     vector<int> mol_idx(2);
     if (type == "contact")
     {
-      mol_idx[0] = atoi(fline[4].c_str()) - 1;
-      mol_idx[1] = atoi(fline[5].c_str()) - 1;
+      string confile = fline[3];
+      double pad  = atof(fline[4].c_str());
+      // placeholders:
+      mol_idx = {-1};
+      val = -1;
+      confiles_.push_back(confile);
+      conpads_.push_back(pad);
     }
-    else  mol_idx[0] = atoi(fline[4].c_str()) - 1;
-    add_termcond(idx, fline[2], mol_idx, val);
+    else
+    {
+      mol_idx[0] = atoi(fline[4].c_str()) - 1;
+    }
+    add_termcond(idx, type, mol_idx, val);
+    
   } else if (keyword == "attypes")
   {
     cout << "Atom Types command found" << endl;
