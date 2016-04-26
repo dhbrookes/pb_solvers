@@ -236,6 +236,8 @@ void get_check_inputs(shared_ptr<Setup> &setFile, shared_ptr<System> &syst,
 int main(int argc, const char * argv[])
 {
   string input_file = argv[1];
+//  string input_file = "/Users/davidbrookes/data/2fgr/run.electrostatic_abs.inp";
+//  string input_file = "/Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/energyforce_test/run.energyforce_david.inp";
 //  string input_file = "/Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/dynamics_test/contact_1BRS_nam/run.dyn.hard.refs";
 //  string input_file = "/Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/electrostatic_test/run.electrostatic_david.inp";
 

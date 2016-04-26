@@ -29,7 +29,7 @@ double EnergyCalc::calc_ei(int i)
 {
   double ei;
   int n, m;
-  cmplx unm, vnm;
+  
   MyMatrix<cmplx> Li = _L_->operator[](i);
   MyMatrix<cmplx> Ai = _A_->operator[](i);
   
@@ -39,6 +39,7 @@ double EnergyCalc::calc_ei(int i)
   {
     for (m = -n; m <= n; m++)
     {
+      cmplx unm, vnm;
       unm = Li(n, m + p_);
       vnm = Ai(n, m + p_);
       ei += unm.real()*vnm.real() + unm.imag()*vnm.imag();

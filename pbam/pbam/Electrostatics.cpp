@@ -316,14 +316,20 @@ void Electrostatic::compute_pot()
   double e_s = _consts_->get_dielectric_water();
   clock_t t;
   t = clock();
+  int total = 0;
   #pragma omp parallel for
   for ( int xct=0; xct<npts_[0]; xct++)
   {
-    cout  << range_min_[0]+xct*step_[0] << " ..  " << endl ;
+//    cout  << range_min_[0]+xct*step_[0] << " ..  " << endl ;
     for (int yct=0; yct<npts_[1]; yct++)
     {
       for ( int zct=0; zct<npts_[2]; zct++)
       {
+        #pragma omp atomic
+//        total += 1;
+//        
+//        if (total % 100000 == 0) cout << total << "\t" << ((float) (clock() - t ))/CLOCKS_PER_SEC <<  endl;
+        
         Pt center, pos;
         bool cont;
         double rad;
