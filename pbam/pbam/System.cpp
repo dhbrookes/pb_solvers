@@ -41,7 +41,7 @@ Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
                    double drot, double dtrans)
 :moveType_(movetype), drot_(drot), dtrans_(dtrans),
 qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()), center_(cen), unwrappedCenter_(cen)
+M_((int) pos.size()), center_(cen), unwrappedCenter_(cen), a_(0)
 {
   set_Dtr_Drot(movetype);
   reposition_charges();
@@ -53,7 +53,7 @@ Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
                    double drot, double dtrans)
 :moveType_(movetype), drot_(drot), dtrans_(dtrans),
 qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size())
+M_((int) pos.size()), a_(0)
 {
   set_Dtr_Drot(movetype);
   calc_center();
@@ -171,6 +171,7 @@ System::System(Setup setup, double cutoff)
   vector<int> keys(2);
   for (i = 0; i < setup.get_ntype(); i++)
   {
+    
     PQRFile pqrI (setup.getTypeNPQR(i));
     XYZFile xyzI (setup.getTypeNXYZ(i), setup.getTypeNCount(i));
     for (j = 0; j < setup.getTypeNCount(i); j++)
@@ -195,7 +196,9 @@ System::System(Setup setup, double cutoff)
                        repos_charges, pqrI.get_radii(),
                        xyzI.get_pts()[j], i, j,
                        setup.getDrot(i), setup.getDtr(i));
+        
       }
+      
       molecules_.push_back(mol);
       typeIdxToIdx_[keys] = k;
       k++;
@@ -251,13 +254,6 @@ Pt System::get_pbc_dist_vec(int i, int j)
   Pt ci = get_centeri(i);
   Pt cj = get_centeri(j);
   return get_pbc_dist_vec_base(ci, cj);
-//  Pt dv  = ci - cj;
-//
-//  Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
-//          dv.y() - round(dv.y()/boxLength_)*boxLength_,
-//          dv.z() - round(dv.z()/boxLength_)*boxLength_);
-//
-//  return v;
 }
 
 Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
