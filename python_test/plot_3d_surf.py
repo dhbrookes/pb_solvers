@@ -3,13 +3,16 @@ import matplotlib.pyplot as plt
 from pylab import *
 from mpl_toolkits.mplot3d import Axes3D
 
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
+
 '''
 Program to plot a 3D version of the ESP from PB-AM
 '''
-dirName='/Users/lfelberg/'
-fileName = dirName + 'PBSAM/pb_solvers/pbam/'
-fileName += 'pbam_test_files/electro_barnase_test/barn_map.out'
-outFile= dirName + 'Desktop/out.surf'
+dirName='/Users/davidbrookes/'
+# fileName = dirName + 'PBSAM/pb_solvers/pbam/'
+fileName = dirName + 'data/2fgr/2fgr_tri_move_map.out'
+outFile= dirName + 'Desktop/trimer_monoview_out.surf'
 
 #-----------------------------------------------------------------------
 def randrange(n, vmin, vmax):
@@ -59,29 +62,50 @@ def dispPlot( org, bn, xv, yv, zv, potential,
     colmap = cm.ScalarMappable(cmap=cm.jet)
     colmap.set_array(potential)
 
+    n = len(xv)
+    for i in range(n):
+        if xv[i] < 0:
+            break
+
+    xv = xv[:i]
+    yv = yv[:i]
+    zv = zv[:i]
+    potential=potential[:i]
+
+    xv -= np.mean(xv)
+    yv -= np.mean(yv)
+    zv -= np.mean(zv)
+    
+
     yg = ax.scatter(xv, yv, zv, c=potential, cmap = plt.get_cmap('jet'), marker='o', lw = 0)
     cb = fig.colorbar(colmap)
+    cb.set_label("%s" % units)
 
     minl = min(min(xv), min(yv), min(zv))
     maxl = max(max(xv), max(yv), max(zv))
 
-    ax.set_xlim([minl, maxl])
-    ax.set_ylim([minl, maxl])
-    ax.set_zlim([minl, maxl])
+    ax.set_xlim([minl-10, maxl+10])
+    ax.set_ylim([minl-10, maxl+10])
+    ax.set_zlim([minl-10, maxl+10])
 
     plt.title(title, fontsize = 13);
-    ax.set_xlabel(r'$X (\AA)$', fontsize = 10)
-    ax.set_ylabel(r'$Y (\AA)$', fontsize = 10)
-    ax.set_zlabel(r'$Z (\AA)$', fontsize = 10)
+    ax.set_xlabel(r'$X (\AA)$', fontsize = 12)
+    ax.set_ylabel(r'$Y (\AA)$', fontsize = 12)
+    ax.set_zlabel(r'$Z (\AA)$', fontsize = 12)
     for tick in ax.xaxis.get_major_ticks():
         tick.label.set_fontsize(8)
     for tick in ax.yaxis.get_major_ticks():
         tick.label.set_fontsize(8)
+    for tick in ax.zaxis.get_major_ticks():
+        tick.label.set_fontsize(8)
     if outFile != None:
         for ii in xrange(0,360,90):
-            ax.view_init(elev=10., azim=ii)
-            plt.savefig(outFile+str(ii)+'.jpg',
-                              bbox_inches='tight', dpi = 200)
+            ax.view_init(elev=20., azim=ii)
+            plt.gcf().subplots_adjust(bottom=0.15)
+            plt.savefig(outFile+str(ii)+'.jpg', dpi = 300)
+
+    # ax.xaxis._axinfo['label']['space_factor'] = 6
+    plt.tight_layout()
     plt.close()
     #plt.show()
 
@@ -90,7 +114,9 @@ def dispPlot( org, bn, xv, yv, zv, potential,
 
 plt.close()
 esp, org, dl, units = FileOpen(fileName)
-titl = 'Potential at surfaces in ' + units
+if units == "jmol":
+    units = "$J/$mol"
+titl = 'Potential at surfaces in %s' % units
 
 dispPlot( org, dl, esp[:,0], esp[:,1], esp[:,2], esp[:,3],
           titl, outFile=outFile)

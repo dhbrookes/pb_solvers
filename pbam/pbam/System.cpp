@@ -179,6 +179,7 @@ System::System(Setup setup, double cutoff)
       keys = { i, j };
       vector<Pt> repos_charges(pqrI.get_M());
       Pt com = pqrI.get_cg_centers()[0];
+      cout << com.x() << "\t" << com.y() << "\t" << com.z() << endl;
       Pt move = xyzI.get_pts()[j] + com * -1.0;
       for ( chg = 0; chg < pqrI.get_M(); chg ++)
         repos_charges[chg] = pqrI.get_atom_pts()[chg] + move;

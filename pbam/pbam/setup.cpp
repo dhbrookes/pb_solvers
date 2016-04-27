@@ -280,6 +280,7 @@ void Setup::findKeyword(vector<string> fline)
     if (typeNo > getNType()-1)
       return;
     setTypeNPQR( typeNo, fline[2].c_str() );
+    cout << "This is my molecule" << typeNo << fline[2].c_str() << endl;
   } else if (keyword == "xyz")
   {
     string xyz;
@@ -298,6 +299,7 @@ void Setup::findKeyword(vector<string> fline)
     if (typeNo > getNType()-1)
       return;
     setTypeNXYZ( typeNo, traj, xyz );
+    cout << "This is my molecule" << typeNo << fline[2].c_str() << endl;
     
   } else if (keyword == "randorient")
   {

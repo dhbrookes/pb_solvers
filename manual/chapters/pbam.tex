@@ -106,6 +106,7 @@ Each keyword is described in the table below, along with its associated paramete
 \T attypes & \param{numtypes} & \parbox[t]{\colthree}{Set the number of different atom types to \param{numtypes}.}\\
 \T pqr & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this xyz file. Provide input PQR file at \param{fpath}.} \\
 \T xyz & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this xyz file. Provide input XYZ file at \param{fpath}.} \\
+\T transrot & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule type index for this translation/rotation file that can be input instead of a xyz file. Provide input file at \param{fpath}.}\\
 \T randorient &  & \parbox[t]{\colthree}{If you want your molecules to be randomly rotated, use this flag} \\
 \T units & \param{units} & \parbox[t]{\colthree}{Set the units of output to \param{units}. The current options are: \texttt{jmol} (Joules/mole), \texttt{kT} and \texttt{kcalmol} (kCal/mole).}\\
 \T salt & \param{con} & \parbox[t]{\colthree}{Set salt concentration in the system to \param{con}.}\\
@@ -159,7 +160,7 @@ Each keyword is described in the table below, along with its associated paramete
 
 \clearpage
 
-\subsubsection{System inputs: PQR, XYZ, and Contact files}
+\subsubsection{System inputs: PQR, XYZ, Translation/Rotation and Contact files }
 
 All the options above require a \textbf{PQR} file name. A PQR file can be generated from a PDB file using the PDB2PQR program, available as a web server or for download at: \\
 
@@ -192,12 +193,27 @@ The \textbf{XYZ} file simply specifies the desired molecule centers for a given 
 \texttt{mol2X  mol2Y  mol2Z }\\
 \texttt{mol3X  mol3Y  mol3Z }\\
 
+
+\textbf{Translation/Rotation} Instead of a XYZ file, one can input a file specifying the translations and rotations that should be applied to 
+each molecule of a particular type. For these files, we follow the PDB standard for rotation matrices and translation vectors, 
+which is as follows: \\
+
+\texttt{mol1 rot\_1\_11 rot\_1\_12 rot\_1\_13 trans\_1\_1} \\
+\texttt{mol1 rot\_1\_21 rot\_1\_22 rot\_1\_23 trans\_1\_2} \\
+\texttt{mol1 rot\_1\_31 rot\_1\_32 rot\_1\_33 trans\_1\_3} \\
+\texttt{mol2 rot\_2\_11 rot\_2\_12 rot\_2\_13 trans\_2\_1} \\
+\texttt{mol2 rot\_2\_21 rot\_2\_22 rot\_2\_23 trans\_2\_2} \\
+\texttt{mol2 rot\_2\_31 rot\_2\_32 rot\_2\_33 trans\_2\_3} \\
+
+where \texttt{mol1} and \texttt{mol2} are indices of the molecule of the type this file applies to, \texttt{rot\_i\_jk} is the \texttt{j,k} index
+of the rotation matrix for molecule \texttt{i} and \texttt{trans\_i\_j} is the \texttt{j}th element in the translation vector for molecule \texttt{i}.
+
 \textbf{Contact} files describe contacts between two molecular types. Generally this information is used to determine if a dynamics 
 simulation should be terminated (e.g. terminate a simulation after two proteins have docked). The contact file contains lines with the format: \\
 
-\texttt{mol1  at1 mol2 at2 dist}\\
+\texttt{moltype1  at1 moltype2 at2 dist}\\
 
-where \texttt{mol1} and \texttt{mol2} are indices of the molecular types, \texttt{at1} is the index of an atom from the first 
+where \texttt{moltype1} and \texttt{moltype2} are indices of the molecular types, \texttt{at1} is the index of an atom from the first 
 molecular type, \texttt{at2} is the index of an atom from the second molecular type and \texttt{dist} is the maximum distance between
 the two atoms that defines the contact.  Note that sometimes these distances cannot be reached due to the assumption in this model that 
 the molecule is spherical. To correct for this case, one must specify a \"pad\"  distance that is defined as the maximum distance between 

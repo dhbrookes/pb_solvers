@@ -185,7 +185,7 @@ protected:
           cent = cent + Pt(x,y,z);
         }
       }
-      fin.getline(buf,99);
+      fin.getline(buf,599);
     }
     M_ = int(atomCenters_.size());
     if (cg_ == false) cgCenters_.push_back( cent * (1./(double) M_));
