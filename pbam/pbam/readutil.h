@@ -111,11 +111,11 @@ protected:
       stringstream linestream(line);
       
       linestream >> mol1 >> at1 >> mol2 >> at2 >> dist;
-      moltype1_ = mol1;
-      moltype2_ = mol2;
-      
-      pair[0] = at1;
-      pair[1] = at2;
+      moltype1_ = mol1 - 1;
+      moltype2_ = mol2 - 1;
+
+      pair[0] = at1 - 1;
+      pair[1] = at2 - 1;
       atPairs_.push_back(pair);
       dists_.push_back(dist);
     }

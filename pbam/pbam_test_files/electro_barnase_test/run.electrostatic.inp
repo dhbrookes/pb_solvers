@@ -1,23 +1,23 @@
-runtype electrostatics 20
-runname barn.out
+runtype electrostatics 120
+runname bars.out
 
 units kT
 salt 0.0
 temp 298
-idiel 2 
+idiel 4 
 sdiel 78
 
 #randorient
 
-#dx barnase_pbam.dx
+dx barstar_pbam.dx
 
-3dmap barn_map.out
+3dmap bars_map.out
 
-#gridct 2
-#grid2D 1 barnase.y.0.dat y 0
-#grid2D 2 barnase.z.0.dat z 0
+gridct 2
+grid2D 1 barstar.y.-19.dat y -19.8619
+grid2D 2 barstar.z.-22.dat z -22.722
 
 attypes 1
 type 1 1
-pqr 1 barnaseh.pqr
-xyz 1 zero.xyz
+pqr 1 1BRS_D.pqr
+xyz 1 positions_D.xyz

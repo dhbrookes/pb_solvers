@@ -73,6 +73,8 @@ andCombine_(false)
     xyz_names_[i][0] = molfn[i][1];
   }
   
+  confiles_.resize(0);
+  
   read_infile(infile);
 }
 
@@ -225,8 +227,11 @@ void Setup::findKeyword(vector<string> fline)
       // placeholders:
       mol_idx = {-1};
       val = -1;
-      confiles_.push_back(confile);
+      confiles_.push_back(fline[3]);
+      cout << "Contact size " << confiles_.size() << endl;
       conpads_.push_back(pad);
+      cout << "This is my first contact file " << confiles_[0] << endl;
+      cout << "This is my first contact file " << fline[3] << endl;
     }
     else
     {
