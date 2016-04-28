@@ -59,18 +59,10 @@ int main_dynamics( int poles, double tol, shared_ptr<Setup> setup,
     if ( type == "contact" )
     {
       cout << "Contact termination found for molecules ";
-      string conpath = setup->get_confile(j);
       double pad = setup->get_conpad(j);
-      ContactFile confile (conpath);
-      
+      ContactFile confile (setup->get_confile(j));
       auto conterm = make_shared<ContactTerminate2>(confile, pad);
-      
-      vector<vector<int> > pairs = confile.get_at_pairs();
-      
-      for (int k1 = 0; k1<pairs.size(); k1++)
-        cout << pairs[k1][0] << " and " << pairs[k1][1]  << endl;
-      cout  << " at a distance " << pad << endl;
-//      terms[i] = make_shared<ContactTerminate>( setup->get_termMolIDX(i), val);
+
       terms[i] = make_shared<ContactTerminate2>(confile, pad);
       j += 1;  // j is index of contact termconditions
     } else if (type.substr(0,1) == "x")
@@ -240,10 +232,10 @@ void get_check_inputs(shared_ptr<Setup> &setFile, shared_ptr<System> &syst,
 
 int main(int argc, const char * argv[])
 {
-//  string input_file = argv[1];
+  string input_file = argv[1];
 //  string input_file = "/Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/dynamics_test/contact_1BRS_nam/run.dyn.hard.refs";
 //  string input_file = "/Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/electrostatic_test/run.electrostatic_david.inp";
-  string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbam/pbam_test_files/dynamics_test/contact_1BRS_nam/run.dyn.hard.refs";
+//  string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbam/pbam_test_files/dynamics_test/contact_1BRS_nam/run.dyn.hard.refs";
 
   int poles = 5;
   double solv_tol = 1e-4;

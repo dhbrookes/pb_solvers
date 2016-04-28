@@ -112,26 +112,40 @@ protected:
   vector<vector<int> > atPairs_;  // vector of size two vectors (atom index from each molecule type)
   vector<double> dists_;  // min distance between the above pairs
   
+  string how_term_;
+  
 public:
   ContactTerminate2(vector<int> mol, vector<vector<int> > atpairs,
                     vector<double> dists, double pad)
   :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
   dists_(dists), pad_(pad)
   {
+    string_create();
   }
   
   ContactTerminate2(ContactFile confile, double pad)
   :pad_(pad), mol1_(confile.get_moltype1()), mol2_(confile.get_moltype2()),
   atPairs_(confile.get_at_pairs()), dists_(confile.get_dists())
   {
+    string_create();
   }
+  
+  void string_create()
+  {
+    char buff[400];
+    sprintf(buff, "Type %d and Type %d are within %5.2f;\t",
+            mol1_, mol2_, pad_);
+    how_term_ = "System has fulfilled condition: " + string(buff);
+  }
+  
+  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
   
   const bool is_terminated(shared_ptr<System> _sys) const
   {
+    bool contacted = false;
     int i, j, k, idx1, idx2;
-    Pt cen1, cen2, pos1, pos2;
-    double a1, a2;
-    double d, dcon;
+    Pt cen1, cen2, pos1, pos2, vc1, vc2;
+    double a1, a2, d, dcon;
     double sphdist1, sphdist2;  // distance of atom to edge of sphere
     
     for ( i = 0; i < _sys->get_typect(mol1_); i++)
@@ -147,25 +161,25 @@ public:
         a1 = _sys->get_ai(idx1);
         a2 = _sys->get_ai(idx2);
         
-        bool contact = true;
-        
         for (k = 0; k < atPairs_.size(); k++)
         {
           dcon = dists_[k];
+          pos1 = _sys->get_posijreal(idx1, atPairs_[k][0]);
+          pos2 = _sys->get_posijreal(idx2, atPairs_[k][1]);
           
-          pos1 = _sys->get_posij(idx1, atPairs_[k][0]);
-          pos2 = _sys->get_posij(idx2, atPairs_[k][1]);
+          vc1 = pos1 - cen1;
+          vc2 = pos2 - cen2;
           
-          sphdist1 = a1 - pos1.norm();
-          sphdist2 = a2 - pos2.norm();
+          sphdist1 = a1 - vc1.norm();
+          sphdist2 = a2 - vc2.norm();
           
           // if sum of distances to edge of the spheres is > contact distance,
           // then contact can never happen and the new position is closest
           // point on edge of sphere and new contact distance is pad
           if ( (sphdist1 + sphdist2) > dcon)
           {
-            pos1 = pos1 * (a1/pos1.norm()); // project onto sphere surface
-            pos2 = pos2 * (a2/pos2.norm());
+            pos1 = vc1 * (a1/vc1.norm()); // project onto sphere surface
+            pos2 = vc2 * (a2/vc2.norm());
             dcon = pad_;
           }
           
@@ -175,18 +189,13 @@ public:
           pos2 = pos2 + cen2;
           
           d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
+          if (d < dcon){ contacted = true; break;}
           
-          if (d > dcon)
-          {
-            contact = false;
-          }
         }
-        if (contact) return true;
       }
     }
-    return false;
+    return contacted;
   }
-  
 };
 
 
