@@ -4,15 +4,16 @@ import matplotlib.pyplot as plt
 '''
 Program to plot a 2D version of the ESP from PB-AM
 '''
-dirName='/Users/lfelberg/PBSAM/pb_solvers/'
-fileName = dirName + 'pbam/pbam_test_files/electrostatic_test/out.x.0.dat'
-outFile= dirName + 'pbam/out.4sp.jpg'
+dirName='/Users/lfelberg/PBSAM/pb_solvers/pbam/'\
+                    'pbam_test_files/electrostatic_test/'
+fileName = dirName + 'out.x.0.dat'
+outFile= dirName + 'out.2sp.jpg'
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):
     """Gets data from 2D plot output of PB-AM"""
     lines = open(fileName).readlines()
-    
+
     grid,org,dl = np.zeros(2), np.zeros(2),np.zeros(2)
     axval, ax, units, mn, mx = 0.0, 'x', 'jmol', 0.0, 0.0
     pot = np.zeros((100,100))
@@ -23,16 +24,16 @@ def FileOpen(fileName):
         if 'units' in line[0:10]:
             units = temp[1]
         elif 'grid' in line[0:10]:
-            grid[0], grid[1] = int(temp[1]), int(temp[2])  
+            grid[0], grid[1] = int(temp[1]), int(temp[2])
             pot = np.zeros((grid[0], grid[1]))
         elif 'axis' in line[0:10]:
             ax, axval = temp[1], float(temp[2])
         elif 'origin' in line[0:10]:
-            org[0], org[1] = float(temp[1]), float(temp[2])  
+            org[0], org[1] = float(temp[1]), float(temp[2])
         elif 'delta' in line[0:10]:
-            dl[0], dl[1] = float(temp[1]), float(temp[2]) 
+            dl[0], dl[1] = float(temp[1]), float(temp[2])
         elif 'maxmin' in line[0:10]:
-             mx, mn = float(temp[1]), float(temp[2]) 
+             mx, mn = float(temp[1]), float(temp[2])
         elif '#' not in line:
             temp = [float(x) for x in line.split()]
 
@@ -42,22 +43,21 @@ def FileOpen(fileName):
 
     return(pot, org, dl, ax, axval, units, mx, mn)
 
-def dispPlot( org, bn, count, potential, 
-                mx = 0.1, mn = -0.1, title = '', 
+def dispPlot( org, bn, count, potential,
+                mx = 0.1, mn = -0.1, title = '',
                 xlab = r'$X \AA$', ylab = r'$Y \, (\AA)$',
                 lege = '', outFile = None ):
     """Plots the colormap of potential plot, 2D"""
-    fig = plt.figure(1, figsize = (5, 4)); 
+    fig = plt.figure(1, figsize = (5, 3.));
     ax = fig.add_subplot(1,1,1)
 
     nbins = len(potential[0])
-    #X, Y = np.meshgrid(np.arange(0, 100, 1), np.arange(0, 100, 1))
-    #levels = np.arange(-1,1,0.1)
-    #plt.contourf(X, Y, potential, levels)
-    
+
     X = np.arange(org[0], org[0]+ nbins*bn[0], bn[0])
     Y = np.arange(org[1], org[1]+ nbins*bn[1], bn[1])
-    plt.pcolor(X, Y, potential, vmin=mn+0.1*mn, vmax=mx)
+    big = max( abs(mn)-abs(0.1*mn), abs(mx)+abs(mx)*0.1)
+    plt.pcolor(X, Y, potential, cmap = 'jet_r',
+                    vmin=-big, vmax=big)
     plt.colorbar()
 
     #xl = [-28.0, 32.5]      # for comparing w APBS
@@ -66,9 +66,13 @@ def dispPlot( org, bn, count, potential,
     ax.set_xlim([X[0], X[-1]])
     ax.set_ylim([Y[0], Y[-1]])
 
+    ax.xaxis.labelpad = -1.4
+    ax.yaxis.labelpad = -1.4
+
     plt.title(title, fontsize = 13);
-    ax.set_ylabel(ylab, fontsize = 10); 
+    ax.set_ylabel(ylab, fontsize = 10);
     ax.set_xlabel(xlab, fontsize = 10)
+
     for tick in ax.xaxis.get_major_ticks():
         tick.label.set_fontsize(8)
     for tick in ax.yaxis.get_major_ticks():
@@ -83,6 +87,11 @@ def dispPlot( org, bn, count, potential,
 esp, org, dl, ax, axval, units, mx, mn = FileOpen(fileName)
 boxl = len(esp[0])
 
+for i in range(len(esp)):
+    for j in range(len(esp[i])):
+        if np.isnan(esp[i][j]):
+            esp[i][j] = float('Inf')
+
 titl = 'Cross section at ' + ax + ' = ' + str(axval)
 titl += ' in ' + units
 xla = r'$Y \, (\AA)$'; yla = r'$Z \, (\AA)$'
@@ -91,7 +100,7 @@ if ax == 'y':
 elif ax == 'z':
     xla = r'$X \, (\AA)$'; yla = r'$Y \, (\AA)$'
 
-dispPlot( org, dl, len(esp[0]), esp, 
+dispPlot( org, dl, len(esp[0]), np.transpose(esp),
                 mx, mn, titl,
                 xlab = xla, ylab = yla,
                 outFile=outFile)

@@ -23,3 +23,8 @@ dyn_*
 
 ## Files for work on APBS comparison
 APBS_compare/
+
+## Pretty pictures
+*.png
+*.jpg
+*.jpeg

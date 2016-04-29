@@ -14,8 +14,8 @@ dx barstar_pbam.dx
 3dmap bars_map.out
 
 gridct 2
-grid2D 1 barstar.y.-19.dat y -19.8619
-grid2D 2 barstar.z.-22.dat z -22.722
+grid2D 1 barstar.y.0.dat y 0.0
+grid2D 2 barstar.z.0.dat z 0.0
 
 attypes 1
 type 1 1

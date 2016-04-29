@@ -1,23 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cmx
 from pylab import *
 from mpl_toolkits.mplot3d import Axes3D
-
 from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
 
 '''
 Program to plot a 3D version of the ESP from PB-AM
 '''
-dirName='/Users/davidbrookes/'
-# fileName = dirName + 'PBSAM/pb_solvers/pbam/'
-fileName = dirName + 'data/2fgr/2fgr_tri_move_map.out'
+dirName='/Users/lfelberg/'\
+                 + 'PBSAM/pb_solvers/pbam/pbam_test_files/electrostatic_test/'
+fileName = dirName + 'electro_map.out'
+#fileName = dirName + 'data/2fgr/2fgr_tri_move_map.out'
 outFile= dirName + 'Desktop/trimer_monoview_out.surf'
+outFile= dirName + 'electro_3d_'
 
-#-----------------------------------------------------------------------
-def randrange(n, vmin, vmax):
-    '''Get a random range of numbers'''
-    return (vmax-vmin)*np.random.rand(n) + vmin
 
 def FileOpen(fileName):
     """Gets data from 3D plot output of PB-AM"""
@@ -29,8 +27,8 @@ def FileOpen(fileName):
 
     for line in lines:
         temp = line.split()
-        if 'units' in line[0:10]:
-            units = temp[1]
+        if 'units' in line[-10:-1]:
+            units = temp[-1]
         elif 'grid' in line[0:10]:
             grid[0], grid[1] = int(temp[1]), int(temp[2])
         elif 'origin' in line[0:10]:
@@ -54,58 +52,63 @@ def dispPlot( org, bn, xv, yv, zv, potential,
     fig = plt.figure(1, figsize = (5, 4));
     ax = fig.add_subplot(111,projection='3d')
 
-    #colors = cm.bwr(potential) #(potential-min(potential))/
-                                #(max(potential)-min(potential)))
-    #colors.set_clim(vmin = min(potential),
-                            #vmax = max(potential))
+    big = max( abs(potential))
+    cm = plt.get_cmap('jet_r')
+    cNorm = matplotlib.colors.Normalize(vmin=-big,
+                                                               vmax=big)
+    scalarMap = cmx.ScalarMappable(norm=cNorm,
+                                                           cmap=cm)
 
-    colmap = cm.ScalarMappable(cmap=cm.jet)
-    colmap.set_array(potential)
+    ax.scatter(xv, yv, zv, s = 85,
+                     c=scalarMap.to_rgba(potential),
+                     lw = 0)
+    scalarMap.set_array(potential)
+    #fig.colorbar(scalarMap)
+    cbaxes = fig.add_axes([0.86, 0.1, 0.025, 0.75])
+    cb = plt.colorbar(scalarMap, cax = cbaxes)
+    cbaxes.set_xlabel(units, fontname='Arial',
+            fontsize='small', labelpad=5.)
 
-    n = len(xv)
-    for i in range(n):
-        if xv[i] < 0:
-            break
-
-    xv = xv[:i]
-    yv = yv[:i]
-    zv = zv[:i]
-    potential=potential[:i]
-
-    xv -= np.mean(xv)
-    yv -= np.mean(yv)
-    zv -= np.mean(zv)
-    
-
-    yg = ax.scatter(xv, yv, zv, c=potential, cmap = plt.get_cmap('jet'), marker='o', lw = 0)
-    cb = fig.colorbar(colmap)
-    cb.set_label("%s" % units)
+#    n = len(xv)
+#    for i in range(n):
+#        if xv[i] < 0:
+#            break
+#
+#    xv = xv[:i]
+#    yv = yv[:i]
+#    zv = zv[:i]
+#    potential=potential[:i]
+#
+#    xv -= np.mean(xv)
+#    yv -= np.mean(yv)
+#    zv -= np.mean(zv)
 
     minl = min(min(xv), min(yv), min(zv))
     maxl = max(max(xv), max(yv), max(zv))
 
-    ax.set_xlim([minl-10, maxl+10])
-    ax.set_ylim([minl-10, maxl+10])
-    ax.set_zlim([minl-10, maxl+10])
+    ax.set_xlim([minl-2, maxl+2])
+    ax.set_ylim([minl-2, maxl+2])
+    ax.set_zlim([minl-2, maxl+2])
 
-    plt.title(title, fontsize = 13);
-    ax.set_xlabel(r'$X (\AA)$', fontsize = 12)
-    ax.set_ylabel(r'$Y (\AA)$', fontsize = 12)
-    ax.set_zlabel(r'$Z (\AA)$', fontsize = 12)
+    #plt.title(title, fontsize = 13);
+    ax.set_xlabel(r'$X (\AA)$', fontsize = 10)
+    ax.set_ylabel(r'$Y (\AA)$', fontsize = 10)
+    ax.set_zlabel(r'$Z (\AA)$', fontsize = 10 )
     for tick in ax.xaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
+        tick.label.set_fontsize(10)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
+        tick.label.set_fontsize(10)
     for tick in ax.zaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
-    if outFile != None:
-        for ii in xrange(0,360,90):
-            ax.view_init(elev=20., azim=ii)
-            plt.gcf().subplots_adjust(bottom=0.15)
-            plt.savefig(outFile+str(ii)+'.jpg', dpi = 300)
+        tick.label.set_fontsize(10)
+    ax.tick_params(pad=-5.5)
 
-    # ax.xaxis._axinfo['label']['space_factor'] = 6
-    plt.tight_layout()
+    if outFile != None:
+        for ii in xrange(0,360,180):
+            ax.view_init(elev=20., azim=ii)
+            #plt.gcf().subplots_adjust(bottom=0.15)
+            plt.savefig(outFile+str(ii)+'.jpg',
+                             bbox_inches='tight',dpi = 300)
+
     plt.close()
     #plt.show()
 
