@@ -10,11 +10,11 @@ rcParams.update({'figure.autolayout': True})
 Program to plot a 3D version of the ESP from PB-AM
 '''
 dirName='/Users/lfelberg/'\
-                 + 'PBSAM/pb_solvers/pbam/pbam_test_files/electrostatic_test/'
-fileName = dirName + 'electro_map.out'
+                 + 'PBSAM/pb_solvers/pbam/pbam_test_files/electro_barnase_test/'
+fileName = dirName + 'barn_0.05M_map.out'
 #fileName = dirName + 'data/2fgr/2fgr_tri_move_map.out'
 outFile= dirName + 'Desktop/trimer_monoview_out.surf'
-outFile= dirName + 'electro_3d_'
+outFile= dirName + 'barn_0.05M_3d_'
 
 
 def FileOpen(fileName):
@@ -49,7 +49,7 @@ def FileOpen(fileName):
 def dispPlot( org, bn, xv, yv, zv, potential,
                 title = '', lege = '', outFile = None ):
     """Plots the colormap of potential plot, 3D"""
-    fig = plt.figure(1, figsize = (5, 4));
+    fig = plt.figure(1, figsize = (4, 4));
     ax = fig.add_subplot(111,projection='3d')
 
     big = max( abs(potential))

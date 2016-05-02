@@ -1,5 +1,5 @@
-runtype electrostatics 120
-runname bars.out
+runtype electrostatics 180
+runname bars_cont_0.0M.out
 
 units kT
 salt 0.0
@@ -9,13 +9,16 @@ sdiel 78
 
 #randorient
 
-dx barstar_pbam.dx
+dx barstar_cont_0.0M.dx
 
-3dmap bars_map.out
+#3dmap bars_cont_0.0M_map.out
 
-gridct 2
-grid2D 1 barstar.y.0.dat y 0.0
-grid2D 2 barstar.z.0.dat z 0.0
+#gridct 2
+#grid2D 1 barnase_0.05M.y.0.dat y 0.0
+#grid2D 2 barnase_0.05M.x.0.dat x 0.0
+
+## Barmase = A
+## Barstar = D
 
 attypes 1
 type 1 1

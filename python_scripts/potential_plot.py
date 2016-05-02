@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 Program to plot a 2D version of the ESP from PB-AM
 '''
 dirName='/Users/lfelberg/PBSAM/pb_solvers/pbam/'\
-                    'pbam_test_files/electrostatic_test/'
-fileName = dirName + 'out.x.0.dat'
-outFile= dirName + 'out.2sp.jpg'
+                    'pbam_test_files/electro_barnase_test/'
+fileName = dirName + 'barnase_0.05M.y.0.dat'
+outFile= dirName + 'barnase_0.05M.y0.jpg'
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):
@@ -48,7 +48,7 @@ def dispPlot( org, bn, count, potential,
                 xlab = r'$X \AA$', ylab = r'$Y \, (\AA)$',
                 lege = '', outFile = None ):
     """Plots the colormap of potential plot, 2D"""
-    fig = plt.figure(1, figsize = (5, 3.));
+    fig = plt.figure(1, figsize = (3.5, 3.));
     ax = fig.add_subplot(1,1,1)
 
     nbins = len(potential[0])
