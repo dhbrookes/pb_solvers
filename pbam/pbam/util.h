@@ -225,6 +225,16 @@ public:
     return d;
   }
   
+  Point<T> rotate(MyMatrix<T>& rotmat)
+  {
+    convert_to_euclidean();
+    T x, y, z;
+    x = rotmat(0, 0) * p1_ + rotmat(0, 1) * p2_ + rotmat(0, 2) * p3_;
+    y = rotmat(1, 0) * p1_ + rotmat(1, 1) * p2_ + rotmat(1, 2) * p3_;
+    z = rotmat(2, 0) * p1_ + rotmat(2, 1) * p2_ + rotmat(2, 2) * p3_;
+    return Point<T>(x, y, z);
+  }
+  
   // Getter methods perform necessary conversions:
   const T& x()
   {

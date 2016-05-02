@@ -173,16 +173,47 @@ System::System(Setup setup, double cutoff)
   {
     
     PQRFile pqrI (setup.getTypeNPQR(i));
-    XYZFile xyzI (setup.getTypeNXYZ(i), setup.getTypeNCount(i));
+    TransRotFile transrot;
+    XYZFile xyzI;
+    if (setup.getTypeIsTransRot(i))
+    {
+      transrot = TransRotFile(setup.getTypeNXYZ(i), setup.getTypeNCount(i));
+    }
+    else
+    {
+      xyzI = XYZFile (setup.getTypeNXYZ(i), setup.getTypeNCount(i));
+    }
     for (j = 0; j < setup.getTypeNCount(i); j++)
     {
-      keys = { i, j };
-      vector<Pt> repos_charges(pqrI.get_M());
+      Pt trans;
+      MyMatrix<double> rot;
+      
       Pt com = pqrI.get_cg_centers()[0];
-      cout << com.x() << "\t" << com.y() << "\t" << com.z() << endl;
-      Pt move = xyzI.get_pts()[j] + com * -1.0;
+      
+      if (setup.getTypeIsTransRot(i))
+      {
+        trans = transrot.get_trans(j);
+        rot = transrot.get_rotmat(j);
+      }
+      else
+      {
+        trans = xyzI.get_pts()[j] + com * -1.0;
+        rot = MyMatrix<double> (3, 3, 0.0);
+        rot.set_val(0, 0, 1.0);
+        rot.set_val(1, 1, 1.0);
+        rot.set_val(2, 2, 1.0);
+      }
+      
+      keys = { i, j };
+      
+      vector<Pt> repos_charges(pqrI.get_M());
+      Pt new_pt;
+      
       for ( chg = 0; chg < pqrI.get_M(); chg ++)
-        repos_charges[chg] = pqrI.get_atom_pts()[chg] + move;
+      {
+        repos_charges[chg] = pqrI.get_atom_pts()[chg].rotate(rot) + trans;
+      }
+      
       if (pqrI.get_cg())  // coarse graining is in pqr
       {
         mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
@@ -190,13 +221,19 @@ System::System(Setup setup, double cutoff)
                         pqrI.get_radii(), xyzI.get_pts()[j], i, j,
                         setup.getDrot(i), setup.getDtr(i));
       }
-      else
+      else if (! setup.getTypeIsTransRot(i))
       {
         mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
                        repos_charges, pqrI.get_radii(),
                        xyzI.get_pts()[j], i, j,
                        setup.getDrot(i), setup.getDtr(i));
         
+      }
+      else
+      {
+        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
+                       repos_charges, pqrI.get_radii(), i, j,
+                       setup.getDrot(i), setup.getDtr(i));
       }
       
       molecules_.push_back(mol);

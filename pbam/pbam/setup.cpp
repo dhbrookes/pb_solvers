@@ -30,6 +30,7 @@ typeDef_(2),
 typeDiff_(2),
 pqr_names_(2),
 xyz_names_(2),
+isTransRot_(2),
 runSpecs_(2),
 mbdfile_loc_(2),
 termvals_(2),
@@ -70,7 +71,9 @@ andCombine_(false)
   {
     pqr_names_[i] = molfn[i][0];
     xyz_names_[i].resize(1);
+    isTransRot_[i].resize(1);
     xyz_names_[i][0] = molfn[i][1];
+    isTransRot_[i][0] = false;
   }
   
   confiles_.resize(0);
@@ -298,7 +301,26 @@ void Setup::findKeyword(vector<string> fline)
     if (typeNo > getNType()-1)
       return;
     setTypeNXYZ( typeNo, traj, xyz );
+    setTypeNisTransRot(typeNo, traj, false);
+  } else if (keyword == "transrot")
+  {
+    string transrot;
+    int traj, typeNo = atoi(fline[1].c_str())-1;
+    cout << "transrot command found" << endl;
     
+    if ( fline.size() == 4 )
+    {
+      traj = atoi(fline[2].c_str())-1;
+      transrot = fline[3];
+    } else
+    {
+      traj = 0;
+      transrot = fline[2];
+    }
+    if (typeNo > getNType()-1)
+      return;
+    setTypeNXYZ( typeNo, traj, transrot );
+    setTypeNisTransRot(typeNo, traj, true);
   } else if (keyword == "randorient")
   {
     cout << "Random orientation command found" << endl;
@@ -329,7 +351,12 @@ void Setup::resizeVecs()
 
   pqr_names_.resize(nType_);
   xyz_names_.resize(nType_);
-  for(int i = 0; i < nType_; i++)   xyz_names_[i].resize(ntraj);
+  isTransRot_.resize(nType_);
+  for(int i = 0; i < nType_; i++)
+  {
+    xyz_names_[i].resize(ntraj);
+    isTransRot_[i].resize(nType_);
+  }
 
 } // end resizeVecs
 
