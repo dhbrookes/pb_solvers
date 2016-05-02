@@ -136,6 +136,70 @@ public:
   
 };
 
+
+class TransRotFile
+{
+protected:
+  string path_;
+  vector<int> mols_;
+  int nmols_;
+  vector<MyMatrix<double> > rotMats_;
+  vector<Pt> transVecs_;
+  
+public:
+  TransRotFile(string path, int nmols)
+  :path_(path), rotMats_(nmols, MyMatrix<double>(3, 3, 0.0)), transVecs_(nmols)
+  {
+    read();
+  }
+  
+  TransRotFile() { }
+  
+  void read()
+  {
+    ifstream file(path_.c_str());
+    if (!file.is_open()) throw CouldNotReadException(path_);
+    string line;
+    int i = 0;
+    int row;
+    MyMatrix<double> rm;
+    Pt trans;
+    vector<int> pair (2);
+    int mol;
+    double rot1, rot2, rot3, tr;
+    while (getline(file, line))
+    {
+      stringstream linestream(line);
+      linestream >> mol >> rot1 >> rot2 >> rot3 >> tr;
+      
+      row = i % 3;
+//      if (row == 0)
+//      {
+//        rm = MyMatrix<double>(3, 3, 0.0);
+//        trans = Pt();
+//        mols_.push_back(mol);
+//        rotMats_.push_back(rm);
+//        transVecs_.push_back(trans);
+//      }
+      
+      rotMats_[mol-1].set_val(row, 0, rot1);
+      rotMats_[mol-1].set_val(row, 1, rot2);
+      rotMats_[mol-1].set_val(row, 2, rot3);
+      
+      if (row == 0) trans.set_x(tr);
+      else if (row == 1) trans.set_y(tr);
+      else if (row == 2) trans.set_z(tr);
+      
+      i += 1;
+    }
+  }
+  
+  const string get_path() const     { return path_; }
+  const Pt get_trans(int j) const   { return transVecs_[j]; }
+  const MyMatrix<double> get_rotmat(int j) const { return rotMats_[j]; }
+  
+};
+
 /*
  Class for reading and storing the info in .pqr files
  */
@@ -233,6 +297,8 @@ public:
     pts_.reserve(nmols);
     read();
   }
+  
+  XYZFile() { }
   
   void read()
   {

@@ -128,7 +128,7 @@ public:
    Fill with a default value (good for initializing memory)
    */
   MyMatrix(const int nrows, const int ncols, T default_val)
-  :nrows_(nrows), ncols_(ncols), vals_(nrows, ncols)
+  :nrows_(nrows), ncols_(ncols), vals_(nrows, vector<T> (ncols, default_val))
   {
     int i, j;
     for (i = 0; i < nrows; i++)

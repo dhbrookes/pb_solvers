@@ -78,6 +78,7 @@ protected:
   vector<string> runSpecs_;	//include run type [0] (electrost/bd) & runname [1]
   vector<string> pqr_names_;  // PQR file names
   vector<vector<string> > xyz_names_;  // XYZ file names
+  vector<vector<bool> > isTransRot_;
   
   vector<string> mbdfile_loc_; // location of names for manybd data output
   
@@ -167,6 +168,9 @@ protected:
   void setTypeNXYZ( int typeCount, int traj, string xyz )
   { xyz_names_[typeCount][traj] = xyz; }
   
+  void setTypeNisTransRot( int typeCount, int traj, bool istr )
+  { isTransRot_[typeCount][traj] = istr; }
+  
 public:
   Setup(string infile);
   
@@ -217,6 +221,7 @@ public:
   string getTypeNDef(int type)     { return typeDef_[type]; }
   string getTypeNPQR(int type)     { return pqr_names_[type]; }
   string getTypeNXYZ(int type, int traj) { return xyz_names_[type][traj]; }
+  bool getTypeIsTransRot(int type, int traj)  { return isTransRot_[type][traj]; }
   vector<string> get_trajn_xyz(int traj)
   {
     vector<string> traj_xyz;
@@ -225,6 +230,7 @@ public:
   }
   
   string getTypeNXYZ(int type)     { return xyz_names_[type][0]; }
+  bool getTypeIsTransRot(int type)     { return isTransRot_[type][0]; }
   double getKappa()                { return kappa_; }
   double getIKbT()                 { return iKbT_; }
   
