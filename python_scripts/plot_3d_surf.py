@@ -10,11 +10,11 @@ rcParams.update({'figure.autolayout': True})
 Program to plot a 3D version of the ESP from PB-AM
 '''
 dirName='/Users/lfelberg/'\
-                 + 'PBSAM/pb_solvers/pbam/pbam_test_files/electro_barnase_test/'
-fileName = dirName + 'barn_0.05M_map.out'
+                 + 'PBSAM/pb_solvers/pbam/pbam_test_files/electro_porin/'
+fileName = dirName + 'porin_trip_0.05M_map.out'
 #fileName = dirName + 'data/2fgr/2fgr_tri_move_map.out'
 outFile= dirName + 'Desktop/trimer_monoview_out.surf'
-outFile= dirName + 'barn_0.05M_3d_'
+outFile= dirName + 'porin_triple1_0.05M_3d_'
 
 
 def FileOpen(fileName):
@@ -52,6 +52,22 @@ def dispPlot( org, bn, xv, yv, zv, potential,
     fig = plt.figure(1, figsize = (4, 4));
     ax = fig.add_subplot(111,projection='3d')
 
+    n = len(xv)
+    for i in range(n):
+        if xv[i] < 0:
+            break
+    xv = xv[:i]
+    yv = yv[:i]
+    zv = zv[:i]
+    potential=potential[:i]
+
+    xv -= np.mean(xv)
+    yv -= np.mean(yv)
+    zv -= np.mean(zv)
+
+    minl = min(min(xv), min(yv), min(zv))
+    maxl = max(max(xv), max(yv), max(zv))
+
     big = max( abs(potential))
     cm = plt.get_cmap('jet_r')
     cNorm = matplotlib.colors.Normalize(vmin=-big,
@@ -68,23 +84,6 @@ def dispPlot( org, bn, xv, yv, zv, potential,
     cb = plt.colorbar(scalarMap, cax = cbaxes)
     cbaxes.set_xlabel(units, fontname='Arial',
             fontsize='small', labelpad=5.)
-
-#    n = len(xv)
-#    for i in range(n):
-#        if xv[i] < 0:
-#            break
-#
-#    xv = xv[:i]
-#    yv = yv[:i]
-#    zv = zv[:i]
-#    potential=potential[:i]
-#
-#    xv -= np.mean(xv)
-#    yv -= np.mean(yv)
-#    zv -= np.mean(zv)
-
-    minl = min(min(xv), min(yv), min(zv))
-    maxl = max(max(xv), max(yv), max(zv))
 
     ax.set_xlim([minl-2, maxl+2])
     ax.set_ylim([minl-2, maxl+2])

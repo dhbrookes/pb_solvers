@@ -172,6 +172,12 @@ public:
           
           sphdist1 = a1 - vc1.norm();
           sphdist2 = a2 - vc2.norm();
+//          
+//          cout << "This is point positions" << endl;
+//          cout << "draw sphere {" << pos1.x() << " "
+//          << pos1.y() << " " << pos1.z() << "} radius 0.1" << endl;
+//          cout << "draw sphere {" << pos2.x() << " "
+//          << pos2.y() << " " << pos2.z() << "} radius 0.1" << endl;
           
           // if sum of distances to edge of the spheres is > contact distance,
           // then contact can never happen and the new position is closest
@@ -181,7 +187,7 @@ public:
             pos1 = vc1 * (a1/vc1.norm()); // project onto sphere surface
             pos2 = vc2 * (a2/vc2.norm());
             dcon = pad_;
-          }
+          } else { contacted = true; break;}
           
           // get position of atoms relative to box
           // (as opposed to center of molecule)
@@ -189,6 +195,12 @@ public:
           pos2 = pos2 + cen2;
           
           d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
+          
+//          cout << "This is their dist " << d << endl;
+//          cout << "draw sphere {" << pos1.x() << " "
+//          << pos1.y() << " " << pos1.z() << "} radius 0.1" << endl;
+//          cout << "draw sphere {" << pos2.x() << " "
+//          << pos2.y() << " " << pos2.z() << "} radius 0.1" << endl;
           if (d < dcon){ contacted = true; break;}
           
         }

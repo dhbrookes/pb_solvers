@@ -6,8 +6,10 @@ Program to plot a 2D version of the ESP from PB-AM
 '''
 dirName='/Users/lfelberg/PBSAM/pb_solvers/pbam/'\
                     'pbam_test_files/electro_barnase_test/'
-fileName = dirName + 'barnase_0.05M.y.0.dat'
-outFile= dirName + 'barnase_0.05M.y0.jpg'
+#fileName = dirName + 'porin_sing_0.05M.z.0.dat'
+fileName = dirName + 'barnase.x.-20.dat'
+#outFile= dirName + 'porin_sing_0.05M.z.0.jpg'
+outFile= dirName + 'barnase.x.-20.jpg'
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):
@@ -48,7 +50,7 @@ def dispPlot( org, bn, count, potential,
                 xlab = r'$X \AA$', ylab = r'$Y \, (\AA)$',
                 lege = '', outFile = None ):
     """Plots the colormap of potential plot, 2D"""
-    fig = plt.figure(1, figsize = (3.5, 3.));
+    fig = plt.figure(1, figsize = (3.5, 3.))
     ax = fig.add_subplot(1,1,1)
 
     nbins = len(potential[0])
@@ -60,11 +62,13 @@ def dispPlot( org, bn, count, potential,
                     vmin=-big, vmax=big)
     plt.colorbar()
 
-    #xl = [-28.0, 32.5]      # for comparing w APBS
-    #yl = [-29.10, 25.49]
-    #zl = [-33.84, 30.2]
-    ax.set_xlim([X[0], X[-1]])
-    ax.set_ylim([Y[0], Y[-1]])
+    xl = [-28.0, 32.5]      # for comparing w APBS
+    yl = [-29.10, 25.49]
+    zl = [-33.84, 30.2]
+    ax.set_xlim(yl)
+    ax.set_ylim(zl)
+    #ax.set_xlim([X[0], X[-1]])
+    #ax.set_ylim([Y[0], Y[-1]])
 
     ax.xaxis.labelpad = -1.4
     ax.yaxis.labelpad = -1.4
