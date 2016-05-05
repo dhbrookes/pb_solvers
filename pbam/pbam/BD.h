@@ -192,7 +192,17 @@ public:
           }else
           {
             d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
-            if (d < dcon){ contacted = true; break;}
+            if (d < dcon)
+            {
+              contacted = true;
+              cout << "This is dcon " << dcon << " and d " << d << endl;
+              cout << "This is pos1 " << pos1.x() << " " <<
+              pos1.y() << " " << pos1.z() << " " << endl;
+              cout << "This is pos2 " << pos2.x() << " " <<
+              pos2.y() << " " << pos2.z() << " " << endl;
+              
+              break;
+            }
           }
         }
       }
