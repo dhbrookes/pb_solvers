@@ -173,12 +173,6 @@ public:
           sphdist1 = a1 - vc1.norm();
           sphdist2 = a2 - vc2.norm();
           
-          cout << "Point xyz " << endl;
-          cout << "draw sphere {" << pos1.x() << " "
-          << pos1.y() << " " << pos1.z() << "} radius 0.1" << endl;
-          cout << "draw sphere {" << pos2.x() << " "
-          << pos2.y() << " " << pos2.z() << "} radius 0.1" << endl;
-          
           // if sum of distances to edge of the spheres is > contact distance,
           // then contact can never happen and the new position is closest
           // point on edge of sphere and new contact distance is pad
@@ -193,13 +187,7 @@ public:
             pos1 = pos1 + cen1;
             pos2 = pos2 + cen2;
             d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
-            
-            cout << "This is their dist " << d << endl;
-            cout << "draw sphere {" << pos1.x() << " "
-            << pos1.y() << " " << pos1.z() << "} radius 0.1" << endl;
-            cout << "draw sphere {" << pos2.x() << " "
-            << pos2.y() << " " << pos2.z() << "} radius 0.1" << endl;
-            cout << endl; cout << endl;
+ 
             if (d < dcon){ contacted = true; break;}
           }else
           {
