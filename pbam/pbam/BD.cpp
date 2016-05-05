@@ -184,7 +184,7 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
 void BDRun::run(string xyzfile, string statfile)
 {
   int i = 0;
-  int WRITEFREQ = 5000;
+  int WRITEFREQ = 1;
   bool term = false;
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);

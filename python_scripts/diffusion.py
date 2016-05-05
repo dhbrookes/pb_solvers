@@ -13,7 +13,7 @@ import os
 
 wkDir = '/Users/lfelberg/PBSAM/pb_solvers/'\
                     'pbam/pbam_test_files/'\
-                    'dynamics_test/contact_1BRS_nam/'
+                    'dynamics_test/contact_2sp/'
 os.chdir(wkDir)
 cgtot = 2
 
@@ -50,10 +50,10 @@ fontP = FontProperties()
 fontP.set_size(18)
 
 ct = 0
-for dr in range(1,21, 1):
-    for traj in range(3):
-        dirN = '0'+str(dr) if dr < 10 else str(dr)
-        list_t, list_pos = trajDat(dirN+'/dyn_nam_barn_{0}.xyz'
+for dr in range(1,2, 1):
+    dirN = '' #'0'+str(dr) +'/' if dr < 10 else str(dr) +'/'
+    for traj in range(62):
+        list_t, list_pos = trajDat(dirN+'dyn_contact_2sp_{0}.xyz'
                                     .format(traj))
 
         list_tuple, list_DT, list_DR2, list_DT2 = [], [], [], []
@@ -66,25 +66,21 @@ for dr in range(1,21, 1):
                 disp[cg][step] = np.linalg.norm(
                                 list_pos[cg][0] - list_pos[cg][step])
 
-
         ax.plot(list_t/1000., disp[1], label=str(ct) ) # 'x', color='r', label="data")
         ct+=1
-    #line_fit = ax.plot(list_DT[1:6], list_y[1:6], '-', color='b', label="fit")
 print ct
 
-ax = plt.gca()
 gcf().subplots_adjust(bottom=0.20, left=0.20)
 for tick in ax.xaxis.get_major_ticks():
     tick.label.set_fontsize(18)
 for tick in ax.yaxis.get_major_ticks():
     tick.label.set_fontsize(18)
 
-#ax.legend(prop=fontP)
+ax.legend(prop=fontP)
 ax.set_xlabel('Time (ns)', fontsize=24)
 ax.set_ylabel('$\Delta r$', fontsize=24)
 ax.set_title('')
 
-plt.setp(ax.get_xticklabels())    #, rotation=-50)
 plt.show()
 plt.savefig("diffusion.pdf")
 
