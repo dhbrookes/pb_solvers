@@ -184,7 +184,7 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
 void BDRun::run(string xyzfile, string statfile)
 {
   int i = 0;
-  int WRITEFREQ = 1;
+  int WRITEFREQ = 2000;
   bool term = false;
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
@@ -206,6 +206,8 @@ void BDRun::run(string xyzfile, string statfile)
     _physCalc_->calc_torque();
     
     _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
+
+    if ( (i % 100) == 0 ) cout << "This is step " << i << endl;
 
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {

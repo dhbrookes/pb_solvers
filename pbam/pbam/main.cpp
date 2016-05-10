@@ -209,6 +209,7 @@ void get_check_inputs(shared_ptr<Setup> &setFile, shared_ptr<System> &syst,
     syst = make_shared<System>(*setFile);
   } catch(const OverlappingMoleculeException& ex1)
   {
+    cout << ex1.what() << endl;
     cout << "Provided system has overlapping molecules. ";
     cout << "Please provide a correct system."<< endl;
     exit(0);

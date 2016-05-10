@@ -205,7 +205,6 @@ System::System(Setup setup, double cutoff)
       }
       
       keys = { i, j };
-      
       vector<Pt> repos_charges(pqrI.get_M());
       Pt new_pt;
       
@@ -281,7 +280,10 @@ void System::check_for_overlap()
     {
       aj = molecules_[j].get_a();
       dist = get_pbc_dist_vec(i, j).norm();
-      if (dist < (ai + aj)) throw OverlappingMoleculeException(i, j);
+      if (dist < (ai + aj))
+      {
+        throw OverlappingMoleculeException(i, j);
+      }
     }
   }
 }
