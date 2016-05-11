@@ -328,29 +328,87 @@ shared_ptr<System> ThreeBody::make_subsystem(vector<int> mol_idx)
   return _subsys;
 }
 
-// Two or three body approximation computation
+//// Two or three body approximation computation
+//void ThreeBody::solveNmer( int num, double preclim )
+//{
+//  int i, j;
+//  shared_ptr<vector<vector<int> > > nmer = (( num == 2 ) ?
+//                                            make_shared<vector<vector<int> > >(dimer_) :
+//                                            make_shared<vector<vector<int> > >(trimer_));
+//  vector< Molecule > mol_temp;
+//  shared_ptr<System> _sysTemp = make_subsystem(nmer->operator[](0));
+//  shared_ptr<ASolver> _asolvTemp = make_shared<ASolver>(_besselCalc_, _shCalc_,
+//                                                        _sysTemp, _consts_, p_);
+//  
+//  for( i = 0; i < nmer->size(); i++)
+//  {
+//    shared_ptr<System> _sysTemp = make_subsystem(nmer->operator[](i));
+//    
+//    _asolvTemp->reset_all(_sysTemp);
+//    _asolvTemp->solve_A(preclim);
+//    _asolvTemp->solve_gradA(preclim);
+//    
+//    PhysCalc phys_all( _asolvTemp, outfname_, unit_);
+//    phys_all.calc_all();
+//    
+//    for ( j = 0; j < num; j++)
+//    {
+//      if ( num == 2 )
+//      {
+//        energy_di_[i][j] = phys_all.get_omegai_conv(j);
+//        force_di_[i][j] = phys_all.get_forcei_conv(j);
+//        torque_di_[i][j] = phys_all.get_taui_conv(j);
+//      } else
+//      {
+//        energy_tri_[i][j] = phys_all.get_omegai_conv(j);
+//        force_tri_[i][j] = phys_all.get_forcei_conv(j);
+//        torque_tri_[i][j] = phys_all.get_taui_conv(j);
+//      }
+//    }
+//  }
+//  
+//  cout << num << "mers done " << endl;
+//}
+
+
 void ThreeBody::solveNmer( int num, double preclim )
 {
   int i, j;
   shared_ptr<vector<vector<int> > > nmer = (( num == 2 ) ?
                                             make_shared<vector<vector<int> > >(dimer_) :
                                             make_shared<vector<vector<int> > >(trimer_));
-  vector< Molecule > mol_temp;
-  shared_ptr<System> _sysTemp = make_subsystem(nmer->operator[](0));
-  shared_ptr<ASolver> _asolvTemp = make_shared<ASolver>(_besselCalc_, _shCalc_,
-                                                        _sysTemp, _consts_, p_);
   
+  #pragma omp parallel for
   for( i = 0; i < nmer->size(); i++)
   {
-    shared_ptr<System> _sysTemp = make_subsystem(nmer->operator[](i));
+    vector<int> tempmol;
+    int poles;
+    #pragma omp critical
+    {
+      tempmol = nmer->operator[](i);
+      poles = p_;
+      cout << i << endl;
+    }
+    shared_ptr<System> _sysTemp = make_subsystem(tempmol);
+    shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
+    shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
+    shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
+    shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
+    shared_ptr<Constants> consts =  make_shared<Constants>();
     
-    _asolvTemp->reset_all(_sysTemp);
+    shared_ptr<ASolver> _asolvTemp = make_shared<ASolver>(bCalcu, SHCalcu,
+                                                          _sysTemp,
+                                                          consts, poles);
+    
+//    _asolvTemp->reset_all(_sysTemp);
     _asolvTemp->solve_A(preclim);
     _asolvTemp->solve_gradA(preclim);
     
     PhysCalc phys_all( _asolvTemp, outfname_, unit_);
     phys_all.calc_all();
     
+    #pragma omp critical
+    {
     for ( j = 0; j < num; j++)
     {
       if ( num == 2 )
@@ -364,6 +422,7 @@ void ThreeBody::solveNmer( int num, double preclim )
         force_tri_[i][j] = phys_all.get_forcei_conv(j);
         torque_tri_[i][j] = phys_all.get_taui_conv(j);
       }
+    }
     }
   }
   

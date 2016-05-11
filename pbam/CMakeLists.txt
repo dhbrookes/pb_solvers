@@ -17,7 +17,6 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-
 add_executable(pbam
 	pbam/ASolver.cpp
 	pbam/ASolver.h

@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <memory>
 #include "ASolver.h"
+//#include <omp.h>
 
 using namespace std;
 
@@ -272,6 +273,7 @@ public:
   
   // Solve the N body problem, only 2 or 3 right now
   void solveNmer( int num, double preclim = 1e-4);
+//  void solveNmerParallel( int num, double preclim = 1e-4);
   
   void printNmer( int num, string outfile);
   

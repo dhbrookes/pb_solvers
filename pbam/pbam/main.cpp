@@ -33,6 +33,7 @@
 #include "setup.h"
 #include "BD.h"
 #include "Electrostatics.h"
+#include <time.h>
 
 using namespace std;
 
@@ -156,6 +157,8 @@ int main_electrostatics( int poles, double tol, shared_ptr<Setup> setup,
 int main_energyforce( int poles, double tol, shared_ptr<Setup> setup,
                      shared_ptr<Constants> consts, shared_ptr<System> sys)
 {
+  clock_t t;
+  t = clock();
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
@@ -163,17 +166,22 @@ int main_energyforce( int poles, double tol, shared_ptr<Setup> setup,
   
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         consts, poles);
+  
   ASolv->solve_A(tol); ASolv->solve_gradA(tol);
   PhysCalc calcEnFoTo( ASolv, setup->getRunName(), consts->get_unitsEnum());
   calcEnFoTo.calc_all();
   calcEnFoTo.print_all();
-  
+  t = clock() - t;
+  printf ("energyforce calc took me %f seconds.\n",
+          ((float)t)/CLOCKS_PER_SEC);
   return 0;
 }
 
 int main_bodyapprox( int poles, double tol, shared_ptr<Setup> setup,
                   shared_ptr<Constants> consts, shared_ptr<System> sys)
 {
+    clock_t t3;
+  t3 = clock();
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
@@ -182,11 +190,16 @@ int main_bodyapprox( int poles, double tol, shared_ptr<Setup> setup,
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                     consts, poles);
   ThreeBody threeBodTest( ASolv, consts->get_unitsEnum() );
-  
   threeBodTest.solveNmer(2);
   threeBodTest.solveNmer(3);
+  t3 = clock() - t3;
   threeBodTest.calcTBDEnForTor();
+
+  
   threeBodTest.printTBDEnForTor(setup->getMBDLoc());
+  
+  printf ("manybody approx calc took me %f seconds.\n",
+          ((float)t3)/CLOCKS_PER_SEC);
   
   return 0;
 }

@@ -6,7 +6,7 @@
 # executable ignores
 bin
 build
-
+pbam/pbam_test_files/manybodyapprox_test2/
 
 ## PBAM output ignores
 *.dx 
