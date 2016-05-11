@@ -20,10 +20,9 @@ cgtot = 2
 def trajDat( inFile):
     '''get data from traj file'''
     infile = open(inFile,"r")
-    cgct = 0
 
     list_t, list_pos = [], [[] for x in range(cgtot)]
-    DT, MSD, DR2 = 0, 0, 0
+    DT, MSD, DR2, cgct = 0, 0, 0, 0
     for line in infile :
         line = line.split()
         if "Atom" in line[0]:
@@ -36,13 +35,58 @@ def trajDat( inFile):
             cgct += 1
             if cgct == cgtot:
                 cgct = 0
-        # ignore lines starting with 1
 
     list_t = np.array(list_t)
     list_pos = np.array(list_pos)
-
     return(list_t, list_pos)
 
+def msd_slice(list_t, list_pos):
+    '''Calc dt & MSD for slices of the data
+     calc of var not working correctly yet
+     -- should have very small varDT & large varDR2'''
+    members = len(list_t)
+    time_mat = np.zeros((members-1, members-1))
+    pos_mat  = np.zeros((members-1, members-1))
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    fontP = FontProperties()
+    fontP.set_size(18)
+
+    for i in range(members-1):
+        times = list_t[i+1:-1:3] - list_t[i]
+        disps = np.sqrt(np.sum( np.square( list_pos[i+1:-1:3] -
+                                  list_pos[i]), axis = 2))
+        time_mat[i,0:len(times)] = times
+        pos_mat[i,0:len(disps)] = disps.resize(len(disps))
+        ax.plot(times/1000., disps, label=str(ct) )
+
+    print np.shape(time_mat)
+
+    #for i in range(members, 1, -1) : # decrement by 1
+    #    DT, DT2, DR2, DR22 = 0, 0, 0, 0
+    #    slices = members+1-i
+    #    print slices, members
+    #    for j in range(0, slices) :
+    #        arr_dt = list_t[0+j:i+j]
+    #        arr_pos = list_pos[0+j:i+j]
+    #        dt = arr_dt[-1] - arr_dt[0]
+    #        dr2 = np.sum( np.square( arr_pos[-1] -
+    #                                                 arr_pos[0] ) )
+    #        DT += dt
+    #        DT2 += dt*dt
+    #        DR2 += dr2
+    #        DR22 += dr2*dr2
+    #    list_DT.append(DT/slices)
+    #    list_DR2.append(DR2/slices)
+    #    if slices != 1 :
+    #        list_varDT.append( slices*(DT2 - DT*DT)/
+    #                                       (slices*(slices-1)) )
+    #        list_varDR2.append( slices*( DR22 -
+    #                                        DR2*DR2 )/
+    #                                        (slices*(slices-1)) )
+    #    elif slices == 1 :
+    #        list_varDT.append(0)
+    #        list_varDR2.append(0)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -52,14 +96,15 @@ fontP.set_size(18)
 ct = 0
 for dr in range(1,2, 1):
     dirN = '' #'0'+str(dr) +'/' if dr < 10 else str(dr) +'/'
-    for traj in range(62):
+    for traj in range(3):
         list_t, list_pos = trajDat(dirN+'dyn_contact_2sp_{0}.xyz'
                                     .format(traj))
 
         list_tuple, list_DT, list_DR2, list_DT2 = [], [], [], []
         list_DR22, list_varDT, list_varDR2 = [], [], []
-        members = len(list_t)
         disp = np.zeros((cgtot, list_pos.shape[1]))
+
+        msd_slice(list_t, list_pos[1])
 
         for cg in range(cgtot):
             for step in range(list_pos.shape[1]):
@@ -68,7 +113,6 @@ for dr in range(1,2, 1):
 
         ax.plot(list_t/1000., disp[1], label=str(ct) ) # 'x', color='r', label="data")
         ct+=1
-print ct
 
 gcf().subplots_adjust(bottom=0.20, left=0.20)
 for tick in ax.xaxis.get_major_ticks():
@@ -82,35 +126,8 @@ ax.set_ylabel('$\Delta r$', fontsize=24)
 ax.set_title('')
 
 plt.show()
-plt.savefig("diffusion.pdf")
-
-# calculate dt and mean square distance for slices of the data
-# calculation of variance not working correctly yet
-#   -- should have very small varDT and large varDR2
-#for i in range(members, 1, -1) : # decrement by 1 until reaching 2
-#    DT = 0
-#    DT2 = 0
-#    DR2 = 0
-#    DR22 = 0
-#    slices = members+1-i
-#    for j in range(0, slices) :
-#        arr_dt = list_t[0+j:i+j]
-#        arr_pos = list_pos[0+j:i+j]
-#        dt = arr_dt[-1] - arr_dt[0]
-#        dr2 = np.sum( np.square( arr_pos[-1] - arr_pos[0] ) )
-#        DT += dt
-#        DT2 += dt*dt
-#        DR2 += dr2
-#        DR22 += dr2*dr2
-#    list_DT.append(DT/slices)
-#    list_DR2.append(DR2/slices)
-#    if slices != 1 :
-#        list_varDT.append( slices*(DT2 - DT*DT)/(slices*(slices-1)) )
-#        list_varDR2.append( slices*( DR22 - DR2*DR2 )/(slices*(slices-1)) )
-#    elif slices == 1 :
-#        list_varDT.append(0)
-#        list_varDR2.append(0)
-
+plt.savefig("diffusion.jpg", bbox_inches='tight',
+                  dpi = 200)
 
 # fit data for diffusion coeff calc.
 # 1D or 3D ??? assuming 3D for now

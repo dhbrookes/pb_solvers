@@ -670,30 +670,22 @@ void PhysCalc::print_all()
     out << ", " << mol_pos[i].z() << "]" << endl;
     out << "\tENERGY: " << unit_conv_ * get_omega()->operator[](i) << endl;
     force_i = get_forcei(i); torque_i = get_taui(i);
-    for ( j = 0; j < 3; j++)
-    {
-      if (j == 0)
-      {
-        force_i.set_x(force_i.x() * unit_conv_);
-        torque_i.set_x(torque_i.x() * unit_conv_);
-        force_norm += force_i.x() * force_i.x();
-        torque_norm += torque_i.x() * torque_i.x();
-      }
-      if (j == 0)
-      {
-        force_i.set_y(force_i.y() * unit_conv_);
-        torque_i.set_y(torque_i.y() * unit_conv_);
-        force_norm += force_i.y() * force_i.y();
-        torque_norm += torque_i.y() * torque_i.y();
-      }
-      if (j == 0)
-      {
-        force_i.set_y(force_i.y() * unit_conv_);
-        torque_i.set_y(torque_i.y() * unit_conv_);
-        force_norm += force_i.y() * force_i.y();
-        torque_norm += torque_i.y() * torque_i.y();
-      }
-    }
+
+    force_i.set_x(force_i.x() * unit_conv_);
+    torque_i.set_x(torque_i.x() * unit_conv_);
+    force_norm += force_i.x() * force_i.x();
+    torque_norm += torque_i.x() * torque_i.x();
+    
+    force_i.set_y(force_i.y() * unit_conv_);
+    torque_i.set_y(torque_i.y() * unit_conv_);
+    force_norm += force_i.y() * force_i.y();
+    torque_norm += torque_i.y() * torque_i.y();
+    
+    force_i.set_z(force_i.z() * unit_conv_);
+    torque_i.set_z(torque_i.z() * unit_conv_);
+    force_norm += force_i.z() * force_i.z();
+    torque_norm += torque_i.z() * torque_i.z();
+
     out << "\tFORCE: " << sqrt(force_norm) << ", [";
     out << force_i.x() <<" " << force_i.y() << " " << force_i.z()<< "]"<<endl;
     out << "\tTORQUE: " << sqrt(torque_norm) << ", [";
