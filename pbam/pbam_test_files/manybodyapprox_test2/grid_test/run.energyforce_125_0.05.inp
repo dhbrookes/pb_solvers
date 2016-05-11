@@ -1,0 +1,11 @@
+runtype energyforce 1
+runname energyforce_125_0.05.out
+units kT
+salt 0.05
+temp 298
+idiel 4
+sdiel 78
+attypes 1
+type 1 125
+pqr 1 mol.pqr
+xyz 1 pos125_grid.xyz

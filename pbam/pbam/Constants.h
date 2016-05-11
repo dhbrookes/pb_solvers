@@ -91,6 +91,7 @@ public:
   
   Constants(Units units = INTERNAL);
   Constants(Setup setup);
+  Constants(Constants &other);
   
   //The methods below update dependent constants (called when others are set in
   //setter methods)
@@ -147,7 +148,10 @@ public:
   const double get_kappa() const              { return kappa_; }
   const double get_patch_size() const         { return patchSize_; }
   const double get_rotate_size() const        { return rotateSize_; }
-  Units get_unitsEnum()                       { return units_; }
+  const double get_patch_angle() const        { return patchAngle_; }
+  const double get_rotate_angle() const       { return rotateAngle_; }
+  const double get_lambda() const             { return lambda_; }
+  const Units get_unitsEnum() const                    { return units_; }
   string get_units();
   
   const double get_conv_factor();

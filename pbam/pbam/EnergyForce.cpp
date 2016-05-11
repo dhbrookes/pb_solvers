@@ -387,14 +387,14 @@ void ThreeBody::solveNmer( int num, double preclim )
     {
       tempmol = nmer->operator[](i);
       poles = p_;
-      cout << i << endl;
+//      cout << i << endl;
     }
     shared_ptr<System> _sysTemp = make_subsystem(tempmol);
     shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
     shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
     shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
     shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
-    shared_ptr<Constants> consts =  make_shared<Constants>();
+    shared_ptr<Constants> consts =  make_shared<Constants>(*_consts_);
     
     shared_ptr<ASolver> _asolvTemp = make_shared<ASolver>(bCalcu, SHCalcu,
                                                           _sysTemp,

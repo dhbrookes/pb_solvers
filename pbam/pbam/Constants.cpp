@@ -52,6 +52,19 @@ patchAngle_(6.0), rotateAngle_(20.0)
   update_all();
 }
 
+Constants::Constants(Constants &consts)
+:bDist_(consts.get_b_dist()), qDist_(consts.get_q_dist()),
+fDist_(consts.get_f_dist()), dielectricWater_(consts.get_dielectric_water()),
+dielectricProt_(consts.get_dielectric_prot()),
+saltConcentration_(consts.get_salt_concentration()),
+temp_(consts.get_temp()), tol_(consts.get_tol()),
+patchAngle_(consts.get_patch_angle()), rotateAngle_(consts.get_rotate_angle()),
+lambda_(consts.get_lambda()), KbT_(consts.get_kbt()), iKbT_(consts.get_ikbt()),
+kappa_(consts.get_kappa()), patchSize_(consts.get_patch_size()),
+rotateSize_(consts.get_rotate_size()), units_(consts.get_unitsEnum())
+{
+}
+
 void Constants::update_kbt()
 {
   KbT_ = KB * temp_;

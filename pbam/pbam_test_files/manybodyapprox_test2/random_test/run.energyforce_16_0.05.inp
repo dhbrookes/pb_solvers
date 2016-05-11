@@ -1,0 +1,12 @@
+runtype energyforce 1
+runname energyforce_16_0.05.out
+units kT
+salt 0.05
+temp 298
+idiel 4
+sdiel 78
+randorient
+attypes 1
+type 1 16
+pqr 1 mol.pqr
+xyz 1 pos16.xyz
