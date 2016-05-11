@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 Program to write VMD script for
 '''
 dirName='/Users/lfelberg/PBSAM/pb_solvers/pbam/'\
-                    'pbam_test_files/energyforce_test/'
-fileName = dirName + 'energyforce.kT_0.05M.out'
-outFile= dirName + '2sp_0.05M.kT.'
+                    'pbam_test_files/energyforce_test/'\
+                    'porin/'
+fileName = dirName + 'enfor_porin_trip.kT_0.05M.out'
+outFile= dirName + 'porin_0.05M.kT.'
 
 def cleanString(strg):
     '''Removes , [ and ] from a string'''
@@ -45,7 +46,7 @@ def FileOpen(fileName):
 
 rad, ps, nrg, frc, tor = FileOpen(fileName)
 scale = 0.25
-torscal = .2
+torscal = .65
 rad = np.array(rad)
 ps = np.array(ps)
 nrg = np.array(nrg)
@@ -54,18 +55,17 @@ tor = np.array(tor)/torscal
 
 vmd_scr = open(outFile+'force', 'w')
 for i in range(len(nrg)):
-    pos = [ 0, 0, rad[i]]
     vmd_scr.write('draw color black\n')
     strr = 'draw cylinder {{{0}}} '.format(
-        ' '.join(map(str,tuple(ps[i]+pos))))
-    tmp = ' '.join(map(str,tuple(ps[i]+pos+frc[i]*0.8)))
+        ' '.join(map(str,tuple(ps[i]))))
+    tmp = ' '.join(map(str,tuple(ps[i]+frc[i]*0.8)))
     strr += '{{{0:s}}} radius {1}\n'.format(
         tmp, rad[i]*0.2)
     vmd_scr.write(strr)
 
     strr = 'draw cone {{{0}}} '.format(
-        ' '.join(map(str,tuple(ps[i]+pos+frc[i]*0.80))))
-    tmp = ' '.join(map(str,tuple(ps[i]+pos+frc[i])))
+        ' '.join(map(str,tuple(ps[i]+frc[i]*0.80))))
+    tmp = ' '.join(map(str,tuple(ps[i]+frc[i])))
     strr += '{{{0:s}}} radius {1}\n'.format(
         tmp, rad[i]*0.3)
     vmd_scr.write(strr)
@@ -79,23 +79,25 @@ for i in range(len(nrg)):
     strr = 'draw cylinder {{{0}}} '.format(
         ' '.join(map(str,tuple(ps[i]))))
 
-    torn = np.linalg.norm(tor[i])/(rad[i]*2.)
+    rarr = rad[i]*0.1
+    torn = np.linalg.norm(tor[i])/(rad[i]*1.05)
     tmp = ' '.join(map(str,tuple(ps[i]+tor[i]/torn*0.8)))
     strr += '{{{0:s}}} radius {1}\n'.format(
-        tmp, rad[i]*0.2)
+        tmp, rarr)
     vmd_scr.write(strr)
 
     strr = 'draw cone {{{0}}} '.format(
         ' '.join(map(str,tuple(ps[i]+tor[i]/torn*0.8))))
     tmp = ' '.join(map(str,tuple(ps[i]+tor[i]/torn)))
     strr += '{{{0:s}}} radius {1}\n'.format(
-        tmp, rad[i]*0.3)
+        tmp, rarr*1.2)
     vmd_scr.write(strr)
 
+    print torn, tor[i]
     torn = np.linalg.norm(tor[i])
-    plan = torn/(rad[i]*1.5)
-    sprad = 0.2  ## rad of sphere for curved arr
-    crad = 1.1
+    plan = torn/(rad[i]*.85)
+    sprad = 1.0  ## rad of sphere for curved arr
+    crad = rarr*2.0
 
     npts = 360
     xyVec = np.array([0,0,1])
@@ -103,10 +105,7 @@ for i in range(len(nrg)):
     ang = math.acos(np.dot(xyVec, tor[i]) / (
                                 np.linalg.norm(xyVec) *
                                 np.linalg.norm(tor[i])))
-
-    print xyVec, xx
     axi = xx/np.linalg.norm(xx)
-    print ang, axi
 
     c = math.cos(ang)
     s = math.sin(ang)
@@ -140,7 +139,7 @@ for i in range(len(nrg)):
         ' '.join(map(str,tuple(circROT[0]))))
     tmp = ' '.join(map(str,tuple(circROT[330])))
     strr += '{{{0:s}}} radius {1}\n'.format(
-        tmp, rad[i]*0.2)
+        tmp, rarr)
     vmd_scr.write(strr)
 
 vmd_scr.close()
