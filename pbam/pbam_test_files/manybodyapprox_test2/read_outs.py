@@ -42,12 +42,16 @@ f_ave_errors = [[0 for _ in range(len(num_mols))] for _ in range(len(salts))]
 for k in range(len(num_mols)):
 	nmol = num_mols[k]
 	for j in range(len(salts)):
+		if k ==2 and j > 0:
+			break
 		salt = salts[j]
 		descriptor = "_%i_%.2f" % (nmol, salt)
 		enf_fname = "energyforce%s.out" % descriptor 
 		three_fname = "bodyapprox%s.out" % descriptor
 		ens1, fs1, tors1 = read_en_force_out(enf_fname)
 		ens2, fs2 = read_3bd_out(three_fname)
+
+		print enf_fname, ens1, ens2
 
 		assert len(ens1) == len(ens2) == nmol
 		assert len(fs1) == len(fs2) == nmol
