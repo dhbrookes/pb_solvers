@@ -123,20 +123,21 @@ public:
   
   void translate(Pt dr, double boxlen);
   void rotate(Quat qrot);
+  void rotate(MyMatrix<double> rotmat);
   
-  string get_move_type() const          { return moveType_; }
-  int get_type() const                  { return type_; }
-  int get_type_idx() const              { return typeIdx_; }
-  int get_nc() const                    { return Nc_; }
-  int get_ns() const                    { return Ns_; }
-  double get_drot() const               { return drot_; }
-  double get_dtrans() const             { return dtrans_; }
-  Pt get_posj(int j) const              { return pos_[j]; }
-  Pt get_posj_realspace(int j)          { return pos_[j] + centers_[chToCG_[j]];}
-  const double get_qj(int j) const      { return qs_[j]; }
-  const double get_radj(int j) const    { return vdwr_[j]; }
-  Pt get_centerk(int k) const           { return centers_[k]; }
-  const double get_ak(int k) const      { return as_[k]; }
+  string get_move_type() const         { return moveType_; }
+  int get_type() const                 { return type_; }
+  int get_type_idx() const             { return typeIdx_; }
+  int get_nc() const                   { return Nc_; }
+  int get_ns() const                   { return Ns_; }
+  double get_drot() const              { return drot_; }
+  double get_dtrans() const            { return dtrans_; }
+  Pt get_posj(int j) const             { return pos_[j]; }
+  Pt get_posj_realspace(int j)         { return pos_[j] + centers_[chToCG_[j]];}
+  Pt get_centerk(int k) const          { return centers_[k]; }
+  const double get_qj(int j) const     { return qs_[j]; }
+  const double get_radj(int j) const   { return vdwr_[j]; }
+  const double get_ak(int k) const     { return as_[k]; }
   
   /*
    Choose a random orientation for a Pt vector

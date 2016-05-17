@@ -111,6 +111,18 @@ void Molecule::rotate(Quat qrot)
   }
 }
 
+void Molecule::rotate(MyMatrix<double> rotmat)
+{
+  for (int k = 0; k < Ns_; k++)
+  {
+    centers_[k] = centers_[k].rotate(rotmat);
+    for (int i = 0; i < cgCharges_[k].size(); i++)
+    {
+      pos_[cgCharges_[k][i]] = pos_[cgCharges_[k][i]].rotate(rotmat);
+    }
+  }
+}
+
 void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
                               double tol_sp, int n_trials,
                               int max_trials)
@@ -176,8 +188,6 @@ CGSphere Molecule::find_best_center(vector<Pt> sp,vector<Pt> np,
                                       double tol_sp, int iter, double beta)
 {
   int sz = (int) unbound.size();
-  const double sphere_tol =  1.0;
-  
   Pt best_cen;
   double best_a = 0;
   int best_N = 0;
@@ -279,14 +289,14 @@ boxLength_(boxlength), t_(0)
 }
 
 System::System(Setup setup, double cutoff)
-:t_(0), ntype_(setup.get_ntype()), typect_(setup.get_type_nct())
+:t_(0), ntype_(setup.getNType()), typect_(setup.get_type_nct())
 {
   vector<Molecule> mols;
-  int chg, i, j, k=0;
+  int i, j, k=0;
   string pqrpath;
   Molecule mol;
   vector<int> keys(2);
-  for (i = 0; i < setup.get_ntype(); i++)
+  for (i = 0; i < setup.getNType(); i++)
   {
     
     // First a build a representative molecule of this type (which will
@@ -296,15 +306,21 @@ System::System(Setup setup, double cutoff)
     if (pqrI.get_Ns() == 0)
     {
       MSMSFile surf_file (setup.getTypeNSurf(i));
-      /********************************
-      need to add TolSP, max trials, beta, and n_trials to Setup:
-       ********************************/
+      type_mol = Molecule(i, 0, setup.getTypeNDef(i), pqrI.get_charges(),
+                          pqrI.get_atom_pts(), pqrI.get_radii(),
+                          surf_file.get_sp(), surf_file.get_np(),
+                          setup.get_tol_sp(), setup.get_n_trials(),
+                          setup.get_max_trials(), setup.get_sph_beta(),
+                          setup.getDrot(i), setup.getDtr(i));
+    }
+    else
+    {
+      type_mol = Molecule(i, -1, setup.getTypeNDef(i), pqrI.get_charges(),
+                          pqrI.get_atom_pts(), pqrI.get_radii(),
+                          pqrI.get_cg_centers(), pqrI.get_cg_radii(),
+                          setup.getDrot(i), setup.getDtr(i));
     }
     
-    
-  
-    
-    // reposition molecules
     TransRotFile transrot;
     XYZFile xyzI;
     if (setup.getTypeIsTransRot(i))
@@ -315,10 +331,14 @@ System::System(Setup setup, double cutoff)
     {
       xyzI = XYZFile (setup.getTypeNXYZ(i), setup.getTypeNCount(i));
     }
+    
     for (j = 0; j < setup.getTypeNCount(i); j++)
     {
+      // now copy the representative molecule and reposition it
       Pt trans;
       MyMatrix<double> rot;
+      Molecule mol (type_mol);
+      mol.set_type_idx(j);
       
       Pt com = pqrI.get_center_geo();
       
@@ -336,48 +356,8 @@ System::System(Setup setup, double cutoff)
         rot.set_val(2, 2, 1.0);
       }
       
-      vector<Pt> repos_charges (pqrI.get_Nc());
-      vector<Pt> repos_cg_cens (pqrI.get_Nc());
-      
-      keys = { i, j };
-      Pt new_pt;
-      
-      for ( chg = 0; chg < pqrI.get_Ns(); chg ++)
-      {
-        repos_charges[chg] = pqrI.get_atom_pts()[chg].rotate(rot) + trans;
-      }
-      
-      for (int k = 0; k < pqrI.get_Nc(); k++)
-      {
-        repos_cg_cens[k] = pqrI.get_cg_centers()[k].rotate(rot) + trans;
-      }
-      
-      if (pqrI.get_Ns() > 0)
-      {
-        
-      }
-//
-//      if (pqrI.is_cg())  // coarse graining is in pqr
-//      {
-//        mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
-//                        pqrI.get_charges(), repos_charges,
-//                        pqrI.get_radii(), xyzI.get_pts()[j], i, j,
-//                        setup.getDrot(i), setup.getDtr(i));
-//      }
-//      else if (! setup.getTypeIsTransRot(i))
-//      {
-//        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
-//                       repos_charges, pqrI.get_radii(),
-//                       xyzI.get_pts()[j], i, j,
-//                       setup.getDrot(i), setup.getDtr(i));
-//        
-//      }
-//      else
-//      {
-//        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
-//                       repos_charges, pqrI.get_radii(), i, j,
-//                       setup.getDrot(i), setup.getDtr(i));
-//      }
+      mol.rotate(rot);
+      mol.translate(trans, setup.getBLen());
       
       molecules_.push_back(mol);
       typeIdxToIdx_[keys] = k;

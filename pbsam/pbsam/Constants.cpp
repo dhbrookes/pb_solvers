@@ -49,6 +49,7 @@ patchAngle_(6.0), rotateAngle_(20.0)
   set_dielectric_water(setup.getSDiel());
   set_salt_concentration(setup.getSaltConc());
   set_temp(setup.getTemp());
+  tolSP_ = setup.get_tol_sp();
   update_all();
 }
 

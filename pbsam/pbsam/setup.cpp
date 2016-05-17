@@ -39,8 +39,8 @@ termtype_(2),
 andCombine_(false),
 sphBeta_(2.0),
 tolSP_(1.0),
-maxSphTrials_(40),
-nSphTrials_(1200)
+maxTrials_(40),
+nTrials_(1200)
 {
   nTypenCount_[0] = 1;
   nTypenCount_[1] = 1;
@@ -345,6 +345,22 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "Units command found" << endl;
     setUnits( fline[1].c_str() );
+  } else if (keyword == "tolsp")
+  {
+    cout << "tolsp command found" << endl;
+    set_tol_sp(atof(fline[1].c_str()));
+  } else if (keyword == "ntrials")
+  {
+    cout << "ntrials command found" << endl;
+    set_n_trials(atoi(fline[1].c_str()));
+  } else if (keyword == "maxtrials")
+  {
+    cout << "maxtrials command found" << endl;
+    set_max_trials(atoi(fline[1].c_str()));
+  } else if (keyword == "sphbeta")
+  {
+    cout << "sphbeta command found" << endl;
+    set_sph_beta(atof(fline[1].c_str()));
   } else
     cout << "Keyword not found, read in as " << fline[0] << endl;
 }

@@ -41,13 +41,27 @@ protected:
   
   static const double MAX_DIST;  // maximum distance for cutoff, box length
   
+  string  units_; // the units desired for output
   int     ompThreads_;
   int     nType_;  		// Number of different molecule types
   int     PBCs_;			// PBC in 0, pseudo-2, or 3 dimensions
   int     maxtime_;
   int     ntraj_;
+  int     srand_;			// random seed
   double  saltConc_;
   double  blen_; 		// boxlength for PBC
+  double  idiel_;
+  double  sdiel_;  // dielectric constant win molecule and of solvent
+  double  iKbT_;
+  double  temp_;
+  double  kappa_;
+  bool    orientRand_; // flag for creating random orientations for mols
+
+  // make spheres settings:
+  double    sphBeta_;
+  double    tolSP_;
+  int       nTrials_;
+  int       maxTrials_;
   
   // for electrostatics runtype
   int             gridPts_;  // number of voxels to compute for each dim
@@ -65,48 +79,33 @@ protected:
   vector<double>        conpads_;   // pads for contact termination conditions
   vector<double>        termvals_;  // value for each termination condition
   vector<vector<int> >  termmols_;  // vector of molecule ids
-
-  bool andCombine_;  //if true, term conds will combine w 'and', otherwise 'or'
+  bool                  andCombine_;  //if true, term conds will
+                                      //combine w/ 'and', otherwise 'or'
   
-  double idiel_;
-  double sdiel_;  // dielectric constant win molecule and of solvent
-  double temp_;
-  int srand_;			// random seed
-  bool orientRand_; // flag for creating random orientations for mols
-  
-  double sphBeta_;
-  double tolSP_;
-  int nSphTrials_;
-  int maxSphTrials_;
-  
-  vector<int> nTypenCount_; // Array for each of mol types, how many mols
-  vector<vector<double> > typeDiff_; // Dtr, Drot each type, size [Ntype][2]
-  vector<string> typeDef_; 		// For each type, type is stat, rot or move
-  vector<string> runSpecs_;	//include run type [0] (electrost/bd) & runname [1]
-  vector<string> pqr_names_;  // PQR file names
-  vector<string> surfNames_;  // MSMS surface file names
+  vector<int>             nTypenCount_;  // number of mols of each type
+  vector<vector<double> > typeDiff_;  // Dtr, Drot each type, size [Ntype][2]
+  vector<string>          typeDef_;  // For each type, type is stat, rot or move
+  vector<string>          runSpecs_;  //include run type [0] (electrost/bd)
+                                      //and runname [1]
+  vector<string>          pqr_names_;  // PQR file names
+  vector<string>          surfNames_;  // MSMS surface file names
   vector<vector<string> > xyz_names_;  // XYZ file names
-  vector<vector<bool> > isTransRot_;
+  vector<vector<bool> >   isTransRot_;
   
   vector<string> mbdfile_loc_; // location of names for manybd data output
   
-  double kappa_;
-  double iKbT_;
-  
-  string units_; // the units desired for output
-  
+
   // input file reading methods:
   void read_infile(string infile);
   vector<string> split(string str, char delim);
   void findLines(string fline);
   void findKeyword(vector<string> fline);
   void resizeVecs();
-
   
   // basic settings:
-  void setRunType( string runt )      {runSpecs_[0] = runt;}
-  void setRunName( string runn )      {runSpecs_[1] = runn;}
-  void setUnits( string units )       {units_ = units;}
+  void setRunType( string runt )      { runSpecs_[0] = runt; }
+  void setRunName( string runn )      { runSpecs_[1] = runn; }
+  void setUnits( string units )       { units_ = units;}
   void setIDiel( double idiel )       { idiel_ = idiel; }
   void setSDiel( double sdiel )       { sdiel_ = sdiel;}
   void setTemp( double temp )         { temp_ = temp;}
@@ -120,6 +119,9 @@ protected:
   void setMaxTime( int maxt )         { maxtime_ = maxt; }
   void setKappa( double kappa )       { kappa_ = kappa; }
   void set_tol_sp(double tolsp)       { tolSP_ = tolsp; }
+  void set_sph_beta(double sphbeta)   { sphBeta_ = sphbeta; }
+  void set_n_trials(int n)            { nTrials_ = n; }
+  void set_max_trials(int n)          { maxTrials_ = n; }
   
   // three body settings:
   void set2BDLoc( string fileloc )    { mbdfile_loc_[0] = fileloc;}
@@ -188,14 +190,10 @@ protected:
 public:
   Setup(string infile);
   
-  string getRunType()              { return runSpecs_[0]; }
-  string getRunName()              { return runSpecs_[1]; }
-  string getUnits()                { return units_; }
-  
   // electrostatics
-  string getDXoutName(  )  { return potOutfnames_[0];}
-  string get_3dmap_name( ) { return potOutfnames_[1];}
-  string getGridOutName( int i ) { return potOutfnames_[i+2];}
+  string getDXoutName(  )         { return potOutfnames_[0];}
+  string get_3dmap_name( )        { return potOutfnames_[1];}
+  string getGridOutName( int i )  { return potOutfnames_[i+2];}
   
   int getGridPts() { return gridPts_; }
   int getGridCt() { return gridCt_; }
@@ -203,53 +201,59 @@ public:
   double getGridAxLoc( int i ) { return axLoc_[i];}
   
   // Dynamics termination conds
-  int get_numterms( )              { return numTerm_; }
-  string get_termtype( int i)      { return termtype_[i]; }
-  vector<int> get_termMolIDX( int i) { return termmols_[i]; }
-  double get_termval( int i)       { return termvals_[i];}
-  string get_confile(int j)        { return confiles_[j]; }
-  double get_conpad(int j)         { return conpads_[j]; }
-  bool get_andCombine( )           { return andCombine_; }
-  
+  int get_numterms( )                 { return numTerm_; }
+  string get_termtype( int i)         { return termtype_[i]; }
+  vector<int> get_termMolIDX( int i)  { return termmols_[i]; }
+  double get_termval( int i)          { return termvals_[i];}
+  string get_confile(int j)           { return confiles_[j]; }
+  double get_conpad(int j)            { return conpads_[j]; }
+  bool get_andCombine( )              { return andCombine_; }
+  int getMaxTime()                    { return maxtime_; }
+  int getNTraj()                      { return ntraj_; }
   
   // threebody
   string get2BDLoc()               { return mbdfile_loc_[0]; }
   string get3BDLoc()               { return mbdfile_loc_[1]; }
   vector<string> getMBDLoc()       { return mbdfile_loc_; }
   
+  // retreive basic settings:
+  string getRunType()              { return runSpecs_[0]; }
+  string getRunName()              { return runSpecs_[1]; }
+  string getUnits()                { return units_; }
+  string getTypeNXYZ(int type)     { return xyz_names_[type][0]; }
+  bool get_randOrient()            { return orientRand_; }
   int getThreads()                 { return ompThreads_; }
   int getNType()                   { return nType_; }
-  int get_ntype()                  { return nType_; } // repeat
-  vector<int> get_type_nct()       { return nTypenCount_;}
+  int getTypeNCount(int type)      { return nTypenCount_[type]; }
   int getPBCs()                    { return PBCs_; }
+  int get_n_trials()               { return nTrials_; }
+  int get_max_trials()             { return maxTrials_; }
   double getBLen()                 { return blen_; }
   double getIDiel()                { return idiel_; }
   double getSDiel()                { return sdiel_; }
   double getSaltConc()             { return saltConc_; }
   double getTemp()                 { return temp_; }
-  int getMaxTime()                 { return maxtime_; }
-  int getNTraj()                   { return ntraj_; }
   double getDtr( int n )           { return typeDiff_[n][0]; }
   double getDrot( int n )          { return typeDiff_[n][1]; }
-  int getTypeNCount(int type)      { return nTypenCount_[type]; }
-  string getTypeNDef(int type)     { return typeDef_[type]; }
-  string getTypeNPQR(int type)     { return pqr_names_[type]; }
-  string getTypeNSurf(int type)     { return surfNames_[type]; }
-  string getTypeNXYZ(int type, int traj) { return xyz_names_[type][traj]; }
-  bool getTypeIsTransRot(int type, int traj)  { return isTransRot_[type][traj]; }
+  double getKappa()                { return kappa_; }
+  double getIKbT()                 { return iKbT_; }
+  double get_tol_sp()              { return tolSP_; }
+  double get_sph_beta ()           { return sphBeta_; }
+  vector<int> get_type_nct()       { return nTypenCount_;}
+
+  // retrieve files:
+  string getTypeNDef(int type)                { return typeDef_[type]; }
+  string getTypeNPQR(int type)                { return pqr_names_[type]; }
+  string getTypeNSurf(int type)               { return surfNames_[type]; }
+  string getTypeNXYZ(int type, int traj)      { return xyz_names_[type][traj];}
+  bool getTypeIsTransRot(int type, int traj)  { return isTransRot_[type][traj];}
+  bool getTypeIsTransRot(int type)            { return isTransRot_[type][0]; }
   vector<string> get_trajn_xyz(int traj)
   {
     vector<string> traj_xyz;
     for (int i = 0; i < nType_; i ++) traj_xyz.push_back(xyz_names_[i][traj]);
     return traj_xyz;
   }
-  
-  string getTypeNXYZ(int type)     { return xyz_names_[type][0]; }
-  bool getTypeIsTransRot(int type)     { return isTransRot_[type][0]; }
-  double getKappa()                { return kappa_; }
-  double getIKbT()                 { return iKbT_; }
-  
-  bool get_randOrient()            { return orientRand_; }
   
   // check input arguments and throw BadInputException if they dont check out
   void check_inputs();
