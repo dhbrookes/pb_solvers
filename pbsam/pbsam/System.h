@@ -62,7 +62,7 @@ public:
 };
 
 
-class MoleculeCG
+class Molecule
 {
 protected:
   string              moveType_;
@@ -74,7 +74,7 @@ protected:
   int                 Nc_;  // number of charges in this molecule
   vector<double>      qs_;  // magnitude of each charge in the molecule
   vector<Pt>          pos_;  // position of each charge in the molecule
-  vector<double>      vdwr_; // van der waal radius of each charge
+  vector<double>      vdwr_; // van der waal radius of each chargeGoogle
   
   int                     Ns_;  // number of coarse grained spheres
   vector<Pt>              centers_; //coarse-grained sphere centers
@@ -101,20 +101,25 @@ protected:
                             vector<int> unbounded,
                             double tol_sp, int iter=1200, double beta=2.0);
   
-  
-  
 public:
   
-  MoleculeCG() { }
+  Molecule() { }
+  
+  Molecule(const Molecule& mol);
   
   // user specified centers
-  MoleculeCG(int type, int type_idx, string movetype, vector<double> qs,
-            vector<Pt> pos, vector<double> vdwr, vector<Pt> cens,
-            vector<double> as, double drot=0, double dtrans=0);
+  Molecule(int type, int type_idx, string movetype, vector<double> qs,
+             vector<Pt> pos, vector<double> vdwr, vector<Pt> cens,
+             vector<double> as, double drot=0, double dtrans=0);
   
-  MoleculeCG(int type, int type_idx, string movetype, vector<double> qs,
-            vector<Pt> pos, vector<double> vdwr, double drot=0,
-            double dtrans=0);
+  Molecule(int type, int type_idx, string movetype, vector<double> qs,
+             vector<Pt> pos, vector<double> vdwr, vector<Pt> msms_sp,
+             vector<Pt> msms_np, double tol_sp, int n_trials=1200,
+             int max_trials=40, double beta=2.0, double drot=0,
+             double dtrans=0);
+  
+  void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
+  
   
   void translate(Pt dr, double boxlen);
   void rotate(Quat qrot);
@@ -133,84 +138,15 @@ public:
   Pt get_centerk(int k) const           { return centers_[k]; }
   const double get_ak(int k) const      { return as_[k]; }
   
+  /*
+   Choose a random orientation for a Pt vector
+   */
+  Pt random_pt();
+  
+  // random number from normal distribution
+  double random_norm();
+  
 };
-
-
-/*
- Class for storing relevant data about each molecule
- */
-class Molecule
-{
-protected:
-  string              moveType_;
-  int                 type_; // int index of type of molecule, 0 based
-  int                 typeIdx_; // int index of mol within given type_, 0 based
-  double              drot_;  // rotational diffusion coefficient
-  double              dtrans_; // translational diffusion coefficients
-  int                 M_;  // number of charges in this molecule
-  double              a_;  // radius of this molecule
-  Pt                  center_; // wrapped center position
-//  Pt                  unwrappedCenter_; // unwrapped center to check for term
-  vector<double>      qs_;  // magnitude of each charge in the molecule
-  vector<Pt>          pos_;  // position of each charge in the molecule
-  vector<double>      vdwr_; // van der waal radius of each charge
-  
-  // Set coefficients according to the type indicated
-  void set_Dtr_Drot(string type);
-  
-  // calculate the center of the molecule
-  void calc_center();
-  
-  // calculate the radius of the molecule
-  void calc_a();
-  
-  // reposition charges wrt the center
-  void reposition_charges();
-    
-public:
-  
-  Molecule() {}
-
-  // user specified radius and center
-  Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
-           vector<double> vdwr, Pt cen, int type, int typeIdx,
-           double drot_=0, double dtrans=0);
-  
-  // user specified radius
-  Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
-           vector<double> vdwr, int type, int typeIdx,
-           double drot_=0, double dtrans=0);
-  
-  // user specified center
-  Molecule(string movetype, vector<double> qs, vector<Pt> pos,
-           vector<double> vdwr, Pt cen, int type, int typeIdx,
-           double drot_=0, double dtrans=0);
-  
-  // neither the center or radius are specified
-  Molecule(string movetype, vector<double> qs, vector<Pt> pos,
-           vector<double> vdwr, int type, int typeIdx,
-           double drot_=0, double dtrans=0);
-  
-  const int get_m() const               { return M_; }
-  const double get_a() const            { return a_; }
-  const double get_qj(int j) const      { return qs_[j]; }
-  const double get_radj(int j) const    { return vdwr_[j]; }
-  Pt get_posj(int j) const              { return pos_[j]; }
-  Pt get_posj_realspace(int j)          { return center_ + pos_[j]; }
-  Pt get_center() const                 { return center_; }
-//  Pt get_unwrapped_center() const       { return unwrappedCenter_; }
-  
-  string get_move_type() const          { return moveType_; }
-  int get_type() const                  { return type_; }
-  int get_type_idx() const              { return typeIdx_; }
-  
-  double get_drot() const               { return drot_; }
-  double get_dtrans() const             { return dtrans_; }
-  
-  void translate(Pt dr, double boxlen);
-  void rotate(Quat qrot);
-};
-
 
 /*
  Class containing all of the relevant information for a particular system
@@ -234,6 +170,8 @@ protected:
   
   const double calc_average_radius() const;
   
+//  Molecule build_type_mol(int type, Setup setup);
+  
 public:
   System() { }
   
@@ -246,27 +184,23 @@ public:
   const int get_n() const                  {return N_;}
   const int get_ntype()                    {return ntype_;}
   const int get_typect(int i)              {return typect_[i];}
-  const double get_ai(int i) const         {return molecules_[i].get_a();}
-  const double get_Mi(int i) const         {return molecules_[i].get_m();}
+  const double get_aik(int i, int k) const {return molecules_[i].get_ak(k);}
+  const double get_Nc_i(int i) const       {return molecules_[i].get_nc();}
+  const double get_Ns_i(int i) const       {return molecules_[i].get_ns();}
   const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
-  const double get_radij(int i, int j) const {return molecules_[i].get_radj(j);}
-  Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
-  Pt get_posijreal(int i, int j)
-  {return molecules_[i].get_posj_realspace(j);}
-  Molecule get_molecule(int i) const       {return molecules_[i];}
-  vector<Pt> get_allcenter() const;
-  Pt get_centeri(int i) const              {return molecules_[i].get_center();}
-//  Pt get_unwrapped_center(int i) const
-//  {return molecules_[i].get_unwrapped_center();}
-  double get_radi(int i) const             {return molecules_[i].get_a();}
-  const double get_lambda() const          {return lambda_;}
-  const string get_typei(int i) const
-  {return molecules_[i].get_move_type();}
   const double get_droti(int i) const      {return molecules_[i].get_drot();}
   const double get_dtransi(int i) const    {return molecules_[i].get_dtrans();}
   const double get_boxlength() const       {return boxLength_;}
   const double get_cutoff() const          {return cutoff_;}
   const double get_time() const            {return t_;}
+  const double get_lambda() const          {return lambda_;}
+  Molecule get_molecule(int i) const       {return molecules_[i];}
+  Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
+  Pt get_centerik(int i, int k) const    {return molecules_[i].get_centerk(k);}
+  const string get_typei(int i) const    {return molecules_[i].get_move_type();}
+  
+  const double get_radij(int i, int j) const {return molecules_[i].get_radj(j);}
+  Pt get_posijreal(int i, int j) {return molecules_[i].get_posj_realspace(j);}
   
   const int get_mol_global_idx(int type, int ty_idx)
   {
@@ -289,11 +223,6 @@ public:
   // Check to determine if any molecules are overlapping
   void check_for_overlap();
   
-  // get the distance vector (Point object) between two molecules, taking into
-  // account periodic boundary conditions by returning the distance vector
-  // between the closest image of the molecule
-  Pt get_pbc_dist_vec(int i, int j);
-  
   // get distance vector between any two points taking into account periodic
   // boundary conditions
   Pt get_pbc_dist_vec_base(Pt p1, Pt p2);
@@ -302,7 +231,7 @@ public:
   bool less_than_cutoff(Pt v);
   
   // reset positions with input xyz file
-  void reset_positions( vector<string> xyzfiles );
+//  void reset_positions( vector<string> xyzfiles );
   
   // write current system to PQR file
   void write_to_pqr( string outfile );

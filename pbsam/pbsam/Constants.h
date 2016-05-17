@@ -58,8 +58,11 @@ protected:
   double tol_;
   double patchAngle_;
   double rotateAngle_;
-  double lambda_; //uniform scaling 
+  double lambda_; //uniform scaling
   
+  double tolSP_;
+//  double sphBeta_;
+
   //Dependent constants:
   double KbT_;  //!< [kCal/mol] = [J/K]*[#/mol]*[K]*[kCal/J]
   double iKbT_;  //!<  1/KbT = [kCal/mol]-1
@@ -135,6 +138,8 @@ public:
     update_rotate_size();
   }
   
+  const double get_tol_sp() const             { return tolSP_; }
+//  const double get_sph_beta() const           { return sphBeta_; }
   const double get_b_dist() const             { return bDist_; }
   const double get_q_dist() const             { return qDist_; }
   const double get_f_dist() const             { return fDist_; }
@@ -151,7 +156,8 @@ public:
   const double get_patch_angle() const        { return patchAngle_; }
   const double get_rotate_angle() const       { return rotateAngle_; }
   const double get_lambda() const             { return lambda_; }
-  const Units get_unitsEnum() const                    { return units_; }
+  
+  const Units get_unitsEnum() const           { return units_; }
   string get_units();
   
   const double get_conv_factor();

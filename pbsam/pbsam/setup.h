@@ -41,29 +41,31 @@ protected:
   
   static const double MAX_DIST;  // maximum distance for cutoff, box length
   
-  int ompThreads_;
-  double saltConc_;
-  int nType_;  		// Number of different molecule types
-  int PBCs_;			// PBC in 0, pseudo-2, or 3 dimensions
-  double blen_; 		// boxlength for PBC
-  int maxtime_;
-  int ntraj_;
+  int     ompThreads_;
+  int     nType_;  		// Number of different molecule types
+  int     PBCs_;			// PBC in 0, pseudo-2, or 3 dimensions
+  int     maxtime_;
+  int     ntraj_;
+  double  saltConc_;
+  double  blen_; 		// boxlength for PBC
   
   // for electrostatics runtype
+  int             gridPts_;  // number of voxels to compute for each dim
+  int             gridCt_;  // number of grid files to write
+  vector<string>  axis_;    // For grid print, axis desired
+  vector<double>  axLoc_;   // Location along given axis
   vector< string> potOutfnames_; // Vector of outfiles, [0] = dx, rest = grid
   
-  int gridPts_; // number of voxels to compute for each dim
-  int gridCt_; // number of grid files to write
-  vector<string> axis_;  // For grid print, axis desired
-  vector<double> axLoc_; // Location along given axis
-  
   // for dynamics runs
-  int numTerm_;  //number of termination conditions
-  vector<string> termtype_; // type of each term ('time', 'x', 'y', 'z', 'r' or 'contact')
-  vector<vector<int> > termmols_; // vector of molecule ids
-  vector<double> termvals_; // value for each termination condition
-  vector<string> confiles_;  // contact files for contact termination conditions
-  vector<double> conpads_;  // pads for contact termination conditions
+  int                   numTerm_;   //number of termination conditions
+  vector<string>        termtype_;  // type of each term ('time', 'x', 'y', 'z',
+                                    //'r' or 'contact')
+  vector<string>        confiles_;  // contact files for contact termination
+                                    //conditions
+  vector<double>        conpads_;   // pads for contact termination conditions
+  vector<double>        termvals_;  // value for each termination condition
+  vector<vector<int> >  termmols_;  // vector of molecule ids
+
   bool andCombine_;  //if true, term conds will combine w 'and', otherwise 'or'
   
   double idiel_;
@@ -72,11 +74,17 @@ protected:
   int srand_;			// random seed
   bool orientRand_; // flag for creating random orientations for mols
   
+  double sphBeta_;
+  double tolSP_;
+  int nSphTrials_;
+  int maxSphTrials_;
+  
   vector<int> nTypenCount_; // Array for each of mol types, how many mols
   vector<vector<double> > typeDiff_; // Dtr, Drot each type, size [Ntype][2]
   vector<string> typeDef_; 		// For each type, type is stat, rot or move
   vector<string> runSpecs_;	//include run type [0] (electrost/bd) & runname [1]
   vector<string> pqr_names_;  // PQR file names
+  vector<string> surfNames_;  // MSMS surface file names
   vector<vector<string> > xyz_names_;  // XYZ file names
   vector<vector<bool> > isTransRot_;
   
@@ -92,25 +100,44 @@ protected:
   vector<string> split(string str, char delim);
   void findLines(string fline);
   void findKeyword(vector<string> fline);
-  
-  //'electrostatics' or 'dynamics' (for RunType)
-  void setRunType( string runt ) {runSpecs_[0] = runt;}
-  void setRunName( string runn ) {runSpecs_[1] = runn;}
-  void setUnits( string units )  {units_ = units;}
   void resizeVecs();
+
   
-  // setting values for electrostatics run
-  void setDXoutName( string dx) { potOutfnames_[0] = dx;}
-  void set_3dmap_name( string ht) { potOutfnames_[1] = ht;}
-  void setGridOutName( int i, string grid) { potOutfnames_[i+1] = grid;}
+  // basic settings:
+  void setRunType( string runt )      {runSpecs_[0] = runt;}
+  void setRunName( string runn )      {runSpecs_[1] = runn;}
+  void setUnits( string units )       {units_ = units;}
+  void setIDiel( double idiel )       { idiel_ = idiel; }
+  void setSDiel( double sdiel )       { sdiel_ = sdiel;}
+  void setTemp( double temp )         { temp_ = temp;}
+  void setRand( int rand )            { srand_ = rand; }
+  void setRandOrient()                { orientRand_ = true; }
+  void setOMP( int ompT )             { ompThreads_ = ompT ; }
+  void setSaltCon( double saltCon )   { saltConc_ = saltCon; }
+  void setNType( int numType )        { nType_ = numType; }
+  void setPBCT( int pbc )             { PBCs_ = pbc; }
+  void setBoxl( double boxl )         { blen_ = boxl; }
+  void setMaxTime( int maxt )         { maxtime_ = maxt; }
+  void setKappa( double kappa )       { kappa_ = kappa; }
+  void set_tol_sp(double tolsp)       { tolSP_ = tolsp; }
   
-  void setGridPts( int gridP ) { gridPts_ = gridP; }
-  void setGridCt( int gridC ) { gridCt_ = gridC; }
-  void setGridAx( int i, string ax) { axis_[i-1] = ax;}
-  void setGridAxLoc( int i, double axLoc) { axLoc_[i-1] = axLoc;}
+  // three body settings:
+  void set2BDLoc( string fileloc )    { mbdfile_loc_[0] = fileloc;}
+  void set3BDLoc( string fileloc )    { mbdfile_loc_[1] = fileloc;}
   
-  //dynamics settings
+  // electrostatics settings:
+  void setDXoutName( string dx)             { potOutfnames_[0] = dx;}
+  void set_3dmap_name( string ht)           { potOutfnames_[1] = ht;}
+  void setGridOutName( int i, string grid)  { potOutfnames_[i+1] = grid;}
+  void setGridPts( int gridP )              { gridPts_ = gridP; }
+  void setGridCt( int gridC )               { gridCt_ = gridC; }
+  void setGridAx( int i, string ax)         { axis_[i-1] = ax;}
+  void setGridAxLoc( int i, double axLoc)   { axLoc_[i-1] = axLoc;}
+  
+  
+  //dynamics settings:
   void set_numterms(int n) { numTerm_ = n; }
+  void setNTraj( int ntraj )          { ntraj_ = ntraj; }
   void resize_termcond(int n)
   {
     termtype_.resize(n);
@@ -118,6 +145,7 @@ protected:
     for ( int i = 0; i < n; i++) termmols_[i].resize(2);
     termvals_.resize(n);
   }
+  
   void add_termcond(int i, string type, vector<int> mol_idx, double val)
   {
     termtype_[i] = type;
@@ -132,38 +160,24 @@ protected:
     else andCombine_ = false;
   }
   
-  // setting details for 3bd
-  void set2BDLoc( string fileloc ) { mbdfile_loc_[0] = fileloc;}
-  void set3BDLoc( string fileloc ) { mbdfile_loc_[1] = fileloc;}
-  
-  //
-  void setOMP( int ompT ) { ompThreads_ = ompT ; }
-  void setSaltCon( double saltCon )
-  { saltConc_ = saltCon; }
-  void setNType( int numType ) { nType_ = numType; }
-  void setPBCT( int pbc ){ PBCs_ = pbc; }
-  void setBoxl( double boxl ){ blen_ = boxl; }
-  void setMaxTime( int maxt ){ maxtime_ = maxt; }
-  
-  void setIDiel( double idiel ) { idiel_ = idiel; }
-  void setSDiel( double sdiel ) { sdiel_ = sdiel;}
-  void setTemp( double temp ) { temp_ = temp;}
-  void setRand( int rand ) { srand_ = rand; }
-  void setRandOrient()          { orientRand_ = true; }
-  void setNTraj( int ntraj ){ ntraj_ = ntraj; }
-  void setKappa( double kappa ) { kappa_ = kappa; }
-  
+  // file paths:
   void setTypeNCount( int typeCount, int count )
   { nTypenCount_[typeCount] = count; }
+  
   void setTypeNDef( int typeCount, string definit )
   { typeDef_[typeCount] = definit; }
+  
   void setTypeNDtr( int typeCount, double dTR )
   { typeDiff_[typeCount][0] = dTR; }
+  
   void setTypeNDrot( int typeCount, double dRot )
   { typeDiff_[typeCount][1] = dRot; }
   
   void setTypeNPQR( int typeCount, string pqr )
   { pqr_names_[typeCount] = pqr; }
+  
+  void setTypeNSurf( int typeCount, string path )
+  { surfNames_[typeCount] = path; }
   
   void setTypeNXYZ( int typeCount, int traj, string xyz )
   { xyz_names_[typeCount][traj] = xyz; }
@@ -220,6 +234,7 @@ public:
   int getTypeNCount(int type)      { return nTypenCount_[type]; }
   string getTypeNDef(int type)     { return typeDef_[type]; }
   string getTypeNPQR(int type)     { return pqr_names_[type]; }
+  string getTypeNSurf(int type)     { return surfNames_[type]; }
   string getTypeNXYZ(int type, int traj) { return xyz_names_[type][traj]; }
   bool getTypeIsTransRot(int type, int traj)  { return isTransRot_[type][traj]; }
   vector<string> get_trajn_xyz(int traj)

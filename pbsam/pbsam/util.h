@@ -277,27 +277,7 @@ public:
   T norm2() { return p1_*p1_ + p2_*p2_ + p3_*p3_; }
   
   T norm() { return sqrt(norm2()); }
-  
 };
-
-//!  normRand
-/*! Generate a random number  */
-
-double random_normalized()
-{
-  
-  double v1, v2, rsq;
-  do
-  {
-      v1 = 2.0 * drand48(  ) - 1.0;
-      v2 = 2.0 * drand48(  ) - 1.0;
-      rsq = v1*v1 + v2*v2;
-    } while ( rsq >= 1.0 || rsq == 0.0 );
-    
-    double fac = sqrt( -2.0*log(rsq )/rsq);
-    return fac*v2;
-}
-
 
 /*
  Class for storing quaternions, which are defined as a real part and a vector
@@ -427,16 +407,6 @@ typedef Point<double> Pt;
 typedef Quaternion Quat;
 
 
-/*
- Choose a random orientation for a Pt vector 
- */
-Pt random_pt()
-{
-  double phi = drand48(  )*2*M_PI;
-  double u = drand48(  )*2 - 1;
-  
-  return Pt( sqrt(1 - u*u ) * cos(phi), sqrt(1 - u*u) * sin(phi), u);
-}
 
 
 #endif /* util_h */

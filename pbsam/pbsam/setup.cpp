@@ -29,13 +29,18 @@ nTypenCount_(2),
 typeDef_(2),
 typeDiff_(2),
 pqr_names_(2),
+surfNames_(2),
 xyz_names_(2),
 isTransRot_(2),
 runSpecs_(2),
 mbdfile_loc_(2),
 termvals_(2),
 termtype_(2),
-andCombine_(false)
+andCombine_(false),
+sphBeta_(2.0),
+tolSP_(1.0),
+maxSphTrials_(40),
+nSphTrials_(1200)
 {
   nTypenCount_[0] = 1;
   nTypenCount_[1] = 1;
@@ -321,6 +326,13 @@ void Setup::findKeyword(vector<string> fline)
       return;
     setTypeNXYZ( typeNo, traj, transrot );
     setTypeNisTransRot(typeNo, traj, true);
+  } else if (keyword == "surf")
+  {
+    cout << "surf command found" << endl;
+    int typeNo = atoi(fline[1].c_str())-1;
+    if (typeNo > getNType()-1)
+      return;
+    setTypeNSurf( typeNo, fline[2].c_str() );
   } else if (keyword == "randorient")
   {
     cout << "Random orientation command found" << endl;
@@ -351,6 +363,7 @@ void Setup::resizeVecs()
 
   pqr_names_.resize(nType_);
   xyz_names_.resize(nType_);
+  surfNames_.resize(nType_);
   isTransRot_.resize(nType_);
   for(int i = 0; i < nType_; i++)
   {

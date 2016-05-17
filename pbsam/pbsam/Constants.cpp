@@ -31,7 +31,7 @@ const int Constants::MAX_NUM_POLES = 30;
 Constants::Constants(Units units)
 :bDist_(100.0), qDist_(500.0), fDist_(100.0), dielectricWater_(78.0),
 dielectricProt_(4.0), saltConcentration_(0.0100), temp_(353.0), tol_(2.5),
-patchAngle_(6.0), rotateAngle_(20.0), units_(units)
+patchAngle_(6.0), rotateAngle_(20.0), units_(units), tolSP_(1.0)
 {
 	update_all();
 }
@@ -61,7 +61,8 @@ temp_(consts.get_temp()), tol_(consts.get_tol()),
 patchAngle_(consts.get_patch_angle()), rotateAngle_(consts.get_rotate_angle()),
 lambda_(consts.get_lambda()), KbT_(consts.get_kbt()), iKbT_(consts.get_ikbt()),
 kappa_(consts.get_kappa()), patchSize_(consts.get_patch_size()),
-rotateSize_(consts.get_rotate_size()), units_(consts.get_unitsEnum())
+rotateSize_(consts.get_rotate_size()), units_(consts.get_unitsEnum()),
+tolSP_(consts.get_tol_sp())
 {
 }
 

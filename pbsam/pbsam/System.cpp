@@ -9,7 +9,7 @@
 #include "System.h"
 
 
-MoleculeCG::MoleculeCG(int type, int type_idx, string movetype, vector<double> qs,
+Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
           vector<Pt> pos, vector<double> vdwr, vector<Pt> cens,
           vector<double> as, double drot, double dtrans)
 :type_(type), typeIdx_(type_idx), moveType_(movetype), qs_(qs), pos_(pos),
@@ -26,24 +26,68 @@ Nc_((int) qs.size()), Ns_((int) cens.size()), cgCharges_(cens.size())
   }
 }
 
-int MoleculeCG::find_closest_center(Pt pos)
+Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
+                       vector<Pt> pos, vector<double> vdwr, vector<Pt> msms_sp,
+                       vector<Pt> msms_np, double tol_sp, int n_trials,
+                       int max_trials, double beta, double drot,
+                       double dtrans)
+:type_(type), typeIdx_(type_idx), moveType_(movetype), qs_(qs), pos_(pos),
+vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
+{
+  find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials);
+}
+
+Molecule::Molecule(const Molecule& mol)
+:moveType_(mol.moveType_), type_(mol.type_), typeIdx_(mol.typeIdx_),
+drot_(mol.drot_), dtrans_(mol.dtrans_), Nc_(mol.Nc_), qs_(mol.qs_),
+pos_(mol.pos_), vdwr_(mol.vdwr_), Ns_(mol.Ns_), centers_(mol.centers_),
+as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_)
+{
+}
+
+
+Pt Molecule::random_pt()
+{
+  double phi = drand48(  )*2*M_PI;
+  double u = drand48(  )*2 - 1;
+  
+  return Pt( sqrt(1 - u*u ) * cos(phi), sqrt(1 - u*u) * sin(phi), u);
+}
+
+double Molecule::random_norm()
+{
+  
+  double v1, v2, rsq;
+  do
+  {
+    v1 = 2.0 * drand48(  ) - 1.0;
+    v2 = 2.0 * drand48(  ) - 1.0;
+    rsq = v1*v1 + v2*v2;
+  } while ( rsq >= 1.0 || rsq == 0.0 );
+  
+  double fac = sqrt( -2.0*log(rsq )/rsq);
+  return fac*v2;
+}
+
+
+int Molecule::find_closest_center(Pt pos)
 {
   int idx = 0;
   double dmin = __DBL_MAX__;
   double d;
-  for (int i = 0; i < Ns_; i++)
+  for (int k = 0; k < Ns_; k++)
   {
-    d = pos.dist(centers_[i]);
+    d = pos.dist(centers_[k]);
     if (d < dmin)
     {
-      idx = i;
+      idx = k;
       dmin = d;
     }
   }
   return idx;
 }
 
-void MoleculeCG::translate(Pt dr, double boxlen)
+void Molecule::translate(Pt dr, double boxlen)
 {
   for (int k = 0; k < Ns_; k++)
   {
@@ -55,7 +99,7 @@ void MoleculeCG::translate(Pt dr, double boxlen)
   }
 }
 
-void MoleculeCG::rotate(Quat qrot)
+void Molecule::rotate(Quat qrot)
 {
   for (int k = 0; k < Ns_; k++)
   {
@@ -67,7 +111,7 @@ void MoleculeCG::rotate(Quat qrot)
   }
 }
 
-void MoleculeCG::find_centers(vector<Pt> sp, vector<Pt> np,
+void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
                               double tol_sp, int n_trials,
                               int max_trials)
 {
@@ -127,7 +171,7 @@ void MoleculeCG::find_centers(vector<Pt> sp, vector<Pt> np,
   }
 }
 
-CGSphere MoleculeCG::find_best_center(vector<Pt> sp,vector<Pt> np,
+CGSphere Molecule::find_best_center(vector<Pt> sp,vector<Pt> np,
                                       vector<int> unbound,
                                       double tol_sp, int iter, double beta)
 {
@@ -155,7 +199,7 @@ CGSphere MoleculeCG::find_best_center(vector<Pt> sp,vector<Pt> np,
       if (distsq < cmin) cmin = distsq;
     }
     double scale = sqrt(cmin);
-    tri_cen = best_cen + (random_pt() * scale * random_normalized());
+    tri_cen = best_cen + (random_pt() * scale * random_norm());
     
     int min_id = 0;
     tri_a = __DBL_MAX__;
@@ -204,130 +248,6 @@ CGSphere MoleculeCG::find_best_center(vector<Pt> sp,vector<Pt> np,
 }
 
 
-
-
-// user specified radius and center
-Molecule::Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
-                   vector<double> vdwr, Pt cen, int type, int typeIdx,
-                   double drot, double dtrans)
-:moveType_(movetype), drot_(drot), dtrans_(dtrans),
-qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()), a_(a), center_(cen)
-{
-  set_Dtr_Drot(movetype);
-  reposition_charges();
-}
-
-// user specified radius
-Molecule::Molecule(string movetype, double a, vector<double> qs,
-                   vector<Pt> pos, vector<double> vdwr, int type, int typeIdx,
-                   double drot, double dtrans)
-:moveType_(movetype), drot_(drot), dtrans_(dtrans),
-qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()),
-a_(a)
-{
-  set_Dtr_Drot(movetype);
-  calc_center();
-  reposition_charges();
-}
-
-// user specified center
-Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
-                   vector<double> vdwr, Pt cen, int type, int typeIdx,
-                   double drot, double dtrans)
-:moveType_(movetype), drot_(drot), dtrans_(dtrans),
-qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()), center_(cen), a_(0)
-{
-  set_Dtr_Drot(movetype);
-  reposition_charges();
-}
-
-// neither the center or radius are specified
-Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
-                   vector<double> vdwr,  int type, int typeIdx,
-                   double drot, double dtrans)
-:moveType_(movetype), drot_(drot), dtrans_(dtrans),
-qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()), a_(0)
-{
-  set_Dtr_Drot(movetype);
-  calc_center();
-  reposition_charges();
-}
-
-
-void Molecule::set_Dtr_Drot(string type)
-{
-  if ((type == "stat") or (type == "rot"))  dtrans_ = 0.0;
-  if (type == "stat") drot_ = 0.0;
-}
-
-void Molecule::calc_center()
-{
-  // calculate the center of the molecule (for now using center):
-  double xc, yc, zc;
-  xc = 0;
-  yc = 0;
-  zc = 0;
-  for (int i = 0; i < M_; i++)
-  {
-    xc += pos_[i].x();
-    yc += pos_[i].y();
-    zc += pos_[i].z();
-  }
-  xc /= (double) M_;
-  yc /= (double) M_;
-  zc /= (double) M_;
-  
-  center_ = Pt(xc, yc, zc);
-//  unwrappedCenter_ = center_;
-}
-
-void Molecule::calc_a()
-{
-  a_ = 0;
-  double dist;
-  for (int i = 0; i < M_; i++)
-  {
-    dist = pos_[i].norm() + vdwr_[i];
-    if (dist > a_) a_ = dist;
-  }
-}
-
-void Molecule::reposition_charges()
-{
-  bool recalc_a = false;
-  // repositioning the charges WRT center of charge
-  for (int i = 0; i < M_; i++)
-  {
-    // check that the charge is encompassed by the the center and radius:
-    if (pos_[i].dist(center_)+vdwr_[i] > a_)   recalc_a = true;
-    pos_[i] = pos_[i] - center_;
-  }
-  
-  if (recalc_a) calc_a();
-}
-
-void Molecule::translate(Pt dr, double boxlen)
-{
-  Pt dv  = center_ + dr;
-  
-//  unwrappedCenter_ = unwrappedCenter_ + dr; // unwrapped position
-  center_ = Pt(dv.x() - round(dv.x()/boxlen)*boxlen,
-            dv.y() - round(dv.y()/boxlen)*boxlen,
-            dv.z() - round(dv.z()/boxlen)*boxlen);
-}
-
-void Molecule::rotate(Quat qrot)
-{
-  for (int i = 0; i < M_; i++)
-  {
-    pos_[i] = qrot.rotate_point(pos_[i]);
-  }
-}
-
 System::System(const vector<Molecule>& mols, double cutoff,
                double boxlength)
 :molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
@@ -369,7 +289,22 @@ System::System(Setup setup, double cutoff)
   for (i = 0; i < setup.get_ntype(); i++)
   {
     
+    // First a build a representative molecule of this type (which will
+    // be repositioned below
     PQRFile pqrI (setup.getTypeNPQR(i));
+    Molecule type_mol;
+    if (pqrI.get_Ns() == 0)
+    {
+      MSMSFile surf_file (setup.getTypeNSurf(i));
+      /********************************
+      need to add TolSP, max trials, beta, and n_trials to Setup:
+       ********************************/
+    }
+    
+    
+  
+    
+    // reposition molecules
     TransRotFile transrot;
     XYZFile xyzI;
     if (setup.getTypeIsTransRot(i))
@@ -385,7 +320,7 @@ System::System(Setup setup, double cutoff)
       Pt trans;
       MyMatrix<double> rot;
       
-      Pt com = pqrI.get_cg_centers()[0];
+      Pt com = pqrI.get_center_geo();
       
       if (setup.getTypeIsTransRot(i))
       {
@@ -401,36 +336,48 @@ System::System(Setup setup, double cutoff)
         rot.set_val(2, 2, 1.0);
       }
       
+      vector<Pt> repos_charges (pqrI.get_Nc());
+      vector<Pt> repos_cg_cens (pqrI.get_Nc());
+      
       keys = { i, j };
-      vector<Pt> repos_charges(pqrI.get_M());
       Pt new_pt;
       
-      for ( chg = 0; chg < pqrI.get_M(); chg ++)
+      for ( chg = 0; chg < pqrI.get_Ns(); chg ++)
       {
         repos_charges[chg] = pqrI.get_atom_pts()[chg].rotate(rot) + trans;
       }
       
-      if (pqrI.get_cg())  // coarse graining is in pqr
+      for (int k = 0; k < pqrI.get_Nc(); k++)
       {
-        mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
-                        pqrI.get_charges(), repos_charges,
-                        pqrI.get_radii(), xyzI.get_pts()[j], i, j,
-                        setup.getDrot(i), setup.getDtr(i));
+        repos_cg_cens[k] = pqrI.get_cg_centers()[k].rotate(rot) + trans;
       }
-      else if (! setup.getTypeIsTransRot(i))
+      
+      if (pqrI.get_Ns() > 0)
       {
-        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
-                       repos_charges, pqrI.get_radii(),
-                       xyzI.get_pts()[j], i, j,
-                       setup.getDrot(i), setup.getDtr(i));
         
       }
-      else
-      {
-        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
-                       repos_charges, pqrI.get_radii(), i, j,
-                       setup.getDrot(i), setup.getDtr(i));
-      }
+//
+//      if (pqrI.is_cg())  // coarse graining is in pqr
+//      {
+//        mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
+//                        pqrI.get_charges(), repos_charges,
+//                        pqrI.get_radii(), xyzI.get_pts()[j], i, j,
+//                        setup.getDrot(i), setup.getDtr(i));
+//      }
+//      else if (! setup.getTypeIsTransRot(i))
+//      {
+//        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
+//                       repos_charges, pqrI.get_radii(),
+//                       xyzI.get_pts()[j], i, j,
+//                       setup.getDrot(i), setup.getDtr(i));
+//        
+//      }
+//      else
+//      {
+//        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
+//                       repos_charges, pqrI.get_radii(), i, j,
+//                       setup.getDrot(i), setup.getDtr(i));
+//      }
       
       molecules_.push_back(mol);
       typeIdxToIdx_[keys] = k;
@@ -449,14 +396,17 @@ System::System(Setup setup, double cutoff)
 const double System::calc_average_radius() const
 {
   double ave = 0;
+  int total_sphere = 0;
   for (int i = 0; i < N_; i++)
   {
-    ave += get_ai(i);
+    total_sphere += get_Ns_i(i);
+    for (int k = 0; k < get_Ns_i(i); k++)
+      ave += get_aik(i, k);
   }
-  ave  =  ave / N_;
+  ave  =  ave / total_sphere;
   return ave;
 }
-
+//
 
 void System::compute_cutoff()
 {
@@ -468,28 +418,28 @@ void System::compute_cutoff()
 
 void System::check_for_overlap()
 {
-  int i, j;
-  double dist, ai, aj;
+  int i, j, k1, k2;
+  double dist, aik, ajk;
+  Pt cen_ik, cen_jk;
   for (i = 0; i < N_; i++)
   {
-    ai = molecules_[i].get_a();
     for (j = i+1; j < N_; j++)
     {
-      aj = molecules_[j].get_a();
-      dist = get_pbc_dist_vec(i, j).norm();
-      if (dist < (ai + aj))
+      for (k1 = 0; k1 < molecules_[i].get_ns(); k1++)
       {
-        throw OverlappingMoleculeException(i, j);
+        for (k2 = 0; k2 < molecules_[j].get_ns(); k1++)
+        {
+          aik = molecules_[i].get_ak(k1);
+          ajk = molecules_[j].get_ak(k2);
+          cen_ik = molecules_[i].get_centerk(k1);
+          cen_jk = molecules_[j].get_centerk(k2);
+          dist = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
+          if (dist < (aik + ajk))
+            throw OverlappingMoleculeException(i, j);
+        }
       }
     }
   }
-}
-
-Pt System::get_pbc_dist_vec(int i, int j)
-{
-  Pt ci = get_centeri(i);
-  Pt cj = get_centeri(j);
-  return get_pbc_dist_vec_base(ci, cj);
 }
 
 Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
@@ -503,14 +453,14 @@ Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
   return v;
 }
 
-vector<Pt> System::get_allcenter() const
-{
-  vector< Pt> mol_cen(N_);
-  for ( int i = 0; i < N_; i++)
-    mol_cen[i] = molecules_[i].get_center();
-  
-  return mol_cen;
-}
+//vector<Pt> System::get_allcenter() const
+//{
+//  vector< Pt> mol_cen(N_);
+//  for ( int i = 0; i < N_; i++)
+//    mol_cen[i] = molecules_[i].get_center();
+//  
+//  return mol_cen;
+//}
 
 bool System::less_than_cutoff(Pt v)
 {
@@ -518,27 +468,27 @@ bool System::less_than_cutoff(Pt v)
   else return false;
 }
 
-void System::reset_positions( vector<string> xyzfiles )
-{
-  int i, j, k;
-  vector<int> keys(2);
-  for (i = 0; i < ntype_; i++)
-  {
-    XYZFile xyzI (xyzfiles[i], typect_[i]);
-    for (j = 0; j < typect_[i]; j++)
-    {
-      keys = { i, j};
-      k = typeIdxToIdx_[keys];
-      Pt dist_to_new = get_centeri(k) - xyzI.get_pts()[j];
-      molecules_[k].translate(dist_to_new*-1, boxLength_);
-    }
-  }
-  
-}
+//void System::reset_positions( vector<string> xyzfiles )
+//{
+//  int i, j, k;
+//  vector<int> keys(2);
+//  for (i = 0; i < ntype_; i++)
+//  {
+//    XYZFile xyzI (xyzfiles[i], typect_[i]);
+//    for (j = 0; j < typect_[i]; j++)
+//    {
+//      keys = { i, j};
+//      k = typeIdxToIdx_[keys];
+//      Pt dist_to_new = get_centeri(k) - xyzI.get_pts()[j];
+//      molecules_[k].translate(dist_to_new*-1, boxLength_);
+//    }
+//  }
+//  
+//}
 
 void System::write_to_pqr(string outfile)
 {
-  int i, j, ct = 0;
+  int i, j, k, ct = 0;
   ofstream pqr_out;
   char pqrlin[400];
   
@@ -546,7 +496,7 @@ void System::write_to_pqr(string outfile)
   
   for ( i = 0; i < N_; i++ )
   {
-    for ( j = 0; j < get_Mi(i); j++)
+    for ( j = 0; j < get_Nc_i(i); j++)
     {
       sprintf(pqrlin,"%6d  C   CHG A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,i,
               get_posijreal(i, j).x(),
@@ -556,21 +506,24 @@ void System::write_to_pqr(string outfile)
       pqr_out << "ATOM " << pqrlin << endl;
       ct++;
     }
-    sprintf(pqrlin,"%6d  X   CEN A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,i,
-            get_centeri(i).x(), get_centeri(i).y(), get_centeri(i).z(),
-            0.0, get_radi(i));
-    pqr_out << "ATOM " << pqrlin << endl;
-    ct++;
+    for (k = 0; k < get_Ns_i(i); k++)
+    {
+      sprintf(pqrlin,"%6d  X   CEN A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,i,
+              get_centerik(i, k).x(), get_centerik(i, k).y(),
+              get_centerik(i, k).z(), 0.0, get_aik(i,k));
+      pqr_out << "ATOM " << pqrlin << endl;
+      ct++;
+    }
   }
 }
 
 void System::write_to_xyz(ofstream & xyz_out)
 {
-  int i, j, at_tot = 0;
+  int i, j, k, at_tot = 0;
   char xyzlin[400];
   
   for ( i = 0; i < N_; i++ )
-    for ( j = 0; j < get_Mi(i); j++)
+    for ( j = 0; j < get_Nc_i(i); j++)
       at_tot++;
   at_tot += N_; // for adding CG centers
   
@@ -578,14 +531,17 @@ void System::write_to_xyz(ofstream & xyz_out)
   xyz_out << "Atoms. Timestep (ps): " << t_ << endl;
   for ( i = 0; i < N_; i++ )
   {
-    for ( j = 0; j < get_Mi(i); j++)
+    for ( j = 0; j < get_Nc_i(i); j++)
     {
       sprintf(xyzlin,"N %8.3f %8.3f %8.3f", get_posijreal(i, j).x(),
               get_posijreal(i, j).y(), get_posijreal(i, j).z());
       xyz_out << xyzlin << endl;
     }
-    sprintf(xyzlin,"X %8.3f %8.3f %8.3f", get_centeri(i).x(),
-            get_centeri(i).y(), get_centeri(i).z());
-    xyz_out << xyzlin << endl;
+    for (k = 0; k < get_Ns_i(i); k++)
+    {
+      sprintf(xyzlin,"X %8.3f %8.3f %8.3f", get_centerik(i, k).x(),
+            get_centerik(i, k).y(), get_centerik(i, k).z());
+      xyz_out << xyzlin << endl;
+    }
   }
 }
