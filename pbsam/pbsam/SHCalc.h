@@ -87,7 +87,7 @@ class SHCalc
 {
 protected:
   
-  int                     numVals_;  //# of poles (output matrix will be 2Nx2N)
+  int                     numVals_;  //# of poles (output matrix will be NxN)
   shared_ptr<SHCalcConstants> _consts_;
   MyMatrix<double>        P_;  // legendre polynomials
   MyMatrix<cmplx>         Y_;  // spherical harmonics calcualted by this class
@@ -110,6 +110,7 @@ public:
   MyMatrix<cmplx> get_full_result() { return Y_; }
   
   double get_legendre_result( int n, int m );
+  int get_num_vals()  { return numVals_; }
 };
 
 #endif /* SHCalc_hpp */

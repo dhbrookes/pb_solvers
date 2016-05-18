@@ -433,38 +433,11 @@ Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
   return v;
 }
 
-//vector<Pt> System::get_allcenter() const
-//{
-//  vector< Pt> mol_cen(N_);
-//  for ( int i = 0; i < N_; i++)
-//    mol_cen[i] = molecules_[i].get_center();
-//  
-//  return mol_cen;
-//}
-
 bool System::less_than_cutoff(Pt v)
 {
   if (v.norm() < cutoff_) return true;
   else return false;
 }
-
-//void System::reset_positions( vector<string> xyzfiles )
-//{
-//  int i, j, k;
-//  vector<int> keys(2);
-//  for (i = 0; i < ntype_; i++)
-//  {
-//    XYZFile xyzI (xyzfiles[i], typect_[i]);
-//    for (j = 0; j < typect_[i]; j++)
-//    {
-//      keys = { i, j};
-//      k = typeIdxToIdx_[keys];
-//      Pt dist_to_new = get_centeri(k) - xyzI.get_pts()[j];
-//      molecules_[k].translate(dist_to_new*-1, boxLength_);
-//    }
-//  }
-//  
-//}
 
 void System::write_to_pqr(string outfile)
 {

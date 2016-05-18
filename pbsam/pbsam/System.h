@@ -130,6 +130,8 @@ public:
   int get_type_idx() const             { return typeIdx_; }
   int get_nc() const                   { return Nc_; }
   int get_ns() const                   { return Ns_; }
+  int get_nc_k(int k) const            { return (int) cgCharges_[k].size(); }
+  int get_cg_k_alpha(int k, int alpha) { return cgCharges_[k][alpha]; }
   double get_drot() const              { return drot_; }
   double get_dtrans() const            { return dtrans_; }
   Pt get_posj(int j) const             { return pos_[j]; }
@@ -138,6 +140,7 @@ public:
   const double get_qj(int j) const     { return qs_[j]; }
   const double get_radj(int j) const   { return vdwr_[j]; }
   const double get_ak(int k) const     { return as_[k]; }
+  const int get_cg_of_ch(int j)        { return chToCG_[j]; }
   
   /*
    Choose a random orientation for a Pt vector
@@ -230,9 +233,6 @@ public:
   
   // given a distance vector, determine whether it is in the cutoff
   bool less_than_cutoff(Pt v);
-  
-  // reset positions with input xyz file
-//  void reset_positions( vector<string> xyzfiles );
   
   // write current system to PQR file
   void write_to_pqr( string outfile );

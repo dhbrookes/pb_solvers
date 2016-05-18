@@ -204,7 +204,7 @@ public:
     return pout;
   }
   
-  Point<T> operator-(Point<T>& other)
+  Point<T> operator-(Point<T> other)
   {
     Point<T> pout;
     if (sph_) convert_to_euclidean(); //for simplicity

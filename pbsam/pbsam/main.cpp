@@ -7,6 +7,11 @@
 //
 
 #include <stdio.h>
+#include "Solver.h"
+#include "System.h"
+#include "SHCalc.h"
+#include "BesselCalc.h"
+#include "Constants.h"
 
 int main( int argc, const char* argv[] )
 {
