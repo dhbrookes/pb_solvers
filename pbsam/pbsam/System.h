@@ -131,7 +131,7 @@ public:
   int get_nc() const                   { return Nc_; }
   int get_ns() const                   { return Ns_; }
   int get_nc_k(int k) const            { return (int) cgCharges_[k].size(); }
-  int get_cg_k_alpha(int k, int alpha) { return cgCharges_[k][alpha]; }
+  int get_ch_k_alpha(int k, int alpha) { return cgCharges_[k][alpha]; }
   double get_drot() const              { return drot_; }
   double get_dtrans() const            { return dtrans_; }
   Pt get_posj(int j) const             { return pos_[j]; }

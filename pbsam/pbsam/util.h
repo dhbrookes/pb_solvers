@@ -215,7 +215,7 @@ public:
   }
   
   // calculate the distance to another point
-  double dist(Point<T>& other)
+  double dist(Point<T> other)
   {
     convert_to_euclidean();
     double d = pow(this->x() - other.x(), 2);
