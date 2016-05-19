@@ -1,4 +1,6 @@
-General XCode set-up:
+### General XCode set-up: ###
+
+#### Steps ####
 1. Add path to user-made header files to Build Settings --> Search Paths --> User Header Search Paths for all Targets
 2. Set Apple LLVM Language Dialects
     C Language Dialect    GNU99
@@ -10,14 +12,24 @@ General XCode set-up:
     
 
 
-For the simple schemes:
+#### For the simple schemes: ####
 
 Need to change the Search Paths : User Header Search Paths
 to where your code is on the local machine!
 
-
+### GTest Setup ###
 For gtest, it's a little more complicated...
-1. Compile gtest.framework
+1. Compile gtest.framework for version 1.7!!
+  a. The first step is to download the latest version of gtest
+  b. Go to the XCode directory and I had to do the following hacks
+     i. Comment out the following lines in gtest-port.h:
+          #include "gtest/internal/gtest-port-arch.h"
+          #include "gtest/internal/custom/gtest-port.h"
+     ii. Comment out the following options in xcode/Config/General.xconfig:
+         `SDKROOT`, `MACOS_DEPLOYMENT_TARGET`, and `GCC_VERSION`
+  c. With those changes the framework should compile
+  d. To find it, right click on the gtest.framework icon and select "Show in Finder"
+  e. Copy this to a directory of your choice
 
 2. Add Target gtests
 
@@ -34,7 +46,7 @@ For gtest, it's a little more complicated...
 
 
 
-Other XCode hints : 
+#### Other XCode hints : ####
 - To see page width:
     XCode --> Preferences --> Text Editing --> Show : Page guide at column 80
 
