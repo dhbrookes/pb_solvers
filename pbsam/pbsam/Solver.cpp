@@ -31,7 +31,7 @@ EMatrix::EMatrix(Molecule mol, shared_ptr<SHCalc> sh_calc,
           
           val = conj(sh_calc->get_result(n, m));
           val *= q_alpha / eps_in;
-          val *= r_alpha / a_k;
+          val *= pow(r_alpha / a_k, n);
           val += get_E_knm(k, n, m);
           set_E_knm(k, n, m, val);
         }
@@ -67,7 +67,7 @@ LEMatrix::LEMatrix(Molecule mol, shared_ptr<SHCalc> sh_calc,
           val = conj(sh_calc->get_result(n, m));
           val *= q_alpha / eps_in;
           val *= 1 / r_alpha;
-          val *= a_k / r_alpha;
+          val *= pow(a_k / r_alpha, n);
           val += get_LE_knm(k, n, m);
           set_LE_knm(k, n, m, val);
         }

@@ -57,7 +57,7 @@ public:
   LEMatrix(Molecule mol, shared_ptr<SHCalc> sh_calc, int p, double eps_in);
   
   cmplx get_LE_knm(int k, int n, int m) { return LE_[k](n, m+p_); }
-  MyMatrix<cmplx> get_LE_k(int k)     { return LE_[k]; }
+  MyMatrix<cmplx> get_LE_k(int k)       { return LE_[k]; }
 };
 
 
