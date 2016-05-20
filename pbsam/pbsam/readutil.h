@@ -328,7 +328,7 @@ public:
   const int get_Nc() const                  { return Nc_; }
   const int get_Ns() const                  { return Ns_; }
   const vector<double> get_cg_radii() const { return cgRadii_; }
-  vector<Pt> get_cg_centers() const   { return cgCenters_; }
+  vector<Pt> get_cg_centers() const         { return cgCenters_; }
   const Pt get_center_geo() const           { return centerGeo_; }
   
 };

@@ -1,0 +1,21 @@
+runname test1
+runtype dynamics
+
+salt 0.0 
+temp 353
+idiel 1
+sdiel 8
+
+attypes 3
+
+type 1 1 stat 0.095 1.5e-5 
+pqr 1 barnase.pqr
+xyz 1 lisa.xyz
+
+type 2 1 rot 9.2e-5 
+pqr 2 2charge.pqr
+xyz 2 other.xyz
+
+type 3 1 move 0.811 0.5e-5 
+pqr 3 2charge.pqr
+xyz 3 trd.xyz
