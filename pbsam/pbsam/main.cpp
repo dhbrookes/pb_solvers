@@ -7,7 +7,7 @@
 //
 
 #include <stdio.h>
-#include "Solver.h"
+//#include "Solver.h"
 #include "System.h"
 #include "SHCalc.h"
 #include "BesselCalc.h"
@@ -16,10 +16,6 @@
 int main( int argc, const char* argv[] )
 {
   printf( "\nHello World\n\n" );
-  
-  
-
-  
 }
 
 
