@@ -19,7 +19,6 @@ to where your code is on the local machine!
 
 ### GTest Setup ###
 For gtest, it's a little more complicated...
-
 1. Compile gtest.framework for version 1.7!!
   1. The first step is to download the latest version of gtest
   2. Go to the XCode directory and I had to do the following hacks
@@ -61,5 +60,3 @@ For gtest, it's a little more complicated...
     make sure path to executable is correct -- XCode makes a Debug and Release version in separate folders
     Product --> Clean ; Product --> Build for --> Profiling ; Product --> Profile
         should display data in Instruments window 
-
-
