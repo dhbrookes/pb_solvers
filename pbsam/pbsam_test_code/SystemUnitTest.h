@@ -28,19 +28,18 @@ TEST_F(CGSphereUTest, checkUserSpecRadCent)
   
   CGSphere spNew( pos, rad, charges);
   
-  // ASSERT_EQ(      3, spNew.get_n());
-  // ASSERT_EQ(    5.3, spNew.get_a());
-  // ASSERT_EQ( pos.x(), spNew.get_center().x());
-  // ASSERT_EQ( pos.y(), spNew.get_center().y());
-  // ASSERT_EQ( pos.z(), spNew.get_center().z());
+  ASSERT_EQ(      3, spNew.get_n());
+  ASSERT_EQ(    5.3, spNew.get_a());
+  ASSERT_EQ( pos.x(), spNew.get_center().x());
+  ASSERT_EQ( pos.y(), spNew.get_center().y());
+  ASSERT_EQ( pos.z(), spNew.get_center().z());
 
-  // ASSERT_EQ( charges[0], spNew.get_ch()[0]);
-  // ASSERT_EQ( charges[1], spNew.get_ch()[1]);
-  // ASSERT_EQ( charges[2], spNew.get_ch()[2]);
-
+  ASSERT_EQ( charges[0], spNew.get_ch()[0]);
+  ASSERT_EQ( charges[1], spNew.get_ch()[1]);
+  ASSERT_EQ( charges[2], spNew.get_ch()[2]);
 }
 
-/*
+
 class MoleculeUTest : public ::testing::Test
 {
 public :
@@ -51,26 +50,32 @@ protected :
 };
 
 
-TEST_F(MoleculeUTest, checkUserSpecRadCent)
+TEST_F(MoleculeUTest, checkUserSpecCG)
 {
-  Pt pos(0.0,0.0,-5.0);
+  vector<Pt> pos(1); vector<double> cgRad(1);
   int M = 3; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
-  charges[0]=2.0; vdW[0]=0; posCharges[0] = pos;
-  charges[1]=2.0; vdW[1]=0; posCharges[1] = pos + Pt(1.0, 0.0, 0.0);
-  charges[2]=2.0; vdW[2]=0; posCharges[2] = pos + Pt(0.0, 1.0, 0.0);
+  pos[0] = Pt(2.3, -3.5, 10.1); cgRad[0] = 2.0;
+  charges[0]=2.0; vdW[0]=0; posCharges[0] = pos[0];
+  charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[0] + Pt(1.0, 0.0, 0.0);
+  charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[0] + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos, 0, 0);
+  Molecule molNew( 0, 0, "stat", charges, posCharges, vdW, pos, cgRad, 0, 0);
   
-  ASSERT_EQ(      3, molNew.get_m());
-  ASSERT_EQ(    2.0, molNew.get_a());
+  ASSERT_EQ(      3, molNew.get_nc());
+  ASSERT_EQ(      1, molNew.get_ns());
+  ASSERT_EQ(    2.0, molNew.get_ak(0));
   ASSERT_EQ( "stat", molNew.get_move_type());
   ASSERT_EQ(    0.0, molNew.get_drot());
   ASSERT_EQ(    0.0, molNew.get_dtrans());
+
+  ASSERT_EQ(      0, molNew.get_cg_of_ch(0));
+  ASSERT_EQ(      0, molNew.get_cg_of_ch(1));
+  ASSERT_EQ(      0, molNew.get_cg_of_ch(2));
   
-  ASSERT_EQ( 0.0, molNew.get_center().x());
-  ASSERT_EQ( 0.0, molNew.get_center().y());
-  ASSERT_EQ(-5.0, molNew.get_center().z());
+  ASSERT_EQ( 2.3, molNew.get_centerk(0).x());
+  ASSERT_EQ(-3.5, molNew.get_centerk(0).y());
+  ASSERT_EQ(10.1, molNew.get_centerk(0).z());
   
   ASSERT_EQ( 0.0, molNew.get_posj(0).x());
   ASSERT_EQ( 0.0, molNew.get_posj(0).y());
@@ -81,127 +86,65 @@ TEST_F(MoleculeUTest, checkUserSpecRadCent)
   ASSERT_EQ( 0.0, molNew.get_posj(2).x());
   ASSERT_EQ( 1.0, molNew.get_posj(2).y());
   
-  ASSERT_EQ( 0.0, molNew.get_posj_realspace(0).x());
-  ASSERT_EQ( 0.0, molNew.get_posj_realspace(0).y());
-  ASSERT_EQ(-5.0, molNew.get_posj_realspace(0).z());
+  ASSERT_EQ( 2.3, molNew.get_posj_realspace(0).x());
+  ASSERT_EQ(-3.5, molNew.get_posj_realspace(0).y());
+  ASSERT_EQ(10.1, molNew.get_posj_realspace(0).z());
   
-  ASSERT_EQ( 1.0, molNew.get_posj_realspace(1).x());
-  ASSERT_EQ( 0.0, molNew.get_posj_realspace(1).y());
-  ASSERT_EQ(-5.0, molNew.get_posj_realspace(1).z());
+  ASSERT_EQ( 3.3, molNew.get_posj_realspace(1).x());
+  ASSERT_EQ(-3.5, molNew.get_posj_realspace(1).y());
+  ASSERT_EQ(10.1, molNew.get_posj_realspace(1).z());
 }
 
 
-TEST_F(MoleculeUTest, checkUserSpecRad)
-{
-  Pt pos(-10.0,23.4,-8.7);
-  int M = 2; vector<double> charges(M); vector<double> vdW(M);
-  vector<Pt> posCharges(M);
-  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
-  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
-  
-  Molecule molNew( "move", 13.7, charges, posCharges, vdW,  0, 0, 0.04, 0.34);
-  
-  ASSERT_EQ(      2, molNew.get_m());
-  ASSERT_EQ(   13.7, molNew.get_a());
-  ASSERT_EQ( "move", molNew.get_move_type());
-  ASSERT_EQ(   0.04, molNew.get_drot());
-  ASSERT_EQ(   0.34, molNew.get_dtrans());
-  
-  ASSERT_EQ( -9.5, molNew.get_center().x());
-  ASSERT_EQ( 23.9, molNew.get_center().y());
-  ASSERT_EQ( -8.7, molNew.get_center().z());
-
-  ASSERT_EQ( 0.5, molNew.get_posj(0).x());
-  ASSERT_EQ(-0.5, molNew.get_posj(0).y());
-  ASSERT_EQ( 0.0, molNew.get_posj(0).z());
-  
-  ASSERT_EQ(-0.5, molNew.get_posj(1).x());
-  ASSERT_EQ( 0.5, molNew.get_posj(1).y());
-  ASSERT_EQ( 0.0, molNew.get_posj(1).z());
-  
-  ASSERT_EQ( -9.0, molNew.get_posj_realspace(0).x());
-  ASSERT_EQ( 23.4, molNew.get_posj_realspace(0).y());
-  ASSERT_EQ( -8.7, molNew.get_posj_realspace(0).z());
-  
-  ASSERT_EQ(-10.0, molNew.get_posj_realspace(1).x());
-  ASSERT_EQ( 24.4, molNew.get_posj_realspace(1).y());
-  ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
-}
-
-TEST_F(MoleculeUTest, checkUserSpecCent)
-{
-  Pt pos(-10.0,23.4,-8.7);
-  int M = 2; vector<double> charges(M); vector<double> vdW(M);
-  vector<Pt> posCharges(M);
-  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
-  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
-  
-  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
-  
-  ASSERT_EQ(    2, molNew.get_m());
-  ASSERT_EQ("rot", molNew.get_move_type());
-  ASSERT_EQ( 0.24, molNew.get_drot());
-  ASSERT_EQ( 0.00, molNew.get_dtrans());
-  EXPECT_NEAR( 7.32, molNew.get_a(), preclim);
-  
-  ASSERT_EQ(-10.0, molNew.get_center().x());
-  ASSERT_EQ( 23.4, molNew.get_center().y());
-  ASSERT_EQ( -8.7, molNew.get_center().z());
-  
-  ASSERT_EQ( 1.0, molNew.get_posj(0).x());
-  ASSERT_EQ( 0.0, molNew.get_posj(0).y());
-  ASSERT_EQ( 0.0, molNew.get_posj(0).z());
-  
-  ASSERT_EQ( 0.0, molNew.get_posj(1).x());
-  ASSERT_EQ( 1.0, molNew.get_posj(1).y());
-  ASSERT_EQ( 0.0, molNew.get_posj(1).z());
-  
-  ASSERT_EQ( -9.0, molNew.get_posj_realspace(0).x());
-  ASSERT_EQ( 23.4, molNew.get_posj_realspace(0).y());
-  ASSERT_EQ( -8.7, molNew.get_posj_realspace(0).z());
-  
-  ASSERT_EQ(-10.0, molNew.get_posj_realspace(1).x());
-  ASSERT_EQ( 24.4, molNew.get_posj_realspace(1).y());
-  ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
-}
 
 TEST_F(MoleculeUTest, checkCreateCen)
 {
-  Pt pos(-10.0,23.4,-8.7);
+
+  vector<Pt> pos(1);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
-  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
-  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
+  pos[0] = Pt(-10.0,23.4,-8.7); 
+  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos[0] + Pt(1.0, 0.0, 0.0);
+  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos[0] + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, 0, 0, 0.24);
+  // Molecule molNew( 0, 0, "rot", charges, posCharges, vdW, 0.24, 0);
   
-  ASSERT_EQ(    2, molNew.get_m());
-  ASSERT_EQ("rot", molNew.get_move_type());
-  ASSERT_EQ( 0.24, molNew.get_drot());
-  ASSERT_EQ( 0.00, molNew.get_dtrans());
-  EXPECT_NEAR( 7.0271067811865, molNew.get_a(), preclim);
+  // ASSERT_EQ(    2, molNew.get_nc());
+  // ASSERT_EQ("rot", molNew.get_move_type());
+  // ASSERT_EQ( 0.24, molNew.get_drot());
+  // ASSERT_EQ( 0.00, molNew.get_dtrans());
+  // // EXPECT_NEAR( 7.0271067811865, molNew.get_a(), preclim);
   
-  ASSERT_EQ( -9.5, molNew.get_center().x());
-  ASSERT_EQ( 23.9, molNew.get_center().y());
-  ASSERT_EQ( -8.7, molNew.get_center().z());
+  // // ASSERT_EQ( -9.5, molNew.get_center().x());
+  // // ASSERT_EQ( 23.9, molNew.get_center().y());
+  // // ASSERT_EQ( -8.7, molNew.get_center().z());
+
+  // cout << "This is my CG centers " << endl;
+  // for (int i=0; i<molNew.get_ns(); i++)
+  // {
+  //   cout << "CG " << i << " pos: " << molNew.get_centerk(i).x();
+  //   cout << ", " << molNew.get_centerk(i).y();
+  //   cout << ", " << molNew.get_centerk(i).z() << endl;
+  // }
   
-  ASSERT_EQ( 0.5, molNew.get_posj(0).x());
-  ASSERT_EQ(-0.5, molNew.get_posj(0).y());
-  ASSERT_EQ( 0.0, molNew.get_posj(0).z());
+  // ASSERT_EQ( 0.5, molNew.get_posj(0).x());
+  // ASSERT_EQ(-0.5, molNew.get_posj(0).y());
+  // ASSERT_EQ( 0.0, molNew.get_posj(0).z());
   
-  ASSERT_EQ(-0.5, molNew.get_posj(1).x());
-  ASSERT_EQ( 0.5, molNew.get_posj(1).y());
-  ASSERT_EQ( 0.0, molNew.get_posj(1).z());
+  // ASSERT_EQ(-0.5, molNew.get_posj(1).x());
+  // ASSERT_EQ( 0.5, molNew.get_posj(1).y());
+  // ASSERT_EQ( 0.0, molNew.get_posj(1).z());
   
-  ASSERT_EQ( -9.0, molNew.get_posj_realspace(0).x());
-  ASSERT_EQ( 23.4, molNew.get_posj_realspace(0).y());
-  ASSERT_EQ( -8.7, molNew.get_posj_realspace(0).z());
+  // ASSERT_EQ( -9.0, molNew.get_posj_realspace(0).x());
+  // ASSERT_EQ( 23.4, molNew.get_posj_realspace(0).y());
+  // ASSERT_EQ( -8.7, molNew.get_posj_realspace(0).z());
   
-  ASSERT_EQ(-10.0, molNew.get_posj_realspace(1).x());
-  ASSERT_EQ( 24.4, molNew.get_posj_realspace(1).y());
-  ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
+  // ASSERT_EQ(-10.0, molNew.get_posj_realspace(1).x());
+  // ASSERT_EQ( 24.4, molNew.get_posj_realspace(1).y());
+  // ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
 }
 
+/*
 TEST_F(MoleculeUTest, translate)
 {
   Pt pos(-10.0,23.4,-8.7);

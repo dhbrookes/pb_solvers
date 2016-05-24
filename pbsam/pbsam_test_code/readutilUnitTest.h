@@ -20,8 +20,96 @@ public :
   
 protected :
 
+  vector<double> sp_x = {2.965, 4.52, 7.092, 7.782, 7.614, 4.82, 4.093, 7.83, 
+    6.265, 12.017, 9.993, 8.764, 12.731, 8.46, 4.095, 6.813, 8.422};
+  vector<double> sp_z = {-1.084, -3.482, -6.049, 1.145, 4.029, 2.408, -0.923, 
+    2.59, -6.542, 3.608, -7.069, 3.456, -4.511, -2.487, -3.01, -0.62, 1.101};
+  vector<double> np_y = {-0.636, -0.442, -0.574, -0.594, -0.524, 0.526, -0.048,
+   0.512, -0.779, -0.442, 0.201, -0.895, 0.184, -0.595, -0.171, -0.111, -0.75};
+  vector<double> np_z = {-0.175, -0.581, -0.81, -0.453, -0.01, 0.656, -0.377,
+   0.758, -0.608, 0.723, -0.842, 0.091, -0.82, -0.382, -0.296, -0.774, -0.22};
 };
 
+
+// MSMS section
+TEST_F(ReadUtilUTest, checkMSMSExceptions)
+{
+  string path = test_dir_loc + "none.face";
+  try
+  {
+    MSMSFile MSMStest(path);
+    FAIL();
+  }
+  catch( const CouldNotReadException& err )
+  {
+    // check exception
+    string error_exp = "Could not read: " + path;
+    EXPECT_EQ(string(err.what()), error_exp);
+  }
+}
+
+TEST_F(ReadUtilUTest, readMSMS)
+{
+  string path = test_dir_loc + "test.vert";
+  MSMSFile MSMStest(path);
+  vector<Pt> my_sp = MSMStest.get_sp();
+  vector<Pt> my_np = MSMStest.get_np();
+
+  ASSERT_EQ( my_sp.size(), 1669);
+  ASSERT_EQ( my_np.size(), 1669);
+
+  int ct = 0;
+  for (int i=0; i<sp_x.size(); i += 100)
+  {
+    EXPECT_NEAR( my_sp[i].x(), sp_x[ct], preclim);
+    EXPECT_NEAR( my_sp[i].z(), sp_z[ct], preclim);
+    EXPECT_NEAR( my_np[i].y(), np_y[ct], preclim);
+    EXPECT_NEAR( my_np[i].z(), np_z[ct], preclim);
+    ct++;
+  }
+
+}
+
+// Contact section
+TEST_F(ReadUtilUTest, checkContactExceptions)
+{
+  string path = test_dir_loc + "none.cont";
+  try
+  {
+    ContactFile contTest(path);
+    FAIL();
+  }
+  catch( const CouldNotReadException& err )
+  {
+    // check exception
+    string error_exp = "Could not read: " + path;
+    EXPECT_EQ(string(err.what()), error_exp);
+  }
+}
+
+TEST_F(ReadUtilUTest, readContact)
+{
+  string path = test_dir_loc + "test.cont";
+  ContactFile contTest(path);
+  vector<vector<int > > my_pr = contTest.get_at_pairs();
+
+  ASSERT_EQ( contTest.get_moltype1(), 0);
+  ASSERT_EQ( contTest.get_moltype2(), 21);
+
+  vector<int > pair1 = {22, 47, 17};
+  vector<int > pair2 = {46, 108, 455};
+  vector<double > dst = {3.0, 2.57, 9.57};
+
+  for (int i=0; i<my_pr.size(); i++)
+  {
+    ASSERT_EQ( my_pr[i][0], pair1[i]);
+    ASSERT_EQ( my_pr[i][1], pair2[i]);
+    EXPECT_NEAR( contTest.get_dists()[i], dst[i], preclim);
+  }
+
+}
+
+// PQR section
 TEST_F(ReadUtilUTest, checkPQRExceptions)
 {
   string path = test_dir_loc + "none.pqr";
@@ -46,7 +134,7 @@ TEST_F(ReadUtilUTest, readPQR)
   vector<Pt> my_cents = PQRtest.get_cg_centers();
   
 //  ASSERT_EQ(true, PQRtest.get_cg());
-//  ASSERT_EQ(   2, PQRtest.get_M());  // !!Change
+//  ASSERT_EQ(   2, PQRtest.get_M());  // !!TODO: Change
   ASSERT_EQ( PQR, PQRtest.get_path());
   ASSERT_EQ( my_atoms[0].x(), 0);
   ASSERT_EQ( my_atoms[0].y(), 0);

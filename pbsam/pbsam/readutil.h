@@ -106,11 +106,13 @@ protected:
       getline( fin, s );
     
     double x, y, z, nx, ny, nz;
-    getline( fin, s );
+    getline( fin, s ); // ignore first line b/c its summary of cols
     
     // While there is no EOF read
     while ( !fin.eof( ))
     {
+      stringstream linestream(s);
+      linestream >> x >> y >> z >> nx >> ny >> nz;
       sp_.push_back( Pt(x, y, z));
       np_.push_back( Pt(nx, ny, nz));
       getline( fin, s );
@@ -142,7 +144,8 @@ protected:
   int moltype1_;
   int moltype2_;
   
-  vector<vector<int> > atPairs_;  // vector of size-two vectors (atom index from each molecule type)
+  vector<vector<int> > atPairs_;  // vector of size-two vectors (atom index 
+                                  // from each molecule type)
   vector<double> dists_;  // min distance between the above pairs
   
   
