@@ -11,9 +11,7 @@
 
 #include "readutil.h"
 
-/*
- Class to test opening PQR and XYZ files
- */
+/* Class to test opening PQR and XYZ files */
 class ReadUtilUTest : public ::testing::Test
 {
 public :
@@ -133,8 +131,7 @@ TEST_F(ReadUtilUTest, readPQR)
   vector<Pt> my_atoms = PQRtest.get_atom_pts();
   vector<Pt> my_cents = PQRtest.get_cg_centers();
   
-//  ASSERT_EQ(true, PQRtest.get_cg());
-//  ASSERT_EQ(   2, PQRtest.get_M());  // !!TODO: Change
+  ASSERT_EQ( 1.85, PQRtest.get_cg_radii()[0]);
   ASSERT_EQ( PQR, PQRtest.get_path());
   ASSERT_EQ( my_atoms[0].x(), 0);
   ASSERT_EQ( my_atoms[0].y(), 0);
@@ -162,8 +159,7 @@ TEST_F(ReadUtilUTest, readPQRNoCen)
   PQRFile PQRtest(PQR, 10);
   vector<Pt> my_atoms = PQRtest.get_atom_pts();
   
-//  ASSERT_EQ(false, PQRtest.get_cg());
-//  ASSERT_EQ(   4, PQRtest.get_M());  // !!Change
+  ASSERT_EQ(   4, PQRtest.get_Nc()); 
   ASSERT_EQ( PQR, PQRtest.get_path());
   ASSERT_EQ( my_atoms[0].x(), 0);
   ASSERT_EQ( my_atoms[0].y(), 0);
