@@ -17,33 +17,5 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-add_executable(pbam
-	pbam/ASolver.cpp
-	pbam/ASolver.h
-	pbam/BD.cpp
-	pbam/BD.h
-	pbam/BesselCalc.cpp
-	pbam/BesselCalc.h
-	pbam/Constants.cpp
-	pbam/Constants.h
-	pbam/Electrostatics.cpp
-	pbam/Electrostatics.h
-	pbam/EnergyForce.cpp
-	pbam/EnergyForce.h
-	pbam/main.cpp
-	pbam/MyMatrix.h
-	pbam/readutil.h
-	pbam/ReExpCalc.cpp
-	pbam/ReExpCalc.h
-	pbam/setup.cpp
-	pbam/setup.h
-	pbam/SHCalc.cpp
-	pbam/SHCalc.h
-	pbam/System.cpp
-	pbam/System.h
-	pbam/util.h
-	)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
-
-install(TARGETS pbam RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/../bin)
+add_subdirectory(pbam)
+add_subdirectory(pbam_test_code)
