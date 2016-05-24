@@ -11,6 +11,36 @@
 
 #include "System.h"
 
+class CGSphereUTest : public ::testing::Test
+{
+  public :
+  
+  protected :
+  virtual void SetUp() {}
+  virtual void TearDown() {}
+};
+
+TEST_F(CGSphereUTest, checkUserSpecRadCent)
+{
+  Pt pos(102.57,33.0,-5.0); double rad = 5.3;
+  int M = 3; vector<int> charges(M);
+  charges[0]=20; charges[1]=4; charges[2]=1;
+  
+  CGSphere spNew( pos, rad, charges);
+  
+  // ASSERT_EQ(      3, spNew.get_n());
+  // ASSERT_EQ(    5.3, spNew.get_a());
+  // ASSERT_EQ( pos.x(), spNew.get_center().x());
+  // ASSERT_EQ( pos.y(), spNew.get_center().y());
+  // ASSERT_EQ( pos.z(), spNew.get_center().z());
+
+  // ASSERT_EQ( charges[0], spNew.get_ch()[0]);
+  // ASSERT_EQ( charges[1], spNew.get_ch()[1]);
+  // ASSERT_EQ( charges[2], spNew.get_ch()[2]);
+
+}
+
+/*
 class MoleculeUTest : public ::testing::Test
 {
 public :
@@ -269,7 +299,7 @@ TEST_F(MoleculeUTest, rotate2)
   EXPECT_NEAR( 24.09353490, molNew.get_posj_realspace(1).y(), preclim);
   EXPECT_NEAR( -8.06094394, molNew.get_posj_realspace(1).z(), preclim);
 }
-
+*/
 class SystemUTest : public ::testing::Test
 {
 public :
@@ -281,7 +311,7 @@ protected :
   virtual void TearDown() {}
 };
 
-
+/*
 TEST_F(SystemUTest, checkOverlap)
 {
   vector < Molecule > mol_;
@@ -460,5 +490,6 @@ TEST_F(SystemUTest, PBCcheck)
   EXPECT_NEAR( -10/dis12.z(), 1.0, preclim);
 
 }
+*/
 
 #endif /* SystemUnitTest_h */

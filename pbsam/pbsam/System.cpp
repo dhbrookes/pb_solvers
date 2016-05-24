@@ -254,7 +254,7 @@ CGSphere Molecule::find_best_center(vector<Pt> sp,vector<Pt> np,
     }
   }
   
-  return CGSphere(best_cen, best_a, best_N, ch);
+  return CGSphere(best_cen, best_a, ch);
 }
 
 

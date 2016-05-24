@@ -43,12 +43,11 @@ class CGSphere
 protected:
   Pt cen_;
   double a_;
-//  int n_; 
   vector<int> ch_;  // encompassed charges
   
 public:
   CGSphere() { }
-  CGSphere(Pt cen, double a, int n, vector<int> ch)
+  CGSphere(Pt cen, double a, vector<int> ch)
   : cen_(cen), a_(a), ch_(ch) { }
   
   Pt get_center() const { return cen_; }
@@ -58,7 +57,6 @@ public:
   
 //  void set_center(Pt cen) { cen_ = cen; }
 //  void set_a(double a) { a_ = a; }
-  
 };
 
 
@@ -142,9 +140,7 @@ public:
   const double get_ak(int k) const     { return as_[k]; }
   const int get_cg_of_ch(int j)        { return chToCG_[j]; }
   
-  /*
-   Choose a random orientation for a Pt vector
-   */
+  /* Choose a random orientation for a Pt vector  */
   Pt random_pt();
   
   // random number from normal distribution
