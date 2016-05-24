@@ -394,8 +394,6 @@ TEST_F(ElecUTest, printPOTZ)
   while ( (ct < 7) && (!fin.eof()))
   {
     EXPECT_TRUE( inputLine == potz[ct]);
-    cout << "This is inputLine " << inputLine << endl;
-    cout << "This is potz[ct] " << potz[ct] << endl;
     getline(fin,inputLine);
     ct++;
   }
