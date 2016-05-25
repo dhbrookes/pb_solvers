@@ -13,13 +13,9 @@ PBAM::PBAM() : PBAMInput()
   poles_ = 5;
   solveTol_ = 1e-4;
 
-  cout << "Setting setp" << endl;
-  setp_ = make_shared<Setup>( 300.0, 0.05, 2, 80);
-  cout << "Setup okay, setting syst" << endl;
+  setp_ = make_shared<Setup>( 300.0, 0.05, 2, 80, "electrostatics", "tst");
   syst_ = make_shared<System> ();
-  cout << "Setup okay, setting consts" << endl;
   consts_ = make_shared<Constants> ();
-  cout << "Consts okay, all done!" << endl;
 }
 
 
@@ -44,8 +40,11 @@ PBAM::PBAM(const struct PBAMInput& pbami, vector<Molecule> mls )
 poles_(5),
 solveTol_(1e-4)
 {
+  cout << "This is runType: " << pbami.runType_ << endl;
+  cout << "This is runName: " << pbami.runName_ << endl;
   setp_ = make_shared<Setup>(pbami.temp_, pbami.salt_, pbami.idiel_,
-                             pbami.sdiel_);
+                             pbami.sdiel_, string(pbami.runType_), 
+                             string(pbami.runName_));
   syst_ = make_shared<System> (mls); // TODO: add in boxl and cutoff
   consts_ = make_shared<Constants> (*setp_);
   init_write_system();

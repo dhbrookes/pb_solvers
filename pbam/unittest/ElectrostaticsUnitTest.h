@@ -54,7 +54,7 @@ protected :
   double pot2DZ[121] = {-0.0235165772,-0.025995406,-0.0285360312,-0.0309637309,-0.0330199631,-0.0343976892,-0.0348373993,-0.0342453379,-0.0327428873,-0.0306026231,-0.0281300003,-0.025995406,-0.0291921075,-0.0326219703,-0.0360715111,-0.0391473454,-0.0412941837,-0.0419840826,-0.0410233733,-0.0386835377,-0.0355096325,-0.0320323573,-0.0285360312,-0.0326219703,-0.0372556567,-0.0422428634,-0.0470356788,-0.050597752,-0.0517356294,-0.0500156815,-0.0461475027,-0.0412961,-0.0363639461,-0.0309637309,-0.0360715111,-0.0422428634,-0.0494927772,-0.0572916284,-0.0637454481,-0.0657190929,-0.0621567717,-0.0553274598,-0.0477875008,-0.0408636339,-0.0330199631,-0.0391473454,-0.0470356788,-0.0572916284,-0.0702972812,-0.0835042993,-0.0870245225,-0.0781417261,-0.0656256899,-0.0542276016,-0.0449563637,-0.0343976892,-0.0412941837,-0.050597752,-0.0637454481,-0.0835042993,0,0,-0.0945330902,-0.0741852171,-0.0589697212,-0.047760186,-0.0348373993,-0.0419840826,-0.0517356294,-0.0657190929,-0.0870245225,0,0,-0.0980533134,-0.0761588619,-0.0601075987,-0.0484500849,-0.0342453379,-0.0410233733,-0.0500156815,-0.0621567717,-0.0781417261,-0.0945330902,-0.0980533134,-0.085986171,-0.0704908333,-0.0572076043,-0.0468323916,-0.0327428873,-0.0386835377,-0.0461475027,-0.0553274598,-0.0656256899,-0.0741852171,-0.0761588619,-0.0704908333,-0.0611621424,-0.0516921401,-0.0434756605,-0.0306026231,-0.0355096325,-0.0412961,-0.0477875008,-0.0542276016,-0.0589697212,-0.0601075987,-0.0572076043,-0.0516921401,-0.0453365432,-0.0392516082,-0.0281300003,-0.0320323573,-0.0363639461,-0.0408636339,-0.0449563637,-0.047760186,-0.0484500849,-0.0468323916,-0.0434756605,-0.0392516082,-0.0348726072};
   
   string dx[9] = {"# Data from PBAM Electrostat run",
-    "# My runname is "+test_dir_loc+"electrostatic_test/test.dx and "
+    "# My runname is "+test_dir_loc+"test.dx and "
     + "units internal",
     "object 1 class gridpositions counts 11 11 11",
     "origin -7.2 -7.2 -15.2",
@@ -65,15 +65,15 @@ protected :
     "object 3 class array type double rank 0 items 1331 data follows"};
   
   string potx[7] = {"# Data from PBAM Electrostat run",
-    "# My runname is "+test_dir_loc+"electrostatic_test/pot_x_1.00.dat",
+    "# My runname is "+test_dir_loc+"pot_x_1.00.dat",
     "units internal", "grid 11 11", "axis x 0.654545",
     "origin -7.2 -15.2", "delta 1.30909 2.03636"};
   string poty[7] = {"# Data from PBAM Electrostat run",
-    "# My runname is "+test_dir_loc+"electrostatic_test/pot_y_4.00.dat",
+    "# My runname is "+test_dir_loc+"pot_y_4.00.dat",
     "units internal", "grid 11 11", "axis y 4.58182",
     "origin -7.2 -15.2", "delta 1.30909 2.03636"};
   string potz[7] = {"# Data from PBAM Electrostat run",
-    "# My runname is "+test_dir_loc+"electrostatic_test/pot_z_-1.00.dat",
+    "# My runname is "+test_dir_loc+"pot_z_-1.00.dat",
     "units internal","grid 11 11","axis z -0.945455",
     "origin -7.2 -7.2","delta 1.30909 1.30909"};
   
@@ -182,10 +182,10 @@ TEST_F(ElecUTest, printDX)
   ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
   
   Electrostatic EstatTest( ASolvTest, 11);
-  EstatTest.print_dx(test_dir_loc+"electrostatic_test/test.dx");
+  EstatTest.print_dx(test_dir_loc+"test.dx");
   
   string inputLine;
-  ifstream fin(test_dir_loc+"electrostatic_test/test.dx");
+  ifstream fin(test_dir_loc+"test.dx");
   getline(fin,inputLine);
   
   int ct = 0;
@@ -215,7 +215,7 @@ TEST_F(ElecUTest, checkPOTZ)
   
   double val = -5.4;
   char pot[50];
-  sprintf(pot, "electrostatic_test/pot_z_%.2f.dat", val);
+  sprintf(pot, "pot_z_%.2f.dat", val);
   EstatTest.print_grid("z", val, test_dir_loc+string(pot));
   
   vector<vector<double > > p2d = EstatTest.get_pot2d();
@@ -251,7 +251,7 @@ TEST_F(ElecUTest, checkGridOutRange)
   
   double val = 100.8;
   char pot[50];
-  sprintf(pot, "electrostatic_test/pot_x_%.2f.dat", val);
+  sprintf(pot, "pot_x_%.2f.dat", val);
   try
   {
     EstatTest.print_grid("x", val, test_dir_loc+string(pot));
@@ -283,7 +283,7 @@ TEST_F(ElecUTest, checkGridOutRange2)
   
   double val = -50.4;
   char pot[50];
-  sprintf(pot, "electrostatic_test/pot_z_%.2f.dat", val);
+  sprintf(pot, "pot_z_%.2f.dat", val);
   try
   {
     EstatTest.print_grid("z", val, test_dir_loc+string(pot));
@@ -315,7 +315,7 @@ TEST_F(ElecUTest, printPOTX)
   
   double val = 1;
   char pot[50];
-  sprintf(pot, "electrostatic_test/pot_x_%.2f.dat", val);
+  sprintf(pot, "pot_x_%.2f.dat", val);
   EstatTest.print_grid("x", val, test_dir_loc+string(pot));
   
   string inputLine;
@@ -349,7 +349,7 @@ TEST_F(ElecUTest, printPOTY)
   
   double val = 4;
   char pot[50];
-  sprintf(pot, "electrostatic_test/pot_y_%.2f.dat", val);
+  sprintf(pot, "pot_y_%.2f.dat", val);
   EstatTest.print_grid("y", val, test_dir_loc+string(pot));
   
   string inputLine;
@@ -383,7 +383,7 @@ TEST_F(ElecUTest, printPOTZ)
   
   double val = -1;
   char pot[50];
-  sprintf(pot, "electrostatic_test/pot_z_%.2f.dat", val);
+  sprintf(pot, "pot_z_%.2f.dat", val);
   EstatTest.print_grid("z", val, test_dir_loc+string(pot));
   
   string inputLine;
@@ -432,7 +432,7 @@ TEST_F(ElecUTest, printPOT)
   
   Electrostatic EstatTest( ASolvTest, 11);
   double val = 0; char pot[50];
-  sprintf(pot, "electrostatic_test/pot_z_%.2f.dat", val);
+  sprintf(pot, "pot_z_%.2f.dat", val);
   EstatTest.print_grid("z", val, test_dir_loc+string(pot));
   
   EXPECT_TRUE( 0 == 0);

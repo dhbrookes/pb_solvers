@@ -27,19 +27,19 @@ include_directories("${source_dir}/include")
 
 file(GLOB SRCS *.cpp)
 
-include_directories("../pbam")
+include_directories("../src")
 
 ADD_EXECUTABLE(pbamtest 
-  ../pbam/ASolver.cpp
-  ../pbam/BD.cpp
-  ../pbam/BesselCalc.cpp
-  ../pbam/Constants.cpp
-  ../pbam/Electrostatics.cpp
-  ../pbam/EnergyForce.cpp
-  ../pbam/ReExpCalc.cpp
-  ../pbam/SHCalc.cpp
-  ../pbam/System.cpp
-  ../pbam/setup.cpp
+  ../src/ASolver.cpp
+  ../src/BD.cpp
+  ../src/BesselCalc.cpp
+  ../src/Constants.cpp
+  ../src/Electrostatics.cpp
+  ../src/EnergyForce.cpp
+  ../src/ReExpCalc.cpp
+  ../src/SHCalc.cpp
+  ../src/System.cpp
+  ../src/setup.cpp
   main.cpp
   )
   

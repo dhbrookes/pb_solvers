@@ -59,7 +59,8 @@ protected:
   
   // for dynamics runs
   int numTerm_;  //number of termination conditions
-  vector<string> termtype_; // type of each term ('time', 'x', 'y', 'z', 'r' or 'contact')
+  vector<string> termtype_; // type of each term ('time', 'x', 'y', 'z', 'r' 
+                            // or 'contact')
   vector<vector<int> > termmols_; // vector of molecule ids
   vector<double> termvals_; // value for each termination condition
   vector<string> confiles_;  // contact files for contact termination conditions
@@ -175,7 +176,8 @@ public:
   Setup(string infile);
 
   // Not pretty, but getting necessary inputs from APBS
-  Setup( double temp, double salt_conc, double int_diel, double solv_diel);
+  Setup( double temp, double salt_conc, double int_diel, double solv_diel,
+         string runtype, string runname);
   
   string getRunType()              { return runSpecs_[0]; }
   string getRunName()              { return runSpecs_[1]; }

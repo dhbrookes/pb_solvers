@@ -10,13 +10,17 @@ struct PBAMInput {
   double salt_;
   double idiel_;
   double sdiel_;
+  char runType_[8192];
+  char runName_[8192];
 
 #ifdef __cplusplus
 PBAMInput() :
   temp_(298.15),
   salt_(0.01),
   idiel_(1.5), // Solute dielectric
-  sdiel_(80)
+  sdiel_(80.0),
+  runType_("energyforce"),
+  runName_("tst")
 	{}
 #endif
 

@@ -83,7 +83,8 @@ andCombine_(false)
 
 // APBS
 // TODO: Need to get more information later
-Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel)
+Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel,
+             string runtype, string runname)
 :
 ompThreads_( 1 ),
 saltConc_( salt_conc ),
@@ -120,8 +121,8 @@ andCombine_(false)
   }
 
   typeDef_[0]  = "stat";
-  runSpecs_[0] = "energyforce";
-  runSpecs_[1] = "test";
+  runSpecs_[0] = runtype; // For apbs
+  runSpecs_[1] = runname; // for apbs
   
   potOutfnames_.resize(3);
   potOutfnames_[0] = "";

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8)
 
 project(pbam CXX)
 enable_testing()
@@ -34,5 +34,5 @@ endif()
 #  set(CMAKE_BUILD_TYPE Release)
 #endif()
 
-add_subdirectory(pbam)
-add_subdirectory(pbam_test_code)
+add_subdirectory(src)
+add_subdirectory(unittest)
