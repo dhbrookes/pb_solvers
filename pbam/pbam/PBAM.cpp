@@ -14,31 +14,30 @@ poles_(5),
 solveTol_(1e-4)
 {
   setp_ = make_shared<Setup>(infile);
-  syst_ = make_shared<System> ();
-  consts_ = make_shared<Constants> ();
-  
-  get_check_inputs();
+  check_setup();
 
+  syst_ = make_shared<System> ();
+  consts_ = make_shared<Constants> (*setp_);
+  
+  check_system();
+  init_write_system();
 }
 
 
-PBAM::PBAM(const struct PBAMInput& pbami )
+PBAM::PBAM(const struct PBAMInput& pbami, vector<Molecule> mls )
 : 
 poles_(5),
 solveTol_(1e-4)
 {
   setp_ = make_shared<Setup>(pbami.temp_, pbami.salt_, pbami.idiel_,
                              pbami.sdiel_);
-  syst_ = make_shared<System> ();
+  syst_ = make_shared<System> (mls); // TODO: add in boxl and cutoff
   consts_ = make_shared<Constants> (*setp_);
-  
-  // get_check_inputs();
-
+  init_write_system();
 }
 
-
-// Function to get and check inputs from file
-void PBAM::get_check_inputs()
+// Function to check inputs from setup file
+void PBAM::check_setup()
 {
   try {
     setp_->check_inputs();
@@ -48,8 +47,12 @@ void PBAM::get_check_inputs()
     exit(0);
   }
   cout << "All inputs okay " << endl;
-  
-  consts_ = make_shared<Constants>(*setp_);
+}
+
+
+// Function to check created system
+void PBAM::check_system()
+{
   try {
     syst_ = make_shared<System>(*setp_);
   } catch(const OverlappingMoleculeException& ex1)
@@ -64,7 +67,12 @@ void PBAM::get_check_inputs()
     exit(0);
   }
   cout << "Molecule setup okay " << endl;
+}
   
+
+// Rotate molecules if needed and then write out config to pqr
+void PBAM::init_write_system()
+{
   if (setp_->get_randOrient())
   {
     for ( int i = 0; i < syst_->get_n(); i++)

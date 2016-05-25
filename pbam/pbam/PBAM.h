@@ -56,12 +56,15 @@ public:
   // Constructors
   PBAM();
   PBAM(string infile);
-  PBAM(const struct PBAMInput& pbami ); // For APBS
+  PBAM(const struct PBAMInput& pbami, vector<Molecule> mls ); // For APBS
   
   // for running the APBS version
   struct PBAMOutput run_apbs( );
 
-  void get_check_inputs();
+  void check_setup();
+  void check_system();
+
+  void init_write_system();
 
   int run();
 

@@ -82,6 +82,7 @@ andCombine_(false)
 }
 
 // APBS
+// TODO: Need to get more information later
 Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel)
 :
 ompThreads_( 1 ),

@@ -34,8 +34,7 @@ PBAMInput() :
 //
 struct PBAMOutput {
 
-	double m_sumpot,
-		m_elecSolvation;
+  double energies[], forces[][3];
 
 } ;
 

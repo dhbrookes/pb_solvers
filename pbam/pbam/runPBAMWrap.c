@@ -60,7 +60,7 @@ int main( int argc, char *argv[] )
       getPBAMParams();
 
    // change any of the parameters you want...
-   pbamIn.m_gamma =  0.0001;
+   pbamIn.temp_ =  298.15;
    
    //
    // TODO: need to create an AtomList - the c version of this code for
