@@ -8,6 +8,21 @@
 
 #include "PBAM.h"
 
+PBAM::PBAM() : PBAMInput()
+{
+  poles_ = 5;
+  solveTol_ = 1e-4;
+
+  cout << "Setting setp" << endl;
+  setp_ = make_shared<Setup>( 300.0, 0.05, 2, 80);
+  cout << "Setup okay, setting syst" << endl;
+  syst_ = make_shared<System> ();
+  cout << "Setup okay, setting consts" << endl;
+  consts_ = make_shared<Constants> ();
+  cout << "Consts okay, all done!" << endl;
+}
+
+
 PBAM::PBAM(string infile)
 : 
 poles_(5),
@@ -100,6 +115,23 @@ int PBAM::run()
     cout << "Runtype not recognized! See manual for options" << endl;
 
   return 0;
+}
+
+struct PBAMOutput PBAM::run_apbs()
+{
+  if ( setp_->getRunType() == "dynamics")
+    run_dynamics();
+  else if ( setp_->getRunType() == "electrostatics")
+    run_electrostatics( );
+  else if ( setp_->getRunType() == "energyforce")
+    run_energyforce( );
+  else if ( setp_->getRunType() == "bodyapprox")
+    run_bodyapprox( );
+  else
+    cout << "Runtype not recognized! See manual for options" << endl;
+
+  struct PBAMOutput pbamO;
+  return pbamO;
 }
 
 void PBAM::run_dynamics()

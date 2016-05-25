@@ -62,14 +62,12 @@
 extern "C"{
 #endif
 
-struct PBAMOutput runPBAMWrapAPBS
-   ( struct PBAMInput pbamParams );
-
 void printPBAMStruct( struct PBAMInput pbamIn );
 
 #ifdef PBAM_APBS
-struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamIn,
-                                   Valist* all_molecules ); 
+struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamIn, Valist* molecules[], int nmls ); 
+//#else
+//struct PBAMOutput runPBAMWrap( struct PBAMInput pbamParams );
 #endif //PBAM_APBS
 
 struct PBAMInput getPBAMParams();

@@ -118,7 +118,7 @@ andCombine_(false)
     typeDiff_[i][0] = 0.0;
     typeDiff_[i][1] = 0.0;
   }
-  
+
   typeDef_[0]  = "stat";
   runSpecs_[0] = "energyforce";
   runSpecs_[1] = "test";
@@ -131,12 +131,13 @@ andCombine_(false)
   mbdfile_loc_[0] = "";
   mbdfile_loc_[1] = "";
   
-  units_ = "internal";
-  
+  units_ = "kT";
+
   // Initializing file locs to defaults
-  // pqr fname, imat path, spol path, spol name
-  vector<vector<string> > molfn = {{"../Config/test1.pqr"}, {"../Config/test2.pqr"}};
-  
+  // pqr fname
+  vector<vector<string> > molfn = {{"../Config/test1.pqr",
+                                    "../Config/test1.xyz"}};
+
   for (int i=0; i<nType_; i++)
   {
     pqr_names_[i] = molfn[i][0];
@@ -144,8 +145,7 @@ andCombine_(false)
     isTransRot_[i].resize(1);
     xyz_names_[i][0] = molfn[i][1];
     isTransRot_[i][0] = false;
-  }
-  
+  }  
   confiles_.resize(0);
 }
 

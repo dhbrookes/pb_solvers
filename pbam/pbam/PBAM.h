@@ -41,7 +41,7 @@
 
 using namespace std;
 
-class PBAM
+class PBAM : protected PBAMInput
 {
 protected:
   shared_ptr<Setup> setp_;
@@ -56,10 +56,14 @@ public:
   // Constructors
   PBAM();
   PBAM(string infile);
-  PBAM(const struct PBAMInput& pbami, vector<Molecule> mls ); // For APBS
-  
-  // for running the APBS version
-  struct PBAMOutput run_apbs( );
+  // For APBS
+  PBAM(const struct PBAMInput& pbami, vector<Molecule> mls ); 
+
+  friend struct PBAMInput getPBAMParams();
+
+  // Copy constructors
+  PBAM( const PBAM& pbam ) ;
+  PBAM( const PBAM* pbam ) ;
 
   void check_setup();
   void check_system();
@@ -67,6 +71,8 @@ public:
   void init_write_system();
 
   int run();
+  // for running the APBS version
+  struct PBAMOutput run_apbs( );
 
   void run_bodyapprox();
   void run_dynamics();

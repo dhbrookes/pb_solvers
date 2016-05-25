@@ -53,19 +53,17 @@
 /// @endverbatim
 #include "PBAMWrap.h"
 #include "PBAM.h"
-
 #include <iostream>
-
 
 using namespace std;
 
 struct PBAMInput getPBAMParams()
 {
-  // create the pbam Class
+  // create the pbam 
   PBAM pbam;
+
   // get the struct for use in the c code
   struct PBAMInput pbamI = pbam;
-
   return pbamI;
 }
 
@@ -93,56 +91,68 @@ struct PBAMInput getPBAMParams()
 //
 void printPBAMStruct( struct PBAMInput pbamIn )
 {
-   printf("PBAMInput: %i, %f, %f, %f, %f, %f, %f, %f, %f, %f, %i, %f\n", 
-         pbamIn.m_gamma, 
-         pbamIn.m_pdie,
-         pbamIn.m_sdie);
+   printf("PBAMInput: %f, %f, %f, %f\n", 
+         pbamIn.temp_, 
+         pbamIn.idiel_,
+         pbamIn.sdiel_,
+         pbamIn.salt_);
 }
 
 //
 //  to call from APBS
 //
 #ifdef PBAM_APBS
-struct PBAMOutput runPBAMWrapAPBS
-   ( struct PBAMInput pbamParams,
-     Valist* molecules ) 
+struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamParams,
+                                   Valist* molecules[], int nmls ) 
 {
-   //cout << "boo from PBAMWrap!" << endl; 
+  cout << "boo from PBAMWrap!" << endl; 
 
-   //
-   //  create the PBAM object
-   //
-   PBAM pbam( pbamParams );
+   // convert Valist to a vector of Molecules
+  vector<Molecule> mols;
+  cout << "converting atom list" << endl;
+  
+  //cout << "natoms: " << natoms << endl;
+  for (unsigned int mol=0; mol < nmls; mol++) 
+  {  
+    Vatom *atom;
+    unsigned int natoms = Valist_getNumberAtoms(molecules[mol]);
 
-   //
-   // convert Valist to an AtomList
-   //
-   //cout << "converting atom list" << endl;
-   // AtomList atomList;
-   // Vatom *atom;
-   // unsigned int natoms = Valist_getNumberAtoms(molecules);
-   // //cout << "natoms: " << natoms << endl;
-   // for (unsigned int i=0; i < natoms; i++) 
-   // {		
-   //    atom = Valist_getAtom(molecules, i);
-   //    //cout << "i: " << i << endl;
-   //    Atom myAtom( 
-   //          GF.getFFModel(),
-   //       Vatom_getPosition(atom)[0],
-   //       Vatom_getPosition(atom)[1],		
-   //       Vatom_getPosition(atom)[2],		
-   //       Vatom_getRadius(atom) * GF.getRadExp(),
-   //       Vatom_getCharge(atom) );
-   //    atomList.add( myAtom );
-   // }
-   //cout << "done with atom list" << endl;
-   //atomList.print();
+    vector<double> vdw, chg;
+    vector<Pt> cgpos;
 
-   //
-   //  run Geoflow!
-   //
-   struct PBAMOutput pbamO = pbam.run( atomList );
-   
-   return pbamO;
+    for (unsigned int i=0; i < natoms; i++) 
+    {   
+      atom = Valist_getAtom(molecules[mol], i);
+      cout << "i: " << i << endl;
+
+      cgpos.push_back( Pt(Vatom_getPosition(atom)[0],
+                          Vatom_getPosition(atom)[1],   
+                          Vatom_getPosition(atom)[2])); 
+      vdw.push_back(Vatom_getRadius(atom));
+      chg.push_back(Vatom_getCharge(atom));
+    }
+    mols.push_back(Molecule("stat", chg, cgpos, vdw, mol, 0));
+  }
+
+  cout << "done with atom list" << endl;
+  for (unsigned int mol=0; mol < nmls; mol++) 
+  {  
+    cout << "This is molecule " << mol << endl;
+    for (unsigned int i=0; i < mols[mol].get_m(); i++) 
+    { 
+      cout << "This is atom " << i << " pos: ";
+      cout << mols[mol].get_posj_realspace(i).x() << ", ";
+      cout << mols[mol].get_posj_realspace(i).y() << ", ";
+      cout << mols[mol].get_posj_realspace(i).z() << endl;
+    }
+  }  
+  
+  //  create the PBAM object
+  PBAM pbam( pbamParams, mols );
+
+  //  run PBAM!
+  struct PBAMOutput pbamO = pbam.run_apbs( );
+
+  return pbamO;
 }
 #endif // PBAM_APBS

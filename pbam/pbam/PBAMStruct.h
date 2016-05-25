@@ -13,17 +13,10 @@ struct PBAMInput {
 
 #ifdef __cplusplus
 PBAMInput() :
-
   temp_(298.15),
-
   salt_(0.01),
-
-  // Solute dielectric
-  idiel_(1.5),
-
-  // Solvent dielectric, from Thomas et. al.
+  idiel_(1.5), // Solute dielectric
   sdiel_(80)
-
 	{}
 #endif
 
@@ -34,7 +27,12 @@ PBAMInput() :
 //
 struct PBAMOutput {
 
-  double energies[], forces[][3];
+  double energies_[500];
+  double forces_[500][3];
+
+#ifdef __cplusplus
+  PBAMOutput() {}
+#endif
 
 } ;
 
