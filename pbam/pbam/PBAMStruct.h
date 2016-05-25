@@ -6,24 +6,25 @@
 //
 struct PBAMInput {
 
-  double m_gamma;
-  double m_tol;
-  double m_pdie;
-  double m_sdie;
-
+  double temp_;
+  double salt_;
+  double idiel_;
+  double sdiel_;
 
 #ifdef __cplusplus
 PBAMInput() :
 
-    m_gamma(0.0001),
+  temp_(298.15),
+
+  salt_(0.01),
 
   // Solute dielectric
-    m_pdie(1.5),
+  idiel_(1.5),
 
   // Solvent dielectric, from Thomas et. al.
-    m_sdie(80),
+  sdiel_(80)
 
-	   {}
+	{}
 #endif
 
 } ;

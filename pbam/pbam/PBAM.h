@@ -32,22 +32,24 @@
 #define PBAM_H
 
 #include <memory>
+#include <time.h>
 #include "setup.h"
 #include "BD.h"
+#include "PBAMStruct.h"
 #include "Electrostatics.h"
-#include <time.h>
+
 
 using namespace std;
 
 class PBAM
 {
 protected:
-  shared_ptr<Setup> setp;
-  shared_ptr<System> syst;
-  shared_ptr<Constants> consts;
+  shared_ptr<Setup> setp_;
+  shared_ptr<System> syst_;
+  shared_ptr<Constants> consts_;
 
-  int poles;
-  double solveTol;
+  int poles_;
+  double solveTol_;
   
 public:
   
@@ -57,7 +59,7 @@ public:
   PBAM(const struct PBAMInput& pbami ); // For APBS
   
   // for running the APBS version
-  // struct PBAMOutput run( const AtomList& atomList);
+  struct PBAMOutput run_apbs( );
 
   void get_check_inputs();
 

@@ -81,6 +81,74 @@ andCombine_(false)
   read_infile(infile);
 }
 
+// APBS
+Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel)
+:
+ompThreads_( 1 ),
+saltConc_( salt_conc ),
+nType_( 1 ),
+PBCs_( 0 ),
+blen_( MAX_DIST ),
+maxtime_( 1000000 ),
+ntraj_( 1 ),
+gridPts_( 30 ),
+gridCt_(0),
+idiel_( int_diel ),
+sdiel_( solv_diel ),
+temp_( temp ),
+srand_( (unsigned)time(NULL) ),
+nTypenCount_(1),
+typeDef_(1),
+typeDiff_(1),
+pqr_names_(1),
+xyz_names_(1),
+isTransRot_(1),
+runSpecs_(2),
+mbdfile_loc_(2),
+termvals_(2),
+termtype_(2),
+andCombine_(false)
+{
+  nTypenCount_[0] = 1;
+  
+  for (int i = 0; i<nType_; i++)
+  {
+    typeDiff_[i] = vector<double> (2);
+    typeDiff_[i][0] = 0.0;
+    typeDiff_[i][1] = 0.0;
+  }
+  
+  typeDef_[0]  = "stat";
+  runSpecs_[0] = "energyforce";
+  runSpecs_[1] = "test";
+  
+  potOutfnames_.resize(3);
+  potOutfnames_[0] = "";
+  potOutfnames_[1] = "";
+  potOutfnames_[2] = "";
+  
+  mbdfile_loc_[0] = "";
+  mbdfile_loc_[1] = "";
+  
+  units_ = "internal";
+  
+  // Initializing file locs to defaults
+  // pqr fname, imat path, spol path, spol name
+  vector<vector<string> > molfn = {{"../Config/test1.pqr"}, {"../Config/test2.pqr"}};
+  
+  for (int i=0; i<nType_; i++)
+  {
+    pqr_names_[i] = molfn[i][0];
+    xyz_names_[i].resize(1);
+    isTransRot_[i].resize(1);
+    xyz_names_[i][0] = molfn[i][1];
+    isTransRot_[i][0] = false;
+  }
+  
+  confiles_.resize(0);
+}
+
+
 void Setup::read_infile(string fname)
 {
   cout << "Reading Input file " << fname << endl ;

@@ -173,6 +173,9 @@ protected:
   
 public:
   Setup(string infile);
+
+  // Not pretty, but getting necessary inputs from APBS
+  Setup( double temp, double salt_conc, double int_diel, double solv_diel);
   
   string getRunType()              { return runSpecs_[0]; }
   string getRunName()              { return runSpecs_[1]; }
