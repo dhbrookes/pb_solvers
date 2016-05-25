@@ -30,6 +30,8 @@ add_executable(pbam
   EnergyForce.h
   main.cpp
   MyMatrix.h
+  PBAM.cpp
+  PBAM.h
   readutil.h
   ReExpCalc.cpp
   ReExpCalc.h

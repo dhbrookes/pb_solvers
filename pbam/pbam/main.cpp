@@ -29,11 +29,7 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <memory>
-#include "setup.h"
-#include "BD.h"
-#include "Electrostatics.h"
-#include <time.h>
+#include "PBAM.h"
 
 using namespace std;
 
