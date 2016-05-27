@@ -88,7 +88,8 @@ Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel,
              int nmol, string runtype, string runname, bool randorient, 
              double boxl, int pbc_type, int gridpts, string map3d, int g2dct, 
              vector<string> grid2Dfn, vector <string> grid2Dax, 
-             vector <double> grid2Dloc, string dxnam)
+             vector <double> grid2Dloc, string dxnam, bool termcomb,
+             vector<string> difftype, vector<vector<double> > diffcon)
 :
 ompThreads_( 1 ),
 saltConc_( salt_conc ), //
@@ -113,7 +114,7 @@ runSpecs_(2),
 mbdfile_loc_(2),
 termvals_(2),
 termtype_(2),
-andCombine_(false),
+andCombine_(termcomb), //
 orientRand_(randorient) //
 {
   runSpecs_[0] = runtype; //
@@ -123,13 +124,14 @@ orientRand_(randorient) //
   for (int i = 0; i<nType_; i++) nTypenCount_[i] = 1; //
   
   // Dynamics part
-  typeDef_[0]  = "stat";
   confiles_.resize(0);
   for (int i = 0; i<nType_; i++)
   {
+    typeDef_[i] = difftype[i];
+    cout << "This is typeDef: " << i << " \t " << typeDef_[i] << endl;
     typeDiff_[i] = vector<double> (2);
-    typeDiff_[i][0] = 0.0;
-    typeDiff_[i][1] = 0.0;
+    typeDiff_[i][0] = diffcon[i][0];
+    typeDiff_[i][1] = diffcon[i][1];
   }
   
   // Electrostatics part
@@ -158,7 +160,6 @@ orientRand_(randorient) //
     xyz_names_[i][0] = "";
     isTransRot_[i][0] = false;
   }  
-
 }
 
 

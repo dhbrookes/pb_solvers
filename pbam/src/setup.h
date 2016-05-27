@@ -180,7 +180,8 @@ public:
         int nmol, string runtype, string runname, bool randorient, double boxl,
         int pbc_type, int gridpts, string map3d, int g2dct, 
         vector<string> grid2Dfn, vector <string> grid2Dax, 
-        vector<double> grid2Dloc, string dxnam);
+        vector<double> grid2Dloc, string dxnam, bool termcomb, 
+        vector<string> difftype, vector<vector<double> > diffcon);
   
   string getRunType()              { return runSpecs_[0]; }
   string getRunName()              { return runSpecs_[1]; }

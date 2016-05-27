@@ -17,9 +17,15 @@ PBAM::PBAM() : PBAMInput()
   vector<string> gridax = {"x"};
   vector<double> gridloc = {0.0};
 
+  // Dynamics
+  vector<string> difftype = {"stat"};
+  vector<vector <double > > diffcon(1, vector<double> (2));
+
+  diffcon[0][0] = 0.0; diffcon[0][1] = 0.0;
   setp_ = make_shared<Setup>( 300.0, 0.05, 2., 80., 1, "electrostatics", "tst",
                              false, 100, 0, 15, "tst.map", 1, grid2d, 
-                             gridax, gridloc, "tst.dx");
+                             gridax, gridloc, "tst.dx", false, difftype,
+                             diffcon);
   syst_ = make_shared<System> ();
   consts_ = make_shared<Constants> ();
 }
@@ -46,6 +52,7 @@ PBAM::PBAM(const struct PBAMInput& pbami, vector<Molecule> mls )
 poles_(5),
 solveTol_(1e-4)
 {
+  // Electrostatics
   int i;
   vector<string> grid2Dname(pbami.grid2Dct_);
   vector<string> grid2Dax(pbami.grid2Dct_);
@@ -58,13 +65,28 @@ solveTol_(1e-4)
     grid2Dloc[i] = pbami.grid2Dloc_[i];
   }
   
+  // Dynamics
+  bool termcomb = true;
+  if (pbami.termCombine_ == "or")  termcomb = false;
+
+  vector<string> difftype(pbami.nmol_);
+  vector<vector<double > > diffcon(pbami.nmol_, vector<double> (2));
+  if (string(pbami.runType_) == "dynamics")
+    for (i=0; i<pbami.nmol_; i++)
+    {
+      difftype[i] = string(pbami.moveType_[i]);
+      diffcon[i][0] = pbami.transDiff_[i];
+      diffcon[i][1] = pbami.rotDiff_[i];
+    }
+
   setp_ = make_shared<Setup>(pbami.temp_, pbami.salt_, pbami.idiel_,
                              pbami.sdiel_, pbami.nmol_, string(pbami.runType_),
                              string(pbami.runName_), pbami.randOrient_,
                              pbami.boxLen_, pbami.pbcType_, pbami.gridPts_,
                              string(pbami.map3D_), pbami.grid2Dct_,
                              grid2Dname, grid2Dax, grid2Dloc,
-                             string(pbami.dxname_));
+                             string(pbami.dxname_), termcomb, difftype,
+                             diffcon);
 
 
   syst_ = make_shared<System> (mls); // TODO: add in boxl and cutoff

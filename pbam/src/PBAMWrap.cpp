@@ -71,21 +71,28 @@ struct PBAMInput getPBAMParams()
 //  print the PBAM flow structure for debugging
 void printPBAMStruct( struct PBAMInput pbamIn )
 {
-   printf("PBAMInput: %f, %f, %f, %f and\n runtype: %s\n runname: %s\n", 
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  printf("PBAMInput: %f, %f, %f, %f and\n runtype: %s\n runname: %s\n", 
          pbamIn.temp_, 
          pbamIn.idiel_,
          pbamIn.sdiel_,
          pbamIn.salt_,
          pbamIn.runType_,
          pbamIn.runName_);
-   printf("Here's some more: %d, %lf, %d, %s, %d\t pts: %d\n",
+  printf("Here's some more: %d, %lf, %d, %s, %d\t pts: %d\n termcb %s\n",
          pbamIn.randOrient_,
          pbamIn.boxLen_,
          pbamIn.pbcType_,
          pbamIn.map3D_,
          pbamIn.grid2Dct_,
-         pbamIn.gridPts_);
+         pbamIn.gridPts_,
+         pbamIn.termCombine_);
 
+  if(strncmp(pbamIn.runType_, "dynamics", 8)== 0)
+    for (int i=0; i<pbamIn.nmol_; i++)
+      printf("This is mol %d movetype: %s, diff: %lf, rot: %lf\n", 
+        i, pbamIn.moveType_[i], pbamIn.transDiff_[i], pbamIn.rotDiff_[i]);  
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 }
 
 //  to call from APBS
@@ -102,6 +109,21 @@ struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamParams,
 
     vector<double> vdw, chg;
     vector<Pt> cgpos;
+    string difftype;
+    double dtr, drot;
+
+    if (string(pbamParams.runType_) == "dynamics")
+    {
+      difftype = string(pbamParams.moveType_[mol]);
+      dtr = pbamParams.transDiff_[mol];
+      drot = pbamParams.rotDiff_[mol];
+    }
+    else
+    {
+      difftype = "stat";
+      dtr = 0.0;
+      drot = 0.0;
+    }
 
     for (unsigned int i=0; i < natoms; i++) 
     {   
@@ -112,7 +134,7 @@ struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamParams,
       vdw.push_back(Vatom_getRadius(atom));
       chg.push_back(Vatom_getCharge(atom));
     }
-    mols.push_back(Molecule("stat", chg, cgpos, vdw, mol, 0));
+    mols.push_back(Molecule(difftype, chg, cgpos, vdw, mol, 0, dtr, drot));
   }
   
   //  create the PBAM object

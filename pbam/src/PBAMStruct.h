@@ -3,7 +3,7 @@
 
 #define CHR_MAX 8192
 #define FIL_MAX 20
-#define MOL_MAX 500
+#define MOL_MAX 200
 
 //
 //  input
@@ -34,12 +34,11 @@ struct PBAMInput {
   char dxname_[CHR_MAX];
 
   // Dynamics
-  // char termCombine_[CHR_MAX];
+  char termCombine_[CHR_MAX];
 
-  // char moveType_[MOL_MAX][CHR_MAX];
-  // double transDiff_[MOL_MAX];
-  // double rotDiff_[MOL_MAX];
-  
+  char moveType_[MOL_MAX][CHR_MAX];
+  double transDiff_[MOL_MAX];
+  double rotDiff_[MOL_MAX];
 
 
 #ifdef __cplusplus
@@ -55,7 +54,8 @@ PBAMInput() :
   boxLen_(1.4e18),
   pbcType_(0),
   map3D_("tst.map"),
-  grid2Dct_(0)
+  grid2Dct_(0),
+  termCombine_("or")
 	{}
 #endif
 
