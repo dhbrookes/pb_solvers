@@ -178,8 +178,9 @@ public:
   // Not pretty, but getting necessary inputs from APBS
   Setup(double temp, double salt_conc, double int_diel, double solv_diel, 
         int nmol, string runtype, string runname, bool randorient, double boxl,
-        int pbc_type, string map3d, vector<string> grid2Dfn, 
-        vector <string> grid2Dax, string dxnam);
+        int pbc_type, int gridpts, string map3d, int g2dct, 
+        vector<string> grid2Dfn, vector <string> grid2Dax, 
+        vector<double> grid2Dloc, string dxnam);
   
   string getRunType()              { return runSpecs_[0]; }
   string getRunName()              { return runSpecs_[1]; }

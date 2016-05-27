@@ -3,6 +3,7 @@
 
 #define CHR_MAX 8192
 #define FIL_MAX 20
+#define MOL_MAX 500
 
 //
 //  input
@@ -20,6 +21,9 @@ struct PBAMInput {
   double boxLen_;
   int pbcType_;
 
+
+  // Electrostatics
+  int gridPts_;
   char map3D_[CHR_MAX];
   
   int grid2Dct_;
@@ -28,6 +32,13 @@ struct PBAMInput {
   double grid2Dloc_[FIL_MAX];
 
   char dxname_[CHR_MAX];
+
+  // Dynamics
+  // char termCombine_[CHR_MAX];
+
+  // char moveType_[MOL_MAX][CHR_MAX];
+  // double transDiff_[MOL_MAX];
+  // double rotDiff_[MOL_MAX];
   
 
 

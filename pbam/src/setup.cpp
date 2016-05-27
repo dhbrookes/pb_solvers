@@ -86,8 +86,9 @@ orientRand_(false)
 // TODO: Need to get more information later
 Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel,
              int nmol, string runtype, string runname, bool randorient, 
-             double boxl, int pbc_type, string map3d, vector<string> grid2Dfn, 
-             vector <string> grid2Dax, string dxnam)
+             double boxl, int pbc_type, int gridpts, string map3d, int g2dct, 
+             vector<string> grid2Dfn, vector <string> grid2Dax, 
+             vector <double> grid2Dloc, string dxnam)
 :
 ompThreads_( 1 ),
 saltConc_( salt_conc ), //
@@ -96,8 +97,8 @@ PBCs_( pbc_type ),  //
 blen_( boxl ),   //
 maxtime_( 1000000 ),
 ntraj_( 1 ),
-gridPts_( 30 ),
-gridCt_(grid2Dax.size()), //
+gridPts_( gridpts ), //
+gridCt_(g2dct), //
 idiel_( int_diel ),  //
 sdiel_( solv_diel ), //
 temp_( temp ),       //
@@ -121,7 +122,6 @@ orientRand_(randorient) //
 
   for (int i = 0; i<nType_; i++) nTypenCount_[i] = 1; //
   
-  cout << "Wroking here 3" << endl;
   // Dynamics part
   typeDef_[0]  = "stat";
   confiles_.resize(0);
@@ -132,20 +132,18 @@ orientRand_(randorient) //
     typeDiff_[i][1] = 0.0;
   }
   
-  cout << "Wroking here 4" << endl;
   // Electrostatics part
-  potOutfnames_.resize(2+grid2Dax.size()); //
-  cout << "Wroking here 5" << endl;
-  axis_.resize(grid2Dax.size());  //
-  cout << "Wroking here 6" << endl;
+  potOutfnames_.resize(2+g2dct); //
+  axis_.resize(g2dct);  //
+  axLoc_.resize(g2dct); //
   potOutfnames_[0] = dxnam;  //
   potOutfnames_[1] = map3d;  //
   
-  cout << "Wroking here 7" << endl;
   for (int i = 0; i<grid2Dax.size(); i++) 
   {
     potOutfnames_[2+i] = grid2Dfn[i]; //
     axis_[i] = grid2Dax[i];  //
+    axLoc_[i] = grid2Dloc[i];
   }
   
   // Mutibody expansion part
@@ -161,7 +159,6 @@ orientRand_(randorient) //
     isTransRot_[i][0] = false;
   }  
 
-  cout << "End" << endl;
 }
 
 

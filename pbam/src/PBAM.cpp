@@ -13,11 +13,13 @@ PBAM::PBAM() : PBAMInput()
   poles_ = 5;
   solveTol_ = 1e-4;
 
-  vector <string> grid2d = {"tst.2d"};
-  vector <string> gridax = {"x"};
-  setp_ = make_shared<Setup>( 300.0, 0.05, 2, 80, 1, "electrostatics", "tst",
-                             false, 100, 0, "tst.map", grid2d, gridax,
-                             "tst.dx");
+  vector<string> grid2d = {"tst.2d"};
+  vector<string> gridax = {"x"};
+  vector<double> gridloc = {0.0};
+
+  setp_ = make_shared<Setup>( 300.0, 0.05, 2., 80., 1, "electrostatics", "tst",
+                             false, 100, 0, 15, "tst.map", 1, grid2d, 
+                             gridax, gridloc, "tst.dx");
   syst_ = make_shared<System> ();
   consts_ = make_shared<Constants> ();
 }
@@ -45,21 +47,23 @@ poles_(5),
 solveTol_(1e-4)
 {
   int i;
-  vector <string> grid2Dname(pbami.grid2Dct_);
-  vector <string> grid2Dax(pbami.grid2Dct_);
+  vector<string> grid2Dname(pbami.grid2Dct_);
+  vector<string> grid2Dax(pbami.grid2Dct_);
+  vector<double> grid2Dloc(pbami.grid2Dct_);
 
   for (i=0; i<pbami.grid2Dct_; i++)
   {
     grid2Dname[i] = string(pbami.grid2D_[i]);
     grid2Dax[i] = string(pbami.grid2Dax_[i]);
+    grid2Dloc[i] = pbami.grid2Dloc_[i];
   }
   
-
   setp_ = make_shared<Setup>(pbami.temp_, pbami.salt_, pbami.idiel_,
                              pbami.sdiel_, pbami.nmol_, string(pbami.runType_),
                              string(pbami.runName_), pbami.randOrient_,
-                             pbami.boxLen_, pbami.pbcType_, 
-                             string(pbami.map3D_), grid2Dname, grid2Dax, 
+                             pbami.boxLen_, pbami.pbcType_, pbami.gridPts_,
+                             string(pbami.map3D_), pbami.grid2Dct_,
+                             grid2Dname, grid2Dax, grid2Dloc,
                              string(pbami.dxname_));
 
 
@@ -260,6 +264,7 @@ void PBAM::run_electrostatics()
     Estat.print_grid(setp_->getGridAx(i), setp_->getGridAxLoc(i),
                      setp_->getGridOutName(i));
   }
+
 }
 
 

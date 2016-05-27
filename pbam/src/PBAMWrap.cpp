@@ -78,12 +78,14 @@ void printPBAMStruct( struct PBAMInput pbamIn )
          pbamIn.salt_,
          pbamIn.runType_,
          pbamIn.runName_);
-   printf("Here's some more: %d, %lf, %d, %s, %d\n",
+   printf("Here's some more: %d, %lf, %d, %s, %d\t pts: %d\n",
          pbamIn.randOrient_,
          pbamIn.boxLen_,
          pbamIn.pbcType_,
          pbamIn.map3D_,
-         pbamIn.grid2Dct_);
+         pbamIn.grid2Dct_,
+         pbamIn.gridPts_);
+
 }
 
 //  to call from APBS
