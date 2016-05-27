@@ -1,6 +1,9 @@
 #ifndef __PBAMSTRUCT_H
 #define __PBAMSTRUCT_H
 
+#define CHR_MAX 8192
+#define FIL_MAX 20
+
 //
 //  input
 //
@@ -10,8 +13,23 @@ struct PBAMInput {
   double salt_;
   double idiel_;
   double sdiel_;
-  char runType_[8192];
-  char runName_[8192];
+  int nmol_;
+  char runType_[CHR_MAX];
+  char runName_[CHR_MAX];
+  int randOrient_;
+  double boxLen_;
+  int pbcType_;
+
+  char map3D_[CHR_MAX];
+  
+  int grid2Dct_;
+  char grid2D_[FIL_MAX][CHR_MAX];
+  char grid2Dax_[FIL_MAX][CHR_MAX];
+  double grid2Dloc_[FIL_MAX];
+
+  char dxname_[CHR_MAX];
+  
+
 
 #ifdef __cplusplus
 PBAMInput() :
@@ -19,8 +37,14 @@ PBAMInput() :
   salt_(0.01),
   idiel_(1.5), // Solute dielectric
   sdiel_(80.0),
+  nmol_(1),
   runType_("energyforce"),
-  runName_("tst")
+  runName_("tst"),
+  randOrient_(0),
+  boxLen_(1.4e18),
+  pbcType_(0),
+  map3D_("tst.map"),
+  grid2Dct_(0)
 	{}
 #endif
 

@@ -50,7 +50,7 @@ protected:
   int ntraj_;
   
   // for electrostatics runtype
-  vector< string> potOutfnames_; // Vector of outfiles, [0] = dx, rest = grid
+  vector< string> potOutfnames_; // Electro outfls, [0]=dx, [1]=3d, rest=grid
   
   int gridPts_; // number of voxels to compute for each dim
   int gridCt_; // number of grid files to write
@@ -176,8 +176,10 @@ public:
   Setup(string infile);
 
   // Not pretty, but getting necessary inputs from APBS
-  Setup( double temp, double salt_conc, double int_diel, double solv_diel,
-         string runtype, string runname);
+  Setup(double temp, double salt_conc, double int_diel, double solv_diel, 
+        int nmol, string runtype, string runname, bool randorient, double boxl,
+        int pbc_type, string map3d, vector<string> grid2Dfn, 
+        vector <string> grid2Dax, string dxnam);
   
   string getRunType()              { return runSpecs_[0]; }
   string getRunName()              { return runSpecs_[1]; }

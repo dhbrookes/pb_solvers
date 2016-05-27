@@ -13,7 +13,11 @@ PBAM::PBAM() : PBAMInput()
   poles_ = 5;
   solveTol_ = 1e-4;
 
-  setp_ = make_shared<Setup>( 300.0, 0.05, 2, 80, "electrostatics", "tst");
+  vector <string> grid2d = {"tst.2d"};
+  vector <string> gridax = {"x"};
+  setp_ = make_shared<Setup>( 300.0, 0.05, 2, 80, 1, "electrostatics", "tst",
+                             false, 100, 0, "tst.map", grid2d, gridax,
+                             "tst.dx");
   syst_ = make_shared<System> ();
   consts_ = make_shared<Constants> ();
 }
@@ -40,11 +44,25 @@ PBAM::PBAM(const struct PBAMInput& pbami, vector<Molecule> mls )
 poles_(5),
 solveTol_(1e-4)
 {
-  cout << "This is runType: " << pbami.runType_ << endl;
-  cout << "This is runName: " << pbami.runName_ << endl;
+  int i;
+  vector <string> grid2Dname(pbami.grid2Dct_);
+  vector <string> grid2Dax(pbami.grid2Dct_);
+
+  for (i=0; i<pbami.grid2Dct_; i++)
+  {
+    grid2Dname[i] = string(pbami.grid2D_[i]);
+    grid2Dax[i] = string(pbami.grid2Dax_[i]);
+  }
+  
+
   setp_ = make_shared<Setup>(pbami.temp_, pbami.salt_, pbami.idiel_,
-                             pbami.sdiel_, string(pbami.runType_), 
-                             string(pbami.runName_));
+                             pbami.sdiel_, pbami.nmol_, string(pbami.runType_),
+                             string(pbami.runName_), pbami.randOrient_,
+                             pbami.boxLen_, pbami.pbcType_, 
+                             string(pbami.map3D_), grid2Dname, grid2Dax, 
+                             string(pbami.dxname_));
+
+
   syst_ = make_shared<System> (mls); // TODO: add in boxl and cutoff
   consts_ = make_shared<Constants> (*setp_);
   init_write_system();

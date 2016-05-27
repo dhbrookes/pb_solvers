@@ -35,7 +35,8 @@ runSpecs_(2),
 mbdfile_loc_(2),
 termvals_(2),
 termtype_(2),
-andCombine_(false)
+andCombine_(false),
+orientRand_(false)
 {
   nTypenCount_[0] = 1;
   nTypenCount_[1] = 1;
@@ -84,70 +85,83 @@ andCombine_(false)
 // APBS
 // TODO: Need to get more information later
 Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel,
-             string runtype, string runname)
+             int nmol, string runtype, string runname, bool randorient, 
+             double boxl, int pbc_type, string map3d, vector<string> grid2Dfn, 
+             vector <string> grid2Dax, string dxnam)
 :
 ompThreads_( 1 ),
-saltConc_( salt_conc ),
-nType_( 1 ),
-PBCs_( 0 ),
-blen_( MAX_DIST ),
+saltConc_( salt_conc ), //
+nType_( nmol ),
+PBCs_( pbc_type ),  //
+blen_( boxl ),   //
 maxtime_( 1000000 ),
 ntraj_( 1 ),
 gridPts_( 30 ),
-gridCt_(0),
-idiel_( int_diel ),
-sdiel_( solv_diel ),
-temp_( temp ),
+gridCt_(grid2Dax.size()), //
+idiel_( int_diel ),  //
+sdiel_( solv_diel ), //
+temp_( temp ),       //
 srand_( (unsigned)time(NULL) ),
-nTypenCount_(1),
-typeDef_(1),
-typeDiff_(1),
-pqr_names_(1),
-xyz_names_(1),
-isTransRot_(1),
+nTypenCount_(nmol),
+typeDef_(nmol),
+typeDiff_(nmol),
+pqr_names_(nmol),
+xyz_names_(nmol),
+isTransRot_(nmol),
 runSpecs_(2),
 mbdfile_loc_(2),
 termvals_(2),
 termtype_(2),
-andCombine_(false)
+andCombine_(false),
+orientRand_(randorient) //
 {
-  nTypenCount_[0] = 1;
+  runSpecs_[0] = runtype; //
+  runSpecs_[1] = runname; //
+  units_ = "kT";
+
+  for (int i = 0; i<nType_; i++) nTypenCount_[i] = 1; //
   
+  cout << "Wroking here 3" << endl;
+  // Dynamics part
+  typeDef_[0]  = "stat";
+  confiles_.resize(0);
   for (int i = 0; i<nType_; i++)
   {
     typeDiff_[i] = vector<double> (2);
     typeDiff_[i][0] = 0.0;
     typeDiff_[i][1] = 0.0;
   }
-
-  typeDef_[0]  = "stat";
-  runSpecs_[0] = runtype; // For apbs
-  runSpecs_[1] = runname; // for apbs
   
-  potOutfnames_.resize(3);
-  potOutfnames_[0] = "";
-  potOutfnames_[1] = "";
-  potOutfnames_[2] = "";
+  cout << "Wroking here 4" << endl;
+  // Electrostatics part
+  potOutfnames_.resize(2+grid2Dax.size()); //
+  cout << "Wroking here 5" << endl;
+  axis_.resize(grid2Dax.size());  //
+  cout << "Wroking here 6" << endl;
+  potOutfnames_[0] = dxnam;  //
+  potOutfnames_[1] = map3d;  //
   
+  cout << "Wroking here 7" << endl;
+  for (int i = 0; i<grid2Dax.size(); i++) 
+  {
+    potOutfnames_[2+i] = grid2Dfn[i]; //
+    axis_[i] = grid2Dax[i];  //
+  }
+  
+  // Mutibody expansion part
   mbdfile_loc_[0] = "";
   mbdfile_loc_[1] = "";
-  
-  units_ = "kT";
-
-  // Initializing file locs to defaults
-  // pqr fname
-  vector<vector<string> > molfn = {{"../Config/test1.pqr",
-                                    "../Config/test1.xyz"}};
 
   for (int i=0; i<nType_; i++)
   {
-    pqr_names_[i] = molfn[i][0];
+    pqr_names_[i] = "";
     xyz_names_[i].resize(1);
     isTransRot_[i].resize(1);
-    xyz_names_[i][0] = molfn[i][1];
+    xyz_names_[i][0] = "";
     isTransRot_[i][0] = false;
   }  
-  confiles_.resize(0);
+
+  cout << "End" << endl;
 }
 
 

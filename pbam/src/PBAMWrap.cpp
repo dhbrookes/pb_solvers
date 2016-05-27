@@ -67,24 +67,6 @@ struct PBAMInput getPBAMParams()
   return pbamI;
 }
 
-//
-//  for testing only!
-//
-// struct GeometricFlowOutput runGeometricFlowWrap
-//    ( struct GeometricFlowInput geoflowParams )
-// {
-
-//    //cout << "boo from GeometricFlowWrap!" << endl; 
-
-//    GeometricFlow GF( geoflowParams );
-   
-//    AtomList emptyAtomList; // need to fill this with atoms
-//    AtomList AL( "imidazole.xyzr", GF.getRadExp(), GF.getFFModel() ); 
-
-//    struct GeometricFlowOutput GFO = GF.run( AL ); //emptyAtomList );
-   
-//    return GFO;
-// }
 
 //  print the PBAM flow structure for debugging
 void printPBAMStruct( struct PBAMInput pbamIn )
@@ -96,6 +78,12 @@ void printPBAMStruct( struct PBAMInput pbamIn )
          pbamIn.salt_,
          pbamIn.runType_,
          pbamIn.runName_);
+   printf("Here's some more: %d, %lf, %d, %s, %d\n",
+         pbamIn.randOrient_,
+         pbamIn.boxLen_,
+         pbamIn.pbcType_,
+         pbamIn.map3D_,
+         pbamIn.grid2Dct_);
 }
 
 //  to call from APBS
@@ -124,19 +112,6 @@ struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamParams,
     }
     mols.push_back(Molecule("stat", chg, cgpos, vdw, mol, 0));
   }
-
-  // cout << "done with atom list" << endl;
-  // for (unsigned int mol=0; mol < nmls; mol++) 
-  // {  
-  //   cout << "This is molecule " << mol << endl;
-  //   for (unsigned int i=0; i < mols[mol].get_m(); i++) 
-  //   { 
-  //     cout << "This is atom " << i << " pos: ";
-  //     cout << mols[mol].get_posj_realspace(i).x() << ", ";
-  //     cout << mols[mol].get_posj_realspace(i).y() << ", ";
-  //     cout << mols[mol].get_posj_realspace(i).z() << endl;
-  //   }
-  // }  
   
   //  create the PBAM object
   PBAM pbam( pbamParams, mols );
