@@ -74,7 +74,7 @@ TEST_F(ReadUtilUTest, readPQRNoCen)
   PQRFile PQRtest(PQR, 10);
   vector<Pt> my_atoms = PQRtest.get_atom_pts();
   
-  ASSERT_EQ(false, PQRtest.get_cg());
+  ASSERT_FALSE( PQRtest.get_cg());
   ASSERT_EQ(   4, PQRtest.get_M());
   ASSERT_EQ( PQR, PQRtest.get_path());
   ASSERT_EQ( my_atoms[0].x(), 0);

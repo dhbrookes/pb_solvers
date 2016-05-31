@@ -50,7 +50,7 @@ protected:
   int ntraj_;
   
   // for electrostatics runtype
-  vector< string> potOutfnames_; // Vector of outfiles, [0] = dx, rest = grid
+  vector< string> potOutfnames_; // Electro outfls, [0]=dx, [1]=3d, rest=grid
   
   int gridPts_; // number of voxels to compute for each dim
   int gridCt_; // number of grid files to write
@@ -59,10 +59,11 @@ protected:
   
   // for dynamics runs
   int numTerm_;  //number of termination conditions
-  vector<string> termtype_; // type of each term ('time', 'x', 'y', 'z', 'r' or 'contact')
+  vector<string> termtype_; // type of each term ('time', 'x', 'y', 'z', 'r' 
+                            // or 'contact')
   vector<vector<int> > termmols_; // vector of molecule ids
   vector<double> termvals_; // value for each termination condition
-  vector<string> confiles_;  // contact files for contact termination conditions
+  vector<string> confiles_;  // contact files for contact termx conditions
   vector<double> conpads_;  // pads for contact termination conditions
   bool andCombine_;  //if true, term conds will combine w 'and', otherwise 'or'
   
@@ -173,6 +174,17 @@ protected:
   
 public:
   Setup(string infile);
+
+  // Not pretty, but getting necessary inputs from APBS
+  Setup(double temp, double salt_conc, double int_diel, double solv_diel, 
+        int nmol, string runtype, string runname, bool randorient, double boxl,
+        int pbc_type, int gridpts, string map3d, int g2dct, 
+        vector<string> grid2Dfn, vector <string> grid2Dax, 
+        vector<double> grid2Dloc, string dxnam, int ntraj, bool termcomb, 
+        vector<string> difftype, vector<vector<double> > diffcon,
+        vector<string> termcond, vector<double> termval, 
+        vector<vector <int > > termnu, vector<string> confil,
+        vector<double> conpad, vector<vector <string> > xyzfil);
   
   string getRunType()              { return runSpecs_[0]; }
   string getRunName()              { return runSpecs_[1]; }

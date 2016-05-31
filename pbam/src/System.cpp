@@ -170,8 +170,7 @@ System::System(Setup setup, double cutoff)
   Molecule mol;
   vector<int> keys(2);
   for (i = 0; i < setup.get_ntype(); i++)
-  {
-    
+  { 
     PQRFile pqrI (setup.getTypeNPQR(i));
     TransRotFile transrot;
     XYZFile xyzI;
@@ -226,7 +225,6 @@ System::System(Setup setup, double cutoff)
                        repos_charges, pqrI.get_radii(),
                        xyzI.get_pts()[j], i, j,
                        setup.getDrot(i), setup.getDtr(i));
-        
       }
       else
       {
