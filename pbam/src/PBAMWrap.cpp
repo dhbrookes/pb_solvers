@@ -79,19 +79,31 @@ void printPBAMStruct( struct PBAMInput pbamIn )
          pbamIn.salt_,
          pbamIn.runType_,
          pbamIn.runName_);
-  printf("Here's some more: %d, %lf, %d, %s, %d\t pts: %d\n termcb %s\n",
+  printf("Here's some more: %d, %lf, %d, %s, %d\t pts: %d, ntrj: \
+%d, termcb: %s\n",
          pbamIn.randOrient_,
          pbamIn.boxLen_,
          pbamIn.pbcType_,
          pbamIn.map3D_,
          pbamIn.grid2Dct_,
          pbamIn.gridPts_,
+         pbamIn.ntraj_,
          pbamIn.termCombine_);
 
   if(strncmp(pbamIn.runType_, "dynamics", 8)== 0)
+  {
     for (int i=0; i<pbamIn.nmol_; i++)
-      printf("This is mol %d movetype: %s, diff: %lf, rot: %lf\n", 
-        i, pbamIn.moveType_[i], pbamIn.transDiff_[i], pbamIn.rotDiff_[i]);  
+    {
+      printf("This is mol %d movetype: %s, diff: %7.4lf, rot: %7.4lf\n", 
+        i, pbamIn.moveType_[i], pbamIn.transDiff_[i], pbamIn.rotDiff_[i]); 
+      for (int j=0; j < pbamIn.ntraj_; j++)
+        printf("This is traj %d, xyzfname: %s\n", j, pbamIn.xyzfil_[i][j]);
+    }
+
+    for (int i=0; i<pbamIn.termct_; i++)
+      printf("This is termination cond %d: %s, val is %7.3f\n", i, 
+              pbamIn.termnam_[i], pbamIn.termval_[i]);
+  }
   printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 }
 
@@ -101,6 +113,7 @@ struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamParams,
                                    Valist* molecules[], int nmls ) 
 {
    // convert Valist to a vector of Molecules
+  printf("Inside pbamrun\n");
   vector<Molecule> mols;
   for (unsigned int mol=0; mol < nmls; mol++) 
   {  
@@ -123,6 +136,9 @@ struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamParams,
       difftype = "stat";
       dtr = 0.0;
       drot = 0.0;
+      pbamParams.ntraj_ = 0;
+      pbamParams.termct_ = 0;
+      pbamParams.contct_ = 0;
     }
 
     for (unsigned int i=0; i < natoms; i++) 

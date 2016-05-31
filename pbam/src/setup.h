@@ -63,7 +63,7 @@ protected:
                             // or 'contact')
   vector<vector<int> > termmols_; // vector of molecule ids
   vector<double> termvals_; // value for each termination condition
-  vector<string> confiles_;  // contact files for contact termination conditions
+  vector<string> confiles_;  // contact files for contact termx conditions
   vector<double> conpads_;  // pads for contact termination conditions
   bool andCombine_;  //if true, term conds will combine w 'and', otherwise 'or'
   
@@ -180,8 +180,11 @@ public:
         int nmol, string runtype, string runname, bool randorient, double boxl,
         int pbc_type, int gridpts, string map3d, int g2dct, 
         vector<string> grid2Dfn, vector <string> grid2Dax, 
-        vector<double> grid2Dloc, string dxnam, bool termcomb, 
-        vector<string> difftype, vector<vector<double> > diffcon);
+        vector<double> grid2Dloc, string dxnam, int ntraj, bool termcomb, 
+        vector<string> difftype, vector<vector<double> > diffcon,
+        vector<string> termcond, vector<double> termval, 
+        vector<vector <int > > termnu, vector<string> confil,
+        vector<double> conpad, vector<vector <string> > xyzfil);
   
   string getRunType()              { return runSpecs_[0]; }
   string getRunName()              { return runSpecs_[1]; }

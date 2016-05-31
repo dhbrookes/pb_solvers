@@ -21,11 +21,20 @@ PBAM::PBAM() : PBAMInput()
   vector<string> difftype = {"stat"};
   vector<vector <double > > diffcon(1, vector<double> (2));
 
+  vector<string> termtype = {"time"};
+  vector<double> termval = {0.0};
+  vector<vector<int > > termnu = {{0}};
+  vector<string> confil = {""};
+  vector<double> conpad = {0.0};
+  vector<vector<string > > xyzf = {{""}};
+
+
   diffcon[0][0] = 0.0; diffcon[0][1] = 0.0;
   setp_ = make_shared<Setup>( 300.0, 0.05, 2., 80., 1, "electrostatics", "tst",
                              false, 100, 0, 15, "tst.map", 1, grid2d, 
-                             gridax, gridloc, "tst.dx", false, difftype,
-                             diffcon);
+                             gridax, gridloc, "tst.dx", 1, false, difftype,
+                             diffcon, termtype, termval, termnu, confil, 
+                             conpad, xyzf);
   syst_ = make_shared<System> ();
   consts_ = make_shared<Constants> ();
 }
@@ -53,7 +62,7 @@ poles_(5),
 solveTol_(1e-4)
 {
   // Electrostatics
-  int i;
+  int i, j;
   vector<string> grid2Dname(pbami.grid2Dct_);
   vector<string> grid2Dax(pbami.grid2Dct_);
   vector<double> grid2Dloc(pbami.grid2Dct_);
@@ -67,17 +76,47 @@ solveTol_(1e-4)
   
   // Dynamics
   bool termcomb = true;
-  if (pbami.termCombine_ == "or")  termcomb = false;
+  if (string(pbami.termCombine_) == "or")  termcomb = false;
 
   vector<string> difftype(pbami.nmol_);
   vector<vector<double > > diffcon(pbami.nmol_, vector<double> (2));
+  vector<string> termcond(pbami.termct_);
+  vector<double> termval(pbami.termct_);
+  vector<vector<int > > termnu(pbami.termct_, vector<int> (1));
+  vector<double> conpad;
+  vector<string> confil(pbami.contct_);
+  vector<vector <string > > xyzf(pbami.nmol_);
+
   if (string(pbami.runType_) == "dynamics")
+  {
     for (i=0; i<pbami.nmol_; i++)
     {
       difftype[i] = string(pbami.moveType_[i]);
       diffcon[i][0] = pbami.transDiff_[i];
       diffcon[i][1] = pbami.rotDiff_[i];
+      xyzf[i] = vector<string> (pbami.ntraj_);
+
+      for (j=0; j<pbami.ntraj_; j++)
+      {
+        xyzf[i][j] = string(pbami.xyzfil_[i][j]);
+      }
     }
+
+    for (i=0; i<pbami.termct_; i++)
+    {
+      termcond[i] = string(pbami.termnam_[i]);
+      termval[i] = pbami.termval_[i];
+      termnu[i][0] = pbami.termnu_[i][0];
+
+      if (termcond[i] == "contact")
+        conpad.push_back(termval[i]);
+    }
+
+    for (i=0; i<pbami.contct_; i++)
+    {
+      confil[i] = string(pbami.confil_[i]);
+    }
+  }
 
   setp_ = make_shared<Setup>(pbami.temp_, pbami.salt_, pbami.idiel_,
                              pbami.sdiel_, pbami.nmol_, string(pbami.runType_),
@@ -85,10 +124,11 @@ solveTol_(1e-4)
                              pbami.boxLen_, pbami.pbcType_, pbami.gridPts_,
                              string(pbami.map3D_), pbami.grid2Dct_,
                              grid2Dname, grid2Dax, grid2Dloc,
-                             string(pbami.dxname_), termcomb, difftype,
-                             diffcon);
+                             string(pbami.dxname_), pbami.ntraj_, termcomb, 
+                             difftype, diffcon, termcond, termval, termnu,
+                             confil, conpad, xyzf);
 
-
+  check_setup();
   syst_ = make_shared<System> (mls); // TODO: add in boxl and cutoff
   consts_ = make_shared<Constants> (*setp_);
   init_write_system();
@@ -192,9 +232,9 @@ void PBAM::run_dynamics()
   for (i = 0; i < setp_->get_numterms(); i++)
   {
     string type = setp_->get_termtype(i);
-    string bdtype = type.substr(1,2);
+    string bdtype = type.substr(1,1);
     double val = setp_->get_termval(i);
-    BoundaryType btype = ( bdtype == "<=" ) ? LEQ : GEQ;
+    BoundaryType btype = ( bdtype == "<" ) ? LEQ : GEQ;
     
     if ( type == "contact" )
     {

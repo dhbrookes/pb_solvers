@@ -88,32 +88,39 @@ Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel,
              int nmol, string runtype, string runname, bool randorient, 
              double boxl, int pbc_type, int gridpts, string map3d, int g2dct, 
              vector<string> grid2Dfn, vector <string> grid2Dax, 
-             vector <double> grid2Dloc, string dxnam, bool termcomb,
-             vector<string> difftype, vector<vector<double> > diffcon)
+             vector <double> grid2Dloc, string dxnam, int ntraj, bool termcomb,
+             vector<string> difftype, vector<vector<double> > diffcon,
+             vector<string> termcond, vector<double> termval, 
+             vector<vector <int > > termnu, vector<string> confil,
+             vector<double> conpad, vector<vector <string> > xyzfil)
 :
 ompThreads_( 1 ),
 saltConc_( salt_conc ), //
-nType_( nmol ),
+nType_( nmol ),  //
 PBCs_( pbc_type ),  //
 blen_( boxl ),   //
 maxtime_( 1000000 ),
-ntraj_( 1 ),
+ntraj_( ntraj ), //
 gridPts_( gridpts ), //
 gridCt_(g2dct), //
 idiel_( int_diel ),  //
 sdiel_( solv_diel ), //
 temp_( temp ),       //
 srand_( (unsigned)time(NULL) ),
-nTypenCount_(nmol),
+nTypenCount_(nmol), //
 typeDef_(nmol),
 typeDiff_(nmol),
 pqr_names_(nmol),
 xyz_names_(nmol),
 isTransRot_(nmol),
-runSpecs_(2),
+runSpecs_(2),  // 
 mbdfile_loc_(2),
-termvals_(2),
-termtype_(2),
+numTerm_(termcond.size()), // 
+termvals_(termcond.size()), //
+termmols_(termcond.size()), //
+termtype_(termcond.size()), //
+confiles_(confil.size()),  //
+conpads_(confil.size()),  //
 andCombine_(termcomb), //
 orientRand_(randorient) //
 {
@@ -122,18 +129,31 @@ orientRand_(randorient) //
   units_ = "kT";
 
   for (int i = 0; i<nType_; i++) nTypenCount_[i] = 1; //
-  
+
   // Dynamics part
   confiles_.resize(0);
   for (int i = 0; i<nType_; i++)
   {
     typeDef_[i] = difftype[i];
-    cout << "This is typeDef: " << i << " \t " << typeDef_[i] << endl;
     typeDiff_[i] = vector<double> (2);
     typeDiff_[i][0] = diffcon[i][0];
     typeDiff_[i][1] = diffcon[i][1];
   }
-  
+
+  for (int i = 0; i < numTerm_; i++)
+  {
+    termtype_[i] = termcond[i];
+    termmols_[i] = vector<int> (1);
+    termmols_[i][0] = termnu[i][0];
+    termvals_[i] = termval[i];
+  }
+
+  for (int i = 0; i < confiles_.size(); i++)
+  {
+    confiles_[i] = confil[i];
+    conpads_[i] = conpad[i];
+  }
+
   // Electrostatics part
   potOutfnames_.resize(2+g2dct); //
   axis_.resize(g2dct);  //
@@ -152,13 +172,15 @@ orientRand_(randorient) //
   mbdfile_loc_[0] = "";
   mbdfile_loc_[1] = "";
 
+  // Molecule part
   for (int i=0; i<nType_; i++)
   {
     pqr_names_[i] = "";
-    xyz_names_[i].resize(1);
+    xyz_names_[i].resize(ntraj);
     isTransRot_[i].resize(1);
-    xyz_names_[i][0] = "";
     isTransRot_[i][0] = false;
+
+    for (int j=0; j<ntraj; j++) xyz_names_[i][j] = xyzfil[i][j];
   }  
 }
 

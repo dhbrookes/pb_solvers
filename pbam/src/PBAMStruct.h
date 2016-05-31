@@ -1,9 +1,9 @@
 #ifndef __PBAMSTRUCT_H
 #define __PBAMSTRUCT_H
 
-#define CHR_MAX 8192
-#define FIL_MAX 20
-#define MOL_MAX 200
+#define CHR_MAX 1000
+#define FIL_MAX 15
+#define MOL_MAX 150
 
 //
 //  input
@@ -34,11 +34,23 @@ struct PBAMInput {
   char dxname_[CHR_MAX];
 
   // Dynamics
+  int ntraj_;
   char termCombine_[CHR_MAX];
 
   char moveType_[MOL_MAX][CHR_MAX];
   double transDiff_[MOL_MAX];
   double rotDiff_[MOL_MAX];
+
+  int termct_;
+  int contct_;
+
+  char termnam_[FIL_MAX][CHR_MAX];
+  int termnu_[FIL_MAX][1];
+  double termval_[FIL_MAX];
+  char confil_[FIL_MAX][CHR_MAX];
+
+  char xyzfil_[MOL_MAX][FIL_MAX][CHR_MAX];
+  int xyzct_[MOL_MAX];
 
 
 #ifdef __cplusplus
@@ -53,10 +65,14 @@ PBAMInput() :
   randOrient_(0),
   boxLen_(1.4e18),
   pbcType_(0),
+  gridPts_(15),
   map3D_("tst.map"),
   grid2Dct_(0),
-  termCombine_("or")
-	{}
+  ntraj_(1),
+  termCombine_("or"),
+  termct_(1),
+  contct_(0)
+	{ }
 #endif
 
 } ;
@@ -66,8 +82,8 @@ PBAMInput() :
 //
 struct PBAMOutput {
 
-  double energies_[500];
-  double forces_[500][3];
+  double energies_[MOL_MAX];
+  double forces_[MOL_MAX][3];
 
 #ifdef __cplusplus
   PBAMOutput() {}
