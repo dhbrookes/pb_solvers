@@ -28,40 +28,17 @@ include_directories("${source_dir}/include")
 
 file(GLOB SRCS *.cpp)
 
-include_directories("../pbsam")
+include_directories("../src")
 
 ADD_EXECUTABLE(pbsamtest 
-  ../pbsam/BesselCalc.cpp
-  ../pbsam/BesselCalc.h
-  ../pbsam/Constants.cpp
-  ../pbsam/Constants.h
-  ../pbsam/MyMatrix.h
-  ../pbsam/readutil.h
-  ../pbsam/ReExpCalc.cpp
-  ../pbsam/ReExpCalc.h
-  ../pbsam/setup.cpp
-  ../pbsam/setup.h
-  ../pbsam/SHCalc.cpp
-  ../pbsam/SHCalc.h
-  ../pbsam/Solver.cpp
-  ../pbsam/Solver.h
-  ../pbsam/System.cpp
-  ../pbsam/System.h
-  ../pbsam/util.h
-  BesselCalcTest.h
-  BesselCalcUnitTest.h
-  CMakeLists.txt
-  ConstantsTest.h
-  ConstantsUnitTest.h
-  MyMatrixUnitTest.h
-  SHCalcTest.h
-  SHCalcUnitTest.h
-  SystemUnitTest.h
+  ../src/BesselCalc.cpp
+  ../src/Constants.cpp
+  ../src/ReExpCalc.cpp
+  ../src/setup.cpp
+  ../src/SHCalc.cpp
+  ../src/Solver.cpp
+  ../src/System.cpp
   main.cpp
-  readutilUnitTest.h
-  setupUnitTest.h
-  tester.h
-  utilUnitTest.h
   )
 
 TARGET_LINK_LIBRARIES(pbsamtest

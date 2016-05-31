@@ -22,5 +22,5 @@ endif()
 
 enable_testing()
 
-add_subdirectory(pbsam)
-add_subdirectory(pbsam_test_code)
+add_subdirectory(src)
+add_subdirectory(unittest)
