@@ -89,7 +89,7 @@ protected:
    */
   void find_centers(vector<Pt> sp, vector<Pt> np,
                     double tol_sp, int n_trials,
-                    int max_trials);
+                    int max_trials, double beta);
   
   /*
    Perform a monte carlo search for the best center to encompass the 
@@ -98,6 +98,12 @@ protected:
   CGSphere find_best_center(vector<Pt> sp,vector<Pt> np,
                             vector<int> unbounded,
                             double tol_sp, int iter=1200, double beta=2.0);
+
+  /* Ensure that all the CG spheres are touching */
+  void check_connect();
+
+  /* For CG sphere i, find a vector of CG spheres it's in contact w */
+  vector <int> find_neighbors( int i);
   
 public:
   
@@ -112,7 +118,7 @@ public:
   
   Molecule(int type, int type_idx, string movetype, vector<double> qs,
              vector<Pt> pos, vector<double> vdwr, vector<Pt> msms_sp,
-             vector<Pt> msms_np, double tol_sp, int n_trials=1200,
+             vector<Pt> msms_np, double tol_sp, int n_trials=10,
              int max_trials=40, double beta=2.0, double drot=0,
              double dtrans=0);
   
@@ -123,22 +129,22 @@ public:
   void rotate(Quat qrot);
   void rotate(MyMatrix<double> rotmat);
   
-  string get_move_type() const         { return moveType_; }
-  int get_type() const                 { return type_; }
-  int get_type_idx() const             { return typeIdx_; }
-  int get_nc() const                   { return Nc_; }
-  int get_ns() const                   { return Ns_; }
-  int get_nc_k(int k) const            { return (int) cgCharges_[k].size(); }
-  int get_ch_k_alpha(int k, int alpha) { return cgCharges_[k][alpha]; }
-  double get_drot() const              { return drot_; }
-  double get_dtrans() const            { return dtrans_; }
-  Pt get_posj(int j) const             { return pos_[j]; }
-  Pt get_posj_realspace(int j)         { return pos_[j] + centers_[chToCG_[j]];}
-  Pt get_centerk(int k) const          { return centers_[k]; }
-  const double get_qj(int j) const     { return qs_[j]; }
-  const double get_radj(int j) const   { return vdwr_[j]; }
-  const double get_ak(int k) const     { return as_[k]; }
-  const int get_cg_of_ch(int j)        { return chToCG_[j]; }
+  string get_move_type() const        { return moveType_; }
+  int get_type() const                { return type_; }
+  int get_type_idx() const            { return typeIdx_; }
+  int get_nc() const                  { return Nc_; }
+  int get_ns() const                  { return Ns_; }
+  int get_nc_k(int k) const           { return (int) cgCharges_[k].size(); }
+  int get_ch_k_alpha(int k, int alpha){ return cgCharges_[k][alpha]; }
+  double get_drot() const             { return drot_; }
+  double get_dtrans() const           { return dtrans_; }
+  Pt get_posj(int j) const            { return pos_[j]; }
+  Pt get_posj_realspace(int j)        { return pos_[j] + centers_[chToCG_[j]];}
+  Pt get_centerk(int k) const         { return centers_[k]; }
+  const double get_qj(int j) const    { return qs_[j]; }
+  const double get_radj(int j) const  { return vdwr_[j]; }
+  const double get_ak(int k) const    { return as_[k]; }
+  const int get_cg_of_ch(int j)       { return chToCG_[j]; }
   
   /* Choose a random orientation for a Pt vector  */
   Pt random_pt();
@@ -196,10 +202,10 @@ public:
   const double get_lambda() const          {return lambda_;}
   Molecule get_molecule(int i) const       {return molecules_[i];}
   Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
-  Pt get_centerik(int i, int k) const    {return molecules_[i].get_centerk(k);}
-  const string get_typei(int i) const    {return molecules_[i].get_move_type();}
-  
-  const double get_radij(int i, int j) const {return molecules_[i].get_radj(j);}
+  Pt get_centerik(int i, int k) const   {return molecules_[i].get_centerk(k);}
+  const string get_typei(int i) const   {return molecules_[i].get_move_type();}
+  const double get_radij(int i, int j) 
+                                     const {return molecules_[i].get_radj(j);}
   Pt get_posijreal(int i, int j) {return molecules_[i].get_posj_realspace(j);}
   
   const int get_mol_global_idx(int type, int ty_idx)

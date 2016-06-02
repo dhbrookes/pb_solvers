@@ -34,7 +34,20 @@ Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
 :type_(type), typeIdx_(type_idx), moveType_(movetype), qs_(qs), pos_(pos),
 vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
 {
-  find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials);
+  find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
+  check_connect();
+
+  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].x());
+  cout << endl; cout << endl;
+
+  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].y());
+  cout << endl; cout << endl;
+  
+  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].z());
+  cout << endl; cout << endl;
+
+  for (int i=0; i<Ns_; i++) printf("%10.7f,", as_[i]);
+  cout << endl; cout << endl;
 }
 
 Molecule::Molecule(const Molecule& mol)
@@ -56,8 +69,7 @@ Pt Molecule::random_pt()
 
 double Molecule::random_norm()
 {
-  
-  double v1, v2, rsq;
+  double v1, v2, rsq = 0.0;
   do
   {
     v1 = 2.0 * drand48(  ) - 1.0;
@@ -65,7 +77,7 @@ double Molecule::random_norm()
     rsq = v1*v1 + v2*v2;
   } while ( rsq >= 1.0 || rsq == 0.0 );
   
-  double fac = sqrt( -2.0*log(rsq )/rsq);
+  double fac = sqrt( -2.0*log(rsq)/rsq);
   return fac*v2;
 }
 
@@ -125,27 +137,27 @@ void Molecule::rotate(MyMatrix<double> rotmat)
 
 void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
                               double tol_sp, int n_trials,
-                              int max_trials)
+                              int max_trials, double beta)
 {
   vector<int> unbound (Nc_);
-  
+  int j = -1; int ct = 0;
   for (int i = 0; i < Nc_; i++) unbound[i] = i;
-  int j = -1;
-  int ct = 0;
-  
+
   while(unbound.size() != 0 && ct < Nc_)
   {
-    j++;
+    int n_max = 0; int m=-1; j++;
+    cout << "# spheres to be CGed: " << unbound.size() << endl;
     centers_.resize(j+1);
     as_.resize(j+1);
     cgCharges_.resize(j+1);
-    int n_max = 0;
     
-    int m=-1;
     while (m < n_trials || (m >= n_trials && n_max==0 && m < max_trials))
     {
       m++;
-      CGSphere best = find_best_center(sp, np, unbound, tol_sp);
+      CGSphere best = find_best_center(sp, np, unbound, tol_sp, beta);
+      // cout << "Trial no: " << m << " and bd points: " << best.get_n() 
+      //      << " and center: " << best.get_center().x() << ", " 
+      //      << best.get_center().y() << ", " << best.get_center().z() << endl;
       if (best.get_n() > n_max)
       {
         centers_[j] = best.get_center();
@@ -170,17 +182,16 @@ void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
     
     // remove bound charges from list of unbound charges:
     for (int l = 0; l < cgCharges_[j].size(); l++)
-    {
       for (int f = 0; f < unbound.size(); f++)
-      {
         if (unbound[f] == cgCharges_[j][l])
         {
           unbound.erase(unbound.begin() + f);
         }
-      }
-    }
     ct++;
   }
+
+  Ns_ = centers_.size();
+  cout << "End of find_centers" << endl;
 }
 
 CGSphere Molecule::find_best_center(vector<Pt> sp,vector<Pt> np,
@@ -193,8 +204,7 @@ CGSphere Molecule::find_best_center(vector<Pt> sp,vector<Pt> np,
   int best_N = 0;
   vector<int> ch;  // encompassed charges of best sphere
   
-  best_cen = pos_[unbound[(int) floor(drand48()*sz)]];
-  
+  best_cen = pos_[unbound[(int) floor(drand48()*sz)]];  
   for (int m = 0; m < iter; m++)
   {
     Pt tri_cen;
@@ -238,7 +248,7 @@ CGSphere Molecule::find_best_center(vector<Pt> sp,vector<Pt> np,
     {
       best_cen = tri_cen;
       best_N = tri_N;
-      best_a = tri_a;  // should this be sqrt() ??
+      best_a = tri_a; 
     }
     
     if ((m+1) % 100 == 0) beta *= 1.1;
@@ -254,7 +264,51 @@ CGSphere Molecule::find_best_center(vector<Pt> sp,vector<Pt> np,
     }
   }
   
-  return CGSphere(best_cen, best_a, ch);
+  return CGSphere(best_cen, sqrt(best_a), ch);
+}
+
+void Molecule::check_connect()
+{
+  bool all_con = false;
+  int maxct = 20;
+  double increm_r = 0.5;
+  int i, ct = 0;
+
+  while (!all_con && ct < maxct)
+  {
+    all_con = true;
+    for ( i = 0; i < Ns_; i++ )
+    {
+      vector<int> neigh;
+      neigh = find_neighbors( i );
+      if (neigh.size() == 0 )
+      {
+        all_con = false;
+        cout << "Incrementing CG sphere " << i << " radius" << endl;
+        as_[i] += increm_r;
+      }
+    }
+    ct++;
+  }
+  if (ct == maxct) 
+    cout << "Warning: Spheres may not all be connected!" << endl;
+}
+
+vector<int> Molecule::find_neighbors( int i )
+{
+  int j;
+  double sum_rad2;
+  vector <int > neighs;
+  for ( j = 0; j < Ns_; j++ )
+  {
+    if ( i != j )
+    {
+      sum_rad2 = (as_[i] + as_[j]) * (as_[i] + as_[j]);
+      if ( (centers_[i]-centers_[j]).norm2() < sum_rad2)
+        neighs.push_back(j);
+    }
+  }
+  return neighs;
 }
 
 
@@ -381,9 +435,11 @@ const double System::calc_average_radius() const
   {
     total_sphere += get_Ns_i(i);
     for (int k = 0; k < get_Ns_i(i); k++)
+    {
       ave += get_aik(i, k);
+    }
   }
-  ave  =  ave / total_sphere;
+  ave  =  ave / (double) total_sphere;
   return ave;
 }
 //
@@ -452,9 +508,9 @@ void System::write_to_pqr(string outfile)
     for ( j = 0; j < get_Nc_i(i); j++)
     {
       sprintf(pqrlin,"%6d  C   CHG A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,i,
-              get_posijreal(i, j).x(),
-              get_posijreal(i, j).y(),
-              get_posijreal(i, j).z(),
+              get_posij(i, j).x(),
+              get_posij(i, j).y(),
+              get_posij(i, j).z(),
               get_qij(i, j), get_radij(i, j));
       pqr_out << "ATOM " << pqrlin << endl;
       ct++;

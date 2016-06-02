@@ -24,3 +24,5 @@ enable_testing()
 
 add_subdirectory(src)
 add_subdirectory(unittest)
+
+file(MAKE_DIRECTORY build/bin)

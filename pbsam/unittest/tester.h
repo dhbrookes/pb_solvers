@@ -14,6 +14,7 @@
 #include "BesselCalcTest.h"
 #include "ConstantsTest.h"
 #include "SHCalcTest.h"
+#include "SystemTest.h"
 
 /*
  Class for testing all Classes
@@ -22,8 +23,12 @@ class CTester
 {
 public:
 	
-	int unitTest(int argc, char * argv[])
-	{
+  int unitTest(int argc, char * argv[])
+  {
+    SystemTest SysT;
+    SysT.TestSystem();
+    cout << "Complete system test" << endl;
+
     BesselConstantsTest BCT;
     BCT.TestBesselConstants();
     cout << "Complete Bessel constant test" << endl;
@@ -48,8 +53,8 @@ public:
 //    ReR.runReExTest();
 //    cout << "Complete ReExpan test" << endl;
 		
-		SHCalcConstantsTest SHConT;
-		SHConT.TestSHCalcConstants();
+	SHCalcConstantsTest SHConT;
+	SHConT.TestSHCalcConstants();
     cout << "Complete SH test" << endl;
     
     SHCalcTest SHCalcT;

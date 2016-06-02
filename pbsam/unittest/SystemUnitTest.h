@@ -18,6 +18,7 @@ class CGSphereUTest : public ::testing::Test
   protected :
   virtual void SetUp() {}
   virtual void TearDown() {}
+
 };
 
 TEST_F(CGSphereUTest, checkUserSpecRadCent)
@@ -47,6 +48,16 @@ public :
 protected :
   virtual void SetUp() {}
   virtual void TearDown() {}
+
+  vector<double> cen_x = {12.1713353,  8.3634097,  6.4158811,  7.4766144,  9.4871234, 11.3504313, 14.7444661, 12.2051735,  9.1604839, 10.0228620, 12.4253020,  9.9452795,  4.1820000,  5.5360000,  5.9370000};
+  vector<double> cen_y = {4.7575147,  8.1637544, 12.8213053,  8.2385808,  5.7298088, 11.6602253, 10.8177846, 10.1585197,  1.2516617,  8.6378868,  4.1841707,  1.8740232, 11.6680000,  5.9180000,  3.8990000,};
+  vector<double> cen_z = {-0.5078420,  0.7497167, -1.3233676, -3.7726684,  1.7090811,  1.8321553,  4.3286237,  3.4271198,  2.1837470, -4.5740322, -4.1688846,  4.5244564,  0.4430000, -0.7120000,  1.2680000};
+  vector<double> cen_r = {4.6373202,  5.0432774,  4.2604095,  4.6023886,  5.2796013,  3.6490073,  2.7461362,  3.8797867,  4.2381621,  3.9138282,  3.7464659,  3.5894635,  1.4590000,  1.6612000,  1.4870000,};
+
+  vector<double> brs_x = {};
+  vector<double> brs_y = {};
+  vector<double> brs_z = {};
+  vector<double> brs_r = {};
 };
 
 
@@ -95,53 +106,43 @@ TEST_F(MoleculeUTest, checkUserSpecCG)
   ASSERT_EQ(10.1, molNew.get_posj_realspace(1).z());
 }
 
-
-
 TEST_F(MoleculeUTest, checkCreateCen)
 {
+  srand(1);
+  PQRFile pqr(test_dir_loc + "test.pqr");
+  MSMSFile surf_file (test_dir_loc + "test.vert");
+  vector<Molecule> mols(1);
+  mols[0] = Molecule( 0, 0, "stat", pqr.get_charges(),
+                      pqr.get_atom_pts(), pqr.get_radii(),
+                      surf_file.get_sp(), surf_file.get_np(), 2.5);
 
-  vector<Pt> pos(1);
-  int M = 2; vector<double> charges(M); vector<double> vdW(M);
-  vector<Pt> posCharges(M);
-  pos[0] = Pt(-10.0,23.4,-8.7); 
-  charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos[0] + Pt(1.0, 0.0, 0.0);
-  charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos[0] + Pt(0.0, 1.0, 0.0);
-  
-  // Molecule molNew( 0, 0, "rot", charges, posCharges, vdW, 0.24, 0);
-  
-  // ASSERT_EQ(    2, molNew.get_nc());
-  // ASSERT_EQ("rot", molNew.get_move_type());
-  // ASSERT_EQ( 0.24, molNew.get_drot());
-  // ASSERT_EQ( 0.00, molNew.get_dtrans());
-  // // EXPECT_NEAR( 7.0271067811865, molNew.get_a(), preclim);
-  
-  // // ASSERT_EQ( -9.5, molNew.get_center().x());
-  // // ASSERT_EQ( 23.9, molNew.get_center().y());
-  // // ASSERT_EQ( -8.7, molNew.get_center().z());
+  for (int i=0; i<mols[0].get_ns(); i++)
+  {
+    EXPECT_NEAR( cen_x[i], mols[0].get_centerk(i).x(), preclim);
+    EXPECT_NEAR( cen_y[i], mols[0].get_centerk(i).y(), preclim);
+    EXPECT_NEAR( cen_z[i], mols[0].get_centerk(i).z(), preclim);
+    EXPECT_NEAR( cen_r[i], mols[0].get_ak(i), preclim);
+  }
+}
 
-  // cout << "This is my CG centers " << endl;
-  // for (int i=0; i<molNew.get_ns(); i++)
-  // {
-  //   cout << "CG " << i << " pos: " << molNew.get_centerk(i).x();
-  //   cout << ", " << molNew.get_centerk(i).y();
-  //   cout << ", " << molNew.get_centerk(i).z() << endl;
-  // }
-  
-  // ASSERT_EQ( 0.5, molNew.get_posj(0).x());
-  // ASSERT_EQ(-0.5, molNew.get_posj(0).y());
-  // ASSERT_EQ( 0.0, molNew.get_posj(0).z());
-  
-  // ASSERT_EQ(-0.5, molNew.get_posj(1).x());
-  // ASSERT_EQ( 0.5, molNew.get_posj(1).y());
-  // ASSERT_EQ( 0.0, molNew.get_posj(1).z());
-  
-  // ASSERT_EQ( -9.0, molNew.get_posj_realspace(0).x());
-  // ASSERT_EQ( 23.4, molNew.get_posj_realspace(0).y());
-  // ASSERT_EQ( -8.7, molNew.get_posj_realspace(0).z());
-  
-  // ASSERT_EQ(-10.0, molNew.get_posj_realspace(1).x());
-  // ASSERT_EQ( 24.4, molNew.get_posj_realspace(1).y());
-  // ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
+TEST_F(MoleculeUTest, checkCreateCen1BRS)
+{
+  srand(1);
+  PQRFile pqr(test_dir_loc + "test_1BRS.pqr");
+  MSMSFile surf_file (test_dir_loc + "test_1BRS.vert");
+  vector<Molecule> mols(1);
+  mols[0] = Molecule( 0, 0, "stat", pqr.get_charges(),
+                      pqr.get_atom_pts(), pqr.get_radii(),
+                      surf_file.get_sp(), surf_file.get_np(), 3.5);
+
+  EXPECT_NEAR( 2, 2, preclim);
+  for (int i=0; i<mols[0].get_ns(); i++)
+  {
+    // EXPECT_NEAR( brs_x[i], mols[0].get_centerk(i).x(), preclim);
+    // EXPECT_NEAR( brs_y[i], mols[0].get_centerk(i).y(), preclim);
+    // EXPECT_NEAR( brs_z[i], mols[0].get_centerk(i).z(), preclim);
+    // EXPECT_NEAR( brs_r[i], mols[0].get_ak(i), preclim);
+  }
 }
 
 /*

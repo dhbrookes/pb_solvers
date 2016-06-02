@@ -225,14 +225,6 @@ public:
       linestream >> mol >> rot1 >> rot2 >> rot3 >> tr;
       
       row = i % 3;
-//      if (row == 0)
-//      {
-//        rm = MyMatrix<double>(3, 3, 0.0);
-//        trans = Pt();
-//        mols_.push_back(mol);
-//        rotMats_.push_back(rm);
-//        transVecs_.push_back(trans);
-//      }
       
       rotMats_[mol-1].set_val(row, 0, rot1);
       rotMats_[mol-1].set_val(row, 1, rot2);
@@ -313,7 +305,7 @@ protected:
   
 public:
   
-  PQRFile(string path, int approx_size=1000)
+  PQRFile(string path, int approx_size=5000)
   :path_(path), centerGeo_(0.0, 0.0, 0.0)
   {
     charges_.reserve(approx_size);
