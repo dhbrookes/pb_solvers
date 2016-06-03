@@ -253,31 +253,6 @@ TEST_F(ReadUtilUTest, readPQRCen)
   ASSERT_EQ(1403, PQRtest.get_Nc());
   ASSERT_EQ(  47, PQRtest.get_Ns());
   ASSERT_EQ( PQR, PQRtest.get_path());
-
-    
-  for (int i=0; i <  PQRtest.get_Ns(); i+=5)
-  {
-    cout << "," << setprecision(9) << PQRtest.get_cg_radii()[i];
-  }
-  cout << endl; cout << endl;
-  
-  for (int i=0; i <  PQRtest.get_Ns(); i+=5)
-  {
-    cout << "," << setprecision(9) << PQRtest.get_cg_centers()[i].x();
-  }
-  cout << endl; cout << endl;
-  
-  for (int i=0; i <  PQRtest.get_Ns(); i+=5)
-  {
-    cout << "," << setprecision(9) << PQRtest.get_cg_centers()[i].y();
-  }
-  cout << endl; cout << endl;
-  
-  for (int i=0; i <  PQRtest.get_Ns(); i+=5)
-  {
-    cout << "," << setprecision(9) << PQRtest.get_cg_centers()[i].z();
-  }
-  cout << endl; cout << endl;
   
   ct = 0;
   for (int i=0; i < PQRtest.get_Nc(); i+=100)
@@ -289,10 +264,7 @@ TEST_F(ReadUtilUTest, readPQRCen)
     EXPECT_NEAR( at_r[ct], PQRtest.get_radii()[i], preclim);
     ct++;
   }
-
 }
-
-
 
 
 TEST_F(ReadUtilUTest, checkXYZExceptions)
