@@ -70,6 +70,7 @@ protected:
   vector<double>      qs_;  // magnitude of each charge in the molecule
   vector<Pt>          pos_;  // position of each charge in the molecule
   vector<double>      vdwr_; // van der waal radius of each chargeGoogle
+  Pt                  cog_; // Molecule center of geometry
   
   int                     Ns_;  // number of coarse grained spheres
   vector<Pt>              centers_; //coarse-grained sphere centers
@@ -124,8 +125,10 @@ public:
   void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
   
   void translate(Pt dr, double boxlen);
-  void rotate(Quat qrot);
+  void rotate(Quat qrot); // This will rotate with respect to origin!
   void rotate(MyMatrix<double> rotmat);
+  
+  void calc_cog();
   
   string get_move_type() const        { return moveType_; }
   int get_type() const                { return type_; }
@@ -139,6 +142,7 @@ public:
   Pt get_posj(int j) const            { return pos_[j]; }
   Pt get_posj_realspace(int j)        { return pos_[j] + centers_[chToCG_[j]];}
   Pt get_centerk(int k) const         { return centers_[k]; }
+  Pt get_cog() const                  { return cog_;}
   const double get_qj(int j) const    { return qs_[j]; }
   const double get_radj(int j) const  { return vdwr_[j]; }
   const double get_ak(int k) const    { return as_[k]; }
@@ -205,6 +209,8 @@ public:
   const double get_radij(int i, int j) 
                                      const {return molecules_[i].get_radj(j);}
   Pt get_posijreal(int i, int j) {return molecules_[i].get_posj_realspace(j);}
+  
+  Pt get_cogi(int i) const                {return molecules_[i].get_cog();}
   
   const int get_mol_global_idx(int type, int ty_idx)
   {

@@ -17,6 +17,7 @@ vdwr_(vdwr), centers_(cens), as_(as), drot_(drot), dtrans_(dtrans),
 Nc_((int) qs.size()), Ns_((int) cens.size()), cgCharges_((int) cens.size())
 {
   map_repos_charges();
+  calc_cog();
 }
 
 Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
@@ -30,6 +31,7 @@ vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
   find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
   check_connect();
   map_repos_charges();
+  calc_cog();
 
 //  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].x());
 //  cout << endl; cout << endl;
@@ -50,6 +52,7 @@ drot_(mol.drot_), dtrans_(mol.dtrans_), Nc_(mol.Nc_), qs_(mol.qs_),
 pos_(mol.pos_), vdwr_(mol.vdwr_), Ns_(mol.Ns_), centers_(mol.centers_),
 as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_)
 {
+  calc_cog();
 }
 
 
@@ -63,6 +66,13 @@ void Molecule::map_repos_charges()
     pos_[i] = pos_[i] - centers_[closest];  // reposition charge
     chToCG_[i] = closest;
   }
+}
+
+void Molecule::calc_cog()
+{
+  cog_ = Pt(0.0, 0.0, 0.0);
+  for (int i = 0; i < Nc_; i++)  cog_ = cog_ + get_posj_realspace(i);
+  cog_ = cog_ * (1.0/(double) Nc_);
 }
 
 Pt Molecule::random_pt()
@@ -107,14 +117,15 @@ int Molecule::find_closest_center(Pt pos)
 
 void Molecule::translate(Pt dr, double boxlen)
 {
+  Pt dv_cen  = cog_ + dr;
   for (int k = 0; k < Ns_; k++)
   {
     Pt dv  = centers_[k] + dr;
-    
-    centers_[k] = Pt(dv.x() - round(dv.x()/boxlen)*boxlen,
-                 dv.y() - round(dv.y()/boxlen)*boxlen,
-                 dv.z() - round(dv.z()/boxlen)*boxlen);
+    centers_[k] = Pt(dv.x() - round(dv_cen.x()/boxlen)*boxlen,
+                 dv.y() - round(dv_cen.y()/boxlen)*boxlen,
+                 dv.z() - round(dv_cen.z()/boxlen)*boxlen);
   }
+  calc_cog();
 }
 
 void Molecule::rotate(Quat qrot)
@@ -127,6 +138,8 @@ void Molecule::rotate(Quat qrot)
       pos_[cgCharges_[k][i]] = qrot.rotate_point(pos_[cgCharges_[k][i]]);
     }
   }
+  
+  calc_cog();
 }
 
 void Molecule::rotate(MyMatrix<double> rotmat)
@@ -139,6 +152,7 @@ void Molecule::rotate(MyMatrix<double> rotmat)
       pos_[cgCharges_[k][i]] = pos_[cgCharges_[k][i]].rotate(rotmat);
     }
   }
+  calc_cog();
 }
 
 void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
