@@ -11,6 +11,7 @@ To build this branch, follow the instructions below:
 ~~~
 mkdir build
 cd build
+mkdir bin
 cmake ..
 make
 ~~~

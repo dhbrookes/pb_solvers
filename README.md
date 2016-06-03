@@ -1,5 +1,9 @@
 ### General XCode set-up: ###
 
+#### Adding a new target ####
+1. Editor --> Add target
+2. OS X --> Application --> Command Line Tool 
+
 #### Steps ####
 1. Add path to user-made header files to Build Settings --> Search Paths --> User Header Search Paths for all Targets
 2. Set Apple LLVM Language Dialects
