@@ -203,14 +203,13 @@ public:
   const double get_time() const            {return t_;}
   const double get_lambda() const          {return lambda_;}
   Molecule get_molecule(int i) const       {return molecules_[i];}
+  Pt get_cogi(int i) const                {return molecules_[i].get_cog();}
   Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
   Pt get_centerik(int i, int k) const   {return molecules_[i].get_centerk(k);}
   const string get_typei(int i) const   {return molecules_[i].get_move_type();}
   const double get_radij(int i, int j) 
                                      const {return molecules_[i].get_radj(j);}
   Pt get_posijreal(int i, int j) {return molecules_[i].get_posj_realspace(j);}
-  
-  Pt get_cogi(int i) const                {return molecules_[i].get_cog();}
   
   const int get_mol_global_idx(int type, int ty_idx)
   {

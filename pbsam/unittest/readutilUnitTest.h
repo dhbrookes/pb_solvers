@@ -127,6 +127,55 @@ TEST_F(ReadUtilUTest, readContact)
 
 }
 
+
+// TransRot section
+TEST_F(ReadUtilUTest, checkTransRotExceptions)
+{
+  string path = test_dir_loc + "none.transrot";
+  try
+  {
+    PQRFile TRtest(path, 10);
+    FAIL();
+  }
+  catch( const CouldNotReadException& err )
+  {
+    // check exception
+    string error_exp = "Could not read: " + path;
+    EXPECT_EQ(string(err.what()), error_exp);
+  }
+}
+
+TEST_F(ReadUtilUTest, readTransRot)
+{
+  int M = 3;
+  string trrot = test_dir_loc + "test.transrot";
+  TransRotFile TRtest(trrot, M);
+  vector<double> trx  = { 0.0, 53.20500, -53.20500};
+  vector<double> tryy = { 0.0, 92.15376, 92.15376};
+  vector<double> trz  = { 0.0, 0.0, 0.0};
+  vector<vector<vector<double > > > rot = {
+      {{1, 0, 0},              {0, 1, 0},              {0, 0, 1}},
+      {{-0.5, -0.866025, 0.0}, { 0.866025, -0.5, 0.0}, {0, 0, 1}},
+      {{-0.5,  0.866025, 0.0}, {-0.866025, -0.5, 0.0}, {0, 0, 1}} };
+  
+  ASSERT_EQ( trrot, TRtest.get_path());
+  
+  for (int i = 0; i < M; i++)
+  {
+    EXPECT_NEAR(TRtest.get_trans(i).x(), trx[i], preclim);
+    EXPECT_NEAR(TRtest.get_trans(i).y(), tryy[i], preclim);
+    EXPECT_NEAR(TRtest.get_trans(i).z(), trz[i], preclim);
+    for (int j = 0; j < 3; j++)
+    {
+      for (int k = 0; k < 3; k++)
+      {
+        MyMatrix<double> tmp = TRtest.get_rotmat(i);
+        EXPECT_NEAR(tmp(j, k), rot[i][j][k], preclim);
+      }
+    }
+  }
+}
+
 // PQR section
 TEST_F(ReadUtilUTest, checkPQRExceptions)
 {

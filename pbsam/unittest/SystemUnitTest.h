@@ -169,19 +169,13 @@ TEST_F(MoleculeUTest, check1BRSCGtoAtMap)
 TEST_F(MoleculeUTest, translate)
 {
   int ct = 0;
-  vector<Molecule> mols;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   Molecule molNew( 0, 0, "stat", pqr.get_charges(),
                   pqr.get_atom_pts(), pqr.get_radii(),
                   pqr.get_cg_centers(), pqr.get_cg_radii());
   molNew.translate( Pt( 50.0, 50.0, 50.0), 1e48);
   
-  mols.push_back(molNew);
-  System sys(mols);
-  sys.write_to_pqr(test_dir_loc+"test_1BRS_trans.pqr");
-  
-  
-  for (int i=0; i<mols[0].get_nc(); i+=40)
+  for (int i=0; i<molNew.get_nc(); i+=40)
   {
     EXPECT_NEAR( trans_at_x[ct], molNew.get_posj_realspace(i).x(), preclim);
     EXPECT_NEAR( trans_at_y[ct], molNew.get_posj_realspace(i).y(), preclim);
@@ -190,7 +184,7 @@ TEST_F(MoleculeUTest, translate)
   }
   
   ct = 0;
-  for (int i=0; i<mols[0].get_ns(); i+=4)
+  for (int i=0; i<molNew.get_ns(); i+=4)
   {
     EXPECT_NEAR( trans_cg_x[ct], molNew.get_centerk(i).x(), preclim);
     EXPECT_NEAR( trans_cg_y[ct], molNew.get_centerk(i).y(), preclim);
@@ -203,19 +197,13 @@ TEST_F(MoleculeUTest, translate)
 TEST_F(MoleculeUTest, translatePBC)
 {
   int ct = 0;
-  vector<Molecule> mols;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   Molecule molNew( 0, 0, "stat", pqr.get_charges(),
                   pqr.get_atom_pts(), pqr.get_radii(),
                   pqr.get_cg_centers(), pqr.get_cg_radii());
   molNew.translate( Pt( 100.0, 100.0, 100.0), 90);
   
-  mols.push_back(molNew);
-  System sys(mols);
-  sys.write_to_pqr(test_dir_loc+"test_1BRS_trans_pbc.pqr");
-  
-  
-  for (int i=0; i<mols[0].get_nc(); i+=40)
+  for (int i=0; i<molNew.get_nc(); i+=40)
   {
     EXPECT_NEAR( trans_pbc_at_x[ct], molNew.get_posj_realspace(i).x(), preclim);
     EXPECT_NEAR( trans_pbc_at_y[ct], molNew.get_posj_realspace(i).y(), preclim);
@@ -224,7 +212,7 @@ TEST_F(MoleculeUTest, translatePBC)
   }
   
   ct = 0;
-  for (int i=0; i<mols[0].get_ns(); i+=4)
+  for (int i=0; i<molNew.get_ns(); i+=4)
   {
     EXPECT_NEAR( trans_pbc_cg_x[ct], molNew.get_centerk(i).x(), preclim);
     EXPECT_NEAR( trans_pbc_cg_y[ct], molNew.get_centerk(i).y(), preclim);
@@ -264,7 +252,6 @@ TEST_F(MoleculeUTest, rotateSimple)
 TEST_F(MoleculeUTest, rotate2)
 {
   int ct = 0;
-  vector<Molecule> mols;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   Molecule molNew( 0, 0, "stat", pqr.get_charges(),
                   pqr.get_atom_pts(), pqr.get_radii(),
@@ -298,6 +285,28 @@ protected :
   
   virtual void SetUp() {}
   virtual void TearDown() {}
+  
+  vector<double> sytran_at_x = {9.33366999,13.62767,5.76466999,10.07467,2.85466999,-5.47433001,-1.96733001,-1.79133001,-2.23433001,4.78766999,2.86766999,-6.70133001,-10.49333,-6.79333001,-12.34833,-8.09833001,-5.37633001,-6.33833001,-1.38633001,3.04266999,10.15967,8.72066999,9.94966999,0.00766999287,8.11366999,0.793669993,-3.50533001,-6.55033001,-0.696330007,-0.806330007,-4.14733001,5.01366999,-0.0523300071,6.10166999,11.52367,12.26667};
+  vector<double> sytran_at_y = {5.993134,2.507134,-4.921866,-10.738866,-7.977866,-9.068866,-8.605866,-10.039866,-1.637866,-7.564866,0.727133999,-0.752866001,-4.027866,-6.392866,2.521134,3.965134,2.807134,8.637134,6.141134,11.702134,5.635134,2.006134,-2.957866,-0.676866001,-10.594866,-9.382866,-8.039866,2.326134,4.432134,5.439134,9.767134,14.272134,13.427134,9.441134,5.204134,0.816133999};
+  vector<double> sytran_at_z = {8.73927798,2.43427798,-0.625722024,-5.10572202,-1.76072202,-1.90972202,-0.894722024,4.33127798,0.113277976,7.84027798,7.51527798,11.251278,14.541278,4.93227798,2.32927798,2.96927798,7.59927798,10.471278,7.90227798,8.65027798,0.842277976,-2.77772202,-4.15972202,-9.87672202,-12.166722,-14.373722,-5.48472202,-5.35672202,-7.54772202,-2.07072202,-3.76872202,-1.88872202,3.63627798,0.175277976,-2.76672202,-8.47472202};
+  vector<double> sytran_cg_x = {2.47366999,-3.90633001,1.48066999,-5.19833001,3.22666999,2.07566999,-9.84933001,-8.11133001,2.87466999,-5.41033001,-1.58133001,-11.15833};
+  vector<double> sytran_cg_y = {1.065134,-4.011866,-4.822866,2.394134,7.093134,-3.769866,5.332134,14.683134,-9.684866,8.818134,6.026134,7.486134};
+  vector<double> sytran_cg_z = {-0.588722024,12.066278,-6.69672202,-7.87872202,10.165278,7.05627798,8.28127798,1.58727798,-15.540722,6.01227798,12.511278,3.81427798};
+  
+  
+  vector<double> sytran1_at_x = {-60.66633,-56.37233,-64.23533,-59.92533,-67.14533,-75.47433,-71.96733,-71.79133,-72.23433,-65.21233,-67.13233,-76.70133,-80.49333,-76.79333,-82.34833,-78.09833,-75.37633,-76.33833,-71.38633,-66.95733,-59.84033,-61.27933,-60.05033,-69.99233,-61.88633,-69.20633,-73.50533,-76.55033,-70.69633,-70.80633,-74.14733,-64.98633,-70.05233,-63.89833,-58.47633,-57.73333};
+  vector<double> sytran1_at_y = {-64.006866,-67.492866,-74.921866,-80.738866,-77.977866,-79.068866,-78.605866,-80.039866,-71.637866,-77.564866,-69.272866,-70.752866,-74.027866,-76.392866,-67.478866,-66.034866,-67.192866,-61.362866,-63.858866,-58.297866,-64.364866,-67.993866,-72.957866,-70.676866,-80.594866,-79.382866,-78.039866,-67.673866,-65.567866,-64.560866,-60.232866,-55.727866,-56.572866,-60.558866,-64.795866,-69.183866};
+  vector<double> sytran1_at_z = {-61.260722,-67.565722,-70.625722,-75.105722,-71.760722,-71.909722,-70.894722,-65.668722,-69.886722,-62.159722,-62.484722,-58.748722,-55.458722,-65.067722,-67.670722,-67.030722,-62.400722,-59.528722,-62.097722,-61.349722,-69.157722,-72.777722,-74.159722,-79.876722,-82.166722,-84.373722,-75.484722,-75.356722,-77.547722,-72.070722,-73.768722,-71.888722,-66.363722,-69.824722,-72.766722,-78.474722};
+  vector<double> sytran1_cg_x = {-67.52633,-73.90633,-68.51933,-75.19833,-66.77333,-67.92433,-79.84933,-78.11133,-67.12533,-75.41033,-71.58133,-81.15833};
+  vector<double> sytran1_cg_y = {-68.934866,-74.011866,-74.822866,-67.605866,-62.906866,-73.769866,-64.667866,-55.316866,-79.684866,-61.181866,-63.973866,-62.513866};
+  vector<double> sytran1_cg_z = {-70.588722,-57.933722,-76.696722,-77.878722,-59.834722,-62.943722,-61.718722,-68.412722,-85.540722,-63.987722,-57.488722,-66.185722};
+  
+  vector<double> syrot_at_x = {79.33367,83.62767,75.76467,80.07467,72.85467,64.52567,68.03267,68.20867,67.76567,74.78767,72.86767,63.29867,59.50667,63.20667,57.65167,61.90167,64.62367,63.66167,68.61367,73.04267,80.15967,78.72067,79.94967,70.00767,78.11367,70.79367,66.49467,63.44967,69.30367,69.19367,65.85267,75.01367,69.94767,76.10167,81.52367,82.26667};
+  vector<double> syrot_at_y = {75.993134,72.507134,65.078134,59.261134,62.022134,60.931134,61.394134,59.960134,68.362134,62.435134,70.727134,69.247134,65.972134,63.607134,72.521134,73.965134,72.807134,78.637134,76.141134,81.702134,75.635134,72.006134,67.042134,69.323134,59.405134,60.617134,61.960134,72.326134,74.432134,75.439134,79.767134,84.272134,83.427134,79.441134,75.204134,70.816134};
+  vector<double> syrot_at_z = {78.739278,72.434278,69.374278,64.894278,68.239278,68.090278,69.105278,74.331278,70.113278,77.840278,77.515278,81.251278,84.541278,74.932278,72.329278,72.969278,77.599278,80.471278,77.902278,78.650278,70.842278,67.222278,65.840278,60.123278,57.833278,55.626278,64.515278,64.643278,62.452278,67.929278,66.231278,68.111278,73.636278,70.175278,67.233278,61.525278};
+  vector<double> syrot_cg_x = {72.47367,66.09367,71.48067,64.80167,73.22667,72.07567,60.15067,61.88867,72.87467,64.58967,68.41867,58.84167};
+  vector<double> syrot_cg_y = {71.065134,65.988134,65.177134,72.394134,77.093134,66.230134,75.332134,84.683134,60.315134,78.818134,76.026134,77.486134};
+  vector<double> syrot_cg_z = {69.411278,82.066278,63.303278,62.121278,80.165278,77.056278,78.281278,71.587278,54.459278,76.012278,82.511278,73.814278};
 };
 
 TEST_F(SystemUTest, checkOverlap)
@@ -358,7 +367,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
 TEST_F(SystemUTest, checkVals)
 {
   vector < Molecule > mol_;
-  int nMol = 3;
+  int nMol = 3; int ct = 0;
   double cutoff = 45.876;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(70.0,70.0,70.0), Pt(-70.0,-70.0,-70.0)};
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
@@ -372,9 +381,8 @@ TEST_F(SystemUTest, checkVals)
     mol_[molInd].translate(mol_[molInd].get_cog()*(-1)+pos[molInd], 1e48);
   }
   
-  // TODO
   System sys( mol_, cutoff );
-//  EXPECT_NEAR( 5.7666666667, sys.get_lambda(), preclim);
+  EXPECT_NEAR( 5.18149787, sys.get_lambda(), preclim);
   EXPECT_NEAR( cutoff/sys.get_cutoff(), 1.0, preclim);
 
   sys.set_time( 1.435);
@@ -383,31 +391,61 @@ TEST_F(SystemUTest, checkVals)
   EXPECT_EQ(sys.less_than_cutoff(Pt( 5.3, 0.34,  -2.13)), true);
   EXPECT_EQ(sys.less_than_cutoff(Pt(25.3,79.34, -12.13)), false);
 
-  sys.translate_mol(0, Pt(0.0, 0.0, -5.0));
+  sys.translate_mol(0, Pt(10.0, 3.7, -5.0));
+  for (int i=0; i<mol_[0].get_nc(); i+=40)
+  {
+    EXPECT_NEAR( sytran_at_x[ct], mol_[0].get_posj_realspace(i).x(), preclim);
+    EXPECT_NEAR( sytran_at_y[ct], mol_[0].get_posj_realspace(i).y(), preclim);
+    EXPECT_NEAR( sytran_at_z[ct], mol_[0].get_posj_realspace(i).z(), preclim);
+    ct++;
+  }
   
-//  EXPECT_NEAR(  0.0, sys.get_centeri(0).x(), preclim);
-//  EXPECT_NEAR(  0.0, sys.get_centeri(0).y(), preclim);
-//  EXPECT_NEAR(-10.0, sys.get_centeri(0).z(), preclim);
-//  
-//  sys.translate_mol(1, Pt(-10.0, -7.8, -25.0));
-//  
-//  EXPECT_NEAR(  0.0, sys.get_centeri(1).x(), preclim);
-//  EXPECT_NEAR(  0.0, sys.get_centeri(1).y(), preclim);
-//  EXPECT_NEAR(  0.0, sys.get_centeri(1).z(), preclim);
-//  
-//  sys.rotate_mol(1, Quat( M_PI/2, Pt(0.0, 0.0, 1.0)));
-//  
-//  ASSERT_EQ( 0.0, sys.get_centeri(1).x());
-//  ASSERT_EQ( 0.0, sys.get_centeri(1).y());
-//  ASSERT_EQ( 0.0, sys.get_centeri(1).z());
-//  
-//  EXPECT_NEAR( 0.0, sys.get_posij(1, 1).x(), preclim);
-//  EXPECT_NEAR( 1.0, sys.get_posij(1, 1).y(), preclim);
-//  EXPECT_NEAR( 0.0, sys.get_posij(1, 1).z(), preclim);
-//  
-//  EXPECT_NEAR( -1.0, sys.get_posij(1, 2).x(), preclim);
-//  EXPECT_NEAR(  0.0, sys.get_posij(1, 2).y(), preclim);
-//  EXPECT_NEAR(  0.0, sys.get_posij(1, 2).z(), preclim);
+  ct = 0;
+  for (int i=0; i<mol_[0].get_ns(); i+=4)
+  {
+    EXPECT_NEAR( sytran_cg_x[ct], mol_[0].get_centerk(i).x(), preclim);
+    EXPECT_NEAR( sytran_cg_y[ct], mol_[0].get_centerk(i).y(), preclim);
+    EXPECT_NEAR( sytran_cg_z[ct], mol_[0].get_centerk(i).z(), preclim);
+    ct++;
+  }
+  
+  sys.translate_mol(2, Pt(-10.0, -7.8, -25.0));
+  ct = 0;
+  for (int i=0; i<mol_[2].get_nc(); i+=40)
+  {
+    EXPECT_NEAR( sytran1_at_x[ct], mol_[2].get_posj_realspace(i).x(), preclim);
+    EXPECT_NEAR( sytran1_at_y[ct], mol_[2].get_posj_realspace(i).y(), preclim);
+    EXPECT_NEAR( sytran1_at_z[ct], mol_[2].get_posj_realspace(i).z(), preclim);
+    ct++;
+  }
+  
+  ct = 0;
+  for (int i=0; i<mol_[2].get_ns(); i+=4)
+  {
+    EXPECT_NEAR( sytran1_cg_x[ct], mol_[2].get_centerk(i).x(), preclim);
+    EXPECT_NEAR( sytran1_cg_y[ct], mol_[2].get_centerk(i).y(), preclim);
+    EXPECT_NEAR( sytran1_cg_z[ct], mol_[2].get_centerk(i).z(), preclim);
+    ct++;
+  }
+  
+  sys.rotate_mol(1, Quat( M_PI/2, Pt(0.0, 0.0, 1.0)));
+  ct = 0;
+  for (int i=0; i<mol_[1].get_nc(); i+=40)
+  {
+    EXPECT_NEAR( syrot_at_x[ct], mol_[1].get_posj_realspace(i).x(), preclim);
+    EXPECT_NEAR( syrot_at_y[ct], mol_[1].get_posj_realspace(i).y(), preclim);
+    EXPECT_NEAR( syrot_at_z[ct], mol_[1].get_posj_realspace(i).z(), preclim);
+    ct++;
+  }
+  
+  ct = 0;
+  for (int i=0; i<mol_[1].get_ns(); i+=4)
+  {
+    EXPECT_NEAR( syrot_cg_x[ct], mol_[1].get_centerk(i).x(), preclim);
+    EXPECT_NEAR( syrot_cg_y[ct], mol_[1].get_centerk(i).y(), preclim);
+    EXPECT_NEAR( syrot_cg_z[ct], mol_[1].get_centerk(i).z(), preclim);
+    ct++;
+  }
 }
 
 TEST_F(SystemUTest, changeCutoff)
@@ -435,11 +473,11 @@ TEST_F(SystemUTest, changeCutoff)
 
 TEST_F(SystemUTest, PBCcheck)
 {
-  double cutoff = 125.0;
-  double boxl   = 300.0;
+  double cutoff = 75.0;
+  double boxl   = 180.0;
   vector < Molecule > mol_;
   int nMol = 3;
-  Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(70.0,70.0,70.0), Pt(-70.0,-70.0,-70.0)};
+  Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(70.0,70.0,70.0), Pt(-65.3,-68.2,-61.21)};
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   Molecule molNew( 0, 0, "stat", pqr.get_charges(),
                   pqr.get_atom_pts(), pqr.get_radii(),
@@ -452,22 +490,20 @@ TEST_F(SystemUTest, PBCcheck)
   }
 
   System sys( mol_, cutoff, boxl );
-  // TODO
   Pt dis01 = sys.get_pbc_dist_vec_base(sys.get_cogi(0), sys.get_cogi(1));
-//  EXPECT_NEAR(  10/dis01.x(), 1.0, preclim);
-//  EXPECT_NEAR(-7.8/dis01.y(), 1.0, preclim);
-//  EXPECT_NEAR(  10/dis01.z(), 1.0, preclim);
+  EXPECT_NEAR( -70/dis01.x(), 1.0, preclim);
+  EXPECT_NEAR( -70/dis01.y(), 1.0, preclim);
+  EXPECT_NEAR( -70/dis01.z(), 1.0, preclim);
   
   Pt dis02 = sys.get_pbc_dist_vec_base(sys.get_cogi(0), sys.get_cogi(2));
-//  EXPECT_NEAR( -10/dis02.x(), 1.0, preclim);
-//  EXPECT_NEAR( 2.2/dis02.y(), 1.0, preclim);
-//  EXPECT_NEAR(   0,     dis02.z(), preclim);
+  EXPECT_NEAR( 65.30/dis02.x(), 1.0, preclim);
+  EXPECT_NEAR( 68.20/dis02.y(), 1.0, preclim);
+  EXPECT_NEAR( 61.21/dis02.z(), 1.0, preclim);
   
   Pt dis12 = sys.get_pbc_dist_vec_base(sys.get_cogi(1), sys.get_cogi(2));
-//  EXPECT_NEAR( 0.0,  dis12.x(), preclim);
-//  EXPECT_NEAR(  10/dis12.y(), 1.0, preclim);
-//  EXPECT_NEAR( -10/dis12.z(), 1.0, preclim);
-
+  EXPECT_NEAR( -44.70/dis12.x(), 1.0, preclim);
+  EXPECT_NEAR( -41.80/dis12.y(), 1.0, preclim);
+  EXPECT_NEAR( -48.79/dis12.z(), 1.0, preclim);
 }
 
 

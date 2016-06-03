@@ -9,7 +9,6 @@
 #ifndef MyMatrixTest_h
 #define MyMatrixTest_h
 
-//#include "MyMatrix.h"
 #include "util.h"
 using namespace std;
 

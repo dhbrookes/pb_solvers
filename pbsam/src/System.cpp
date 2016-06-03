@@ -32,18 +32,6 @@ vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
   check_connect();
   map_repos_charges();
   calc_cog();
-
-//  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].x());
-//  cout << endl; cout << endl;
-//
-//  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].y());
-//  cout << endl; cout << endl;
-//  
-//  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].z());
-//  cout << endl; cout << endl;
-//
-//  for (int i=0; i<Ns_; i++) printf("%10.7f,", as_[i]);
-//  cout << endl; cout << endl;
 }
 
 Molecule::Molecule(const Molecule& mol)
