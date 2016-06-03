@@ -54,9 +54,6 @@ public:
   double get_a() const  { return a_; }
   int get_n() const     { return (int) ch_.size(); }
   vector<int> get_ch() const { return ch_; }
-  
-//  void set_center(Pt cen) { cen_ = cen; }
-//  void set_a(double a) { a_ = a; }
 };
 
 
@@ -122,8 +119,9 @@ public:
              int max_trials=40, double beta=2.0, double drot=0,
              double dtrans=0);
   
-  void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
+  void map_repos_charges();
   
+  void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
   
   void translate(Pt dr, double boxlen);
   void rotate(Quat qrot);

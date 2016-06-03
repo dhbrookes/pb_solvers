@@ -14,16 +14,9 @@ Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
           vector<double> as, double drot, double dtrans)
 :type_(type), typeIdx_(type_idx), moveType_(movetype), qs_(qs), pos_(pos),
 vdwr_(vdwr), centers_(cens), as_(as), drot_(drot), dtrans_(dtrans),
-Nc_((int) qs.size()), Ns_((int) cens.size()), cgCharges_(cens.size())
+Nc_((int) qs.size()), Ns_((int) cens.size()), cgCharges_((int) cens.size())
 {
-  int closest;
-  for (int i = 0; i < Nc_; i++)
-  {
-    closest = find_closest_center(pos_[i]);
-    cgCharges_[closest].push_back(i);
-    pos_[i] = pos_[i] - centers_[closest];  // reposition charge
-    chToCG_[i] = closest;
-  }
+  map_repos_charges();
 }
 
 Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
@@ -36,18 +29,19 @@ vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
 {
   find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
   check_connect();
+  map_repos_charges();
 
-  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].x());
-  cout << endl; cout << endl;
-
-  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].y());
-  cout << endl; cout << endl;
-  
-  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].z());
-  cout << endl; cout << endl;
-
-  for (int i=0; i<Ns_; i++) printf("%10.7f,", as_[i]);
-  cout << endl; cout << endl;
+//  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].x());
+//  cout << endl; cout << endl;
+//
+//  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].y());
+//  cout << endl; cout << endl;
+//  
+//  for (int i=0; i<Ns_; i++) printf("%10.7f,", centers_[i].z());
+//  cout << endl; cout << endl;
+//
+//  for (int i=0; i<Ns_; i++) printf("%10.7f,", as_[i]);
+//  cout << endl; cout << endl;
 }
 
 Molecule::Molecule(const Molecule& mol)
@@ -58,6 +52,18 @@ as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_)
 {
 }
 
+
+void Molecule::map_repos_charges()
+{
+  int closest;
+  for (int i = 0; i < Nc_; i++)
+  {
+    closest = find_closest_center(pos_[i]);
+    cgCharges_[closest].push_back(i);
+    pos_[i] = pos_[i] - centers_[closest];  // reposition charge
+    chToCG_[i] = closest;
+  }
+}
 
 Pt Molecule::random_pt()
 {
@@ -190,7 +196,7 @@ void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
     ct++;
   }
 
-  Ns_ = centers_.size();
+  Ns_ = (int) centers_.size();
   cout << "End of find_centers" << endl;
 }
 
@@ -463,7 +469,7 @@ void System::check_for_overlap()
     {
       for (k1 = 0; k1 < molecules_[i].get_ns(); k1++)
       {
-        for (k2 = 0; k2 < molecules_[j].get_ns(); k1++)
+        for (k2 = 0; k2 < molecules_[j].get_ns(); k2++)
         {
           aik = molecules_[i].get_ak(k1);
           ajk = molecules_[j].get_ak(k2);
@@ -508,9 +514,9 @@ void System::write_to_pqr(string outfile)
     for ( j = 0; j < get_Nc_i(i); j++)
     {
       sprintf(pqrlin,"%6d  C   CHG A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,i,
-              get_posij(i, j).x(),
-              get_posij(i, j).y(),
-              get_posij(i, j).z(),
+              get_posijreal(i, j).x(),
+              get_posijreal(i, j).y(),
+              get_posijreal(i, j).z(),
               get_qij(i, j), get_radij(i, j));
       pqr_out << "ATOM " << pqrlin << endl;
       ct++;

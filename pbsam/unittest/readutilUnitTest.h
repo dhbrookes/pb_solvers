@@ -26,6 +26,26 @@ protected :
    0.512, -0.779, -0.442, 0.201, -0.895, 0.184, -0.595, -0.171, -0.111, -0.75};
   vector<double> np_z = {-0.175, -0.581, -0.81, -0.453, -0.01, 0.656, -0.377,
    0.758, -0.608, 0.723, -0.842, 0.091, -0.82, -0.382, -0.296, -0.774, -0.22};
+    
+  vector<double> at_x = {48.33,47.142,33.522,41.035,41.864,31.784,30.898,
+    33.893,49.156,48.227,39.79,35.538,34.849,43.227,51.263};
+  vector<double> at_y = {40.393,25.566,25.331,26.912,35.127,33.217,38.365,
+    35.594,40.035,27.504,25.017,34.25,44.167,48.997,35.216};
+  vector<double> at_z = {9.798,-1.042,-0.851,4.988,8.574,8.786,4.028,17.666,
+    1.901,-6.897,-13.315,-0.595,-2.71,5.886,-7.416};
+  vector<double> at_r = {1.824,1.487,1.908,1.387,1.387,1.459,1.824,1.459,1.908,
+    1.487,1.908,1.487,1.824,1.487,1.387};
+  vector<double> at_c = {0.0966,0.0797,0.5973,0.1007,0.0922,0.1699,-0.4157,
+    0.1417,-0.3192,0.0352,-0.0645,0.0791,-0.5163,-0.0122,0.0813};
+  
+  vector<double> cg_x = {41.47,30.915,44.892,30.335,41.072,27.716,40.051,
+    29.456,37.415,23.556};
+  vector<double> cg_y = {35.465,33.065,31.202,34.506,30.63,31.582,41.039,
+    32.238,40.426,36.176};
+  vector<double> cg_z = {0.47,3.732,-3.627,-1.291,8.115,3.988,8.699,15.186,
+    13.57,1.911};
+  vector<double> cg_r = {13.2578,6.3783,10.5985,4.666,8.7937,4.0027,5.0065,
+    3.1349,1.6612,1.6612};
 };
 
 
@@ -174,6 +194,56 @@ TEST_F(ReadUtilUTest, readPQRNoCen)
   ASSERT_EQ( 0.50, PQRtest.get_radii()[0]);
   ASSERT_EQ( 0.87, PQRtest.get_radii()[1]);
 }
+
+TEST_F(ReadUtilUTest, readPQRCen)
+{
+  int ct = 0;
+  string PQR = test_dir_loc + "test_1BRS_cg.pqr";
+  PQRFile PQRtest(PQR, 2000);
+    
+  ASSERT_EQ(1403, PQRtest.get_Nc());
+  ASSERT_EQ(  47, PQRtest.get_Ns());
+  ASSERT_EQ( PQR, PQRtest.get_path());
+
+    
+  for (int i=0; i <  PQRtest.get_Ns(); i+=5)
+  {
+    cout << "," << setprecision(9) << PQRtest.get_cg_radii()[i];
+  }
+  cout << endl; cout << endl;
+  
+  for (int i=0; i <  PQRtest.get_Ns(); i+=5)
+  {
+    cout << "," << setprecision(9) << PQRtest.get_cg_centers()[i].x();
+  }
+  cout << endl; cout << endl;
+  
+  for (int i=0; i <  PQRtest.get_Ns(); i+=5)
+  {
+    cout << "," << setprecision(9) << PQRtest.get_cg_centers()[i].y();
+  }
+  cout << endl; cout << endl;
+  
+  for (int i=0; i <  PQRtest.get_Ns(); i+=5)
+  {
+    cout << "," << setprecision(9) << PQRtest.get_cg_centers()[i].z();
+  }
+  cout << endl; cout << endl;
+  
+  ct = 0;
+  for (int i=0; i < PQRtest.get_Nc(); i+=100)
+  {
+    EXPECT_NEAR( at_x[ct], PQRtest.get_atom_pts()[i].x(), preclim);
+    EXPECT_NEAR( at_y[ct], PQRtest.get_atom_pts()[i].y(), preclim);
+    EXPECT_NEAR( at_z[ct], PQRtest.get_atom_pts()[i].z(), preclim);
+    EXPECT_NEAR( at_c[ct], PQRtest.get_charges()[i], preclim);
+    EXPECT_NEAR( at_r[ct], PQRtest.get_radii()[i], preclim);
+    ct++;
+  }
+
+}
+
+
 
 
 TEST_F(ReadUtilUTest, checkXYZExceptions)

@@ -271,7 +271,6 @@ protected:
     
     char buf[600];
     fin.getline(buf, 599);
-    int iCen = 17;
     int iCoord = 31;
     while (!fin.eof())
     {
@@ -280,9 +279,8 @@ protected:
       {
         sscanf(&(buf[iCoord]), "%lf %lf %lf %lf %lf", &x, &y, &z, &c, &r);
         // read in as centers that specifies dielectric boundary
-        if (strncmp(&(buf[iCen]),"CEN",3) == 0)
+        if (string(buf).find(" CEN ") != string::npos)
         {
-//          cg_ = true;
           cgRadii_.push_back(r);
           cgCenters_.push_back(Pt(x,y,z));
         }
