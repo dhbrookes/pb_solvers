@@ -212,12 +212,10 @@ public:
     ifstream file(path_.c_str());
     if (!file.is_open()) throw CouldNotReadException(path_);
     string line;
-    int i = 0;
-    int row;
+    int mol, row, i = 0;
     MyMatrix<double> rm;
     Pt trans;
     vector<int> pair (2);
-    int mol;
     double rot1, rot2, rot3, tr;
     while (getline(file, line))
     {
@@ -225,21 +223,24 @@ public:
       linestream >> mol >> rot1 >> rot2 >> rot3 >> tr;
       
       row = i % 3;
-      
       rotMats_[mol-1].set_val(row, 0, rot1);
       rotMats_[mol-1].set_val(row, 1, rot2);
       rotMats_[mol-1].set_val(row, 2, rot3);
       
       if (row == 0) trans.set_x(tr);
       else if (row == 1) trans.set_y(tr);
-      else if (row == 2) trans.set_z(tr);
+      else if (row == 2)
+      {
+        trans.set_z(tr);
+        transVecs_[mol-1] = trans;
+      }
       
       i += 1;
     }
   }
   
   const string get_path() const     { return path_; }
-  const Pt get_trans(int j) const   { return transVecs_[j]; }
+  Pt get_trans(int j) const   { return transVecs_[j]; }
   const MyMatrix<double> get_rotmat(int j) const { return rotMats_[j]; }
   
 };
@@ -269,8 +270,8 @@ protected:
     ifstream fin(path_.c_str());
     if (!fin.is_open()) throw CouldNotReadException(path_);
     
-    char buf[600];
-    fin.getline(buf, 599);
+    char buf[1000];
+    fin.getline(buf, 999);
     int iCoord = 31;
     while (!fin.eof())
     {
