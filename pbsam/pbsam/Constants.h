@@ -115,7 +115,10 @@ public:
     dielectricWater_ = val;
     update_kappa();
   }
-  void set_dielectric_prot(double val)        { dielectricProt_ = val; }
+  void set_dielectric_prot(double val)
+  {
+    dielectricProt_ = val;
+  }
   void set_salt_concentration(double val)
   {
     saltConcentration_ = val;

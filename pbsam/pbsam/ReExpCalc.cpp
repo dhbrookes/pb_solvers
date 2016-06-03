@@ -62,7 +62,6 @@ void ReExpCoeffsConstants::calc_alpha_and_beta()
       beta_val *= (1.0 / ((2.0 * nD + 1.0) * (2.0 * nD + 3.0)));
       set_alpha( n, m, alpha_val);
       set_beta(  n, m, beta_val);
-      
     }
   }
 }
@@ -90,9 +89,9 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
 }
 
 ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp,
-                               vector<double> besselK,
-                               shared_ptr<ReExpCoeffsConstants> _consts,
-                               double kappa, double lambda, bool grad)
+                         vector<double> besselK,
+                         shared_ptr<ReExpCoeffsConstants> _consts,
+                         double kappa, double lambda, bool grad)
 :p_(p),
 v_(v),
 Ytp_(Ytp),
