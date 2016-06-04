@@ -17,6 +17,26 @@
 #include "BesselCalc.h"
 #include "ReExpCalc.h"
 
+/*
+ Base class for matrices that will be re-expanded
+ */
+class ComplexMoleculeMatrix
+{
+protected:
+  vector<MyMatrix<cmplx> > mat_;
+  int p_;
+  int I_;
+  
+  void set_mat_knm(int k, int n, int m, cmplx val) { mat_[k].set_val(n, m+p_, val); }
+    
+public:
+  ComplexMoleculeMatrix(int I, int ns, int p);
+  
+  cmplx get_mat_knm(int k, int n, int m) { return mat_[k](n, m+p_); }
+  const int get_I() const   { return I_; }
+  const int get_p() const   { return p_; }
+    
+};
 
 /*
  Pre-computed values representing fixed charges within each sphere. Each object
@@ -25,24 +45,13 @@
  The indices of the inner matrices are then n and m, which loop over the number
  of poles in the system. See eq. 8a in Yap 2010 for more info
  */
-class EMatrix
+class EMatrix: public ComplexMoleculeMatrix
 {
-protected:
-  vector<MyMatrix<cmplx> > E_;
-  int p_;
-  int I_;
-  
-  void set_E_knm(int k, int n, int m, cmplx val) { E_[k].set_val(n, m+p_, val); }
-  
 public:
-  //i is index of molecule, ns is number of coarse grained spheres in molecule
   EMatrix(int I, int ns, int p);
-  EMatrix(int I, Molecule mol, shared_ptr<SHCalc> sh_calc, int p, double eps_in);
+  virtual void calc_vals(Molecule mol, shared_ptr<SHCalc> sh_calc,
+                         double eps_in);
   
-  void calc_vals(Molecule mol, shared_ptr<SHCalc> sh_calc, double eps_in);
-  
-  cmplx get_E_knm(int k, int n, int m) { return E_[k](n, m+p_); }
-  MyMatrix<cmplx> get_E_k(int k)     { return E_[k]; }
 };
 
 /*
@@ -52,24 +61,12 @@ public:
  The indices of the inner matrices are then n and m, which loop over the number
  of poles in the system. See eq. 8b in Yap 2010 for more info
  */
-class LEMatrix
+class LEMatrix : public ComplexMoleculeMatrix
 {
-protected:
-  vector<MyMatrix<cmplx> > LE_;
-  int p_;
-  int I_;
-  
-  void set_LE_knm(int k, int n,
-                  int m, cmplx val) { LE_[k].set_val(n, m+p_, val); }
-  
 public:
   LEMatrix(int I, int ns, int p);
-  LEMatrix(int I, Molecule mol, shared_ptr<SHCalc> sh_calc, int p, double eps_in);
-  
-  void calc_vals(Molecule mol, shared_ptr<SHCalc> sh_calc, double eps_in);
-  
-  cmplx get_LE_knm(int k, int n, int m) { return LE_[k](n, m+p_); }
-  MyMatrix<cmplx> get_LE_k(int k)       { return LE_[k]; }
+  void calc_vals(Molecule mol, shared_ptr<SHCalc> sh_calc,
+                 double eps_in);
 };
 
 
@@ -112,7 +109,6 @@ public:
 };
 
 
-
 /*
  Re-expansion coefficients
  */
@@ -128,22 +124,35 @@ protected:
   map<vector<int>, int> idxMap_;
   
 public:
+  
   TMatrix(int p, shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           shared_ptr<Constants> _consts, shared_ptr<BesselCalc> _besselcalc,
           shared_ptr<ReExpCoeffsConstants> _reexpconsts);
   
   // if these spheres can be re-expanded analytically, return true
-  bool is_analytic(int I, int k, int J, int l);
+  bool is_analytic(int I, int k, int J, int l)
+  {
+    if (idxMap_[{I, k, J, l}] == -1 ) return false;
+    else return true;
+  }
   
   // get re-expansion of sphere (I, k) with respect to (J, l)
-  shared_ptr<ReExpCoeffs> get_T_Ik_Jl(int I, int k, int J, int l);
+  shared_ptr<ReExpCoeffs> get_T_Ik_Jl(int I, int k, int J, int l)
+  {
+    return T_[idxMap_[{I, k, J, l}]];
+  }
   
   void update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
                    shared_ptr<BesselCalc> _besselcalc,
                    shared_ptr<ReExpCoeffsConstants> _reexpconsts);
   
+  
+  /*
+   Re-expand a matrix X with respect to T(I,k)(J,l)
+  */
+  MyMatrix<cmplx> re_expand(int I, int k, int J, int l, MyMatrix<cmplx> X);
+  
 };
-
 
 class HMatrix;
 class FMatrix;
@@ -151,82 +160,37 @@ class FMatrix;
 /*
  Equation 8c
  */
-class LFMatrix
+class LFMatrix : public ComplexMoleculeMatrix
 {
-protected:
-  vector<MyMatrix<cmplx> > LF_;
-  int p_;
-  int I_;
-  
-  void set_LF_knm(int k, int n,
-                  int m, cmplx val) { LF_[k].set_val(n, m+p_, val); }
-  
 public:
-  
   LFMatrix(int I, int ns, int p);
-  
-  cmplx get_LF_knm(int k, int n, int m)   { return LF_[k](n, m+p_); }
-  MyMatrix<cmplx> get_LF_k(int k)         { return LF_[k]; }
   
 };
 
 /*
  Equation 10b
  */
-class LHMatrix
+class LHMatrix : public ComplexMoleculeMatrix
 {
-protected:
-  vector<MyMatrix<cmplx> > LH_;
-  int p_;
-  int I_;
-  
-  void set_LH_knm(int k, int n,
-                  int m, cmplx val) { LH_[k].set_val(n, m+p_, val); }
-  
 public:
-  
   LHMatrix(int I, int ns, int p);
-  
-  cmplx get_LH_knm(int k, int n, int m)   { return LH_[k](n, m+p_); }
-  MyMatrix<cmplx> get_LH_k(int k)         { return LH_[k]; }
-  
 };
 
 /*
  Equation 10c
  */
-class LHNMatrix
+class LHNMatrix : public ComplexMoleculeMatrix
 {
-protected:
-  vector<MyMatrix<cmplx> > LHN_;
-  int p_;
-  int I_;
-  
-  void set_LHN_knm(int k, int n,
-                  int m, cmplx val) { LHN_[k].set_val(n, m+p_, val); }
-  
 public:
-  
   LHNMatrix(int I, int ns, int p);
-  
-  cmplx get_LHN_knm(int k, int n, int m)   { return LHN_[k](n, m+p_); }
-  MyMatrix<cmplx> get_LHN_k(int k)         { return LHN_[k]; }
   
 };
 
 /*
  Equation 14a
  */
-class XHMatrix
+class XHMatrix : public ComplexMoleculeMatrix
 {
-protected:
-  vector<MyMatrix<cmplx> > XH_;
-  int p_;
-  int I_;
-  
-  void set_XH_knm(int k, int n,
-                   int m, cmplx val) { XH_[k].set_val(n, m+p_, val); }
-  
 public:
   XHMatrix(int I, int ns, int p);
   
@@ -234,24 +198,14 @@ public:
                  shared_ptr<EMatrix> E, shared_ptr<LEMatrix> LE,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                  shared_ptr<LHNMatrix> LHN);
-  
-  cmplx get_XH_knm(int k, int n, int m)   { return XH_[k](n, m+p_); }
-};
 
+};
 
 /*
  Equation 14b
  */
-class XFMatrix
+class XFMatrix : public ComplexMoleculeMatrix
 {
-protected:
-  vector<MyMatrix<cmplx> > XF_;
-  int p_;
-  int I_;
-  
-  void set_XF_knm(int k, int n,
-                  int m, cmplx val) { XF_[k].set_val(n, m+p_, val); }
-  
 public:
   XFMatrix(int I, int ns, int p);
   
@@ -260,8 +214,6 @@ public:
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                  shared_ptr<LHNMatrix> LHN, double eps_in,
                  double eps_out, double kappa);
-  
-  cmplx get_XF_knm(int k, int n, int m)   { return XF_[k](n, m+p_); }
 };
 
 

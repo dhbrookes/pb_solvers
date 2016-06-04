@@ -624,7 +624,7 @@ MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i, int j, double theta,
       for (int m = 1; m < n; m++)
       {
         x.set_val(n, m+p_,
-            rec*(cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,0))*mat(n,m-1+p_)
+            rec*(cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m, 0))*mat(n,m-1+p_)
                 - cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat(n,m+1+p_)));
         x.set_val( n, -m+p_, conj(x(n, m+p_)));
       }
