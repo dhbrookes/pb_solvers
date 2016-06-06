@@ -8,16 +8,14 @@
 
 #include "Solver.h"
 
-EMatrix::EMatrix(int I, int ns, int p)
-:p_(p), E_ (ns, MyMatrix<cmplx> (p, 2*p+1)), I_(I)
+ComplexMoleculeMatrix::ComplexMoleculeMatrix(int I, int ns, int p)
+:p_(p), mat_(ns, MyMatrix<cmplx> (p, 2*p+1)), I_(I)
 {
 }
 
-EMatrix::EMatrix(int i, Molecule mol, shared_ptr<SHCalc> _shcalc,
-                 int p, double eps_in)
-:p_(p), E_ (mol.get_ns(), MyMatrix<cmplx> (p, 2*p+1)), I_(i)
+EMatrix::EMatrix(int I, int ns, int p)
+:ComplexMoleculeMatrix(I, ns, p)
 {
-  calc_vals(mol, _shcalc, eps_in);
 }
 
 void EMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc, double eps_in)
@@ -42,8 +40,8 @@ void EMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc, double eps_in)
           val = conj(_shcalc->get_result(n, m));
           val *= q_alpha / eps_in;
           val *= pow(r_alpha / a_k, n);
-          val += get_E_knm(k, n, m);
-          set_E_knm(k, n, m, val);
+          val += get_mat_knm(k, n, m);
+          set_mat_knm(k, n, m, val);
         }
       }
     }
@@ -51,15 +49,8 @@ void EMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc, double eps_in)
 }
 
 LEMatrix::LEMatrix(int I, int ns, int p)
-:p_(p), LE_ (ns, MyMatrix<cmplx> (p, 2*p+1)), I_(I)
+:ComplexMoleculeMatrix(I, ns, p)
 {
-}
-
-LEMatrix::LEMatrix(int I, Molecule mol, shared_ptr<SHCalc> _shcalc,
-                 int p, double eps_in)
-:p_(p), LE_ (mol.get_ns(), MyMatrix<cmplx> (p, 2*p+1)), I_(I)
-{
-  calc_vals(mol, _shcalc, eps_in);
 }
 
 void LEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc,
@@ -89,8 +80,8 @@ void LEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc,
           val *= q_alpha / eps_in;
           val *= 1 / r_alpha;
           val *= pow(a_k / r_alpha, n);
-          val += get_LE_knm(k, n, m);
-          set_LE_knm(k, n, m, val);
+          val += get_mat_knm(k, n, m);
+          set_mat_knm(k, n, m, val);
         }
       }
     }
@@ -151,6 +142,32 @@ void IEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc)
   }
 }
 
+// use Rakhmanov method
+vector<Pt> IEMatrix::make_uniform_sph_grid(int m_grid, double r)
+{
+  
+  vector<Pt> grid (m_grid);
+  Pt gp;
+  grid[0].set_r(r);
+  grid[0].set_theta(0.0);
+  grid[0].set_phi(0.0);
+  double hk;
+  for (int k = 0; k < m_grid; k++)
+  {
+    grid[k].set_r(r);
+    hk = -1 + ((2 * (k-1)) / (m_grid-1));
+    grid[k].set_theta(acos(hk));
+    
+    if (k==0 || k==m_grid-1) grid[k].set_phi(0);
+    else
+    {
+      grid[k] = fmod(grid[k-1].phi() + (3.6/sqrt(m_grid) * (1/sqrt(1-(hk*hk)))),
+                     2*M_PI);
+    }
+  }
+  return grid;
+}
+
 TMatrix::TMatrix(int p, shared_ptr<System> _sys,
                  shared_ptr<SHCalc> _shcalc,
                  shared_ptr<Constants> _consts,
@@ -208,50 +225,85 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
       }
     }
   }
-  
 }
 
-vector<Pt> IEMatrix::make_uniform_sph_grid(int m_grid, double r)
+MyMatrix<cmplx> TMatrix::re_expand(int I, int k, int j, int l, MyMatrix<cmplx> X)
 {
-  vector<Pt> grid (m_grid);
-  Pt gp;
-  double offset = 2.0/m_grid;
-  double increment = M_PI * (3.0-sqrt(5.0));
-  double x, y, z, rad, phi;
-  for (int i = 0; i < m_grid; i++)
+  MyMatrix<cmplx> X1 (p_, 2*p_ + 1);
+  MyMatrix<cmplx> X2 (p_, 2*p_ + 1);
+  MyMatrix<cmplx> Z (p_, 2*p_ + 1);
+  
+  int n, m, s;
+  cmplx inter, sval, rval, aval;
+  shared_ptr<ReExpCoeffs> T = get_T_Ik_Jl(I, k, j, l);
+  
+  // fill X1:
+  for (n = 0; n < p_; n++)
   {
-    y = ((i * offset) - 1) + (offset / 2);
-    rad = sqrt(1 - pow(y, 2));
-    phi = (i % m_grid) * increment;
-    x = cos(phi) * rad;
-    z = sin(phi) * rad;
+    for (m = -n; m <= n; m++)
+    {
+      inter  = 0;
+      for (s = -n; s <= n; s++)
+      {
+          rval = T->get_rval(n, m, s);
+          aval = X(n, s+p_);
+          
+          inter += rval * aval;
+        } // end s
+        X1.set_val(n, m+p_, inter);
+      } // end m
+    } //end n
+  
+  // fill x2:
+  for (n = 0; n < p_; n++)
+  {
+    for (m = -n; m <= n; m++)
+    {
+      inter  = 0;
+      for (l = abs(m); l < p_; l++)
+      {
+        sval = T->get_sval(l, n, m);
+        inter += sval * X1(l, m+p_);
+      } // end l
+      X2.set_val(n, m+p_, inter);
+    } // end m
+  } //end n
+  
+  //fill z:
+  for (n = 0; n < p_; n++)
+  {
+    for (m = -n; m <= n; m++)
+    {
+      inter = 0;
+      for (s = -n; s <= n; s++)
+      {
+        rval = T->get_rval(n, s, m);
+        inter += conj(rval) * X2(n, s+p_);
+      } // end s
+      Z.set_val(n, m+p_, inter);
+    } // end m
+  } //end n
 
-    grid[i].set_x(r*x);
-    grid[i].set_y(r*y);
-    grid[i].set_z(r*z);
-  }
-  return grid;
+  return Z;
 }
-
 
 LFMatrix::LFMatrix(int I, int ns, int p)
-:p_(p), LF_(ns, MyMatrix<cmplx>(p, 2*p+1)), I_(I)
+:ComplexMoleculeMatrix(I, ns, p)
 {
 }
 
 LHMatrix::LHMatrix(int I, int ns, int p)
-:p_(p), LH_(ns, MyMatrix<cmplx>(p, 2*p+1)), I_(I)
+:ComplexMoleculeMatrix(I, ns, p)
 {
 }
 
 LHNMatrix::LHNMatrix(int I, int ns, int p)
-:p_(p), LHN_(ns, MyMatrix<cmplx>(p, 2*p+1)), I_(I)
+:ComplexMoleculeMatrix(I, ns, p)
 {
 }
 
-
 XHMatrix::XHMatrix(int I, int ns, int p)
-:p_(p), XH_(ns, MyMatrix<cmplx>(p, 2*p+1)), I_(I)
+:ComplexMoleculeMatrix(I, ns, p)
 {
 }
 
@@ -271,10 +323,10 @@ void XHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
     {
       for (int m = - n; m < n+1; m++)
       {
-        inner = E->get_E_knm(k, n, m);
-        inner += ak*(LE->get_LE_knm(k, n, m)+LF->get_LF_knm(k, n, m));
-        inner -= ak*in_k[n]*(LH->get_LH_knm(k, n, m)+LHN->get_LHN_knm(k, n, m));
-        set_XH_knm(k, n, m, inner);
+        inner = E->get_mat_knm(k, n, m);
+        inner += ak*(LE->get_mat_knm(k, n, m)+LF->get_mat_knm(k, n, m));
+        inner -= ak*in_k[n]*(LH->get_mat_knm(k, n, m)+LHN->get_mat_knm(k, n, m));
+        set_mat_knm(k, n, m, inner);
       }
     }
   }
@@ -282,7 +334,7 @@ void XHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
 
 
 XFMatrix::XFMatrix(int I, int ns, int p)
-:p_(p), XF_(ns, MyMatrix<cmplx>(p, 2*p+1)), I_(I)
+:ComplexMoleculeMatrix(I, ns, p)
 {
 }
 
@@ -306,10 +358,10 @@ void XFMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
       {
         inner = (pow(kappa * ak, 2) * in_k[n+1])/(2*n+3);
         inner += n * in_k[n];
-        inner *= ak * (LH->get_LH_knm(k, n, m) + LHN->get_LHN_knm(k, n, m));
-        inner += (n+1) * eps * E->get_E_knm(k, n, m);
-        inner -= n*eps*ak*(LE->get_LE_knm(k, n, m)+LF->get_LF_knm(k, n, m));
-        set_XF_knm(k, n, m, inner);
+        inner *= ak * (LH->get_mat_knm(k, n, m) + LHN->get_mat_knm(k, n, m));
+        inner += (n+1) * eps * E->get_mat_knm(k, n, m);
+        inner -= n*eps*ak*(LE->get_mat_knm(k, n, m)+LF->get_mat_knm(k, n, m));
+        set_mat_knm(k, n, m, inner);
       }
     }
   }
