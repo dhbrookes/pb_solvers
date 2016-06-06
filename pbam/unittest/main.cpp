@@ -37,7 +37,7 @@ using namespace std;
 
 double preclim = 1e-7;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
-string test_dir_loc = "../pbam_test_files/gtest/";
+string test_dir_loc = "../../pbam/pbam_test_files/gtest/";
 
 #include "ASolverUnitTest.h"
 #include "BesselCalcUnitTest.h"

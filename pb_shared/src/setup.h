@@ -189,6 +189,17 @@ protected:
   
 public:
   Setup(string infile);
+
+  // Not pretty, but getting necessary inputs from APBS
+  Setup(double temp, double salt_conc, double int_diel, double solv_diel, 
+        int nmol, string runtype, string runname, bool randorient, double boxl,
+        int pbc_type, int gridpts, string map3d, int g2dct, 
+        vector<string> grid2Dfn, vector <string> grid2Dax, 
+        vector<double> grid2Dloc, string dxnam, int ntraj, bool termcomb, 
+        vector<string> difftype, vector<vector<double> > diffcon,
+        vector<string> termcond, vector<double> termval, 
+        vector<vector <int > > termnu, vector<string> confil,
+        vector<double> conpad, vector<vector <string> > xyzfil);
   
   // electrostatics
   string getDXoutName(  )         { return potOutfnames_[0];}

@@ -146,7 +146,7 @@ TEST_F(MoleculeUTest, checkUserSpecCG)
   ASSERT_EQ(10.1, molNew.get_posj_realspace(1).z());
 }
 
-// TODO: Not sure this is actually something we can test...
+//TODO: Not sure this is actually something we can test...
 TEST_F(MoleculeUTest, checkCreateCen)
 {
   srand(1);

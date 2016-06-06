@@ -29,6 +29,7 @@ nTypenCount_(2),
 typeDef_(2),
 typeDiff_(2),
 pqr_names_(2),
+surfNames_(2),
 xyz_names_(2),
 isTransRot_(2),
 runSpecs_(2),
@@ -36,7 +37,10 @@ mbdfile_loc_(2),
 termvals_(2),
 termtype_(2),
 andCombine_(false),
-orientRand_(false)
+sphBeta_(2.0),
+tolSP_(1.0),
+maxTrials_(40),
+nTrials_(1200)
 {
   nTypenCount_[0] = 1;
   nTypenCount_[1] = 1;
@@ -83,7 +87,6 @@ orientRand_(false)
 }
 
 // APBS
-// TODO: Need to get more information later
 Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel,
              int nmol, string runtype, string runname, bool randorient, 
              double boxl, int pbc_type, int gridpts, string map3d, int g2dct, 
@@ -183,7 +186,6 @@ orientRand_(randorient) //
     for (int j=0; j<ntraj; j++) xyz_names_[i][j] = xyzfil[i][j];
   }  
 }
-
 
 void Setup::read_infile(string fname)
 {
@@ -425,6 +427,13 @@ void Setup::findKeyword(vector<string> fline)
       return;
     setTypeNXYZ( typeNo, traj, transrot );
     setTypeNisTransRot(typeNo, traj, true);
+  } else if (keyword == "surf")
+  {
+    cout << "surf command found" << endl;
+    int typeNo = atoi(fline[1].c_str())-1;
+    if (typeNo > getNType()-1)
+      return;
+    setTypeNSurf( typeNo, fline[2].c_str() );
   } else if (keyword == "randorient")
   {
     cout << "Random orientation command found" << endl;
@@ -437,6 +446,22 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "Units command found" << endl;
     setUnits( fline[1].c_str() );
+  } else if (keyword == "tolsp")
+  {
+    cout << "tolsp command found" << endl;
+    set_tol_sp(atof(fline[1].c_str()));
+  } else if (keyword == "ntrials")
+  {
+    cout << "ntrials command found" << endl;
+    set_n_trials(atoi(fline[1].c_str()));
+  } else if (keyword == "maxtrials")
+  {
+    cout << "maxtrials command found" << endl;
+    set_max_trials(atoi(fline[1].c_str()));
+  } else if (keyword == "sphbeta")
+  {
+    cout << "sphbeta command found" << endl;
+    set_sph_beta(atof(fline[1].c_str()));
   } else
     cout << "Keyword not found, read in as " << fline[0] << endl;
 }
@@ -455,6 +480,7 @@ void Setup::resizeVecs()
 
   pqr_names_.resize(nType_);
   xyz_names_.resize(nType_);
+  surfNames_.resize(nType_);
   isTransRot_.resize(nType_);
   for(int i = 0; i < nType_; i++)
   {

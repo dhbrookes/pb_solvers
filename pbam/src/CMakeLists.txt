@@ -13,20 +13,22 @@ if(ENABLE_PBAM_APBS)
          )
 endif()
 
+include_directories("../../pb_shared/src")
+include_directories("./")
 
 # C++ code for standalone
 add_executable(pbam
   ASolver.cpp
   BD.cpp
-  BesselCalc.cpp
-  Constants.cpp
+  ../../pb_shared/src/BesselCalc.cpp
+  ../../pb_shared/src/Constants.cpp
   Electrostatics.cpp
   EnergyForce.cpp
   main.cpp
   PBAM.cpp
   ReExpCalc.cpp
-  setup.cpp
-  SHCalc.cpp
+  ../../pb_shared/src/setup.cpp
+  ../../pb_shared/src/SHCalc.cpp
   System.cpp
   )
 
@@ -41,15 +43,15 @@ add_executable(pbam
 add_library(PBAMLib 
   ASolver.cpp
   BD.cpp
-  BesselCalc.cpp
-  Constants.cpp
+  ../../pb_shared/src/BesselCalc.cpp
+  ../../pb_shared/src/Constants.cpp
   Electrostatics.cpp
   EnergyForce.cpp
   PBAM.cpp
   PBAMWrap.cpp
   ReExpCalc.cpp
-  setup.cpp
-  SHCalc.cpp
+  ../../pb_shared/src/setup.cpp
+  ../../pb_shared/src/SHCalc.cpp
   System.cpp
   )
 

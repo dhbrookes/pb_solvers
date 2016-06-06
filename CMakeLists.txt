@@ -1,6 +1,12 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8)
 
-project(pbsam)
+project(pb_solvers)
+
+set( CMAKE_VERBOSE_MAKEFILE false )
+set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
+set(PBSOLV_BUILD ${PROJECT_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${PBSOLV_BUILD}/bin)
+set(EXECUTABLE_INSTALL_PATH bin)
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -22,7 +28,13 @@ endif()
 
 enable_testing()
 
-add_subdirectory(src)
-add_subdirectory(unittest)
+add_subdirectory(pb_shared/src)
+add_subdirectory(pb_shared/unittest)
+
+add_subdirectory(pbam/src)
+add_subdirectory(pbam/unittest)
+
+add_subdirectory(pbsam/src)
+add_subdirectory(pbsam/unittest)
 
 file(MAKE_DIRECTORY build/bin)
