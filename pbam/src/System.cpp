@@ -212,7 +212,7 @@ System::System(Setup setup, double cutoff)
         repos_charges[chg] = pqrI.get_atom_pts()[chg].rotate(rot) + trans;
       }
       
-      if (pqrI.get_Ns() == 0)  // coarse graining is in pqr
+      if (pqrI.get_Ns() != 0)  // coarse graining is in pqr
       {
         mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
                         pqrI.get_charges(), repos_charges,
