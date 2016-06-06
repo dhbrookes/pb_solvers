@@ -51,6 +51,7 @@ patchAngle_(6.0), rotateAngle_(20.0)
   set_temp(setup.getTemp());
   tolSP_ = setup.get_tol_sp();
   update_all();
+  cout << "Okay at end with setup constructor" << endl;
 }
 
 Constants::Constants(Constants &consts)
@@ -96,8 +97,8 @@ void Constants::update_all()
 {
   update_kappa();
   update_rotate_size();
+  update_patch_size();
   update_kbt();
-  update_rotate_size();
 }
 
 void Constants::set_units( string units )

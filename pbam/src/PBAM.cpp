@@ -50,6 +50,8 @@ solveTol_(1e-4)
 
   syst_ = make_shared<System> ();
   consts_ = make_shared<Constants> (*setp_);
+
+  cout << "Okay after constants init" << endl;
   
   check_system();
   init_write_system();
