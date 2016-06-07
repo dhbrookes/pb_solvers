@@ -37,9 +37,7 @@ add_executable(pbam
 # APBS components?
 ####################
 
-#
 #  build pbam library
-#
 add_library(PBAMLib 
   ASolver.cpp
   BD.cpp
@@ -55,9 +53,7 @@ add_library(PBAMLib
   System.cpp
   )
 
-#
 #  build standalone C example
-#
 add_executable(PBAMWrap
   runPBAMWrap.c
 )
