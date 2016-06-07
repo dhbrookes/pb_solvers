@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  pbsam_xcode
+//  pbsam
 //
 //  Created by David Brookes on 5/13/16.
 //  Copyright © 2016 David Brookes. All rights reserved.

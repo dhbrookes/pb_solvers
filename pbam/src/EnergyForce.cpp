@@ -643,7 +643,7 @@ void PhysCalc::compute_units( shared_ptr<Constants> cst, Units unit)
 
 void PhysCalc::print_all()
 {
-  int i, j;
+  int i;
   Pt force_i, torque_i;
   double force_norm, torque_norm;
   streambuf * buf;

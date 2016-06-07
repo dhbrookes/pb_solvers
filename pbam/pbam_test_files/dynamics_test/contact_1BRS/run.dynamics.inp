@@ -8,7 +8,7 @@ sdiel 78
 
 termct 1
 termcombine or
-term 1 contact 2.5 1 2
+term 1 contact 1BRS.contact 2.0
 
 attypes 2
 type 1 2 move 0.015 0.000045

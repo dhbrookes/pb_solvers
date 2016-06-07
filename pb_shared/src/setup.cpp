@@ -118,12 +118,12 @@ xyz_names_(nmol),
 isTransRot_(nmol),
 runSpecs_(2),  // 
 mbdfile_loc_(2),
-numTerm_(termcond.size()), // 
-termvals_(termcond.size()), //
-termmols_(termcond.size()), //
-termtype_(termcond.size()), //
-confiles_(confil.size()),  //
-conpads_(confil.size()),  //
+numTerm_((int)termcond.size()), //
+termvals_((int)termcond.size()), //
+termmols_((int)termcond.size()), //
+termtype_((int)termcond.size()), //
+confiles_((int)confil.size()),  //
+conpads_((int)confil.size()),  //
 andCombine_(termcomb), //
 orientRand_(randorient) //
 {

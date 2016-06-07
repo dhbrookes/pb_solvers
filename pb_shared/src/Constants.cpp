@@ -65,6 +65,7 @@ kappa_(consts.get_kappa()), patchSize_(consts.get_patch_size()),
 rotateSize_(consts.get_rotate_size()), units_(consts.get_unitsEnum()),
 tolSP_(consts.get_tol_sp())
 {
+  update_all();
 }
 
 void Constants::update_kbt()
@@ -96,8 +97,8 @@ void Constants::update_all()
 {
   update_kappa();
   update_rotate_size();
+  update_patch_size();
   update_kbt();
-  update_rotate_size();
 }
 
 void Constants::set_units( string units )

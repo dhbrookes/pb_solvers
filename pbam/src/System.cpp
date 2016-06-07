@@ -187,7 +187,7 @@ System::System(Setup setup, double cutoff)
       Pt trans;
       MyMatrix<double> rot;
       
-      Pt com = pqrI.get_cg_centers()[0];
+      Pt com = pqrI.get_center_geo();
       
       if (setup.getTypeIsTransRot(i))
       {
