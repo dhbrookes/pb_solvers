@@ -91,7 +91,7 @@ protected:
   
   /*
    Perform a monte carlo search for the best center to encompass the 
-   remaining charges
+   remaining chargesg
    */
   CGSphere find_best_center(vector<Pt> sp,vector<Pt> np,
                             vector<int> unbounded,

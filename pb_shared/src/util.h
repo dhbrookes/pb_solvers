@@ -407,6 +407,31 @@ typedef Point<double> Pt;
 typedef Quaternion Quat;
 
 
+// use Rakhmanov method
+vector<Pt> make_uniform_sph_grid(int m_grid, double r)
+{
+  
+  vector<Pt> grid (m_grid);
+  Pt gp;
+  grid[0].set_r(r);
+  grid[0].set_theta(0.0);
+  grid[0].set_phi(0.0);
+  double hk;
+  for (int k = 0; k < m_grid; k++)
+  {
+    grid[k].set_r(r);
+    hk = -1 + ((2 * (k-1)) / (m_grid-1));
+    grid[k].set_theta(acos(hk));
+    
+    if (k==0 || k==m_grid-1) grid[k].set_phi(0);
+    else
+    {
+      grid[k] = fmod(grid[k-1].phi() + (3.6/sqrt(m_grid) * (1/sqrt(1-(hk*hk)))),
+                     2*M_PI);
+    }
+  }
+  return grid;
+}
 
 
 #endif /* util_h */
