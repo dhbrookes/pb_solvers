@@ -1,0 +1,11 @@
+#!/bin/bash
+#$ -S /bin/bash
+#$ -cwd
+#$ -o bd_nam.out
+#$ -j y
+###$ -q lfelber*
+#$ -pe threaded 1
+
+EXEC="../../../../bin/pbam"
+
+$EXEC run.dynamics.inp
