@@ -183,6 +183,26 @@ void IEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc)
   }
 }
 
+void IEMatrix::reset_mat()
+{
+  for (int k = 0; k < IE_.size(); k++)
+  {
+    for (int n = 0; n < p_; n++)
+    {
+      for (int m = -n; m < n+1; m++)
+      {
+        for (int l = 0; l < p_; l++)
+        {
+          for (int s = -l; s < l+1; s++)
+          {
+            set_IE_k_nm_ls(k, n, m, l, s, cmplx(0, 0));
+          }
+        }
+      }
+    }
+  }
+}
+
 TMatrix::TMatrix(int p, shared_ptr<System> _sys,
                  shared_ptr<SHCalc> _shcalc,
                  shared_ptr<Constants> _consts,
@@ -617,6 +637,31 @@ void HMatrix::calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
   }
 }
 
+double HMatrix::calc_converge(shared_ptr<HMatrix> curr,
+                              shared_ptr<HMatrix> prev)
+{
+  double mu=0, num, den;
+  cmplx hnm_curr, hnm_prev;
+  for (int k = 0; curr->mat_.size(); k++)
+  {
+    num = 0;
+    den = 0;
+    for (int n = 0; n < curr->get_p(); n++)
+    {
+      for (int m = -n; m < n+1; m++)
+      {
+        hnm_curr = curr->get_mat_knm(k, n, m);
+        hnm_prev = prev->get_mat_knm(k, n, m);
+        num += abs(hnm_curr - hnm_prev);
+        den += abs(hnm_curr) + abs(hnm_prev);
+      }
+    }
+    mu += num / (0.5 * den);
+  }
+  
+  return mu;
+}
+
 FMatrix::FMatrix(int I, int ns, int p, double kappa)
 :ComplexMoleculeMatrix(I, ns, p), kappa_(kappa)
 {
@@ -661,6 +706,140 @@ void FMatrix::calc_vals(Molecule mol, shared_ptr<FMatrix> prev,
 }
 
 
+Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+               shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
+               int p)
+:_E_(_sys->get_n()),
+_LE_(_sys->get_n()),
+_IE_(_sys->get_n()),
+_LF_(_sys->get_n()),
+_LH_(_sys->get_n()),
+_LHN_(_sys->get_n()),
+_XF_(_sys->get_n()),
+_XH_(_sys->get_n()),
+_H_(_sys->get_n()),
+_F_(_sys->get_n()),
+_shCalc_(_shCalc),
+_bCalc_(_bCalc),
+_consts_(_consts),
+_sys_(_sys),
+p_(p),
+kappa_(_consts->get_kappa())
+{
+  _reExConsts_ = make_shared<ReExpCoeffsConstants> (kappa_,
+                                                    _sys_->get_lambda(), p_);
+  _T_ = make_shared<TMatrix> (p_, _sys_, _shCalc_, _consts_,
+                             _bCalc_, _reExConsts_);
+  Molecule mol;
+  // intialize all matrices
+  for (int I = 0; I < _sys_->get_n(); I++)
+  {
+    mol = _sys_->get_molecule(I);
+    
+    _E_[I] = make_shared<EMatrix> (I, _sys_->get_Ns_i(I), p_);
+    _E_[I]->calc_vals(mol, _shCalc_, _consts_->get_dielectric_prot());
+    
+    _LE_[I] = make_shared<LEMatrix> (I, _sys_->get_Ns_i(I), p_);
+    _LE_[I]->calc_vals(mol, _shCalc_, _consts_->get_dielectric_prot());
+    
+    _IE_[I] = make_shared<IEMatrix>(I, _sys_->get_Ns_i(I), p_);
+    _IE_[I]->calc_vals(_sys_->get_molecule(I), _shCalc_);
+    
+    _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
+    _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa_);
+    _LHN_[I] = make_shared<LHNMatrix> (I, _sys_->get_Ns_i(I), p_);
+    
+    _XF_[I] = make_shared<XFMatrix> (I, _sys_->get_Ns_i(I), p_,
+                                     _consts_->get_dielectric_prot(),
+                                     _consts_->get_dielectric_water());
+    _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_);
+    
+    _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+    _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+    _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+    _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+  }
+}
 
+double Solver::iter()
+{
+  double mu = 0;
+  Molecule mol;
+  // start an iteration by calculating XF and XH (is this right?)
+  for (int I = 0; I < _sys_->get_n(); I++)
+  {
+    mol = _sys_->get_molecule(I);
+    _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _E_[I], _LE_[I],
+                      _LH_[I], _LF_[I], _LHN_[I], kappa_);
+    _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _E_[I], _LE_[I],
+                      _LH_[I], _LF_[I], _LHN_[I]);
+    
+    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _prevF_[I], _IE_[I], _bCalc_);
+    _F_[I]->calc_vals(mol, _prevF_[I], _XF_[I], _prevH_[I], _IE_[I], _bCalc_);
+    
+    _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_);
+    _LH_[I]->calc_vals(_T_, _H_[I], _shCalc_, _sys_, _bCalc_);
+    
+    mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
+  }
+  
+  for (int I = 0; I < _sys_->get_n(); I++)
+  {
+    _LHN_[I]->calc_vals(_T_, _H_); // requires all Hs so do it after they are
+                                    // calculated
+  }
+  update_prev();
+  return mu;
+}
+
+
+void Solver::update_prev()
+{
+  for (int I = 0; I < _H_.size(); I++)
+  {
+    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+    {
+      for (int n = 0; n < p_; n++)
+      {
+        for (int m = 0; m < p_; m++)
+        {
+          _prevH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
+          _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
+        }
+      }
+    }
+  }
+}
+
+void Solver::solve(double tol, int maxiter)
+{
+  double mu;
+  for (int t = 0; t < maxiter; t++)
+  {
+    mu = iter();
+    if (mu < tol) break;
+  }
+}
+
+
+void Solver::reset_all()
+{
+  for (int I = 0; I < _sys_->get_n(); I++)
+  {
+    _E_[I]->reset_mat();
+    _LE_[I]->reset_mat();
+    _IE_[I]->reset_mat();
+    _LF_[I]->reset_mat();
+    _LH_[I]->reset_mat();
+    _LHN_[I]->reset_mat();
+    _XF_[I]->reset_mat();
+    _XH_[I]->reset_mat();
+    _H_[I]->reset_mat();
+    _F_[I]->reset_mat();
+    _prevH_[I]->reset_mat();
+    _prevF_[I]->reset_mat();
+    
+  }
+}
 
 
