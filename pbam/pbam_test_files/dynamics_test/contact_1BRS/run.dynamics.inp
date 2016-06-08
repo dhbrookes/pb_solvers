@@ -12,7 +12,7 @@ randorient
 
 termct 1
 termcombine or
-term 1 contact 1BRS.contact 2.5
+term 1 contact 1BRS.contact 2.0
 
 attypes 2
 type 1 1 move 0.015 0.000045

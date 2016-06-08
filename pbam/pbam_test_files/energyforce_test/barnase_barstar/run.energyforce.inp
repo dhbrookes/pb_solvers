@@ -1,0 +1,18 @@
+runtype energyforce
+runname energyforce.1BRS_0.05M.out
+
+units kT
+salt 0.05
+temp 298
+idiel 4 
+sdiel 78
+
+attypes 2
+type 1 1
+pqr 1 1BRS_A.pqr
+xyz 1 positions_A.xyz
+
+type 2 1
+pqr 2 1BRS_D.pqr
+xyz 2 positions_D.xyz
+

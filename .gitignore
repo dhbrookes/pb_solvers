@@ -7,7 +7,6 @@
 bin
 build
 
-
 ## PBAM output ignores
 *.dx 
 *.dat
