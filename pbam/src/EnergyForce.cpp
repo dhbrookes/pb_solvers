@@ -240,10 +240,7 @@ _besselCalc_(_asolver->get_bessel()),
 _shCalc_(_asolver->get_sh()),
 _consts_(_asolver->get_consts()),
 _sys_(_asolver->get_sys()),
-//energy_approx_(N_, 0),
-//force_approx_(N_, Pt(0,0,0)),
-//torque_approx_(N_, Pt(0,0,0)),
-unit_(unt)
+unt_(unt)
 {
   energy_approx_ = make_shared<vector<double> >(N_);
   force_approx_ = make_shared<vector<Pt> >(N_);
@@ -252,7 +249,30 @@ unit_(unt)
   dimer_.reserve(N_*N_);
   trimer_.reserve(N_*N_*N_);
   
+  compute_units(unt);
   generatePairsTrips();
+}
+
+void ThreeBody::compute_units(Units unt)
+{
+  if (unt==INTERNAL)
+  {
+    unit_ = "Internal";
+    unit_conv_ = 1.0;
+  } else if (unt == KCALMOL)
+  {
+    unit_  = "kCal/Mol";
+    unit_conv_ = _consts_->convert_int_to_kcal_mol(1.0);
+  } else if (unt == JMOL)
+  {
+    unit_  = "Joules/Mol";
+    unit_conv_ = _consts_->convert_int_to_jmol(1.0);
+  } else if (unt == kT)
+  {
+    unit_  = "kT";
+    unit_conv_ = _consts_->convert_int_to_kT(1.0);
+  }
+  
 }
 
 void ThreeBody::generatePairsTrips()
@@ -328,48 +348,6 @@ shared_ptr<System> ThreeBody::make_subsystem(vector<int> mol_idx)
   return _subsys;
 }
 
-//// Two or three body approximation computation
-//void ThreeBody::solveNmer( int num, double preclim )
-//{
-//  int i, j;
-//  shared_ptr<vector<vector<int> > > nmer = (( num == 2 ) ?
-//                                            make_shared<vector<vector<int> > >(dimer_) :
-//                                            make_shared<vector<vector<int> > >(trimer_));
-//  vector< Molecule > mol_temp;
-//  shared_ptr<System> _sysTemp = make_subsystem(nmer->operator[](0));
-//  shared_ptr<ASolver> _asolvTemp = make_shared<ASolver>(_besselCalc_, _shCalc_,
-//                                                        _sysTemp, _consts_, p_);
-//  
-//  for( i = 0; i < nmer->size(); i++)
-//  {
-//    shared_ptr<System> _sysTemp = make_subsystem(nmer->operator[](i));
-//    
-//    _asolvTemp->reset_all(_sysTemp);
-//    _asolvTemp->solve_A(preclim);
-//    _asolvTemp->solve_gradA(preclim);
-//    
-//    PhysCalc phys_all( _asolvTemp, outfname_, unit_);
-//    phys_all.calc_all();
-//    
-//    for ( j = 0; j < num; j++)
-//    {
-//      if ( num == 2 )
-//      {
-//        energy_di_[i][j] = phys_all.get_omegai_conv(j);
-//        force_di_[i][j] = phys_all.get_forcei_conv(j);
-//        torque_di_[i][j] = phys_all.get_taui_conv(j);
-//      } else
-//      {
-//        energy_tri_[i][j] = phys_all.get_omegai_conv(j);
-//        force_tri_[i][j] = phys_all.get_forcei_conv(j);
-//        torque_tri_[i][j] = phys_all.get_taui_conv(j);
-//      }
-//    }
-//  }
-//  
-//  cout << num << "mers done " << endl;
-//}
-
 
 void ThreeBody::solveNmer( int num, double preclim )
 {
@@ -387,12 +365,11 @@ void ThreeBody::solveNmer( int num, double preclim )
     {
       tempmol = nmer->operator[](i);
       poles = p_;
-//      cout << i << endl;
     }
     shared_ptr<System> _sysTemp = make_subsystem(tempmol);
-    shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles);
-    shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
-    shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*poles);
+    auto bConsta = make_shared<BesselConstants>(2*poles);
+    auto bCalcu = make_shared<BesselCalc>(2*poles, bConsta);
+    auto SHConsta = make_shared<SHCalcConstants>(2*poles);
     shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles, SHConsta);
     shared_ptr<Constants> consts =  make_shared<Constants>(*_consts_);
     
@@ -400,11 +377,10 @@ void ThreeBody::solveNmer( int num, double preclim )
                                                           _sysTemp,
                                                           consts, poles);
     
-//    _asolvTemp->reset_all(_sysTemp);
     _asolvTemp->solve_A(preclim);
     _asolvTemp->solve_gradA(preclim);
     
-    PhysCalc phys_all( _asolvTemp, outfname_, unit_);
+    PhysCalc phys_all( _asolvTemp, outfname_, unt_);
     phys_all.calc_all();
     
     #pragma omp critical
@@ -491,7 +467,7 @@ void ThreeBody::calcTBDEnForTor( )
 
 void ThreeBody::printTBDEnForTor( vector<string> outfile )
 {
-  int j;
+  int i, j;
   streambuf * buf;
   ofstream of;
   
@@ -512,6 +488,24 @@ void ThreeBody::printTBDEnForTor( vector<string> outfile )
     out << get_forcei_approx(j).x();
     out << ", " << get_forcei_approx(j).y()<< ", ";
     out << get_forcei_approx(j).z()<< "]"<< endl;
+  }
+  
+  out << "My units are " << unit_ << ". Time: " << _sys_->get_time() << endl;
+  
+  for ( i = 0; i < N_; i++)
+  {
+    out << "MOLECULE #" << i + 1 << " radius: " << _sys_->get_radi(i) << endl;
+    out << "\tPOSITION: [" << _sys_->get_centeri(i).x() << ", "
+        << _sys_->get_centeri(i).y() << ", ";
+    out << _sys_->get_centeri(i).z() << "]" << endl;
+    out << "\tENERGY: " << unit_conv_ * get_energyi_approx(j) << endl;
+    
+    out << "\tFORCE: " << unit_conv_ * get_forcei_approx(j).norm() << ", [";
+    out << unit_conv_ * get_forcei_approx(j).x() << " "
+        << unit_conv_ * get_forcei_approx(j).y() << " "
+        << unit_conv_ * get_forcei_approx(j).z()<< "]"<<endl;
+//    out << "\tTORQUE: " << sqrt(torque_norm) << ", [";
+//    out << torque_i.x() << " " << torque_i.y()<<" "<<torque_i.z()<< "]"<<endl;
   }
   
   if ( outfile[0] != "") printNmer( 2, outfile[0]);
@@ -554,12 +548,8 @@ void ThreeBody::printNmer( int num, string outfile)
       Pt com = (_sys_->get_centeri(mol[0]) + _sys_->get_centeri(mol[1]) +
                 _sys_->get_centeri(mol[1]))*(1/3.);
       dists[0] = _sys_->get_centeri(mol[0]).dist(com);
-      //_sysTemp->get_pbc_dist_vec(0, 1).norm();
       dists[1] = _sys_->get_centeri(mol[1]).dist(com);
-      //_sysTemp->get_pbc_dist_vec(0, 2).norm();
       dists[2] = _sys_->get_centeri(mol[2]).dist(com);
-      //_sysTemp->get_pbc_dist_vec(1, 2).norm();
-      //sort( dists.begin(), dists.end());
       dist = dists[0] + dists[1] + dists[2];
     }
     for ( j = 0; j < num; j++)
@@ -638,7 +628,6 @@ void PhysCalc::compute_units( shared_ptr<Constants> cst, Units unit)
     unit_  = "kT";
     unit_conv_ = cst->convert_int_to_kT(1.0);
   }
-  
 }
 
 void PhysCalc::print_all()

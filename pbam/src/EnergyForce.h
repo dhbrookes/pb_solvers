@@ -237,7 +237,9 @@ protected:
   
   double cutoffTBD_;  // distance for cutoff of tbd approx
   
-  Units unit_; // String value of units
+  string unit_; // String value of units
+  Units unt_; // String value of units
+  double unit_conv_; // Conversion factor for units from internal
   
   vector<vector<int > > dimer_;   // list of all pairs by their index #
   vector<vector<int > > trimer_;  // list of all triplets by their index #
@@ -261,6 +263,8 @@ protected:
   shared_ptr<Constants>       _consts_;
   
   string outfname_;
+  
+  void compute_units(Units unt);
   
   shared_ptr<System> make_subsystem(vector<int> mol_idx);
   
