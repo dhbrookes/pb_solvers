@@ -33,10 +33,8 @@
 
 #include <memory>
 #include <time.h>
-#include "setup.h"
-#include "BD.h"
 #include "PBAMStruct.h"
-#include "Electrostatics.h"
+#include "BD.h"
 
 
 using namespace std;

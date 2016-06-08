@@ -35,8 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <random>
 #include <memory>
-#include "EnergyForce.h"
-#include "readutil.h"
+#include "Electrostatics.h"
 
 /*
  Base class for implementing termination conditions in BD

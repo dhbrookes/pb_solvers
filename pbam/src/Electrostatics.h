@@ -31,7 +31,7 @@
 #ifndef Electrostatics_h
 #define Electrostatics_h
 
-#include "ASolver.h"
+#include "EnergyForce.h"
 #include <time.h> 
 //#include <omp.h>
 

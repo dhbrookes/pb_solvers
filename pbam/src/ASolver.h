@@ -33,7 +33,6 @@
 #define ASolver_h
 
 #include "ReExpCalc.h"
-#include "System.h"
 #include <memory>
 
 /*
