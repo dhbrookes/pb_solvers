@@ -8,6 +8,32 @@
 
 #include "Solver.h"
 
+vector<Pt> make_uniform_sph_grid(int m_grid, double r)
+{
+  
+  vector<Pt> grid (m_grid);
+  Pt gp;
+  grid[0].set_r(r);
+  grid[0].set_theta(0.0);
+  grid[0].set_phi(0.0);
+  double hk;
+  for (int k = 0; k < m_grid; k++)
+  {
+    grid[k].set_r(r);
+    hk = -1 + ((2 * (k-1)) / (m_grid-1));
+    grid[k].set_theta(acos(hk));
+    
+    if (k==0 || k==m_grid-1) grid[k].set_phi(0);
+    else
+    {
+      grid[k] = fmod(grid[k-1].phi() + (3.6/sqrt(m_grid) * (1/sqrt(1-(hk*hk)))),
+                     2*M_PI);
+    }
+  }
+  return grid;
+}
+
+
 ComplexMoleculeMatrix::ComplexMoleculeMatrix(int I, int ns, int p)
 :p_(p), mat_(ns, MyMatrix<cmplx> (p, 2*p+1)), I_(I)
 {
@@ -114,6 +140,7 @@ IE_(mol.get_ns(), MatOfMats<cmplx>::type(p, 2*p+1, MyMatrix<cmplx>(p, 2*p+1)))
 {
   calc_vals(mol, _shcalc);
 }
+
 
 void IEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc)
 {

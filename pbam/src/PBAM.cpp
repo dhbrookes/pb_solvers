@@ -129,7 +129,7 @@ solveTol_(1e-4)
                              confil, conpad, xyzf);
 
   check_setup();
-  syst_ = make_shared<System> (mls); // TODO: add in boxl and cutoff
+  syst_ = make_shared<System> (mls, pbami.boxLen_);
   consts_ = make_shared<Constants> (*setp_);
   init_write_system();
 }

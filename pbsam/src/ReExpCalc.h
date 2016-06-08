@@ -32,7 +32,6 @@
 #ifndef ReExpCalc_h
 #define ReExpCalc_h
 
-#include "BesselCalc.h"
 #include "SHCalc.h"
 
 using namespace std;
