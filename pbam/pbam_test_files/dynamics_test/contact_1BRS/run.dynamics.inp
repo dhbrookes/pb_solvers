@@ -1,22 +1,222 @@
-runtype dynamics 2
-runname dyn_cont_barn
+runtype dynamics 100
+runname dyn_barn_pbc
 
-salt 0.01
+salt 0.05
 temp 298
 idiel 4 
 sdiel 78
 
+pbc 3 325
+
+randorient
+
 termct 1
 termcombine or
-term 1 contact 2.5 1 2
+term 1 contact 1BRS.contact 2.5
 
 attypes 2
-type 1 2 move 0.015 0.000045
+type 1 1 move 0.015 0.000045
 pqr 1 1BRS_chainA.pqr
-xyz 1 1 pos_1_1.xyz
-xyz 1 2 pos_1_2.xyz
+xyz 1 1 xyz/pos_0_1.xyz
+xyz 1 2 xyz/pos_0_2.xyz
+xyz 1 3 xyz/pos_0_3.xyz
+xyz 1 4 xyz/pos_0_4.xyz
+xyz 1 5 xyz/pos_0_5.xyz
+xyz 1 6 xyz/pos_0_6.xyz
+xyz 1 7 xyz/pos_0_7.xyz
+xyz 1 8 xyz/pos_0_8.xyz
+xyz 1 9 xyz/pos_0_9.xyz
+xyz 1 10 xyz/pos_0_10.xyz
+xyz 1 11 xyz/pos_0_11.xyz
+xyz 1 12 xyz/pos_0_12.xyz
+xyz 1 13 xyz/pos_0_13.xyz
+xyz 1 14 xyz/pos_0_14.xyz
+xyz 1 15 xyz/pos_0_15.xyz
+xyz 1 16 xyz/pos_0_16.xyz
+xyz 1 17 xyz/pos_0_17.xyz
+xyz 1 18 xyz/pos_0_18.xyz
+xyz 1 19 xyz/pos_0_19.xyz
+xyz 1 20 xyz/pos_0_20.xyz
+xyz 1 21 xyz/pos_0_21.xyz
+xyz 1 22 xyz/pos_0_22.xyz
+xyz 1 23 xyz/pos_0_23.xyz
+xyz 1 24 xyz/pos_0_24.xyz
+xyz 1 25 xyz/pos_0_25.xyz
+xyz 1 26 xyz/pos_0_26.xyz
+xyz 1 27 xyz/pos_0_27.xyz
+xyz 1 28 xyz/pos_0_28.xyz
+xyz 1 29 xyz/pos_0_29.xyz
+xyz 1 30 xyz/pos_0_30.xyz
+xyz 1 31 xyz/pos_0_31.xyz
+xyz 1 32 xyz/pos_0_32.xyz
+xyz 1 33 xyz/pos_0_33.xyz
+xyz 1 34 xyz/pos_0_34.xyz
+xyz 1 35 xyz/pos_0_35.xyz
+xyz 1 36 xyz/pos_0_36.xyz
+xyz 1 37 xyz/pos_0_37.xyz
+xyz 1 38 xyz/pos_0_38.xyz
+xyz 1 39 xyz/pos_0_39.xyz
+xyz 1 40 xyz/pos_0_40.xyz
+xyz 1 41 xyz/pos_0_41.xyz
+xyz 1 42 xyz/pos_0_42.xyz
+xyz 1 43 xyz/pos_0_43.xyz
+xyz 1 44 xyz/pos_0_44.xyz
+xyz 1 45 xyz/pos_0_45.xyz
+xyz 1 46 xyz/pos_0_46.xyz
+xyz 1 47 xyz/pos_0_47.xyz
+xyz 1 48 xyz/pos_0_48.xyz
+xyz 1 49 xyz/pos_0_49.xyz
+xyz 1 50 xyz/pos_0_50.xyz
+xyz 1 51 xyz/pos_0_51.xyz
+xyz 1 52 xyz/pos_0_52.xyz
+xyz 1 53 xyz/pos_0_53.xyz
+xyz 1 54 xyz/pos_0_54.xyz
+xyz 1 55 xyz/pos_0_55.xyz
+xyz 1 56 xyz/pos_0_56.xyz
+xyz 1 57 xyz/pos_0_57.xyz
+xyz 1 58 xyz/pos_0_58.xyz
+xyz 1 59 xyz/pos_0_59.xyz
+xyz 1 60 xyz/pos_0_60.xyz
+xyz 1 61 xyz/pos_0_61.xyz
+xyz 1 62 xyz/pos_0_62.xyz
+xyz 1 63 xyz/pos_0_63.xyz
+xyz 1 64 xyz/pos_0_64.xyz
+xyz 1 65 xyz/pos_0_65.xyz
+xyz 1 66 xyz/pos_0_66.xyz
+xyz 1 67 xyz/pos_0_67.xyz
+xyz 1 68 xyz/pos_0_68.xyz
+xyz 1 69 xyz/pos_0_69.xyz
+xyz 1 70 xyz/pos_0_70.xyz
+xyz 1 71 xyz/pos_0_71.xyz
+xyz 1 72 xyz/pos_0_72.xyz
+xyz 1 73 xyz/pos_0_73.xyz
+xyz 1 74 xyz/pos_0_74.xyz
+xyz 1 75 xyz/pos_0_75.xyz
+xyz 1 76 xyz/pos_0_76.xyz
+xyz 1 77 xyz/pos_0_77.xyz
+xyz 1 78 xyz/pos_0_78.xyz
+xyz 1 79 xyz/pos_0_79.xyz
+xyz 1 80 xyz/pos_0_80.xyz
+xyz 1 81 xyz/pos_0_81.xyz
+xyz 1 82 xyz/pos_0_82.xyz
+xyz 1 83 xyz/pos_0_83.xyz
+xyz 1 84 xyz/pos_0_84.xyz
+xyz 1 85 xyz/pos_0_85.xyz
+xyz 1 86 xyz/pos_0_86.xyz
+xyz 1 87 xyz/pos_0_87.xyz
+xyz 1 88 xyz/pos_0_88.xyz
+xyz 1 89 xyz/pos_0_89.xyz
+xyz 1 90 xyz/pos_0_90.xyz
+xyz 1 91 xyz/pos_0_91.xyz
+xyz 1 92 xyz/pos_0_92.xyz
+xyz 1 93 xyz/pos_0_93.xyz
+xyz 1 94 xyz/pos_0_94.xyz
+xyz 1 95 xyz/pos_0_95.xyz
+xyz 1 96 xyz/pos_0_96.xyz
+xyz 1 97 xyz/pos_0_97.xyz
+xyz 1 98 xyz/pos_0_98.xyz
+xyz 1 99 xyz/pos_0_99.xyz
+xyz 1 100 xyz/pos_0_0.xyz
 
-type 2 2 move 0.015 0.000045
+type 2 124 move 0.015 0.000045
 pqr 2 1BRS_chainD.pqr
-xyz 2 1 pos_2_1.xyz
-xyz 2 2 pos_2_2.xyz
+xyz 2 1 xyz/pos_1_1.xyz
+xyz 2 2 xyz/pos_1_2.xyz
+xyz 2 3 xyz/pos_1_3.xyz
+xyz 2 4 xyz/pos_1_4.xyz
+xyz 2 5 xyz/pos_1_5.xyz
+xyz 2 6 xyz/pos_1_6.xyz
+xyz 2 7 xyz/pos_1_7.xyz
+xyz 2 8 xyz/pos_1_8.xyz
+xyz 2 9 xyz/pos_1_9.xyz
+xyz 2 10 xyz/pos_1_10.xyz
+xyz 2 11 xyz/pos_1_11.xyz
+xyz 2 12 xyz/pos_1_12.xyz
+xyz 2 13 xyz/pos_1_13.xyz
+xyz 2 14 xyz/pos_1_14.xyz
+xyz 2 15 xyz/pos_1_15.xyz
+xyz 2 16 xyz/pos_1_16.xyz
+xyz 2 17 xyz/pos_1_17.xyz
+xyz 2 18 xyz/pos_1_18.xyz
+xyz 2 19 xyz/pos_1_19.xyz
+xyz 2 20 xyz/pos_1_20.xyz
+xyz 2 21 xyz/pos_1_21.xyz
+xyz 2 22 xyz/pos_1_22.xyz
+xyz 2 23 xyz/pos_1_23.xyz
+xyz 2 24 xyz/pos_1_24.xyz
+xyz 2 25 xyz/pos_1_25.xyz
+xyz 2 26 xyz/pos_1_26.xyz
+xyz 2 27 xyz/pos_1_27.xyz
+xyz 2 28 xyz/pos_1_28.xyz
+xyz 2 29 xyz/pos_1_29.xyz
+xyz 2 30 xyz/pos_1_30.xyz
+xyz 2 31 xyz/pos_1_31.xyz
+xyz 2 32 xyz/pos_1_32.xyz
+xyz 2 33 xyz/pos_1_33.xyz
+xyz 2 34 xyz/pos_1_34.xyz
+xyz 2 35 xyz/pos_1_35.xyz
+xyz 2 36 xyz/pos_1_36.xyz
+xyz 2 37 xyz/pos_1_37.xyz
+xyz 2 38 xyz/pos_1_38.xyz
+xyz 2 39 xyz/pos_1_39.xyz
+xyz 2 40 xyz/pos_1_40.xyz
+xyz 2 41 xyz/pos_1_41.xyz
+xyz 2 42 xyz/pos_1_42.xyz
+xyz 2 43 xyz/pos_1_43.xyz
+xyz 2 44 xyz/pos_1_44.xyz
+xyz 2 45 xyz/pos_1_45.xyz
+xyz 2 46 xyz/pos_1_46.xyz
+xyz 2 47 xyz/pos_1_47.xyz
+xyz 2 48 xyz/pos_1_48.xyz
+xyz 2 49 xyz/pos_1_49.xyz
+xyz 2 50 xyz/pos_1_50.xyz
+xyz 2 51 xyz/pos_1_51.xyz
+xyz 2 52 xyz/pos_1_52.xyz
+xyz 2 53 xyz/pos_1_53.xyz
+xyz 2 54 xyz/pos_1_54.xyz
+xyz 2 55 xyz/pos_1_55.xyz
+xyz 2 56 xyz/pos_1_56.xyz
+xyz 2 57 xyz/pos_1_57.xyz
+xyz 2 58 xyz/pos_1_58.xyz
+xyz 2 59 xyz/pos_1_59.xyz
+xyz 2 60 xyz/pos_1_60.xyz
+xyz 2 61 xyz/pos_1_61.xyz
+xyz 2 62 xyz/pos_1_62.xyz
+xyz 2 63 xyz/pos_1_63.xyz
+xyz 2 64 xyz/pos_1_64.xyz
+xyz 2 65 xyz/pos_1_65.xyz
+xyz 2 66 xyz/pos_1_66.xyz
+xyz 2 67 xyz/pos_1_67.xyz
+xyz 2 68 xyz/pos_1_68.xyz
+xyz 2 69 xyz/pos_1_69.xyz
+xyz 2 70 xyz/pos_1_70.xyz
+xyz 2 71 xyz/pos_1_71.xyz
+xyz 2 72 xyz/pos_1_72.xyz
+xyz 2 73 xyz/pos_1_73.xyz
+xyz 2 74 xyz/pos_1_74.xyz
+xyz 2 75 xyz/pos_1_75.xyz
+xyz 2 76 xyz/pos_1_76.xyz
+xyz 2 77 xyz/pos_1_77.xyz
+xyz 2 78 xyz/pos_1_78.xyz
+xyz 2 79 xyz/pos_1_79.xyz
+xyz 2 80 xyz/pos_1_80.xyz
+xyz 2 81 xyz/pos_1_81.xyz
+xyz 2 82 xyz/pos_1_82.xyz
+xyz 2 83 xyz/pos_1_83.xyz
+xyz 2 84 xyz/pos_1_84.xyz
+xyz 2 85 xyz/pos_1_85.xyz
+xyz 2 86 xyz/pos_1_86.xyz
+xyz 2 87 xyz/pos_1_87.xyz
+xyz 2 88 xyz/pos_1_88.xyz
+xyz 2 89 xyz/pos_1_89.xyz
+xyz 2 90 xyz/pos_1_90.xyz
+xyz 2 91 xyz/pos_1_91.xyz
+xyz 2 92 xyz/pos_1_92.xyz
+xyz 2 93 xyz/pos_1_93.xyz
+xyz 2 94 xyz/pos_1_94.xyz
+xyz 2 95 xyz/pos_1_95.xyz
+xyz 2 96 xyz/pos_1_96.xyz
+xyz 2 97 xyz/pos_1_97.xyz
+xyz 2 98 xyz/pos_1_98.xyz
+xyz 2 99 xyz/pos_1_99.xyz
+xyz 2 100 xyz/pos_1_0.xyz
