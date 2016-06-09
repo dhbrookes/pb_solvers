@@ -370,7 +370,7 @@ void PBAM::run_bodyapprox()
   threeBodTest.calcTBDEnForTor();
 
   
-  threeBodTest.printTBDEnForTor(setp_->getMBDLoc());
+  threeBodTest.printTBDEnForTor(setp_->getRunName(), setp_->getMBDLoc());
   
   printf ("manybody approx calc took me %f seconds.\n",
           ((float)t3)/CLOCKS_PER_SEC);
