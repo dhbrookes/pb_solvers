@@ -37,7 +37,7 @@ cdef class PBAM_Solver:
     nmol = 1
     natm = cvarray(shape=(nmol), itemsize=sizeof(int), format="i")
     natm[0] = <int> len(molecules['atoms'])
-    xyzrc = cvarray(shape=(nmol, PBAMStruct.MOL_MAX,PBAMStruct.XYZRCWIDTH),
+    xyzrc = cvarray(shape=(nmol, PBAMStruct.AT_MAX, PBAMStruct.XYZRCWIDTH),
         itemsize=sizeof(double), format="d")
 
     #TODO: change from 1 molecule to many
@@ -52,10 +52,10 @@ cdef class PBAM_Solver:
     pbamin.sdiel_ = self.epsilons_;
     pbamin.idiel_ = self.epsiloni_;
 
-    pbamout = PBAMStruct.runPBAMSphinxWrap(
+    pbamout = PBAMWrap.runPBAMSphinxWrap(
       # trying to figure out next line... seems like a pointer to the xyzr vect
         <double (*)[PBAMStruct.AT_MAX][PBAMStruct.XYZRCWIDTH]> &xyzrc[0,0,0],
-        nmol, natm, pbamin)
+        nmol, <int (*)> &natm[0], pbamin)
 
     return {'energy': pbamout.energies_,
         'force': pbamout.forces_}

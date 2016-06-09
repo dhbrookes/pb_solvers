@@ -16,7 +16,15 @@ set(EXECUTABLE_INSTALL_PATH bin)
 ################################################
 option(ENABLE_PBAM_SPHINX "pbam SPHINX" OFF)
 if(ENABLE_PBAM_SPHINX)
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
+
+  if(APPLE)
+    list(APPEND CMAKE_MODULE_LINKER_FLAGS "-Wl,-undefined,dynamic_lookup")
+  endif()
+  if(WIN32)
+    list(APPEND CMAKE_MODULE_LINKER_FLAGS "/LIBPATH:C:\Python34\libs")
+  endif()
+
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
 
   find_package(PythonInterp 3.4 REQUIRED)
   find_package(PythonInclude REQUIRED)
@@ -26,8 +34,8 @@ if(ENABLE_PBAM_SPHINX)
   add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
                      COMMAND "${PYTHON_EXECUTABLE}" -m cython
                      -o "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
-                     "${CMAKE_CURRENT_SOURCE_DIR}/pbam.pyx"
-                     MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/pbam.pyx")
+                     "${CMAKE_CURRENT_SOURCE_DIR}/pbam_sph.pyx"
+                     MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/pbam_sph.pyx")
 endif()
 
 ################################################

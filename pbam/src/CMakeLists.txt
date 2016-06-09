@@ -68,8 +68,8 @@ if(ENABLE_PBAM_SPHINX)
   add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
                      COMMAND "${PYTHON_EXECUTABLE}" -m cython
                      -o "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
-                     "${CMAKE_CURRENT_SOURCE_DIR}/pbam.pyx"
-                     MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/pbam.pyx")
+                     "${CMAKE_CURRENT_SOURCE_DIR}/pbam_sph.pyx"
+                     MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/pbam_sph.pyx")
   
   
   add_library(pbam_sph MODULE
