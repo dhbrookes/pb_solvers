@@ -26,12 +26,13 @@ protected:
   int p_;
   int I_;
   
-  void set_mat_knm(int k, int n, int m, cmplx val) { mat_[k].set_val(n, m+p_, val); }
+  
     
 public:
   ComplexMoleculeMatrix(int I, int ns, int p);
   
   cmplx get_mat_knm(int k, int n, int m) { return mat_[k](n, m+p_); }
+  void set_mat_knm(int k, int n, int m, cmplx val) { mat_[k].set_val(n, m+p_, val); }
   MyMatrix<cmplx> get_mat_k(int k)       { return mat_[k]; }
   const int get_I() const   { return I_; }
   const int get_p() const   { return p_; }
@@ -107,6 +108,8 @@ public:
   }
   
   void calc_vals(Molecule mol, shared_ptr<SHCalc> sh_calc);
+  
+  void reset_mat();
 };
 
 
@@ -130,6 +133,8 @@ protected:
   vector<int> Nsi_; // number of spheres in each molecule
   
 public:
+  
+  TMatrix() { }
   
   TMatrix(int p, shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           shared_ptr<Constants> _consts, shared_ptr<BesselCalc> _besselcalc,
@@ -285,6 +290,10 @@ public:
                  shared_ptr<IEMatrix> IE,
                  shared_ptr<BesselCalc> bcalc);
   
+  // calculate convergence criteria (Equation 23)
+  static double calc_converge(shared_ptr<HMatrix> curr,
+                              shared_ptr<HMatrix> prev);
+  
 };
 
 
@@ -301,6 +310,58 @@ public:
                  shared_ptr<HMatrix> H,
                  shared_ptr<IEMatrix> IE,
                  shared_ptr<BesselCalc> bcalc);
+  
+};
+
+
+/*
+ Class the uses the above classes to iteratively solve for the F and H matrices
+ */
+class Solver
+{
+protected:
+  int p_;
+  double kappa_;
+  
+  vector<shared_ptr<EMatrix> >      _E_;
+  vector<shared_ptr<LEMatrix> >     _LE_;
+  vector<shared_ptr<IEMatrix> >     _IE_;
+  
+  vector<shared_ptr<LFMatrix> >     _LF_;
+  vector<shared_ptr<LHMatrix> >     _LH_;
+  vector<shared_ptr<LHNMatrix> >    _LHN_;
+  vector<shared_ptr<XFMatrix> >     _XF_;
+  vector<shared_ptr<XHMatrix> >     _XH_;
+  
+  vector<shared_ptr<HMatrix> >      _H_;
+  vector<shared_ptr<HMatrix> >      _prevH_;
+  
+  vector<shared_ptr<FMatrix> >      _F_;
+  vector<shared_ptr<FMatrix> >      _prevF_;
+  
+  shared_ptr<TMatrix>               _T_;
+  
+  shared_ptr<System>                _sys_;
+  shared_ptr<SHCalc>                _shCalc_;
+  shared_ptr<BesselCalc>            _bCalc_;
+  shared_ptr<Constants>             _consts_;
+  shared_ptr<ReExpCoeffsConstants>  _reExConsts_;
+  
+  // update prevH and prevF
+  void update_prev();
+  
+  // run an iteration and return convergence value
+  double iter();
+
+public:
+  Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+         shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
+         int p);
+  
+  
+  void solve(double tol, int maxiter=10000);
+  
+  void reset_all();
   
 };
 
