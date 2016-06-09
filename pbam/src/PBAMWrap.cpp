@@ -1,6 +1,6 @@
 ///  @file PBAMFlowWrap.cpp
 ///  @author  Lisa Felberg
-///  @brief c interface for the C++  
+///  @brief c interface for the C++
 ///  @ingroup PBAM
 ///  @version $Id$
 ///  @attention
@@ -57,23 +57,23 @@
 
 using namespace std;
 
-struct PBAMInput getPBAMParams()
+PBAMInput getPBAMParams()
 {
-  // create the pbam 
+  // create the pbam
   PBAM pbam;
 
   // get the struct for use in the c code
-  struct PBAMInput pbamI = pbam;
+  PBAMInput pbamI = pbam;
   return pbamI;
 }
 
 
 //  print the PBAM flow structure for debugging
-void printPBAMStruct( struct PBAMInput pbamIn )
+void printPBAMStruct( PBAMInput pbamIn )
 {
   printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-  printf("PBAMInput: %f, %f, %f, %f and\n runtype: %s\n runname: %s\n", 
-         pbamIn.temp_, 
+  printf("PBAMInput: %f, %f, %f, %f and\n runtype: %s\n runname: %s\n",
+         pbamIn.temp_,
          pbamIn.idiel_,
          pbamIn.sdiel_,
          pbamIn.salt_,
@@ -94,29 +94,80 @@ void printPBAMStruct( struct PBAMInput pbamIn )
   {
     for (int i=0; i<pbamIn.nmol_; i++)
     {
-      printf("This is mol %d movetype: %s, diff: %7.4lf, rot: %7.4lf\n", 
-        i, pbamIn.moveType_[i], pbamIn.transDiff_[i], pbamIn.rotDiff_[i]); 
+      printf("This is mol %d movetype: %s, diff: %7.4lf, rot: %7.4lf\n",
+        i, pbamIn.moveType_[i], pbamIn.transDiff_[i], pbamIn.rotDiff_[i]);
       for (int j=0; j < pbamIn.ntraj_; j++)
         printf("This is traj %d, xyzfname: %s\n", j, pbamIn.xyzfil_[i][j]);
     }
 
     for (int i=0; i<pbamIn.termct_; i++)
-      printf("This is termination cond %d: %s, val is %7.3f\n", i, 
+      printf("This is termination cond %d: %s, val is %7.3f\n", i,
               pbamIn.termnam_[i], pbamIn.termval_[i]);
   }
   printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 }
 
+// For python wrap
+PBAMOutput runPBAMSphinxWrap( double xyzrc[][AT_MAX][XYZRCWIDTH],
+                              int nmol,
+                              int natm[1],
+                              PBAMInput pbamfin)
+{
+   // convert xyzrc to a vector of Molecules
+  printf("Inside pbamrun sphinx\n");
+  vector<Molecule> mols;
+  for (int mol=0; mol < nmol; mol++)
+  {
+    int natoms = natm[mol];
+    vector<double> vdw, chg;
+    vector<Pt> cgpos;
+    string difftype;
+    double dtr, drot;
+
+    if (string(pbamfin.runType_) == "dynamics")
+    {
+      difftype = string(pbamfin.moveType_[mol]);
+      dtr = pbamfin.transDiff_[mol];
+      drot = pbamfin.rotDiff_[mol];
+    }
+    else
+    {
+      difftype = "stat";
+      dtr = 0.0;
+      drot = 0.0;
+      pbamfin.ntraj_ = 0;
+      pbamfin.termct_ = 0;
+      pbamfin.contct_ = 0;
+    }
+
+    for (unsigned int i=0; i < natoms; i++)
+    {
+      cgpos.push_back( Pt(xyzrc[mol][i][0],
+                          xyzrc[mol][i][1],
+                          xyzrc[mol][i][2]));
+      vdw.push_back(xyzrc[mol][i][3]);
+      chg.push_back(xyzrc[mol][i][4]);
+    }
+    mols.push_back(Molecule(difftype, chg, cgpos, vdw, mol, 0, dtr, drot));
+  }
+
+  //  create the PBAM object
+  PBAM pbam( pbamfin, mols );
+
+  PBAMOutput pbamOut = pbam.run_apbs( );
+  return pbamOut;
+}
+
 //  to call from APBS
 #ifdef PBAM_APBS
-struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamParams,
-                                   Valist* molecules[], int nmls ) 
+PBAMOutput runPBAMWrapAPBS( PBAMInput pbamParams,
+                            Valist* molecules[], int nmls )
 {
    // convert Valist to a vector of Molecules
   printf("Inside pbamrun\n");
   vector<Molecule> mols;
-  for (unsigned int mol=0; mol < nmls; mol++) 
-  {  
+  for (unsigned int mol=0; mol < nmls; mol++)
+  {
     Vatom *atom;
     unsigned int natoms = Valist_getNumberAtoms(molecules[mol]);
 
@@ -141,23 +192,23 @@ struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamParams,
       pbamParams.contct_ = 0;
     }
 
-    for (unsigned int i=0; i < natoms; i++) 
-    {   
+    for (unsigned int i=0; i < natoms; i++)
+    {
       atom = Valist_getAtom(molecules[mol], i);
       cgpos.push_back( Pt(Vatom_getPosition(atom)[0],
-                          Vatom_getPosition(atom)[1],   
-                          Vatom_getPosition(atom)[2])); 
+                          Vatom_getPosition(atom)[1],
+                          Vatom_getPosition(atom)[2]));
       vdw.push_back(Vatom_getRadius(atom));
       chg.push_back(Vatom_getCharge(atom));
     }
     mols.push_back(Molecule(difftype, chg, cgpos, vdw, mol, 0, dtr, drot));
   }
-  
+
   //  create the PBAM object
   PBAM pbam( pbamParams, mols );
 
   //  run PBAM!
-  struct PBAMOutput pbamO = pbam.run_apbs( );
+  PBAMOutput pbamO = pbam.run_apbs( );
 
   return pbamO;
 }

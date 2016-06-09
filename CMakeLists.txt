@@ -14,18 +14,21 @@ set(EXECUTABLE_INSTALL_PATH bin)
 ################################################
 ### For APBS Sphinx
 ################################################
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+option(ENABLE_PBAM_SPHINX "pbam SPHINX" OFF)
+if(ENABLE_PBAM_SPHINX)
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
 
-find_package(PythonInterp 3.4 REQUIRED)
-find_package(PythonInclude REQUIRED)
-find_package(Cython REQUIRED)
-
-include_directories("${PYTHON_INCLUDE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
-add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
-		COMMAND "${PYTHON_EXECUTABLE}" -m cython
-			-o "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
-			"${CMAKE_CURRENT_SOURCE_DIR}/pbam.pyx"
-		MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/pbam.pyx")
+  find_package(PythonInterp 3.4 REQUIRED)
+  find_package(PythonInclude REQUIRED)
+  find_package(Cython REQUIRED)
+ 
+  include_directories("${PYTHON_INCLUDE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
+  add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
+                     COMMAND "${PYTHON_EXECUTABLE}" -m cython
+                     -o "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/pbam.pyx"
+                     MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/pbam.pyx")
+endif()
 
 ################################################
 ##### Need a compiler for C++11
@@ -49,8 +52,8 @@ endif()
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 

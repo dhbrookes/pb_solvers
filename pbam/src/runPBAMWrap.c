@@ -56,7 +56,7 @@
 
 int main( int argc, char *argv[] )
 {
-   struct PBAMInput pbamIn = 
+   PBAMInput pbamIn = 
       getPBAMParams();
 
    // change any of the parameters you want...
@@ -67,7 +67,7 @@ int main( int argc, char *argv[] )
    // APBS uses the APBS data structures (Valist.h)
    //
 
-   struct PBAMOutput pbamOut = 
+   PBAMOutput pbamOut = 
       runPBAMWrap( pbamIn );
 
 }

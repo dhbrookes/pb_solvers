@@ -5,9 +5,9 @@ cdef extern from "PBAMStruct.h":
     FIL_MAX = 15
     MOL_MAX = 150
     AT_MAX  = 50000
-    XYZCRWIDTH = 5 // XYZCR = 5 values
+    XYZRCWIDTH = 5 ## XYZCR = 5 values
 
-//  input
+##  input
   ctypedef struct PBAMInput:
     double temp_;
     double salt_;
@@ -21,7 +21,7 @@ cdef extern from "PBAMStruct.h":
     int pbcType_;
 
 
-    // Electrostatics
+    ## Electrostatics
     int gridPts_;
     char map3D_[CHR_MAX];
 
@@ -32,7 +32,7 @@ cdef extern from "PBAMStruct.h":
 
     char dxname_[CHR_MAX];
 
-    // Dynamics
+    ## Dynamics
     int ntraj_;
     char termCombine_[CHR_MAX];
 
@@ -51,12 +51,13 @@ cdef extern from "PBAMStruct.h":
     char xyzfil_[MOL_MAX][FIL_MAX][CHR_MAX];
     int xyzct_[MOL_MAX];
 
-//  output
-ctype struct PBAMOutput:
-  double energies_[MOL_MAX];
-  double forces_[MOL_MAX][3];
+##  output
+  ctypedef struct PBAMOutput:
+    double energies_[MOL_MAX];
+    double forces_[MOL_MAX][3];
 
-PBAMOutput runPBAMSphinxWrap(double xyzcr[][AT_MAX][XYZCRWIDTH],
-      int nmol,
-      int natm[1],
-      PBAMInput pbamfin);
+cdef extern from "PBAMWrap.h":
+  PBAMOutput runPBAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
+                               int nmol,
+                               int natm[],
+                               PBAMInput pbamfin);

@@ -1,4 +1,5 @@
 cimport PBAMWrap
+cimport PBAMStruct
 from cython.view cimport array as cvarray
 
 import logging
@@ -17,7 +18,7 @@ cdef class PBAM_Solver:
     self.epsiloni_ = 0
 
 
-  def __init__(temp, epsilons, epsiloni):
+  def __init__(self, temp, epsilons, epsiloni):
     self.temp_ = temp
     self.epsilons_ = epsilons
     self.epsiloni_ = epsiloni
@@ -27,25 +28,25 @@ cdef class PBAM_Solver:
 
   cdef _run_pbam(self, molecules):
     cdef int i
-    cdef natm[:]
-    cdef double[:, :, :] xyzr
+    cdef int[:] natm
+    cdef double[:, :, :] xyzrc
     cdef PBAMStruct.PBAMInput pbamin
     cdef PBAMStruct.PBAMOutput pbamout
 
     #TODO: change from 1 molecule to many
     nmol = 1
-    natm[0] = (int) len(molecules['atoms'])
-    xyzr = cvarray(shape=(natm, PBAMStruct.MOL_MAX),
+    natm = cvarray(shape=(nmol), itemsize=sizeof(int), format="i")
+    natm[0] = <int> len(molecules['atoms'])
+    xyzrc = cvarray(shape=(nmol, PBAMStruct.MOL_MAX,PBAMStruct.XYZRCWIDTH),
         itemsize=sizeof(double), format="d")
-    pqr = cvarray(shape=(natm,), itemsize=sizeof(double), format="d")
 
     #TODO: change from 1 molecule to many
     for i, atom in enumerate(molecules['atoms']):
-      xyzr[0, i, 0] = atom['pos'][0]
-      xyzr[0, i, 1] = atom['pos'][1]
-      xyzr[0, i, 2] = atom['pos'][2]
-      xyzr[0, i, 3] = atom['radius']
-      xyzr[0, i, 4] = atom['charge']
+      xyzrc[0, i, 0] = atom['pos'][0]
+      xyzrc[0, i, 1] = atom['pos'][1]
+      xyzrc[0, i, 2] = atom['pos'][2]
+      xyzrc[0, i, 3] = atom['radius']
+      xyzrc[0, i, 4] = atom['charge']
 
     pbamin.temp_ = self.temp_;
     pbamin.sdiel_ = self.epsilons_;
@@ -53,7 +54,7 @@ cdef class PBAM_Solver:
 
     pbamout = PBAMStruct.runPBAMSphinxWrap(
       # trying to figure out next line... seems like a pointer to the xyzr vect
-        <double (*)[PBAMStruct.AT_MAX][PBAMStruct.XYZRWIDTH]> &xyzr[0,0,0],
+        <double (*)[PBAMStruct.AT_MAX][PBAMStruct.XYZRCWIDTH]> &xyzrc[0,0,0],
         nmol, natm, pbamin)
 
     return {'energy': pbamout.energies_,
