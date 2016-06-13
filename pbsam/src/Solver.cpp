@@ -8,6 +8,22 @@
 
 #include "Solver.h"
 
+int calc_n_grid_pts(int poles, double r)
+{
+  int n_pts, min_pts = 200;
+  int n_start = (int) (2.5*poles*poles);
+  double cutoff = 1.5; double maxrad = 10;
+  double gradient = n_start / ((maxrad-cutoff)*(maxrad-cutoff));
+  if (r < cutoff ) return min_pts;
+  else
+  {
+    n_pts = int ( min_pts + gradient * (r-cutoff)*(r-cutoff) );
+    if (n_pts > n_start) n_pts = n_start;
+  }
+  
+  return n_pts;
+}
+
 vector<Pt> make_uniform_sph_grid(int m_grid, double r)
 {
   
@@ -17,18 +33,20 @@ vector<Pt> make_uniform_sph_grid(int m_grid, double r)
   grid[0].set_theta(0.0);
   grid[0].set_phi(0.0);
   double hk;
-  for (int k = 0; k < m_grid; k++)
+  for (int k = 1; k < m_grid+1; k++)
   {
-    grid[k].set_r(r);
-    hk = -1 + ((2 * (k-1)) / (m_grid-1));
-    grid[k].set_theta(acos(hk));
+    grid[k-1].set_r(r);
+    hk = -1.0 + ((2.0 * ( (double)k-1.0)) / ( (double) m_grid-1.0));
+    grid[k-1].set_theta(acos(hk));
     
-    if (k==0 || k==m_grid-1) grid[k].set_phi(0);
+   
+    if ( k == 1 || k == m_grid) grid[k-1].set_phi(0);
     else
-    {
-      grid[k] = fmod(grid[k-1].phi() + (3.6/sqrt(m_grid) * (1/sqrt(1-(hk*hk)))),
-                     2*M_PI);
-    }
+      grid[k-1].set_phi(grid[k-2].phi() +
+                        (3.6/sqrt(m_grid*(1.0-(hk*hk)))));
+    
+    while(grid[k-1].phi() > 2*M_PI) grid[k-1].set_phi(grid[k-1].phi()-2*M_PI);
+    while(grid[k-1].phi() <-2*M_PI) grid[k-1].set_phi(grid[k-1].phi()+2*M_PI);
   }
   return grid;
 }
@@ -134,52 +152,71 @@ IE_(ns, MatOfMats<cmplx>::type(p, 2*p+1, MyMatrix<cmplx>(p, 2*p+1)))
 {
 }
 
-IEMatrix::IEMatrix(int I, Molecule mol, shared_ptr<SHCalc> _shcalc, int p)
+IEMatrix::IEMatrix(int I, shared_ptr<Molecule> mol,
+                   shared_ptr<SHCalc> _shcalc, int p)
 : p_(p), I_(I),
-IE_(mol.get_ns(), MatOfMats<cmplx>::type(p, 2*p+1, MyMatrix<cmplx>(p, 2*p+1)))
+IE_(mol->get_ns(), MatOfMats<cmplx>::type(p, 2*p+1, MyMatrix<cmplx>(p, 2*p+1)))
 {
   calc_vals(mol, _shcalc);
 }
 
 
-void IEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc)
+void IEMatrix::calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> _shcalc)
 {
-  int m_grid = 20 * pow(p_, 2); //suggested in Yap 2010
+  int m_grid = Constants::IMAT_GRID;//= 20 * pow(p_, 2); //sugg in Yap 2010
   cmplx val;
   vector<Pt> grid_pts;
   Pt real_grid;
-  for (int k = 0; k < mol.get_ns(); k++)
+  for (int k = 0; k < mol->get_ns(); k++)
   {
-    grid_pts = make_uniform_sph_grid(m_grid, mol.get_ak(k));
-    // loop through other spheres in this molecule to find exposed grid points:
-    for (int k2 = 0; k2< mol.get_ns(); k2++)
+    vector<int> grid_exp, grid_bur;
+    vector<int> neighs = mol->get_neighj(k);
+//    m_grid = calc_n_grid_pts(p_, mol.get_ak(k));
+    grid_pts = make_uniform_sph_grid(m_grid, mol->get_ak(k));
+    mol->set_gridj(k, grid_pts);
+    
+    // Loop through points to find the exposed ones
+    for (int g = 0; g < m_grid; g++)
     {
-      if (k2 == k) continue;
-      for (int g = 0; g < m_grid; g++)
+      bool buried = false;
+      // loop through other spheres in this molecule to find exposed gd pts:
+      for (int k2 = 0; k2 < neighs.size(); k2++)
       {
-        real_grid = grid_pts[g] - mol.get_centerk(k);
+        real_grid = grid_pts[g] + mol->get_centerk(k);
         // check if sphere is overlapping another
-        if (real_grid.dist(mol.get_centerk(k2)) < mol.get_ak(k2)) continue;
-        
-        _shcalc->calc_sh(grid_pts[g].theta(), grid_pts[g].phi());
-        for (int n = 0; n < p_; n++)
+        if (real_grid.dist(mol->get_centerk(neighs[k2]))
+            < mol->get_ak(neighs[k2]))
         {
-          for (int m = -n; m < n+1; m++)
-          {
-            for (int l = 0; l < p_; l++)
-            {
-              for (int s = -l; s < l+1; s++)
-              {
-                val = get_IE_k_nm_ls(k, n, m, l, s);
-                val += _shcalc->get_result(l, s) *
-                conj(_shcalc->get_result(n, m));
-                set_IE_k_nm_ls(k, n, m, l, s, val);
-              }
-            }
-          }
+          grid_bur.push_back(g);
+          buried = true;
+          break;
         }
       }
+      if (!buried) grid_exp.push_back(g);
     }
+    
+    mol->set_gridexpj(k, grid_exp); mol->set_gridburj(k, grid_bur);
+    cout << "SPE: " << grid_exp.size() << " and SPB " << grid_bur.size() << endl;
+    grid_exp.clear(); grid_bur.clear();
+//        _shcalc->calc_sh(grid_pts[g].theta(), grid_pts[g].phi());
+//        for (int n = 0; n < p_; n++)
+//        {
+//          for (int m = -n; m < n+1; m++)
+//          {
+//            for (int l = 0; l < p_; l++)
+//            {
+//              for (int s = -l; s < l+1; s++)
+//              {
+//                val = get_IE_k_nm_ls(k, n, m, l, s);
+//                val += _shcalc->get_result(l, s) *
+//                conj(_shcalc->get_result(n, m));
+//                set_IE_k_nm_ls(k, n, m, l, s, val);
+//              }
+//            }
+//          }
+//        }
+    
+    
   }
 }
 
@@ -730,20 +767,20 @@ kappa_(_consts->get_kappa())
                                                     _sys_->get_lambda(), p_);
   _T_ = make_shared<TMatrix> (p_, _sys_, _shCalc_, _consts_,
                              _bCalc_, _reExConsts_);
-  Molecule mol;
+  shared_ptr<Molecule> mol;
   // intialize all matrices
   for (int I = 0; I < _sys_->get_n(); I++)
   {
-    mol = _sys_->get_molecule(I);
+    mol = make_shared<Molecule>(_sys_->get_molecule(I));
     
     _E_[I] = make_shared<EMatrix> (I, _sys_->get_Ns_i(I), p_);
-    _E_[I]->calc_vals(mol, _shCalc_, _consts_->get_dielectric_prot());
+    _E_[I]->calc_vals((*mol), _shCalc_, _consts_->get_dielectric_prot());
     
     _LE_[I] = make_shared<LEMatrix> (I, _sys_->get_Ns_i(I), p_);
-    _LE_[I]->calc_vals(mol, _shCalc_, _consts_->get_dielectric_prot());
+    _LE_[I]->calc_vals((*mol), _shCalc_, _consts_->get_dielectric_prot());
     
     _IE_[I] = make_shared<IEMatrix>(I, _sys_->get_Ns_i(I), p_);
-    _IE_[I]->calc_vals(_sys_->get_molecule(I), _shCalc_);
+    _IE_[I]->calc_vals(mol, _shCalc_);
     
     _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa_);

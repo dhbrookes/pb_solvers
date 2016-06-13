@@ -13,6 +13,10 @@
 #include <memory>
 #include "ReExpCalc.h"
 
+
+// For calculating the n grid points on surface
+int calc_n_grid_pts(int poles, double r);
+
 // use Rakhmanov method
 vector<Pt> make_uniform_sph_grid(int m_grid, double r);
 
@@ -100,14 +104,14 @@ protected:
 public:
   IEMatrix(int I, int ns, int p);
 
-  IEMatrix(int I, Molecule mol, shared_ptr<SHCalc> sh_calc, int p);
+  IEMatrix(int I, shared_ptr<Molecule> mol, shared_ptr<SHCalc> sh_calc, int p);
   
   cmplx get_IE_k_nm_ls(int k, int n, int m, int l, int s)
   {
     return IE_[k](n, m+p_)(l, s+p_);
   }
   
-  void calc_vals(Molecule mol, shared_ptr<SHCalc> sh_calc);
+  void calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> sh_calc);
   
   void reset_mat();
 };

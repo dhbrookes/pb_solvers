@@ -14,10 +14,14 @@ Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
           vector<double> as, double drot, double dtrans)
 :type_(type), typeIdx_(type_idx), moveType_(movetype), qs_(qs), pos_(pos),
 vdwr_(vdwr), centers_(cens), as_(as), drot_(drot), dtrans_(dtrans),
-Nc_((int) qs.size()), Ns_((int) cens.size()), cgCharges_((int) cens.size())
+Nc_((int) qs.size()), Ns_((int) cens.size()), cgCharges_((int) cens.size()),
+cgGridPts_((int) cens.size()),
+cgGdPtExp_((int) cens.size()), cgGdPtBur_((int) cens.size())
 {
   map_repos_charges();
+  check_connect();
   calc_cog();
+  for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
 }
 
 Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
@@ -30,6 +34,7 @@ vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
 {
   find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
   check_connect();
+  for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
   map_repos_charges();
   calc_cog();
 }
@@ -38,7 +43,9 @@ Molecule::Molecule(const Molecule& mol)
 :moveType_(mol.moveType_), type_(mol.type_), typeIdx_(mol.typeIdx_),
 drot_(mol.drot_), dtrans_(mol.dtrans_), Nc_(mol.Nc_), qs_(mol.qs_),
 pos_(mol.pos_), vdwr_(mol.vdwr_), Ns_(mol.Ns_), centers_(mol.centers_),
-as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_)
+as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_),
+cgNeighs_(mol.cgNeighs_), cgGridPts_(mol.cgGridPts_),cgGdPtExp_(mol.cgGdPtExp_),
+cgGdPtBur_(mol.cgGdPtBur_)
 {
   calc_cog();
 }
@@ -163,9 +170,6 @@ void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
     {
       m++;
       CGSphere best = find_best_center(sp, np, unbound, tol_sp, beta);
-      // cout << "Trial no: " << m << " and bd points: " << best.get_n() 
-      //      << " and center: " << best.get_center().x() << ", " 
-      //      << best.get_center().y() << ", " << best.get_center().z() << endl;
       if (best.get_n() > n_max)
       {
         centers_[j] = best.get_center();
@@ -198,7 +202,9 @@ void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
     ct++;
   }
 
+  // Setting important vals and vectors
   Ns_ = (int) centers_.size();
+  cgGridPts_.resize(Ns_); cgGdPtExp_.resize(Ns_); cgGdPtBur_.resize(Ns_);
   cout << "End of find_centers" << endl;
 }
 
@@ -289,7 +295,7 @@ void Molecule::check_connect()
     {
       vector<int> neigh;
       neigh = find_neighbors( i );
-      if (neigh.size() == 0 )
+      if ((neigh.size() == 0 ) && (Ns_ > 1))
       {
         all_con = false;
         cout << "Incrementing CG sphere " << i << " radius" << endl;
@@ -300,6 +306,7 @@ void Molecule::check_connect()
   }
   if (ct == maxct) 
     cout << "Warning: Spheres may not all be connected!" << endl;
+
 }
 
 vector<int> Molecule::find_neighbors( int i )
@@ -311,7 +318,7 @@ vector<int> Molecule::find_neighbors( int i )
   {
     if ( i != j )
     {
-      sum_rad2 = (as_[i] + as_[j]) * (as_[i] + as_[j]);
+      sum_rad2 = (as_[i] * as_[i]) + (as_[j] *  as_[j]);
       if ( (centers_[i]-centers_[j]).norm2() < sum_rad2)
         neighs.push_back(j);
     }
