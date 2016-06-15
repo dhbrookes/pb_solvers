@@ -83,8 +83,13 @@ protected:
                                    // each CG sphere that are solvent exposed
   vector<vector<int> > cgGdPtBur_; // indices of grid points on the surface of
                                   // each CG sphere that are buried
-  vector<vector<int> > cgCharges_; // list of indices of charges within each
+  vector<vector<int> > cgCharges_; // indices of charges within each
                                    // coarse grained sphere
+  vector<vector<int> > cgChargesIn_; // indices of charges within each
+                                   // coarse grained sphere
+  vector<vector<int> > cgChargesOut_; // indices of charges not within each
+                                   // coarse grained sphere
+
   
   map<int, int>        chToCG_; // maps index of charge to
                                 //index of its coarse-grained sphere
@@ -152,6 +157,9 @@ public:
   vector<Pt> get_gridj(int j) const   { return cgGridPts_[j]; }
   vector<int> get_gdpt_expj(int j) const { return cgGdPtExp_[j]; }
   vector<int> get_gdpt_burj(int j) const { return cgGdPtBur_[j]; }
+  
+  vector<int> get_ch_allin_k(int k)   { return cgChargesIn_[k]; }
+  vector<int> get_ch_allout_k(int k)  { return cgChargesOut_[k]; }
   
   int get_ch_k_alpha(int k, int alpha){ return cgCharges_[k][alpha]; }
   double get_drot() const             { return drot_; }

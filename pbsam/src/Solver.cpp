@@ -104,23 +104,26 @@ void EMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc, double eps_in)
   cmplx val;
   Pt cen;
   double r_alpha, a_k, q_alpha;
+  MyMatrix<cmplx> testm (p_, 2*p_+1);
   for (int k=0; k< mol.get_ns(); k++)
   {
-    for (int alpha=0; alpha < mol.get_nc_k(k); alpha++)
+    vector<int> allin = mol.get_ch_allin_k(k);
+    for (int alpha=0; alpha < allin.size(); alpha++)
     {
-      cen = mol.get_posj(mol.get_ch_k_alpha(k, alpha));
+      cen = (mol.get_posj_realspace(allin[alpha]) - mol.get_centerk(k));
       _shcalc->calc_sh(cen.theta(), cen.phi());
       for (int n = 0; n < p_; n++)
       {
         for (int m = -n; m < n+1; m++)
         {
-          q_alpha = mol.get_qj(mol.get_ch_k_alpha(k, alpha));
-          r_alpha = mol.get_radj(mol.get_ch_k_alpha(k, alpha));
+          q_alpha = mol.get_qj(allin[alpha]);
+          r_alpha = cen.r();
           a_k = mol.get_ak(k);
           
-          val = conj(_shcalc->get_result(n, m));
+          val = _shcalc->get_result(n, m);
           val *= q_alpha / eps_in;
           val *= pow(r_alpha / a_k, n);
+          testm.set_val(n, m+p_, val);
           val += get_mat_knm(k, n, m);
           set_mat_knm(k, n, m, val);
         }
@@ -143,21 +146,20 @@ void LEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc,
   double r_alpha, a_k, q_alpha;
   for (int k=0; k< mol.get_ns(); k++)
   {
-    for (int alpha=0; alpha < mol.get_nc_k(k); alpha++)
+    vector<int> allout = mol.get_ch_allout_k(k);
+    for (int alpha=0; alpha < allout.size(); alpha++)
     {
-      if (mol.get_cg_of_ch(alpha) == k) continue;
-      cen = mol.get_posj_realspace(alpha) - mol.get_centerk(k);
-      cen = mol.get_posj(mol.get_ch_k_alpha(k, alpha));
+      cen = mol.get_posj_realspace(allout[alpha]) - mol.get_centerk(k);
       _shcalc->calc_sh(cen.theta(), cen.phi());
       for (int n = 0; n < p_; n++)
       {
         for (int m = -n; m < n+1; m++)
         {
-          q_alpha = mol.get_qj(mol.get_ch_k_alpha(k, alpha));
-          r_alpha = mol.get_radj(mol.get_ch_k_alpha(k, alpha));
+          q_alpha = mol.get_qj(allout[alpha]);
+          r_alpha = cen.r();
           a_k = mol.get_ak(k);
           
-          val = conj(_shcalc->get_result(n, m));
+          val = _shcalc->get_result(n, m);
           val *= q_alpha / eps_in;
           val *= 1 / r_alpha;
           val *= pow(a_k / r_alpha, n);

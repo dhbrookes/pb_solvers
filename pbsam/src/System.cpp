@@ -44,8 +44,9 @@ Molecule::Molecule(const Molecule& mol)
 drot_(mol.drot_), dtrans_(mol.dtrans_), Nc_(mol.Nc_), qs_(mol.qs_),
 pos_(mol.pos_), vdwr_(mol.vdwr_), Ns_(mol.Ns_), centers_(mol.centers_),
 as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_),
-cgNeighs_(mol.cgNeighs_), cgGridPts_(mol.cgGridPts_),cgGdPtExp_(mol.cgGdPtExp_),
-cgGdPtBur_(mol.cgGdPtBur_)
+cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
+cgNeighs_(mol.cgNeighs_),cgGridPts_(mol.cgGridPts_),
+cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_)
 {
   calc_cog();
 }
@@ -54,13 +55,42 @@ cgGdPtBur_(mol.cgGdPtBur_)
 void Molecule::map_repos_charges()
 {
   int closest;
-  for (int i = 0; i < Nc_; i++)
+  for (int cg = 0; cg < Nc_; cg++)
   {
-    closest = find_closest_center(pos_[i]);
-    cgCharges_[closest].push_back(i);
-    pos_[i] = pos_[i] - centers_[closest];  // reposition charge
-    chToCG_[i] = closest;
+    closest = find_closest_center(pos_[cg]);
+    cgCharges_[closest].push_back(cg);
+    pos_[cg] = pos_[cg] - centers_[closest];  // reposition charge
+    chToCG_[cg] = closest;
   }
+  
+  // Assigning all charges to either in or out of molecule
+  cgChargesIn_.resize(Ns_); cgChargesOut_.resize(Ns_);
+  for (int i = 0; i < Ns_; i++)
+  {
+    for (int cg = 0; cg < Nc_; cg++)
+    {
+      if ( get_posj_realspace(cg).dist(get_centerk(i)) < get_ak(i))
+        cgChargesIn_[i].push_back(cg);
+      else cgChargesOut_[i].push_back(cg);
+    }
+  }
+}
+
+int Molecule::find_closest_center(Pt pos)
+{
+  int idx = 0;
+  double dmin = __DBL_MAX__;
+  double d;
+  for (int k = 0; k < Ns_; k++)
+  {
+    d = pos.dist(centers_[k]);
+    if (d < dmin)
+    {
+      idx = k;
+      dmin = d;
+    }
+  }
+  return idx;
 }
 
 void Molecule::calc_cog()
@@ -90,24 +120,6 @@ double Molecule::random_norm()
   
   double fac = sqrt( -2.0*log(rsq)/rsq);
   return fac*v2;
-}
-
-
-int Molecule::find_closest_center(Pt pos)
-{
-  int idx = 0;
-  double dmin = __DBL_MAX__;
-  double d;
-  for (int k = 0; k < Ns_; k++)
-  {
-    d = pos.dist(centers_[k]);
-    if (d < dmin)
-    {
-      idx = k;
-      dmin = d;
-    }
-  }
-  return idx;
 }
 
 void Molecule::translate(Pt dr, double boxlen)

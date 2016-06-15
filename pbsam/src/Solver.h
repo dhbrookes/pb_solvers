@@ -10,6 +10,7 @@
 #define Solver_h
 
 #include <stdio.h>
+#include <iostream>
 #include <memory>
 #include "ReExpCalc.h"
 
@@ -61,13 +62,36 @@ public:
   ComplexMoleculeMatrix(int I, int ns, int p);
   
   cmplx get_mat_knm(int k, int n, int m) { return mat_[k](n, m+p_); }
-  void set_mat_knm(int k, int n, int m, cmplx val) { mat_[k].set_val(n, m+p_, val); }
+  void set_mat_knm(int k, int n, int m, cmplx val)
+  { mat_[k].set_val(n, m+p_, val); }
   MyMatrix<cmplx> get_mat_k(int k)       { return mat_[k]; }
   const int get_I() const   { return I_; }
   const int get_p() const   { return p_; }
+  const int get_ns() const  { return (int) mat_.size(); }
   
   void reset_mat();
-    
+  
+  friend ostream & operator<<(ostream & fout, ComplexMoleculeMatrix & M)
+  {
+    for (int k = 0; k < M.get_ns(); k++)
+    {
+      fout << "For sphere " << k << endl;
+      for (int n = 0; n < M.get_p(); n++)
+      {
+        for (int m = 0; m <= n; m++)
+        {
+          double real = M.get_mat_knm( k, n, m).real();
+          double imag = M.get_mat_knm( k, n, m).imag();
+          if(abs(real) < 1e-15 ) real = 0.0;
+          if(abs(imag) < 1e-15 ) imag = 0.0;
+          fout << "(" << real << ", " << imag << ") ";
+        }
+        fout << endl;
+      }
+    }
+    return fout;
+  }
+
 };
 
 /*
