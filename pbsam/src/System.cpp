@@ -318,7 +318,7 @@ vector<int> Molecule::find_neighbors( int i )
   {
     if ( i != j )
     {
-      sum_rad2 = (as_[i] * as_[i]) + (as_[j] *  as_[j]);
+      sum_rad2 = (as_[i] + as_[j]) * (as_[i] +  as_[j]);
       if ( (centers_[i]-centers_[j]).norm2() < sum_rad2)
         neighs.push_back(j);
     }

@@ -52,6 +52,29 @@ vector<Pt> make_uniform_sph_grid(int m_grid, double r)
 }
 
 
+void ExpansionConstants::compute_coeffs()
+{
+  int ct = 0;
+  // constants
+  for(int l=0; l < p_; l++)
+  {
+    set_const1_l( l, (2.0*l+1.0) / (4.0*M_PI));
+    set_const2_l( l,  1.0/ (double)(2*l+1));
+    for(int m=0; m <= l; m++)
+    {
+      imatLoc_[ct] = vector<int> {l, m};
+      ct++;
+    }
+  }
+}
+
+ExpansionConstants::ExpansionConstants(int p)
+: p_(p), expansionConst1_(p), expansionConst2_(p), imatLoc_(p*p)
+{
+  compute_coeffs();
+}
+
+
 ComplexMoleculeMatrix::ComplexMoleculeMatrix(int I, int ns, int p)
 :p_(p), mat_(ns, MyMatrix<cmplx> (p, 2*p+1)), I_(I)
 {
@@ -146,46 +169,52 @@ void LEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc,
   }
 }
 
-IEMatrix::IEMatrix(int I, int ns, int p)
+IEMatrix::IEMatrix(int I, int ns, int p,
+                   shared_ptr<ExpansionConstants> _expconst)
 :p_(p), I_(I),
-IE_(ns, MatOfMats<cmplx>::type(p, 2*p+1, MyMatrix<cmplx>(p, 2*p+1)))
+IE_(ns, MatOfMats<cmplx>::type(p, 2*p+1, MyMatrix<cmplx>(p, 2*p+1))),
+IE_orig_(ns, vector<double> (p*p*p*p)),
+_expConst_(_expconst)
 {
 }
 
-IEMatrix::IEMatrix(int I, shared_ptr<Molecule> mol,
-                   shared_ptr<SHCalc> _shcalc, int p)
+IEMatrix::IEMatrix(int I, shared_ptr<Molecule> _mol,
+                   shared_ptr<SHCalc> _shcalc, int p,
+                   shared_ptr<ExpansionConstants> _expconst,
+                   int npts)
 : p_(p), I_(I),
-IE_(mol->get_ns(), MatOfMats<cmplx>::type(p, 2*p+1, MyMatrix<cmplx>(p, 2*p+1)))
+IE_(_mol->get_ns(),
+    MatOfMats<cmplx>::type(p, 2*p+1, MyMatrix<cmplx>(p, 2*p+1))),
+IE_orig_(_mol->get_ns(), vector<double> (p*p*p*p)),
+_expConst_(_expconst),
+gridPts_(npts)
 {
-  calc_vals(mol, _shcalc);
+  compute_grid_pts(_mol);
+  calc_vals(_mol, _shcalc);
 }
 
-
-void IEMatrix::calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> _shcalc)
+void IEMatrix::compute_grid_pts(shared_ptr<Molecule> _mol)
 {
-  int m_grid = Constants::IMAT_GRID;//= 20 * pow(p_, 2); //sugg in Yap 2010
-  cmplx val;
   vector<Pt> grid_pts;
   Pt real_grid;
-  for (int k = 0; k < mol->get_ns(); k++)
+  for (int k = 0; k < _mol->get_ns(); k++)
   {
     vector<int> grid_exp, grid_bur;
-    vector<int> neighs = mol->get_neighj(k);
-//    m_grid = calc_n_grid_pts(p_, mol.get_ak(k));
-    grid_pts = make_uniform_sph_grid(m_grid, mol->get_ak(k));
-    mol->set_gridj(k, grid_pts);
-    
+    vector<int> neighs = _mol->get_neighj(k);
+    // m_grid = calc_n_grid_pts(p_, mol.get_ak(k));
+    grid_pts = make_uniform_sph_grid(gridPts_, _mol->get_ak(k));
+    _mol->set_gridj(k, grid_pts);
     // Loop through points to find the exposed ones
-    for (int g = 0; g < m_grid; g++)
+    for (int g = 0; g < gridPts_; g++)
     {
       bool buried = false;
       // loop through other spheres in this molecule to find exposed gd pts:
       for (int k2 = 0; k2 < neighs.size(); k2++)
       {
-        real_grid = grid_pts[g] + mol->get_centerk(k);
+        real_grid = grid_pts[g] + _mol->get_centerk(k);
         // check if sphere is overlapping another
-        if (real_grid.dist(mol->get_centerk(neighs[k2]))
-            < mol->get_ak(neighs[k2]))
+        if (real_grid.dist(_mol->get_centerk(neighs[k2]))
+            < _mol->get_ak(neighs[k2]))
         {
           grid_bur.push_back(g);
           buried = true;
@@ -195,28 +224,209 @@ void IEMatrix::calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> _shcalc)
       if (!buried) grid_exp.push_back(g);
     }
     
-    mol->set_gridexpj(k, grid_exp); mol->set_gridburj(k, grid_bur);
-    cout << "SPE: " << grid_exp.size() << " and SPB " << grid_bur.size() << endl;
+    _mol->set_gridexpj(k, grid_exp); _mol->set_gridburj(k, grid_bur);
     grid_exp.clear(); grid_bur.clear();
-//        _shcalc->calc_sh(grid_pts[g].theta(), grid_pts[g].phi());
-//        for (int n = 0; n < p_; n++)
-//        {
-//          for (int m = -n; m < n+1; m++)
-//          {
-//            for (int l = 0; l < p_; l++)
-//            {
-//              for (int s = -l; s < l+1; s++)
-//              {
-//                val = get_IE_k_nm_ls(k, n, m, l, s);
-//                val += _shcalc->get_result(l, s) *
-//                conj(_shcalc->get_result(n, m));
-//                set_IE_k_nm_ls(k, n, m, l, s, val);
-//              }
-//            }
-//          }
-//        }
+  }
+}
+
+vector<MatOfMats<cmplx>::type > IEMatrix::compute_integral(
+                                                  shared_ptr<Molecule> _mol,
+                                                  shared_ptr<SHCalc> sh_calc,
+                                                  int k)
+{
+  vector<Pt> gridpts;
+  vector<int> burpts, exppts;
+  int min, grid_tot;
+  bool bur;
+  vector<MatOfMats<cmplx>::type > Ys(2,
+                                     MatOfMats<cmplx>::type(p_, p_,
+                                     MyMatrix<cmplx> (p_, p_)));
+  gridpts = _mol->get_gridj(k);
+  burpts = _mol->get_gdpt_burj(k);
+  exppts = _mol->get_gdpt_expj(k);
+  grid_tot = (int) (burpts.size() + exppts.size());
+  
+  if ( burpts.size() < exppts.size() ) {bur = true; min = (int)burpts.size();}
+  else                                 {bur = false;min = (int)exppts.size();}
+  for(int h=0; h<min; h++)
+  {
+    double w=0;
+    int ind = (bur) ? burpts[h] : exppts[h];
+    Pt gdpt = gridpts[ind];
+    // convert the position relative to the center to spherical coordinates.
+    sh_calc->calc_sh(gdpt.theta(), gdpt.phi());
     
+    // collect sums for (n,m) rows x (l,s) column
+    for(int l = 0; l < p_; l++)
+      for(int s = 0; s <= l; s++)
+      {
+        cmplx Yls, Ynm;
+        if(s==0) Yls = complex<double> (sh_calc->get_result(l,0));
+        else     Yls = complex<double> (sh_calc->get_result(l,s));
+        
+        for(int n=0; n<=l; n++)
+          for(int m=0; m<=n; m++)
+          {
+            if( n==l && m > s) break;
+            if(m==0) Ynm = complex<double> (sh_calc->get_result(n,0));
+            else     Ynm = complex<double> (sh_calc->get_result(n,m));
+            
+            // integrate using the appropriate integration rules
+            if(m==0 && s==0 && (n+l)%2==0) //simpson's rule
+            {
+              if(h > 0 && h < grid_tot)
+              {
+                if(h % 2 == 0 ) w = 2.0/3.0; // even
+                else w = 4.0/3.0; //odd
+              } else w = 1.0/3.0;
+            } else w = 1.0; // rectangular
+            // Yrr and Yri
+            Ys[0](l,s).set_val(n, m, Ys[0](l,s)(n,m)+ w * complex<double>
+                              (Yls.real()*Ynm.real(), Yls.real()*Ynm.imag()));
+            // Yir and Yii
+            Ys[1](l,s).set_val(n, m, Ys[1](l,s)(n,m) + w * complex<double>
+                               (Yls.imag()*Ynm.real(), Yls.imag()*Ynm.imag()));
+          }//nm
+      }//ls
+//    if( h % 1 == 0 ) cout <<"completed "<<h<<" points "<<endl;
+  }//h
+  
+  double dA = 4*M_PI / (double)(grid_tot-1);
+  double mul = (bur) ? -1.0 : 1.0;
+  for(int l=0; l<p_; l++)
+  {
+    double delta = (bur) ? 1.0/_expConst_->get_const1_l(l) : 0.0;
+    for(int s=0; s<=l; s++)
+      for(int n=0; n<=l; n++)
+        for(int m=0; m<=n; m++)
+        {
+          if( n==l && m > s ) break;
+          if( n==l && m==s )
+          {
+            if(m==0)
+            {
+              Ys[0](l,s)(n,m).real(delta + mul*dA*Ys[0](l,s)(n,m).real());
+              Ys[1](l,s)(n,m).imag(0.0);
+            }
+            else
+            {
+              Ys[0](l,s)(n,m).real(0.5*delta + mul*dA*Ys[0](l,s)(n,m).real());
+              Ys[1](l,s)(n,m).imag(0.5*delta + mul*dA*Ys[1](l,s)(n,m).imag());
+            }
+            Ys[0](l,s)(n,m).imag(Ys[0](l,s)(n,m).imag()*mul*dA);
+            Ys[1](l,s)(n,m).real(Ys[1](l,s)(n,m).real()*mul*dA);
+          }
+          else
+          {
+            Ys[0](l,s)(n,m) *= (mul*dA);
+            Ys[1](l,s)(n,m) *= (mul*dA);
+          }
+        } // end m
+  } // end l
+  
+  for(int l=0; l<p_; l++)
+    for(int s=0; s<=l; s++)
+      for(int n=0; n<=l; n++)
+        for(int m=0; m<=n; m++)
+        {
+          if( n==l && s < m)
+          {
+            vector<int> myind = _expConst_->get_imat_loc(m-s-1);
+            Ys[0](l,s).set_val(n, m, Ys[0](l,s+1)(myind[0], myind[1]));
+            Ys[1](l,s).set_val(n, m, Ys[1](l,s+1)(myind[0], myind[1]));
+          }
+        }
+  
+  return Ys;
+} // end compute_integral
+
+// Currently using old format because I dont know whats going on!
+// TODO, change to understandable
+void IEMatrix::populate_mat(vector<MatOfMats<cmplx>::type >  Ys, int k)
+{
+  int i = 0;
+  int sNeg = -1; int mNeg = -1;
+  for(int l=0; l<p_; l++)
+  {
+    double imat;
+    for(int n=0; n<p_; n++) // s=0
+    {
+      double scl = _expConst_->get_const1_l(n);
+      for(int m=0; m<=n; m++)
+      {
+        bool bUpper = ( n<l || (n==l && m<=0) );
+        imat = scl * (bUpper? Ys[0](l,0)(n,m).real():Ys[0](n,m)(l,0).real());
+        IE_orig_[k][i] = imat;
+        i++;
+        if ( m != 0 )
+        {
+          imat  = (bUpper? Ys[0](l,0)(n,m).imag():Ys[1](n,m)(l,0).real());
+          IE_orig_[k][i] = (mNeg * -1.0 * scl*imat);
+          i++;
+        }
+      } //m
+    }//n
     
+    for(int s=1; s<=l; s++) // s>0 and // (l,s)real columns
+    {
+      for(int n=0; n<p_; n++)
+      {
+        double scl = _expConst_->get_const1_l(n);
+        for(int m=0; m<=n; m++)
+        {
+          bool bUpper = ( n<l || (n==l && m<=0) );
+          imat = 2.*scl*(bUpper? Ys[0](l,s)(n,m).real():Ys[0](n,m)(l,s).real());
+          IE_orig_[k][i] = imat;
+          i++;
+          if ( m != 0 )
+          {
+            imat  = (bUpper? Ys[0](l,s)(n,m).imag():Ys[1](n,m)(l,s).real());
+            IE_orig_[k][i] = (mNeg * -2.0 * scl * imat);
+            i++;
+          }
+        } //m
+      }//n
+      
+      // (l,s)imag columns
+      for(int n=0; n<p_; n++)
+      {
+        double scl = _expConst_->get_const1_l(n);
+        for(int m=0; m<=n; m++)
+        {
+          bool bUpper = ( n<l || (n==l && m<=0) );
+          imat  = (bUpper? Ys[1](l,s)(n,m).real():Ys[0](n,m)(l,s).imag());
+          IE_orig_[k][i] =  (sNeg * -2.0 * scl * imat);
+          i++;
+          if ( m != 0 )
+          {
+            imat  = (bUpper? Ys[1](l,s)(n,m).imag():Ys[1](n,m)(l,s).imag());
+            IE_orig_[k][i] = (-2.0 * scl * imat);
+            i++;
+          }
+        } //m
+      }//n
+    }//s
+  }//l
+  
+  int ind = 0;
+  for(int l=0; l<p_; l++)
+    for(int s=0; s<=l; s++)
+      for(int n=0; n<=l; n++)
+        for(int m=0; m<=n; m++)
+        {
+                    printf("This is l: %d, s: %d, n: %d, m: %d and Imat real: %f\n",
+                           l, s, n, m,
+                           IE_orig_[k][ind]);
+          ind++;
+        }
+}
+
+void IEMatrix::calc_vals(shared_ptr<Molecule> _mol, shared_ptr<SHCalc> _shcalc)
+{
+  for (int k = 0; k < _mol->get_ns(); k++)
+  {
+    vector<MatOfMats<cmplx>::type > Ys = compute_integral(_mol, _shcalc, k);
+    populate_mat(Ys, k);
   }
 }
 
@@ -767,20 +977,22 @@ kappa_(_consts->get_kappa())
                                                     _sys_->get_lambda(), p_);
   _T_ = make_shared<TMatrix> (p_, _sys_, _shCalc_, _consts_,
                              _bCalc_, _reExConsts_);
-  shared_ptr<Molecule> mol;
+  
+  auto _expConst = make_shared<ExpansionConstants>(p_);
+  shared_ptr<Molecule> _mol;
   // intialize all matrices
   for (int I = 0; I < _sys_->get_n(); I++)
   {
-    mol = make_shared<Molecule>(_sys_->get_molecule(I));
+    _mol = make_shared<Molecule>(_sys_->get_molecule(I));
     
     _E_[I] = make_shared<EMatrix> (I, _sys_->get_Ns_i(I), p_);
-    _E_[I]->calc_vals((*mol), _shCalc_, _consts_->get_dielectric_prot());
+    _E_[I]->calc_vals((*_mol), _shCalc_, _consts_->get_dielectric_prot());
     
     _LE_[I] = make_shared<LEMatrix> (I, _sys_->get_Ns_i(I), p_);
-    _LE_[I]->calc_vals((*mol), _shCalc_, _consts_->get_dielectric_prot());
+    _LE_[I]->calc_vals((*_mol), _shCalc_, _consts_->get_dielectric_prot());
     
-    _IE_[I] = make_shared<IEMatrix>(I, _sys_->get_Ns_i(I), p_);
-    _IE_[I]->calc_vals(mol, _shCalc_);
+    _IE_[I] = make_shared<IEMatrix>(I, _sys_->get_Ns_i(I), p_, _expConst);
+    _IE_[I]->calc_vals(_mol, _shCalc_);
     
     _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa_);

@@ -21,6 +21,33 @@ int calc_n_grid_pts(int poles, double r);
 vector<Pt> make_uniform_sph_grid(int m_grid, double r);
 
 /*
+ Base class for coefficients of expansion
+ */
+class ExpansionConstants
+{
+protected:
+  MyVector<double> expansionConst1_; // (2*l+1)/(4*pi)
+  MyVector<double> expansionConst2_; // 1 / (2*l+1)
+  vector<vector<int> > imatLoc_; // Locator for imat coeffs
+  int p_;
+  
+  void compute_coeffs();
+  
+public:
+  ExpansionConstants(int p);
+
+  void set_const1_l(int l, double val) { expansionConst1_.set_val(l, val); }
+  void set_const2_l(int l, double val) { expansionConst2_.set_val(l, val); }
+  double get_const1_l(int l)        { return expansionConst1_[l]; }
+  double get_const2_l(int l)        { return expansionConst2_[l]; }
+  vector<int> get_imat_loc(int m)   { return imatLoc_[m]; }
+  const int get_p() const           { return p_; }
+};
+
+
+
+
+/*
  Base class for matrices that will be re-expanded
  */
 class ComplexMoleculeMatrix
@@ -29,8 +56,6 @@ protected:
   vector<MyMatrix<cmplx> > mat_;
   int p_;
   int I_;
-  
-  
     
 public:
   ComplexMoleculeMatrix(int I, int ns, int p);
@@ -88,30 +113,46 @@ protected:
   
   // indices in order are k, (n, m), (l, s)
   vector<MatOfMats<cmplx>::type > IE_;
+  vector<vector<double> > IE_orig_;
+  shared_ptr<ExpansionConstants> _expConst_;
   int p_;
   int I_;
+  int gridPts_; // grid point count for surface integrals
   
   void set_IE_k_nm_ls(int k, int n, int m, int l, int s, cmplx val)
   {
     IE_[k](n, m+p_).set_val(l, s+p_, val);
   }
-
-  /*
-   Make a uniform grid of points on the surface of the sphere.
-   */
-//  vector<Pt> make_uniform_sph_grid(int num, double r);
+  
+  void set_IE_k_nm_ls_re(int k, int n, int m, int l, int s, double val)
+  {
+    IE_[k](n, m+p_)(l, s+p_).real(val);
+  }
+  
+  void set_IE_k_nm_ls_im(int k, int n, int m, int l, int s, double val)
+  {
+    IE_[k](n, m+p_)(l, s+p_).imag(val);
+  }
   
 public:
-  IEMatrix(int I, int ns, int p);
+  IEMatrix(int I, int ns, int p, shared_ptr<ExpansionConstants> _expconst);
 
-  IEMatrix(int I, shared_ptr<Molecule> mol, shared_ptr<SHCalc> sh_calc, int p);
+  IEMatrix(int I, shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc, int p,
+           shared_ptr<ExpansionConstants> _expconst,
+           int npts = Constants::IMAT_GRID );
   
   cmplx get_IE_k_nm_ls(int k, int n, int m, int l, int s)
   {
     return IE_[k](n, m+p_)(l, s+p_);
   }
   
-  void calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> sh_calc);
+  void compute_grid_pts(shared_ptr<Molecule> _mol);
+  vector<MatOfMats<cmplx>::type >compute_integral(shared_ptr<Molecule> _mol,
+                                                  shared_ptr<SHCalc> sh_calc,
+                                                  int k);
+  void populate_mat(vector<MatOfMats<cmplx>::type > Ys, int k);
+  
+  void calc_vals(shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc);
   
   void reset_mat();
 };

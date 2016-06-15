@@ -40,12 +40,12 @@ const int nvals = 10 ;      //! standard number of poles for testing
 //string test_dir_loc = "../pbsam/pbsam_test_files/gtest/";
 string test_dir_loc = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/gtest/";
 
-#include "BesselCalcUnitTest.h"
-#include "ConstantsUnitTest.h"
-#include "MyMatrixUnitTest.h"
-#include "readutilUnitTest.h"
-#include "setupUnitTest.h"
-#include "SHCalcUnitTest.h"
+//#include "BesselCalcUnitTest.h"
+//#include "ConstantsUnitTest.h"
+//#include "MyMatrixUnitTest.h"
+//#include "readutilUnitTest.h"
+//#include "setupUnitTest.h"
+//#include "SHCalcUnitTest.h"
 #include "SolverUnitTest.h"
 #include "SystemUnitTest.h"
 #include "utilUnitTest.h"
