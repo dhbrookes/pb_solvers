@@ -148,6 +148,8 @@ TEST_F(SolverUTest, Efix_test)
   EMatrix emat(0, mol->get_ns(), pol);
   emat.calc_vals((*mol), SHCalcTest, 4.0);
   
+  cout << emat << endl;
+  
   for (int i = 0; i < mol->get_ns(); i++)
   {
     int ct = 0;
