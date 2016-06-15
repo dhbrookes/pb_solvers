@@ -288,7 +288,7 @@ vector<MatOfMats<cmplx>::type > IEMatrix::compute_integral(
                                (Yls.imag()*Ynm.real(), Yls.imag()*Ynm.imag()));
           }//nm
       }//ls
-//    if( h % 1 == 0 ) cout <<"completed "<<h<<" points "<<endl;
+    if( h % 10000 == 0 ) cout <<"completed "<<h<<" points "<<endl;
   }//h
   
   double dA = 4*M_PI / (double)(grid_tot-1);
@@ -354,14 +354,14 @@ void IEMatrix::populate_mat(vector<MatOfMats<cmplx>::type >  Ys, int k)
       double scl = _expConst_->get_const1_l(n);
       for(int m=0; m<=n; m++)
       {
-        bool bUpper = ( n<l || (n==l && m<=0) );
+        bool bUpper = ( n<l || (n==l && m==0) );
         imat = scl * (bUpper? Ys[0](l,0)(n,m).real():Ys[0](n,m)(l,0).real());
         IE_orig_[k][i] = imat;
         i++;
         if ( m != 0 )
         {
-          imat  = (bUpper? Ys[0](l,0)(n,m).imag():Ys[1](n,m)(l,0).real());
-          IE_orig_[k][i] = (mNeg * -1.0 * scl*imat);
+          imat  = (bUpper ? Ys[0](l,0)(n,m).imag():Ys[1](n,m)(l,0).real());
+          IE_orig_[k][i] = (-1.0 * mNeg * scl * imat);
           i++;
         }
       } //m
@@ -374,7 +374,7 @@ void IEMatrix::populate_mat(vector<MatOfMats<cmplx>::type >  Ys, int k)
         double scl = _expConst_->get_const1_l(n);
         for(int m=0; m<=n; m++)
         {
-          bool bUpper = ( n<l || (n==l && m<=0) );
+          bool bUpper = ( n<l || (n==l && m<=s) );
           imat = 2.*scl*(bUpper? Ys[0](l,s)(n,m).real():Ys[0](n,m)(l,s).real());
           IE_orig_[k][i] = imat;
           i++;
@@ -393,14 +393,14 @@ void IEMatrix::populate_mat(vector<MatOfMats<cmplx>::type >  Ys, int k)
         double scl = _expConst_->get_const1_l(n);
         for(int m=0; m<=n; m++)
         {
-          bool bUpper = ( n<l || (n==l && m<=0) );
+          bool bUpper = ( n<l || (n==l && m<=s) );
           imat  = (bUpper? Ys[1](l,s)(n,m).real():Ys[0](n,m)(l,s).imag());
           IE_orig_[k][i] =  (sNeg * -2.0 * scl * imat);
           i++;
           if ( m != 0 )
           {
             imat  = (bUpper? Ys[1](l,s)(n,m).imag():Ys[1](n,m)(l,s).imag());
-            IE_orig_[k][i] = (-2.0 * scl * imat);
+            IE_orig_[k][i] = (2.0 * scl * imat);
             i++;
           }
         } //m
@@ -408,17 +408,6 @@ void IEMatrix::populate_mat(vector<MatOfMats<cmplx>::type >  Ys, int k)
     }//s
   }//l
   
-  int ind = 0;
-  for(int l=0; l<p_; l++)
-    for(int s=0; s<=l; s++)
-      for(int n=0; n<=l; n++)
-        for(int m=0; m<=n; m++)
-        {
-                    printf("This is l: %d, s: %d, n: %d, m: %d and Imat real: %f\n",
-                           l, s, n, m,
-                           IE_orig_[k][ind]);
-          ind++;
-        }
 }
 
 void IEMatrix::calc_vals(shared_ptr<Molecule> _mol, shared_ptr<SHCalc> _shcalc)
@@ -435,18 +424,13 @@ void IEMatrix::reset_mat()
   for (int k = 0; k < IE_.size(); k++)
   {
     for (int n = 0; n < p_; n++)
-    {
       for (int m = -n; m < n+1; m++)
-      {
         for (int l = 0; l < p_; l++)
-        {
           for (int s = -l; s < l+1; s++)
-          {
             set_IE_k_nm_ls(k, n, m, l, s, cmplx(0, 0));
-          }
-        }
-      }
-    }
+    
+    for (int ind = 0; ind < p_*p_*p_*p_; ind++)
+      IE_orig_[k][ind] = 0.0;
   }
 }
 
@@ -514,7 +498,7 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
   }
 }
 
-MyMatrix<cmplx> TMatrix::re_expand(int I, int k, int J, int l, MyMatrix<cmplx> X)
+MyMatrix<cmplx> TMatrix::re_expand(int I, int k, int J, int l,MyMatrix<cmplx> X)
 {
   MyMatrix<cmplx> X1 (p_, 2*p_ + 1);
   MyMatrix<cmplx> X2 (p_, 2*p_ + 1);

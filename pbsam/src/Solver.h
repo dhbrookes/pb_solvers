@@ -124,16 +124,6 @@ protected:
     IE_[k](n, m+p_).set_val(l, s+p_, val);
   }
   
-  void set_IE_k_nm_ls_re(int k, int n, int m, int l, int s, double val)
-  {
-    IE_[k](n, m+p_)(l, s+p_).real(val);
-  }
-  
-  void set_IE_k_nm_ls_im(int k, int n, int m, int l, int s, double val)
-  {
-    IE_[k](n, m+p_)(l, s+p_).imag(val);
-  }
-  
 public:
   IEMatrix(int I, int ns, int p, shared_ptr<ExpansionConstants> _expconst);
 
@@ -145,15 +135,14 @@ public:
   {
     return IE_[k](n, m+p_)(l, s+p_);
   }
+  double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
   
   void compute_grid_pts(shared_ptr<Molecule> _mol);
   vector<MatOfMats<cmplx>::type >compute_integral(shared_ptr<Molecule> _mol,
                                                   shared_ptr<SHCalc> sh_calc,
                                                   int k);
   void populate_mat(vector<MatOfMats<cmplx>::type > Ys, int k);
-  
   void calc_vals(shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc);
-  
   void reset_mat();
 };
 
