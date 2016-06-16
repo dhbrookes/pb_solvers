@@ -25,6 +25,12 @@ const double Constants::FORCE_CUTOFF = 1e2;
 
 const int Constants::MAX_NUM_POLES = 30;
 
+#ifdef __ACCURATE__
+const int Constants::IMAT_GRID = 250000;
+#else
+const int Constants::IMAT_GRID = 72000;
+#endif
+
 /*
  Constructor sets default values of independent constants
  */

@@ -72,13 +72,27 @@ protected:
   vector<double>      vdwr_; // van der waal radius of each chargeGoogle
   Pt                  cog_; // Molecule center of geometry
   
-  int                     Ns_;  // number of coarse grained spheres
-  vector<Pt>              centers_; //coarse-grained sphere centers
-  vector<double>          as_; // coarse-grained sphere radii
-  vector<vector<int> >    cgCharges_; // list of indices of charges within each
-                                      // coarse grained sphere
-  map<int, int>           chToCG_; // maps index of charge to
-                                    //index of its coarse-grained sphere
+  int                  Ns_;  // number of coarse grained spheres
+  vector<Pt>           centers_; //coarse-grained sphere centers
+  vector<double>       as_; // coarse-grained sphere radii
+  vector<vector<int> > cgNeighs_; // list of indices of CG centers that neighbor
+                                   // each coarse grained sphere
+  vector<vector<Pt> >  cgGridPts_; // grid points on the surface of
+                                  // each coarse grained sphere
+  vector<vector<int> > cgGdPtExp_; // indices of grid points on the surface of
+                                   // each CG sphere that are solvent exposed
+  vector<vector<int> > cgGdPtBur_; // indices of grid points on the surface of
+                                  // each CG sphere that are buried
+  vector<vector<int> > cgCharges_; // indices of charges within each
+                                   // coarse grained sphere
+  vector<vector<int> > cgChargesIn_; // indices of charges within each
+                                   // coarse grained sphere
+  vector<vector<int> > cgChargesOut_; // indices of charges not within each
+                                   // coarse grained sphere
+
+  
+  map<int, int>        chToCG_; // maps index of charge to
+                                //index of its coarse-grained sphere
   
   int find_closest_center(Pt pos);
   
@@ -123,6 +137,9 @@ public:
   void map_repos_charges();
   
   void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
+  void set_gridj(int j, vector<Pt> grid) {cgGridPts_[j] = grid;}
+  void set_gridexpj(int j, vector<int> grid_exp) {cgGdPtExp_[j] = grid_exp;}
+  void set_gridburj(int j, vector<int> grid_bur) {cgGdPtBur_[j] = grid_bur;}
   
   void translate(Pt dr, double boxlen);
   void rotate(Quat qrot); // This will rotate with respect to origin!
@@ -136,10 +153,19 @@ public:
   int get_nc() const                  { return Nc_; }
   int get_ns() const                  { return Ns_; }
   int get_nc_k(int k) const           { return (int) cgCharges_[k].size(); }
+  vector<int> get_neighj(int j) const { return cgNeighs_[j]; }
+  vector<Pt> get_gridj(int j) const   { return cgGridPts_[j]; }
+  vector<int> get_gdpt_expj(int j) const { return cgGdPtExp_[j]; }
+  vector<int> get_gdpt_burj(int j) const { return cgGdPtBur_[j]; }
+  
+  vector<int> get_ch_allin_k(int k)   { return cgChargesIn_[k]; }
+  vector<int> get_ch_allout_k(int k)  { return cgChargesOut_[k]; }
+  
   int get_ch_k_alpha(int k, int alpha){ return cgCharges_[k][alpha]; }
   double get_drot() const             { return drot_; }
   double get_dtrans() const           { return dtrans_; }
   Pt get_posj(int j) const            { return pos_[j]; }
+  
   Pt get_posj_realspace(int j)        { return pos_[j] + centers_[chToCG_[j]];}
   Pt get_centerk(int k) const         { return centers_[k]; }
   Pt get_cog() const                  { return cog_;}

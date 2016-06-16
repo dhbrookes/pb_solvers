@@ -37,15 +37,16 @@ using namespace std;
 
 double preclim = 1e-7;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
-string test_dir_loc = "../pbsam/pbsam_test_files/gtest/";
-//string test_dir_loc = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/gtest/";
+//string test_dir_loc = "../pbsam/pbsam_test_files/gtest/";
+string test_dir_loc = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/gtest/";
 
-#include "BesselCalcUnitTest.h"
-#include "ConstantsUnitTest.h"
-#include "MyMatrixUnitTest.h"
-#include "readutilUnitTest.h"
-#include "setupUnitTest.h"
-#include "SHCalcUnitTest.h"
+//#include "BesselCalcUnitTest.h"
+//#include "ConstantsUnitTest.h"
+//#include "MyMatrixUnitTest.h"
+//#include "readutilUnitTest.h"
+//#include "setupUnitTest.h"
+//#include "SHCalcUnitTest.h"
+#include "SolverUnitTest.h"
 #include "SystemUnitTest.h"
 #include "utilUnitTest.h"
 
@@ -54,7 +55,7 @@ string test_dir_loc = "../pbsam/pbsam_test_files/gtest/";
 int main(int argc, char * argv[])
 {
 
-  bool test = true;
+  bool test = false;
   if (test)
   {
     cout << "Welcome to test suite" << endl;

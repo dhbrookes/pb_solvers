@@ -284,7 +284,7 @@ public:
   void calcTBDEnForTor( );
   void calcTwoBDEnForTor( );
   
-  void printTBDEnForTor( vector<string> outfile );
+  void printTBDEnForTor( string outf, vector<string> outfile );
   
   vector<vector<int > > getDimers()  { return dimer_; }
   vector<vector<int > > getTrimers() { return trimer_; }

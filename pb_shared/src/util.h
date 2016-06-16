@@ -246,7 +246,7 @@ public:
   const T& x()
   {
     if (sph_) convert_to_euclidean();
-    return p1_;
+    return p1_; 
   }
   const T& y()
   {
