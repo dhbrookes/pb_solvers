@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <memory>
 #include "ReExpCalc.h"
+#include "TMatrix.h"
 
 // use Rakhmanov method
 vector<Pt> make_uniform_sph_grid(int m_grid, double r);
@@ -113,60 +114,60 @@ public:
 };
 
 
-/*
- Re-expansion coefficients
- */
-class TMatrix
-{
-protected:
-  int p_;
-  double kappa_;
-  vector<shared_ptr<ReExpCoeffs> > T_;
-  // maps (I,k), (J,l) indices to a single index in T. If this returns -1
-  // then the spheres are overlapping or less than 5A away and numerical
-  // re-expansion is required
-  map<vector<int>, int> idxMap_;
-  shared_ptr<SHCalc>  _shCalc_;
-  shared_ptr<BesselCalc>  _besselCalc_;
-  
-  int Nmol_;
-  vector<int> Nsi_; // number of spheres in each molecule
-  
-public:
-  
-  TMatrix() { }
-  
-  TMatrix(int p, shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
-          shared_ptr<Constants> _consts, shared_ptr<BesselCalc> _besselcalc,
-          shared_ptr<ReExpCoeffsConstants> _reexpconsts);
-  
-  // if these spheres can be re-expanded analytically, return true
-  bool is_analytic(int I, int k, int J, int l)
-  {
-    if (idxMap_[{I, k, J, l}] == -1 ) return false;
-    else return true;
-  }
-  
-  // get re-expansion of sphere (I, k) with respect to (J, l)
-  shared_ptr<ReExpCoeffs> get_T_Ik_Jl(int I, int k, int J, int l)
-  {
-    return T_[idxMap_[{I, k, J, l}]];
-  }
-  
-  void update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
-                   shared_ptr<BesselCalc> _besselcalc,
-                   shared_ptr<ReExpCoeffsConstants> _reexpconsts);
-  
-  /*
-   Re-expand a matrix X with respect to T(I,k)(J,l)
-  */
-  MyMatrix<cmplx> re_expand(int I, int k, int J, int l, MyMatrix<cmplx> X);
-  
-  int get_nmol() const { return Nmol_; }
-  
-  int get_nsi(int i)   { return Nsi_[i]; }
-  
-};
+///*
+// Re-expansion coefficients
+// */
+//class TMatrix
+//{
+//protected:
+//  int p_;
+//  double kappa_;
+//  vector<shared_ptr<ReExpCoeffs> > T_;
+//  // maps (I,k), (J,l) indices to a single index in T. If this returns -1
+//  // then the spheres are overlapping or less than 5A away and numerical
+//  // re-expansion is required
+//  map<vector<int>, int> idxMap_;
+//  shared_ptr<SHCalc>  _shCalc_;
+//  shared_ptr<BesselCalc>  _besselCalc_;
+//  
+//  int Nmol_;
+//  vector<int> Nsi_; // number of spheres in each molecule
+//  
+//public:
+//  
+//  TMatrix() { }
+//  
+//  TMatrix(int p, shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
+//          shared_ptr<Constants> _consts, shared_ptr<BesselCalc> _besselcalc,
+//          shared_ptr<ReExpCoeffsConstants> _reexpconsts);
+//  
+//  // if these spheres can be re-expanded analytically, return true
+//  bool is_analytic(int I, int k, int J, int l)
+//  {
+//    if (idxMap_[{I, k, J, l}] == -1 ) return false;
+//    else return true;
+//  }
+//  
+//  // get re-expansion of sphere (I, k) with respect to (J, l)
+//  shared_ptr<ReExpCoeffs> get_T_Ik_Jl(int I, int k, int J, int l)
+//  {
+//    return T_[idxMap_[{I, k, J, l}]];
+//  }
+//  
+//  void update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
+//                   shared_ptr<BesselCalc> _besselcalc,
+//                   shared_ptr<ReExpCoeffsConstants> _reexpconsts);
+//  
+//  /*
+//   Re-expand a matrix X with respect to T(I,k)(J,l)
+//  */
+//  MyMatrix<cmplx> re_expand(int I, int k, int J, int l, MyMatrix<cmplx> X);
+//  
+//  int get_nmol() const { return Nmol_; }
+//  
+//  int get_nsi(int i)   { return Nsi_[i]; }
+//  
+//};
 
 class HMatrix;
 class FMatrix;

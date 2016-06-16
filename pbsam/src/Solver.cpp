@@ -8,6 +8,8 @@
 
 #include "Solver.h"
 
+
+
 vector<Pt> make_uniform_sph_grid(int m_grid, double r)
 {
   
@@ -203,130 +205,6 @@ void IEMatrix::reset_mat()
   }
 }
 
-TMatrix::TMatrix(int p, shared_ptr<System> _sys,
-                 shared_ptr<SHCalc> _shcalc,
-                 shared_ptr<Constants> _consts,
-                 shared_ptr<BesselCalc> _besselcalc,
-                 shared_ptr<ReExpCoeffsConstants> _reexpconsts)
-:p_(p), kappa_(_consts->get_kappa()), Nmol_(_sys->get_n())
-{
-  int total_spheres=0;
-  Nsi_ = vector<int> (Nmol_);
-  for (int I = 0; I < Nmol_; I++)
-  {
-    total_spheres += _sys->get_Ns_i(I);
-    Nsi_[I] = _sys->get_Ns_i(I);
-  }
-  T_.reserve(total_spheres*total_spheres);
-  
-  update_vals(_sys, _shcalc, _besselcalc, _reexpconsts);
-}
-
-
-void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
-                          shared_ptr<BesselCalc> _besselcalc,
-                          shared_ptr<ReExpCoeffsConstants> _reexpconsts)
-{
-  T_.clear();
-  idxMap_.clear();
-  
-  int idx = 0;
-  Pt c_Ik, c_Jl, v;
-  vector<int> idx_vec;
-  for (int I = 0; I < _sys->get_n(); I++)
-  {
-    for (int J = 0; J < _sys->get_n(); J++)
-    {
-      for (int k = 0; k < _sys->get_Ns_i(I); k++)
-      {
-        c_Ik = _sys->get_centerik(I, k);
-        for (int l = 0; l < _sys->get_Ns_i(J); l++)
-        {
-          if (I==J && k==l) continue;
-          
-          idx_vec = {I, k, J, l};
-          c_Jl = _sys->get_centerik(J, l);
-          if (I==J && c_Ik.dist(c_Jl) < 5.0)
-          {
-            idxMap_[idx_vec] = -1;
-            continue;
-          }
-          vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kappa_ * v.r());
-          v = _sys->get_pbc_dist_vec_base(c_Ik, c_Jl);
-          _shcalc->calc_sh(v.theta(), v.phi());
-          auto re_exp = make_shared<ReExpCoeffs>(p_, v,
-                                                 _shcalc->get_full_result(),
-                                                 besselK, _reexpconsts,
-                                                 _sys->get_lambda(), false);
-          T_.push_back(re_exp);
-          idxMap_[idx_vec] = idx;
-          idx++;
-        }
-      }
-    }
-  }
-}
-
-MyMatrix<cmplx> TMatrix::re_expand(int I, int k, int J, int l, MyMatrix<cmplx> X)
-{
-  MyMatrix<cmplx> X1 (p_, 2*p_ + 1);
-  MyMatrix<cmplx> X2 (p_, 2*p_ + 1);
-  MyMatrix<cmplx> Z (p_, 2*p_ + 1);
-  
-  int n, m, s;
-  cmplx inter, sval, rval, aval;
-  shared_ptr<ReExpCoeffs> T = get_T_Ik_Jl(I, k, J, l);
-  
-  // fill X1:
-  for (n = 0; n < p_; n++)
-  {
-    for (m = -n; m <= n; m++)
-    {
-      inter  = 0;
-      for (s = -n; s <= n; s++)
-      {
-          rval = T->get_rval(n, m, s);
-          aval = X(n, s+p_);
-          
-          inter += rval * aval;
-        } // end s
-        X1.set_val(n, m+p_, inter);
-      } // end m
-    } //end n
-  
-  // fill x2:
-  for (n = 0; n < p_; n++)
-  {
-    for (m = -n; m <= n; m++)
-    {
-      inter  = 0;
-      for (l = abs(m); l < p_; l++)
-      {
-        sval = T->get_sval(l, n, m);
-        inter += sval * X1(l, m+p_);
-      } // end l
-      X2.set_val(n, m+p_, inter);
-    } // end m
-  } //end n
-  
-  //fill z:
-  for (n = 0; n < p_; n++)
-  {
-    for (m = -n; m <= n; m++)
-    {
-      inter = 0;
-      for (s = -n; s <= n; s++)
-      {
-        rval = T->get_rval(n, s, m);
-        inter += conj(rval) * X2(n, s+p_);
-      } // end s
-      Z.set_val(n, m+p_, inter);
-    } // end m
-  } //end n
-
-  return Z;
-}
-
 LFMatrix::LFMatrix(int I, int ns, int p)
 :ComplexMoleculeMatrix(I, ns, p)
 {
@@ -344,7 +222,7 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
       if (j==k) continue;
       if (! T->is_analytic(I_, k, I_, j))
       {
-        reex = T->re_expand(I_, k, I_, j, F->get_mat_k(k));
+        reex = T->re_expandX(F->get_mat_k(k), I_, k, I_, j);
       }
       else
       {
@@ -427,7 +305,7 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H,
       if (j==k) continue;
       if (! T->is_analytic(I_, k, I_, j))
       {
-        reex = T->re_expand(I_, k, I_, j, H->get_mat_k(k));
+        reex = T->re_expandX(H->get_mat_k(k), I_, k, I_, j );
       }
       else
       {
@@ -522,7 +400,7 @@ void LHNMatrix::calc_vals(shared_ptr<TMatrix> T,
       if (J == I_) continue;
       for (int l =0 ; l < T->get_nsi(J); l++)
       {
-        reex = T->re_expand(I_, k, J, l, H[J]->get_mat_k(l));
+        reex = T->re_expandX(H[J]->get_mat_k(l), I_, k, J, l);
         mat_[k] += reex;
       }
     }
