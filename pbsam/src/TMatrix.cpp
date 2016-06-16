@@ -8,8 +8,6 @@
 
 #include "TMatrix.h"
 
-
-
 TMatrix::TMatrix(int p, shared_ptr<System> _sys,
                  shared_ptr<SHCalc> _shcalc,
                  shared_ptr<Constants> _consts,
@@ -89,7 +87,7 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
 
 
 /*
- re-expand element j of grad(X) with element (i, j) of T. REquires 
+ re-expand element j of grad(X) with element (i, j) of T. Requires 
  the three components of grad(X)
  */
 VecOfMats<cmplx>::type TMatrix::re_expand_gradX(MyMatrix<cmplx> dXdR,

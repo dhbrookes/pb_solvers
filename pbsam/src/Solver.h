@@ -15,12 +15,14 @@
 #include "ReExpCalc.h"
 #include "TMatrix.h"
 
-
+//TODO maybe find a home for these?
 // For calculating the n grid points on surface
 int calc_n_grid_pts(int poles, double r);
 
 // use Rakhmanov method
 vector<Pt> make_uniform_sph_grid(int m_grid, double r);
+
+double inner_prod( MyMatrix<double> & M1, MyMatrix<double> & M2, int p );
 
 /*
  Base class for coefficients of expansion
@@ -56,8 +58,8 @@ class ComplexMoleculeMatrix
 {
 protected:
   vector<MyMatrix<cmplx> > mat_;
-  int p_;
-  int I_;
+  int p_;  // number of poles
+  int I_;  // Index of molecule that this matrix
     
 public:
   ComplexMoleculeMatrix(int I, int ns, int p);
@@ -89,6 +91,7 @@ public:
         }
         fout << endl;
       }
+      fout << endl;
     }
     return fout;
   }
@@ -140,6 +143,7 @@ protected:
   vector<MatOfMats<cmplx>::type > IE_;
   vector<vector<double> > IE_orig_;
   shared_ptr<ExpansionConstants> _expConst_;
+  bool calc_pts_; // Boolean of whether or not to estimate number of points
   int p_;
   int I_;
   int gridPts_; // grid point count for surface integrals
@@ -153,7 +157,7 @@ public:
   IEMatrix(int I, int ns, int p, shared_ptr<ExpansionConstants> _expconst);
 
   IEMatrix(int I, shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc, int p,
-           shared_ptr<ExpansionConstants> _expconst,
+           shared_ptr<ExpansionConstants> _expconst, bool calc_npts = false,
            int npts = Constants::IMAT_GRID );
   
   cmplx get_IE_k_nm_ls(int k, int n, int m, int l, int s)
@@ -172,68 +176,56 @@ public:
 };
 
 
-///*
-// Re-expansion coefficients
-// */
-//class TMatrix
-//{
-//protected:
-//  int p_;
-//  double kappa_;
-//  vector<shared_ptr<ReExpCoeffs> > T_;
-//  // maps (I,k), (J,l) indices to a single index in T. If this returns -1
-//  // then the spheres are overlapping or less than 5A away and numerical
-//  // re-expansion is required
-//  map<vector<int>, int> idxMap_;
-//  shared_ptr<SHCalc>  _shCalc_;
-//  shared_ptr<BesselCalc>  _besselCalc_;
-//  
-//  int Nmol_;
-//  vector<int> Nsi_; // number of spheres in each molecule
-//  
-//public:
-//  
-//  TMatrix() { }
-//  
-//  TMatrix(int p, shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
-//          shared_ptr<Constants> _consts, shared_ptr<BesselCalc> _besselcalc,
-//          shared_ptr<ReExpCoeffsConstants> _reexpconsts);
-//  
-//  // if these spheres can be re-expanded analytically, return true
-//  bool is_analytic(int I, int k, int J, int l)
-//  {
-//    if (idxMap_[{I, k, J, l}] == -1 ) return false;
-//    else return true;
-//  }
-//  
-//  // get re-expansion of sphere (I, k) with respect to (J, l)
-//  shared_ptr<ReExpCoeffs> get_T_Ik_Jl(int I, int k, int J, int l)
-//  {
-//    return T_[idxMap_[{I, k, J, l}]];
-//  }
-//  
-//  void update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
-//                   shared_ptr<BesselCalc> _besselcalc,
-//                   shared_ptr<ReExpCoeffsConstants> _reexpconsts);
-//  
-//  /*
-//   Re-expand a matrix X with respect to T(I,k)(J,l)
-//  */
-//  MyMatrix<cmplx> re_expand(int I, int k, int J, int l, MyMatrix<cmplx> X);
-//  
-//  int get_nmol() const { return Nmol_; }
-//  
-//  int get_nsi(int i)   { return Nsi_[i]; }
-//  
-//};
-
 class HMatrix;
 class FMatrix;
 
 /*
+ Base class for numerical matrices
+ */
+class NumericalMatrix
+{
+protected:
+  vector<vector<double> > mat_;
+  int p_;  // number of poles
+  int I_;  // Index of molecule that this matrix
+  
+public:
+  NumericalMatrix(int I, int ns, int p);
+  
+  double get_mat_kh(int k, int h)           { return mat_[k][h]; }
+  void set_mat_kh(int k, int h, double val) { mat_[k][h] = val; }
+  vector<double> get_mat_k(int k)           { return mat_[k]; }
+  int get_mat_k_len(int k)                 { return (int)mat_[k].size(); }
+  const int get_I() const   { return I_; }
+  const int get_p() const   { return p_; }
+  const int get_ns() const  { return (int) mat_.size(); }
+  
+  void reset_mat();
+  
+  friend ostream & operator<<(ostream & fout, NumericalMatrix & M)
+  {
+    for (int k = 0; k < M.get_ns(); k++)
+    {
+      fout << "For sphere " << k << endl;
+      for (int h = 0; h < M.get_mat_k_len(h); h++)
+      {
+        double real = M.get_mat_kh( k, h);
+        if(abs(real) < 1e-15 ) real = 0.0;
+        fout << real << ", ";
+      }
+      fout << endl;
+    }
+    return fout;
+  }
+  
+};
+
+
+
+/*
  Equation 8c
  */
-class LFMatrix : public ComplexMoleculeMatrix
+class LFMatrix : public NumericalMatrix
 {
 public:
   LFMatrix(int I, int ns, int p);
@@ -258,13 +250,17 @@ public:
 /*
  Equation 10b
  */
-class LHMatrix : public ComplexMoleculeMatrix
+class LHMatrix : public NumericalMatrix
 {
 protected:
   double kappa_;
   
 public:
   LHMatrix(int I, int ns, int p, double kappa);
+  
+  void init(Molecule mol, shared_ptr<HMatrix> H,
+            shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
+            shared_ptr<ExpansionConstants> _expconst);
   
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H,
                  shared_ptr<SHCalc> shcalc, shared_ptr<System> sys,
@@ -342,6 +338,8 @@ protected:
   
 public:
   HMatrix(int I, int ns, int p, double kappa);
+  
+  void init(Molecule mol, shared_ptr<SHCalc> _sh_calc, double eps_in);
   
   void calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
                  shared_ptr<XHMatrix> XH,

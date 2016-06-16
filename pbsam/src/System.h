@@ -155,6 +155,7 @@ public:
   int get_nc_k(int k) const           { return (int) cgCharges_[k].size(); }
   vector<int> get_neighj(int j) const { return cgNeighs_[j]; }
   vector<Pt> get_gridj(int j) const   { return cgGridPts_[j]; }
+  Pt get_gridjh(int j, int h) const   { return cgGridPts_[j][h]; }
   vector<int> get_gdpt_expj(int j) const { return cgGdPtExp_[j]; }
   vector<int> get_gdpt_burj(int j) const { return cgGdPtBur_[j]; }
   
