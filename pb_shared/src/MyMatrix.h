@@ -208,6 +208,28 @@ public:
     return *this;
   }
   
+  /*
+   Compute Forbenius inner product of two matrices
+   */
+  T inner(MyMatrix<T>& rhs)
+  {
+    if (ncols_ != rhs.ncols_ || nrows_ != rhs.nrows_)
+    {
+      throw MatrixArithmeticException(INNER_PRODUCT, nrows_,
+                                      ncols_, rhs.nrows_, rhs.ncols_);
+    }
+    
+    T result = T();
+    
+    for (int i = 0; i < nrows_; i++)
+    {
+      for (int j = 0; j < ncols_; j++)
+      {
+         result += vals_[i][j] * rhs(i, j);
+      }
+    }
+    return result;
+  }
   
   /*
    Matrix multiplication. If this is size n x m, then rhs must be size m x p

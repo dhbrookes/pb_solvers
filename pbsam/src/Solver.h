@@ -15,7 +15,14 @@
 #include "ReExpCalc.h"
 #include "TMatrix.h"
 
-//TODO maybe find a home for these?
+
+/*
+ References:
+ [1] Yap, E., Head-Gordon, T. 2010. JCTC 
+ [2] Yap, E., Head-Gordon, T. 2013. JCTC
+ */
+
+
 // For calculating the n grid points on surface
 int calc_n_grid_pts(int poles, double r);
 
@@ -98,6 +105,19 @@ public:
 
 };
 
+
+class EMatrix;
+class LEMatrix;
+class IEMatrix;
+class HMatrix;
+class FMatrix;
+class LFMatrix;
+class LHMatrix;
+class LHNMatrix;
+class XFMatrix;
+class XHMatrix;
+
+
 /*
  Pre-computed values representing fixed charges within each sphere. Each object
  of this class refers to one molecule. This is then a vector of matrices where
@@ -165,6 +185,8 @@ public:
     return IE_[k](n, m+p_)(l, s+p_);
   }
   double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
+  
+  MyMatrix<cmplx> get_IE_knm(int k, int n, int m) { return IE_[k](n, m+p_); }
   
   void compute_grid_pts(shared_ptr<Molecule> _mol);
   vector<MatOfMats<cmplx>::type >compute_integral(shared_ptr<Molecule> _mol,
@@ -234,14 +256,14 @@ public:
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
                  shared_ptr<SHCalc> shcalc, shared_ptr<System> sys);
   
-  // analytic re-expansion (Equation 27a)
+  // analytic re-expansion (Equation 27a [1])
   MyMatrix<cmplx> analytic_reex(int I, int k, int j,
                                 shared_ptr<FMatrix> F,
                                 shared_ptr<SHCalc> shcalc,
                                 shared_ptr<System> sys, int Mp=-1);
   
   /*
-   Equation 15a. For analytic re expansion
+   Equation 15a [1]. For analytic re expansion
    */
   cmplx make_fb_Ij(int I, int j, Pt rb,
                    shared_ptr<FMatrix> F,
@@ -249,7 +271,7 @@ public:
 };
 
 /*
- Equation 10b
+ Equation 10b [1]
  */
 class LHMatrix : public NumericalMatrix
 {
@@ -267,7 +289,7 @@ public:
                  shared_ptr<SHCalc> shcalc, shared_ptr<System> sys,
                  shared_ptr<BesselCalc> bcalc, int Mp=-1);
   
-  // analytic re-expansion (Equation 27b)
+  // analytic re-expansion (Equation 27b [1])
   MyMatrix<cmplx> analytic_reex(int I, int k, int j,
                                 shared_ptr<HMatrix> H,
                                 shared_ptr<SHCalc> shcalc,
@@ -276,7 +298,7 @@ public:
                                 int Mp=-1);
   
   /*
-   Equation 15b. For analytic re expansion
+   Equation 15b [1]. For analytic re expansion
    */
   cmplx make_hb_Ij(int I, int j, Pt rb,
                    shared_ptr<HMatrix> H,
@@ -286,7 +308,7 @@ public:
 };
 
 /*
- Equation 10c
+ Equation 10c [1]
  */
 class LHNMatrix : public ComplexMoleculeMatrix
 {
@@ -298,7 +320,7 @@ public:
 };
 
 /*
- Equation 14a
+ Equation 14a [1]
  */
 class XHMatrix : public ComplexMoleculeMatrix
 {
@@ -313,7 +335,7 @@ public:
 };
 
 /*
- Equation 14b
+ Equation 14b [1]
  */
 class XFMatrix : public ComplexMoleculeMatrix
 {
@@ -368,6 +390,169 @@ public:
                  shared_ptr<HMatrix> H,
                  shared_ptr<IEMatrix> IE,
                  shared_ptr<BesselCalc> bcalc);
+  
+};
+
+/*
+ Base class for gradients of ComplexMoleculeMatrix objects
+ */
+class GradCmplxMolMat
+{
+protected:
+  int wrt_;  // with respect to
+  vector<MyMatrix<Ptx> > mat_;  // each gradient has three components (use Pt)
+  int p_;
+  int I_;
+  
+public:
+  GradCmplxMolMat(int I, int wrt, int ns, int p)
+  :wrt_(wrt), p_(p), I_(I)
+  {
+  }
+  
+  const int get_wrt() const   { return wrt_; }
+  const int get_I() const   { return I_; }
+  const int get_p() const   { return p_; }
+  const int get_ns() const  { return (int) mat_.size(); }
+  Ptx get_mat_knm(int k, int n, int m) { return mat_[k](n, m+p_); }
+  void set_mat_knm(int k, int n, int m, Ptx val)
+  { mat_[k].set_val(n, m+p_, val); }
+  
+  void reset_mat();
+};
+
+// gradient matrices:
+class GradFMatrix;
+class GradHMatrix;
+class GradWHMatrix;
+class GradWFMatrix;
+class GradLHNMatrix;
+class GradLHMatrix;
+class GradLFMatrix;
+
+
+/*
+ Eq. 12a [2]
+ */
+class GradWFMatrix : public GradCmplxMolMat
+{
+protected:
+  double eps_;
+  double kappa_;
+  
+public:
+  GradWFMatrix(int I, int wrt, int ns, int p,
+               double eps_in, double eps_out,
+               double kappa);
+  
+  void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+                 shared_ptr<GradHMatrix> dH, shared_ptr<GradFMatrix> dF,
+                 shared_ptr<GradLHMatrix> dLH, shared_ptr<GradLHNMatrix> dLHN,
+                 shared_ptr<GradLFMatrix> dLF);
+  
+  const double get_eps() const { return eps_; }
+};
+
+/*
+ Eq. 12b [2]
+ */
+class GradWHMatrix : public GradCmplxMolMat
+{
+protected:
+  double kappa_;
+  
+public:
+  GradWHMatrix(int I, int wrt, int ns, int p, double kappa);
+  
+  void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+                 shared_ptr<GradHMatrix> dH, shared_ptr<GradFMatrix> dF,
+                 shared_ptr<GradLHMatrix> dLH, shared_ptr<GradLHNMatrix> dLHN,
+                 shared_ptr<GradLFMatrix> dLF);
+};
+
+/*
+ Eq. 11a [2]
+ */
+class GradFMatrix : public GradCmplxMolMat
+{
+public:
+  GradFMatrix(int I, int wrt, int ns, int p);
+  
+  void calc_vals(Molecule mol, shared_ptr<IEMatrix> IE,
+                 shared_ptr<GradWFMatrix> dWF);
+  
+};
+
+/*
+ Eq. 11b [2]
+ */
+class GradHMatrix : public GradCmplxMolMat
+{
+protected:
+  double kappa_;
+  
+public:
+  GradHMatrix(int I, int wrt, int ns, int p);
+  
+  void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+                 shared_ptr<IEMatrix> IE,
+                 shared_ptr<GradWHMatrix> dWH);
+  
+};
+
+/*
+ Eq. 13 [2]
+ */
+class GradLFMatrix : public GradCmplxMolMat
+{
+public:
+  GradLFMatrix(int I, int wrt, int ns, int p);
+  
+  void calc_vals(Molecule mol, shared_ptr<SHCalc> shcalc,
+                 shared_ptr<TMatrix> T,
+                 shared_ptr<GradFMatrix> dF);
+  
+  MyMatrix<Ptx> analytic_reex(Molecule mol, int k, int j,
+                                shared_ptr<SHCalc> shcalc,
+                                shared_ptr<GradFMatrix> dF,
+                                int Mp=-1);
+  
+  // calculate the gradient of h at point P (Eq. S5a)
+  Ptx calc_df_P(Pt P, int k, shared_ptr<SHCalc> shcalc,
+               shared_ptr<GradFMatrix> dF);
+  
+};
+
+/*
+ Eq. 13 [2]
+ */
+class GradLHMatrix : public GradCmplxMolMat
+{
+public:
+  GradLHMatrix(int I, int wrt, int ns, int p);
+  
+  void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+                 shared_ptr<SHCalc> shcalc,
+                 shared_ptr<TMatrix> T,
+                 shared_ptr<GradHMatrix> dH);
+  
+  // calculate the gradient of h at point P (Eq. S5a)
+  Ptx calc_dh_P(Pt P, shared_ptr<BesselCalc> bcalc,
+               shared_ptr<SHCalc> shcalc,
+               shared_ptr<GradHMatrix> dH);
+  
+};
+
+/*
+ Eq. 13 [2]
+ */
+class GradLHNMatrix : public GradCmplxMolMat
+{
+public:
+  GradLHNMatrix(int I, int wrt, int ns, int p);
+  
+  void calc_vals(Molecule mol, shared_ptr<TMatrix> T,
+                 vector<shared_ptr<GradHMatrix> > dH);
   
 };
 

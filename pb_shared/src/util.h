@@ -194,6 +194,25 @@ public:
     return pout;
   }
   
+  
+  Point<T> operator*=(T scalar)
+  {
+    if (sph_) convert_to_euclidean();
+    p1_ *= scalar;
+    p2_ *= scalar;
+    p3_ *= scalar;
+    return *this;
+  }
+  
+  Point<T> operator+=(Point<T>& rhs)
+  {
+    if (sph_) convert_to_euclidean();
+    p1_ += rhs.p1_;
+    p2_ += rhs.p2_;
+    p3_ += rhs.p3_;
+    return *this;
+  }
+  
   Point<T> operator+(Point<T> other)
   {
     Point<T> pout;
@@ -404,6 +423,7 @@ public:
 
 typedef complex<double> cmplx;
 typedef Point<double> Pt;
+typedef Point<cmplx> Ptx;
 typedef Quaternion Quat;
 
 
