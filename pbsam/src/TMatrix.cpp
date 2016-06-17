@@ -13,7 +13,8 @@ TMatrix::TMatrix(int p, shared_ptr<System> _sys,
                  shared_ptr<Constants> _consts,
                  shared_ptr<BesselCalc> _besselcalc,
                  shared_ptr<ReExpCoeffsConstants> _reexpconsts)
-:p_(p), kappa_(_consts->get_kappa()), Nmol_(_sys->get_n())
+:p_(p), kappa_(_consts->get_kappa()), Nmol_(_sys->get_n()), _system_(_sys),
+_besselCalc_(_besselcalc), _shCalc_(_shcalc)
 {
   int total_spheres=0;
   Nsi_ = vector<int> (Nmol_);
@@ -71,6 +72,38 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
     }
   }
 }
+
+// Perform local expansion from J, l onto I, k
+MyMatrix<cmplx> TMatrix::re_expandX_local(vector<vector<double> > X,
+                                          int I, int k,
+                                          int J, int l)
+{
+  int h, n, m;
+  cmplx val;
+  double chgscl, rscl;
+  MyMatrix<cmplx> Z(p_, 2*p_+1);
+  vector<int> exp_pts = _system_->get_gdpt_expij(J, l);
+  for (h = 0; h < X[l].size(); h++)
+  {
+    Pt sph_dist = _system_->get_centerik(I, k) - _system_->get_centerik(J, l);
+    Pt loc = _system_->get_gridijh(J, l, exp_pts[h]) - sph_dist;
+//    cout << "Hval " << X[l][h] << " at: " << loc.x() << ", " << loc.y() << ", " << loc.z() << " rho: " << loc.r() << endl;
+    _shCalc_->calc_sh(loc.theta(), loc.phi());
+    rscl = _system_->get_aik(I, k) / loc.r();
+    chgscl = X[l][h] / loc.r();
+    for (n = 0; n < p_; n++)
+    {
+      for (m = -n; m <= n; m++)
+      {
+        val = chgscl * _shCalc_->get_result(n, m) + Z(n, m+p_);
+        Z.set_val(n, m+p_, val);
+      }
+      chgscl *= rscl;
+    }
+  }
+  return Z;
+}
+
 
 MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
                                     int I, int k,

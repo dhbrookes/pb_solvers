@@ -42,6 +42,7 @@ protected:
   map<vector<int>, int>   idxMap_;
   shared_ptr<SHCalc>      _shCalc_;
   shared_ptr<BesselCalc>  _besselCalc_;
+  shared_ptr<System>      _system_;
   
   int         Nmol_;
   vector<int> Nsi_; // number of spheres in each molecule
@@ -107,6 +108,12 @@ public:
    Re-expand a matrix X with respect to T(I,k)(J,l)
    */
   MyMatrix<cmplx> re_expandX(MyMatrix<cmplx> X, int I, int k, int J, int l);
+  
+  /*
+   Re-expand a numerical surface with respect to T(I,k)(J,l)
+   */
+  MyMatrix<cmplx> re_expandX_local(vector<vector<double> > X, int I, int k,
+                                   int J, int l);
   
   /*
    re-expand element j of grad(X) with element (I,k,J l) of T. REquires

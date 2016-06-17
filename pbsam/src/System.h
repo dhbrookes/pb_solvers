@@ -238,6 +238,11 @@ public:
                                      const {return molecules_[i].get_radj(j);}
   Pt get_posijreal(int i, int j) {return molecules_[i].get_posj_realspace(j);}
   
+  Pt get_gridijh(int i, int j, int h) const
+        { return molecules_[i].get_gridjh(j, h); }
+  vector<int> get_gdpt_expij(int i, int j) const
+        { return molecules_[i].get_gdpt_expj(j); }
+  
   const int get_mol_global_idx(int type, int ty_idx)
   {
     vector<int> keys = {type, ty_idx};

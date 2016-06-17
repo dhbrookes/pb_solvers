@@ -195,6 +195,7 @@ public:
   double get_mat_kh(int k, int h)           { return mat_[k][h]; }
   void set_mat_kh(int k, int h, double val) { mat_[k][h] = val; }
   vector<double> get_mat_k(int k)           { return mat_[k]; }
+  vector<vector<double> > get_mat()         { return mat_; }
   int get_mat_k_len(int k)                 { return (int)mat_[k].size(); }
   const int get_I() const   { return I_; }
   const int get_p() const   { return p_; }

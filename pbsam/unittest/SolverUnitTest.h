@@ -16,10 +16,7 @@
  */
 class SolverUTest : public ::testing::Test
 {
-  protected :
-
-  double doubleFactorial[10] = {};
-  
+  protected :  
   virtual void SetUp()   {}
   virtual void TearDown() {}
   
