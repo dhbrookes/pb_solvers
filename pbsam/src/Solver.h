@@ -29,6 +29,8 @@ int calc_n_grid_pts(int poles, double r);
 // use Rakhmanov method
 vector<Pt> make_uniform_sph_grid(int m_grid, double r);
 
+double inner_prod( MyMatrix<double> & M1, MyMatrix<double> & M2, int p );
+
 /*
  Base class for coefficients of expansion
  */
@@ -63,8 +65,8 @@ class ComplexMoleculeMatrix
 {
 protected:
   vector<MyMatrix<cmplx> > mat_;
-  int p_;
-  int I_;
+  int p_;  // number of poles
+  int I_;  // Index of molecule that this matrix
     
 public:
   ComplexMoleculeMatrix(int I, int ns, int p);
@@ -96,6 +98,7 @@ public:
         }
         fout << endl;
       }
+      fout << endl;
     }
     return fout;
   }
@@ -160,6 +163,7 @@ protected:
   vector<MatOfMats<cmplx>::type > IE_;
   vector<vector<double> > IE_orig_;
   shared_ptr<ExpansionConstants> _expConst_;
+  bool calc_pts_; // Boolean of whether or not to estimate number of points
   int p_;
   int I_;
   int gridPts_; // grid point count for surface integrals
@@ -173,7 +177,7 @@ public:
   IEMatrix(int I, int ns, int p, shared_ptr<ExpansionConstants> _expconst);
 
   IEMatrix(int I, shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc, int p,
-           shared_ptr<ExpansionConstants> _expconst,
+           shared_ptr<ExpansionConstants> _expconst, bool calc_npts = false,
            int npts = Constants::IMAT_GRID );
   
   cmplx get_IE_k_nm_ls(int k, int n, int m, int l, int s)
@@ -197,7 +201,7 @@ public:
 /*
  Equation 8c [1]
  */
-class LFMatrix : public ComplexMoleculeMatrix
+class LFMatrix : public NumericalMatrix
 {
 public:
   LFMatrix(int I, int ns, int p);
@@ -222,13 +226,17 @@ public:
 /*
  Equation 10b [1]
  */
-class LHMatrix : public ComplexMoleculeMatrix
+class LHMatrix : public NumericalMatrix
 {
 protected:
   double kappa_;
   
 public:
   LHMatrix(int I, int ns, int p, double kappa);
+  
+  void init(Molecule mol, shared_ptr<HMatrix> H,
+            shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
+            shared_ptr<ExpansionConstants> _expconst);
   
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H,
                  shared_ptr<SHCalc> shcalc, shared_ptr<System> sys,
@@ -306,6 +314,8 @@ protected:
   
 public:
   HMatrix(int I, int ns, int p, double kappa);
+  
+  void init(Molecule mol, shared_ptr<SHCalc> _sh_calc, double eps_in);
   
   void calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
                  shared_ptr<XHMatrix> XH,

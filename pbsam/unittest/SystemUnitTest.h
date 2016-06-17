@@ -156,6 +156,9 @@ TEST_F(MoleculeUTest, checkCreateCen)
   mols[0] = Molecule( 0, 0, "stat", pqr.get_charges(),
                       pqr.get_atom_pts(), pqr.get_radii(),
                       surf_file.get_sp(), surf_file.get_np(), 2.5);
+  
+  System sys( mols);
+  sys.write_to_pqr(test_dir_loc + "test_cged.pqr");
 
 //  for (int i=0; i<mols[0].get_ns(); i++)
 //  {
