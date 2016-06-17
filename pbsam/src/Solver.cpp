@@ -801,6 +801,176 @@ void FMatrix::calc_vals(Molecule mol, shared_ptr<FMatrix> prev,
 }
 
 
+GradWFMatrix::GradWFMatrix(int I, int wrt, int ns, int p,
+                           double eps_in, double eps_out,
+                           double kappa)
+:GradCmplxMolMat(I, wrt, ns, p), eps_(eps_in/eps_out), kappa_(kappa)
+{
+}
+
+
+void GradWFMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+                             shared_ptr<GradHMatrix> dH,
+                             shared_ptr<GradFMatrix> dF,
+                             shared_ptr<GradLHMatrix> dLH,
+                             shared_ptr<GradLHNMatrix> dLHN,
+                             shared_ptr<GradLFMatrix> dLF)
+{
+  double ak;
+  double exp_ka;
+  Pt val1, val2, val3, val4;
+  double inner;
+  vector<double> besselk, besseli;
+  for (int k = 0; k < get_ns(); k++)
+  {
+    ak = mol.get_ak(k);
+    besselk = bcalc->calc_mbfK(p_+1, kappa_*ak);
+    besseli = bcalc->calc_mbfI(p_+1, kappa_*ak);
+    exp_ka = exp(-kappa_*ak);
+    for (int n = 0; n < p_; n++)
+    {
+      for (int m = -n; m < n+1; m++)
+      {
+        val1=dH->get_mat_knm(k,n,m)*exp_ka*(n*besselk[n]-(2*n+1)*besselk[n+1]);
+        val2=dF->get_mat_knm(k,n,m)*(2*n+1-n*eps_);
+        val3=dLF->get_mat_knm(k, n, m)*n*eps_*ak;
+        inner=(n*besseli[n])+((besseli[n+1]*kappa_*ak)/(2*n+3));
+        inner+=(besseli[n+1]*kappa_*ak)/(2*n+3);
+        val4 = (dLH->get_mat_knm(k,n,m)+dLHN->get_mat_knm(k,n,m)) * inner;
+        set_mat_knm(k, n, m, val1+val2+val3+val4);
+      }
+    }
+  }
+}
+
+
+GradWHMatrix::GradWHMatrix(int I, int wrt, int ns, int p, double kappa)
+:GradCmplxMolMat(I, wrt, ns, p), kappa_(kappa)
+{
+}
+
+
+void GradWHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+                             shared_ptr<GradHMatrix> dH,
+                             shared_ptr<GradFMatrix> dF,
+                             shared_ptr<GradLHMatrix> dLH,
+                             shared_ptr<GradLHNMatrix> dLHN,
+                             shared_ptr<GradLFMatrix> dLF)
+{
+  double ak;
+  double exp_ka;
+  Pt val1, val2, val3, val4;
+  double inner;
+  vector<double> besselk, besseli;
+  for (int k = 0; k < get_ns(); k++)
+  {
+    ak = mol.get_ak(k);
+    besselk = bcalc->calc_mbfK(p_+1, kappa_*ak);
+    besseli = bcalc->calc_mbfI(p_+1, kappa_*ak);
+    exp_ka = exp(-kappa_*ak);
+    for (int n = 0; n < p_; n++)
+    {
+      for (int m = -n; m < n+1; m++)
+      {
+        inner = ((2 * n + 1) / besseli[n]) - (exp_ka * besselk[n]);
+        val1 = dH->get_mat_knm(k, n, m) * inner;
+        val2 = dF->get_mat_knm(k, n, m);
+        val3 = dLF->get_mat_knm(k, n, m) * ak;
+        val4 = (dLH->get_mat_knm(k,n,m)+dLHN->get_mat_knm(k,n,m))*ak*besseli[n];
+        set_mat_knm(k, n, m, val1+val2+val3+val4);
+      }
+    }
+  }
+}
+
+
+GradFMatrix::GradFMatrix(int I, int wrt, int ns, int p)
+:GradCmplxMolMat(I, wrt, ns, p)
+{
+}
+
+void GradFMatrix::calc_vals(Molecule mol, shared_ptr<IEMatrix> IE,
+                            shared_ptr<GradWFMatrix> dWF)
+{
+  Pt in, in2;
+  for (int k = 0; k < get_ns(); k++)
+  {
+    for (int n = 0; n < p_; n++)
+    {
+      for (int m = -n; m < n+1; m++)
+      {
+        in = Pt();
+        //compute inner product
+        for (int l = 0; l < p_; l++)
+        {
+          for (int s = 0; s < p_; s++)
+          {
+            in2=dWF->get_mat_knm(k,l,s)*IE->get_IE_k_nm_ls(k,n,m,l,s).real();
+            in += in;
+          }
+        }
+        set_mat_knm(k, n, m, in);
+      }
+    }
+  }
+}
+
+GradHMatrix::GradHMatrix(int I, int wrt, int ns, int p)
+:GradCmplxMolMat(I, wrt, ns, p)
+{
+}
+
+void GradHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+                            shared_ptr<IEMatrix> IE,
+                            shared_ptr<GradWHMatrix> dWH)
+{
+  Pt in, in2;
+  double ak;
+  vector<double> besseli;
+  for (int k = 0; k < get_ns(); k++)
+  {
+    ak = mol.get_ak(k);
+    besseli = bcalc->calc_mbfI(p_+1, ak * kappa_);
+    for (int n = 0; n < p_; n++)
+    {
+      for (int m = -n; m < n+1; m++)
+      {
+        in = Pt();
+        //compute inner product
+        for (int l = 0; l < p_; l++)
+        {
+          for (int s = 0; s < p_; s++)
+          {
+            in2 = dWH->get_mat_knm(k,l,s)*IE->get_IE_k_nm_ls(k,n,m,l,s).real();
+            in += in2;
+          }
+        }
+        set_mat_knm(k, n, m, in * besseli[n]);
+      }
+    }
+  }
+}
+
+//GradLFMatrix::GradLFMatrix(int I, int wrt, int ns, int p)
+//:GradCmplxMolMat(I, wrt, ns, p)
+//{
+//}
+//
+//Pt GradLFMatrix::calc_dh_P(Pt P, int k, shared_ptr<SHCalc> shcalc,
+//                           shared_ptr<GradFMatrix> dF)
+//{
+//  shcalc->calc_sh(P.theta(), P.phi());
+//  Pt df = Pt();
+//  Pt in;
+//  for (int n = 0; n < p_; n++)
+//  {
+//    for (int m = -n; m < n+1; m++)
+//    {
+//      in = dF->get_mat_knm(k, n, m) * shcalc->get_result(n, m).real();
+//    }
+//  }
+//}
+
 Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                int p)
@@ -938,5 +1108,4 @@ void Solver::reset_all()
     
   }
 }
-
 

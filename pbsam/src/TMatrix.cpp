@@ -82,8 +82,8 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE;
   
   X1 = expand_RX(X, I, k, J, l, whichR);
-  X2 = expand_SX(X, I, k, J, l, whichS);
-  Z  = expand_RHX(X, I, k, J, l, whichRH);
+  X2 = expand_SX(X1, I, k, J, l, whichS);
+  Z  = expand_RHX(X2, I, k, J, l, whichRH);
   return Z;
 }
 
@@ -103,20 +103,20 @@ VecOfMats<cmplx>::type TMatrix::re_expand_gradX(MyMatrix<cmplx> dXdR,
   
   // first dA/dR
   x1 = expand_RX(dXdR, I, k, J, l, whichR);
-  x2 = expand_SX(dXdR, I, k, J, l, whichS);
-  z  = expand_RHX(dXdR, I, k, J, l, whichRH);
+  x2 = expand_SX(x1, I, k, J, l, whichS);
+  z  = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(0, z);
   
   // dA/dtheta:
   x1 = expand_RX(dXdTheta, I, k, J, l, whichR);
-  x2 = expand_SX(dXdTheta, I, k, J, l, whichS);
-  z  = expand_RHX(dXdTheta, I, k, J, l, whichRH);
+  x2 = expand_SX(x1, I, k, J, l, whichS);
+  z  = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(1, z);
   
   // dA/dphiL
   x1 = expand_RX(dXdPhi, I, k, J, l, whichR);
-  x2 = expand_SX(dXdPhi, I, k, J, l, whichS);
-  z  = expand_RHX(dXdPhi, I, k, J, l, whichRH);
+  x2 = expand_SX(x1, I, k, J, l, whichS);
+  z  = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(2, z);
   
   return Z;
@@ -135,8 +135,8 @@ VecOfMats<cmplx>::type TMatrix::re_expandX_gradT(MyMatrix<cmplx> X,
   // first find with respect to dT/dr:
   whichS = DDR;
   x1 = expand_RX(X, I, k, J, l, whichR);
-  x2 = expand_SX(X, I, k, J, l, whichS);
-  z  = expand_RHX(X, I, k, J, l, whichRH);
+  x2 = expand_SX(x1, I, k, J, l, whichS);
+  z  = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(0, z);
   
   // dT/dtheta:
@@ -144,28 +144,28 @@ VecOfMats<cmplx>::type TMatrix::re_expandX_gradT(MyMatrix<cmplx> X,
   whichS = BASE;
   whichRH = DDTHETA;
   x1 = expand_RX(X, I, k, J, l, whichR);
-  x2 = expand_SX(X, I, k, J, l, whichS);
-  z1 = expand_RHX(X, I, k, J, l, whichRH);
+  x2 = expand_SX(x1, I, k, J, l, whichS);
+  z1 = expand_RHX(x2, I, k, J, l, whichRH);
   
   whichRH = BASE;
   whichR = DDTHETA;
   x1 = expand_RX(X, I, k, J, l, whichR);
-  x2 = expand_SX(X, I, k, J, l, whichS);
-  z2 = expand_RHX(X, I, k, J, l, whichRH);
+  x2 = expand_SX(x1, I, k, J, l, whichS);
+  z2 = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(1, z1 + z2);
   
   // dT/dphi:
   whichR = BASE;
   whichRH = DDPHI;
   x1 = expand_RX(X, I, k, J, l, whichR);
-  x2 = expand_SX(X, I, k, J, l, whichS);
-  z1 = expand_RHX(X, I, k, J, l, whichRH);
+  x2 = expand_SX(x1, I, k, J, l, whichS);
+  z1 = expand_RHX(x2, I, k, J, l, whichRH);
   
   whichRH = BASE;
   whichR = DDPHI;
   x1 = expand_RX(X, I, k, J, l, whichR);
-  x2 = expand_SX(X, I, k, J, l, whichS);
-  z2 = expand_RHX(X, I, k, J, l, whichRH);
+  x2 = expand_SX(x1, I, k, J, l, whichS);
+  z2 = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(2, z1 + z2);
   
   Z = conv_to_cart(Z, I, k, J, l);
