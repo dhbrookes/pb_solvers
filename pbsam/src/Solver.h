@@ -198,8 +198,54 @@ public:
 };
 
 
+class HMatrix;
+class FMatrix;
+
 /*
- Equation 8c [1]
+ Base class for numerical matrices
+ */
+class NumericalMatrix
+{
+protected:
+  vector<vector<double> > mat_;
+  int p_;  // number of poles
+  int I_;  // Index of molecule that this matrix
+  
+public:
+  NumericalMatrix(int I, int ns, int p);
+  
+  double get_mat_kh(int k, int h)           { return mat_[k][h]; }
+  void set_mat_kh(int k, int h, double val) { mat_[k][h] = val; }
+  vector<double> get_mat_k(int k)           { return mat_[k]; }
+  int get_mat_k_len(int k)                 { return (int)mat_[k].size(); }
+  const int get_I() const   { return I_; }
+  const int get_p() const   { return p_; }
+  const int get_ns() const  { return (int) mat_.size(); }
+  
+  void reset_mat();
+  
+  friend ostream & operator<<(ostream & fout, NumericalMatrix & M)
+  {
+    for (int k = 0; k < M.get_ns(); k++)
+    {
+      fout << "For sphere " << k << endl;
+      for (int h = 0; h < M.get_mat_k_len(h); h++)
+      {
+        double real = M.get_mat_kh( k, h);
+        if(abs(real) < 1e-15 ) real = 0.0;
+        fout << real << ", ";
+      }
+      fout << endl;
+    }
+    return fout;
+  }
+  
+};
+
+
+
+/*
+ Equation 8c
  */
 class LFMatrix : public NumericalMatrix
 {
@@ -353,7 +399,7 @@ class GradCmplxMolMat
 {
 protected:
   int wrt_;  // with respect to
-  vector<MyMatrix<Pt> > mat_;  // each gradient has three components (use Pt)
+  vector<MyMatrix<Ptx> > mat_;  // each gradient has three components (use Pt)
   int p_;
   int I_;
   
@@ -367,9 +413,11 @@ public:
   const int get_I() const   { return I_; }
   const int get_p() const   { return p_; }
   const int get_ns() const  { return (int) mat_.size(); }
-  Pt get_mat_knm(int k, int n, int m) { return mat_[k](n, m+p_); }
-  void set_mat_knm(int k, int n, int m, Pt val)
+  Ptx get_mat_knm(int k, int n, int m) { return mat_[k](n, m+p_); }
+  void set_mat_knm(int k, int n, int m, Ptx val)
   { mat_[k].set_val(n, m+p_, val); }
+  
+  void reset_mat();
 };
 
 // gradient matrices:
@@ -463,8 +511,13 @@ public:
                  shared_ptr<TMatrix> T,
                  shared_ptr<GradFMatrix> dF);
   
+  MyMatrix<Ptx> analytic_reex(Molecule mol, int k, int j,
+                                shared_ptr<SHCalc> shcalc,
+                                shared_ptr<GradFMatrix> dF,
+                                int Mp=-1);
+  
   // calculate the gradient of h at point P (Eq. S5a)
-  Pt calc_dh_P(Pt P, int k, shared_ptr<SHCalc> shcalc,
+  Ptx calc_df_P(Pt P, int k, shared_ptr<SHCalc> shcalc,
                shared_ptr<GradFMatrix> dF);
   
 };
@@ -477,16 +530,16 @@ class GradLHMatrix : public GradCmplxMolMat
 public:
   GradLHMatrix(int I, int wrt, int ns, int p);
   
-//  void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
-//                 shared_ptr<SHCalc> shcalc,
-//                 shared_ptr<TMatrix> T,
-//                 shared_ptr<GradHMatrix> dH);
-//  
-//  // calculate the gradient of h at point P (Eq. S5a)
-//  Pt calc_dh_P(Pt P, shared_ptr<BesselCalc> bcalc,
-//               shared_ptr<SHCalc> shcalc,
-//               shared_ptr<GradHMatrix> dH);
-//  
+  void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+                 shared_ptr<SHCalc> shcalc,
+                 shared_ptr<TMatrix> T,
+                 shared_ptr<GradHMatrix> dH);
+  
+  // calculate the gradient of h at point P (Eq. S5a)
+  Ptx calc_dh_P(Pt P, shared_ptr<BesselCalc> bcalc,
+               shared_ptr<SHCalc> shcalc,
+               shared_ptr<GradHMatrix> dH);
+  
 };
 
 /*

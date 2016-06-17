@@ -423,6 +423,7 @@ public:
 
 typedef complex<double> cmplx;
 typedef Point<double> Pt;
+typedef Point<cmplx> Ptx;
 typedef Quaternion Quat;
 
 
