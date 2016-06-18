@@ -42,6 +42,7 @@ protected:
   map<vector<int>, int>   idxMap_;
   shared_ptr<SHCalc>      _shCalc_;
   shared_ptr<BesselCalc>  _besselCalc_;
+  shared_ptr<System>      _system_;
   
   int         Nmol_;
   vector<int> Nsi_; // number of spheres in each molecule
