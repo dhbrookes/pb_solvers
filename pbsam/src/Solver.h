@@ -293,7 +293,8 @@ public:
                                 shared_ptr<HMatrix> H,
                                 shared_ptr<SHCalc> shcalc,
                                 shared_ptr<System> sys,
-                                shared_ptr<BesselCalc> bcalc,
+                                vector<double> besseli,
+                                vector<double> besselk,
                                 int Mp=-1);
   
   /*
@@ -302,7 +303,7 @@ public:
   cmplx make_hb_Ij(int I, int j, Pt rb,
                    shared_ptr<HMatrix> H,
                    shared_ptr<SHCalc> shcalc,
-                   shared_ptr<BesselCalc> bcalc);
+                   vector<double> besseli);
   
 };
 
@@ -405,7 +406,7 @@ protected:
   
 public:
   GradCmplxMolMat(int I, int wrt, int ns, int p)
-  :wrt_(wrt), p_(p), I_(I)
+  :wrt_(wrt), p_(p), I_(I), mat_(ns, MyMatrix<Ptx> (p, 2*p+1))
   {
   }
   
@@ -416,6 +417,8 @@ public:
   Ptx get_mat_knm(int k, int n, int m) { return mat_[k](n, m+p_); }
   void set_mat_knm(int k, int n, int m, Ptx val)
   { mat_[k].set_val(n, m+p_, val); }
+  
+  MyMatrix<Ptx> get_mat_k(int k) const { return mat_[k]; }
   
   void reset_mat();
 };
@@ -509,7 +512,8 @@ public:
   
   void calc_vals(Molecule mol, shared_ptr<SHCalc> shcalc,
                  shared_ptr<TMatrix> T,
-                 shared_ptr<GradFMatrix> dF);
+                 shared_ptr<GradFMatrix> dF,
+                 int Mp=-1);
   
   MyMatrix<Ptx> analytic_reex(Molecule mol, int k, int j,
                                 shared_ptr<SHCalc> shcalc,
@@ -527,16 +531,26 @@ public:
  */
 class GradLHMatrix : public GradCmplxMolMat
 {
+protected:
+  double kappa_;
+  
 public:
-  GradLHMatrix(int I, int wrt, int ns, int p);
+  GradLHMatrix(int I, int wrt, int ns, int p, double kappa);
   
   void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
                  shared_ptr<SHCalc> shcalc,
                  shared_ptr<TMatrix> T,
-                 shared_ptr<GradHMatrix> dH);
+                 shared_ptr<GradHMatrix> dH, int Mp=-1);
+  
+  MyMatrix<Ptx> analytic_reex(Molecule mol, int k, int j,
+                              vector<double> besseli,
+                              vector<double> besselk,
+                              shared_ptr<SHCalc> shcalc,
+                              shared_ptr<GradHMatrix> dH,
+                              int Mp=-1);
   
   // calculate the gradient of h at point P (Eq. S5a)
-  Ptx calc_dh_P(Pt P, shared_ptr<BesselCalc> bcalc,
+  Ptx calc_dh_P(Pt P, int k, vector<double> besseli,
                shared_ptr<SHCalc> shcalc,
                shared_ptr<GradHMatrix> dH);
   

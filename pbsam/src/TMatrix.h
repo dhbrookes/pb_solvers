@@ -109,27 +109,31 @@ public:
   MyMatrix<cmplx> re_expandX(MyMatrix<cmplx> X, int I, int k, int J, int l);
   
   /*
-   re-expand element j of grad(X) with element (I,k,J l) of T. REquires
-   the three components of grad(X)
+   re-expand element j of grad(X) with element (I,k,J l) of T.
    */
-  VecOfMats<cmplx>::type re_expand_gradX(MyMatrix<cmplx> dXdR,
-                                         MyMatrix<cmplx> dXdTheta,
-                                         MyMatrix<cmplx> dXdPhi,
-                                         int I, int k, int J, int l);
+  MyMatrix<Ptx> re_expand_gradX(MyMatrix<Ptx> dX,
+                                int I, int k, int J, int l);
+  
+  
   
   /*
    Re-expand X with element (I, k, J, l) of grad(T) and return
-   as a 3-element vector containing the results for the re-expansion
-   with each element of grad(T)
+   a matrix of Point objects containing each element of the gradient
    */
-  VecOfMats<cmplx>::type re_expandX_gradT(MyMatrix<cmplx> X,
-                                          int I, int k,
-                                          int J, int l);
+  MyMatrix<Ptx> re_expandX_gradT(MyMatrix<cmplx> X,
+                                 int I, int k,
+                                 int J, int l);
   
 
   int get_nmol() const { return Nmol_; }
   
   int get_nsi(int i)   { return Nsi_[i]; }
+  
+  
+  // convert a matrix of Pts into a vector of 3 matrices
+  VecOfMats<cmplx>::type convert_from_ptx(MyMatrix<Ptx> X);
+  //and do the opposite of the above
+  MyMatrix<Ptx> convert_to_ptx(VecOfMats<cmplx>::type X);
   
 };
 

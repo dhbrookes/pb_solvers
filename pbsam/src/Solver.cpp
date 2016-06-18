@@ -591,8 +591,11 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H,
 {
   reset_mat();
   MyMatrix<cmplx> reex;
+  vector<double> besseli, besselk;
   for (int k = 0; k < mat_.size(); k++)
   {
+    besseli = bcalc->calc_mbfI(p_+1, kappa_*sys->get_aik(I_, k));
+    besselk = bcalc->calc_mbfK(p_+1, kappa_*sys->get_aik(I_, k));
     //TODO: figure this out
 //    for (int j = 0; j < T->get_nsi(I_); j++)
 //    {
@@ -603,7 +606,7 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H,
 //      }
 //      else
 //      {
-//        reex = analytic_reex(I_, k, j, H, shcalc, sys, bcalc, Mp);
+//        reex = analytic_reex(I_, k, j, H, shcalc, sys, besseli, besselk, Mp);
 //      }
 //      mat_[k] += reex;
 //    }
@@ -614,7 +617,8 @@ MyMatrix<cmplx> LHMatrix::analytic_reex(int I, int k, int j,
                                         shared_ptr<HMatrix> H,
                                         shared_ptr<SHCalc> shcalc,
                                         shared_ptr<System> sys,
-                                        shared_ptr<BesselCalc> bcalc,
+                                        vector<double> besseli,
+                                        vector<double> besselk,
                                         int Mp)
 {
   if (Mp == -1) Mp = 2.5 * p_*p_;
@@ -622,7 +626,7 @@ MyMatrix<cmplx> LHMatrix::analytic_reex(int I, int k, int j,
   cmplx inner, hbj;
   Pt rb_k;
   MyMatrix<cmplx> LH_Ik (p_, 2 * p_ + 1);
-  vector<double> besselk, besseli;
+//  vector<double> besselk, besseli;
 
   for (int n = 0; n < p_; n++)
   {
@@ -631,12 +635,12 @@ MyMatrix<cmplx> LHMatrix::analytic_reex(int I, int k, int j,
       for (int b = 0; b < Mp; b++)
       {
         
-        hbj = make_hb_Ij(I, j, sph_grid[b], H, shcalc, bcalc);
+        hbj = make_hb_Ij(I, j, sph_grid[b], H, shcalc, besseli);
         hbj *= (4 * M_PI) / (Mp);
         
         rb_k = sph_grid[b]-(sys->get_centerik(I, k)-sys->get_centerik(I, j));
         shcalc->calc_sh(rb_k.theta(), rb_k.phi());
-        besselk = bcalc->calc_mbfK(p_+1, kappa_ * rb_k.r());
+//        besselk = bcalc->calc_mbfK(p_+1, kappa_ * rb_k.r());
         
         inner = hbj / rb_k.r();
         inner *= pow(sys->get_aik(I, k) / rb_k.r(), n);
@@ -653,15 +657,15 @@ MyMatrix<cmplx> LHMatrix::analytic_reex(int I, int k, int j,
 cmplx LHMatrix::make_hb_Ij(int I, int j, Pt rb,
                            shared_ptr<HMatrix> H,
                            shared_ptr<SHCalc> shcalc,
-                           shared_ptr<BesselCalc> bcalc)
+                           vector<double> besseli)
 {
-  vector<double> besseli;
+//  vector<double> besseli;
   cmplx hb_inner, hbj;
   vector<cmplx> h;
 
   shcalc->calc_sh(rb.theta(), rb.phi());
-  besseli = bcalc->calc_mbfI(p_+1,
-                             kappa_*rb.r());
+//  besseli = bcalc->calc_mbfI(p_+1,
+//                             kappa_*rb.r());
   hbj = 0;
   for (int n = 0; n < p_; n++)
   {
@@ -1090,65 +1094,179 @@ void GradHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
   }
 }
 
-//GradLFMatrix::GradLFMatrix(int I, int wrt, int ns, int p)
-//:GradCmplxMolMat(I, wrt, ns, p)
-//{
-//}
-//
-//void GradLFMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> shcalc,
-//                             shared_ptr<TMatrix> T,
-//                             shared_ptr<GradFMatrix> dF)
-//{
-//  
-//}
-//
-//MyMatrix<Ptx> GradLFMatrix::analytic_reex(Molecule mol, int k, int j,
-//                                            shared_ptr<SHCalc> shcalc,
-//                                            shared_ptr<GradFMatrix> dF,
-//                                            int Mp)
-//{
-//  if (Mp == -1) Mp = 2.5 * p_*p_;
-//  vector<Pt> sph_grid = make_uniform_sph_grid(Mp, mol.get_ak(j));
-//  Ptx fpj, inner;
-//  Pt rb_k;
-//  MyMatrix<Ptx> dLF_Ik (p_, 2 * p_ + 1);
-//  for (int n = 0; n < p_; n++)
-//  {
-//    for (int m = -n; m < n+1; m++)
-//    {
-//      for (int b = 0; b < Mp; b++)
-//      {
-//        fpj = calc_df_P(sph_grid[b], k, shcalc, dF);
-//        fpj *= (4 * M_PI) / sph_grid.size();
-//
-//        rb_k = sph_grid[b]-(mol.get_centerk(k)-mol.get_centerk(j));
-//        shcalc->calc_sh(rb_k.theta(), rb_k.phi());
-//        
-//        inner = fpj * (1/rb_k.r());
-//        inner *= pow(mol.get_ak(k)/ rb_k.r(), n);
-//        inner *= conj(shcalc->get_result(n, m));
-//        dLF_Ik.set_val(n, m, inner);
-//      }
-//    }
-//  }
-//  return dLF_Ik;
-//}
-//
-//Ptx GradLFMatrix::calc_df_P(Pt P, int k, shared_ptr<SHCalc> shcalc,
-//                           shared_ptr<GradFMatrix> dF)
-//{
-//  shcalc->calc_sh(P.theta(), P.phi());
-//  Ptx df = Ptx();
-//  Ptx in;
-//  for (int n = 0; n < p_; n++)
-//  {
-//    for (int m = -n; m < n+1; m++)
-//    {
-//      in = dF->get_mat_knm(k,n,m)*shcalc->get_result(n,m)*((2*n+1)/(4*M_PI));
-//    }
-//  }
-//  return df;
-//}
+GradLFMatrix::GradLFMatrix(int I, int wrt, int ns, int p)
+:GradCmplxMolMat(I, wrt, ns, p)
+{
+}
+
+void GradLFMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> shcalc,
+                             shared_ptr<TMatrix> T,
+                             shared_ptr<GradFMatrix> dF, int Mp)
+{
+  MyMatrix<Ptx> reex, inner;
+  for (int k = 0; k < get_ns(); k++)
+  {
+    inner = MyMatrix<Ptx> (p_, 2*p_+1);
+    for (int j = 0; j < get_ns(); j++)
+    {
+      if (j == k) continue;
+      if (T->is_analytic(I_, k, I_, j))
+      {
+        reex = T->re_expand_gradX(dF->get_mat_k(k), I_, k, I_, j);
+      }
+      else
+      {
+        reex = analytic_reex(mol, k, j, shcalc, dF);
+      }
+      inner += reex;
+    }
+    mat_[k] = inner;
+  }
+}
+
+MyMatrix<Ptx> GradLFMatrix::analytic_reex(Molecule mol, int k, int j,
+                                            shared_ptr<SHCalc> shcalc,
+                                            shared_ptr<GradFMatrix> dF,
+                                            int Mp)
+{
+  if (Mp == -1) Mp = 2.5 * p_*p_;
+  vector<Pt> sph_grid = make_uniform_sph_grid(Mp, mol.get_ak(j));
+  Ptx fpj, inner;
+  Pt rb_k;
+  MyMatrix<Ptx> dLF_Ik (p_, 2 * p_ + 1);
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m < n+1; m++)
+    {
+      for (int b = 0; b < Mp; b++)
+      {
+        fpj = calc_df_P(sph_grid[b], k, shcalc, dF);
+        fpj *= (4 * M_PI) / sph_grid.size();
+
+        rb_k = sph_grid[b]-(mol.get_centerk(k)-mol.get_centerk(j));
+        shcalc->calc_sh(rb_k.theta(), rb_k.phi());
+        
+        inner = fpj * (1/rb_k.r());
+        inner *= pow(mol.get_ak(k)/ rb_k.r(), n);
+        inner *= conj(shcalc->get_result(n, m));
+        dLF_Ik.set_val(n, m, inner);
+      }
+    }
+  }
+  return dLF_Ik;
+}
+
+Ptx GradLFMatrix::calc_df_P(Pt P, int k, shared_ptr<SHCalc> shcalc,
+                           shared_ptr<GradFMatrix> dF)
+{
+  shcalc->calc_sh(P.theta(), P.phi());
+  Ptx df = Ptx();
+  Ptx in;
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m < n+1; m++)
+    {
+      in = dF->get_mat_knm(k,n,m)*shcalc->get_result(n,m)*((2*n+1)/(4*M_PI));
+      df += in;
+    }
+  }
+  return df;
+}
+
+
+GradLHMatrix::GradLHMatrix(int I, int wrt, int ns, int p, double kappa)
+:GradCmplxMolMat(I, wrt, ns, p), kappa_(kappa)
+{
+}
+
+void GradLHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+                             shared_ptr<SHCalc> shcalc,
+                             shared_ptr<TMatrix> T,
+                             shared_ptr<GradHMatrix> dH, int Mp)
+{
+  MyMatrix<Ptx> reex, inner;
+  
+  vector<double> besseli, besselk;
+  
+  for (int k = 0; k < get_ns(); k++)
+  {
+    
+    besseli = bcalc->calc_mbfI(p_+1, mol.get_ak(k) * kappa_);
+    besselk = bcalc->calc_mbfK(p_+1, mol.get_ak(k) * kappa_);
+    
+    inner = MyMatrix<Ptx> (p_, 2*p_+1);
+    for (int j = 0; j < get_ns(); j++)
+    {
+      if (j == k) continue;
+      if (T->is_analytic(I_, k, I_, j))
+      {
+        reex = T->re_expand_gradX(dH->get_mat_k(k), I_, k, I_, j);
+      }
+      else
+      {
+        reex = analytic_reex(mol, k, j, besseli, besselk, shcalc, dH, Mp);
+      }
+      inner += reex;
+    }
+    mat_[k] = inner;
+  }
+}
+
+MyMatrix<Ptx> GradLHMatrix::analytic_reex(Molecule mol, int k, int j,
+                                          vector<double> besseli,
+                                          vector<double> besselk,
+                                          shared_ptr<SHCalc> shcalc,
+                                          shared_ptr<GradHMatrix> dH,
+                                          int Mp)
+{
+  if (Mp == -1) Mp = 2.5 * p_*p_;
+  vector<Pt> sph_grid = make_uniform_sph_grid(Mp, mol.get_ak(j));
+  Ptx hpj, inner;
+  Pt rb_k;
+  MyMatrix<Ptx> dLH_Ik (p_, 2 * p_ + 1);
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m < n+1; m++)
+    {
+      for (int b = 0; b < Mp; b++)
+      {
+        hpj = calc_dh_P(sph_grid[b], k, besseli, shcalc, dH);
+        hpj *= (4 * M_PI) / sph_grid.size();
+        
+        rb_k = sph_grid[b]-(mol.get_centerk(k)-mol.get_centerk(j));
+        shcalc->calc_sh(rb_k.theta(), rb_k.phi());
+        
+        inner = hpj * (1/rb_k.r());
+        inner *= pow(mol.get_ak(k)/ rb_k.r(), n);
+        inner *= conj(shcalc->get_result(n, m));
+        inner *= exp(-kappa_*rb_k.r());
+        inner *= besselk[n];
+        
+        dLH_Ik.set_val(n, m, inner);
+      }
+    }
+  }
+  return dLH_Ik;
+}
+
+Ptx GradLHMatrix::calc_dh_P(Pt P, int k, vector<double> besseli,
+                            shared_ptr<SHCalc> shcalc,
+                            shared_ptr<GradHMatrix> dH)
+{
+  shcalc->calc_sh(P.theta(), P.phi());
+  Ptx dh = Ptx();
+  Ptx in;
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m < n+1; m++)
+    {
+      in = dH->get_mat_knm(k,n,m)*shcalc->get_result(n,m)*((2*n+1)/(4*M_PI));
+      in *= 1/besseli[n];
+      dh += in;
+    }
+  }
+  return dh;
+}
 
 Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,

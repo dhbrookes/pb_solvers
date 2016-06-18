@@ -90,40 +90,42 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
  re-expand element j of grad(X) with element (i, j) of T. Requires 
  the three components of grad(X)
  */
-VecOfMats<cmplx>::type TMatrix::re_expand_gradX(MyMatrix<cmplx> dXdR,
-                                                MyMatrix<cmplx> dXdTheta,
-                                                MyMatrix<cmplx> dXdPhi,
-                                                int I, int k, int J, int l)
+MyMatrix<Ptx> TMatrix::re_expand_gradX(MyMatrix<Ptx> dX,
+                                        int I, int k,
+                                        int J, int l)
+
 {
+  VecOfMats<cmplx>::type dX_comps = convert_from_ptx(dX);
+  
   MyMatrix<cmplx> x1, x2, z;
   VecOfMats<cmplx>::type Z (3);
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE;
   
   // first dA/dR
-  x1 = expand_RX(dXdR, I, k, J, l, whichR);
+  x1 = expand_RX(dX_comps[0], I, k, J, l, whichR);
   x2 = expand_SX(x1, I, k, J, l, whichS);
   z  = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(0, z);
   
   // dA/dtheta:
-  x1 = expand_RX(dXdTheta, I, k, J, l, whichR);
+  x1 = expand_RX(dX_comps[0], I, k, J, l, whichR);
   x2 = expand_SX(x1, I, k, J, l, whichS);
   z  = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(1, z);
   
   // dA/dphiL
-  x1 = expand_RX(dXdPhi, I, k, J, l, whichR);
+  x1 = expand_RX(dX_comps[0], I, k, J, l, whichR);
   x2 = expand_SX(x1, I, k, J, l, whichS);
   z  = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(2, z);
   
-  return Z;
+  return convert_to_ptx(Z);
 }
 
 
-VecOfMats<cmplx>::type TMatrix::re_expandX_gradT(MyMatrix<cmplx> X,
-                                                 int I, int k,
-                                                 int J, int l)
+MyMatrix<Ptx> TMatrix::re_expandX_gradT(MyMatrix<cmplx> X,
+                                         int I, int k,
+                                         int J, int l)
 {
   MyMatrix<cmplx> x1, x2, z, z1, z2;
   VecOfMats<cmplx>::type Z (3); // output vector
@@ -167,7 +169,7 @@ VecOfMats<cmplx>::type TMatrix::re_expandX_gradT(MyMatrix<cmplx> X,
   Z.set_val(2, z1 + z2);
   
   Z = conv_to_cart(Z, I, k, J, l);
-  return Z;
+  return convert_to_ptx(Z);
 }
 
 
@@ -492,4 +494,35 @@ VecOfMats<cmplx>::type TMatrix::conv_to_cart(VecOfMats<cmplx>::type dZ,
                            + con3[1]*dZ[1](n, m+p_)+con3[2]*dZ[2](n, m+p_));
     }
   return Zcart;
+}
+
+
+// convert a matrix of Point objects into a vector of 3 matrices
+VecOfMats<cmplx>::type convert_from_ptx(MyMatrix<Ptx> X)
+{
+  VecOfMats<cmplx>::type result (3, MyMatrix<cmplx> (X.get_ncols(),
+                                                     X.get_nrows()));
+  for (int i = 0 ; i < 3; i++)
+    for (int j = 0; j < X.get_nrows(); j++)
+      for (int k = 0; k < X.get_ncols(); k++)
+        result[i].set_val(j, k, X(j, k)[i]);
+  
+  return result;
+     
+}
+
+
+MyMatrix<Ptx> convert_to_ptx(VecOfMats<cmplx>::type X)
+{
+  MyMatrix<Ptx> result (X[0].get_nrows(), X[1].get_ncols());
+  for (int j = 0; j < X.get_nrows(); j++)
+    for (int k = 0; k < X.get_ncols(); k++)
+    {
+      result(j, k).set_x(X[0](j, k));
+      result(j, k).set_y(X[1](j, k));
+      result(j, k).set_z(X[2](j, k));
+    }
+  
+  return result;
+  
 }
