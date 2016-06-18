@@ -531,7 +531,7 @@ VecOfMats<cmplx>::type TMatrix::conv_to_cart(VecOfMats<cmplx>::type dZ,
 
 
 // convert a matrix of Point objects into a vector of 3 matrices
-VecOfMats<cmplx>::type convert_from_ptx(MyMatrix<Ptx> X)
+VecOfMats<cmplx>::type TMatrix::convert_from_ptx(MyMatrix<Ptx> X)
 {
   VecOfMats<cmplx>::type result (3, MyMatrix<cmplx> (X.get_ncols(),
                                                      X.get_nrows()));
@@ -545,7 +545,7 @@ VecOfMats<cmplx>::type convert_from_ptx(MyMatrix<Ptx> X)
 }
 
 
-MyMatrix<Ptx> convert_to_ptx(VecOfMats<cmplx>::type X)
+MyMatrix<Ptx> TMatrix::convert_to_ptx(VecOfMats<cmplx>::type X)
 {
   MyMatrix<Ptx> result (X[0].get_nrows(), X[1].get_ncols());
   for (int j = 0; j < X.get_nrows(); j++)

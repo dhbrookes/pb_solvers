@@ -110,7 +110,14 @@ public:
   MyMatrix<cmplx> re_expandX(MyMatrix<cmplx> X, int I, int k, int J, int l);
   
   /*
-   re-expand element j of grad(X) with element (I,k,J l) of T.
+   Re-expand a numerical surface with respect to T(I,k)(J,l)
+   */
+  MyMatrix<cmplx> re_expandX_local(vector<vector<double> > X, int I, int k,
+                                   int J, int l);
+  
+  /*
+   re-expand element j of grad(X) with element (I,k,J l) of T. REquires
+   the three components of grad(X)
    */
   MyMatrix<Ptx> re_expand_gradX(MyMatrix<Ptx> dX,
                                 int I, int k, int J, int l);
