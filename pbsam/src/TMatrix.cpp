@@ -63,10 +63,14 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kapVal * v.r());
           v = _sys->get_pbc_dist_vec_base(c_Ik, c_Jl);
           _shcalc->calc_sh(v.theta(), v.phi());
-          cout << "This is Ik, Jl pair : " << I << ", " << k << " & " <<
-          J << ", " << l << " and dist " << v.norm() << " and ajl " << _sys->get_aik(J, l)<< endl;
-          cout << "Pt : " << v.x() << ", " << v.y() << ", " << v.z() << endl;
           
+          if (( k == 3 ) and (l == 16))
+          {
+            
+          cout << "This is Ik, Jl pair : " << I << ", " << k << " & " <<
+          J << ", " << l << " and dist " << v.norm() << " and ajl " << _sys->get_aik(J, l) << " rho : " <<  v.r()<<  endl;
+          cout << "Pt : " << v.x() << ", " << v.y() << ", " << v.z() << endl;
+          }
           vector<double> lambdas = {_sys->get_aik(J, l), _sys->get_aik(I, k)};
           auto re_exp = make_shared<ReExpCoeffs>(p_, v,
                                                  _shcalc->get_full_result(),
@@ -128,7 +132,7 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
   {
     for (int m = 0; m <= n; m++)
     {
-      cout << X2(n,m+p_) << ", ";
+      cout << Z(n,m+p_) << ", ";
     }
     cout << endl;
   }
@@ -300,14 +304,15 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
   MyMatrix<cmplx> x2(p_, 2*p_ + 1);
   
   int n, m, s, map_idx;
-  
   bool jl_greater = is_Jl_greater(I, k, J, l);
   if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
   else            map_idx = idxMap_[{J, l, I, k}];
   
-  
-  cout << map_idx << endl;
-  T_[map_idx]->print_S();
+  double fac;
+  vector<double> lam = T_[map_idx]->get_lambdas();
+  vector<double> lamScl = T_[map_idx]->get_lam_scale();
+//  cout << map_idx << endl;
+//  T_[map_idx]->print_S();
   
   // fill x2:
   for (n = 0; n < p_; n++)
@@ -317,6 +322,7 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
       inter  = 0;
       for (s = abs(m); s < p_; s++)
       {
+        fac = ( s <= n ) ? lamScl[n-s] : 1.0;
         if ( jl_greater )
         {
           if (whichS == DDR) sval = T_[map_idx]->get_sval(n, s, m);
@@ -327,7 +333,7 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
           if (whichS == DDR) sval = T_[map_idx]->get_sval(s, n, m);
           else sval = T_[map_idx]->get_sval(s, n, m);
         }
-        inter += sval * x1(s, m+p_);
+        inter += fac * sval * x1(s, m+p_);
       } // end l
       x2.set_val(n, m+p_, inter);
     } // end m

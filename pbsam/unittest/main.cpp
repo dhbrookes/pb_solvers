@@ -44,7 +44,7 @@ string test_dir_loc = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/gtest/";
 //#include "ConstantsUnitTest.h"
 //#include "MyMatrixUnitTest.h"
 //#include "readutilUnitTest.h"
-#include "ReExpCalcUnitTest.h"
+//#include "ReExpCalcUnitTest.h"
 //#include "setupUnitTest.h"
 //#include "SHCalcUnitTest.h"
 #include "SolverUnitTest.h"

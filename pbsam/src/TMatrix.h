@@ -33,6 +33,7 @@ protected:
   
   int     p_;
   double  kappa_;
+  vector<double> lam_scl_; // S factors, 0=kpio and 1=kpoo, for PB-SAM
   
   vector<shared_ptr<ReExpCoeffs> > T_;
   
