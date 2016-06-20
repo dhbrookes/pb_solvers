@@ -256,7 +256,7 @@ public:
                  shared_ptr<SHCalc> shcalc, shared_ptr<System> sys);
   
   // analytic re-expansion (Equation 27a [1])
-  MyMatrix<cmplx> analytic_reex(int I, int k, int j,
+  MyMatrix<cmplx> numeric_reex(int I, int k, int j,
                                 shared_ptr<FMatrix> F,
                                 shared_ptr<SHCalc> shcalc,
                                 shared_ptr<System> sys, int Mp=-1);
@@ -289,7 +289,7 @@ public:
                  shared_ptr<BesselCalc> bcalc, int Mp=-1);
   
   // analytic re-expansion (Equation 27b [1])
-  MyMatrix<cmplx> analytic_reex(int I, int k, int j,
+  MyMatrix<cmplx> numeric_reex(int I, int k, int j,
                                 shared_ptr<HMatrix> H,
                                 shared_ptr<SHCalc> shcalc,
                                 shared_ptr<System> sys,
@@ -515,7 +515,7 @@ public:
                  shared_ptr<GradFMatrix> dF,
                  int Mp=-1);
   
-  MyMatrix<Ptx> analytic_reex(Molecule mol, int k, int j,
+  MyMatrix<Ptx> numeric_reex(Molecule mol, int k, int j,
                                 shared_ptr<SHCalc> shcalc,
                                 shared_ptr<GradFMatrix> dF,
                                 int Mp=-1);
@@ -542,7 +542,7 @@ public:
                  shared_ptr<TMatrix> T,
                  shared_ptr<GradHMatrix> dH, int Mp=-1);
   
-  MyMatrix<Ptx> analytic_reex(Molecule mol, int k, int j,
+  MyMatrix<Ptx> numeric_reex(Molecule mol, int k, int j,
                               vector<double> besseli,
                               vector<double> besselk,
                               shared_ptr<SHCalc> shcalc,
