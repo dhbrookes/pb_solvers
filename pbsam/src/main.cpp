@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 #include "Solver.h"
+#include "Solvmat.h"
+#include "Gradsolvmat.h"
 //#include "System.h"
 //#include "SHCalc.h"
 //#include "BesselCalc.h"
