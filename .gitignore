@@ -28,3 +28,9 @@ APBS_compare/
 *.jpg
 *.jpeg
 *.pdf
+
+# Dynamics ignores
+[0-2][0-9]
+contact_1BRS_other/
+pbcs
+porin

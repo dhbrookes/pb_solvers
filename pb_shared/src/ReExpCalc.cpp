@@ -108,6 +108,11 @@ dSdR_(2*p, MyMatrix<double> (2*p, 4*p)),
 dRdTheta_(2*p, MyMatrix<cmplx> (2*p, 4*p)),
 prefacSing_(2*p, MyMatrix<double>(p, 2))
 {
+  
+  // for PBAM, only have one lambda
+  if (lam_sam_.size() == 1) lam_sam_.resize(2);
+  lam_sam_[1] = lam_sam_[0];
+  
   if (besselK_.size() < 2 * p_)
   {
     throw BesselSizeException(p_, (int) besselK_.size());
