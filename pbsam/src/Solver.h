@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <memory>
-#include "ReExpCalc.h"
 #include "TMatrix.h"
 
 
@@ -88,7 +87,7 @@ public:
       fout << "For sphere " << k << endl;
       for (int n = 0; n < M.get_p(); n++)
       {
-        for (int m = 0; m <= n; m++)
+        for (int m = -n; m <= n; m++)
         {
           double real = M.get_mat_knm( k, n, m).real();
           double imag = M.get_mat_knm( k, n, m).imag();

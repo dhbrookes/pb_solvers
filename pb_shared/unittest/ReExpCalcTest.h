@@ -31,13 +31,12 @@ class ReExpTest
     MyMatrix<cmplx> shMat = shCalc.get_full_result();
     double kap            = Cst.get_kappa();
     double lambda         = 5.0;
-//    ReExpCoeffsConstants reExpConsts (kap, lambda, nvals);
-
+    
     vector<double> besselK = bCal.calc_mbfK(2*nvals, kap*testPt.r());
     
     ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
-                          make_shared<ReExpCoeffsConstants> (kap, lambda, nvals),
-                          kap, lambda, true );
+                          make_shared<ReExpCoeffsConstants> (kap,lambda,nvals),
+                          kap, {lambda}, true );
     
   }
   

@@ -26,7 +26,7 @@ add_executable(pbam
   EnergyForce.cpp
   main.cpp
   PBAM.cpp
-  ReExpCalc.cpp
+  ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/setup.cpp
   ../../pb_shared/src/SHCalc.cpp
   System.cpp
@@ -49,7 +49,7 @@ add_library(PBAMLib
   EnergyForce.cpp
   PBAM.cpp
   PBAMWrap.cpp
-  ReExpCalc.cpp
+  ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/setup.cpp
   ../../pb_shared/src/SHCalc.cpp
   System.cpp

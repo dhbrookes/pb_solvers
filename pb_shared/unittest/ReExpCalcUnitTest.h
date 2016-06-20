@@ -312,7 +312,7 @@ TEST_F(ReExpUTest, checkSpecialSH)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCo),
-                        kap, lambda );
+                        kap, {lambda} );
   
   MyVector<double> singSH = ReExpTest.calc_SH_spec(1.0);
   
@@ -339,7 +339,7 @@ TEST_F(ReExpUTest, checkSingPrefactor)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCo),
-                        kap, lambda , true);
+                        kap, {lambda}, true);
 
   int ct = 0;
   for ( int s = 1; s < 5; s++ )
@@ -370,7 +370,7 @@ TEST_F(ReExpUTest, checkR0Zpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCo),
-                        kap, lambda );
+                        kap, {lambda} );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -401,7 +401,7 @@ TEST_F(ReExpUTest, checkR0)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda );
+                        kap, {lambda} );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -432,7 +432,7 @@ TEST_F(ReExpUTest, checkRZpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda );
+                        kap, {lambda} );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -464,7 +464,7 @@ TEST_F(ReExpUTest, checkR)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda );
+                        kap, {lambda} );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -494,7 +494,7 @@ TEST_F(ReExpUTest, checkS0Zpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCo),
-                        kap, lambda );
+                        kap, {lambda} );
 
   for ( int s = 0; s < nvals; s++ )
   {
@@ -524,7 +524,7 @@ TEST_F(ReExpUTest, checkS0)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda );
+                        kap, {lambda} );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -553,7 +553,7 @@ TEST_F(ReExpUTest, checkSZpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda );
+                        kap, {lambda} );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -584,7 +584,7 @@ TEST_F(ReExpUTest, checkS)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda );
+                        kap, {lambda} );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -618,7 +618,7 @@ TEST_F(ReExpUTest, checkdRdtheta0Zpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCo),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
 }
 
@@ -642,7 +642,7 @@ TEST_F(ReExpUTest, checkdRdtheta0)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -673,7 +673,7 @@ TEST_F(ReExpUTest, checkdRdthetaZpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -705,7 +705,7 @@ TEST_F(ReExpUTest, checkdRdtheta)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -735,7 +735,7 @@ TEST_F(ReExpUTest, checkdRdphi0Zpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCo),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -765,7 +765,7 @@ TEST_F(ReExpUTest, checkdRdphi0)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -796,7 +796,7 @@ TEST_F(ReExpUTest, checkdRdphiZpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -827,7 +827,7 @@ TEST_F(ReExpUTest, checkdRdphi)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
 
   for ( int s = 0; s < nvals; s++ )
   {
@@ -859,7 +859,7 @@ TEST_F(ReExpUTest, checkdSdr0Zpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCo),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -890,7 +890,7 @@ TEST_F(ReExpUTest, checkdSdr0)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
 
   for ( int s = 0; s < nvals; s++ )
   {
@@ -920,7 +920,7 @@ TEST_F(ReExpUTest, checkdSdrZpt)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
   for ( int s = 0; s < nvals; s++ )
   {
@@ -953,7 +953,7 @@ TEST_F(ReExpUTest, checkdSdr)
   
   ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                         make_shared<ReExpCoeffsConstants> (ReExpCoeff),
-                        kap, lambda, true );
+                        kap, {lambda}, true );
   
   for ( int s = 0; s < nvals; s++ )
   {

@@ -38,6 +38,7 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
   
   int idx = 0;
   Pt c_Ik, c_Jl, v;
+  double kapVal;
   vector<int> idx_vec;
   for (int I = 0; I < _sys->get_n(); I++)
   {
@@ -57,13 +58,21 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
             idxMap_[idx_vec] = -1;
             continue;
           }
-          vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kappa_ * v.r());
+          
+          kapVal  = ( I == J ) ? 0.0 : kappa_;
+          vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kapVal * v.r());
           v = _sys->get_pbc_dist_vec_base(c_Ik, c_Jl);
           _shcalc->calc_sh(v.theta(), v.phi());
+          cout << "This is Ik, Jl pair : " << I << ", " << k << " & " <<
+          J << ", " << l << " and dist " << v.norm() << " and ajl " << _sys->get_aik(J, l)<< endl;
+          cout << "Pt : " << v.x() << ", " << v.y() << ", " << v.z() << endl;
+          
+          vector<double> lambdas = {_sys->get_aik(J, l), _sys->get_aik(I, k)};
           auto re_exp = make_shared<ReExpCoeffs>(p_, v,
                                                  _shcalc->get_full_result(),
                                                  besselK, _reexpconsts,
-                                                 _sys->get_lambda(), false);
+                                                 kapVal,
+                                                 lambdas, false);
           T_.push_back(re_exp);
           idxMap_[idx_vec] = idx;
           idx++;
@@ -115,6 +124,14 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
   X1 = expand_RX(X, I, k, J, l, whichR);
   X2 = expand_SX(X1, I, k, J, l, whichS);
   Z  = expand_RHX(X2, I, k, J, l, whichRH);
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = 0; m <= n; m++)
+    {
+      cout << X2(n,m+p_) << ", ";
+    }
+    cout << endl;
+  }
   return Z;
 }
 
@@ -279,8 +296,6 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
                                    int I, int k, int J, int l,
                                    WhichReEx whichS)
 {
-  
-  
   cmplx inter, sval;
   MyMatrix<cmplx> x2(p_, 2*p_ + 1);
   
@@ -290,6 +305,9 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
   if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
   else            map_idx = idxMap_[{J, l, I, k}];
   
+  
+  cout << map_idx << endl;
+  T_[map_idx]->print_S();
   
   // fill x2:
   for (n = 0; n < p_; n++)
@@ -301,12 +319,12 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
       {
         if ( jl_greater )
         {
-          if (whichS == DDR) sval = T_[map_idx]->get_dsdr_val(n, s, m);
+          if (whichS == DDR) sval = T_[map_idx]->get_sval(n, s, m);
           else sval = T_[map_idx]->get_sval(n, s, m);
         }
         else
         {
-          if (whichS == DDR) sval = T_[map_idx]->get_dsdr_val(s, n, m);
+          if (whichS == DDR) sval = T_[map_idx]->get_sval(s, n, m);
           else sval = T_[map_idx]->get_sval(s, n, m);
         }
         inter += sval * x1(s, m+p_);

@@ -92,13 +92,14 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
 ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp,
                                vector<double> besselK,
                                shared_ptr<ReExpCoeffsConstants> _consts,
-                               double kappa, double lambda, bool grad)
+                               double kappa, vector<double> lambda, bool grad)
 :p_(p),
 v_(v),
 Ytp_(Ytp),
 besselK_(besselK),
 kappa_(kappa),
-lambda_(lambda),
+lambda_(lambda[0]),
+lam_sam_(lambda),
 grad_(grad),
 _consts_(_consts),
 R_(2*p, MyMatrix<cmplx> (2*p, 4*p)),
@@ -240,12 +241,9 @@ void ReExpCoeffs::calc_s()
   int m, n, l;
   double val;
   double r = v_.r();
-//  S_ = MyVector<MyMatrix<double> > ( 2 * p_ );
-//  for (n = 0; n < 2*p_; n++)
-//  {
-//    S_.set_val(n, MyMatrix<double> ( 2*p_, 4*p_));
-//  }
   
+//  cout << "This is r : " << r << " and lambda_ " << lambda_ << " and bessel " << besselK_[0] << endl;
+
   for (l = 0; l < 2 * p_; l++)
   {
     val = pow((lambda_ / r), l) * (besselK_[l] * exp(-kappa_*r)) / r;
@@ -254,6 +252,8 @@ void ReExpCoeffs::calc_s()
     // Set S_{n,0}^0 vals
     set_sval( l, 0, 0, pow(-1.0, l) * val );
   }
+  
+  print_S();
   
   for (l = 1; l < 2 * p_ - 2; l++)
   {
@@ -311,6 +311,8 @@ void ReExpCoeffs::calc_s()
     }
   }
 
+  cout << "At the end " << endl;
+  print_S();
 } // end calc_s
 
 

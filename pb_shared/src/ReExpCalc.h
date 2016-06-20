@@ -160,6 +160,7 @@ protected:
 
   double kappa_; //from Constants
   double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
+  vector<double> lam_sam_; // scaling factor for PB-SAM
   
   Pt v_; //computing re-expansion along this vector
   
@@ -191,7 +192,7 @@ public:
   
   ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
               shared_ptr<ReExpCoeffsConstants> _consts, double kappa,
-              double lambda, bool grad = false);
+              vector<double> lambda, bool grad = false);
   
   MyVector<double> calc_SH_spec( double val ); // for singularities
   
@@ -275,6 +276,8 @@ public:
   {
     (&prefacSing_[n])->set_val(m, l, val);
   }
+  
+  
   
 };
   
