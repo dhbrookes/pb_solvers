@@ -487,14 +487,14 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
 //      }
 //      else
 //      {
-//        reex = analytic_reex(I_, k, j, F, shcalc, sys);
+//        reex = numeric_reex(I_, k, j, F, shcalc, sys);
 //      }
 //      mat_[k] += reex;
 //    }
   }
 }
 
-MyMatrix<cmplx> LFMatrix::analytic_reex(int I, int k, int j,
+MyMatrix<cmplx> LFMatrix::numeric_reex(int I, int k, int j,
                                         shared_ptr<FMatrix> F,
                                         shared_ptr<SHCalc> shcalc,
                                         shared_ptr<System> sys, int Mp)
@@ -606,14 +606,14 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H,
 //      }
 //      else
 //      {
-//        reex = analytic_reex(I_, k, j, H, shcalc, sys, besseli, besselk, Mp);
+//        reex = numeric_reex(I_, k, j, H, shcalc, sys, besseli, besselk, Mp);
 //      }
 //      mat_[k] += reex;
 //    }
   }
 }
 
-MyMatrix<cmplx> LHMatrix::analytic_reex(int I, int k, int j,
+MyMatrix<cmplx> LHMatrix::numeric_reex(int I, int k, int j,
                                         shared_ptr<HMatrix> H,
                                         shared_ptr<SHCalc> shcalc,
                                         shared_ptr<System> sys,
@@ -1116,7 +1116,7 @@ void GradLFMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> shcalc,
       }
       else
       {
-        reex = analytic_reex(mol, k, j, shcalc, dF);
+        reex = numeric_reex(mol, k, j, shcalc, dF);
       }
       inner += reex;
     }
@@ -1124,7 +1124,7 @@ void GradLFMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> shcalc,
   }
 }
 
-MyMatrix<Ptx> GradLFMatrix::analytic_reex(Molecule mol, int k, int j,
+MyMatrix<Ptx> GradLFMatrix::numeric_reex(Molecule mol, int k, int j,
                                             shared_ptr<SHCalc> shcalc,
                                             shared_ptr<GradFMatrix> dF,
                                             int Mp)
@@ -1204,7 +1204,7 @@ void GradLHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
       }
       else
       {
-        reex = analytic_reex(mol, k, j, besseli, besselk, shcalc, dH, Mp);
+        reex = numeric_reex(mol, k, j, besseli, besselk, shcalc, dH, Mp);
       }
       inner += reex;
     }
@@ -1212,7 +1212,7 @@ void GradLHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
   }
 }
 
-MyMatrix<Ptx> GradLHMatrix::analytic_reex(Molecule mol, int k, int j,
+MyMatrix<Ptx> GradLHMatrix::numeric_reex(Molecule mol, int k, int j,
                                           vector<double> besseli,
                                           vector<double> besselk,
                                           shared_ptr<SHCalc> shcalc,
