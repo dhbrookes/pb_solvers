@@ -12,9 +12,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <memory>
-#include "TMatrix.h"
 #include "Solvmat.h"
-
 
 
 /*
@@ -49,20 +47,24 @@ protected:
   shared_ptr<BesselCalc>            _bCalc_;
   shared_ptr<Constants>             _consts_;
   shared_ptr<ReExpCoeffsConstants>  _reExConsts_;
+  shared_ptr<ExpansionConstants>    _expConsts_;
   
   // update prevH and prevF
   void update_prev();
   
-  // run an iteration and return convergence value
-  double iter();
+  
 
 public:
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
          shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
          int p);
   
+  // run an iteration and return convergence value
+  double iter();
   
   void solve(double tol, int maxiter=10000);
+  
+  void solve_inner();
   
   void reset_all();
   

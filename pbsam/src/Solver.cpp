@@ -9,8 +9,6 @@
 #include "Solver.h"
 
 
-
-
 Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                int p)
@@ -24,6 +22,8 @@ _XF_(_sys->get_n()),
 _XH_(_sys->get_n()),
 _H_(_sys->get_n()),
 _F_(_sys->get_n()),
+_prevH_(_sys->get_n()),
+_prevF_(_sys->get_n()),
 _shCalc_(_shCalc),
 _bCalc_(_bCalc),
 _consts_(_consts),
@@ -36,7 +36,7 @@ kappa_(_consts->get_kappa())
   _T_ = make_shared<TMatrix> (p_, _sys_, _shCalc_, _consts_,
                              _bCalc_, _reExConsts_);
   
-  auto _expConst = make_shared<ExpansionConstants>(p_);
+  _expConsts_ = make_shared<ExpansionConstants>(p_);
   shared_ptr<Molecule> _mol;
   // intialize all matrices
   for (int I = 0; I < _sys_->get_n(); I++)
@@ -49,8 +49,15 @@ kappa_(_consts->get_kappa())
     _LE_[I] = make_shared<LEMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LE_[I]->calc_vals((*_mol), _shCalc_, _consts_->get_dielectric_prot());
     
-    _IE_[I] = make_shared<IEMatrix>(I, _sys_->get_Ns_i(I), p_, _expConst);
-    _IE_[I]->calc_vals(_mol, _shCalc_);
+    _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+    _H_[I]->init((*_mol), _shCalc_, _consts_->get_dielectric_prot());
+    
+    _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+    _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+    _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+    
+//    _IE_[I] = make_shared<IEMatrix>(I, _sys_->get_Ns_i(I), p_, _expConst);
+//    _IE_[I]->calc_vals(_mol, _shCalc_);
     
     _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa_);
@@ -58,13 +65,10 @@ kappa_(_consts->get_kappa())
     
     _XF_[I] = make_shared<XFMatrix> (I, _sys_->get_Ns_i(I), p_,
                                      _consts_->get_dielectric_prot(),
-                                     _consts_->get_dielectric_water());
-    _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_);
-    
-    _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
-    _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
-    _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
-    _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+                                     _consts_->get_dielectric_water(),
+                                     (*_mol), _E_[I], _LE_[I]);
+    _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_,
+                                     (*_mol), _E_[I], _LE_[I]);
   }
 }
 
@@ -72,20 +76,27 @@ double Solver::iter()
 {
   double mu = 0;
   Molecule mol;
-  // start an iteration by calculating XF and XH (is this right?)
+  // start an iteration
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     mol = _sys_->get_molecule(I);
-    _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _E_[I], _LE_[I],
-                      _LH_[I], _LF_[I], _LHN_[I], kappa_);
-    _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _E_[I], _LE_[I],
-                      _LH_[I], _LF_[I], _LHN_[I]);
     
-    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _prevF_[I], _IE_[I], _bCalc_);
-    _F_[I]->calc_vals(mol, _prevF_[I], _XF_[I], _prevH_[I], _IE_[I], _bCalc_);
+    _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
+    _LH_[I]->calc_vals(_T_, _H_[I], _shCalc_, _sys_, _bCalc_);
     
     _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_);
-    _LH_[I]->calc_vals(_T_, _H_[I], _shCalc_, _sys_, _bCalc_);
+    
+    _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
+                      _LH_[I], _LF_[I], _LHN_[I], kappa_);
+    cout << "This is XF " << endl;
+    cout << (*_XF_[I]) << endl;
+    _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
+                       _LF_[I], _LHN_[I], 0.0);
+    
+    cout << "This is XH " << endl;
+    cout << (*_XH_[I]) << endl;
+//    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _prevF_[I], _IE_[I], _bCalc_);
+//    _F_[I]->calc_vals(mol, _prevF_[I], _XF_[I], _prevH_[I], _IE_[I], _bCalc_);
     
     mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
   }
@@ -125,6 +136,19 @@ void Solver::solve(double tol, int maxiter)
   {
     mu = iter();
     if (mu < tol) break;
+  }
+}
+
+
+void Solver::solve_inner()
+{
+  double mu;
+  double solveTol = 1e-6;
+  int maxiter = 20;
+  for (int t = 0; t < maxiter; t++)
+  {
+    mu = iter();
+    if (mu < solveTol) break;
   }
 }
 

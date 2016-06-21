@@ -268,4 +268,51 @@ TEST_F(SolverUTest, LHinit_test)
   }
 }
 
+TEST_F(SolverUTest, constructor_test)
+{
+  int pol = 5;
+  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+  auto myMol = make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                   pqr.get_atom_pts(), pqr.get_radii(),
+                                   pqr.get_cg_centers(), pqr.get_cg_radii());
+  auto cst = make_shared<Constants> ();
+  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+  auto BesselCons = make_shared<BesselConstants> (2*pol);
+  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+  auto _expcons = make_shared<ExpansionConstants> (pol);
+  
+  // Generate surface integrals
+  IEMatrix ieMatTest(0, myMol, SHCalcTest, pol, _expcons, true);
+  
+  vector<Molecule> mols;
+  mols.push_back((*myMol));
+  auto sys = make_shared<System>(mols);
+  
+  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
+  
+  solvTest.iter();
+  
+  for (int i = 0; i < myMol->get_ns(); i++)
+  {
+    int ct = 0;
+//    vector <int> exp_pts = mol->get_gdpt_expj(i);
+    //    cout << " This is sphere " << i << " npts: " << exp_pts.size()<< endl;
+    //    for (int h = 0; h < exp_pts.size(); h++)
+    //    {
+    //      double real = lhmt.get_mat_kh(i, h);
+    //      if(abs(real) < 1e-15 ) real = 0.0;
+    //      cout  << real << ", ";
+    //      cout << "," << lhmt.get_mat_kh(i, h);
+    //    }
+    //
+    //    cout << endl; cout << endl;
+//    for (int h = 0; h < exp_pts.size(); h++)
+//    {
+////      EXPECT_NEAR(lh_all[i][ct],lhmt.get_mat_kh(i, h),preclim);
+//      ct++;
+//    }
+  }
+}
+
 #endif /* SolverUnitTest_h */

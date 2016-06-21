@@ -31,7 +31,7 @@ class TMatrixUTest : public ::testing::Test
   
 };
 
-TEST_F(TMatrixUTest, xfor_analytic_test)
+TEST_F(TMatrixUTest, xfor_numeric_test)
 {
   int pol = 5;
   double kap = 0.21053961;
@@ -75,8 +75,8 @@ TEST_F(TMatrixUTest, xfor_analytic_test)
       if ( j == mySphs[i] ) continue;
       if ( localXSphre[i][sphct].size() == 0 ) continue;
       int expct = 0;
-      MyMatrix<cmplx> out = tmat.re_expandX_local(lhmt.get_mat(), 0,
-                                                  mySphs[i], 0, j);
+      MyMatrix<cmplx> out = tmat.re_expandX_numeric(lhmt.get_mat(), 0,
+                                                    mySphs[i], 0, j);
       for (int n = 0; n < pol; n++)
       {
         for (int m = 0; m <= n; m++)
@@ -151,7 +151,6 @@ TEST_F(TMatrixUTest, xforIntra_analytic_test)
                       preclim);
           expct++;
         }
-        cout << endl;
       }
       sphct++;
     }

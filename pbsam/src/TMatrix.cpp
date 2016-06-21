@@ -38,7 +38,7 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
   
   int idx = 0;
   Pt c_Ik, c_Jl, v;
-  double kapVal;
+  double kapVal, ak, al;
   vector<int> idx_vec;
   for (int I = 0; I < _sys->get_n(); I++)
   {
@@ -53,7 +53,15 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           
           idx_vec = {I, k, J, l};
           c_Jl = _sys->get_centerik(J, l);
-          if (I==J && c_Ik.dist(c_Jl) < 5.0)
+          ak = _sys->get_aik(I, k);
+          al = _sys->get_aik(J, l);
+          
+//          cout << "This is Ik, Jl pair : " << I << ", " << k << " & " <<
+//          J << ", " << l << " and dist " << v.norm() << " and aIk "
+//          << ak << " and ajl "
+//          << al << " dis1 : " <<  c_Ik.dist(c_Jl) - ak - al << endl;
+//
+          if (I==J && ((c_Ik.dist(c_Jl)<5.0) || (c_Ik.dist(c_Jl)<ak+al+5.0)))
           {
             idxMap_[idx_vec] = -1;
             continue;
@@ -63,11 +71,6 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kapVal * v.r());
           v = _sys->get_pbc_dist_vec_base(c_Ik, c_Jl);
           _shcalc->calc_sh(v.theta(), v.phi());
-          
-
-          cout << "This is Ik, Jl pair : " << I << ", " << k << " & " <<
-          J << ", " << l << " and dist " << v.norm() << " and ajl " << _sys->get_aik(J, l) << " rho : " <<  v.r()<<  endl;
-          cout << "Pt : " << v.x() << ", " << v.y() << ", " << v.z() << endl;
           
           vector<double> lambdas = {_sys->get_aik(J, l), _sys->get_aik(I, k)};
           auto re_exp = make_shared<ReExpCoeffs>(p_, v,
@@ -85,7 +88,7 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
 }
 
 // Perform local expansion from J, l onto I, k
-MyMatrix<cmplx> TMatrix::re_expandX_local(vector<vector<double> > X,
+MyMatrix<cmplx> TMatrix::re_expandX_numeric(vector<vector<double> > X,
                                           int I, int k,
                                           int J, int l)
 {
@@ -98,7 +101,6 @@ MyMatrix<cmplx> TMatrix::re_expandX_local(vector<vector<double> > X,
   {
     Pt sph_dist = _system_->get_centerik(I, k) - _system_->get_centerik(J, l);
     Pt loc = _system_->get_gridijh(J, l, exp_pts[h]) - sph_dist;
-//    cout << "Hval " << X[l][h] << " at: " << loc.x() << ", " << loc.y() << ", " << loc.z() << " rho: " << loc.r() << endl;
     _shCalc_->calc_sh(loc.theta(), loc.phi());
     rscl = _system_->get_aik(I, k) / loc.r();
     chgscl = X[l][h] / loc.r();
@@ -126,14 +128,14 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
   X1 = expand_RX(X, I, k, J, l, whichR);
   X2 = expand_SX(X1, I, k, J, l, whichS);
   Z  = expand_RHX(X2, I, k, J, l, whichRH);
-  for (int n = 0; n < p_; n++)
-  {
-    for (int m = 0; m <= n; m++)
-    {
-      cout << Z(n,m+p_) << ", ";
-    }
-    cout << endl;
-  }
+//  for (int n = 0; n < p_; n++)
+//  {
+//    for (int m = 0; m <= n; m++)
+//    {
+//      cout << Z(n,m+p_) << ", ";
+//    }
+//    cout << endl;
+//  }
   return Z;
 }
 

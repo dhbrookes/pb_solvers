@@ -10,10 +10,6 @@
 #define Solvmat_h
 
 #include <stdio.h>
-#include "MyMatrix.h"
-#include "util.h"
-#include "System.h"
-#include "SHCalc.h"
 #include "BesselCalc.h"
 #include "TMatrix.h"
 
@@ -22,7 +18,6 @@
  [1] Yap, E., Head-Gordon, T. 2010. JCTC
  [2] Yap, E., Head-Gordon, T. 2013. JCTC
  */
-
 
 // For calculating the n grid points on surface
 int calc_n_grid_pts(int poles, double r);
@@ -84,12 +79,12 @@ public:
   
   friend ostream & operator<<(ostream & fout, ComplexMoleculeMatrix & M)
   {
-    for (int k = 0; k < M.get_ns(); k++)
+    for (int k = 0; k < 1/*M.get_ns()*/; k++)
     {
       fout << "For sphere " << k << endl;
       for (int n = 0; n < M.get_p(); n++)
       {
-        for (int m = -n; m <= n; m++)
+        for (int m = 0; m <= n; m++)
         {
           double real = M.get_mat_knm( k, n, m).real();
           double imag = M.get_mat_knm( k, n, m).imag();
@@ -209,6 +204,7 @@ class NumericalMatrix
 {
 protected:
   vector<vector<double> > mat_;
+  vector<MyMatrix<cmplx> > mat_cmplx_;
   int p_;  // number of poles
   int I_;  // Index of molecule that this matrix
   
@@ -216,6 +212,7 @@ public:
   NumericalMatrix(int I, int ns, int p);
   
   double get_mat_kh(int k, int h)           { return mat_[k][h]; }
+  cmplx get_mat_knm(int k, int n, int m)   { return mat_cmplx_[k](n,m+p_); }
   void set_mat_kh(int k, int h, double val) { mat_[k][h] = val; }
   vector<double> get_mat_k(int k)           { return mat_[k]; }
   vector<vector<double> > get_mat()         { return mat_; }
@@ -228,7 +225,7 @@ public:
   
   friend ostream & operator<<(ostream & fout, NumericalMatrix & M)
   {
-    for (int k = 0; k < M.get_ns(); k++)
+    for (int k = 0; k < 1 /*M.get_ns()*/; k++)
     {
       fout << "For sphere " << k << endl;
       for (int h = 0; h < M.get_mat_k_len(h); h++)
@@ -240,6 +237,27 @@ public:
       fout << endl;
     }
     return fout;
+  }
+  
+  void print_analytical()
+  {
+    for (int k = 0; k < get_ns(); k++)
+    {
+      cout << "For sphere " << k << endl;
+      for (int n = 0; n < get_p(); n++)
+      {
+        for (int m = 0; m <= n; m++)
+        {
+          double real = get_mat_knm( k, n, m).real();
+          double imag = get_mat_knm( k, n, m).imag();
+          if(abs(real) < 1e-15 ) real = 0.0;
+          if(abs(imag) < 1e-15 ) imag = 0.0;
+          cout << "(" << real << ", " << imag << ") ";
+        }
+        cout << endl;
+      }
+      cout << endl;
+    }
   }
   
 };
@@ -290,15 +308,6 @@ public:
                  shared_ptr<SHCalc> shcalc, shared_ptr<System> sys,
                  shared_ptr<BesselCalc> bcalc, int Mp=-1);
   
-  // analytic re-expansion (Equation 27b [1])
-  MyMatrix<cmplx> numeric_reex(int I, int k, int j,
-                               shared_ptr<HMatrix> H,
-                               shared_ptr<SHCalc> shcalc,
-                               shared_ptr<System> sys,
-                               vector<double> besseli,
-                               vector<double> besselk,
-                               int Mp=-1);
-  
   /*
    Equation 15b [1]. For analytic re expansion
    */
@@ -326,13 +335,16 @@ public:
  */
 class XHMatrix : public ComplexMoleculeMatrix
 {
+protected:
+  vector<MyMatrix<cmplx> > E_LE_mat_;
+  
 public:
-  XHMatrix(int I, int ns, int p);
+  XHMatrix(int I, int ns, int p, Molecule mol, shared_ptr<EMatrix> E,
+           shared_ptr<LEMatrix> LE);
   
   void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
-                 shared_ptr<EMatrix> E, shared_ptr<LEMatrix> LE,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
-                 shared_ptr<LHNMatrix> LHN);
+                 shared_ptr<LHNMatrix> LHN, double kappa);
   
 };
 
@@ -343,12 +355,13 @@ class XFMatrix : public ComplexMoleculeMatrix
 {
 protected:
   double eps_;
+  vector<MyMatrix<cmplx> > E_LE_mat_;
   
 public:
-  XFMatrix(int I, int ns, int p, double eps_in, double eps_out);
+  XFMatrix(int I, int ns, int p, double eps_in, double eps_out, Molecule mol,
+           shared_ptr<EMatrix> E, shared_ptr<LEMatrix> LE);
   
   void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
-                 shared_ptr<EMatrix> E, shared_ptr<LEMatrix> LE,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                  shared_ptr<LHNMatrix> LHN, double kappa);
   
