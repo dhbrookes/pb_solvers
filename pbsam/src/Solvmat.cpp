@@ -138,25 +138,26 @@ EMatrix::EMatrix(int I, int ns, int p)
 {
 }
 
-void EMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc, double eps_in)
+void EMatrix::calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> _shcalc,
+                        double eps_in)
 {
   cmplx val;
   Pt cen;
   double r_alpha, a_k, q_alpha;
-  for (int k=0; k< mol.get_ns(); k++)
+  for (int k=0; k< mol->get_ns(); k++)
   {
-    vector<int> allin = mol.get_ch_allin_k(k);
+    vector<int> allin = mol->get_ch_allin_k(k);
     for (int alpha=0; alpha < allin.size(); alpha++)
     {
-      cen = (mol.get_posj_realspace(allin[alpha]) - mol.get_centerk(k));
+      cen = (mol->get_posj_realspace(allin[alpha]) - mol->get_centerk(k));
       _shcalc->calc_sh(cen.theta(), cen.phi());
       for (int n = 0; n < p_; n++)
       {
         for (int m = -n; m < n+1; m++)
         {
-          q_alpha = mol.get_qj(allin[alpha]);
+          q_alpha = mol->get_qj(allin[alpha]);
           r_alpha = cen.r();
-          a_k = mol.get_ak(k);
+          a_k = mol->get_ak(k);
           
           val = _shcalc->get_result(n, m);
           val *= q_alpha / eps_in;
@@ -174,27 +175,27 @@ LEMatrix::LEMatrix(int I, int ns, int p)
 {
 }
 
-void LEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc,
+void LEMatrix::calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> _shcalc,
                          double eps_in)
 {
   cmplx val;
   Pt cen;
   
   double r_alpha, a_k, q_alpha;
-  for (int k=0; k< mol.get_ns(); k++)
+  for (int k=0; k< mol->get_ns(); k++)
   {
-    vector<int> allout = mol.get_ch_allout_k(k);
+    vector<int> allout = mol->get_ch_allout_k(k);
     for (int alpha=0; alpha < allout.size(); alpha++)
     {
-      cen = mol.get_posj_realspace(allout[alpha]) - mol.get_centerk(k);
+      cen = mol->get_posj_realspace(allout[alpha]) - mol->get_centerk(k);
       _shcalc->calc_sh(cen.theta(), cen.phi());
       for (int n = 0; n < p_; n++)
       {
         for (int m = -n; m < n+1; m++)
         {
-          q_alpha = mol.get_qj(allout[alpha]);
+          q_alpha = mol->get_qj(allout[alpha]);
           r_alpha = cen.r();
-          a_k = mol.get_ak(k);
+          a_k = mol->get_ak(k);
           
           val = _shcalc->get_result(n, m);
           val *= q_alpha / eps_in;
@@ -212,11 +213,12 @@ void LEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc,
 IEMatrix::IEMatrix(int I, shared_ptr<Molecule> _mol,
                    shared_ptr<SHCalc> _shcalc, int p,
                    shared_ptr<ExpansionConstants> _expconst,
-                   bool calc_npts, int npts)
+                   bool calc_npts, int npts, bool set_mol)
 : p_(p), I_(I),
 IE_orig_(_mol->get_ns(), vector<double> (p*p*p*p)),
 _expConst_(_expconst), calc_pts_(calc_npts),
-gridPts_(npts)
+gridPts_(npts), gridPtLocs_(_mol->get_ns()),
+grid_exp_(_mol->get_ns()),grid_bur_(_mol->get_ns())
 {
   compute_grid_pts(_mol);
 }
@@ -240,15 +242,17 @@ MyMatrix<double> IEMatrix::get_IE_k(int k)
 
 void IEMatrix::compute_grid_pts(shared_ptr<Molecule> _mol)
 {
-  vector<Pt> grid_pts;
   Pt real_grid;
+  vector<Pt> grid_loc;
   for (int k = 0; k < _mol->get_ns(); k++)
   {
     vector<int> grid_exp, grid_bur;
     vector<int> neighs = _mol->get_neighj(k);
     if (calc_pts_) gridPts_ = calc_n_grid_pts(p_, _mol->get_ak(k));
-    grid_pts = make_uniform_sph_grid(gridPts_, _mol->get_ak(k));
-    _mol->set_gridj(k, grid_pts);
+    grid_loc = make_uniform_sph_grid(gridPts_, _mol->get_ak(k));
+    if (set_mol_)    _mol->set_gridj(k, grid_loc);
+    else gridPtLocs_[k] = grid_loc;
+    
     // Loop through points to find the exposed ones
     for (int g = 0; g < gridPts_; g++)
     {
@@ -256,7 +260,7 @@ void IEMatrix::compute_grid_pts(shared_ptr<Molecule> _mol)
       // loop through other spheres in this molecule to find exposed gd pts:
       for (int k2 = 0; k2 < neighs.size(); k2++)
       {
-        real_grid = grid_pts[g] + _mol->get_centerk(k);
+        real_grid = grid_loc[g] + _mol->get_centerk(k);
         // check if sphere is overlapping another
         if (real_grid.dist(_mol->get_centerk(neighs[k2]))
             < _mol->get_ak(neighs[k2]))
@@ -269,34 +273,55 @@ void IEMatrix::compute_grid_pts(shared_ptr<Molecule> _mol)
       if (!buried) grid_exp.push_back(g);
     }
     
-    _mol->set_gridexpj(k, grid_exp); _mol->set_gridburj(k, grid_bur);
+    if (set_mol_)
+    {
+      _mol->set_gridexpj(k, grid_exp);
+      _mol->set_gridburj(k, grid_bur);
+    } else
+    {
+      grid_bur_[k] = grid_bur;
+      grid_exp_[k] = grid_exp;
+    }
+    
     grid_exp.clear(); grid_bur.clear();
   }
 }
 
-vector<MatOfMats<cmplx>::type > IEMatrix::compute_integral(
-                                                           shared_ptr<Molecule> _mol,
-                                                           shared_ptr<SHCalc> sh_calc,
-                                                           int k)
+vector<MatOfMats<cmplx>::type >
+IEMatrix::compute_integral(shared_ptr<Molecule> _mol,
+                           shared_ptr<SHCalc> sh_calc,
+                           int k)
 {
-  vector<Pt> gridpts;
-  vector<int> burpts, exppts;
   int min, grid_tot;
   bool bur;
-  vector<MatOfMats<cmplx>::type > Ys(2,MatOfMats<cmplx>::type(p_, p_,
-                                                              MyMatrix<cmplx> (p_, p_)));
-  gridpts = _mol->get_gridj(k);
-  burpts = _mol->get_gdpt_burj(k);
-  exppts = _mol->get_gdpt_expj(k);
-  grid_tot = (int) (burpts.size() + exppts.size());
+  vector<MatOfMats<cmplx>::type > Ys(2,
+                                     MatOfMats<cmplx>::type(p_, p_,
+                                                            MyMatrix<cmplx>
+                                                            (p_, p_)));
+  if (set_mol_)
+  {
+    gridPtLocs_[k] = _mol->get_gridj(k);
+    grid_bur_[k] = _mol->get_gdpt_burj(k);
+    grid_exp_[k] = _mol->get_gdpt_expj(k);
+  }
   
-  if ( burpts.size() < exppts.size() ) {bur = true; min = (int)burpts.size();}
-  else                                 {bur = false;min = (int)exppts.size();}
+  grid_tot = (int) (grid_bur_[k].size() + grid_exp_[k].size());
+  
+  if ( grid_bur_[k].size() < grid_exp_[k].size() )
+  {
+    bur = true;
+    min = (int)grid_bur_[k].size();
+  }
+  else
+  {
+    bur = false;
+    min = (int)grid_exp_[k].size();
+  }
   for(int h=0; h<min; h++)
   {
     double w=0;
-    int ind = (bur) ? burpts[h] : exppts[h];
-    Pt gdpt = gridpts[ind];
+    int ind = (bur) ? grid_bur_[k][h] : grid_exp_[k][h];
+    Pt gdpt = gridPtLocs_[k][ind];
     // convert the position relative to the center to spherical coordinates.
     sh_calc->calc_sh(gdpt.theta(), gdpt.phi());
     
@@ -523,22 +548,22 @@ LHMatrix::LHMatrix(int I, int ns, int p, double kappa)
 {
 }
 
-void LHMatrix::init(Molecule mol, shared_ptr<HMatrix> H,
+void LHMatrix::init(shared_ptr<Molecule> mol, shared_ptr<HMatrix> H,
                     shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
                     shared_ptr<ExpansionConstants> _expconst)
 {
   double rl, im;
   
-  for (int k=0; k< mol.get_ns(); k++)
+  for (int k=0; k< mol->get_ns(); k++)
   {
-    vector <int> exp_pts = mol.get_gdpt_expj(k);
+    vector <int> exp_pts = mol->get_gdpt_expj(k);
     mat_[k].resize( (int) exp_pts.size() );
-    double dA = 4 * M_PI / (double) mol.get_gridj(k).size();
+    double dA = 4 * M_PI / (double) mol->get_gridj(k).size();
     
     for (int h = 0; h < exp_pts.size(); h++)
     {
       double val = 0.0;
-      Pt q = mol.get_gridjh(k, exp_pts[h]);
+      Pt q = mol->get_gridjh(k, exp_pts[h]);
       shcalc->calc_sh(q.theta(), q.phi());
       
       for (int n=0; n<p_; n++)
@@ -632,7 +657,9 @@ void LHNMatrix::calc_vals(shared_ptr<TMatrix> T,
 
 }
 
-XHMatrix::XHMatrix(int I, int ns, int p, Molecule mol, shared_ptr<EMatrix> E,
+XHMatrix::XHMatrix(int I, int ns, int p,
+                   shared_ptr<Molecule> mol,
+                   shared_ptr<EMatrix> E,
                    shared_ptr<LEMatrix> LE)
 : ComplexMoleculeMatrix(I, ns, p), E_LE_mat_(ns, MyMatrix<cmplx> (p, 2*p+1))
 {
@@ -640,7 +667,7 @@ XHMatrix::XHMatrix(int I, int ns, int p, Molecule mol, shared_ptr<EMatrix> E,
   
   for (int k = 0; k < ns; k++)
   {
-    ak = mol.get_ak(k);
+    ak = mol->get_ak(k);
     for (int n = 0; n < p_; n++)
     {
       for (int m = -n; m < n+1; m++)
@@ -652,12 +679,12 @@ XHMatrix::XHMatrix(int I, int ns, int p, Molecule mol, shared_ptr<EMatrix> E,
   }
 }
 
-void XHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+void XHMatrix::calc_vals(shared_ptr<Molecule> mol, shared_ptr<BesselCalc> bcalc,
                          shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                          shared_ptr<LHNMatrix> LHN, double kappa, int k)
 {
   cmplx inner;
-  double ak = mol.get_ak(k);
+  double ak = mol->get_ak(k);
   vector<double> in_k = bcalc->calc_mbfI(p_, kappa * ak);
 
   for (int n = 0; n < p_; n++)
@@ -674,7 +701,7 @@ void XHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
 
 
 XFMatrix::XFMatrix(int I, int ns, int p, double eps_in, double eps_out,
-                   Molecule mol, shared_ptr<EMatrix> E,
+                   shared_ptr<Molecule> mol, shared_ptr<EMatrix> E,
                    shared_ptr<LEMatrix> LE)
 :ComplexMoleculeMatrix(I, ns, p), eps_(eps_in/eps_out),
 E_LE_mat_(ns, MyMatrix<cmplx> (p, 2*p+1))
@@ -683,7 +710,7 @@ E_LE_mat_(ns, MyMatrix<cmplx> (p, 2*p+1))
   
   for (int k = 0; k < ns; k++)
   {
-    ak = mol.get_ak(k);
+    ak = mol->get_ak(k);
     for (int n = 0; n < p_; n++)
     {
       for (int m = -n; m <= n; m++)
@@ -695,12 +722,12 @@ E_LE_mat_(ns, MyMatrix<cmplx> (p, 2*p+1))
   }
 }
 
-void XFMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+void XFMatrix::calc_vals(shared_ptr<Molecule> mol, shared_ptr<BesselCalc> bcalc,
                          shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                          shared_ptr<LHNMatrix> LHN, double kappa, int k)
 {
   cmplx inner;
-  double ak = mol.get_ak(k);
+  double ak = mol->get_ak(k);
   vector<double> in_k = bcalc->calc_mbfI(p_+1, kappa * ak);
   
   for (int n = 0; n < p_; n++)
@@ -724,24 +751,24 @@ HMatrix::HMatrix(int I, int ns, int p, double kappa)
 }
 
 // Initialize H matrix to E with charges mapped to cg (mol.cgCharges_)
-void HMatrix::init(Molecule mol, shared_ptr<SHCalc> _sh_calc, double eps_in)
+void HMatrix::init(shared_ptr<Molecule> mol, shared_ptr<SHCalc> _sh_calc, double eps_in)
 {
   cmplx val;
   Pt cen;
   double r_alpha, a_k, q_alpha;
-  for (int k=0; k< mol.get_ns(); k++)
+  for (int k=0; k< mol->get_ns(); k++)
   {
-    for (int alpha=0; alpha < mol.get_nc_k(k); alpha++)
+    for (int alpha=0; alpha < mol->get_nc_k(k); alpha++)
     {
-      cen = mol.get_posj(mol.get_ch_k_alpha(k, alpha));
+      cen = mol->get_posj(mol->get_ch_k_alpha(k, alpha));
       _sh_calc->calc_sh(cen.theta(), cen.phi());
       for (int n = 0; n < p_; n++)
       {
         for (int m = -n; m < n+1; m++)
         {
-          q_alpha = mol.get_qj(mol.get_ch_k_alpha(k, alpha));
+          q_alpha = mol->get_qj(mol->get_ch_k_alpha(k, alpha));
           r_alpha = cen.r();
-          a_k = mol.get_ak(k);
+          a_k = mol->get_ak(k);
           
           val = _sh_calc->get_result(n, m);
           val *= q_alpha / eps_in;
@@ -755,7 +782,8 @@ void HMatrix::init(Molecule mol, shared_ptr<SHCalc> _sh_calc, double eps_in)
 }
 
 //TODO replace IMAT mult with actual LAPAC
-void HMatrix::calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
+void HMatrix::calc_vals(shared_ptr<Molecule> mol,
+                        shared_ptr<HMatrix> prev,
                         shared_ptr<XHMatrix> XH,
                         shared_ptr<FMatrix> F,
                         shared_ptr<IEMatrix> IE,
@@ -763,7 +791,7 @@ void HMatrix::calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
 {
   int ct = 0;
   cmplx inner;
-  double ak = mol.get_ak(k);
+  double ak = mol->get_ak(k);
   MyMatrix<double> h_in(p_*p_, 1), h_out(p_*p_, 1);
   vector<double> bessel_i = bcalc->calc_mbfI(p_+1, kappa_*ak);
   vector<double> bessel_k = bcalc->calc_mbfK(p_+1, kappa_*ak);
@@ -830,7 +858,8 @@ FMatrix::FMatrix(int I, int ns, int p, double kappa)
 }
 
 
-void FMatrix::calc_vals(Molecule mol, shared_ptr<FMatrix> prev,
+void FMatrix::calc_vals(shared_ptr<Molecule> mol,
+                        shared_ptr<FMatrix> prev,
                         shared_ptr<XFMatrix> XF,
                         shared_ptr<HMatrix> H,
                         shared_ptr<IEMatrix> IE,
@@ -838,7 +867,7 @@ void FMatrix::calc_vals(Molecule mol, shared_ptr<FMatrix> prev,
 {
   int ct = 0;
   cmplx inner;
-  double ak = mol.get_ak(k);
+  double ak = mol->get_ak(k);
   vector<double> bessel_i = bcalc->calc_mbfI(p_+1, kappa_*ak);
   vector<double> bessel_k = bcalc->calc_mbfK(p_+1, kappa_*ak);
   MyMatrix<double> f_in(p_*p_, 1), f_out(p_*p_, 1);

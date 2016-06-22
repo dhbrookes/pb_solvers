@@ -32,10 +32,10 @@ public:
     auto _expcons = make_shared<ExpansionConstants> (pol);
     
     // Generate surface integrals
-    IEMatrix ieMatTest(0, myMol, SHCalcTest, pol, _expcons, true);
+    IEMatrix ieMatTest(0, myMol, SHCalcTest, pol, _expcons, true, 0, true);
     
-    vector<Molecule> mols;
-    mols.push_back((*myMol));
+    vector<shared_ptr<Molecule> > mols;
+    mols.push_back(myMol);
     auto sys = make_shared<System>(mols);
     
     Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);

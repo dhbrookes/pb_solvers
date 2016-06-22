@@ -143,7 +143,7 @@ class EMatrix: public ComplexMoleculeMatrix
 {
 public:
   EMatrix(int I, int ns, int p);
-  virtual void calc_vals(Molecule mol, shared_ptr<SHCalc> sh_calc,
+  virtual void calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> sh_calc,
                          double eps_in);
   
 };
@@ -159,7 +159,7 @@ class LEMatrix : public ComplexMoleculeMatrix
 {
 public:
   LEMatrix(int I, int ns, int p);
-  void calc_vals(Molecule mol, shared_ptr<SHCalc> sh_calc,
+  void calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> sh_calc,
                  double eps_in);
 };
 
@@ -177,14 +177,17 @@ protected:
   vector<vector<double> > IE_orig_;
   shared_ptr<ExpansionConstants> _expConst_;
   bool calc_pts_; // Boolean of whether or not to estimate number of points
+  bool set_mol_; // Whether or not to save calculated points in mol
   int p_;
   int I_;
   int gridPts_; // grid point count for surface integrals
+  vector<vector<Pt> > gridPtLocs_; // vector of locations in space of grid
+  vector<vector<int> > grid_exp_, grid_bur_;
   
 public:
   IEMatrix(int I, shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc, int p,
            shared_ptr<ExpansionConstants> _expconst, bool calc_npts = false,
-           int npts = Constants::IMAT_GRID );
+           int npts = Constants::IMAT_GRID, bool set_mol = false );
   
   double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
   MyMatrix<double> get_IE_k( int k );
@@ -312,7 +315,7 @@ protected:
 public:
   LHMatrix(int I, int ns, int p, double kappa);
   
-  void init(Molecule mol, shared_ptr<HMatrix> H,
+  void init(shared_ptr<Molecule> mol, shared_ptr<HMatrix> H,
             shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
             shared_ptr<ExpansionConstants> _expconst);
   
@@ -349,10 +352,10 @@ protected:
   vector<MyMatrix<cmplx> > E_LE_mat_;
   
 public:
-  XHMatrix(int I, int ns, int p, Molecule mol, shared_ptr<EMatrix> E,
-           shared_ptr<LEMatrix> LE);
+  XHMatrix(int I, int ns, int p, shared_ptr<Molecule> mol,
+           shared_ptr<EMatrix> E, shared_ptr<LEMatrix> LE);
   
-  void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+  void calc_vals(shared_ptr<Molecule> mol, shared_ptr<BesselCalc> bcalc,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                  shared_ptr<LHNMatrix> LHN, double kappa, int k);
   
@@ -368,10 +371,11 @@ protected:
   vector<MyMatrix<cmplx> > E_LE_mat_;
   
 public:
-  XFMatrix(int I, int ns, int p, double eps_in, double eps_out, Molecule mol,
-           shared_ptr<EMatrix> E, shared_ptr<LEMatrix> LE);
+  XFMatrix(int I, int ns, int p, double eps_in, double eps_out,
+           shared_ptr<Molecule> mol, shared_ptr<EMatrix> E,
+           shared_ptr<LEMatrix> LE);
   
-  void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
+  void calc_vals(shared_ptr<Molecule> mol, shared_ptr<BesselCalc> bcalc,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                  shared_ptr<LHNMatrix> LHN, double kappa, int k);
   
@@ -387,9 +391,12 @@ protected:
 public:
   HMatrix(int I, int ns, int p, double kappa);
   
-  void init(Molecule mol, shared_ptr<SHCalc> _sh_calc, double eps_in);
+  void init(shared_ptr<Molecule> mol,
+            shared_ptr<SHCalc> _sh_calc,
+            double eps_in);
   
-  void calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
+  void calc_vals(shared_ptr<Molecule> mol,
+                 shared_ptr<HMatrix> prev,
                  shared_ptr<XHMatrix> XH,
                  shared_ptr<FMatrix> F,
                  shared_ptr<IEMatrix> IE,
@@ -410,7 +417,8 @@ protected:
 public:
   FMatrix(int I, int ns, int p, double kappa);
   
-  void calc_vals(Molecule mol, shared_ptr<FMatrix> prev,
+  void calc_vals(shared_ptr<Molecule> mol,
+                 shared_ptr<FMatrix> prev,
                  shared_ptr<XFMatrix> XF,
                  shared_ptr<HMatrix> H,
                  shared_ptr<IEMatrix> IE,

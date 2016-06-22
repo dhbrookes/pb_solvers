@@ -49,8 +49,8 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
   // Generate surface integrals
   IEMatrix ieMatTest(0, myMol, SHCalcTest, pol, _expcons, true);
   
-  vector<Molecule> mols;
-  mols.push_back((*myMol));
+  vector<shared_ptr<Molecule> > mols;
+  mols.push_back(myMol);
   auto sys = make_shared<System>(mols);
   auto ReExp = make_shared<ReExpCoeffsConstants>(kap,sys->get_lambda(),pol);
   
@@ -109,8 +109,8 @@ TEST_F(TMatrixUTest, xforIntra_analytic_test)
   // Generate surface integrals
   IEMatrix ieMatTest(0, myMol, SHCalcTest, pol, _expcons, true);
   
-  vector<Molecule> mols;
-  mols.push_back((*myMol));
+  vector<shared_ptr<Molecule> > mols;
+  mols.push_back(myMol);
   auto sys = make_shared<System>(mols);
   auto ReExp = make_shared<ReExpCoeffsConstants> (kap, sys->get_lambda(), pol);
   
