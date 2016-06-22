@@ -76,6 +76,33 @@ kappa_(_consts->get_kappa())
   }
 }
 
+double Solver::calc_converge_H(int I)
+{
+  double mu=0, num, den;
+  cmplx hnm_curr, hnm_prev;
+  for (int k = 0; k < _H_[I]->get_ns(); k++)
+  {
+    num = 0;
+    den = 0;
+    for (int n = 0; n < _H_[I]->get_p(); n++)
+    {
+      for (int m = -n; m < n+1; m++)
+      {
+        hnm_curr = _H_[I]->get_mat_knm(k, n, m);
+        hnm_prev = _prevH_[I]->get_mat_knm(k, n, m);
+        num += abs(hnm_curr - hnm_prev);
+        den += abs(hnm_curr) + abs(hnm_prev);
+      }
+    }
+    if ( den == 0 ) den = 1.0;
+    mu += num / (0.5 * den);
+  }
+  
+  mu = mu / (double)(4.0*p_*p_);
+  return mu;
+  
+}
+
 double Solver::iter()
 {
   double mu = 0;
@@ -85,20 +112,25 @@ double Solver::iter()
   {
     mol = _sys_->get_molecule(I);
     
-    _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
-    _LH_[I]->calc_vals(_T_, _H_[I], _shCalc_, _sys_, _bCalc_);
-    
-    _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_);
-    
-    _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
-                      _LH_[I], _LF_[I], _LHN_[I], 0.0);
-    _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
-                       _LF_[I], _LHN_[I], 0.0);
-    
-    _F_[I]->calc_vals(mol, _prevF_[I], _XF_[I], _prevH_[I], _IE_[I], _bCalc_);
-    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _F_[I], _IE_[I], _bCalc_);
-    
-//    mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
+    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+    {
+      _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
+      _LH_[I]->calc_vals(_T_, _H_[I], k);
+      
+      _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+      
+      _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
+                         _LH_[I], _LF_[I], _LHN_[I], 0.0, k);
+      _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
+                         _LF_[I], _LHN_[I], 0.0, k);
+      
+      _F_[I]->calc_vals(mol,_prevF_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k);
+      _H_[I]->calc_vals(mol,_prevH_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
+      
+      //    mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
+      mu += calc_converge_H(I);
+      cout << "This is mu " << mu<< endl;
+    }
   }
   
   for (int I = 0; I < _sys_->get_n(); I++)
@@ -136,19 +168,6 @@ void Solver::solve(double tol, int maxiter)
   {
     mu = iter();
     if (mu < tol) break;
-  }
-}
-
-
-void Solver::solve_inner()
-{
-  double mu;
-  double solveTol = 1e-6;
-  int maxiter = 20;
-  for (int t = 0; t < maxiter; t++)
-  {
-    mu = iter();
-    if (mu < solveTol) break;
   }
 }
 

@@ -260,13 +260,7 @@ public:
   LFMatrix(int I, int ns, int p);
   
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
-                 shared_ptr<SHCalc> shcalc, shared_ptr<System> sys);
-  
-  // analytic re-expansion (Equation 27a [1])
-  MyMatrix<cmplx> numeric_reex(int I, int k, int j,
-                               shared_ptr<FMatrix> F,
-                               shared_ptr<SHCalc> shcalc,
-                               shared_ptr<System> sys, int Mp=-1);
+                 shared_ptr<SHCalc> shcalc, shared_ptr<System> sys, int k);
   
   /*
    Equation 15a [1]. For analytic re expansion
@@ -291,9 +285,7 @@ public:
             shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
             shared_ptr<ExpansionConstants> _expconst);
   
-  void calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H,
-                 shared_ptr<SHCalc> shcalc, shared_ptr<System> sys,
-                 shared_ptr<BesselCalc> bcalc, int Mp=-1);
+  void calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k);
   
   /*
    Equation 15b [1]. For analytic re expansion
@@ -331,7 +323,7 @@ public:
   
   void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
-                 shared_ptr<LHNMatrix> LHN, double kappa);
+                 shared_ptr<LHNMatrix> LHN, double kappa, int k);
   
 };
 
@@ -350,7 +342,7 @@ public:
   
   void calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
-                 shared_ptr<LHNMatrix> LHN, double kappa);
+                 shared_ptr<LHNMatrix> LHN, double kappa, int k);
   
   const double get_eps() const { return eps_; }
 };
@@ -370,11 +362,11 @@ public:
                  shared_ptr<XHMatrix> XH,
                  shared_ptr<FMatrix> F,
                  shared_ptr<IEMatrix> IE,
-                 shared_ptr<BesselCalc> bcalc);
+                 shared_ptr<BesselCalc> bcalc, int k);
   
   // calculate convergence criteria (Equation 23)
-  static double calc_converge(shared_ptr<HMatrix> curr,
-                              shared_ptr<HMatrix> prev);
+//  static double calc_converge(shared_ptr<HMatrix> curr,
+//                              shared_ptr<HMatrix> prev);
   
 };
 
@@ -391,7 +383,7 @@ public:
                  shared_ptr<XFMatrix> XF,
                  shared_ptr<HMatrix> H,
                  shared_ptr<IEMatrix> IE,
-                 shared_ptr<BesselCalc> bcalc);
+                 shared_ptr<BesselCalc> bcalc, int k);
   
 };
 

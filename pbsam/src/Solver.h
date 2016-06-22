@@ -62,6 +62,9 @@ public:
   // run an iteration and return convergence value
   double iter();
   
+  // Use h matrices to compute convergence
+  double calc_converge_H(int I);
+  
   void solve(double tol, int maxiter=10000);
   
   void solve_inner();
