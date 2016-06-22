@@ -152,7 +152,8 @@ void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
       {
         for (int s = 0; s < p_; s++)
         {
-          in2=dWF->get_mat_knm(k,l,s)*IE->get_IE_k_nm_ls(k,n,m,l,s).real();
+          in2=dWF->get_mat_knm(k,l,s);
+          //*IE->get_IE_k_nm_ls(k,n,m,l,s).real();
           in += in;
         }
       }
@@ -189,7 +190,8 @@ void GradHMatrix::calc_val_k(int k, shared_ptr<PrecalcBessel> bcalc,
       {
         for (int s = 0; s < p_; s++)
         {
-          in2 = dWH->get_mat_knm(k,l,s)*IE->get_IE_k_nm_ls(k,n,m,l,s);
+          in2 = dWH->get_mat_knm(k,l,s);
+          //*IE->get_IE_k_nm_ls(k,n,m,l,s);
           in += in2;
         }
       }

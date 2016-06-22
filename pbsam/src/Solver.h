@@ -47,20 +47,24 @@ protected:
   shared_ptr<SHCalc>                _shCalc_;
   shared_ptr<BesselCalc>            _bCalc_;
   shared_ptr<Constants>             _consts_;
-//  shared_ptr<ReExpCoeffsConstants>  _reExConsts_;
+  shared_ptr<ReExpCoeffsConstants>  _reExConsts_;
+  shared_ptr<ExpansionConstants>    _expConsts_;
   
   // update prevH and prevF
   void update_prev();
   
   
-
+  
 public:
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
          shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
-         shared_ptr<TMatrix> _T, int p);
+         int p);
   
   // run an iteration and return convergence value
   double iter();
+  
+  // Use h matrices to compute convergence
+  double calc_converge_H(int I);
   
   void solve(double tol, int maxiter=10000);
   
