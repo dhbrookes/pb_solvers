@@ -10,6 +10,7 @@
 #include "Solver.h"
 #include "Solvmat.h"
 #include "Gradsolvmat.h"
+#include "PhysCalc.h"
 
 int main( int argc, const char* argv[] )
 {

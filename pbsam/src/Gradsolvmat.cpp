@@ -398,21 +398,7 @@ void GradLHNMatrix::calc_all_vals(shared_ptr<System> sys,
 {
   MyMatrix<Ptx> lhn_k, inner;
   for (int k = 0; k < get_ns(); k++)
-  {
-    lhn_k = MyMatrix<Ptx> (p_, 2*p_+1);
-    for (int M=0; M < sys->get_n(); M++)
-    {
-      for (int m=0; m < sys->get_Ns_i(M); m++)
-      {
-        inner = T->re_expandX_gradT(H[M]->get_mat_k(m), I_, k, M, m);
-        lhn_k += inner;
-        
-        inner = T->re_expand_gradX(dH[M]->get_mat_k(m), I_, k, M, m);
-        lhn_k += inner;
-      }
-      mat_[k] = lhn_k;
-    }
-  }
+    calc_val_k(k, sys, T, H, dH);
 }
 
 void GradLHNMatrix::calc_val_k(int k, shared_ptr<System> sys,

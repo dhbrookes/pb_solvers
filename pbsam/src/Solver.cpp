@@ -250,7 +250,6 @@ dLHN_(_sys->get_n(), vector<shared_ptr<GradLHNMatrix> > (_sys->get_n()))
       dH_[I][J] = make_shared<GradHMatrix> (I,J,_sys_->get_Ns_i(I),p_,kappa_);
       dWH_[I][J] = make_shared<GradWHMatrix> (I,J,_sys_->get_Ns_i(I),p_,kappa_);
       dLH_[I][J] = make_shared<GradLHMatrix> (I,J,_sys_->get_Ns_i(I),p_,kappa_);
-      
     }
   }
   
