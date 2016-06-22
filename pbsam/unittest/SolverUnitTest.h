@@ -293,7 +293,7 @@ TEST_F(SolverUTest, constructor_test)
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
   
-  solvTest.iter();
+  solvTest.solve(1e-4);
   
   for (int i = 0; i < myMol->get_ns(); i++)
   {

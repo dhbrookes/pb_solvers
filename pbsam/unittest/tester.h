@@ -40,7 +40,7 @@ public:
     cout << "Complete Bessel calculation test" << endl;
     
     SolverTest SolvT;
-    //    SolvT.RunSolverTest();
+    SolvT.RunSolverTest();
     cout << "Complete Solv test" << endl;
     
     ConstantsTest ConT;
