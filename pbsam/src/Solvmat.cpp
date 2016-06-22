@@ -564,7 +564,7 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
 {
   reset_mat();
   MyMatrix<cmplx> reex;
-  
+
   for (int j = 0; j < T->get_nsi(I_); j++)
   {
     if (j==k) continue;
@@ -576,15 +576,15 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
     
     mat_cmplx_[k] += reex;
   }
-  //    for (int n=0; n<p_; n++)
-  //    {
-  //      for (int m = 0; m <= n; m++)
-  //      {
-  //        cout << ", " << mat_cmplx_[k](n, m+p_);
-  //      }
-  //      cout << endl;
-  //    }
-  
+//    for (int n=0; n<p_; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        cout << ", " << mat_cmplx_[k](n, m+p_);
+//      }
+//      cout << endl;
+//    }
+
 }
 
 
@@ -666,7 +666,7 @@ void XHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
   cmplx inner;
   double ak = mol.get_ak(k);
   vector<double> in_k = bcalc->calc_mbfI(p_, kappa * ak);
-  
+
   for (int n = 0; n < p_; n++)
   {
     for (int m = - n; m <= n; m++)
@@ -853,7 +853,7 @@ void HMatrix::calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
 //    if ( den == 0 ) den = 1.0;
 //    mu += num / (0.5 * den);
 //  }
-//
+//  
 //  mu = mu / (4.0*p2);
 //  return mu;
 //}
@@ -919,15 +919,15 @@ void FMatrix::calc_vals(Molecule mol, shared_ptr<FMatrix> prev,
       if ( m > 0 ) set_mat_knm(k, n, -m, scl * complex<double> (fRe, -fIm));
     }
   }
-  //    cout << "This is OUTPUT to mul " <<  k << endl;
-  //    for (int n = 0; n < p_; n++)  // rows in new matrix
-  //    {
-  //      for (int m = 0; m < n+1; m++)  // columns in new matrix
-  //      {
-  //        cout << get_mat_knm(k, n, m )<< ", " ;
-  //      }
-  //      cout << endl;
-  //    }
-  //    cout << endl;
+//    cout << "This is OUTPUT to mul " <<  k << endl;
+//    for (int n = 0; n < p_; n++)  // rows in new matrix
+//    {
+//      for (int m = 0; m < n+1; m++)  // columns in new matrix
+//      {
+//        cout << get_mat_knm(k, n, m )<< ", " ;
+//      }
+//      cout << endl;
+//    }
+//    cout << endl;
   
 }

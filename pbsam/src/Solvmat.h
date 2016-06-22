@@ -365,8 +365,8 @@ public:
                  shared_ptr<BesselCalc> bcalc, int k);
   
   // calculate convergence criteria (Equation 23)
-  //  static double calc_converge(shared_ptr<HMatrix> curr,
-  //                              shared_ptr<HMatrix> prev);
+//  static double calc_converge(shared_ptr<HMatrix> curr,
+//                              shared_ptr<HMatrix> prev);
   
 };
 
