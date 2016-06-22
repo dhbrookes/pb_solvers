@@ -75,11 +75,11 @@ public:
   const int get_p() const   { return p_; }
   const int get_ns() const  { return (int) mat_.size(); }
   
-  void reset_mat();
+  void reset_mat(int k);
   
   friend ostream & operator<<(ostream & fout, ComplexMoleculeMatrix & M)
   {
-    for (int k = 0; k < 1/*M.get_ns()*/; k++)
+    for (int k = 0; k < M.get_ns(); k++)
     {
       fout << "For sphere " << k << endl;
       for (int n = 0; n < M.get_p(); n++)
@@ -97,6 +97,24 @@ public:
       fout << endl;
     }
     return fout;
+  }
+  
+  void print_kmat(int k)
+  {
+    cout << "For sphere " << k << endl;
+    for (int n = 0; n < get_p(); n++)
+    {
+      for (int m = 0; m <= n; m++)
+      {
+        double real = get_mat_knm( k, n, m).real();
+        double imag = get_mat_knm( k, n, m).imag();
+        if(abs(real) < 1e-15 ) real = 0.0;
+        if(abs(imag) < 1e-15 ) imag = 0.0;
+        cout << "(" << real << ", " << imag << ") ";
+      }
+      cout << endl;
+    }
+    cout << endl;
   }
   
 };
@@ -208,11 +226,11 @@ public:
   const int get_p() const   { return p_; }
   const int get_ns() const  { return (int) mat_.size(); }
   
-  void reset_mat();
+  void reset_mat(int k);
   
   friend ostream & operator<<(ostream & fout, NumericalMatrix & M)
   {
-    for (int k = 0; k < 1 /*M.get_ns()*/; k++)
+    for (int k = 0; k < M.get_ns(); k++)
     {
       fout << "For sphere " << k << endl;
       for (int h = 0; h < M.get_mat_k_len(h); h++)
@@ -226,9 +244,22 @@ public:
     return fout;
   }
   
+  void print_kmat(int k)
+  {
+    cout << "For sphere " << k << endl;
+    for (int h = 0; h < get_mat_k_len(h); h++)
+    {
+      double real = get_mat_kh( k, h);
+      if(abs(real) < 1e-15 ) real = 0.0;
+      cout << real << ", ";
+    }
+    cout << endl;
+  }
+  
+  
   void print_analytical()
   {
-    for (int k = 0; k < 1 /*get_ns()*/; k++)
+    for (int k = 0; k < get_ns(); k++)
     {
       cout << "For sphere " << k << endl;
       for (int n = 0; n < get_p(); n++)
@@ -305,7 +336,7 @@ class LHNMatrix : public ComplexMoleculeMatrix
 public:
   LHNMatrix(int I, int ns, int p);
   
-  void calc_vals(shared_ptr<TMatrix> T, vector<shared_ptr<HMatrix> > H);
+  void calc_vals(shared_ptr<TMatrix> T, vector<shared_ptr<HMatrix> > H, int k);
   
 };
 

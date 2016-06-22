@@ -51,7 +51,8 @@ protected:
   shared_ptr<ExpansionConstants>    _expConsts_;
   
   // update prevH and prevF
-  void update_prev();
+  void update_prev(int I, int k);
+  void update_prev_all();
   
   
   
@@ -64,7 +65,7 @@ public:
   double iter();
   
   // Use h matrices to compute convergence
-  double calc_converge_H(int I);
+  double calc_converge_H(int I, int k);
   
   void solve(double tol, int maxiter=10000);
   

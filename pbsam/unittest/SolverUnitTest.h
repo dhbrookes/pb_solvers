@@ -292,8 +292,10 @@ TEST_F(SolverUTest, constructor_test)
   auto sys = make_shared<System>(mols);
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
+  solvTest.iter();
+  solvTest.solve(1e-25, 50);
   
-  solvTest.solve(1e-4);
+  solvTest.calc_converge_H(0, 9);
   
   for (int i = 0; i < myMol->get_ns(); i++)
   {

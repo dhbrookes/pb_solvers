@@ -72,31 +72,30 @@ kappa_(_consts->get_kappa())
     _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_,
                                      (*_mol), _E_[I], _LE_[I]);
     
-    update_prev();
+    update_prev_all();
   }
 }
 
-double Solver::calc_converge_H(int I)
+double Solver::calc_converge_H(int I, int k)
 {
-  double mu=0, num, den;
+  double mu=0, num(0), den(0);
   cmplx hnm_curr, hnm_prev;
-  for (int k = 0; k < _H_[I]->get_ns(); k++)
+  
+  for (int n = 0; n < _H_[I]->get_p(); n++)
   {
-    num = 0;
-    den = 0;
-    for (int n = 0; n < _H_[I]->get_p(); n++)
+    for (int m = -n; m < n+1; m++)
     {
-      for (int m = -n; m < n+1; m++)
-      {
-        hnm_curr = _H_[I]->get_mat_knm(k, n, m);
-        hnm_prev = _prevH_[I]->get_mat_knm(k, n, m);
-        num += abs(hnm_curr - hnm_prev);
-        den += abs(hnm_curr) + abs(hnm_prev);
-      }
+      hnm_curr = _H_[I]->get_mat_knm(k, n, m);
+      hnm_prev = _prevH_[I]->get_mat_knm(k, n, m);
+      num += norm(hnm_curr - hnm_prev);
+      den += norm(hnm_curr) + norm(hnm_prev);
     }
-    if ( den == 0 ) den = 1.0;
-    mu += num / (0.5 * den);
   }
+  
+  if ( fabs(den) > 1e-15 )
+    mu = (num / den);
+  else
+    mu = 0.0;
   
   mu = mu / (double)(4.0*p_*p_);
   return mu;
@@ -105,13 +104,12 @@ double Solver::calc_converge_H(int I)
 
 double Solver::iter()
 {
-  double mu = 0;
+  double devk, mu = 0;
   Molecule mol;
   // start an iteration
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     mol = _sys_->get_molecule(I);
-    
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
       _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
@@ -127,36 +125,55 @@ double Solver::iter()
       _F_[I]->calc_vals(mol,_prevF_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k);
       _H_[I]->calc_vals(mol,_prevH_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
       
-      //    mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
-      mu += calc_converge_H(I);
-      cout << "This is mu " << mu<< endl;
+      devk = calc_converge_H(I,k);
+      if ( devk > mu )
+      {
+//        cout << "This is mu " << mu << " and devk " << devk<< endl;
+        mu = devk;
+//        cout << "This is curr " << endl;
+//        _H_[I]->print_kmat(k);
+//        cout << "This is prev" << endl;
+//        _prevH_[I]->print_kmat(k);
+        
+      }
+      mu = ( devk > mu ) ? devk : mu;
+     
+      for (int I = 0; I < _sys_->get_n(); I++)
+      {
+        for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+        {
+          _LHN_[I]->calc_vals(_T_, _H_, k); // requires all Hs so do it at end
+        }
+      }
+      update_prev(I, k);
     }
   }
   
-  for (int I = 0; I < _sys_->get_n(); I++)
-  {
-    _LHN_[I]->calc_vals(_T_, _H_); // requires all Hs so do it after they are
-    // calculated
-  }
-  update_prev();
+
   return mu;
 }
 
 
-void Solver::update_prev()
+void Solver::update_prev_all()
 {
   for (int I = 0; I < _H_.size(); I++)
   {
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      for (int n = 0; n < p_; n++)
-      {
-        for (int m = 0; m < p_; m++)
-        {
-          _prevH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
-          _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
-        }
-      }
+      update_prev(I, k);
+    }
+  }
+}
+
+void Solver::update_prev(int I, int k)
+{
+  
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m < p_; m++)
+    {
+      _prevH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
+      _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
     }
   }
 }
@@ -166,9 +183,12 @@ void Solver::solve(double tol, int maxiter)
   double mu;
   for (int t = 0; t < maxiter; t++)
   {
+    cout << "this is t " << t << endl;
     mu = iter();
     if (mu < tol) break;
   }
+  
+  cout << (*_H_[0]) << endl;
 }
 
 
@@ -176,18 +196,21 @@ void Solver::reset_all()
 {
   for (int I = 0; I < _sys_->get_n(); I++)
   {
-    _E_[I]->reset_mat();
-    _LE_[I]->reset_mat();
+    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+    {
+      _E_[I]->reset_mat(k);
+      _LE_[I]->reset_mat(k);
+      _LF_[I]->reset_mat(k);
+      _LH_[I]->reset_mat(k);
+      _LHN_[I]->reset_mat(k);
+      _XF_[I]->reset_mat(k);
+      _XH_[I]->reset_mat(k);
+      _H_[I]->reset_mat(k);
+      _F_[I]->reset_mat(k);
+      _prevH_[I]->reset_mat(k);
+      _prevF_[I]->reset_mat(k);
+    }
     _IE_[I]->reset_mat();
-    _LF_[I]->reset_mat();
-    _LH_[I]->reset_mat();
-    _LHN_[I]->reset_mat();
-    _XF_[I]->reset_mat();
-    _XH_[I]->reset_mat();
-    _H_[I]->reset_mat();
-    _F_[I]->reset_mat();
-    _prevH_[I]->reset_mat();
-    _prevF_[I]->reset_mat();
   }
 }
 

@@ -97,16 +97,13 @@ ComplexMoleculeMatrix::ComplexMoleculeMatrix(int I, int ns, int p)
 {
 }
 
-void ComplexMoleculeMatrix::reset_mat()
+void ComplexMoleculeMatrix::reset_mat(int k)
 {
-  for (int k = 0; k < mat_.size(); k++)
+  for (int i = 0; i < mat_[k].get_nrows(); i++)
   {
-    for (int i = 0; i < mat_[k].get_nrows(); i++)
+    for (int j = 0; j < mat_[k].get_ncols(); j++)
     {
-      for (int j = 0; j < mat_[k].get_ncols(); j++)
-      {
-        mat_[k].set_val(i, j, cmplx(0, 0));
-      }
+      mat_[k].set_val(i, j, cmplx(0, 0));
     }
   }
 }
@@ -116,7 +113,7 @@ NumericalMatrix::NumericalMatrix(int I, int ns, int p)
 {
 }
 
-void NumericalMatrix::reset_mat()
+void NumericalMatrix::reset_mat(int k)
 {
   //  for (int k = 0; k < mat_.size(); k++)
   //  {
@@ -125,17 +122,15 @@ void NumericalMatrix::reset_mat()
   //      mat_[k][i] = 0.0;
   //    }
   //  }
-  
-  for (int k = 0; k < mat_cmplx_.size(); k++)
+
+  for (int i = 0; i < mat_cmplx_[k].get_nrows(); i++)
   {
-    for (int i = 0; i < mat_cmplx_[k].get_nrows(); i++)
+    for (int j = 0; j < mat_cmplx_[k].get_ncols(); j++)
     {
-      for (int j = 0; j < mat_cmplx_[k].get_ncols(); j++)
-      {
-        mat_cmplx_[k].set_val(i, j, cmplx(0, 0));
-      }
+      mat_cmplx_[k].set_val(i, j, cmplx(0, 0));
     }
   }
+  
 }
 
 EMatrix::EMatrix(int I, int ns, int p)
@@ -485,7 +480,7 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
                          shared_ptr<SHCalc> shcalc,
                          shared_ptr<System> sys, int k)
 {
-  reset_mat();
+  reset_mat(k);
   MyMatrix<cmplx> reex;
   for (int j = 0; j < T->get_nsi(I_); j++)
   {
@@ -562,7 +557,7 @@ void LHMatrix::init(Molecule mol, shared_ptr<HMatrix> H,
 
 void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
 {
-  reset_mat();
+  reset_mat(k);
   MyMatrix<cmplx> reex;
 
   for (int j = 0; j < T->get_nsi(I_); j++)
@@ -621,22 +616,20 @@ LHNMatrix::LHNMatrix(int I, int ns, int p)
 }
 
 void LHNMatrix::calc_vals(shared_ptr<TMatrix> T,
-                          vector<shared_ptr<HMatrix> > H)
+                          vector<shared_ptr<HMatrix> > H, int k)
 {
-  reset_mat();
+  reset_mat(k);
   MyMatrix<cmplx> reex;
-  for (int k = 0; k < mat_.size(); k++)
+  for (int J = 0; J < T->get_nmol(); J++)
   {
-    for (int J = 0; J < T->get_nmol(); J++)
+    if (J == I_) continue;
+    for (int l =0 ; l < T->get_nsi(J); l++)
     {
-      if (J == I_) continue;
-      for (int l =0 ; l < T->get_nsi(J); l++)
-      {
-        reex = T->re_expandX(H[J]->get_mat_k(l), I_, k, J, l);
-        mat_[k] += reex;
-      }
+      reex = T->re_expandX(H[J]->get_mat_k(l), I_, k, J, l);
+      mat_[k] += reex;
     }
   }
+
 }
 
 XHMatrix::XHMatrix(int I, int ns, int p, Molecule mol, shared_ptr<EMatrix> E,
@@ -819,44 +812,17 @@ void HMatrix::calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
     }
   }
   
-  cout << "This is molecule " << 0 << endl;
-  for (int n = 0; n < p_; n++)  // rows in new matrix
-  {
-    for (int m = 0; m < n+1; m++)  // columns in new matrix
-    {
-      cout << get_mat_knm(0,n,m) << ", " ;
-    }
-    cout << endl;
-  }
+//  cout << "This is molecule " << 0 << endl;
+//  for (int n = 0; n < p_; n++)  // rows in new matrix
+//  {
+//    for (int m = 0; m < n+1; m++)  // columns in new matrix
+//    {
+//      cout << get_mat_knm(0,n,m) << ", " ;
+//    }
+//    cout << endl;
+//  }
 }
 
-//double HMatrix::calc_converge(shared_ptr<HMatrix> curr,
-//                              shared_ptr<HMatrix> prev)
-//{
-//  double p2 = (double) curr->get_p()*curr->get_p();
-//  double mu=0, num, den;
-//  cmplx hnm_curr, hnm_prev;
-//  for (int k = 0; k < curr->mat_.size(); k++)
-//  {
-//    num = 0;
-//    den = 0;
-//    for (int n = 0; n < curr->get_p(); n++)
-//    {
-//      for (int m = -n; m < n+1; m++)
-//      {
-//        hnm_curr = curr->get_mat_knm(k, n, m);
-//        hnm_prev = prev->get_mat_knm(k, n, m);
-//        num += abs(hnm_curr - hnm_prev);
-//        den += abs(hnm_curr) + abs(hnm_prev);
-//      }
-//    }
-//    if ( den == 0 ) den = 1.0;
-//    mu += num / (0.5 * den);
-//  }
-//  
-//  mu = mu / (4.0*p2);
-//  return mu;
-//}
 
 FMatrix::FMatrix(int I, int ns, int p, double kappa)
 :ComplexMoleculeMatrix(I, ns, p), kappa_(kappa)
@@ -919,15 +885,4 @@ void FMatrix::calc_vals(Molecule mol, shared_ptr<FMatrix> prev,
       if ( m > 0 ) set_mat_knm(k, n, -m, scl * complex<double> (fRe, -fIm));
     }
   }
-//    cout << "This is OUTPUT to mul " <<  k << endl;
-//    for (int n = 0; n < p_; n++)  // rows in new matrix
-//    {
-//      for (int m = 0; m < n+1; m++)  // columns in new matrix
-//      {
-//        cout << get_mat_knm(k, n, m )<< ", " ;
-//      }
-//      cout << endl;
-//    }
-//    cout << endl;
-  
 }
