@@ -87,4 +87,29 @@ public:
   
 };
 
+
+/*
+ Class for pre-calculating i and k alpha*kappa for every sphere in the system
+ */
+class PrecalcBessel
+{
+protected:
+  map<vector<int>, int> ikToIdx_;
+  
+  vector<vector<double> > in_;
+  vector<vector<double> > kn_;
+  
+public:
+  PrecalcBessel(shared_ptr<System> sys,
+                shared_ptr<BesselCalc> bcalc,
+                double kappa, int p);
+  
+  vector<double> get_besseli_Ik(int I, int k) { return in_[ikToIdx_[{I,k}]]; }
+  vector<double> get_besselk_Ik(int I, int k) { return kn_[ikToIdx_[{I, k}]]; }
+  
+  double get_in_Ik(int I, int k, int n) { return in_[ikToIdx_[{I,k}]][n]; }
+  double get_kn_Ik(int I, int k, int n) { return kn_[ikToIdx_[{I,k}]][n]; }
+  
+};
+
 #endif /* BesselCalc_h */

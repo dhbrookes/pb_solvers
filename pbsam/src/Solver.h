@@ -14,6 +14,7 @@
 #include <memory>
 #include "TMatrix.h"
 #include "Solvmat.h"
+#include "Gradsolvmat.h"
 
 
 
@@ -48,7 +49,7 @@ protected:
   shared_ptr<SHCalc>                _shCalc_;
   shared_ptr<BesselCalc>            _bCalc_;
   shared_ptr<Constants>             _consts_;
-  shared_ptr<ReExpCoeffsConstants>  _reExConsts_;
+//  shared_ptr<ReExpCoeffsConstants>  _reExConsts_;
   
   // update prevH and prevF
   void update_prev();
@@ -59,7 +60,7 @@ protected:
 public:
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
          shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
-         int p);
+         shared_ptr<TMatrix> _T, int p);
   
   
   void solve(double tol, int maxiter=10000);
@@ -67,6 +68,48 @@ public:
   void reset_all();
   
 };
+
+
+class GradSolver
+{
+protected:
+  int p_;
+  double kappa_;
+  
+  vector<shared_ptr<FMatrix> >      _F_;  // converged solutions for these
+  vector<shared_ptr<HMatrix> >      _H_;
+  vector<shared_ptr<IEMatrix> >     _IE_;
+
+  shared_ptr<TMatrix>               _T_;
+  
+  // inner index is molecule number, outer index is index of the molecule
+  // that this derivative is with respect to
+  vector<vector<shared_ptr<GradFMatrix> > >   dF_;
+  vector<vector<shared_ptr<GradHMatrix> > >   dH_;
+  vector<vector<shared_ptr<GradWFMatrix> > >  dWF_;
+  vector<vector<shared_ptr<GradWHMatrix> > >  dWH_;
+  vector<vector<shared_ptr<GradLFMatrix> > >  dLF_;
+  vector<vector<shared_ptr<GradLHMatrix> > >  dLH_;
+  vector<vector<shared_ptr<GradLHNMatrix> > > dLHN_;
+  
+  shared_ptr<System>                _sys_;
+  shared_ptr<SHCalc>                _shCalc_;
+  shared_ptr<PrecalcBessel>         _bCalc_;
+  shared_ptr<Constants>             _consts_;
+
+public:
+  GradSolver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+             shared_ptr<SHCalc> _shCalc, shared_ptr<PrecalcBessel> _bCalc,
+             shared_ptr<TMatrix> _T, vector<shared_ptr<FMatrix> > _F,
+             vector<shared_ptr<HMatrix> > _H, int p);
+  
+  void solve();
+  
+  
+};
+
+
+
 
 #endif /* Solver_h */
 
