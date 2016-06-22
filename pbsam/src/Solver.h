@@ -12,10 +12,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <memory>
-#include "TMatrix.h"
 #include "Solvmat.h"
 #include "Gradsolvmat.h"
-
 
 
 /*
@@ -54,16 +52,19 @@ protected:
   // update prevH and prevF
   void update_prev();
   
-  // run an iteration and return convergence value
-  double iter();
+  
 
 public:
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
          shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
          shared_ptr<TMatrix> _T, int p);
   
+  // run an iteration and return convergence value
+  double iter();
   
   void solve(double tol, int maxiter=10000);
+  
+  void solve_inner();
   
   void reset_all();
   

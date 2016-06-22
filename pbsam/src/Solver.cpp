@@ -9,8 +9,6 @@
 #include "Solver.h"
 
 
-
-
 Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                shared_ptr<TMatrix> _T, int p)
@@ -24,6 +22,8 @@ _XF_(_sys->get_n()),
 _XH_(_sys->get_n()),
 _H_(_sys->get_n()),
 _F_(_sys->get_n()),
+_prevH_(_sys->get_n()),
+_prevF_(_sys->get_n()),
 _shCalc_(_shCalc),
 _bCalc_(_bCalc),
 _consts_(_consts),
@@ -37,7 +37,7 @@ _T_(_T)
 //  _T_ = make_shared<TMatrix> (p_, _sys_, _shCalc_, _consts_,
 //                             _bCalc_, _reExConsts_);
   
-  auto _expConst = make_shared<ExpansionConstants>(p_);
+  _expConsts_ = make_shared<ExpansionConstants>(p_);
   shared_ptr<Molecule> _mol;
   // intialize all matrices
   for (int I = 0; I < _sys_->get_n(); I++)
@@ -73,22 +73,25 @@ double Solver::iter()
 {
   double mu = 0;
   Molecule mol;
-  // start an iteration by calculating XF and XH (is this right?)
+  // start an iteration
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     mol = _sys_->get_molecule(I);
-    _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _E_[I], _LE_[I],
-                      _LH_[I], _LF_[I], _LHN_[I], kappa_);
-    _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _E_[I], _LE_[I],
-                      _LH_[I], _LF_[I], _LHN_[I]);
     
-    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _prevF_[I], _IE_[I], _bCalc_);
-    _F_[I]->calc_vals(mol, _prevF_[I], _XF_[I], _prevH_[I], _IE_[I], _bCalc_);
-    
-    _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_);
+    _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
     _LH_[I]->calc_vals(_T_, _H_[I], _shCalc_, _sys_, _bCalc_);
     
-    mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
+    _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_);
+    
+    _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
+                      _LH_[I], _LF_[I], _LHN_[I], 0.0);
+    _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
+                       _LF_[I], _LHN_[I], 0.0);
+    
+    _F_[I]->calc_vals(mol, _prevF_[I], _XF_[I], _prevH_[I], _IE_[I], _bCalc_);
+    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _F_[I], _IE_[I], _bCalc_);
+    
+//    mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
   }
   
   for (int I = 0; I < _sys_->get_n(); I++)
@@ -145,7 +148,6 @@ void Solver::reset_all()
     _F_[I]->reset_mat();
     _prevH_[I]->reset_mat();
     _prevF_[I]->reset_mat();
-    
   }
 }
 

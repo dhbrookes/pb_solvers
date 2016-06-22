@@ -160,7 +160,9 @@ protected:
 
   double kappa_; //from Constants
   double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
-  vector<double> lam_sam_; // scaling factor for PB-SAM
+  vector<double> lam_sam_; // scaling factor: ain=0, aout=1 for PB-SAM
+  vector<double> lam_scl_; // scaling factor: (aout/ain)^n  for PB-SAM
+  vector<double> s_prefac_; // S factors, 0=kpio and 1=kpoo, for PB-SAM
   
   Pt v_; //computing re-expansion along this vector
   
@@ -195,6 +197,9 @@ public:
               vector<double> lambda, bool grad = false);
   
   MyVector<double> calc_SH_spec( double val ); // for singularities
+  
+  vector<double> get_lambdas()   { return lam_sam_; };
+  vector<double> get_lam_scale() { return lam_scl_; };
   
   bool isSingular()  { return rSing_; }  
   Pt get_TVec()       { return v_; }

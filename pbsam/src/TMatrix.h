@@ -33,6 +33,7 @@ protected:
   
   int     p_;
   double  kappa_;
+  vector<double> lam_scl_; // S factors, 0=kpio and 1=kpoo, for PB-SAM
   
   vector<shared_ptr<ReExpCoeffs> > T_;
   
@@ -110,9 +111,9 @@ public:
   MyMatrix<cmplx> re_expandX(MyMatrix<cmplx> X, int I, int k, int J, int l);
   
   /*
-   Re-expand a numerical surface with respect to T(I,k)(J,l)
+   Re-expand a numerical surface with respect to T(I,k)(J,l) (Equation 27b [1])
    */
-  MyMatrix<cmplx> re_expandX_local(vector<vector<double> > X, int I, int k,
+  MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
                                    int J, int l);
   
   /*

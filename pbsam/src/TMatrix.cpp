@@ -38,7 +38,7 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
   
   int idx = 0;
   Pt c_Ik, c_Jl, v;
-  double kapVal;
+  double kapVal, ak, al;
   vector<int> idx_vec;
   for (int I = 0; I < _sys->get_n(); I++)
   {
@@ -53,7 +53,15 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           
           idx_vec = {I, k, J, l};
           c_Jl = _sys->get_centerik(J, l);
-          if (I==J && c_Ik.dist(c_Jl) < 5.0)
+          ak = _sys->get_aik(I, k);
+          al = _sys->get_aik(J, l);
+          
+//          cout << "This is Ik, Jl pair : " << I << ", " << k << " & " <<
+//          J << ", " << l << " and dist " << v.norm() << " and aIk "
+//          << ak << " and ajl "
+//          << al << " dis1 : " <<  c_Ik.dist(c_Jl) - ak - al << endl;
+//
+          if (I==J && ((c_Ik.dist(c_Jl)<5.0) || (c_Ik.dist(c_Jl)<ak+al+5.0)))
           {
             idxMap_[idx_vec] = -1;
             continue;
@@ -63,9 +71,6 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kapVal * v.r());
           v = _sys->get_pbc_dist_vec_base(c_Ik, c_Jl);
           _shcalc->calc_sh(v.theta(), v.phi());
-          cout << "This is Ik, Jl pair : " << I << ", " << k << " & " <<
-          J << ", " << l << " and dist " << v.norm() << " and ajl " << _sys->get_aik(J, l)<< endl;
-          cout << "Pt : " << v.x() << ", " << v.y() << ", " << v.z() << endl;
           
           vector<double> lambdas = {_sys->get_aik(J, l), _sys->get_aik(I, k)};
           auto re_exp = make_shared<ReExpCoeffs>(p_, v,
@@ -83,7 +88,7 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
 }
 
 // Perform local expansion from J, l onto I, k
-MyMatrix<cmplx> TMatrix::re_expandX_local(vector<vector<double> > X,
+MyMatrix<cmplx> TMatrix::re_expandX_numeric(vector<vector<double> > X,
                                           int I, int k,
                                           int J, int l)
 {
@@ -96,7 +101,6 @@ MyMatrix<cmplx> TMatrix::re_expandX_local(vector<vector<double> > X,
   {
     Pt sph_dist = _system_->get_centerik(I, k) - _system_->get_centerik(J, l);
     Pt loc = _system_->get_gridijh(J, l, exp_pts[h]) - sph_dist;
-//    cout << "Hval " << X[l][h] << " at: " << loc.x() << ", " << loc.y() << ", " << loc.z() << " rho: " << loc.r() << endl;
     _shCalc_->calc_sh(loc.theta(), loc.phi());
     rscl = _system_->get_aik(I, k) / loc.r();
     chgscl = X[l][h] / loc.r();
@@ -124,14 +128,14 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
   X1 = expand_RX(X, I, k, J, l, whichR);
   X2 = expand_SX(X1, I, k, J, l, whichS);
   Z  = expand_RHX(X2, I, k, J, l, whichRH);
-  for (int n = 0; n < p_; n++)
-  {
-    for (int m = 0; m <= n; m++)
-    {
-      cout << X2(n,m+p_) << ", ";
-    }
-    cout << endl;
-  }
+//  for (int n = 0; n < p_; n++)
+//  {
+//    for (int m = 0; m <= n; m++)
+//    {
+//      cout << Z(n,m+p_) << ", ";
+//    }
+//    cout << endl;
+//  }
   return Z;
 }
 
@@ -237,9 +241,11 @@ MyMatrix<cmplx> TMatrix::expand_RX(MyMatrix<cmplx> X,
 {
 
   int n, m, s, map_idx;
-  bool jl_greater = is_Jl_greater(I, k, J, l);
-  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
-  else            map_idx = idxMap_[{J, l, I, k}];
+//  bool jl_greater = is_Jl_greater(I, k, J, l);
+//  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
+//  else            map_idx = idxMap_[{J, l, I, k}];
+  
+  map_idx = idxMap_[{I, k, J, l}];
   
   MyMatrix<cmplx> x1(p_, 2*p_ + 1);
   cmplx inter, rval, aval;
@@ -299,15 +305,17 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
   cmplx inter, sval;
   MyMatrix<cmplx> x2(p_, 2*p_ + 1);
   
-  int n, m, s, map_idx;
+  int n, m, s, map_idx = idxMap_[{I, k, J, l}];
+  //TODO see if this is_greater is still needed
+//  bool jl_greater = is_Jl_greater(I, k, J, l);
+//  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
+//  else            map_idx = idxMap_[{J, l, I, k}];
   
-  bool jl_greater = is_Jl_greater(I, k, J, l);
-  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
-  else            map_idx = idxMap_[{J, l, I, k}];
-  
-  
-  cout << map_idx << endl;
-  T_[map_idx]->print_S();
+  double fac;
+  vector<double> lam = T_[map_idx]->get_lambdas();
+  vector<double> lamScl = T_[map_idx]->get_lam_scale();
+//  cout << map_idx << endl;
+//  T_[map_idx]->print_S();
   
   // fill x2:
   for (n = 0; n < p_; n++)
@@ -317,17 +325,18 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
       inter  = 0;
       for (s = abs(m); s < p_; s++)
       {
-        if ( jl_greater )
-        {
+        fac = ( s <= n ) ? lamScl[n-s] : 1.0;
+//        if ( jl_greater )
+//        {
           if (whichS == DDR) sval = T_[map_idx]->get_sval(n, s, m);
           else sval = T_[map_idx]->get_sval(n, s, m);
-        }
-        else
-        {
-          if (whichS == DDR) sval = T_[map_idx]->get_sval(s, n, m);
-          else sval = T_[map_idx]->get_sval(s, n, m);
-        }
-        inter += sval * x1(s, m+p_);
+//        }
+//        else
+//        {
+//          if (whichS == DDR) sval = T_[map_idx]->get_sval(s, n, m);
+//          else sval = T_[map_idx]->get_sval(s, n, m);
+//        }
+        inter += fac * sval * x1(s, m+p_);
       } // end l
       x2.set_val(n, m+p_, inter);
     } // end m
@@ -340,15 +349,14 @@ MyMatrix<cmplx> TMatrix::expand_RHX( MyMatrix<cmplx> x2,
                                     int I, int k, int J, int l,
                                     WhichReEx whichRH)
 {
-  int n, m, s, map_idx;
+  int n, m, s, map_idx = idxMap_[{I, k, J, l}];
   cmplx inter, rval;
   MyMatrix<cmplx> z(p_, 2*p_ + 1);
   
-  bool jl_greater = is_Jl_greater(I, k, J, l);
-  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
-  else            map_idx = idxMap_[{J, l, I, k}];
+//  bool jl_greater = is_Jl_greater(I, k, J, l);
+//  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
+//  else            map_idx = idxMap_[{J, l, I, k}];
   
-
   //fill zj:
   for (n = 0; n < p_; n++)
   {

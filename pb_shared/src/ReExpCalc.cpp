@@ -10,7 +10,8 @@
 #include <iostream>
 
 ReExpCoeffsConstants::ReExpCoeffsConstants(const double &kappa,
-                                           const double &lambda, const int &p)
+                                           const double &lambda,
+                                           const int &p)
 : kappa_(kappa), lambda_(lambda), p_(p),
 a_(2*p, 4*p), b_(2*p, 4*p),
 alpha_(2*p, 4*p), beta_(2*p, 4*p),
@@ -89,6 +90,7 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
   }
 }
 
+
 ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp,
                                vector<double> besselK,
                                shared_ptr<ReExpCoeffsConstants> _consts,
@@ -100,6 +102,8 @@ besselK_(besselK),
 kappa_(kappa),
 lambda_(lambda[0]),
 lam_sam_(lambda),
+lam_scl_(p),
+s_prefac_(2),
 grad_(grad),
 _consts_(_consts),
 R_(2*p, MyMatrix<cmplx> (2*p, 4*p)),
@@ -110,8 +114,21 @@ prefacSing_(2*p, MyMatrix<double>(p, 2))
 {
   
   // for PBAM, only have one lambda
-  if (lam_sam_.size() == 1) lam_sam_.resize(2);
-  lam_sam_[1] = lam_sam_[0];
+  if (lam_sam_.size() == 1)
+  {
+    lam_sam_.resize(2);
+    lam_sam_[1] = lam_sam_[0];
+    s_prefac_[0] = 1.0;
+    s_prefac_[1] = 1.0;
+  } else
+  {
+    s_prefac_[0] = kappa_ * kappa_ * lam_sam_[0] * lam_sam_[0];
+    s_prefac_[1] = kappa_ * kappa_ * lam_sam_[0] * lam_sam_[1];
+  }
+  
+  lam_scl_[0] = 1.0;
+  for (int i = 1; i < p_; i++)
+    lam_scl_[i] = lam_scl_[i-1]*(lam_sam_[1]/lam_sam_[0]);
   
   if (besselK_.size() < 2 * p_)
   {
@@ -209,12 +226,9 @@ void ReExpCoeffs::calc_r()
   double phi = v_.phi();
   double theta = v_.theta();
   double xi  = M_PI;
-  
-//  R_ = MyVector<MyMatrix<cmplx> > (2*p_); // n range of 0 to 2p-1 is needed!
-  
+
   for (n = 0; n < 2 * p_-1; n++)
   {
-//    R_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));//s range: -2p+1 to 2p-1 needed!
     for (s = -n; s <= n; s++)
     {
       val = get_yval(n, -s);
@@ -246,8 +260,6 @@ void ReExpCoeffs::calc_s()
   int m, n, l;
   double val;
   double r = v_.r();
-  
-//  cout << "This is r : " << r << " and lambda_ " << lambda_ << " and bessel " << besselK_[0] << endl;
 
   for (l = 0; l < 2 * p_; l++)
   {
@@ -258,12 +270,12 @@ void ReExpCoeffs::calc_s()
     set_sval( l, 0, 0, pow(-1.0, l) * val );
   }
   
-  print_S();
+  double lamOI = lam_sam_[1]/lam_sam_[0];
   
   for (l = 1; l < 2 * p_ - 2; l++)
   {
-    val  = _consts_->get_beta(l-1, 0) * get_sval( 0, l-1, 0);
-    val += _consts_->get_alpha( l, 0) * get_sval( 0, l+1, 0);
+    val  = s_prefac_[0] * _consts_->get_beta(l-1, 0) * get_sval( 0, l-1, 0);
+    val += lamOI * _consts_->get_alpha( l, 0) * get_sval( 0, l+1, 0);
     val *= -1.0 / _consts_->get_alpha(0, 0);
     set_sval( 1, l, 0, val );
   }
@@ -272,9 +284,9 @@ void ReExpCoeffs::calc_s()
   {
     for(l = n + 1; l < 2*p_ - n - 2; l++)
     {
-      val  = _consts_->get_beta(l-1, 0) * get_sval(  n, l-1, 0);
-      val += _consts_->get_beta(n-1, 0) * get_sval(n-1,   l, 0);
-      val += _consts_->get_alpha( l, 0) * get_sval(  n, l+1, 0);
+      val  = s_prefac_[0] * _consts_->get_beta(l-1, 0) * get_sval(  n, l-1, 0);
+      val += s_prefac_[1] * _consts_->get_beta(n-1, 0) * get_sval(n-1,   l, 0);
+      val += lamOI * _consts_->get_alpha( l, 0) * get_sval(  n, l+1, 0);
       val *= -1.0 / _consts_->get_alpha(n, 0);
       set_sval(n+1, l, 0, val);
     }
@@ -285,8 +297,8 @@ void ReExpCoeffs::calc_s()
   {
     for (l = m; l < 2*p_ - m - 1; l++)
     {
-      val  = _consts_->get_mu(  l,  -m) * get_sval(m-1, l-1, m-1);
-      val += _consts_->get_nu(l+1,m-1) * get_sval( m-1, l+1, m-1);
+      val  = s_prefac_[0] * _consts_->get_mu(  l,  -m) * get_sval(m-1, l-1, m-1);
+      val += lamOI * _consts_->get_nu(l+1,m-1) * get_sval( m-1, l+1, m-1);
       val *= ( -1.0 / _consts_->get_nu( m, -m) );
       set_sval(m, l, m, val);
     }
@@ -295,9 +307,9 @@ void ReExpCoeffs::calc_s()
     {
       for (l = n + 1; l < 2*p_ - n - 2; l++)
       {
-        val2  = _consts_->get_beta(l-1, m) * get_sval(  n, l-1, m);
-        val2 += _consts_->get_beta(n-1, m) * get_sval(n-1,   l, m);
-        val2 += _consts_->get_alpha( l, m) * get_sval(  n, l+1, m);
+        val2  = s_prefac_[0]*_consts_->get_beta(l-1, m)*get_sval(  n, l-1, m);
+        val2 += s_prefac_[1]*_consts_->get_beta(n-1, m)*get_sval(n-1,   l, m);
+        val2 += lamOI * _consts_->get_alpha( l, m) * get_sval(  n, l+1, m);
         val2 *= (-1.0 / _consts_->get_alpha(n, m));
         set_sval(n+1, l, m, val2);
       }
@@ -315,9 +327,6 @@ void ReExpCoeffs::calc_s()
       }
     }
   }
-
-  cout << "At the end " << endl;
-  print_S();
 } // end calc_s
 
 

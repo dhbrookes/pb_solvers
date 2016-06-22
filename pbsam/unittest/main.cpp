@@ -39,12 +39,13 @@ double preclim = 1e-7;    //! precision limit
 const int nvals = 10 ;      //! standard number of poles for testing
 //string test_dir_loc = "../pbsam/pbsam_test_files/gtest/";
 string test_dir_loc = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/gtest/";
+//string test_dir_loc = "/Users/lfelberg/Documents/pb_solvers/pbsam/pbsam_test_files/gtest/";
 
 //#include "BesselCalcUnitTest.h"
 //#include "ConstantsUnitTest.h"
 //#include "MyMatrixUnitTest.h"
 //#include "readutilUnitTest.h"
-#include "ReExpCalcUnitTest.h"
+//#include "ReExpCalcUnitTest.h"
 //#include "setupUnitTest.h"
 //#include "SHCalcUnitTest.h"
 #include "SolverUnitTest.h"
