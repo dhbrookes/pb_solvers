@@ -270,7 +270,7 @@ TEST_F(SolverUTest, LHinit_test)
 
 TEST_F(SolverUTest, constructor_test)
 {
-  int pol = 5;
+  int pol = 3;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   auto myMol = make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
                                    pqr.get_atom_pts(), pqr.get_radii(),
