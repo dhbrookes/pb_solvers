@@ -72,7 +72,7 @@ TEST_F(SolverUTest, IMATTestIntermediates)
   auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
   auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
   auto _expcons = make_shared<ExpansionConstants> (pol);
-  IEMatrix ieMatTest(10, mol, SHCalcTest, pol, _expcons, false, 20, true);
+  IEMatrix ieMatTest(0, mol, SHCalcTest, pol, _expcons, false, 20, true);
   ieMatTest.calc_vals(mol, SHCalcTest);
   
   ASSERT_EQ( mol->get_gdpt_expj(0).size(), 18 );
@@ -292,10 +292,9 @@ TEST_F(SolverUTest, constructor_test)
   auto sys = make_shared<System>(mols);
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
-  solvTest.iter();
-  solvTest.solve(1e-25, 50);
+  solvTest.solve(1e-15, 200);
   
-  solvTest.calc_converge_H(0, 9);
+  solvTest.iter();
   
   for (int i = 0; i < myMol->get_ns(); i++)
   {
