@@ -128,7 +128,8 @@ void GradFMatrix::calc_vals(Molecule mol, shared_ptr<IEMatrix> IE,
         {
           for (int s = 0; s < p_; s++)
           {
-            in2=dWF->get_mat_knm(k,l,s)*IE->get_IE_k_nm_ls(k,n,m,l,s).real();
+            //TODO fix IMatrix multiplication
+            in2=dWF->get_mat_knm(k,l,s); //*IE->get_IE_k_nm_ls(k,n,m,l,s).real();
             in += in;
           }
         }
@@ -164,7 +165,8 @@ void GradHMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
         {
           for (int s = 0; s < p_; s++)
           {
-            in2 = dWH->get_mat_knm(k,l,s)*IE->get_IE_k_nm_ls(k,n,m,l,s).real();
+            //TODO fix Imatrix multiplication
+            in2 = dWH->get_mat_knm(k,l,s);//*IE->get_IE_k_nm_ls(k,n,m,l,s).real();
             in += in2;
           }
         }

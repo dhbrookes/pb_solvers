@@ -96,9 +96,9 @@ double Solver::iter()
                        _LF_[I], _LHN_[I], 0.0);
     
     _F_[I]->calc_vals(mol, _prevF_[I], _XF_[I], _prevH_[I], _IE_[I], _bCalc_);
-    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _prevF_[I], _IE_[I], _bCalc_);
+    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _F_[I], _IE_[I], _bCalc_);
     
-    mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
+//    mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
   }
   
   for (int I = 0; I < _sys_->get_n(); I++)
