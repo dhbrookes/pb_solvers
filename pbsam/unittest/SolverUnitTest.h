@@ -150,7 +150,7 @@ TEST_F(SolverUTest, Efix_test)
   auto _expcons = make_shared<ExpansionConstants> (pol);
   
   EMatrix emat(0, mol->get_ns(), pol);
-  emat.calc_vals((*mol), SHCalcTest, 4.0);
+  emat.calc_vals(mol, SHCalcTest, 4.0);
 
   for (int i = 0; i < mol->get_ns(); i++)
   {
@@ -179,7 +179,7 @@ TEST_F(SolverUTest, LEfix_test)
   auto _expcons = make_shared<ExpansionConstants> (pol);
   
   LEMatrix lemt(0, mol->get_ns(), pol);
-  lemt.calc_vals((*mol), SHCalcTest, 4.0);
+  lemt.calc_vals(mol, SHCalcTest, 4.0);
 
   for (int i = 0; i < mol->get_ns(); i++)
   {
@@ -208,7 +208,7 @@ TEST_F(SolverUTest, Hinit_test)
   auto _expcons = make_shared<ExpansionConstants> (pol);
   
   HMatrix hmat(0, mol->get_ns(), pol, 0.21053961);
-  hmat.init((*mol), SHCalcTest, 4.0);
+  hmat.init(mol, SHCalcTest, 4.0);
   
   for (int i = 0; i < mol->get_ns(); i++)
   {
@@ -241,10 +241,10 @@ TEST_F(SolverUTest, LHinit_test)
   IEMatrix ieMatTest(0, mol, SHCalcTest, pol, _expcons, true);
   
   auto hmat = make_shared<HMatrix>(0, mol->get_ns(), pol, 0.21053961);
-  hmat->init((*mol), SHCalcTest, 4.0);
+  hmat->init(mol, SHCalcTest, 4.0);
   
   LHMatrix lhmt(0, mol->get_ns(), pol, 0.21053961);
-  lhmt.init((*mol), hmat, SHCalcTest, BesselCal, _expcons);
+  lhmt.init(mol, hmat, SHCalcTest, BesselCal, _expcons);
   
   for (int i = 0; i < mol->get_ns(); i++)
   {
@@ -287,8 +287,8 @@ TEST_F(SolverUTest, constructor_test)
   // Generate surface integrals
   IEMatrix ieMatTest(0, myMol, SHCalcTest, pol, _expcons, true);
   
-  vector<Molecule> mols;
-  mols.push_back((*myMol));
+  vector<shared_ptr<Molecule> > mols;
+  mols.push_back(myMol);
   auto sys = make_shared<System>(mols);
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);

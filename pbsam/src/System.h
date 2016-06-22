@@ -192,7 +192,7 @@ protected:
     
   int                          N_; // number of molecules
   double                       lambda_; // average molecular radius
-  vector<Molecule>             molecules_;
+  vector<shared_ptr<Molecule> >             molecules_;
   
   double                       boxLength_;
   double                       cutoff_;
@@ -210,7 +210,7 @@ protected:
 public:
   System() { }
   
-  System(const vector<Molecule>& mols,
+  System(vector<shared_ptr<Molecule> > mols,
          double cutoff=Constants::FORCE_CUTOFF,
          double boxlength=Constants::MAX_DIST);
   
@@ -219,29 +219,29 @@ public:
   const int get_n() const                  {return N_;}
   const int get_ntype()                    {return ntype_;}
   const int get_typect(int i)              {return typect_[i];}
-  const double get_aik(int i, int k) const {return molecules_[i].get_ak(k);}
-  const double get_Nc_i(int i) const       {return molecules_[i].get_nc();}
-  const double get_Ns_i(int i) const       {return molecules_[i].get_ns();}
-  const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
-  const double get_droti(int i) const      {return molecules_[i].get_drot();}
-  const double get_dtransi(int i) const    {return molecules_[i].get_dtrans();}
+  const double get_aik(int i, int k) const {return molecules_[i]->get_ak(k);}
+  const double get_Nc_i(int i) const       {return molecules_[i]->get_nc();}
+  const double get_Ns_i(int i) const       {return molecules_[i]->get_ns();}
+  const double get_qij(int i, int j) const {return molecules_[i]->get_qj(j);}
+  const double get_droti(int i) const      {return molecules_[i]->get_drot();}
+  const double get_dtransi(int i) const    {return molecules_[i]->get_dtrans();}
   const double get_boxlength() const       {return boxLength_;}
   const double get_cutoff() const          {return cutoff_;}
   const double get_time() const            {return t_;}
   const double get_lambda() const          {return lambda_;}
-  Molecule get_molecule(int i) const       {return molecules_[i];}
-  Pt get_cogi(int i) const                {return molecules_[i].get_cog();}
-  Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
-  Pt get_centerik(int i, int k) const   {return molecules_[i].get_centerk(k);}
-  const string get_typei(int i) const   {return molecules_[i].get_move_type();}
+  shared_ptr<Molecule> get_molecule(int i) const       {return molecules_[i];}
+  Pt get_cogi(int i) const                {return molecules_[i]->get_cog();}
+  Pt get_posij(int i, int j)               {return molecules_[i]->get_posj(j);}
+  Pt get_centerik(int i, int k) const   {return molecules_[i]->get_centerk(k);}
+  const string get_typei(int i) const   {return molecules_[i]->get_move_type();}
   const double get_radij(int i, int j) 
-                                     const {return molecules_[i].get_radj(j);}
-  Pt get_posijreal(int i, int j) {return molecules_[i].get_posj_realspace(j);}
+                                     const {return molecules_[i]->get_radj(j);}
+  Pt get_posijreal(int i, int j) {return molecules_[i]->get_posj_realspace(j);}
   
   Pt get_gridijh(int i, int j, int h) const
-        { return molecules_[i].get_gridjh(j, h); }
+        { return molecules_[i]->get_gridjh(j, h); }
   vector<int> get_gdpt_expij(int i, int j) const
-        { return molecules_[i].get_gdpt_expj(j); }
+        { return molecules_[i]->get_gdpt_expj(j); }
   
   const int get_mol_global_idx(int type, int ty_idx)
   {
@@ -256,10 +256,10 @@ public:
   void set_time(double val) { t_ = val; }
   
   // translate every charge in molecule i by the vector dr
-  void translate_mol(int i, Pt dr) { molecules_[i].translate(dr, boxLength_); }
+  void translate_mol(int i, Pt dr) { molecules_[i]->translate(dr, boxLength_); }
   
   // rotate every charge in molecule i
-  void rotate_mol(int i, Quat qrot) { molecules_[i].rotate(qrot); }
+  void rotate_mol(int i, Quat qrot) { molecules_[i]->rotate(qrot); }
   
   // Check to determine if any molecules are overlapping
   void check_for_overlap();

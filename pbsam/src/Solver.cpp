@@ -41,17 +41,17 @@ kappa_(_consts->get_kappa())
   // intialize all matrices
   for (int I = 0; I < _sys_->get_n(); I++)
   {
-    _mol = make_shared<Molecule>(_sys_->get_molecule(I));
+    _mol = _sys_->get_molecule(I);
     double kappa = 0.0;
     
     _E_[I] = make_shared<EMatrix> (I, _sys_->get_Ns_i(I), p_);
-    _E_[I]->calc_vals((*_mol), _shCalc_, _consts_->get_dielectric_prot());
+    _E_[I]->calc_vals(_mol, _shCalc_, _consts_->get_dielectric_prot());
     
     _LE_[I] = make_shared<LEMatrix> (I, _sys_->get_Ns_i(I), p_);
-    _LE_[I]->calc_vals((*_mol), _shCalc_, _consts_->get_dielectric_prot());
+    _LE_[I]->calc_vals(_mol, _shCalc_, _consts_->get_dielectric_prot());
     
     _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
-    _H_[I]->init((*_mol), _shCalc_, _consts_->get_dielectric_prot());
+    _H_[I]->init(_mol, _shCalc_, _consts_->get_dielectric_prot());
     
     _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     
@@ -68,9 +68,9 @@ kappa_(_consts->get_kappa())
     _XF_[I] = make_shared<XFMatrix> (I, _sys_->get_Ns_i(I), p_,
                                      _consts_->get_dielectric_prot(),
                                      _consts_->get_dielectric_water(),
-                                     (*_mol), _E_[I], _LE_[I]);
+                                     _mol, _E_[I], _LE_[I]);
     _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_,
-                                     (*_mol), _E_[I], _LE_[I]);
+                                     _mol, _E_[I], _LE_[I]);
     
     update_prev();
   }
@@ -106,7 +106,7 @@ double Solver::calc_converge_H(int I)
 double Solver::iter()
 {
   double mu = 0;
-  Molecule mol;
+  shared_ptr<Molecule> mol;
   // start an iteration
   for (int I = 0; I < _sys_->get_n(); I++)
   {
@@ -242,7 +242,7 @@ void GradSolver::solve()
   {
     for (int I = 0; I < _sys_->get_n(); I++)
     {
-      molI = make_shared<Molecule>(_sys_->get_molecule(I));
+      molI = _sys_->get_molecule(I);
       for (int k = 0; k < _sys_->get_Ns_i(I); k++)
       {
         dLF_[J][I]->calc_val_k(k, molI, _shCalc_, _T_, dF_[J][I]);

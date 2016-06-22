@@ -340,7 +340,7 @@ vector<int> Molecule::find_neighbors( int i )
 }
 
 
-System::System(const vector<Molecule>& mols, double cutoff,
+System::System(vector<shared_ptr<Molecule> > mols, double cutoff,
                double boxlength)
 :molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
 boxLength_(boxlength), t_(0)
@@ -349,8 +349,8 @@ boxLength_(boxlength), t_(0)
   vector<int> maxj, keys(2);
   for ( k = 0; k < N_; k++)
   {
-    i = molecules_[k].get_type();
-    j = molecules_[k].get_type_idx();
+    i = molecules_[k]->get_type();
+    j = molecules_[k]->get_type_idx();
     keys = {i,j};
     typeIdxToIdx_[keys] = k;
     maxi = ( maxi > i ) ? maxi : i;
@@ -373,10 +373,10 @@ boxLength_(boxlength), t_(0)
 System::System(Setup setup, double cutoff)
 :t_(0), ntype_(setup.getNType()), typect_(setup.get_type_nct())
 {
-  vector<Molecule> mols;
+  vector<shared_ptr<Molecule> > mols;
   int i, j, k=0;
   string pqrpath;
-  Molecule mol;
+  shared_ptr<Molecule> mol;
   vector<int> keys(2);
   for (i = 0; i < setup.getNType(); i++)
   {
@@ -384,23 +384,28 @@ System::System(Setup setup, double cutoff)
     // First a build a representative molecule of this type (which will
     // be repositioned below
     PQRFile pqrI (setup.getTypeNPQR(i));
-    Molecule type_mol;
+    shared_ptr<Molecule> type_mol;
     if (pqrI.get_Ns() == 0)
     {
       MSMSFile surf_file (setup.getTypeNSurf(i));
-      type_mol = Molecule(i, 0, setup.getTypeNDef(i), pqrI.get_charges(),
-                          pqrI.get_atom_pts(), pqrI.get_radii(),
-                          surf_file.get_sp(), surf_file.get_np(),
-                          setup.get_tol_sp(), setup.get_n_trials(),
-                          setup.get_max_trials(), setup.get_sph_beta(),
-                          setup.getDrot(i), setup.getDtr(i));
+      type_mol = make_shared<Molecule> (i, 0, setup.getTypeNDef(i),
+                                        pqrI.get_charges(),
+                                        pqrI.get_atom_pts(), pqrI.get_radii(),
+                                        surf_file.get_sp(), surf_file.get_np(),
+                                        setup.get_tol_sp(), setup.get_n_trials(),
+                                        setup.get_max_trials(),
+                                        setup.get_sph_beta(),
+                                        setup.getDrot(i), setup.getDtr(i));
     }
     else
     {
-      type_mol = Molecule(i, -1, setup.getTypeNDef(i), pqrI.get_charges(),
-                          pqrI.get_atom_pts(), pqrI.get_radii(),
-                          pqrI.get_cg_centers(), pqrI.get_cg_radii(),
-                          setup.getDrot(i), setup.getDtr(i));
+      type_mol = make_shared<Molecule>(i, -1, setup.getTypeNDef(i),
+                                       pqrI.get_charges(),
+                                       pqrI.get_atom_pts(),
+                                       pqrI.get_radii(),
+                                       pqrI.get_cg_centers(),
+                                       pqrI.get_cg_radii(),
+                                       setup.getDrot(i), setup.getDtr(i));
     }
     
     TransRotFile transrot;
@@ -419,8 +424,8 @@ System::System(Setup setup, double cutoff)
       // now copy the representative molecule and reposition it
       Pt trans;
       MyMatrix<double> rot;
-      Molecule mol (type_mol);
-      mol.set_type_idx(j);
+      shared_ptr<Molecule> mol (type_mol);
+      mol->set_type_idx(j);
       
       Pt com = pqrI.get_center_geo();
       
@@ -438,8 +443,8 @@ System::System(Setup setup, double cutoff)
         rot.set_val(2, 2, 1.0);
       }
       
-      mol.rotate(rot);
-      mol.translate(trans, setup.getBLen());
+      mol->rotate(rot);
+      mol->translate(trans, setup.getBLen());
       
       molecules_.push_back(mol);
       typeIdxToIdx_[keys] = k;
@@ -489,14 +494,14 @@ void System::check_for_overlap()
   {
     for (j = i+1; j < N_; j++)
     {
-      for (k1 = 0; k1 < molecules_[i].get_ns(); k1++)
+      for (k1 = 0; k1 < molecules_[i]->get_ns(); k1++)
       {
-        for (k2 = 0; k2 < molecules_[j].get_ns(); k2++)
+        for (k2 = 0; k2 < molecules_[j]->get_ns(); k2++)
         {
-          aik = molecules_[i].get_ak(k1);
-          ajk = molecules_[j].get_ak(k2);
-          cen_ik = molecules_[i].get_centerk(k1);
-          cen_jk = molecules_[j].get_centerk(k2);
+          aik = molecules_[i]->get_ak(k1);
+          ajk = molecules_[j]->get_ak(k2);
+          cen_ik = molecules_[i]->get_centerk(k1);
+          cen_jk = molecules_[j]->get_centerk(k2);
           dist = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
           if (dist < (aik + ajk))
             throw OverlappingMoleculeException(i, j);
