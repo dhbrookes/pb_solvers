@@ -42,6 +42,7 @@ kappa_(_consts->get_kappa())
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     _mol = make_shared<Molecule>(_sys_->get_molecule(I));
+    double kappa = 0.0;
     
     _E_[I] = make_shared<EMatrix> (I, _sys_->get_Ns_i(I), p_);
     _E_[I]->calc_vals((*_mol), _shCalc_, _consts_->get_dielectric_prot());
@@ -49,15 +50,16 @@ kappa_(_consts->get_kappa())
     _LE_[I] = make_shared<LEMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LE_[I]->calc_vals((*_mol), _shCalc_, _consts_->get_dielectric_prot());
     
-    _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+    _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _H_[I]->init((*_mol), _shCalc_, _consts_->get_dielectric_prot());
     
-    _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
-    _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
-    _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa_);
+    _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     
-//    _IE_[I] = make_shared<IEMatrix>(I, _sys_->get_Ns_i(I), p_, _expConst);
-//    _IE_[I]->calc_vals(_mol, _shCalc_);
+    _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
+    _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
+    
+    _IE_[I] = make_shared<IEMatrix>(I, _mol, _shCalc, p_, _expConsts_, false);
+    _IE_[I]->calc_vals(_mol, _shCalc_);
     
     _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa_);
@@ -69,6 +71,8 @@ kappa_(_consts->get_kappa())
                                      (*_mol), _E_[I], _LE_[I]);
     _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_,
                                      (*_mol), _E_[I], _LE_[I]);
+  
+    update_prev();
   }
 }
 
@@ -87,16 +91,12 @@ double Solver::iter()
     _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_);
     
     _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
-                      _LH_[I], _LF_[I], _LHN_[I], kappa_);
-    cout << "This is XF " << endl;
-    cout << (*_XF_[I]) << endl;
+                      _LH_[I], _LF_[I], _LHN_[I], 0.0);
     _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
                        _LF_[I], _LHN_[I], 0.0);
     
-    cout << "This is XH " << endl;
-    cout << (*_XH_[I]) << endl;
-//    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _prevF_[I], _IE_[I], _bCalc_);
-//    _F_[I]->calc_vals(mol, _prevF_[I], _XF_[I], _prevH_[I], _IE_[I], _bCalc_);
+    _F_[I]->calc_vals(mol, _prevF_[I], _XF_[I], _prevH_[I], _IE_[I], _bCalc_);
+    _H_[I]->calc_vals(mol, _prevH_[I], _XH_[I], _prevF_[I], _IE_[I], _bCalc_);
     
     mu += HMatrix::calc_converge(_H_[I], _prevH_[I]);
   }
@@ -169,7 +169,6 @@ void Solver::reset_all()
     _F_[I]->reset_mat();
     _prevH_[I]->reset_mat();
     _prevF_[I]->reset_mat();
-    
   }
 }
 

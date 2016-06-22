@@ -159,6 +159,7 @@ protected:
   vector<MatOfMats<cmplx>::type > IE_;
   vector<vector<double> > IE_orig_;
   shared_ptr<ExpansionConstants> _expConst_;
+  map<vector<int>, int>   idxMap_; // maps 4D vector to complex double
   bool calc_pts_; // Boolean of whether or not to estimate number of points
   int p_;
   int I_;
@@ -169,16 +170,24 @@ protected:
     IE_[k](n, m+p_).set_val(l, s+p_, val);
   }
   
-public:
-  IEMatrix(int I, int ns, int p, shared_ptr<ExpansionConstants> _expconst);
-  
+public: 
   IEMatrix(int I, shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc, int p,
            shared_ptr<ExpansionConstants> _expconst, bool calc_npts = false,
            int npts = Constants::IMAT_GRID );
   
   cmplx get_IE_k_nm_ls(int k, int n, int m, int l, int s)
   {
-    return IE_[k](n, m+p_)(l, s+p_);
+    double IE_im, IE_rl = IE_orig_[k][idxMap_[{n,abs(m),l,abs(s),0}]];
+    if (idxMap_[{n,abs(m),l,abs(s),1}] == -1)
+      IE_im = 0.0;
+    else
+    {
+      double smul(1.0), mmul(1.0);
+      if ( m < 0 ) mmul = -1.0;
+      if ( s < 0 ) smul = -1.0;
+      IE_im = smul * mmul * IE_orig_[k][idxMap_[{n,abs(m),l,abs(s),1}]];
+    }
+    return complex<double> (IE_rl, IE_im);
   }
   double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
   
@@ -241,7 +250,7 @@ public:
   
   void print_analytical()
   {
-    for (int k = 0; k < get_ns(); k++)
+    for (int k = 0; k < 1 /*get_ns()*/; k++)
     {
       cout << "For sphere " << k << endl;
       for (int n = 0; n < get_p(); n++)

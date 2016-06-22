@@ -276,6 +276,8 @@ TEST_F(SolverUTest, constructor_test)
                                    pqr.get_atom_pts(), pqr.get_radii(),
                                    pqr.get_cg_centers(), pqr.get_cg_radii());
   auto cst = make_shared<Constants> ();
+  cst->set_dielectric_water(80);
+  cst->set_dielectric_prot(4);
   auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
   auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
   auto BesselCons = make_shared<BesselConstants> (2*pol);

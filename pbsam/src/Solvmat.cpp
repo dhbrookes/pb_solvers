@@ -213,14 +213,6 @@ void LEMatrix::calc_vals(Molecule mol, shared_ptr<SHCalc> _shcalc,
   }
 }
 
-IEMatrix::IEMatrix(int I, int ns, int p,
-                   shared_ptr<ExpansionConstants> _expconst)
-:p_(p), I_(I),
-IE_(ns, MatOfMats<cmplx>::type(p, 2*p+1, MyMatrix<cmplx>(p, 2*p+1))),
-IE_orig_(ns, vector<double> (p*p*p*p)), calc_pts_(false),
-_expConst_(_expconst)
-{
-}
 
 IEMatrix::IEMatrix(int I, shared_ptr<Molecule> _mol,
                    shared_ptr<SHCalc> _shcalc, int p,
@@ -234,6 +226,30 @@ _expConst_(_expconst), calc_pts_(calc_npts),
 gridPts_(npts)
 {
   compute_grid_pts(_mol);
+  
+  // Mapping from 1D to 4D
+  vector<int> idx_vec(5);
+  int idx_val = 0;
+  
+  
+  for (int l = 0; l < p_; l++)  // rows in old matrix
+    for (int s = 0; s < l+1; s++)  //columns in old matrix
+      for (int n = 0; n < p_; n++)  // rows in new matrix
+        for (int m = 0; m < n+1; m++)  // columns in new matrix
+        {
+          idx_vec = {n, m, l, s, 0};
+          idxMap_[idx_vec] = idx_val;
+          idx_val++;
+          
+          idx_vec = {n, m, l, s, 1};
+          if ( (m==0) || (s==0))
+            idxMap_[idx_vec] = -1;
+          else
+          {
+            idxMap_[idx_vec] = idx_val;
+            idx_val++;
+          }
+        }
 }
 
 void IEMatrix::compute_grid_pts(shared_ptr<Molecule> _mol)
@@ -273,17 +289,16 @@ void IEMatrix::compute_grid_pts(shared_ptr<Molecule> _mol)
 }
 
 vector<MatOfMats<cmplx>::type > IEMatrix::compute_integral(
-                                                           shared_ptr<Molecule> _mol,
-                                                           shared_ptr<SHCalc> sh_calc,
-                                                           int k)
+                                     shared_ptr<Molecule> _mol,
+                                     shared_ptr<SHCalc> sh_calc,
+                                     int k)
 {
   vector<Pt> gridpts;
   vector<int> burpts, exppts;
   int min, grid_tot;
   bool bur;
-  vector<MatOfMats<cmplx>::type > Ys(2,
-                                     MatOfMats<cmplx>::type(p_, p_,
-                                                            MyMatrix<cmplx> (p_, p_)));
+  vector<MatOfMats<cmplx>::type > Ys(2,MatOfMats<cmplx>::type(p_, p_,
+                                     MyMatrix<cmplx> (p_, p_)));
   gridpts = _mol->get_gridj(k);
   burpts = _mol->get_gdpt_burj(k);
   exppts = _mol->get_gdpt_expj(k);
@@ -450,7 +465,6 @@ void IEMatrix::populate_mat(vector<MatOfMats<cmplx>::type >  Ys, int k)
       }//n
     }//s
   }//l
-  
 }
 
 void IEMatrix::calc_vals(shared_ptr<Molecule> _mol, shared_ptr<SHCalc> _shcalc)
@@ -489,54 +503,51 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
   MyMatrix<cmplx> reex;
   for (int k = 0; k < mat_.size(); k++)
   {
-    //TODO: fix this
-    //    for (int j = 0; j < T->get_nsi(I_); j++)
-    //    {
-    //      if (j==k) continue;
-    //      if (! T->is_analytic(I_, k, I_, j))
-    //      {
-    //        reex = T->re_expandX(F->get_mat_k(k), I_, k, I_, j);
-    //      }
-    //      else
-    //      {
-    //        reex = numeric_reex(I_, k, j, F, shcalc, sys);
-    //      }
-    //      mat_[k] += reex;
-    //    }
+    for (int j = 0; j < T->get_nsi(I_); j++)
+    {
+      if (j==k) continue;
+      
+      if (T->is_analytic(I_, k, I_, j))
+        reex = T->re_expandX(F->get_mat_k(k), I_, k, I_, j );
+      else
+        reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j );
+      
+      mat_cmplx_[k] += reex;
+    }
   }
 }
 
-MyMatrix<cmplx> LFMatrix::numeric_reex(int I, int k, int j,
-                                       shared_ptr<FMatrix> F,
-                                       shared_ptr<SHCalc> shcalc,
-                                       shared_ptr<System> sys, int Mp)
-{
-  if (Mp == -1) Mp = 2.5 * p_*p_;
-  vector<Pt> sph_grid = make_uniform_sph_grid(Mp, sys->get_aik(I_, j));
-  cmplx inner, fbj;
-  Pt rb_k;
-  MyMatrix<cmplx> LF_Ik (p_, 2 * p_ + 1);
-  for (int n = 0; n < p_; n++)
-  {
-    for (int m = -n; m < n+1; m++)
-    {
-      for (int b = 0; b < Mp; b++)
-      {
-        fbj = make_fb_Ij(I, j, sph_grid[b], F, shcalc);
-        fbj *= (4 * M_PI) / sph_grid.size();
-        
-        rb_k = sph_grid[b]-(sys->get_centerik(I, k)-sys->get_centerik(I, j));
-        shcalc->calc_sh(rb_k.theta(), rb_k.phi());
-        
-        inner = fbj / rb_k.r();
-        inner *= pow(sys->get_aik(I, k) / rb_k.r(), n);
-        inner *= conj(shcalc->get_result(n, m));
-        LF_Ik.set_val(n, m, inner);
-      }
-    }
-  }
-  return LF_Ik;
-}
+//MyMatrix<cmplx> LFMatrix::numeric_reex(int I, int k, int j,
+//                                       shared_ptr<FMatrix> F,
+//                                       shared_ptr<SHCalc> shcalc,
+//                                       shared_ptr<System> sys, int Mp)
+//{
+//  if (Mp == -1) Mp = 2.5 * p_*p_;
+//  vector<Pt> sph_grid = make_uniform_sph_grid(Mp, sys->get_aik(I_, j));
+//  cmplx inner, fbj;
+//  Pt rb_k;
+//  MyMatrix<cmplx> LF_Ik (p_, 2 * p_ + 1);
+//  for (int n = 0; n < p_; n++)
+//  {
+//    for (int m = -n; m < n+1; m++)
+//    {
+//      for (int b = 0; b < Mp; b++)
+//      {
+//        fbj = make_fb_Ij(I, j, sph_grid[b], F, shcalc);
+//        fbj *= (4 * M_PI) / sph_grid.size();
+//        
+//        rb_k = sph_grid[b]-(sys->get_centerik(I, k)-sys->get_centerik(I, j));
+//        shcalc->calc_sh(rb_k.theta(), rb_k.phi());
+//        
+//        inner = fbj / rb_k.r();
+//        inner *= pow(sys->get_aik(I, k) / rb_k.r(), n);
+//        inner *= conj(shcalc->get_result(n, m));
+//        LF_Ik.set_val(n, m, inner);
+//      }
+//    }
+//  }
+//  return LF_Ik;
+//}
 
 cmplx LFMatrix::make_fb_Ij(int I, int j, Pt rb,
                            shared_ptr<FMatrix> F,
@@ -758,6 +769,7 @@ void XFMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
   cmplx inner;
   double ak;
   vector<double> in_k;
+
   for (int k = 0; k < mol.get_ns(); k++)
   {
     ak = mol.get_ak(k);
@@ -766,11 +778,11 @@ void XFMatrix::calc_vals(Molecule mol, shared_ptr<BesselCalc> bcalc,
     {
       for (int m = -n; m < n+1; m++)
       {
-        inner = (pow(kappa * ak, 2) * in_k[n+1])/(double)(2*n+3);
-        inner += n * in_k[n];
+        inner = (pow(kappa * ak, 2.0) * in_k[n+1])/(double)(2*n+3);
+        inner += double(n * in_k[n]);
         inner *= ( ak * LH->get_mat_knm(k, n, m));
         inner += E_LE_mat_[k]( n, m+p_);
-        inner -= ( n * eps_ * ak * LH->get_mat_knm(k, n, m));
+        inner -= ( n * eps_ * ak * LF->get_mat_knm(k, n, m));
         set_mat_knm(k, n, m, inner);
       }
     }
@@ -813,36 +825,46 @@ void HMatrix::init(Molecule mol, shared_ptr<SHCalc> _sh_calc, double eps_in)
   }
 }
 
-
+//TODO replace IMAT mult with actual LAPAC
 void HMatrix::calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
                         shared_ptr<XHMatrix> XH,
                         shared_ptr<FMatrix> F,
                         shared_ptr<IEMatrix> IE,
                         shared_ptr<BesselCalc> bcalc)
 {
-  cmplx val, inner, inner2;
+  cmplx val, inner, inner2, ie;
   double ak;
   vector<double> bessel_i, bessel_k;
+  MyMatrix<cmplx> test(p_, 2*p_+1);
   for (int k = 0; k < mol.get_ns(); k++)  // loop over each sphere
   {
     ak = mol.get_ak(k);
     bessel_i = bcalc->calc_mbfI(p_+1, kappa_*ak);
     bessel_k = bcalc->calc_mbfK(p_+1, kappa_*ak);
+    cout << "This is kappa " << kappa_ << endl;
+    cout << (*prev) << endl;
+    
+    cout << "This is lH " << kappa_ << endl;
+    cout << (*XH) << endl;
+    
     for (int n = 0; n < p_; n++)  // rows in new matrix
     {
-      for (int m = -n; m < n+1; m++)  // columns in new matrix
+      for (int m = 0; m < n+1; m++)  // columns in new matrix
       {
         val = 0;
         for (int l = 0; l < p_; l++)  // rows in old matrix
         {
-          for (int s = -l; s < l+1; s++)  //columns in old matrix
+          for (int s = 0; s < l+1; s++)  //columns in old matrix
           {
-            inner = (2 * l + 1) / bessel_i[l];
+            inner = (2.0 * l + 1.0) / bessel_i[l];
             inner -= exp(-kappa_*ak) * bessel_k[l];
             inner *= prev->get_mat_knm(k, l, s);
             inner += F->get_mat_knm(k, l, s);
             inner += XH->get_mat_knm(k, l, s);
-            inner *= IE->get_IE_k_nm_ls(k, n, m, l, s);
+            test(l, s+p_) = inner;
+            ie = IE->get_IE_k_nm_ls(k, n, m, l, s);
+            inner = complex<double>(ie.real()*inner.real(),
+                                     ie.imag()*inner.imag());
             val += inner;
           }
         }
@@ -850,6 +872,16 @@ void HMatrix::calc_vals(Molecule mol, shared_ptr<HMatrix> prev,
         set_mat_knm(k, n, m, val);
       }
     }
+    cout << "This is molecule " <<  k << endl;
+    for (int n = 0; n < p_; n++)  // rows in new matrix
+    {
+      for (int m = 0; m < n+1; m++)  // columns in new matrix
+      {
+        cout << get_mat_knm(k,n,m) << ", " ;
+      }
+      cout << endl;
+    }
+    
   }
 }
 
@@ -890,9 +922,10 @@ void FMatrix::calc_vals(Molecule mol, shared_ptr<FMatrix> prev,
                         shared_ptr<IEMatrix> IE,
                         shared_ptr<BesselCalc> bcalc)
 {
-  cmplx val, inner, inner2;
+  cmplx val, inner, ie;
   double ak;
   vector<double> bessel_i, bessel_k;
+  MyMatrix<cmplx> test(p_, 2*p_+1);
   for (int k = 0; k < mol.get_ns(); k++)  // loop over each sphere
   {
     ak = mol.get_ak(k);
@@ -900,23 +933,48 @@ void FMatrix::calc_vals(Molecule mol, shared_ptr<FMatrix> prev,
     bessel_k = bcalc->calc_mbfK(p_+1, kappa_*ak);
     for (int n = 0; n < p_; n++)  // rows in new matrix
     {
-      for (int m = -n; m < n+1; m++)  // columns in new matrix
+      for (int m = 0; m < n+1; m++)  // columns in new matrix
       {
         val = 0;
         for (int l = 0; l < p_; l++)  // rows in old matrix
         {
-          for (int s = -l; s < l+1; s++)  //columns in old matrix
+          for (int s = 0; s < l+1; s++)  //columns in old matrix
           {
-            inner = (l * bessel_k[l]) - ((2 * l +1) * bessel_k[l+1]);
+            inner = double(l * bessel_k[l]) - ((2.0*l+1.0) * bessel_k[l+1]);
             inner *= exp(-kappa_*ak) * H->get_mat_knm(k, l, s);
             inner += XF->get_mat_knm(k, l, s);
-            inner += (2*l + 1 - l * XF->get_eps()) * prev->get_mat_knm(k, l, s);
-            inner *= IE->get_IE_k_nm_ls(k, n, m, l, s);
+            inner += (double(2*l + 1 - l * XF->get_eps()) *
+                      prev->get_mat_knm(k, l, s));
+            test(l, s+p_) = inner;
+            ie = IE->get_IE_k_nm_ls(k, n, m, l, s);
+            inner = complex<double>(ie.real()*inner.real(),
+                                    ie.imag()*inner.imag());
             val += inner;
           }
         }
         set_mat_knm(k, n, m, val);
       }
     }
+    
+    cout << "This is molecule " <<  k << endl;
+    for (int n = 0; n < p_; n++)  // rows in new matrix
+    {
+      for (int m = 0; m < n+1; m++)  // columns in new matrix
+      {
+        cout << test(n,m+p_) << ", " ;
+      }
+      cout << endl;
+    }
+    
+    cout << "This is molecule " <<  k << endl;
+    for (int n = 0; n < p_; n++)  // rows in new matrix
+    {
+      for (int m = 0; m < n+1; m++)  // columns in new matrix
+      {
+        cout << get_mat_knm(k,n,m) << ", " ;
+      }
+      cout << endl;
+    }
   }
+  cout << "done with loop" << endl;
 }
