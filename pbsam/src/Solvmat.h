@@ -79,9 +79,10 @@ public:
   
   friend ostream & operator<<(ostream & fout, ComplexMoleculeMatrix & M)
   {
+    fout << "{ {";
     for (int k = 0; k < M.get_ns(); k++)
     {
-      fout << "For sphere " << k << endl;
+//      fout << "For sphere " << k << endl;
       for (int n = 0; n < M.get_p(); n++)
       {
         for (int m = 0; m <= n; m++)
@@ -90,12 +91,15 @@ public:
           double imag = M.get_mat_knm( k, n, m).imag();
           if(abs(real) < 1e-15 ) real = 0.0;
           if(abs(imag) < 1e-15 ) imag = 0.0;
-          fout << "(" << real << ", " << imag << ") ";
+//          fout << "(" << real << ", " << imag << ") ";
+          fout << setprecision(9) << imag << ",";
         }
-        fout << endl;
+//        fout << endl;
       }
-      fout << endl;
+      fout << "},{" ;
+//      fout << endl;
     }
+    fout << "},{" << endl;
     return fout;
   }
   
@@ -111,6 +115,7 @@ public:
         if(abs(real) < 1e-15 ) real = 0.0;
         if(abs(imag) < 1e-15 ) imag = 0.0;
         cout << "(" << real << ", " << imag << ") ";
+        
       }
       cout << endl;
     }
@@ -236,7 +241,7 @@ public:
     for (int k = 0; k < M.get_ns(); k++)
     {
       fout << "For sphere " << k << endl;
-      for (int h = 0; h < M.get_mat_k_len(h); h++)
+      for (int h = 0; h < M.get_mat_k_len(k); h++)
       {
         double real = M.get_mat_kh( k, h);
         if(abs(real) < 1e-15 ) real = 0.0;
@@ -250,7 +255,7 @@ public:
   void print_kmat(int k)
   {
     cout << "For sphere " << k << endl;
-    for (int h = 0; h < get_mat_k_len(h); h++)
+    for (int h = 0; h < get_mat_k_len(k); h++)
     {
       double real = get_mat_kh( k, h);
       if(abs(real) < 1e-15 ) real = 0.0;
@@ -292,6 +297,10 @@ class LFMatrix : public NumericalMatrix
 {
 public:
   LFMatrix(int I, int ns, int p);
+  
+  void init(shared_ptr<Molecule> mol, shared_ptr<FMatrix> F,
+            shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
+            shared_ptr<ExpansionConstants> _expconst);
   
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
                  shared_ptr<SHCalc> shcalc, shared_ptr<System> sys, int k);

@@ -306,7 +306,7 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
   MyMatrix<cmplx> x2(p_, 2*p_ + 1);
   
   int n, m, s, map_idx = idxMap_[{I, k, J, l}];
-  //TODO see if this is_greater is still needed
+  //TODO: see if this is_greater is still needed
 //  bool jl_greater = is_Jl_greater(I, k, J, l);
 //  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
 //  else            map_idx = idxMap_[{J, l, I, k}];

@@ -410,7 +410,7 @@ IEMatrix::compute_integral(shared_ptr<Molecule> _mol,
 } // end compute_integral
 
 // Currently using old format because I dont know whats going on!
-// TODO, change to understandable
+// TODO: change to understandable
 void IEMatrix::populate_mat(vector<MatOfMats<cmplx>::type >  Ys, int k)
 {
   int i = 0;
@@ -501,6 +501,38 @@ LFMatrix::LFMatrix(int I, int ns, int p)
 {
 }
 
+void LFMatrix::init(shared_ptr<Molecule> mol, shared_ptr<FMatrix> F,
+                    shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
+                    shared_ptr<ExpansionConstants> _expconst)
+{
+  double rl, im;
+  
+  for (int k=0; k< mol->get_ns(); k++)
+  {
+    vector <int> exp_pts = mol->get_gdpt_expj(k);
+    mat_[k].resize( (int) exp_pts.size() );
+    double dA = 4 * M_PI / (double) mol->get_gridj(k).size();
+    
+    for (int h = 0; h < exp_pts.size(); h++)
+    {
+      double val = 0.0;
+      Pt q = mol->get_gridjh(k, exp_pts[h]);
+      shcalc->calc_sh(q.theta(), q.phi());
+      
+      for (int n=0; n<p_; n++)
+      {
+        for (int m = -n; m <= n; m++)
+        {
+          rl = shcalc->get_result(n,m).real()*F->get_mat_knm(k,n,m).real();
+          im = shcalc->get_result(n,m).imag()*F->get_mat_knm(k,n,m).imag();
+          val += dA*_expconst->get_const1_l(n) * ( rl + im );
+        }
+      }
+      set_mat_kh(k, h, val);
+    }
+  }
+}
+
 void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
                          shared_ptr<SHCalc> shcalc,
                          shared_ptr<System> sys, int k)
@@ -512,9 +544,13 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
     if (j==k) continue;
     
     if (T->is_analytic(I_, k, I_, j))
-      reex = T->re_expandX(F->get_mat_k(k), I_, k, I_, j );
+    {
+      reex = T->re_expandX(F->get_mat_k(j), I_, k, I_, j );
+    }
     else
+    {
       reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j );
+    }
     
     mat_cmplx_[k] += reex;
   }
@@ -590,7 +626,7 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
     if (j==k) continue;
     
     if (T->is_analytic(I_, k, I_, j))
-      reex = T->re_expandX(H->get_mat_k(k), I_, k, I_, j );
+      reex = T->re_expandX(H->get_mat_k(j), I_, k, I_, j );
     else
       reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j );
     
@@ -781,7 +817,7 @@ void HMatrix::init(shared_ptr<Molecule> mol, shared_ptr<SHCalc> _sh_calc, double
   }
 }
 
-//TODO replace IMAT mult with actual LAPAC
+//TODO: replace IMAT mult with actual LAPAC
 void HMatrix::calc_vals(shared_ptr<Molecule> mol,
                         shared_ptr<HMatrix> prev,
                         shared_ptr<XHMatrix> XH,

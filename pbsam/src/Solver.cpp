@@ -137,8 +137,7 @@ double Solver::iter()
     mol = _sys_->get_molecule(I);
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      double dev = 1e20;
-      double tol = 1e-6;
+      double dev(1e20), toli(1e-6);
       int ct(0), mxCt(20);
       
       update_outerH(I, k);
@@ -146,6 +145,7 @@ double Solver::iter()
       _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
       _LH_[I]->calc_vals(_T_, _H_[I], k);
       
+      _LF_[I]->init(_sys_->get_molecule(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
       _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
       
       _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
@@ -153,7 +153,7 @@ double Solver::iter()
       _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
                          _LF_[I], _LHN_[I], 0.0, k);
       
-      while ( dev > tol && ct < mxCt )
+      while ( dev > toli && ct < mxCt )
       {
         _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k);
         _H_[I]->calc_vals(mol,_prevH_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
@@ -165,13 +165,9 @@ double Solver::iter()
       }
       
       devk = calc_converge_H(I,k,false);
-      cout << "This is mu " << mu << " and devk " << devk << endl;
       if ( devk > mu )
-      {
-        cout << "This is mu " << mu << " and dev " << dev << endl;
-        mu = dev;
-        
-      }
+        mu = devk;
+      
      
       for (int I = 0; I < _sys_->get_n(); I++)
       {
@@ -181,7 +177,7 @@ double Solver::iter()
         }
       }
       
-    }
+    } // end k
   }
 
   return mu;
@@ -196,6 +192,7 @@ void Solver::update_prev_all()
     {
       update_prevF(I, k);
       update_prevH(I, k);
+      update_outerH(I, k);
     }
   }
 }
@@ -207,7 +204,7 @@ void Solver::update_outerH(int I, int k)
   {
     for (int m = -n; m <= n; m++)
     {
-      _prevH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
+      _outerH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
     }
   }
 }
@@ -231,8 +228,7 @@ void Solver::update_prevF(int I, int k)
   {
     for (int m = -n; m <= n; m++)
     {
-//      _prevH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
-        _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
+      _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
     }
   }
 }
@@ -242,15 +238,16 @@ void Solver::solve(double tol, int maxiter)
   double mu;
   for (int t = 0; t < maxiter; t++)
   {
-    cout << "this is t " << t << endl;
+    if ((t%10) == 0) cout << "this is t " << t << endl;
     mu = iter();
+    //TODO: make a smarter iter, I guess copy old?
     if (mu < tol) break;
   }
   
-  cout << "H result 0" << endl;
-  _H_[0]->print_kmat(0);
+  cout << "H result" << endl;
+  cout << (*_H_[0]) << endl;
   cout << "F result 0" << endl;
-  _F_[0]->print_kmat(0);
+  cout << (*_F_[0]) << endl;
 
 }
 
