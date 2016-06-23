@@ -216,7 +216,7 @@ IEMatrix::IEMatrix(int I, shared_ptr<Molecule> _mol,
                    bool calc_npts, int npts, bool set_mol)
 : p_(p), I_(I),
 IE_orig_(_mol->get_ns(), vector<double> (p*p*p*p)),
-_expConst_(_expconst), calc_pts_(calc_npts),
+_expConst_(_expconst), calc_pts_(calc_npts), set_mol_(set_mol),
 gridPts_(npts), gridPtLocs_(_mol->get_ns()),
 grid_exp_(_mol->get_ns()),grid_bur_(_mol->get_ns())
 {

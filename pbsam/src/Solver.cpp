@@ -22,6 +22,7 @@ _XF_(_sys->get_n()),
 _XH_(_sys->get_n()),
 _H_(_sys->get_n()),
 _F_(_sys->get_n()),
+_outerH_(_sys->get_n()),
 _prevH_(_sys->get_n()),
 _prevF_(_sys->get_n()),
 _shCalc_(_shCalc),
@@ -55,6 +56,7 @@ kappa_(_consts->get_kappa())
     
     _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     
+    _outerH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     
@@ -76,9 +78,9 @@ kappa_(_consts->get_kappa())
   }
 }
 
-double Solver::calc_converge_H(int I, int k)
+double Solver::calc_converge_H(int I, int k, bool inner)
 {
-  double mu=0, num(0), den(0);
+  double mu(0), rt(0), num(0), den(0);
   cmplx hnm_curr, hnm_prev;
   
   for (int n = 0; n < _H_[I]->get_p(); n++)
@@ -86,20 +88,43 @@ double Solver::calc_converge_H(int I, int k)
     for (int m = -n; m < n+1; m++)
     {
       hnm_curr = _H_[I]->get_mat_knm(k, n, m);
-      hnm_prev = _prevH_[I]->get_mat_knm(k, n, m);
-      num += norm(hnm_curr - hnm_prev);
-      den += norm(hnm_curr) + norm(hnm_prev);
+      hnm_prev = ((inner) ? _prevH_[I]->get_mat_knm(k, n, m) :
+                            _outerH_[I]->get_mat_knm(k, n, m));
+      if (inner)
+      {
+        if ( norm(hnm_prev) < 1e-15 ) // checking for mat values = 0
+        {
+          if ( norm(hnm_curr) < 1e-15 )
+            continue;
+          else
+            rt = 1.0;
+        } else
+        {
+          if ( norm(hnm_curr) < 1e-15 )
+            rt = 1.0;
+          else
+            rt = norm(hnm_curr - hnm_prev)/(norm(hnm_curr) + norm(hnm_prev));
+        }
+        mu += rt;
+      }
+      else
+      {
+        num += norm(hnm_curr - hnm_prev);
+        den += norm(hnm_curr) + norm(hnm_prev);
+      }
     }
   }
   
-  if ( fabs(den) > 1e-15 )
-    mu = (num / den);
+  if (inner)
+    return mu / double(4.0*p_*p_);
   else
-    mu = 0.0;
-  
-  mu = mu / (double)(4.0*p_*p_);
-  return mu;
-  
+  {
+    if ( fabs(den) > 1e-15 )
+      mu = (num / den);
+    else
+      mu = 0.0;
+    return mu / 4.0;
+  }
 }
 
 double Solver::iter()
@@ -112,6 +137,12 @@ double Solver::iter()
     mol = _sys_->get_molecule(I);
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
+      double dev = 1e20;
+      double tol = 1e-6;
+      int ct(0), mxCt(20);
+      
+      update_outerH(I, k);
+      
       _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
       _LH_[I]->calc_vals(_T_, _H_[I], k);
       
@@ -122,21 +153,25 @@ double Solver::iter()
       _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
                          _LF_[I], _LHN_[I], 0.0, k);
       
-      _F_[I]->calc_vals(mol,_prevF_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k);
-      _H_[I]->calc_vals(mol,_prevH_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
+      while ( dev > tol && ct < mxCt )
+      {
+        _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k);
+        _H_[I]->calc_vals(mol,_prevH_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
+        
+        dev = calc_converge_H(I,k,true);
+        update_prevH(I, k);
+        
+        ct++;
+      }
       
-      devk = calc_converge_H(I,k);
+      devk = calc_converge_H(I,k,false);
+      cout << "This is mu " << mu << " and devk " << devk << endl;
       if ( devk > mu )
       {
-//        cout << "This is mu " << mu << " and devk " << devk<< endl;
-        mu = devk;
-//        cout << "This is curr " << endl;
-//        _H_[I]->print_kmat(k);
-//        cout << "This is prev" << endl;
-//        _prevH_[I]->print_kmat(k);
+        cout << "This is mu " << mu << " and dev " << dev << endl;
+        mu = dev;
         
       }
-      mu = ( devk > mu ) ? devk : mu;
      
       for (int I = 0; I < _sys_->get_n(); I++)
       {
@@ -145,10 +180,9 @@ double Solver::iter()
           _LHN_[I]->calc_vals(_T_, _H_, k); // requires all Hs so do it at end
         }
       }
-      update_prev(I, k);
+      
     }
   }
-  
 
   return mu;
 }
@@ -160,20 +194,45 @@ void Solver::update_prev_all()
   {
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      update_prev(I, k);
+      update_prevF(I, k);
+      update_prevH(I, k);
     }
   }
 }
 
-void Solver::update_prev(int I, int k)
+void Solver::update_outerH(int I, int k)
 {
   
   for (int n = 0; n < p_; n++)
   {
-    for (int m = -n; m < p_; m++)
+    for (int m = -n; m <= n; m++)
     {
       _prevH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
-      _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
+    }
+  }
+}
+
+void Solver::update_prevH(int I, int k)
+{
+  
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m <= n; m++)
+    {
+      _prevH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
+    }
+  }
+}
+
+void Solver::update_prevF(int I, int k)
+{
+  
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m <= n; m++)
+    {
+//      _prevH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
+        _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
     }
   }
 }
@@ -188,7 +247,11 @@ void Solver::solve(double tol, int maxiter)
     if (mu < tol) break;
   }
   
-  cout << (*_H_[0]) << endl;
+  cout << "H result 0" << endl;
+  _H_[0]->print_kmat(0);
+  cout << "F result 0" << endl;
+  _F_[0]->print_kmat(0);
+
 }
 
 

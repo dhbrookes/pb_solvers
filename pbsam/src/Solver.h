@@ -37,6 +37,7 @@ protected:
   
   vector<shared_ptr<HMatrix> >      _H_;
   vector<shared_ptr<HMatrix> >      _prevH_;
+  vector<shared_ptr<HMatrix> >      _outerH_;
   
   vector<shared_ptr<FMatrix> >      _F_;
   vector<shared_ptr<FMatrix> >      _prevF_;
@@ -51,7 +52,9 @@ protected:
   shared_ptr<ExpansionConstants>    _expConsts_;
   
   // update prevH and prevF
-  void update_prev(int I, int k);
+  void update_outerH(int I, int k);
+  void update_prevH(int I, int k);
+  void update_prevF(int I, int k);
   void update_prev_all();
   
   
@@ -65,7 +68,7 @@ public:
   double iter();
   
   // Use h matrices to compute convergence
-  double calc_converge_H(int I, int k);
+  double calc_converge_H(int I, int k, bool inner);
   
   void solve(double tol, int maxiter=10000);
   

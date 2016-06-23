@@ -314,8 +314,6 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
   double fac;
   vector<double> lam = T_[map_idx]->get_lambdas();
   vector<double> lamScl = T_[map_idx]->get_lam_scale();
-//  cout << map_idx << endl;
-//  T_[map_idx]->print_S();
   
   // fill x2:
   for (n = 0; n < p_; n++)
