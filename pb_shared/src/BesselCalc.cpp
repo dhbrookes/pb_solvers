@@ -94,23 +94,23 @@ const vector<double> BesselCalc::calc_mbfI(const int n,
   return I;
 }
 
-
-PrecalcBessel::PrecalcBessel(shared_ptr<System> sys,
-                             shared_ptr<BesselCalc> bcalc,
-                             double kappa, int p)
-{
-  int j = 0;
-  in_.reserve(sys->get_n());
-  kn_.reserve(sys->get_n());
-  for (int I = 0; I < sys->get_n(); I++)
-  {
-    for (int k = 0; k < sys->get_Ns_i(I); k++)
-    {
-      in_.push_back(bcalc->calc_mbfI(p+1, sys->get_aik(I, k)*kappa));
-      kn_.push_back(bcalc->calc_mbfK(p+1, sys->get_aik(I, k)*kappa));
-      ikToIdx_[{I,k}] = j;
-      j++;
-    }
-  }
-  
-}
+//
+//PrecalcBessel::PrecalcBessel(shared_ptr<System> sys,
+//                             shared_ptr<BesselCalc> bcalc,
+//                             double kappa, int p)
+//{
+//  int j = 0;
+//  in_.reserve(sys->get_n());
+//  kn_.reserve(sys->get_n());
+//  for (int I = 0; I < sys->get_n(); I++)
+//  {
+//    for (int k = 0; k < sys->get_Ns_i(I); k++)
+//    {
+//      in_.push_back(bcalc->calc_mbfI(2*p+1, sys->get_aik(I, k)*kappa));
+//      kn_.push_back(bcalc->calc_mbfK(2*p+1, sys->get_aik(I, k)*kappa));
+//      ikToIdx_[{I,k}] = j;
+//      j++;
+//    }
+//  }
+//  
+//}

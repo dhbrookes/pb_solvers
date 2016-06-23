@@ -331,7 +331,7 @@ public:
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k);
   
   /*
-   Equation 15b [1]. numeric re expansion
+   Equation 15b [1]. For analytic re expansion
    */
   cmplx make_hb_Ij(int I, int j, Pt rb,
                    shared_ptr<HMatrix> H,

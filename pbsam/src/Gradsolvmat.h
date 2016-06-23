@@ -77,7 +77,7 @@ public:
   
   // calculate values for all spheres in this molecule
   void calc_all_vals(shared_ptr<Molecule> mol,
-                     shared_ptr<PrecalcBessel> bcalc,
+                     shared_ptr<BesselCalc> bcalc,
                      shared_ptr<GradHMatrix> dH,
                      shared_ptr<GradFMatrix> dF,
                      shared_ptr<GradLHMatrix> dLH,
@@ -86,7 +86,8 @@ public:
   
   // calcualte values for one sphere in this molecule
   void calc_val_k(int k, shared_ptr<Molecule> mol,
-                  shared_ptr<PrecalcBessel> bcalc,
+                  vector<double> besseli,
+                  vector<double> besselk,
                   shared_ptr<GradHMatrix> dH,
                   shared_ptr<GradFMatrix> dF,
                   shared_ptr<GradLHMatrix> dLH,
@@ -108,7 +109,7 @@ public:
   GradWHMatrix(int I, int wrt, int ns, int p, double kappa);
   
   void calc_all_vals(shared_ptr<Molecule> mol,
-                     shared_ptr<PrecalcBessel> bcalc,
+                     shared_ptr<BesselCalc> bcalc,
                      shared_ptr<GradHMatrix> dH,
                      shared_ptr<GradFMatrix> dF,
                      shared_ptr<GradLHMatrix> dLH,
@@ -116,7 +117,8 @@ public:
                      shared_ptr<GradLFMatrix> dLF);
   
   void calc_val_k(int k, shared_ptr<Molecule> mol,
-                  shared_ptr<PrecalcBessel> bcalc,
+                  vector<double> besseli,
+                  vector<double> besselk,
                   shared_ptr<GradHMatrix> dH,
                   shared_ptr<GradFMatrix> dF,
                   shared_ptr<GradLHMatrix> dLH,
@@ -152,12 +154,13 @@ public:
   GradHMatrix(int I, int wrt,
               int ns, int p, double kappa);
   
-  void calc_all_vals(shared_ptr<PrecalcBessel> bcalc,
+  void calc_all_vals(shared_ptr<Molecule> mol,
+                     shared_ptr<BesselCalc> bcalc,
                      shared_ptr<IEMatrix> IE,
                      shared_ptr<GradWHMatrix> dWH);
   
   void calc_val_k(int k,
-                  shared_ptr<PrecalcBessel> bcalc,
+                  vector<double> besseli,
                   shared_ptr<IEMatrix> IE,
                   shared_ptr<GradWHMatrix> dWH);
   
@@ -207,26 +210,28 @@ public:
   GradLHMatrix(int I, int wrt, int ns, int p, double kappa);
   
   void calc_all_vals(shared_ptr<Molecule> mol,
-                     shared_ptr<PrecalcBessel> bcalc,
+                     shared_ptr<BesselCalc> bcalc,
                      shared_ptr<SHCalc> shcalc,
                      shared_ptr<TMatrix> T,
                      shared_ptr<GradHMatrix> dH, int Mp=-1);
   
   void calc_val_k(int k, shared_ptr<Molecule> mol,
-                  shared_ptr<PrecalcBessel> bcalc,
+                  vector<double> besseli,
+                  vector<double> besselk,
                   shared_ptr<SHCalc> shcalc,
                   shared_ptr<TMatrix> T,
                   shared_ptr<GradHMatrix> dH, int Mp=-1);
   
   MyMatrix<Ptx> numeric_reex(int k, int j,
                              shared_ptr<Molecule> mol,
-                             shared_ptr<PrecalcBessel> bcalc,
+                             vector<double> besseli,
+                             vector<double> besselk,
                              shared_ptr<SHCalc> shcalc,
                              shared_ptr<GradHMatrix> dH,
                              int Mp=-1);
   
   // calculate the gradient of h at point P (Eq. S5a)
-  Ptx calc_dh_P(Pt P, int k, shared_ptr<PrecalcBessel> bcalc,
+  Ptx calc_dh_P(Pt P, int k, vector<double> besseli,
                 shared_ptr<SHCalc> shcalc,
                 shared_ptr<GradHMatrix> dH);
   

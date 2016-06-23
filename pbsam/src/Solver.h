@@ -114,12 +114,12 @@ protected:
   
   shared_ptr<System>                _sys_;
   shared_ptr<SHCalc>                _shCalc_;
-  shared_ptr<PrecalcBessel>         _bCalc_;
+  shared_ptr<BesselCalc>         _bCalc_;
   shared_ptr<Constants>             _consts_;
 
 public:
   GradSolver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
-             shared_ptr<SHCalc> _shCalc, shared_ptr<PrecalcBessel> _bCalc,
+             shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
              shared_ptr<TMatrix> _T, vector<shared_ptr<FMatrix> > _F,
              vector<shared_ptr<HMatrix> > _H, int p);
   

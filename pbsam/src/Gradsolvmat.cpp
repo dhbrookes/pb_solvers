@@ -33,19 +33,25 @@ GradWFMatrix::GradWFMatrix(int I, int wrt, int ns, int p,
 
 
 void GradWFMatrix::calc_all_vals(shared_ptr<Molecule> mol,
-                                 shared_ptr<PrecalcBessel> bcalc,
+                                 shared_ptr<BesselCalc> bcalc,
                                  shared_ptr<GradHMatrix> dH,
                                  shared_ptr<GradFMatrix> dF,
                                  shared_ptr<GradLHMatrix> dLH,
                                  shared_ptr<GradLHNMatrix> dLHN,
                                  shared_ptr<GradLFMatrix> dLF)
 {
+  vector<double> besseli, besselk;
   for (int k = 0; k < get_ns(); k++)
-    calc_val_k(k, mol, bcalc, dH, dF, dLH, dLHN, dLF);
+  {
+    besseli = bcalc->calc_mbfI(p_+1, kappa_*mol->get_ak(k));
+    besselk = bcalc->calc_mbfK(p_+1, kappa_*mol->get_ak(k));
+    calc_val_k(k, mol, besseli, besselk, dH, dF, dLH, dLHN, dLF);
+  }
 }
 
 void GradWFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
-                              shared_ptr<PrecalcBessel> bcalc,
+                              vector<double> besseli,
+                              vector<double> besselk,
                               shared_ptr<GradHMatrix> dH,
                               shared_ptr<GradFMatrix> dF,
                               shared_ptr<GradLHMatrix> dLH,
@@ -59,11 +65,14 @@ void GradWFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
   double inner;
   for (int n = 0; n < p_; n++)
   {
-    bin = bcalc->get_in_Ik(I_, k, n);
-    bin1 = bcalc->get_in_Ik(I_, k, n+1);
-    bkn = bcalc->get_kn_Ik(I_, k, n);
-    bkn1 = bcalc->get_kn_Ik(I_, k, n+1);
-    
+//    bin = bcalc->get_in_Ik(I_, k, n);
+//    bin1 = bcalc->get_in_Ik(I_, k, n+1);
+//    bkn = bcalc->get_kn_Ik(I_, k, n);
+//    bkn1 = bcalc->get_kn_Ik(I_, k, n+1);
+    bin = besseli[n];
+    bin1 = besseli[n+1];
+    bkn = besselk[n];
+    bkn1 = besselk[n+1];
     for (int m = -n; m < n+1; m++)
     {
       val1=dH->get_mat_knm(k,n,m)*exp_ka*(n*bkn-(2*n+1)*bkn1);
@@ -86,20 +95,26 @@ GradWHMatrix::GradWHMatrix(int I, int wrt,
 
 
 void GradWHMatrix::calc_all_vals(shared_ptr<Molecule> mol,
-                             shared_ptr<PrecalcBessel> bcalc,
+                             shared_ptr<BesselCalc> bcalc,
                              shared_ptr<GradHMatrix> dH,
                              shared_ptr<GradFMatrix> dF,
                              shared_ptr<GradLHMatrix> dLH,
                              shared_ptr<GradLHNMatrix> dLHN,
                              shared_ptr<GradLFMatrix> dLF)
 {
+  vector<double> besseli, besselk;
   for (int k = 0; k < get_ns(); k++)
-    calc_val_k(k, mol, bcalc, dH, dF, dLH, dLHN, dLF);
+  {
+    besseli = bcalc->calc_mbfI(p_+1, kappa_*mol->get_ak(k));
+    besselk = bcalc->calc_mbfK(p_+1, kappa_*mol->get_ak(k));
+    calc_val_k(k, mol, besseli, besselk, dH, dF, dLH, dLHN, dLF);
+  }
 }
 
 
 void GradWHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
-                              shared_ptr<PrecalcBessel> bcalc,
+                              vector<double> besseli,
+                              vector<double> besselk,
                               shared_ptr<GradHMatrix> dH,
                               shared_ptr<GradFMatrix> dF,
                               shared_ptr<GradLHMatrix> dLH,
@@ -112,8 +127,10 @@ void GradWHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
   Ptx val1, val2, val3, val4;
   for (int n = 0; n < p_; n++)
   {
-    bin = bcalc->get_in_Ik(I_, k, n);
-    bkn = bcalc->get_kn_Ik(I_, k, n);
+//    bin = bcalc->get_in_Ik(I_, k, n);
+//    bkn = bcalc->get_kn_Ik(I_, k, n);
+    bin = besseli[n];
+    bkn = besselk[n];
     for (int m = -n; m < n+1; m++)
     {
       inner = ((2 * n + 1) / bin) - (exp_ka * bkn);
@@ -167,15 +184,20 @@ GradHMatrix::GradHMatrix(int I, int wrt, int ns, int p, double kappa)
 {
 }
 
-void GradHMatrix::calc_all_vals(shared_ptr<PrecalcBessel> bcalc,
+void GradHMatrix::calc_all_vals(shared_ptr<Molecule> mol,
+                                shared_ptr<BesselCalc> bcalc,
                                 shared_ptr<IEMatrix> IE,
                                 shared_ptr<GradWHMatrix> dWH)
 {
+  vector<double> besseli;
   for (int k = 0; k < get_ns(); k++)
-    calc_val_k(k, bcalc, IE, dWH);
+  {
+    besseli = bcalc->calc_mbfI(p_, kappa_*mol->get_ak(k));
+    calc_val_k(k, besseli, IE, dWH);
+  }
 }
 
-void GradHMatrix::calc_val_k(int k, shared_ptr<PrecalcBessel> bcalc,
+void GradHMatrix::calc_val_k(int k, vector<double> besseli,
                              shared_ptr<IEMatrix> IE,
                              shared_ptr<GradWHMatrix> dWH)
 {
@@ -195,7 +217,7 @@ void GradHMatrix::calc_val_k(int k, shared_ptr<PrecalcBessel> bcalc,
           in += in2;
         }
       }
-      set_mat_knm(k, n, m, in * bcalc->get_in_Ik(I_, k, n));
+      set_mat_knm(k, n, m, in * besseli[n]);
     }
   }
 }
@@ -295,17 +317,23 @@ GradLHMatrix::GradLHMatrix(int I, int wrt, int ns, int p, double kappa)
 }
 
 void GradLHMatrix::calc_all_vals(shared_ptr<Molecule> mol,
-                                 shared_ptr<PrecalcBessel> bcalc,
+                                 shared_ptr<BesselCalc> bcalc,
                                  shared_ptr<SHCalc> shcalc,
                                  shared_ptr<TMatrix> T,
                                  shared_ptr<GradHMatrix> dH, int Mp)
 {
+  vector<double> besseli, besselk;
   for (int k = 0; k < get_ns(); k++)
-    calc_val_k(k, mol, bcalc, shcalc, T, dH);
+  {
+    besseli = bcalc->calc_mbfI(p_+1, kappa_*mol->get_ak(k));
+    besselk = bcalc->calc_mbfK(p_+1, kappa_*mol->get_ak(k));
+    calc_val_k(k, mol, besseli, besselk, shcalc, T, dH);
+  }
 }
 
 void GradLHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
-                              shared_ptr<PrecalcBessel> bcalc,
+                              vector<double> besseli,
+                              vector<double> besselk,
                               shared_ptr<SHCalc> shcalc,
                               shared_ptr<TMatrix> T,
                               shared_ptr<GradHMatrix> dH, int Mp)
@@ -321,7 +349,7 @@ void GradLHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
     }
     else
     {
-      reex = numeric_reex(k, j, mol, bcalc, shcalc, dH, Mp);
+      reex = numeric_reex(k, j, mol, besseli, besselk, shcalc, dH, Mp);
     }
     inner += reex;
   }
@@ -330,7 +358,8 @@ void GradLHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
 
 MyMatrix<Ptx> GradLHMatrix::numeric_reex(int k, int j,
                                          shared_ptr<Molecule> mol,
-                                         shared_ptr<PrecalcBessel> bcalc,
+                                         vector<double> besseli,
+                                         vector<double> besselk,
                                          shared_ptr<SHCalc> shcalc,
                                          shared_ptr<GradHMatrix> dH,
                                          int Mp)
@@ -346,7 +375,7 @@ MyMatrix<Ptx> GradLHMatrix::numeric_reex(int k, int j,
     {
       for (int b = 0; b < Mp; b++)
       {
-        hpj = calc_dh_P(sph_grid[b], k, bcalc, shcalc, dH);
+        hpj = calc_dh_P(sph_grid[b], k, besseli, shcalc, dH);
         hpj *= (4 * M_PI) / sph_grid.size();
         
         rb_k = sph_grid[b]-(mol->get_centerk(k)-mol->get_centerk(j));
@@ -356,7 +385,7 @@ MyMatrix<Ptx> GradLHMatrix::numeric_reex(int k, int j,
         inner *= pow(mol->get_ak(k)/ rb_k.r(), n);
         inner *= conj(shcalc->get_result(n, m));
         inner *= exp(-kappa_*rb_k.r());
-        inner *= bcalc->get_kn_Ik(I_, k, n);
+        inner *= besselk[n];
         
         dLH_Ik.set_val(n, m, inner);
       }
@@ -366,7 +395,7 @@ MyMatrix<Ptx> GradLHMatrix::numeric_reex(int k, int j,
 }
 
 Ptx GradLHMatrix::calc_dh_P(Pt P, int k,
-                            shared_ptr<PrecalcBessel> bcalc,
+                            vector<double> besseli,
                             shared_ptr<SHCalc> shcalc,
                             shared_ptr<GradHMatrix> dH)
 {
@@ -378,7 +407,7 @@ Ptx GradLHMatrix::calc_dh_P(Pt P, int k,
     for (int m = -n; m < n+1; m++)
     {
       in = dH->get_mat_knm(k,n,m)*shcalc->get_result(n,m)*((2*n+1)/(4*M_PI));
-      in *= 1/bcalc->get_in_Ik(I_, k, n);
+      in *= 1/besseli[n];
       dh += in;
     }
   }
