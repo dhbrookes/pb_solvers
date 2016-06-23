@@ -76,6 +76,15 @@ public:
   
   void reset_all();
   
+  vector<shared_ptr<HMatrix> > get_all_H() {return _H_;}
+  vector<shared_ptr<FMatrix> > get_all_F() {return _F_;}
+  MyMatrix<cmplx> getH_ik(int I, int k) {return _H_[I]->get_mat_k(k);}
+  MyMatrix<cmplx> getF_ik(int I, int k) {return _F_[I]->get_mat_k(k);}
+  cmplx getH_ik_nm(int I, int k, int n, int m)
+                  {return _H_[I]->get_mat_knm(k, n, m);}
+  cmplx getF_ik_nm(int I, int k, int n, int m)
+                  {return _F_[I]->get_mat_knm(k, n, m);}
+  
 };
 
 
