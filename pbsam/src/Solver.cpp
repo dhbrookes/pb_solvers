@@ -127,7 +127,27 @@ double Solver::calc_converge_H(int I, int k, bool inner)
   }
 }
 
-double Solver::iter()
+
+void Solver::iter_innerH(int I, int k)
+{
+  double dev(1e20), toli(1e-6);
+  int ct(0), mxCt(20);
+  
+  auto mol = _sys_->get_molecule(I);
+  
+  // Inner H loop
+  while ( dev > toli && ct < mxCt )
+  {
+    _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k);
+    _H_[I]->calc_vals(mol,_prevH_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
+    
+    dev = calc_converge_H(I,k,true);
+    update_prevH(I, k);
+    ct++;
+  }
+}
+
+double Solver::iter(int t)
 {
   double devk, mu = 0;
   shared_ptr<Molecule> mol;
@@ -137,9 +157,6 @@ double Solver::iter()
     mol = _sys_->get_molecule(I);
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      double dev(1e20), toli(1e-6);
-      int ct(0), mxCt(20);
-      
       update_outerH(I, k);
       
       _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
@@ -153,22 +170,12 @@ double Solver::iter()
       _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
                          _LF_[I], _LHN_[I], 0.0, k);
       
-      while ( dev > toli && ct < mxCt )
-      {
-        _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k);
-        _H_[I]->calc_vals(mol,_prevH_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
-        
-        dev = calc_converge_H(I,k,true);
-        update_prevH(I, k);
-        
-        ct++;
-      }
+      iter_innerH(I, k);
       
       devk = calc_converge_H(I,k,false);
       if ( devk > mu )
         mu = devk;
       
-     
       for (int I = 0; I < _sys_->get_n(); I++)
       {
         for (int k = 0; k < _sys_->get_Ns_i(I); k++)
@@ -239,7 +246,7 @@ void Solver::solve(double tol, int maxiter)
   for (int t = 0; t < maxiter; t++)
   {
     if ((t%10) == 0) cout << "this is t " << t << endl;
-    mu = iter();
+    mu = iter(t);
     //TODO: make a smarter iter, I guess copy old?
     if (mu < tol) break;
   }

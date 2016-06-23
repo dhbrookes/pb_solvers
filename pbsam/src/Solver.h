@@ -57,6 +57,8 @@ protected:
   void update_prevF(int I, int k);
   void update_prev_all();
   
+  void iter_innerH(int I, int k);
+  
   
   
 public:
@@ -65,7 +67,7 @@ public:
          int p);
   
   // run an iteration and return convergence value
-  double iter();
+  double iter(int t);
   
   // Use h matrices to compute convergence
   double calc_converge_H(int I, int k, bool inner);
