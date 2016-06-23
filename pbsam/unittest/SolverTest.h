@@ -39,7 +39,7 @@ public:
     auto sys = make_shared<System>(mols);
     
     Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
-    solvTest.iter();
+    solvTest.iter(0);
   }
   
 };
