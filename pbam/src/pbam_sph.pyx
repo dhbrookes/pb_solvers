@@ -12,6 +12,8 @@ cdef class PBAM_Solver:
   cdef double epsilons_ # solvent dielectric
   cdef double epsiloni_  # molecule dielectric
 
+  cdef int _pid  
+
   def __cinit__(self):
     self.temp_ = 0
     self.epsilons_ = 0
@@ -35,7 +37,7 @@ cdef class PBAM_Solver:
 
     #TODO: change from 1 molecule to many
     nmol = 1
-    natm = cvarray(shape=(nmol), itemsize=sizeof(int), format="i")
+    natm = cvarray(shape=(nmol,), itemsize=sizeof(int), format="i")
     natm[0] = <int> len(molecules['atoms'])
     xyzrc = cvarray(shape=(nmol, PBAMStruct.AT_MAX, PBAMStruct.XYZRCWIDTH),
         itemsize=sizeof(double), format="d")
