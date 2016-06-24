@@ -11,7 +11,9 @@
 
 Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
-               int p)
+               int p, bool readImat, bool readHF,
+               vector<vector<string> > imats,
+               vector<vector<vector<string> > > expHF)
 :_E_(_sys->get_n()),
 _LE_(_sys->get_n()),
 _IE_(_sys->get_n()),
@@ -52,16 +54,30 @@ kappa_(_consts->get_kappa())
     _LE_[I]->calc_vals(_mol, _shCalc_, _consts_->get_dielectric_prot());
     
     _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
-    _H_[I]->init(_mol, _shCalc_, _consts_->get_dielectric_prot());
-    
     _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     
+    if (readHF)
+    {
+      for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+      {
+        _H_[I]->init_from_exp(expHF[I][k][0], k);
+        _F_[I]->init_from_exp(expHF[I][k][1], k);
+      }
+    } else
+      _H_[I]->init(_mol, _shCalc_, _consts_->get_dielectric_prot());
+
     _outerH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     
     _IE_[I] = make_shared<IEMatrix>(I, _mol, _shCalc, p_, _expConsts_, false);
-    _IE_[I]->calc_vals(_mol, _shCalc_);
+    if (readImat)
+    {
+      for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+        _IE_[I]->init_from_file(imats[I][k], k);
+      
+    } else
+      _IE_[I]->calc_vals(_mol, _shCalc_);
     
     _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa_);
@@ -78,6 +94,8 @@ kappa_(_consts->get_kappa())
   }
   update_prev_all();
 }
+
+
 
 double Solver::calc_converge_H(int I, int k, bool inner)
 {
@@ -148,6 +166,24 @@ void Solver::iter_innerH(int I, int k)
   }
 }
 
+void Solver::step(shared_ptr<Molecule> mol, int I, int k)
+{
+  update_outerH(I, k);
+  
+  _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
+  _LH_[I]->calc_vals(_T_, _H_[I], k);
+  
+  _LF_[I]->init(_sys_->get_molecule(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
+  _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+  
+  _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
+                     _LH_[I], _LF_[I], _LHN_[I], 0.0, k);
+  _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
+                     _LF_[I], _LHN_[I], 0.0, k);
+  
+  iter_innerH(I, k);
+}
+
 double Solver::iter(int t)
 {
   double devk, mu = 0;
@@ -157,20 +193,7 @@ double Solver::iter(int t)
     mol = _sys_->get_molecule(I);
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      update_outerH(I, k);
-      
-      _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
-      _LH_[I]->calc_vals(_T_, _H_[I], k);
-      
-      _LF_[I]->init(_sys_->get_molecule(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
-      _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
-      
-      _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
-                         _LH_[I], _LF_[I], _LHN_[I], 0.0, k);
-      _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
-                         _LF_[I], _LHN_[I], 0.0, k);
-      
-      iter_innerH(I, k);
+      step( mol, I, k);
       
       devk = calc_converge_H(I,k,false);
       if ( devk > mu )

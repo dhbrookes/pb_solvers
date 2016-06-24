@@ -223,6 +223,13 @@ grid_exp_(_mol->get_ns()),grid_bur_(_mol->get_ns())
   compute_grid_pts(_mol);
 }
 
+void IEMatrix::init_from_file(string imatfile, int k )
+{
+  IMatFile imat(imatfile, k);
+  set_IE_k(k, imat.get_mat());
+}
+
+
 MyMatrix<double> IEMatrix::get_IE_k(int k)
 {
   MyMatrix<double> IMat(p_*p_, p_*p_);
@@ -777,6 +784,14 @@ HMatrix::HMatrix(int I, int ns, int p, double kappa)
 {
 }
 
+
+void HMatrix::init_from_exp(string hfilename, int k)
+{
+  HFFile hfil( hfilename, p_);
+  set_mat_k(k, hfil.get_mat());
+}
+
+
 // Initialize H matrix to E with charges mapped to cg (mol.cgCharges_)
 void HMatrix::init(shared_ptr<Molecule> mol, shared_ptr<SHCalc> _sh_calc, double eps_in)
 {
@@ -909,6 +924,12 @@ cmplx HMatrix::make_hb_Ik(int k, Pt rb,
 FMatrix::FMatrix(int I, int ns, int p, double kappa)
 :ComplexMoleculeMatrix(I, ns, p), kappa_(kappa)
 {
+}
+
+void FMatrix::init_from_exp(string ffilename, int k)
+{
+  HFFile ffil( ffilename, p_);
+  set_mat_k(k, ffil.get_mat());
 }
 
 

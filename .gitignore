@@ -13,6 +13,7 @@ build
 dyn_*
 *.stat
 *.out.pqr
+test_cged_out.pqr
 
 ## Latex ignores
 *.aux

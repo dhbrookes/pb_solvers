@@ -57,12 +57,12 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           ak = _sys->get_aik(I, k);
           al = _sys->get_aik(J, l);
           
-//          cout << "This is Ik, Jl pair : " << I << ", " << k << " & " <<
-//          J << ", " << l << " and dist " << v.norm() << " and aIk "
-//          << ak << " and ajl "
+//          cout << "This is Ik, Jl pair : "  << k << " & " << l
+//          << " dist: " << c_Ik.dist(c_Jl) << " and aIk " << ak << " and ajl "
 //          << al << " dis1 : " <<  c_Ik.dist(c_Jl) - ak - al << endl;
-//
-          if ( (I==J) && (c_Ik.dist(c_Jl)<ak+al+cutoff))
+
+          if ( (I==J) && ((c_Ik.dist(c_Jl)<cutoff)||
+                          (c_Ik.dist(c_Jl)<ak+al+cutoff)))
           {
             idxMap_[idx_vec] = -1;
             continue;

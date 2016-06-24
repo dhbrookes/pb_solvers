@@ -158,7 +158,7 @@ TEST_F(MoleculeUTest, checkCreateCen)
                       surf_file.get_sp(), surf_file.get_np(), 2.5));
   
   System sys( mols);
-  sys.write_to_pqr(test_dir_loc + "test_cged.pqr");
+  sys.write_to_pqr(test_dir_loc + "test_cged_out.pqr");
 
 //  for (int i=0; i<mols[0].get_ns(); i++)
 //  {
@@ -431,7 +431,6 @@ TEST_F(SystemUTest, checkVals)
     ct++;
   }
   
-  
   sys.translate_mol(2, Pt(-10.0, -7.8, -25.0));
   ct = 0;
   for (int i=0; i<mol_[2]->get_nc(); i+=40)
@@ -452,44 +451,7 @@ TEST_F(SystemUTest, checkVals)
   }
   
   sys.rotate_mol(1, Quat( M_PI/2, Pt(0.0, 0.0, 1.0)));
-  
-  
-  for (int i=0; i<mol_[1]->get_nc(); i+=40)
-  {
-    cout  <<  setprecision(9) << mol_[1]->get_posj_realspace(i).x() << ",";
-  }
-  
-  cout << endl;
-  for (int i=0; i<mol_[1]->get_nc(); i+=40)
-  {
-    cout <<  setprecision(9)  << mol_[1]->get_posj_realspace(i).y() << ",";
-  }
-  
-  cout << endl;
-  for (int i=0; i<mol_[1]->get_nc(); i+=40)
-  {
-    cout<<  setprecision(9) << "," << mol_[1]->get_posj_realspace(i).z();
-  }
-  cout << endl;
-  
-  
-  for (int i=0; i<mol_[1]->get_ns(); i+=4)
-  {
-    cout  <<  setprecision(9) << mol_[1]->get_centerk(i).x() << ",";
-  }
-  
-  cout << endl;
-  for (int i=0; i<mol_[1]->get_ns(); i+=4)
-  {
-    cout <<  setprecision(9)  << mol_[1]->get_centerk(i).y() << ",";
-  }
-  
-  cout << endl;
-  for (int i=0; i<mol_[1]->get_ns(); i+=4)
-  {
-    cout<<  setprecision(9) << "," << mol_[1]->get_centerk(i).z();
-  }
-  cout << endl;
+
   ct = 0;
   for (int i=0; i<mol_[1]->get_nc(); i+=40)
   {

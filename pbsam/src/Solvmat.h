@@ -71,6 +71,7 @@ public:
   void set_mat_knm(int k, int n, int m, cmplx val)
   { mat_[k].set_val(n, m+p_, val); }
   MyMatrix<cmplx> get_mat_k(int k)       { return mat_[k]; }
+  void set_mat_k(int k, MyMatrix<cmplx> mtin) { mat_[k] = mtin; }
   const int get_I() const   { return I_; }
   const int get_p() const   { return p_; }
   const int get_ns() const  { return (int) mat_.size(); }
@@ -193,6 +194,10 @@ public:
   IEMatrix(int I, shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc, int p,
            shared_ptr<ExpansionConstants> _expconst, bool calc_npts = false,
            int npts = Constants::IMAT_GRID, bool set_mol = false );
+  
+  void init_from_file(string imatfile, int k );
+  
+  void set_IE_k(int k, vector<double> ie) { IE_orig_[k] = ie;}
   
   double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
   MyMatrix<double> get_IE_k( int k );
@@ -394,6 +399,9 @@ protected:
 public:
   HMatrix(int I, int ns, int p, double kappa);
   
+  // Read in and initialize from expansion file
+  void init_from_exp(string hfilename, int k);
+  
   void init(shared_ptr<Molecule> mol,
             shared_ptr<SHCalc> _sh_calc,
             double eps_in);
@@ -433,6 +441,9 @@ public:
                  shared_ptr<HMatrix> H,
                  shared_ptr<IEMatrix> IE,
                  shared_ptr<BesselCalc> bcalc, int k);
+  
+  // Read in and initialize from expansion file
+  void init_from_exp(string ffilename, int k);
   
   /*
    Equation 15a [1]. For analytic re expansion

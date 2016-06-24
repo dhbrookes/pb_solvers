@@ -358,17 +358,15 @@ TEST_F(SolverUTest, spol_test)
 
 TEST_F(SolverUTest, mutual_pol_test)
 {
-  int pol = 3;
+  int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<Molecule> > mols;
-  mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-                                       pqr.get_atom_pts(), pqr.get_radii(),
-                                       pqr.get_cg_centers(),
-                                       pqr.get_cg_radii()));
-  mols.push_back(make_shared<Molecule>(1, 0, "stat", pqr.get_charges(),
-                                       pqr.get_atom_pts(), pqr.get_radii(),
-                                       pqr.get_cg_centers(),
-                                       pqr.get_cg_radii()));
+  for (int i=0; i<nmol; i++)
+    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                         pqr.get_atom_pts(), pqr.get_radii(),
+                                         pqr.get_cg_centers(),
+                                         pqr.get_cg_radii()));
+
   mols[0]->translate(Pt(-9.28786, -7.35779, -0.156281), 1e14);
   mols[1]->translate(Pt(10.71214, -7.35779, -0.156281), 1e14);
   auto sys = make_shared<System>(mols);

@@ -66,16 +66,20 @@ protected:
 public:
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
          shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
-         int p);
+         int p, bool readImat=false, bool readHF=false,
+         vector<vector<string> > imats = {{}},
+         vector<vector<vector<string> > > expHF = {{{}}});
   
   // run an iteration and return convergence value
   double iter(int t);
+  
+  // Update LH, LF, XF, XH sequentially
+  void step(shared_ptr<Molecule> mol, int I, int k);
   
   // Use h matrices to compute convergence
   double calc_converge_H(int I, int k, bool inner);
   
   void solve(double tol, int maxiter=10000);
-  
   void solve_inner();
   
   void reset_all();
