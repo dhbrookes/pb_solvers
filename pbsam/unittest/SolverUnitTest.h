@@ -336,7 +336,7 @@ TEST_F(SolverUTest, spol_test)
                      SHCalcTest, pol, _expcons, true, 0, true);
 
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
-  solvTest.solve(1e-25, 200);
+  solvTest.solve(1e-15, 200);
   
   for (int i = 0; i < sys->get_Ns_i(0); i++)
   {
@@ -383,15 +383,28 @@ TEST_F(SolverUTest, mutual_pol_test)
   auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
   auto _expcons = make_shared<ExpansionConstants> (pol);
   
+  string istart = test_dir_loc + "imat_test/imat.sp";
+  string estart = test_dir_loc + "spol_test/test_0.00_p3.0.";
+  vector<vector<string> > imat_loc(sys->get_n());
+  vector<vector<vector<string > > > exp_loc(sys->get_n());
+  
   // Generate surface integrals
   for (int i = 0; i < sys->get_n(); i++)
   {
-    IEMatrix ieMatTest(i, sys->get_molecule(i), SHCalcTest, pol,
-                       _expcons, true, 0, true);
+    imat_loc[i].resize(sys->get_Ns_i(i));
+    exp_loc[i].resize(sys->get_Ns_i(i));
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      exp_loc[i][k].resize(2);
+      imat_loc[i][k] = istart+to_string(k) + ".out.bin";
+      exp_loc[i][k][0] = estart+to_string(k) + ".H.exp";
+      exp_loc[i][k][1] = estart+to_string(k) + ".F.exp";
+    }
   }
   
-  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
-  solvTest.solve(1e-5, 2);
+  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
+                  true, true, imat_loc, exp_loc);
+//  solvTest.solve(1e-5, 2);
   
   for (int i = 0; i < sys->get_n(); i++)
   {

@@ -225,7 +225,7 @@ grid_exp_(_mol->get_ns()),grid_bur_(_mol->get_ns())
 
 void IEMatrix::init_from_file(string imatfile, int k )
 {
-  IMatFile imat(imatfile, k);
+  IMatFile imat(imatfile, p_);
   set_IE_k(k, imat.get_mat());
 }
 
