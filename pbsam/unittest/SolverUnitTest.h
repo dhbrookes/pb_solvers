@@ -231,6 +231,54 @@ TEST_F(SolverUTest, Hinit_test)
   }
 }
 
+
+TEST_F(SolverUTest, H_calc_test)
+{
+  int pol = 5;
+  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+  auto mol = make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                   pqr.get_atom_pts(), pqr.get_radii(),
+                                   pqr.get_cg_centers(), pqr.get_cg_radii());
+  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+  auto _expcons = make_shared<ExpansionConstants> (pol);
+  
+  auto bCons = make_shared<BesselConstants> (2*pol);
+  auto bCalc = make_shared<BesselCalc>(2*pol, bCons);
+  
+  auto hmat1 = make_shared<HMatrix>(0, mol->get_ns(), pol, 0.21053961);
+  hmat1->init(mol, SHCalcTest, 4.0);
+  
+  auto emat = make_shared<EMatrix> (0, mol->get_ns(), pol);
+  emat->calc_vals(mol, SHCalcTest, 4.0);
+  
+  auto lemt = make_shared<LEMatrix> (0, mol->get_ns(), pol);
+  lemt->calc_vals(mol, SHCalcTest, 4.0);
+  
+  auto xhMat = make_shared<XHMatrix> (0, mol->get_ns(), pol, mol, emat, lemt);
+  auto fMat = make_shared<FMatrix> (0, mol->get_ns(), pol, 0.21053961);
+  auto imat = make_shared<IEMatrix> (0, mol, SHCalcTest, pol, _expcons,
+                                     true, 0, false);
+  
+  HMatrix hmat(0, mol->get_ns(), pol, 0.21053961);
+  hmat.calc_vals(mol, hmat1, xhMat, fMat, imat, bCalc, 0);
+  
+  for (int i = 0; i < mol->get_ns(); i++)
+  {
+    int ct = 0;
+    for(int n=0; n<pol; n++)
+    {
+      for(int m=0; m <= n; m++)
+      {
+        //TODO: make tests for H calc_vals
+//        EXPECT_NEAR(hmat_real[i][ct],hmat.get_mat_knm(i,n,m).real(),preclim);
+//        EXPECT_NEAR(hmat_imag[i][ct],hmat.get_mat_knm(i,n,m).imag(),preclim);
+        ct++;
+      }
+    }
+  }
+}
+
 TEST_F(SolverUTest, LHinit_test)
 {
   int pol = 5;
@@ -264,13 +312,16 @@ TEST_F(SolverUTest, LHinit_test)
   }
 }
 
-TEST_F(SolverUTest, constructor_test)
+TEST_F(SolverUTest, spol_test)
 {
   int pol = 3;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
-  auto myMol = make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-                                   pqr.get_atom_pts(), pqr.get_radii(),
-                                   pqr.get_cg_centers(), pqr.get_cg_radii());
+  vector<shared_ptr<Molecule> > mols;
+  mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                       pqr.get_atom_pts(), pqr.get_radii(),
+                                       pqr.get_cg_centers(),
+                                       pqr.get_cg_radii()));
+  auto sys = make_shared<System>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -281,16 +332,13 @@ TEST_F(SolverUTest, constructor_test)
   auto _expcons = make_shared<ExpansionConstants> (pol);
   
   // Generate surface integrals
-  IEMatrix ieMatTest(0, myMol, SHCalcTest, pol, _expcons, true, 0, true);
-  
-  vector<shared_ptr<Molecule> > mols;
-  mols.push_back(myMol);
-  auto sys = make_shared<System>(mols);
-  
+  IEMatrix ieMatTest(0, sys->get_molecule(0),
+                     SHCalcTest, pol, _expcons, true, 0, true);
+
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
   solvTest.solve(1e-25, 200);
   
-  for (int i = 0; i < myMol->get_ns(); i++)
+  for (int i = 0; i < sys->get_Ns_i(0); i++)
   {
     int ct = 0;
     for(int n=0; n<pol; n++)
@@ -306,5 +354,71 @@ TEST_F(SolverUTest, constructor_test)
     }
   }
 }
+
+
+TEST_F(SolverUTest, mutual_pol_test)
+{
+  int pol = 3;
+  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+  vector<shared_ptr<Molecule> > mols;
+  mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                       pqr.get_atom_pts(), pqr.get_radii(),
+                                       pqr.get_cg_centers(),
+                                       pqr.get_cg_radii()));
+  mols.push_back(make_shared<Molecule>(1, 0, "stat", pqr.get_charges(),
+                                       pqr.get_atom_pts(), pqr.get_radii(),
+                                       pqr.get_cg_centers(),
+                                       pqr.get_cg_radii()));
+  mols[0]->translate(Pt(-9.28786, -7.35779, -0.156281), 1e14);
+  mols[1]->translate(Pt(10.71214, -7.35779, -0.156281), 1e14);
+  auto sys = make_shared<System>(mols);
+  
+  cout << "This is cog of i " << sys->get_cogi(0).x() << ", " << sys->get_cogi(0).y() << ", " << sys->get_cogi(0).z() << endl;
+  cout << "This is cog of i " << sys->get_cogi(1).x() << ", " << sys->get_cogi(1).y() << ", " << sys->get_cogi(1).z() << endl;
+  auto cst = make_shared<Constants> ();
+  cst->set_dielectric_water(80);
+  cst->set_dielectric_prot(4);
+  
+  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+  auto BesselCons = make_shared<BesselConstants> (2*pol);
+  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+  auto _expcons = make_shared<ExpansionConstants> (pol);
+  
+  // Generate surface integrals
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    IEMatrix ieMatTest(i, sys->get_molecule(i), SHCalcTest, pol,
+                       _expcons, true, 0, true);
+  }
+  
+  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
+  solvTest.solve(1e-5, 2);
+  
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      int ct = 0;
+      for(int n=0; n<pol; n++)
+      {
+        for(int m=0; m <= n; m++)
+        {
+//          EXPECT_NEAR(spolFre[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).real(),
+//                      preclim);
+//          EXPECT_NEAR(spolHre[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).real(),
+//                      preclim);
+//          EXPECT_NEAR(spolFim[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).imag(),
+//                      preclim);
+//          EXPECT_NEAR(spolHim[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).imag(),
+//                      preclim);
+          ct++;
+        }
+      }
+    }
+  }
+}
+
+
 
 #endif /* SolverUnitTest_h */

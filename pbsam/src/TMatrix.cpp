@@ -37,6 +37,7 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
   idxMap_.clear();
   
   int idx = 0;
+  double cutoff = 5.0;
   Pt c_Ik, c_Jl, v;
   double kapVal, ak, al;
   vector<int> idx_vec;
@@ -61,14 +62,14 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
 //          << ak << " and ajl "
 //          << al << " dis1 : " <<  c_Ik.dist(c_Jl) - ak - al << endl;
 //
-          if (I==J && ((c_Ik.dist(c_Jl)<5.0) || (c_Ik.dist(c_Jl)<ak+al+5.0)))
+          if ( (I==J) && (c_Ik.dist(c_Jl)<ak+al+cutoff))
           {
             idxMap_[idx_vec] = -1;
             continue;
           }
           
           kapVal  = ( I == J ) ? 0.0 : kappa_;
-          vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kapVal * v.r());
+          vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kapVal*v.r());
           v = _sys->get_pbc_dist_vec_base(c_Ik, c_Jl);
           _shcalc->calc_sh(v.theta(), v.phi());
           

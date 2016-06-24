@@ -74,8 +74,9 @@ kappa_(_consts->get_kappa())
     _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_,
                                      _mol, _E_[I], _LE_[I]);
     
-    update_prev_all();
+    
   }
+  update_prev_all();
 }
 
 double Solver::calc_converge_H(int I, int k, bool inner)
@@ -151,7 +152,6 @@ double Solver::iter(int t)
 {
   double devk, mu = 0;
   shared_ptr<Molecule> mol;
-  // start an iteration
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     mol = _sys_->get_molecule(I);
@@ -176,17 +176,9 @@ double Solver::iter(int t)
       if ( devk > mu )
         mu = devk;
       
-      for (int I = 0; I < _sys_->get_n(); I++)
-      {
-        for (int k = 0; k < _sys_->get_Ns_i(I); k++)
-        {
-          _LHN_[I]->calc_vals(_T_, _H_, k); // requires all Hs so do it at end
-        }
-      }
-      
+      update_LHN_all();
     } // end k
   }
-
   return mu;
 }
 
@@ -200,6 +192,17 @@ void Solver::update_prev_all()
       update_prevF(I, k);
       update_prevH(I, k);
       update_outerH(I, k);
+    }
+  }
+}
+
+void Solver::update_LHN_all()
+{
+  for (int I = 0; I < _H_.size(); I++)
+  {
+    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+    {
+      _LHN_[I]->calc_vals(_T_, _H_, k); // requires all Hs so do it at end
     }
   }
 }
@@ -250,11 +253,6 @@ void Solver::solve(double tol, int maxiter)
     //TODO: make a smarter iter, I guess copy old?
     if (mu < tol) break;
   }
-  
-  cout << "H result" << endl;
-  cout << (*_H_[0]) << endl;
-  cout << "F result 0" << endl;
-  cout << (*_F_[0]) << endl;
 
 }
 

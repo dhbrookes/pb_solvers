@@ -82,8 +82,29 @@ public:
   
 };
 
+class TooFewPolesException: public exception
+{
+protected:
+  int infile_;
+  int needed_;
+  
+public:
+  TooFewPolesException( int inFile, int needed)
+  :infile_(inFile), needed_(needed)
+  {
+  }
+  
+  virtual const char* what() const throw()
+  {
+    string ss;
+    ss = "File has "+to_string(infile_)+" poles, need "+to_string(needed_);
+    return ss.c_str();
+  }
+  
+};
+
 /*
- Clsas for storing info in a MSMS surface file
+ Class for storing info in a MSMS surface file
  */
 class MSMSFile
 {
@@ -369,6 +390,147 @@ public:
   const string get_path() const     { return path_; }
   const int get_nmols() const       { return nmols_; }
   vector<Pt> get_pts() const        { return pts_; }
+};
+
+/*
+ Class for reading and storing the info in imatrix files
+ */
+class IMatFile
+{
+protected:
+  string path_;
+  int p_;  // number of poles
+  vector<double> mat_;
+  
+  void read_binary()
+  {
+    int ps = p_*p_;
+    int pq = ps*ps;
+    ifstream fin(path_.c_str());
+    if (!fin.is_open()) throw CouldNotReadException(path_);
+    
+    // read pole order
+    int p;
+    fin.read( reinterpret_cast<char*> (&p), sizeof(int));
+    if( p < p_ ) throw TooFewPolesException(p, p_);
+    // read mat
+    else if(p == p_)
+      for(int h = 0; h<pq; h++)
+        fin.read( reinterpret_cast<char*>(&mat_[h]), sizeof(double));
+    else
+    {
+      streamsize skipsize = ( p*p - ps )*sizeof(double);
+      
+      for(int j=0; j<ps; j++)
+      {
+        for(int h = 0; h<ps; h++)
+          fin.read( reinterpret_cast<char*>(&mat_[h+j*ps]), sizeof(double));
+        fin.seekg( skipsize, ios::cur);
+      }   
+    }
+    fin.close();
+  }
+  
+public:
+  
+  IMatFile(string path, int p)
+  :path_(path), p_(p)
+  {
+    mat_.reserve(p*p*p*p);
+    read_binary();
+  }
+  
+  const string get_path() const             { return path_; }
+  int get_p() const                         { return p_; }
+  vector<double> get_mat()                  { return mat_; }
+  double get_mat_h(int h)                   { return mat_[h]; }
+};
+
+/*
+ Class for reading and storing the info of selfpol solved H and F
+ */
+class HFFile
+{
+protected:
+  string path_;
+  int p_;  // number of poles
+  double kappa_; // Kappa value used for expansion
+  double rcut_; // r cutoff
+  vector<double> vec_;
+  MyMatrix<cmplx> mat_;
+  
+  void read()
+  {
+    int ps = p_*p_;
+    ifstream fin(path_.c_str());
+    if (!fin.is_open()) throw CouldNotReadException(path_);
+    
+    // pole order
+    int pRead;
+    fin >> pRead;
+    fin >> kappa_;
+    fin >> rcut_;
+    
+    int psqRead = pRead*pRead;
+    for(int k=0; k<psqRead; k++) fin >> vec_[k];
+    
+    for(int k=psqRead; k<ps; k++)
+    {
+      if( pRead < p_)
+      {
+        cout <<"Warning : reading exp:  read pole " << pRead
+        << ", padding zeros to poles = " << p_ << endl;
+        vec_[k] = 0.0;
+      }
+      else
+        fin >> vec_[k];
+      
+      fin.close();
+    }
+  }
+  
+  void convert_to_mat()
+  {
+    int ctr = 0;
+    for (int n = 0; n < p_; n++)
+    {
+      for (int m = 0; m < n+1; m++)
+      {
+        double re, im;
+        re = vec_[ctr];
+        ctr++;
+        
+        if ( m > 0 )
+        {
+          im = vec_[ctr];
+          ctr++;
+        } else
+          im = 0.0;
+        
+        mat_(n, m+p_) = complex<double> (re, im);
+        if ( m > 0 ) mat_(n, -m+p_) = complex<double> (re, -im);
+      }
+    }
+  }
+  
+public:
+  
+  HFFile(string path, int p)
+  :path_(path), p_(p), mat_(p, 2*p+1)
+  {
+    vec_.reserve(p*p);
+    read();
+    convert_to_mat();
+  }
+  
+  const string get_path() const             { return path_; }
+  int get_p() const                         { return p_; }
+  double get_kappa()                        { return kappa_;}
+  double get_rcut()                         { return rcut_;}
+  vector<double> get_vec()                  { return vec_; }
+  double get_vec_h(int h)                   { return vec_[h]; }
+  MyMatrix<cmplx> get_mat()                 { return mat_; }
+  cmplx get_mat_nm(int n, int m)            { return mat_(n, m+p_); }
 };
     
 

@@ -57,6 +57,8 @@ protected:
   void update_prevF(int I, int k);
   void update_prev_all();
   
+  void update_LHN_all();
+  
   void iter_innerH(int I, int k);
   
   

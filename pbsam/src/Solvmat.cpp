@@ -556,7 +556,7 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
   }
 }
 
-
+//TODO: Is this ever needed?
 cmplx LFMatrix::make_fb_Ij(int I, int j, Pt rb,
                            shared_ptr<FMatrix> F,
                            shared_ptr<SHCalc> shcalc)
@@ -632,18 +632,9 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
     
     mat_cmplx_[k] += reex;
   }
-//    for (int n=0; n<p_; n++)
-//    {
-//      for (int m = 0; m <= n; m++)
-//      {
-//        cout << ", " << mat_cmplx_[k](n, m+p_);
-//      }
-//      cout << endl;
-//    }
-
 }
 
-
+//TODO: Is this ever needed?
 cmplx LHMatrix::make_hb_Ij(int I, int j, Pt rb,
                            shared_ptr<HMatrix> H,
                            shared_ptr<SHCalc> shcalc,
@@ -817,7 +808,6 @@ void HMatrix::init(shared_ptr<Molecule> mol, shared_ptr<SHCalc> _sh_calc, double
   }
 }
 
-//TODO: replace IMAT mult with actual LAPAC
 void HMatrix::calc_vals(shared_ptr<Molecule> mol,
                         shared_ptr<HMatrix> prev,
                         shared_ptr<XHMatrix> XH,
@@ -852,6 +842,7 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
     }
   }
   
+  //TODO: replace with matMul
   h_out = IE->get_IE_k(k) * h_in;  // Matrix vector multiplication
   
   int ctr(0);
@@ -927,6 +918,7 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
     }
   }
   
+  //TODO: replace with matMul
   f_out = IE->get_IE_k(k) * f_in;  // Matrix vector multiplication
   
   int ctr(0);
