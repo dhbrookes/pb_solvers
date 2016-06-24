@@ -557,27 +557,27 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
 }
 
 //TODO: Is this ever needed?
-cmplx LFMatrix::make_fb_Ij(int I, int j, Pt rb,
-                           shared_ptr<FMatrix> F,
-                           shared_ptr<SHCalc> shcalc)
-{
-  cmplx fbj, fb_inner;
-  shcalc->calc_sh(rb.theta(),rb.phi());
-  
-  //create fbj function
-  fbj = 0;
-  for (int n2 = 0; n2 < p_; n2++)
-  {
-    for (int m2 = -n2; m2 < n2+1; m2++)
-    {
-      fb_inner = ((2 * n2 + 1) / (4 * M_PI)) * F->get_mat_knm(j, n2, m2);
-      fb_inner *= shcalc->get_result(n2, m2);
-      fbj += fb_inner;
-    }
-  }
-  fbj /= pow(rb.r(), 2); // make f_hat into f
-  return fbj;
-}
+//cmplx LFMatrix::make_fb_Ij(int I, int j, Pt rb,
+//                           shared_ptr<FMatrix> F,
+//                           shared_ptr<SHCalc> shcalc)
+//{
+//  cmplx fbj, fb_inner;
+//  shcalc->calc_sh(rb.theta(),rb.phi());
+//  
+//  //create fbj function
+//  fbj = 0;
+//  for (int n2 = 0; n2 < p_; n2++)
+//  {
+//    for (int m2 = -n2; m2 < n2+1; m2++)
+//    {
+//      fb_inner = ((2 * n2 + 1) / (4 * M_PI)) * get_mat_knm(j, n2, m2);
+//      fb_inner *= shcalc->get_result(n2, m2);
+//      fbj += fb_inner;
+//    }
+//  }
+//  fbj /= pow(rb.r(), 2); // make f_hat into f
+//  return fbj;
+//}
 
 LHMatrix::LHMatrix(int I, int ns, int p, double kappa)
 :NumericalMatrix(I, ns, p), kappa_(kappa)
@@ -635,32 +635,32 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
 }
 
 //TODO: Is this ever needed?
-cmplx LHMatrix::make_hb_Ij(int I, int j, Pt rb,
-                           shared_ptr<HMatrix> H,
-                           shared_ptr<SHCalc> shcalc,
-                           vector<double> besseli)
-{
-  //  vector<double> besseli;
-  cmplx hb_inner, hbj;
-  vector<cmplx> h;
-  
-  shcalc->calc_sh(rb.theta(), rb.phi());
-  //  besseli = bcalc->calc_mbfI(p_+1,
-  //                             kappa_*rb.r());
-  hbj = 0;
-  for (int n = 0; n < p_; n++)
-  {
-    for (int m = -n; m < n+1; m++)
-    {
-      hb_inner = ((2*n+1)/ (4*M_PI)) * H->get_mat_knm(j, n, m) ;
-      hb_inner /= besseli[n];
-      hb_inner *= shcalc->get_result(n, m);
-      hbj += hb_inner;
-    }
-  }
-  hbj /= pow(rb.r(), 2);  // make h_hat into h
-  return hbj;
-}
+//cmplx LHMatrix::make_hb_Ij(int I, int j, Pt rb,
+//                           shared_ptr<HMatrix> H,
+//                           shared_ptr<SHCalc> shcalc,
+//                           vector<double> besseli)
+//{
+//  //  vector<double> besseli;
+//  cmplx hb_inner, hbj;
+//  vector<cmplx> h;
+//  
+//  shcalc->calc_sh(rb.theta(), rb.phi());
+//  //  besseli = bcalc->calc_mbfI(p_+1,
+//  //                             kappa_*rb.r());
+//  hbj = 0;
+//  for (int n = 0; n < p_; n++)
+//  {
+//    for (int m = -n; m < n+1; m++)
+//    {
+//      hb_inner = ((2*n+1)/ (4*M_PI)) * H->get_mat_knm(j, n, m) ;
+//      hb_inner /= besseli[n];
+//      hb_inner *= shcalc->get_result(n, m);
+//      hbj += hb_inner;
+//    }
+//  }
+//  hbj /= pow(rb.r(), 2);  // make h_hat into h
+//  return hbj;
+//}
 
 LHNMatrix::LHNMatrix(int I, int ns, int p)
 :ComplexMoleculeMatrix(I, ns, p)
@@ -877,6 +877,33 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
 //    cout << endl;
 //  }
 }
+
+cmplx HMatrix::make_hb_Ik(int k, Pt rb,
+                          shared_ptr<SHCalc> shcalc,
+                          vector<double> besseli)
+{
+  //  vector<double> besseli;
+  cmplx hb_inner, hbj;
+  vector<cmplx> h;
+  
+  shcalc->calc_sh(rb.theta(), rb.phi());
+  //  besseli = bcalc->calc_mbfI(p_+1,
+  //                             kappa_*rb.r());
+  hbj = 0;
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m < n+1; m++)
+    {
+      hb_inner = ((2*n+1)/ (4*M_PI)) * get_mat_knm(k, n, m) ;
+      hb_inner /= besseli[n];
+      hb_inner *= shcalc->get_result(n, m);
+      hbj += hb_inner;
+    }
+  }
+  hbj /= pow(rb.r(), 2);  // make h_hat into h
+  return hbj;
+}
+
 
 
 FMatrix::FMatrix(int I, int ns, int p, double kappa)

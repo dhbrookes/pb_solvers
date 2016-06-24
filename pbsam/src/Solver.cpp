@@ -283,7 +283,7 @@ void Solver::reset_all()
 GradSolver::GradSolver(shared_ptr<System> _sys,
                        shared_ptr<Constants> _consts,
                        shared_ptr<SHCalc> _shCalc,
-                       shared_ptr<PrecalcBessel> _bCalc,
+                       shared_ptr<BesselCalc> _bCalc,
                        shared_ptr<TMatrix> _T,
                        vector<shared_ptr<FMatrix> > _F,
                        vector<shared_ptr<HMatrix> > _H,
@@ -315,7 +315,6 @@ dLHN_(_sys->get_n(), vector<shared_ptr<GradLHNMatrix> > (_sys->get_n()))
       dH_[I][J] = make_shared<GradHMatrix> (I,J,_sys_->get_Ns_i(I),p_,kappa_);
       dWH_[I][J] = make_shared<GradWHMatrix> (I,J,_sys_->get_Ns_i(I),p_,kappa_);
       dLH_[I][J] = make_shared<GradLHMatrix> (I,J,_sys_->get_Ns_i(I),p_,kappa_);
-      
     }
   }
   
@@ -326,24 +325,29 @@ dLHN_(_sys->get_n(), vector<shared_ptr<GradLHNMatrix> > (_sys->get_n()))
 void GradSolver::solve()
 {
   shared_ptr<Molecule> molI;
+  vector<double> besseli, besselk;
   for (int J = 0; J < _sys_->get_n(); J++)  // with respect to
   {
     for (int I = 0; I < _sys_->get_n(); I++)
     {
       molI = _sys_->get_molecule(I);
+      
       for (int k = 0; k < _sys_->get_Ns_i(I); k++)
       {
+        besseli = _bCalc_->calc_mbfI(p_+1, kappa_*molI->get_ak(k));
+        besselk = _bCalc_->calc_mbfK(p_+1, kappa_*molI->get_ak(k));
+        
         dLF_[J][I]->calc_val_k(k, molI, _shCalc_, _T_, dF_[J][I]);
-        dLH_[J][I]->calc_val_k(k, molI, _bCalc_, _shCalc_, _T_, dH_[J][I]);
+        dLH_[J][I]->calc_val_k(k, molI, besseli, besselk, _shCalc_, _T_, dH_[J][I]);
         dLHN_[J][I]->calc_val_k(k, _sys_, _T_, _H_, dH_[J]);
 
-        dWF_[J][I]->calc_val_k(k, molI, _bCalc_, dH_[J][I], dF_[J][I],
+        dWF_[J][I]->calc_val_k(k, molI, besseli, besselk, dH_[J][I], dF_[J][I],
                                dLH_[J][I], dLHN_[J][I], dLF_[J][I]);
-        dWH_[J][I]->calc_val_k(k, molI, _bCalc_, dH_[J][I], dF_[J][I],
+        dWH_[J][I]->calc_val_k(k, molI, besseli, besselk, dH_[J][I], dF_[J][I],
                                dLH_[J][I], dLHN_[J][I], dLF_[J][I]);
         
         dF_[J][I]->calc_val_k(k, _IE_[I], dWF_[J][I]);
-        dH_[J][I]->calc_val_k(k, _bCalc_, _IE_[I], dWH_[J][I]);
+        dH_[J][I]->calc_val_k(k, besseli, _IE_[I], dWH_[J][I]);
       }
     }
   }

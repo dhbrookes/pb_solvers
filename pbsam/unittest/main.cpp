@@ -43,17 +43,17 @@ string test_dir_loc = "/Users/davidbrookes/Projects/pb_solvers/pbsam/pbsam_test_
 
 //string test_dir_loc = "/Users/lfelberg/Documents/pb_solvers/pbsam/pbsam_test_files/gtest/";
 
-//#include "BesselCalcUnitTest.h"
-//#include "ConstantsUnitTest.h"
-//#include "MyMatrixUnitTest.h"
-//#include "readutilUnitTest.h"
-//#include "ReExpCalcUnitTest.h"
-//#include "setupUnitTest.h"
-//#include "SHCalcUnitTest.h"
+#include "BesselCalcUnitTest.h"
+#include "ConstantsUnitTest.h"
+#include "MyMatrixUnitTest.h"
+#include "readutilUnitTest.h"
+#include "ReExpCalcUnitTest.h"
+#include "setupUnitTest.h"
+#include "SHCalcUnitTest.h"
 #include "SolverUnitTest.h"
-//#include "SystemUnitTest.h"
+#include "SystemUnitTest.h"
 #include "TMatrixUnitTest.h"
-//#include "utilUnitTest.h"
+#include "utilUnitTest.h"
 
 #include "tester.h"
 
