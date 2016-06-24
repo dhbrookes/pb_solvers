@@ -140,6 +140,8 @@ public:
   void calc_val_k(int k, shared_ptr<IEMatrix> IE,
                   shared_ptr<GradWFMatrix> dWF);
   
+  Ptx calc_df_P(Pt P, int k, shared_ptr<SHCalc> shcalc);
+  
 };
 
 /*
@@ -163,6 +165,12 @@ public:
                   vector<double> besseli,
                   shared_ptr<IEMatrix> IE,
                   shared_ptr<GradWHMatrix> dWH);
+  
+  // calculate the gradient of h at point P (Eq. S5a)
+  Ptx calc_dh_P(Pt P, int k, vector<double> besseli,
+                shared_ptr<SHCalc> shcalc);
+  
+  double get_kappa() const { return kappa_; }
   
 };
 
@@ -192,9 +200,8 @@ public:
                              shared_ptr<GradFMatrix> dF,
                              int Mp=-1);
   
-  // calculate the gradient of h at point P (Eq. S5a)
-  Ptx calc_df_P(Pt P, int k, shared_ptr<SHCalc> shcalc,
-                shared_ptr<GradFMatrix> dF);
+  // calculate the gradient of f at point P (Eq. S5b)
+
   
 };
 
@@ -230,10 +237,7 @@ public:
                              shared_ptr<GradHMatrix> dH,
                              int Mp=-1);
   
-  // calculate the gradient of h at point P (Eq. S5a)
-  Ptx calc_dh_P(Pt P, int k, vector<double> besseli,
-                shared_ptr<SHCalc> shcalc,
-                shared_ptr<GradHMatrix> dH);
+
   
 };
 

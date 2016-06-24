@@ -29,17 +29,43 @@ public:
 };
 
 
-/*
- Calculate translational force on a molecule given dI_LHN^(I,k), H^(I,k),
- LHN^(I,k) and dI_H^(I,k)
- */
+
 class ForceCalc
 {
-public:
-  ForceCalc() { }
+protected:
+  shared_ptr<SHCalc> shcalc_;
+  shared_ptr<BesselCalc> bcalc_;
   
-  Ptx calc_force(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
-                 shared_ptr<GradHMatrix> dH, shared_ptr<GradLHNMatrix> dLHN);
+public:
+  ForceCalc(shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc)
+  :shcalc_(shcalc), bcalc_(bcalc)
+  {
+  }
+  
+  /*
+   Calculate translational force on a molecule given dI_LHN^(I,k), H^(I,k),
+   LHN^(I,k) and dI_H^(I,k)
+   */
+  Ptx calc_fI(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
+              shared_ptr<GradHMatrix> dH, shared_ptr<GradLHNMatrix> dLHN);
+  
+  //calc force at a point
+  Ptx calc_fp(Pt P, shared_ptr<Molecule> mol,
+              shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
+              shared_ptr<GradHMatrix> dH, shared_ptr<GradLHNMatrix> dLHN);
+};
+
+
+class TorqueCalc
+{
+public:
+  TorqueCalc()  { }
+  
+  Ptx calc_tauI(shared_ptr<Molecule> mol, shared_ptr<ForceCalc> fcalc,
+                shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
+                shared_ptr<GradHMatrix> dH, shared_ptr<GradLHNMatrix> dLHN);
+  
+  Ptx cross_prod(Pt a, Ptx b);
 };
 
 #endif /* PhysCalcCalc_h */

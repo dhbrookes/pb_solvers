@@ -305,12 +305,7 @@ public:
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
                  shared_ptr<SHCalc> shcalc, shared_ptr<System> sys, int k);
   
-  /*
-   Equation 15a [1]. For analytic re expansion
-   */
-  cmplx make_fb_Ij(int I, int j, Pt rb,
-                   shared_ptr<FMatrix> F,
-                   shared_ptr<SHCalc> shcalc);
+
 };
 
 /*
@@ -330,13 +325,13 @@ public:
   
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k);
   
-  /*
-   Equation 15b [1]. For analytic re expansion
-   */
-  cmplx make_hb_Ij(int I, int j, Pt rb,
-                   shared_ptr<HMatrix> H,
-                   shared_ptr<SHCalc> shcalc,
-                   vector<double> besseli);
+//  /*
+//   Equation 15b [1]. For analytic re expansion
+//   */
+//  cmplx make_hb_Ij(int I, int j, Pt rb,
+//                   shared_ptr<HMatrix> H,
+//                   shared_ptr<SHCalc> shcalc,
+//                   vector<double> besseli);
   
 };
 
@@ -367,7 +362,6 @@ public:
   void calc_vals(shared_ptr<Molecule> mol, shared_ptr<BesselCalc> bcalc,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                  shared_ptr<LHNMatrix> LHN, double kappa, int k);
-  
 };
 
 /*
@@ -411,6 +405,13 @@ public:
                  shared_ptr<IEMatrix> IE,
                  shared_ptr<BesselCalc> bcalc, int k);
   
+  /*
+   Equation 15b [1]. For analytic re expansion
+   */
+  cmplx make_hb_Ik(int k, Pt rb,
+                   shared_ptr<SHCalc> shcalc,
+                   vector<double> besseli);
+  
   // calculate convergence criteria (Equation 23)
 //  static double calc_converge(shared_ptr<HMatrix> curr,
 //                              shared_ptr<HMatrix> prev);
@@ -432,6 +433,12 @@ public:
                  shared_ptr<HMatrix> H,
                  shared_ptr<IEMatrix> IE,
                  shared_ptr<BesselCalc> bcalc, int k);
+  
+  /*
+   Equation 15a [1]. For analytic re expansion
+   */
+  cmplx make_fb_Ij(int I, int j, Pt rb,
+                   shared_ptr<SHCalc> shcalc);
   
 };
 

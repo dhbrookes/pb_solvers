@@ -179,6 +179,23 @@ void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
   }
 }
 
+Ptx GradFMatrix::calc_df_P(Pt P, int k, shared_ptr<SHCalc> shcalc)
+{
+  shcalc->calc_sh(P.theta(), P.phi());
+  Ptx df = Ptx();
+  Ptx in;
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m < n+1; m++)
+    {
+      in = get_mat_knm(k,n,m)*shcalc->get_result(n,m)*((2*n+1)/(4*M_PI));
+      df += in;
+    }
+  }
+  return df;
+}
+
+
 GradHMatrix::GradHMatrix(int I, int wrt, int ns, int p, double kappa)
 :GradCmplxMolMat(I, wrt, ns, p), kappa_(kappa)
 {
@@ -277,7 +294,7 @@ MyMatrix<Ptx> GradLFMatrix::numeric_reex(int k, int j,
     {
       for (int b = 0; b < Mp; b++)
       {
-        fpj = calc_df_P(sph_grid[b], k, shcalc, dF);
+        fpj = dF->calc_df_P(sph_grid[b], k, shcalc);
         fpj *= (4 * M_PI) / sph_grid.size();
         
         rb_k = sph_grid[b]-(mol->get_centerk(k)-mol->get_centerk(j));
@@ -293,22 +310,6 @@ MyMatrix<Ptx> GradLFMatrix::numeric_reex(int k, int j,
   return dLF_Ik;
 }
 
-Ptx GradLFMatrix::calc_df_P(Pt P, int k, shared_ptr<SHCalc> shcalc,
-                            shared_ptr<GradFMatrix> dF)
-{
-  shcalc->calc_sh(P.theta(), P.phi());
-  Ptx df = Ptx();
-  Ptx in;
-  for (int n = 0; n < p_; n++)
-  {
-    for (int m = -n; m < n+1; m++)
-    {
-      in = dF->get_mat_knm(k,n,m)*shcalc->get_result(n,m)*((2*n+1)/(4*M_PI));
-      df += in;
-    }
-  }
-  return df;
-}
 
 
 GradLHMatrix::GradLHMatrix(int I, int wrt, int ns, int p, double kappa)
@@ -375,7 +376,7 @@ MyMatrix<Ptx> GradLHMatrix::numeric_reex(int k, int j,
     {
       for (int b = 0; b < Mp; b++)
       {
-        hpj = calc_dh_P(sph_grid[b], k, besseli, shcalc, dH);
+        hpj = dH->calc_dh_P(sph_grid[b], k, besseli, shcalc);
         hpj *= (4 * M_PI) / sph_grid.size();
         
         rb_k = sph_grid[b]-(mol->get_centerk(k)-mol->get_centerk(j));
@@ -394,10 +395,9 @@ MyMatrix<Ptx> GradLHMatrix::numeric_reex(int k, int j,
   return dLH_Ik;
 }
 
-Ptx GradLHMatrix::calc_dh_P(Pt P, int k,
+Ptx GradHMatrix::calc_dh_P(Pt P, int k,
                             vector<double> besseli,
-                            shared_ptr<SHCalc> shcalc,
-                            shared_ptr<GradHMatrix> dH)
+                            shared_ptr<SHCalc> shcalc)
 {
   shcalc->calc_sh(P.theta(), P.phi());
   Ptx dh = Ptx();
@@ -406,7 +406,7 @@ Ptx GradLHMatrix::calc_dh_P(Pt P, int k,
   {
     for (int m = -n; m < n+1; m++)
     {
-      in = dH->get_mat_knm(k,n,m)*shcalc->get_result(n,m)*((2*n+1)/(4*M_PI));
+      in = get_mat_knm(k,n,m)*shcalc->get_result(n,m)*((2*n+1)/(4*M_PI));
       in *= 1/besseli[n];
       dh += in;
     }
