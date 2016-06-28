@@ -80,10 +80,10 @@ public:
   
   friend ostream & operator<<(ostream & fout, ComplexMoleculeMatrix & M)
   {
-//    fout << "{ {";
+    fout << "{{";
     for (int k = 0; k < M.get_ns(); k++)
     {
-      fout << "For sphere " << k << endl;
+//      fout << "For sphere " << k << endl;
       for (int n = 0; n < M.get_p(); n++)
       {
         for (int m = 0; m <= n; m++)
@@ -92,13 +92,13 @@ public:
           double imag = M.get_mat_knm( k, n, m).imag();
           if(abs(real) < 1e-15 ) real = 0.0;
           if(abs(imag) < 1e-15 ) imag = 0.0;
-          fout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
-//          fout << setprecision(9) << imag << ",";
+//          fout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
+          fout << setprecision(9) << real << ",";
         }
-        fout << endl;
+//        fout << endl;
       }
-//      fout << "},{" ;
-      fout << endl;
+      fout << "},{" ;
+//      fout << endl;
     }
 //    fout << "},{" << endl;
     return fout;

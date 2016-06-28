@@ -153,7 +153,7 @@ double Solver::calc_converge_H(int I, int k, bool inner)
 
 void Solver::iter_innerH(int I, int k)
 {
-  double dev(1e20), toli(1e-16);
+  double dev(1e20), toli(1e-6);
   int ct(0), mxCt(20);
   
   auto mol = _sys_->get_molecule(I);
@@ -166,13 +166,7 @@ void Solver::iter_innerH(int I, int k)
     
     dev = calc_converge_H(I,k,true);
     update_prevH(I, k);
-    
-    cout << "This is F " << endl;
-    _F_[I]->print_kmat(k);
-    cout << "This is H " << endl;
-    _H_[I]->print_kmat(k);
-    
-    
+
     ct++;
   }
 }
@@ -191,13 +185,6 @@ void Solver::step(shared_ptr<Molecule> mol, int I, int k)
                      _LH_[I], _LF_[I], _LHN_[I], kappa_, k);
   _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
                      _LF_[I], _LHN_[I], kappa_, k);
-  
-  cout << "This is XH" << endl;
-  _XH_[I]->print_kmat(k);
-  cout << "This is Xf" << endl;
-  _XF_[I]->print_kmat(k);
-  
-  cout << "Entering inner loop" << endl;
   iter_innerH(I, k);
 }
 
