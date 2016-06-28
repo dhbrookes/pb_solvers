@@ -339,7 +339,7 @@ TEST_F(SolverUTest, spol_test)
                      SHCalcTest, pol, _expcons, true, 0, true);
 
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
-  solvTest.solve(1e-15 , 200);
+  solvTest.solve(1e-15 , 10);
   
   cout << "This is H " << endl;
   cout << (*solvTest.get_all_H()[0]) << endl;

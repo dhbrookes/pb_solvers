@@ -270,10 +270,10 @@ public:
   }
   
   
-  void print_analytical()
+  void print_analytical(int k)
   {
-    for (int k = 0; k < get_ns(); k++)
-    {
+//    for (int k = 0; k < get_ns(); k++)
+//    {
       cout << "For sphere " << k << endl;
       for (int n = 0; n < get_p(); n++)
       {
@@ -288,7 +288,7 @@ public:
         cout << endl;
       }
       cout << endl;
-    }
+//    }
   }
   
 };

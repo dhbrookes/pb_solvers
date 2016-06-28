@@ -861,6 +861,8 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
   vector<double> bessel_i = bcalc->calc_mbfI(p_+1, kappa_*ak);
   vector<double> bessel_k = bcalc->calc_mbfK(p_+1, kappa_*ak);
   
+  cout << "This is before H : " << k << endl;
+  
   for (int l = 0; l < p_; l++)  // rows in old matrix
   {
     for (int s = 0; s < l+1; s++)  //columns in old matrix
@@ -878,7 +880,9 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
         h_in(ct,0) = inner.imag();
         ct++;
       }
+      cout << ", " << inner ;
     }
+    cout << endl;
   }
   
   //TODO: replace with matMul
