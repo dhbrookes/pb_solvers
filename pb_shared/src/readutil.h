@@ -436,7 +436,7 @@ public:
   IMatFile(string path, int p)
   :path_(path), p_(p)
   {
-    mat_.reserve(p*p*p*p);
+    mat_.resize(p*p*p*p);
     read_binary();
   }
   

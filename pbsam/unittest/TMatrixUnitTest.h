@@ -34,7 +34,7 @@ class TMatrixUTest : public ::testing::Test
 TEST_F(TMatrixUTest, xfor_numeric_test)
 {
   int pol = 5;
-  double kap = 0.21053961;
+  double kap = 0.0;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<Molecule> > mols;
   mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
@@ -43,6 +43,7 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
   auto sys = make_shared<System>(mols);
   
   auto cst = make_shared<Constants> ();
+  cst->set_salt_concentration(0.0);
   auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
   auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
   auto BesselCons = make_shared<BesselConstants> (2*pol);
@@ -60,7 +61,7 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
   hmat->init(sys->get_molecule(0), SHCalcTest, 4.0);
   
   // Local H, numeric
-  LHMatrix lhmt(0, sys->get_Ns_i(0), pol, 0.21053961);
+  LHMatrix lhmt(0, sys->get_Ns_i(0), pol, kap);
   lhmt.init(sys->get_molecule(0), hmat, SHCalcTest, BesselCal, _expcons);
   
   // Transform class
@@ -77,7 +78,7 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
       if ( localXSphre[i][sphct].size() == 0 ) continue;
       int expct = 0;
       MyMatrix<cmplx> out = tmat.re_expandX_numeric(lhmt.get_mat(), 0,
-                                                    mySphs[i], 0, j);
+                                                    mySphs[i], 0, j, kap);
       for (int n = 0; n < pol; n++)
       {
         for (int m = 0; m <= n; m++)
@@ -103,6 +104,7 @@ TEST_F(TMatrixUTest, xforIntra_analytic_test)
                                      pqr.get_cg_centers(), pqr.get_cg_radii()));
   auto sys = make_shared<System>(mols);
   auto cst = make_shared<Constants> ();
+  
   auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
   auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
   auto BesselCons = make_shared<BesselConstants> (2*pol);

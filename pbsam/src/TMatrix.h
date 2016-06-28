@@ -114,7 +114,7 @@ public:
    Re-expand a numerical surface with respect to T(I,k)(J,l) (Equation 27b [1])
    */
   MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
-                                   int J, int l);
+                                   int J, int l, double kappa);
   
   /*
    re-expand element j of grad(X) with element (I,k,J l) of T. REquires

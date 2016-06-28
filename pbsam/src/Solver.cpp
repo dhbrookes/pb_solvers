@@ -31,6 +31,7 @@ _shCalc_(_shCalc),
 _bCalc_(_bCalc),
 _consts_(_consts),
 _sys_(_sys),
+dev_sph_Ik_(_sys->get_n()),
 p_(p),
 kappa_(_consts->get_kappa())
 {
@@ -45,7 +46,12 @@ kappa_(_consts->get_kappa())
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     _mol = _sys_->get_molecule(I);
-    double kappa = 0.0;
+    
+    dev_sph_Ik_[I].resize(_mol->get_ns());
+    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+      dev_sph_Ik_[I][k] = 0.0;
+    
+    double kappa = _consts->get_kappa();
     
     _E_[I] = make_shared<EMatrix> (I, _sys_->get_Ns_i(I), p_);
     _E_[I]->calc_vals(_mol, _shCalc_, _consts_->get_dielectric_prot());
@@ -54,7 +60,7 @@ kappa_(_consts->get_kappa())
     _LE_[I]->calc_vals(_mol, _shCalc_, _consts_->get_dielectric_prot());
     
     _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
-    _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
+    _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, 0.0);
     
     if (readHF)
     {
@@ -68,7 +74,7 @@ kappa_(_consts->get_kappa())
 
     _outerH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
-    _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
+    _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, 0.0);
     
     _IE_[I] = make_shared<IEMatrix>(I, _mol, _shCalc, p_, _expConsts_, false);
     if (readImat)
@@ -80,7 +86,7 @@ kappa_(_consts->get_kappa())
       _IE_[I]->calc_vals(_mol, _shCalc_);
     
     _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
-    _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa_);
+    _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa);
     _LHN_[I] = make_shared<LHNMatrix> (I, _sys_->get_Ns_i(I), p_);
     
     _XF_[I] = make_shared<XFMatrix> (I, _sys_->get_Ns_i(I), p_,
@@ -89,8 +95,6 @@ kappa_(_consts->get_kappa())
                                      _mol, _E_[I], _LE_[I]);
     _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_,
                                      _mol, _E_[I], _LE_[I]);
-    
-    
   }
   update_prev_all();
 }
@@ -149,7 +153,7 @@ double Solver::calc_converge_H(int I, int k, bool inner)
 
 void Solver::iter_innerH(int I, int k)
 {
-  double dev(1e20), toli(1e-6);
+  double dev(1e20), toli(1e-16);
   int ct(0), mxCt(20);
   
   auto mol = _sys_->get_molecule(I);
@@ -157,7 +161,7 @@ void Solver::iter_innerH(int I, int k)
   // Inner H loop
   while ( dev > toli && ct < mxCt )
   {
-    _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k);
+    _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k,kappa_);
     _H_[I]->calc_vals(mol,_prevH_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
     
     dev = calc_converge_H(I,k,true);
@@ -177,32 +181,39 @@ void Solver::step(shared_ptr<Molecule> mol, int I, int k)
   _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
   
   _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
-                     _LH_[I], _LF_[I], _LHN_[I], 0.0, k);
+                     _LH_[I], _LF_[I], _LHN_[I], kappa_, k);
   _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
-                     _LF_[I], _LHN_[I], 0.0, k);
+                     _LF_[I], _LHN_[I], kappa_, k);
   
   iter_innerH(I, k);
 }
 
 double Solver::iter(int t)
 {
-  double devk, mu = 0;
+  double mu_int(0);
+  if ( t == 0 ) mu_ = 0.0;
+  
   shared_ptr<Molecule> mol;
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     mol = _sys_->get_molecule(I);
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      step( mol, I, k);
-      
-      devk = calc_converge_H(I,k,false);
-      if ( devk > mu )
-        mu = devk;
-      
-      update_LHN_all();
+      if( dev_sph_Ik_[I][k] > 0.1*mu_ || t % 5 == 0)
+      {
+        step( mol, I, k);
+        
+        dev_sph_Ik_[I][k] = calc_converge_H(I,k,false);
+        if ( dev_sph_Ik_[I][k] > mu_int )
+          mu_int = dev_sph_Ik_[I][k];
+        
+        update_LHN_all();
+      }
     } // end k
   }
-  return mu;
+  
+  mu_ = mu_int;
+  return mu_;
 }
 
 

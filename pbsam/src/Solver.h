@@ -51,6 +51,10 @@ protected:
   shared_ptr<ReExpCoeffsConstants>  _reExConsts_;
   shared_ptr<ExpansionConstants>    _expConsts_;
   
+  vector<vector<double> >           dev_sph_Ik_;
+  
+  double                            mu_; // SCF deviation max
+  
   // update prevH and prevF
   void update_outerH(int I, int k);
   void update_prevH(int I, int k);
