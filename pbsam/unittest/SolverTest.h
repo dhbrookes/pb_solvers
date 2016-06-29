@@ -62,6 +62,7 @@ public:
     
     Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
                     true, true, imat_loc, exp_loc);
+    solvTest.iter(0);
   }
   
 };

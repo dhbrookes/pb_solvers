@@ -96,6 +96,8 @@ protected:
   int p_;
   double kappa_; //from Constants
   
+  bool is_sam_;
+  
   void calc_a_and_b();
   void calc_alpha_and_beta();
   void calc_nu_and_mu();
@@ -104,7 +106,8 @@ public:
   
   ReExpCoeffsConstants() { }
 
-  ReExpCoeffsConstants(double const& kappa, double const& lambda, int const &p);
+  ReExpCoeffsConstants(double const& kappa, double const& lambda, int const &p,
+                       bool sam = false);
   
   double get_a_val(int n, int m)  { return a_(n, m + 2*p_); }
   double get_b_val(int n, int m)  { return b_(n, m + 2*p_); }

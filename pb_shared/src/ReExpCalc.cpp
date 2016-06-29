@@ -11,8 +11,9 @@
 
 ReExpCoeffsConstants::ReExpCoeffsConstants(const double &kappa,
                                            const double &lambda,
-                                           const int &p)
-: kappa_(kappa), lambda_(lambda), p_(p),
+                                           const int &p,
+                                           bool sam)
+: kappa_(kappa), lambda_(lambda), p_(p), is_sam_(sam),
 a_(2*p, 4*p), b_(2*p, 4*p),
 alpha_(2*p, 4*p), beta_(2*p, 4*p),
 nu_(2*p, 4*p), mu_(2*p, 4*p)
@@ -59,11 +60,11 @@ void ReExpCoeffsConstants::calc_alpha_and_beta()
       double nD = (double) n;
       double mD = (double) m;
       alpha_val = sqrt((nD + mD + 1.0) * (nD - mD + 1.0));
-      beta_val  = (pow(lambda_*kappa_, 2.0)*alpha_val);
+      if (is_sam_) beta_val = (kappa_ == 0) ? 0 : alpha_val;
+      else         beta_val  = (pow(lambda_*kappa_, 2.0)*alpha_val);
       beta_val *= (1.0 / ((2.0 * nD + 1.0) * (2.0 * nD + 3.0)));
       set_alpha( n, m, alpha_val);
       set_beta(  n, m, beta_val);
-      
     }
   }
 }
@@ -83,7 +84,9 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
       double nD = (double) n;
       double mD = (double) m;
       nu_val = sign * sqrt((nD - mD - 1.) * (nD - mD));
-      mu_val = (pow(lambda_*kappa_, 2) * nu_val) / ((2.*nD-1.) * (2.*nD+1.));
+      if (is_sam_) mu_val = (kappa_ == 0) ? 0 : nu_val;
+      else         mu_val  = (pow(lambda_*kappa_, 2) * nu_val);
+      mu_val *=  (1.0 / ((2.*nD-1.) * (2.*nD+1.)));
       set_nu( n, m, nu_val);
       set_mu( n, m, mu_val);
     }
@@ -122,8 +125,8 @@ prefacSing_(2*p, MyMatrix<double>(p, 2))
     s_prefac_[1] = 1.0;
   } else
   {
-    s_prefac_[0] = kappa_ * kappa_ * lam_sam_[0] * lam_sam_[0];
-    s_prefac_[1] = kappa_ * kappa_ * lam_sam_[0] * lam_sam_[1];
+    s_prefac_[0] = kappa_ * kappa_ * lam_sam_[0] * lam_sam_[1]; //kpio
+    s_prefac_[1] = kappa_ * kappa_ * lam_sam_[1] * lam_sam_[1]; // kpoo
   }
   
   lam_scl_[0] = 1.0;
@@ -260,7 +263,7 @@ void ReExpCoeffs::calc_s()
   int m, n, l;
   double val;
   double r = v_.r();
-
+  
   for (l = 0; l < 2 * p_; l++)
   {
     val = pow((lambda_ / r), l) * (besselK_[l] * exp(-kappa_*r)) / r;
@@ -303,7 +306,16 @@ void ReExpCoeffs::calc_s()
       set_sval(m, l, m, val);
     }
     
-    for (n = m; n < p_ - 1; n++)
+    n = m;
+    for (l = n+1; l < 2*p_ - m - 2; l++)
+    {
+      val  = s_prefac_[0] * _consts_->get_beta(l-1, m)*get_sval(  n, l-1, m);
+      val += lamOI * _consts_->get_alpha(l,m) * get_sval( n, l+1, m);
+      val *= (-1.0 / _consts_->get_alpha( n, m) );
+      set_sval(n+1, l, m, val);
+    }
+    
+    for (n = m + 1; n < p_ - 1; n++)
     {
       for (l = n + 1; l < 2*p_ - n - 2; l++)
       {
@@ -532,7 +544,7 @@ void ReExpCoeffs::print_S()
       for (int n = m; n <= l; n++)
       {
         double r = fabs(get_sval(n, l, m))>1e-15 ? get_sval(n, l, m) : 0;
-        cout << r << " | ";
+        cout << setprecision(9)<< r << " | ";
       }
       cout << endl;
     }

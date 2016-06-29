@@ -56,10 +56,6 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           c_Jl = _sys->get_centerik(J, l);
           ak = _sys->get_aik(I, k);
           al = _sys->get_aik(J, l);
-          
-//          cout << "This is Ik, Jl pair : "  << k << " & " << l
-//          << " dist: " << c_Ik.dist(c_Jl) << " and aIk " << ak << " and ajl "
-//          << al << " dis1 : " <<  c_Ik.dist(c_Jl) - ak - al << endl;
 
           if ( (I==J) && ((c_Ik.dist(c_Jl)<cutoff)||
                           (c_Ik.dist(c_Jl)<ak+al+cutoff)))
@@ -68,9 +64,15 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
             continue;
           }
           
-          kapVal  = ( I == J ) ? 0.0 : kappa_;
-          vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kapVal*v.r());
+//          cout << "This is Ik, Jl pair : "  << I << ", "<< k
+//              << " & "  << J << ", "<< l
+//              << " dist: " << c_Ik.dist(c_Jl) << " and aIk "
+//              << ak << " and ajl "
+//              << al << " dis1 : " <<  c_Ik.dist(c_Jl) - ak - al << endl;
+          
+          kapVal = ( I == J ) ? 0.0 : kappa_;
           v = _sys->get_pbc_dist_vec_base(c_Ik, c_Jl);
+          vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kapVal*v.r());
           _shcalc->calc_sh(v.theta(), v.phi());
           
           vector<double> lambdas = {_sys->get_aik(J, l), _sys->get_aik(I, k)};
@@ -135,10 +137,12 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
 //  {
 //    for (int m = 0; m <= n; m++)
 //    {
-//      cout << Z(n,m+p_) << ", ";
+//      cout << X2(n,m+p_) << ", ";
 //    }
 //    cout << endl;
 //  }
+  
+
   return Z;
 }
 

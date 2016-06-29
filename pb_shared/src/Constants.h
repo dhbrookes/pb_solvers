@@ -125,6 +125,10 @@ public:
     saltConcentration_ = val;
     update_kappa();
   }
+  void set_kappa(double val)
+  {
+    kappa_ = val;
+  }
   void set_temp(double val)
   {
     temp_ = val;

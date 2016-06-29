@@ -26,7 +26,7 @@ _H_(_sys->get_n()),
 _F_(_sys->get_n()),
 _outerH_(_sys->get_n()),
 _prevH_(_sys->get_n()),
-_prevF_(_sys->get_n()),
+//_prevF_(_sys->get_n()),
 _shCalc_(_shCalc),
 _bCalc_(_bCalc),
 _consts_(_consts),
@@ -36,7 +36,8 @@ p_(p),
 kappa_(_consts->get_kappa())
 {
   _reExConsts_ = make_shared<ReExpCoeffsConstants> (kappa_,
-                                                    _sys_->get_lambda(), p_);
+                                                    _sys_->get_lambda(), p_,
+                                                    true);
   _T_ = make_shared<TMatrix> (p_, _sys_, _shCalc_, _consts_,
                               _bCalc_, _reExConsts_);
   
@@ -74,7 +75,6 @@ kappa_(_consts->get_kappa())
 
     _outerH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
-    _prevF_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, 0.0);
     
     _IE_[I] = make_shared<IEMatrix>(I, _mol, _shCalc, p_, _expConsts_, false);
     if (readImat)
@@ -171,37 +171,41 @@ void Solver::iter_innerH(int I, int k)
   }
 }
 
-void Solver::step(shared_ptr<Molecule> mol, int I, int k)
+void Solver::step(int I, int k)
 {
-  update_outerH(I, k);
-  
   _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
   _LH_[I]->calc_vals(_T_, _H_[I], k);
   
   _LF_[I]->init(_sys_->get_molecule(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
   _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
   
+//  cout << "Molecule " << I << " this is k " << k << endl;
+//  cout << "This is LH analytical " << endl;
+//  _LH_[I]->print_analytical(k);
+//  
+//  cout << "This is LF analytical " << endl;
+//  _LF_[I]->print_analytical(k);
+  
   _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
                      _LH_[I], _LF_[I], _LHN_[I], kappa_, k);
   _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
                      _LF_[I], _LHN_[I], kappa_, k);
-  iter_innerH(I, k);
 }
 
 double Solver::iter(int t)
 {
   double mu_int(0);
   if ( t == 0 ) mu_ = 0.0;
-  
-  shared_ptr<Molecule> mol;
+
   for (int I = 0; I < _sys_->get_n(); I++)
   {
-    mol = _sys_->get_molecule(I);
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
       if( dev_sph_Ik_[I][k] > 0.1*mu_ || t % 5 == 0)
       {
-        step( mol, I, k);
+        update_outerH(I, k);
+        step( I, k);
+        iter_innerH(I, k);
         
         dev_sph_Ik_[I][k] = calc_converge_H(I,k,false);
         if ( dev_sph_Ik_[I][k] > mu_int )
@@ -236,7 +240,7 @@ void Solver::update_LHN_all()
   {
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      _LHN_[I]->calc_vals(_T_, _H_, k); // requires all Hs so do it at end
+      _LHN_[I]->calc_vals(_sys_, _T_, _H_, k); // requires all Hs, do it at end
     }
   }
 }
@@ -268,13 +272,13 @@ void Solver::update_prevH(int I, int k)
 void Solver::update_prevF(int I, int k)
 {
   
-  for (int n = 0; n < p_; n++)
-  {
-    for (int m = -n; m <= n; m++)
-    {
-      _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
-    }
-  }
+//  for (int n = 0; n < p_; n++)
+//  {
+//    for (int m = -n; m <= n; m++)
+//    {
+//      _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
+//    }
+//  }
 }
 
 void Solver::solve(double tol, int maxiter)
@@ -307,7 +311,7 @@ void Solver::reset_all()
       _H_[I]->reset_mat(k);
       _F_[I]->reset_mat(k);
       _prevH_[I]->reset_mat(k);
-      _prevF_[I]->reset_mat(k);
+//      _prevF_[I]->reset_mat(k);
     }
     _IE_[I]->reset_mat();
   }

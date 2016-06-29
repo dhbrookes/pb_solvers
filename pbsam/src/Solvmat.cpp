@@ -665,51 +665,48 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
   }
 }
 
-//TODO: Is this ever needed?
-//cmplx LHMatrix::make_hb_Ij(int I, int j, Pt rb,
-//                           shared_ptr<HMatrix> H,
-//                           shared_ptr<SHCalc> shcalc,
-//                           vector<double> besseli)
-//{
-//  //  vector<double> besseli;
-//  cmplx hb_inner, hbj;
-//  vector<cmplx> h;
-//  
-//  shcalc->calc_sh(rb.theta(), rb.phi());
-//  //  besseli = bcalc->calc_mbfI(p_+1,
-//  //                             kappa_*rb.r());
-//  hbj = 0;
-//  for (int n = 0; n < p_; n++)
-//  {
-//    for (int m = -n; m < n+1; m++)
-//    {
-//      hb_inner = ((2*n+1)/ (4*M_PI)) * H->get_mat_knm(j, n, m) ;
-//      hb_inner /= besseli[n];
-//      hb_inner *= shcalc->get_result(n, m);
-//      hbj += hb_inner;
-//    }
-//  }
-//  hbj /= pow(rb.r(), 2);  // make h_hat into h
-//  return hbj;
-//}
-
 LHNMatrix::LHNMatrix(int I, int ns, int p)
 :ComplexMoleculeMatrix(I, ns, p)
 {
 }
 
-void LHNMatrix::calc_vals(shared_ptr<TMatrix> T,
+void LHNMatrix::calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
                           vector<shared_ptr<HMatrix> > H, int k)
 {
   reset_mat(k);
   MyMatrix<cmplx> reex;
+  Pt Ik, Jl;
+  double aIk, aJl, interPolcut = 10.0;
   for (int J = 0; J < T->get_nmol(); J++)
   {
     if (J == I_) continue;
-    for (int l =0 ; l < T->get_nsi(J); l++)
+    Ik = sys->get_centerik(I_, k);
+    aIk = sys->get_aik(I_, k);
+    for (int l = 0 ; l < T->get_nsi(J); l++)
     {
-      reex = T->re_expandX(H[J]->get_mat_k(l), I_, k, J, l);
-      mat_[k] += reex;
+      Jl = sys->get_centerik(J, l);
+      aJl = sys->get_aik(J, l);
+      
+      if ( sys->get_pbc_dist_vec_base(Ik, Jl).norm() < (interPolcut+aIk+aJl))
+      {
+        cout << "This is H before I " << I_ << " and k " << k
+        << " and j " << J << " and l " << l<< endl;
+        H[J]->print_kmat(l);
+        cout << " Rot1 " << endl;
+        reex = T->re_expandX(H[J]->get_mat_k(l), I_, k, J, l);
+        mat_[k] += reex;
+        
+        cout << "This is H After " << endl;
+        for (int n = 0; n < p_; n++)
+        {
+          for (int m = 0; m <= n; m++)
+          {
+            cout << reex(n, m+p_) << ", ";
+          }
+          cout << endl;
+        }
+        
+      }
     }
   }
 

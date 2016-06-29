@@ -326,6 +326,7 @@ TEST_F(SolverUTest, spol_test)
   cst->set_dielectric_prot(4);
   cst->set_salt_concentration(0.01);
   cst->set_temp(298.15);
+  cst->set_kappa(0.0325628352);
   auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
   auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
   auto BesselCons = make_shared<BesselConstants> (2*pol);
@@ -363,85 +364,95 @@ TEST_F(SolverUTest, spol_test)
 }
 
 
-//TEST_F(SolverUTest, mutual_pol_test)
-//{
-//  int pol(3), nmol(2);
-//  PQRFile pqr(test_dir_loc + "test_cged.pqr");
-//  vector<shared_ptr<Molecule> > mols;
-//  for (int i=0; i<nmol; i++)
-//    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-//                                         pqr.get_atom_pts(), pqr.get_radii(),
-//                                         pqr.get_cg_centers(),
-//                                         pqr.get_cg_radii()));
-//
-//  mols[0]->translate(Pt(-9.28786, -7.35779, -0.156281), 1e14);
-//  mols[1]->translate(Pt(10.71214, -7.35779, -0.156281), 1e14);
-//  auto sys = make_shared<System>(mols);
+TEST_F(SolverUTest, mutual_pol_test)
+{
+  int pol(3), nmol(2);
+  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+  vector<shared_ptr<Molecule> > mols;
+  for (int i=0; i<nmol; i++)
+    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                         pqr.get_atom_pts(), pqr.get_radii(),
+                                         pqr.get_cg_centers(),
+                                         pqr.get_cg_radii()));
+  mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
+  mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
+  auto sys = make_shared<System>(mols);
 //  
 //  cout << "This is cog of i " << sys->get_cogi(0).x() << ", " << sys->get_cogi(0).y() << ", " << sys->get_cogi(0).z() << endl;
 //  cout << "This is cog of i " << sys->get_cogi(1).x() << ", " << sys->get_cogi(1).y() << ", " << sys->get_cogi(1).z() << endl;
-//  auto cst = make_shared<Constants> ();
-//  cst->set_dielectric_water(80);
-//  cst->set_dielectric_prot(4);
-//  
-//  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
-//  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
-//  auto BesselCons = make_shared<BesselConstants> (2*pol);
-//  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
-//  auto _expcons = make_shared<ExpansionConstants> (pol);
-//  
-//  // Generate surface integrals
-//  for (int i=0; i<nmol; i++)
-//    IEMatrix ieMatTest(0, sys->get_molecule(i),
-//                       SHCalcTest, pol, _expcons, true, 0, true);
-//  
-//  string istart = test_dir_loc + "imat_test/imat.sp";
-//  string estart = test_dir_loc + "spol_test/test_0.00_p3.0.";
-//  vector<vector<string> > imat_loc(sys->get_n());
-//  vector<vector<vector<string > > > exp_loc(sys->get_n());
-//  
-//  // Generate surface integrals
-//  for (int i = 0; i < sys->get_n(); i++)
-//  {
-//    imat_loc[i].resize(sys->get_Ns_i(i));
-//    exp_loc[i].resize(sys->get_Ns_i(i));
-//    for (int k = 0; k < sys->get_Ns_i(i); k++)
-//    {
-//      exp_loc[i][k].resize(2);
-//      imat_loc[i][k] = istart+to_string(k) + ".out.bin";
-//      exp_loc[i][k][0] = estart+to_string(k) + ".H.exp";
-//      exp_loc[i][k][1] = estart+to_string(k) + ".F.exp";
-//    }
-//  }
-//  
-////  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
-////                  true, true, imat_loc, exp_loc);
-////  solvTest.iter(0);
-////  solvTest.solve(1e-5, 2);
-//  
-//  for (int i = 0; i < sys->get_n(); i++)
-//  {
-//    for (int k = 0; k < sys->get_Ns_i(i); k++)
-//    {
-//      int ct = 0;
-//      for(int n=0; n<pol; n++)
-//      {
-//        for(int m=0; m <= n; m++)
-//        {
-////          EXPECT_NEAR(spolFre[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).real(),
-////                      preclim);
-////          EXPECT_NEAR(spolHre[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).real(),
-////                      preclim);
-////          EXPECT_NEAR(spolFim[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).imag(),
-////                      preclim);
-////          EXPECT_NEAR(spolHim[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).imag(),
-////                      preclim);
-//          ct++;
-//        }
-//      }
-//    }
-//  }
-//}
+  auto cst = make_shared<Constants> ();
+  cst->set_dielectric_water(80);
+  cst->set_dielectric_prot(4);
+  cst->set_salt_concentration(0.01);
+  cst->set_temp(298.15);
+  cst->set_kappa(0.0325628352);
+  
+  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+  auto BesselCons = make_shared<BesselConstants> (2*pol);
+  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+  auto _expcons = make_shared<ExpansionConstants> (pol);
+  
+  // Generate surface integrals
+  for (int i=0; i<nmol; i++)
+    IEMatrix ieMatTest(0, sys->get_molecule(i),
+                       SHCalcTest, pol, _expcons, true, 0, true);
+  
+  string istart = test_dir_loc + "imat_test/imat.sp";
+  string estart = test_dir_loc + "spol_test/test_0.00_p3.0.";
+  vector<vector<string> > imat_loc(sys->get_n());
+  vector<vector<vector<string > > > exp_loc(sys->get_n());
+  
+  // Generate surface integrals
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    imat_loc[i].resize(sys->get_Ns_i(i));
+    exp_loc[i].resize(sys->get_Ns_i(i));
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      exp_loc[i][k].resize(2);
+      imat_loc[i][k] = istart+to_string(k) + ".out.bin";
+      exp_loc[i][k][0] = estart+to_string(k) + ".H.exp";
+      exp_loc[i][k][1] = estart+to_string(k) + ".F.exp";
+    }
+  }
+  
+  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
+                  true, true, imat_loc, exp_loc);
+  
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      solvTest.step(i,k);
+    }
+  }
+  solvTest.update_LHN_all();
+//  solvTest.solve(1e-5, 2);
+  
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      int ct = 0;
+      for(int n=0; n<pol; n++)
+      {
+        for(int m=0; m <= n; m++)
+        {
+//          EXPECT_NEAR(spolFre[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).real(),
+//                      preclim);
+//          EXPECT_NEAR(spolHre[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).real(),
+//                      preclim);
+//          EXPECT_NEAR(spolFim[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).imag(),
+//                      preclim);
+//          EXPECT_NEAR(spolHim[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).imag(),
+//                      preclim);
+          ct++;
+        }
+      }
+    }
+  }
+}
 
 
 

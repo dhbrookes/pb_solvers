@@ -40,7 +40,7 @@ protected:
   vector<shared_ptr<HMatrix> >      _outerH_;
   
   vector<shared_ptr<FMatrix> >      _F_;
-  vector<shared_ptr<FMatrix> >      _prevF_;
+//  vector<shared_ptr<FMatrix> >      _prevF_;
   
   shared_ptr<TMatrix>               _T_;
   
@@ -61,7 +61,7 @@ protected:
   void update_prevF(int I, int k);
   void update_prev_all();
   
-  void update_LHN_all();
+  
   
   void iter_innerH(int I, int k);
   
@@ -78,7 +78,7 @@ public:
   double iter(int t);
   
   // Update LH, LF, XF, XH sequentially
-  void step(shared_ptr<Molecule> mol, int I, int k);
+  void step(int I, int k);
   
   // Use h matrices to compute convergence
   double calc_converge_H(int I, int k, bool inner);
@@ -96,6 +96,8 @@ public:
                   {return _H_[I]->get_mat_knm(k, n, m);}
   cmplx getF_ik_nm(int I, int k, int n, int m)
                   {return _F_[I]->get_mat_knm(k, n, m);}
+  
+  void update_LHN_all();
   
 };
 

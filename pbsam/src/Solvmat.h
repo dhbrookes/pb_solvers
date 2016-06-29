@@ -283,7 +283,7 @@ public:
           double imag = get_mat_knm( k, n, m).imag();
           if(abs(real) < 1e-15 ) real = 0.0;
           if(abs(imag) < 1e-15 ) imag = 0.0;
-          cout << "(" << real << ", " << imag << ") ";
+          cout << setprecision(9)<< "(" << real << ", " << imag << ") ";
         }
         cout << endl;
       }
@@ -348,7 +348,8 @@ class LHNMatrix : public ComplexMoleculeMatrix
 public:
   LHNMatrix(int I, int ns, int p);
   
-  void calc_vals(shared_ptr<TMatrix> T, vector<shared_ptr<HMatrix> > H, int k);
+  void calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
+                 vector<shared_ptr<HMatrix> > H, int k);
   
 };
 
