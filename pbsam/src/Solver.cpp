@@ -14,7 +14,8 @@ Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
                int p, bool readImat, bool readHF,
                vector<vector<string> > imats,
                vector<vector<vector<string> > > expHF)
-:_E_(_sys->get_n()),
+: Ns_tot_(0),
+_E_(_sys->get_n()),
 _LE_(_sys->get_n()),
 _IE_(_sys->get_n()),
 _LF_(_sys->get_n()),
@@ -26,7 +27,6 @@ _H_(_sys->get_n()),
 _F_(_sys->get_n()),
 _outerH_(_sys->get_n()),
 _prevH_(_sys->get_n()),
-//_prevF_(_sys->get_n()),
 _shCalc_(_shCalc),
 _bCalc_(_bCalc),
 _consts_(_consts),
@@ -46,11 +46,12 @@ kappa_(_consts->get_kappa())
   // intialize all matrices
   for (int I = 0; I < _sys_->get_n(); I++)
   {
+    Ns_tot_ += _sys_->get_Ns_i(I);
     _mol = _sys_->get_molecule(I);
     
     dev_sph_Ik_[I].resize(_mol->get_ns());
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
-      dev_sph_Ik_[I][k] = 0.0;
+      dev_sph_Ik_[I][k] = 1.0;
     
     double kappa = _consts->get_kappa();
     
@@ -87,7 +88,7 @@ kappa_(_consts->get_kappa())
     
     _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa);
-    _LHN_[I] = make_shared<LHNMatrix> (I, _sys_->get_Ns_i(I), p_);
+    _LHN_[I] = make_shared<LHNMatrix> (I, _sys_->get_Ns_i(I), p_, _sys_);
     
     _XF_[I] = make_shared<XFMatrix> (I, _sys_->get_Ns_i(I), p_,
                                      _consts_->get_dielectric_prot(),
@@ -157,12 +158,31 @@ void Solver::iter_innerH(int I, int k)
   int ct(0), mxCt(20);
   
   auto mol = _sys_->get_molecule(I);
+//  cout << "Mol I " << I << " and sph " << k << endl;
   
   // Inner H loop
+//  cout << "This is LF " << endl; _LF_[I]->print_analytical(k);
+//  cout << "This is LH " << endl; _LH_[I]->print_analytical(k);
+//  
+//  cout << "This is XF " << endl; _XF_[I]->print_kmat(k);
+//  cout << "This is XH Hbase " << endl; _XH_[I]->print_kmat(k);
   while ( dev > toli && ct < mxCt )
   {
-    _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_prevH_[I],_IE_[I],_bCalc_,k,kappa_);
-    _H_[I]->calc_vals(mol,_prevH_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
+//    cout << "within LH+LHN" << endl;
+//    for (int n2 = 0; n2 < p_; n2++)
+//    {
+//      for (int m2 = 0; m2 < n2+1; m2++)
+//      {
+//        cout << _LH_[I]->get_mat_knm(k, n2, m2)+_LHN_[I]->get_mat_knm(k, n2, m2) << ", " ;
+//      }
+//      cout << endl;
+//    }
+    
+//    cout << "This is F " << endl; _F_[I]->print_kmat(k);
+//    cout << "This is H " << endl; _H_[I]->print_kmat(k);
+    
+    _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_H_[I],_IE_[I],_bCalc_,k,kappa_);
+    _H_[I]->calc_vals(mol,_H_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
     
     dev = calc_converge_H(I,k,true);
     update_prevH(I, k);
@@ -173,18 +193,14 @@ void Solver::iter_innerH(int I, int k)
 
 void Solver::step(int I, int k)
 {
-  _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
-  _LH_[I]->calc_vals(_T_, _H_[I], k);
-  
-  _LF_[I]->init(_sys_->get_molecule(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
-  _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
-  
-//  cout << "Molecule " << I << " this is k " << k << endl;
-//  cout << "This is LH analytical " << endl;
-//  _LH_[I]->print_analytical(k);
-//  
-//  cout << "This is LF analytical " << endl;
-//  _LF_[I]->print_analytical(k);
+  if (_sys_->get_n() == 1)
+  {
+    _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
+    _LH_[I]->calc_vals(_T_, _H_[I], k);
+    
+    _LF_[I]->init(_sys_->get_molecule(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
+    _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+  }
   
   _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
                      _LH_[I], _LF_[I], _LHN_[I], kappa_, k);
@@ -194,29 +210,49 @@ void Solver::step(int I, int k)
 
 double Solver::iter(int t)
 {
-  double mu_int(0);
+  double mu_int(0), mu_mpol(0);
   if ( t == 0 ) mu_ = 0.0;
+
+  if (_sys_->get_n()>1)
+    for (int I = 0; I < _sys_->get_n(); I++)
+    {
+      auto molI = _sys_->get_molecule(I);
+      for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+      {
+        _LH_[I]->init(molI,_H_[I],_shCalc_,_bCalc_,_expConsts_);
+        _LH_[I]->calc_vals(_T_, _H_[I], k);
+        
+        _LF_[I]->init(molI,_F_[I],_shCalc_,_bCalc_,_expConsts_);
+        _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+        
+        _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
+      }
+    }
 
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      if( dev_sph_Ik_[I][k] > 0.1*mu_ || t % 5 == 0)
+      bool pol = true;
+      // if there is more than 1 mol, run if there are sphs on other mol to pol
+      if ((_sys_->get_n()>1) && (_LHN_[I]->get_interPol(k) != 0))
+        pol = false;
+      if((dev_sph_Ik_[I][k] > 0.1*mu_ && pol) ||
+         ((t%5==0) && (_sys_->get_n()==1)))
       {
         update_outerH(I, k);
         step( I, k);
         iter_innerH(I, k);
         
         dev_sph_Ik_[I][k] = calc_converge_H(I,k,false);
+        mu_mpol += dev_sph_Ik_[I][k];
         if ( dev_sph_Ik_[I][k] > mu_int )
           mu_int = dev_sph_Ik_[I][k];
-        
-        update_LHN_all();
       }
     } // end k
   }
   
-  mu_ = mu_int;
+  mu_ = (_sys_->get_n()==1) ? mu_int : mu_mpol / (double) Ns_tot_;
   return mu_;
 }
 
@@ -227,7 +263,6 @@ void Solver::update_prev_all()
   {
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      update_prevF(I, k);
       update_prevH(I, k);
       update_outerH(I, k);
     }
@@ -240,7 +275,7 @@ void Solver::update_LHN_all()
   {
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      _LHN_[I]->calc_vals(_sys_, _T_, _H_, k); // requires all Hs, do it at end
+      _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
     }
   }
 }
@@ -269,26 +304,14 @@ void Solver::update_prevH(int I, int k)
   }
 }
 
-void Solver::update_prevF(int I, int k)
-{
-  
-//  for (int n = 0; n < p_; n++)
-//  {
-//    for (int m = -n; m <= n; m++)
-//    {
-//      _prevF_[I]->set_mat_knm(k, n, m, _F_[I]->get_mat_knm(k, n, m));
-//    }
-//  }
-}
-
 void Solver::solve(double tol, int maxiter)
 {
   double mu;
   for (int t = 0; t < maxiter; t++)
   {
-    if ((t%10) == 0) cout << "this is t " << t << endl;
+    if ((t%1) == 0) cout << "this is t " << t << endl;
     mu = iter(t);
-    //TODO: make a smarter iter, I guess copy old?
+    cout << "Mu " << mu << endl;
     if (mu < tol) break;
   }
 
@@ -311,7 +334,6 @@ void Solver::reset_all()
       _H_[I]->reset_mat(k);
       _F_[I]->reset_mat(k);
       _prevH_[I]->reset_mat(k);
-//      _prevF_[I]->reset_mat(k);
     }
     _IE_[I]->reset_mat();
   }

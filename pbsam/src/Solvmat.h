@@ -93,7 +93,7 @@ public:
           if(abs(real) < 1e-15 ) real = 0.0;
           if(abs(imag) < 1e-15 ) imag = 0.0;
 //          fout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
-          fout << setprecision(9) << real << ",";
+          fout << setprecision(9) << imag << ",";
         }
 //        fout << endl;
       }
@@ -106,7 +106,7 @@ public:
   
   void print_kmat(int k)
   {
-    cout << "For sphere " << k << endl;
+    cout << "Molecule " << I_ << " For sphere " << k << endl;
     for (int n = 0; n < get_p(); n++)
     {
       for (int m = 0; m <= n; m++)
@@ -115,7 +115,7 @@ public:
         double imag = get_mat_knm( k, n, m).imag();
         if(abs(real) < 1e-15 ) real = 0.0;
         if(abs(imag) < 1e-15 ) imag = 0.0;
-        cout << "(" << real << ", " << imag << ") ";
+        cout << setprecision(9) << "(" << real << ", " << imag << ") ";
         
       }
       cout << endl;
@@ -259,7 +259,7 @@ public:
   
   void print_kmat(int k)
   {
-    cout << "For sphere " << k << endl;
+    cout << "Molecule " << I_ << " For sphere " << k << endl;
     for (int h = 0; h < get_mat_k_len(k); h++)
     {
       double real = get_mat_kh( k, h);
@@ -272,23 +272,20 @@ public:
   
   void print_analytical(int k)
   {
-//    for (int k = 0; k < get_ns(); k++)
-//    {
-      cout << "For sphere " << k << endl;
-      for (int n = 0; n < get_p(); n++)
+    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    for (int n = 0; n < get_p(); n++)
+    {
+      for (int m = 0; m <= n; m++)
       {
-        for (int m = 0; m <= n; m++)
-        {
-          double real = get_mat_knm( k, n, m).real();
-          double imag = get_mat_knm( k, n, m).imag();
-          if(abs(real) < 1e-15 ) real = 0.0;
-          if(abs(imag) < 1e-15 ) imag = 0.0;
-          cout << setprecision(9)<< "(" << real << ", " << imag << ") ";
-        }
-        cout << endl;
+        double real = get_mat_knm( k, n, m).real();
+        double imag = get_mat_knm( k, n, m).imag();
+        if(abs(real) < 1e-15 ) real = 0.0;
+        if(abs(imag) < 1e-15 ) imag = 0.0;
+        cout << setprecision(9)<< "(" << real << ", " << imag << ") ";
       }
       cout << endl;
-//    }
+    }
+    
   }
   
 };
@@ -330,14 +327,6 @@ public:
   
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k);
   
-//  /*
-//   Equation 15b [1]. For analytic re expansion
-//   */
-//  cmplx make_hb_Ij(int I, int j, Pt rb,
-//                   shared_ptr<HMatrix> H,
-//                   shared_ptr<SHCalc> shcalc,
-//                   vector<double> besseli);
-  
 };
 
 /*
@@ -345,8 +334,12 @@ public:
  */
 class LHNMatrix : public ComplexMoleculeMatrix
 {
+protected:
+  vector<int> interPol_;
 public:
-  LHNMatrix(int I, int ns, int p);
+  LHNMatrix(int I, int ns, int p, shared_ptr<System> sys);
+  
+  int get_interPol(int k)  { return interPol_[k]; }
   
   void calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
                  vector<shared_ptr<HMatrix> > H, int k);

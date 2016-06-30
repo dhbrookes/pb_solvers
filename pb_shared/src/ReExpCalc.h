@@ -123,6 +123,8 @@ public:
   void set_nu( int n, int m, double val)    {nu_.set_val(n, m + 2*p_, val);}
   void set_mu(int n, int m, double val)     {mu_.set_val(n, m + 2*p_, val);}
   
+  void redo_with_kappa(double kappa);
+  
 };
 
 /*
@@ -153,6 +155,7 @@ protected:
    -n <= m <= n
    */
   VecOfMats<double>::type S_;
+  VecOfMats<double>::type S_F_;
   
   /*
    The useful derivatives are S with respect to r and R with respect to
@@ -162,6 +165,8 @@ protected:
   VecOfMats<double>::type   dSdR_;
 
   double kappa_; //from Constants
+  double kappa_extern_; // For PB-SAM, if we xform within mol, still
+                        // need solution kappa
   double lambda_; // uniform scaling factor (section 4.5 of Lotan 2006)
   vector<double> lam_sam_; // scaling factor: ain=0, aout=1 for PB-SAM
   vector<double> lam_scl_; // scaling factor: (aout/ain)^n  for PB-SAM
@@ -186,7 +191,7 @@ protected:
   VecOfMats<double>::type prefacSing_; // for singular case
   
   void calc_r();  // calculate all the values for R_
-  void calc_s(); // calculate all the values for S_
+  void calc_s(bool useKappa); // calculate all the values for S_
   void calc_dr_dtheta();
   void calc_ds_dr();
 
@@ -196,7 +201,7 @@ public:
   ReExpCoeffs() { };
   
   ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp, vector<double> besselK_,
-              shared_ptr<ReExpCoeffsConstants> _consts, double kappa,
+              shared_ptr<ReExpCoeffsConstants> _consts, vector<double> kappa,
               vector<double> lambda, bool grad = false);
   
   MyVector<double> calc_SH_spec( double val ); // for singularities
@@ -223,6 +228,12 @@ public:
   {
     if ( m < 0 ) return S_[n](l, -m+2*p_);
     else         return S_[n](l,  m+2*p_);
+  }
+  
+  double get_s_fval(int n, int l, int m)
+  {
+    if ( m < 0 ) return S_F_[n](l, -m+2*p_);
+    else         return S_F_[n](l,  m+2*p_);
   }
   
   double get_dsdr_val(int n, int l, int m)
@@ -258,6 +269,7 @@ public:
   void print_dRdtheta();
   void print_dRdphi();
   void print_S();
+  void print_S_F();
   void print_dSdr();
   
   void set_rval(int n, int m, int s, cmplx val)
@@ -268,6 +280,11 @@ public:
   void set_sval(int n, int l, int m, double val)
   {
     (&S_[n])->set_val(l, m+2*p_, val);
+  }
+  
+  void set_s_fval(int n, int l, int m, double val)
+  {
+    (&S_F_[n])->set_val(l, m+2*p_, val);
   }
   
   void set_dr_dtheta_val(int n, int m, int s, cmplx val)

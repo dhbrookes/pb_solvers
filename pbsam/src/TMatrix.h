@@ -29,7 +29,7 @@ protected:
    enum for telling the ReExpCoeffs which values to retrieve
    in the below methods
    */
-  enum WhichReEx { BASE, DDR, DDPHI, DDTHETA };
+  enum WhichReEx { BASE, FBASE, DDR, DDPHI, DDTHETA };
   
   int     p_;
   double  kappa_;
@@ -108,7 +108,8 @@ public:
   /*
    Re-expand a matrix X with respect to T(I,k)(J,l)
    */
-  MyMatrix<cmplx> re_expandX(MyMatrix<cmplx> X, int I, int k, int J, int l);
+  MyMatrix<cmplx> re_expandX(MyMatrix<cmplx> X, int I, int k, int J, int l,
+                             bool isF = false);
   
   /*
    Re-expand a numerical surface with respect to T(I,k)(J,l) (Equation 27b [1])

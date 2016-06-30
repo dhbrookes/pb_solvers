@@ -39,8 +39,9 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
   int idx = 0;
   double cutoff = 5.0;
   Pt c_Ik, c_Jl, v;
-  double kapVal, ak, al;
+  double ak, al;
   vector<int> idx_vec;
+  vector<double> kapVal(2);
   for (int I = 0; I < _sys->get_n(); I++)
   {
     for (int J = 0; J < _sys->get_n(); J++)
@@ -69,10 +70,10 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
 //              << " dist: " << c_Ik.dist(c_Jl) << " and aIk "
 //              << ak << " and ajl "
 //              << al << " dis1 : " <<  c_Ik.dist(c_Jl) - ak - al << endl;
-          
-          kapVal = ( I == J ) ? 0.0 : kappa_;
+          if ( I == J ) kapVal = {0.0, kappa_};
+          kapVal = {kappa_, kappa_};
           v = _sys->get_pbc_dist_vec_base(c_Ik, c_Jl);
-          vector<double> besselK = _besselcalc->calc_mbfK(2*p_, kapVal*v.r());
+          vector<double> besselK = _besselcalc->calc_mbfK(2*p_,kapVal[1]*v.r());
           _shcalc->calc_sh(v.theta(), v.phi());
           
           vector<double> lambdas = {_sys->get_aik(J, l), _sys->get_aik(I, k)};
@@ -125,10 +126,16 @@ MyMatrix<cmplx> TMatrix::re_expandX_numeric(vector<vector<double> > X,
 
 MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
                                     int I, int k,
-                                   int J, int l)
+                                   int J, int l, bool isF)
 {
   MyMatrix<cmplx> X1, X2, Z;
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE;
+  
+//  int map_idx = idxMap_[{I, k, J, l}];
+  
+  if (isF ) whichS = FBASE;
+//  else
+//    T_[map_idx]->print_S();
   
   X1 = expand_RX(X, I, k, J, l, whichR);
   X2 = expand_SX(X1, I, k, J, l, whichS);
@@ -141,8 +148,6 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
 //    }
 //    cout << endl;
 //  }
-  
-
   return Z;
 }
 
@@ -334,6 +339,7 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
 //        if ( jl_greater )
 //        {
           if (whichS == DDR) sval = T_[map_idx]->get_sval(n, s, m);
+          else if (whichS == FBASE) sval = T_[map_idx]->get_s_fval(n, s, m);
           else sval = T_[map_idx]->get_sval(n, s, m);
 //        }
 //        else

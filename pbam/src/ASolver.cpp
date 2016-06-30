@@ -866,7 +866,7 @@ void ASolver::compute_T()
       vector<double> besselK = _besselCalc_->calc_mbfK(2*p_, kappa * v.r());
       T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
                                    besselK, _reExpConsts_,
-                                   kappa, {_sys_->get_lambda()}, true));
+                                   {kappa,kappa}, {_sys_->get_lambda()},true));
     }
   }
 }

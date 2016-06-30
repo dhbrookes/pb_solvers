@@ -24,6 +24,7 @@ class Solver
 protected:
   int p_;
   double kappa_;
+  int Ns_tot_; // total number of cg sphere
   
   vector<shared_ptr<EMatrix> >      _E_;
   vector<shared_ptr<LEMatrix> >     _LE_;
@@ -40,7 +41,6 @@ protected:
   vector<shared_ptr<HMatrix> >      _outerH_;
   
   vector<shared_ptr<FMatrix> >      _F_;
-//  vector<shared_ptr<FMatrix> >      _prevF_;
   
   shared_ptr<TMatrix>               _T_;
   
@@ -55,17 +55,12 @@ protected:
   
   double                            mu_; // SCF deviation max
   
-  // update prevH and prevF
+  // update prevH and outerH
   void update_outerH(int I, int k);
   void update_prevH(int I, int k);
-  void update_prevF(int I, int k);
   void update_prev_all();
   
-  
-  
   void iter_innerH(int I, int k);
-  
-  
   
 public:
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
@@ -97,6 +92,9 @@ public:
   cmplx getF_ik_nm(int I, int k, int n, int m)
                   {return _F_[I]->get_mat_knm(k, n, m);}
   
+  cmplx getLHN_ik_nm(int I, int k, int n, int m)
+                  {return _LHN_[I]->get_mat_knm(k, n, m);}
+  
   void update_LHN_all();
   
 };
@@ -126,7 +124,7 @@ protected:
   
   shared_ptr<System>                _sys_;
   shared_ptr<SHCalc>                _shCalc_;
-  shared_ptr<BesselCalc>         _bCalc_;
+  shared_ptr<BesselCalc>            _bCalc_;
   shared_ptr<Constants>             _consts_;
 
 public:

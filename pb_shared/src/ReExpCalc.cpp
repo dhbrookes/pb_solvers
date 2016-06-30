@@ -60,7 +60,7 @@ void ReExpCoeffsConstants::calc_alpha_and_beta()
       double nD = (double) n;
       double mD = (double) m;
       alpha_val = sqrt((nD + mD + 1.0) * (nD - mD + 1.0));
-      if (is_sam_) beta_val = (kappa_ == 0) ? 0 : alpha_val;
+      if (is_sam_) beta_val = (fabs(kappa_) < 1e-10) ? 0 : alpha_val;
       else         beta_val  = (pow(lambda_*kappa_, 2.0)*alpha_val);
       beta_val *= (1.0 / ((2.0 * nD + 1.0) * (2.0 * nD + 3.0)));
       set_alpha( n, m, alpha_val);
@@ -84,7 +84,7 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
       double nD = (double) n;
       double mD = (double) m;
       nu_val = sign * sqrt((nD - mD - 1.) * (nD - mD));
-      if (is_sam_) mu_val = (kappa_ == 0) ? 0 : nu_val;
+      if (is_sam_) mu_val = (fabs(kappa_) < 1e-10) ? 0 : nu_val;
       else         mu_val  = (pow(lambda_*kappa_, 2) * nu_val);
       mu_val *=  (1.0 / ((2.*nD-1.) * (2.*nD+1.)));
       set_nu( n, m, nu_val);
@@ -93,16 +93,25 @@ void ReExpCoeffsConstants::calc_nu_and_mu()
   }
 }
 
+void ReExpCoeffsConstants::redo_with_kappa(double kappa)
+{
+  kappa_ = kappa;
+  calc_a_and_b();
+  calc_alpha_and_beta();
+  calc_nu_and_mu();
+}
 
 ReExpCoeffs::ReExpCoeffs(int p, Pt v, MyMatrix<cmplx> Ytp,
-                               vector<double> besselK,
-                               shared_ptr<ReExpCoeffsConstants> _consts,
-                               double kappa, vector<double> lambda, bool grad)
+                         vector<double> besselK,
+                         shared_ptr<ReExpCoeffsConstants> _consts,
+                         vector<double> kappa, vector<double> lambda,
+                         bool grad)
 :p_(p),
 v_(v),
 Ytp_(Ytp),
 besselK_(besselK),
-kappa_(kappa),
+kappa_(kappa[0]),
+kappa_extern_(kappa[0]),
 lambda_(lambda[0]),
 lam_sam_(lambda),
 lam_scl_(p),
@@ -111,6 +120,7 @@ grad_(grad),
 _consts_(_consts),
 R_(2*p, MyMatrix<cmplx> (2*p, 4*p)),
 S_(2*p, MyMatrix<double> (2*p, 4*p)),
+S_F_(2*p, MyMatrix<double> (2*p, 4*p)),
 dSdR_(2*p, MyMatrix<double> (2*p, 4*p)),
 dRdTheta_(2*p, MyMatrix<cmplx> (2*p, 4*p)),
 prefacSing_(2*p, MyMatrix<double>(p, 2))
@@ -125,8 +135,11 @@ prefacSing_(2*p, MyMatrix<double>(p, 2))
     s_prefac_[1] = 1.0;
   } else
   {
-    s_prefac_[0] = kappa_ * kappa_ * lam_sam_[0] * lam_sam_[1]; //kpio
-    s_prefac_[1] = kappa_ * kappa_ * lam_sam_[1] * lam_sam_[1]; // kpoo
+    s_prefac_[0] = kappa[1] * kappa[1] * lam_sam_[0] * lam_sam_[1]; //kpio
+    s_prefac_[1] = kappa[1] * kappa[1] * lam_sam_[1] * lam_sam_[1]; // kpoo
+    // checking whether we are transforming between molecules or not
+    // if Xform between spheres on same molecule, kap[0] = 0 and kap[1] = whtevr
+    if (fabs(kappa[0]) < 1e-10) kappa_extern_ = kappa[1];
   }
   
   lam_scl_[0] = 1.0;
@@ -150,7 +163,8 @@ prefacSing_(2*p, MyMatrix<double>(p, 2))
   else                 rSing_ = false;
  
   calc_r();
-  calc_s();
+  calc_s(true); // Calculating S with given kappa
+  calc_s(false); // Calculating S with k = 0 for F matrix
   
   if (grad_)
   {
@@ -258,72 +272,102 @@ void ReExpCoeffs::calc_r()
   }
 }
 
-void ReExpCoeffs::calc_s()
+void ReExpCoeffs::calc_s(bool useKappa)
 {
   int m, n, l;
-  double val;
+  double val, kap, s1, s2, s3;
   double r = v_.r();
+  vector<double> bessK(2*p_, 1.0);
+  
+  if ( useKappa )
+  {
+    kap = kappa_;
+    bessK = besselK_;
+  }
+  else kap = 0;
+
   
   for (l = 0; l < 2 * p_; l++)
   {
-    val = pow((lambda_ / r), l) * (besselK_[l] * exp(-kappa_*r)) / r;
-    set_sval( 0, l, 0, val );
+    val = pow((lambda_ / r), l) * (bessK[l] * exp(-kap*r)) / r;
+    if (useKappa) set_sval( 0, l, 0, val );
+    else          set_s_fval( 0, l, 0, val );
     
     // Set S_{n,0}^0 vals
-    set_sval( l, 0, 0, pow(-1.0, l) * val );
+    if (useKappa) set_sval( l, 0, 0, pow(-1.0, l) * val );
+    else          set_s_fval( l, 0, 0, pow(-1.0, l) * val );
   }
   
   double lamOI = lam_sam_[1]/lam_sam_[0];
   
   for (l = 1; l < 2 * p_ - 2; l++)
   {
-    val  = s_prefac_[0] * _consts_->get_beta(l-1, 0) * get_sval( 0, l-1, 0);
-    val += lamOI * _consts_->get_alpha( l, 0) * get_sval( 0, l+1, 0);
+    s1 = (useKappa) ? get_sval( 0, l-1, 0) : get_s_fval( 0, l-1, 0);
+    s2 = (useKappa) ? get_sval( 0, l+1, 0) : get_s_fval( 0, l+1, 0);
+    val  = s_prefac_[0] * _consts_->get_beta(l-1, 0) * s1;
+    val += lamOI * _consts_->get_alpha( l, 0) * s2;
     val *= -1.0 / _consts_->get_alpha(0, 0);
-    set_sval( 1, l, 0, val );
+
+    if (useKappa) set_sval( 1, l, 0, val );
+    else          set_s_fval( 1, l, 0, val );
   }
   
   for (n = 1; n < p_ - 1; n++)
   {
     for(l = n + 1; l < 2*p_ - n - 2; l++)
     {
-      val  = s_prefac_[0] * _consts_->get_beta(l-1, 0) * get_sval(  n, l-1, 0);
-      val += s_prefac_[1] * _consts_->get_beta(n-1, 0) * get_sval(n-1,   l, 0);
-      val += lamOI * _consts_->get_alpha( l, 0) * get_sval(  n, l+1, 0);
+      s1 = (useKappa) ? get_sval(  n, l-1, 0) : get_s_fval(  n, l-1, 0);
+      s2 = (useKappa) ? get_sval(n-1,   l, 0) : get_s_fval(n-1,   l, 0);
+      s3 = (useKappa) ? get_sval(  n, l+1, 0) : get_s_fval(  n, l+1, 0);
+      val  = s_prefac_[0] * _consts_->get_beta(l-1, 0) * s1;
+      val += s_prefac_[1] * _consts_->get_beta(n-1, 0) * s2;
+      val += lamOI * _consts_->get_alpha( l, 0) * s3;
       val *= -1.0 / _consts_->get_alpha(n, 0);
-      set_sval(n+1, l, 0, val);
+
+      if (useKappa) set_sval(n+1, l, 0, val);
+      else          set_s_fval(n+1, l, 0, val);
     }
   }
-
+  
   double val2;
   for (m = 1; m < p_ ; m++)
   {
     for (l = m; l < 2*p_ - m - 1; l++)
     {
-      val  = s_prefac_[0] * _consts_->get_mu(  l,  -m) * get_sval(m-1, l-1, m-1);
-      val += lamOI * _consts_->get_nu(l+1,m-1) * get_sval( m-1, l+1, m-1);
+      s1 = (useKappa) ? get_sval(m-1, l-1, m-1) : get_s_fval(m-1, l-1, m-1);
+      s2 = (useKappa) ? get_sval(m-1, l+1, m-1) : get_s_fval(m-1, l+1, m-1);
+      val  = s_prefac_[0] * _consts_->get_mu(  l,  -m) * s1;
+      val += lamOI * _consts_->get_nu(l+1,m-1) * s2;
       val *= ( -1.0 / _consts_->get_nu( m, -m) );
-      set_sval(m, l, m, val);
+      if (useKappa) set_sval(m, l, m, val);
+      else          set_s_fval(m, l, m, val);
     }
     
     n = m;
     for (l = n+1; l < 2*p_ - m - 2; l++)
     {
-      val  = s_prefac_[0] * _consts_->get_beta(l-1, m)*get_sval(  n, l-1, m);
-      val += lamOI * _consts_->get_alpha(l,m) * get_sval( n, l+1, m);
+      s1 = (useKappa) ? get_sval(  n, l-1, m) : get_s_fval( n, l-1, m);
+      s2 = (useKappa) ? get_sval(  n, l+1, m) : get_s_fval( n, l+1, m) ;
+      val  = s_prefac_[0] * _consts_->get_beta(l-1, m) * s1;
+      val += lamOI * _consts_->get_alpha(l,m) * s2;
       val *= (-1.0 / _consts_->get_alpha( n, m) );
-      set_sval(n+1, l, m, val);
+      if (useKappa) set_sval(n+1, l, m, val);
+      else          set_s_fval(n+1, l, m, val);
     }
     
     for (n = m + 1; n < p_ - 1; n++)
     {
       for (l = n + 1; l < 2*p_ - n - 2; l++)
       {
-        val2  = s_prefac_[0]*_consts_->get_beta(l-1, m)*get_sval(  n, l-1, m);
-        val2 += s_prefac_[1]*_consts_->get_beta(n-1, m)*get_sval(n-1,   l, m);
-        val2 += lamOI * _consts_->get_alpha( l, m) * get_sval(  n, l+1, m);
+        s1 = (useKappa) ? get_sval(  n, l-1, m) : get_s_fval(  n, l-1, m);
+        s2 = (useKappa) ? get_sval(n-1,   l, m) : get_s_fval(n-1,   l, m);
+        s3 = (useKappa) ? get_sval(  n, l+1, m) : get_s_fval(  n, l+1, m);
+        val2  = s_prefac_[0]*_consts_->get_beta(l-1, m) * s1;
+        val2 += s_prefac_[1]*_consts_->get_beta(n-1, m) * s2;
+        val2 += lamOI * _consts_->get_alpha( l, m) * s3;
         val2 *= (-1.0 / _consts_->get_alpha(n, m));
-        set_sval(n+1, l, m, val2);
+        if (useKappa) set_sval(n+1, l, m, val2);
+        else          set_s_fval(n+1, l, m, val2);
       }
     }
   }
@@ -335,10 +379,20 @@ void ReExpCoeffs::calc_s()
     {
       for (m = -n; m <= n; m++)
       {
-        if (n > l) set_sval(n, l, m, pow(-1.0, n+l) * get_sval(l, n, m));
+        if (n > l)
+        {
+          if (useKappa) set_sval(n, l, m, pow(-1.0, n+l) * get_sval(l, n, m));
+          else set_s_fval(n, l, m, pow(-1.0, n+l) * get_s_fval(l, n, m));
+        }
       }
     }
   }
+  
+  
+  
+  if ( !useKappa ) // Recomputing constants with old kappa
+    _consts_->redo_with_kappa(kappa_);
+
 } // end calc_s
 
 
@@ -544,6 +598,25 @@ void ReExpCoeffs::print_S()
       for (int n = m; n <= l; n++)
       {
         double r = fabs(get_sval(n, l, m))>1e-15 ? get_sval(n, l, m) : 0;
+        cout << setprecision(9)<< r << " | ";
+      }
+      cout << endl;
+    }
+  }
+  cout << endl;
+}
+
+void ReExpCoeffs::print_S_F()
+{
+  cout << "This is my SF" << endl;
+  for (int m = 0; m < p_; m++)
+  {
+    cout << "\t---m = " << m << "---" << endl;
+    for (int l = m; l < p_; l++)
+    {
+      for (int n = m; n <= l; n++)
+      {
+        double r = fabs(get_s_fval(n, l, m))>1e-15 ? get_s_fval(n, l, m) : 0;
         cout << setprecision(9)<< r << " | ";
       }
       cout << endl;

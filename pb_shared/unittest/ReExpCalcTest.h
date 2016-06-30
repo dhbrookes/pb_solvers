@@ -36,7 +36,7 @@ class ReExpTest
     
     ReExpCoeffs ReExpTest( nvals, testPt, shMat, besselK,
                           make_shared<ReExpCoeffsConstants> (kap,lambda,nvals),
-                          kap, {lambda}, true );
+                          {kap,kap}, {lambda}, true );
     
   }
   

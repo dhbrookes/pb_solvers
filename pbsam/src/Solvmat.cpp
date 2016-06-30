@@ -553,50 +553,28 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
     
     if (T->is_analytic(I_, k, I_, j))
     {
-      reex = T->re_expandX(F->get_mat_k(j), I_, k, I_, j );
+      bool isF = true;
+//      cout << "Initialize LF For k " << k << " j: " << j << endl;
+      reex = T->re_expandX(F->get_mat_k(j), I_, k, I_, j, isF );
+//      for (int n2 = 0; n2 < p_; n2++)
+//      {
+//        for (int m2 = 0; m2 < n2+1; m2++)
+//        {
+//          cout << setprecision(9)<< reex(n2, m2+p_) ;
+//        }
+//        cout << endl;
+//      }
     }
     else
     {
       reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j, 0.0 );
     }
     
-//    cout << "For k " << k << " j: " << j << endl;
-//    
-//    for (int n2 = 0; n2 < p_; n2++)
-//    {
-//      for (int m2 = 0; m2 < n2+1; m2++)
-//      {
-//        cout << reex(n2, m2+p_) ;
-//      }
-//      cout << endl;
-//    }
-//    
     mat_cmplx_[k] += reex;
   }
+//  cout << "This is LFS " << I_ << " and sph  " << k << endl;
+//  print_analytical(k);
 }
-
-//TODO: Is this ever needed?
-//cmplx LFMatrix::make_fb_Ij(int I, int j, Pt rb,
-//                           shared_ptr<FMatrix> F,
-//                           shared_ptr<SHCalc> shcalc)
-//{
-//  cmplx fbj, fb_inner;
-//  shcalc->calc_sh(rb.theta(),rb.phi());
-//  
-//  //create fbj function
-//  fbj = 0;
-//  for (int n2 = 0; n2 < p_; n2++)
-//  {
-//    for (int m2 = -n2; m2 < n2+1; m2++)
-//    {
-//      fb_inner = ((2 * n2 + 1) / (4 * M_PI)) * get_mat_knm(j, n2, m2);
-//      fb_inner *= shcalc->get_result(n2, m2);
-//      fbj += fb_inner;
-//    }
-//  }
-//  fbj /= pow(rb.r(), 2); // make f_hat into f
-//  return fbj;
-//}
 
 LHMatrix::LHMatrix(int I, int ns, int p, double kappa)
 :NumericalMatrix(I, ns, p), kappa_(kappa)
@@ -646,7 +624,20 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
     if (j==k) continue;
 
     if (T->is_analytic(I_, k, I_, j))
+    {
+//      cout << "Initialize LH For k " << k << " j: " << j << endl;
       reex = T->re_expandX(H->get_mat_k(j), I_, k, I_, j );
+      
+//      for (int n2 = 0; n2 < p_; n2++)
+//      {
+//        for (int m2 = 0; m2 < n2+1; m2++)
+//        {
+//          cout << setprecision(9)<< reex(n2, m2+p_) ;
+//        }
+//        cout << endl;
+//      }
+    }
+    
     else
       reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j, kappa_ );
     
@@ -665,9 +656,30 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
   }
 }
 
-LHNMatrix::LHNMatrix(int I, int ns, int p)
-:ComplexMoleculeMatrix(I, ns, p)
+LHNMatrix::LHNMatrix(int I, int ns, int p, shared_ptr<System> sys)
+:interPol_(ns, 1), ComplexMoleculeMatrix(I, ns, p)
 {
+  Pt Ik, Jl;
+  double aIk, aJl, interPolcut = 10.0;
+  for (int k = 0; k <sys->get_Ns_i(I); k++)
+  {
+    for (int J = 0; J < sys->get_n(); J++)
+    {
+      if (J == I_) continue;
+      Ik = sys->get_centerik(I_, k);
+      aIk = sys->get_aik(I_, k);
+      for (int l = 0 ; l < sys->get_Ns_i(J); l++)
+      {
+        Jl = sys->get_centerik(J, l);
+        aJl = sys->get_aik(J, l);
+        
+        if ( sys->get_pbc_dist_vec_base(Ik, Jl).norm() < (interPolcut+aIk+aJl))
+        {
+          interPol_[k] = 0;
+        }
+      }
+    }
+  }
 }
 
 void LHNMatrix::calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
@@ -689,22 +701,22 @@ void LHNMatrix::calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
       
       if ( sys->get_pbc_dist_vec_base(Ik, Jl).norm() < (interPolcut+aIk+aJl))
       {
-        cout << "This is H before I " << I_ << " and k " << k
-        << " and j " << J << " and l " << l<< endl;
-        H[J]->print_kmat(l);
-        cout << " Rot1 " << endl;
+//        cout << "This is H before I " << I_ << " and k " << k
+//        << " and j " << J << " and l " << l<< endl;
+//        H[J]->print_kmat(l);
+//        cout << " Rot1 " << endl;
         reex = T->re_expandX(H[J]->get_mat_k(l), I_, k, J, l);
         mat_[k] += reex;
         
-        cout << "This is H After " << endl;
-        for (int n = 0; n < p_; n++)
-        {
-          for (int m = 0; m <= n; m++)
-          {
-            cout << reex(n, m+p_) << ", ";
-          }
-          cout << endl;
-        }
+//        cout << "This is H After " << endl;
+//        for (int n = 0; n < p_; n++)
+//        {
+//          for (int m = 0; m <= n; m++)
+//          {
+//            cout << reex(n, m+p_) << ", ";
+//          }
+//          cout << endl;
+//        }
         
       }
     }
@@ -748,7 +760,7 @@ void XHMatrix::calc_vals(shared_ptr<Molecule> mol, shared_ptr<BesselCalc> bcalc,
     {
       inner = E_LE_mat_[k]( n, m+p_);
       inner += ak*LF->get_mat_knm(k, n, m);
-      inner -= ak*in_k[n]*(LH->get_mat_knm(k, n, m));
+      inner -= ak*in_k[n]*(LH->get_mat_knm(k, n, m)+LHN->get_mat_knm(k, n, m));
       set_mat_knm(k, n, m, inner);
     }
   }
@@ -791,7 +803,7 @@ void XFMatrix::calc_vals(shared_ptr<Molecule> mol, shared_ptr<BesselCalc> bcalc,
     {
       inner = (pow(kappa * ak, 2.0) * in_k[n+1])/(double)(2*n+3);
       inner += double(n * in_k[n]);
-      inner *= ( ak * LH->get_mat_knm(k, n, m));
+      inner *= ( ak * (LH->get_mat_knm(k, n, m) + LHN->get_mat_knm(k, n, m)));
       inner += E_LE_mat_[k]( n, m+p_);
       inner -= ( n * eps_ * ak * LF->get_mat_knm(k, n, m));
       set_mat_knm(k, n, m, inner);
@@ -976,9 +988,7 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
       }
     }
   }
-  
-  
-  
+
   //TODO: replace with matMul
   f_out = IE->get_IE_k(k) * f_in;  // Matrix vector multiplication
   
