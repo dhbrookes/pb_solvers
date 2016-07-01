@@ -701,26 +701,29 @@ void LHNMatrix::calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
       
       if ( sys->get_pbc_dist_vec_base(Ik, Jl).norm() < (interPolcut+aIk+aJl))
       {
-//        cout << "This is H before I " << I_ << " and k " << k
-//        << " and j " << J << " and l " << l<< endl;
+        cout << "This is H before I " << I_ << " and k " << k
+        << " and j " << J << " and l " << l<< endl;
 //        H[J]->print_kmat(l);
 //        cout << " Rot1 " << endl;
         reex = T->re_expandX(H[J]->get_mat_k(l), I_, k, J, l);
         mat_[k] += reex;
         
-//        cout << "This is H After " << endl;
-//        for (int n = 0; n < p_; n++)
-//        {
-//          for (int m = 0; m <= n; m++)
-//          {
-//            cout << reex(n, m+p_) << ", ";
-//          }
-//          cout << endl;
-//        }
+        cout << "This is H After " << endl;
+        for (int n = 0; n < p_; n++)
+        {
+          for (int m = 0; m <= n; m++)
+          {
+            cout << reex(n, m+p_) << ", ";
+          }
+          cout << endl;
+        }
         
       }
     }
   }
+  
+  cout << "This is LHN I " << I_ << " and k " << k << endl;
+  print_kmat(k);
 
 }
 

@@ -160,27 +160,25 @@ void Solver::iter_innerH(int I, int k)
   auto mol = _sys_->get_molecule(I);
 //  cout << "Mol I " << I << " and sph " << k << endl;
   
-  // Inner H loop
+//   Inner H loop
+//  cout << "This is F " << endl; _F_[I]->print_kmat(k);
+//  cout << "This is H " << endl; _H_[I]->print_kmat(k);
 //  cout << "This is LF " << endl; _LF_[I]->print_analytical(k);
 //  cout << "This is LH " << endl; _LH_[I]->print_analytical(k);
-//  
+//      cout << "within LH+LHN" << endl;
+//      for (int n2 = 0; n2 < p_; n2++)
+//      {
+//        for (int m2 = 0; m2 < n2+1; m2++)
+//        {
+//          cout << _LH_[I]->get_mat_knm(k, n2, m2)+_LHN_[I]->get_mat_knm(k, n2, m2) << ", " ;
+//        }
+//        cout << endl;
+//      }
+
 //  cout << "This is XF " << endl; _XF_[I]->print_kmat(k);
 //  cout << "This is XH Hbase " << endl; _XH_[I]->print_kmat(k);
   while ( dev > toli && ct < mxCt )
   {
-//    cout << "within LH+LHN" << endl;
-//    for (int n2 = 0; n2 < p_; n2++)
-//    {
-//      for (int m2 = 0; m2 < n2+1; m2++)
-//      {
-//        cout << _LH_[I]->get_mat_knm(k, n2, m2)+_LHN_[I]->get_mat_knm(k, n2, m2) << ", " ;
-//      }
-//      cout << endl;
-//    }
-    
-//    cout << "This is F " << endl; _F_[I]->print_kmat(k);
-//    cout << "This is H " << endl; _H_[I]->print_kmat(k);
-    
     _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_H_[I],_IE_[I],_bCalc_,k,kappa_);
     _H_[I]->calc_vals(mol,_H_[I],_XH_[I],_F_[I],_IE_[I],_bCalc_,k);
     
@@ -189,17 +187,21 @@ void Solver::iter_innerH(int I, int k)
 
     ct++;
   }
+
 }
 
-void Solver::step(int I, int k)
+void Solver::step(int t, int I, int k)
 {
-  if (_sys_->get_n() == 1)
+  // Do full step for spol and for mpol at t > 0
+  if ((_sys_->get_n() == 1) || (t > 0))
   {
     _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
     _LH_[I]->calc_vals(_T_, _H_[I], k);
     
     _LF_[I]->init(_sys_->get_molecule(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
     _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+    
+    _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
   }
   
   _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
@@ -212,8 +214,10 @@ double Solver::iter(int t)
 {
   double mu_int(0), mu_mpol(0);
   if ( t == 0 ) mu_ = 0.0;
+  Ns_tot_ = 0;
+  cout << "This is MAXDEV " << mu_ << endl;
 
-  if (_sys_->get_n()>1)
+  if ((_sys_->get_n()>1) && (t==0))
     for (int I = 0; I < _sys_->get_n(); I++)
     {
       auto molI = _sys_->get_molecule(I);
@@ -221,39 +225,52 @@ double Solver::iter(int t)
       {
         _LH_[I]->init(molI,_H_[I],_shCalc_,_bCalc_,_expConsts_);
         _LH_[I]->calc_vals(_T_, _H_[I], k);
-        
         _LF_[I]->init(molI,_F_[I],_shCalc_,_bCalc_,_expConsts_);
         _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
-        
         _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
       }
     }
 
   for (int I = 0; I < _sys_->get_n(); I++)
   {
+//    if (t > 0)
+//    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+//      if (_LHN_[I]->get_interPol(k) == 0)
+//        cout << "This is dev I " << I << " k " << k << ": "
+//        << dev_sph_Ik_[I][k]<<endl;
+    cout << endl;
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
       bool pol = true;
-      // if there is more than 1 mol, run if there are sphs on other mol to pol
+      // if there is more than 1 mol, run if there are sphs on mol to pol (LHN)
       if ((_sys_->get_n()>1) && (_LHN_[I]->get_interPol(k) != 0))
         pol = false;
       if((dev_sph_Ik_[I][k] > 0.1*mu_ && pol) ||
          ((t%5==0) && (_sys_->get_n()==1)))
       {
         update_outerH(I, k);
-        step( I, k);
+        step(t, I, k);
         iter_innerH(I, k);
         
         dev_sph_Ik_[I][k] = calc_converge_H(I,k,false);
+        
+        cout << "This is curr I " << I << " k " << k << ": " << dev_sph_Ik_[I][k]<<endl;
         mu_mpol += dev_sph_Ik_[I][k];
+        Ns_tot_ ++;
         if ( dev_sph_Ik_[I][k] > mu_int )
           mu_int = dev_sph_Ik_[I][k];
       }
     } // end k
   }
   
-  mu_ = (_sys_->get_n()==1) ? mu_int : mu_mpol / (double) Ns_tot_;
-  return mu_;
+//  cout << "This is mu_mpol/tot " << (mu_mpol / (double) Ns_tot_) << endl;
+  
+//  mu_ = (_sys_->get_n()==1) ? mu_int : mu_mpol / (double) Ns_tot_;
+  mu_ = mu_int;
+  if (_sys_->get_n()==1)
+    return mu_int;
+  else
+    return (mu_mpol / (double) Ns_tot_);
 }
 
 

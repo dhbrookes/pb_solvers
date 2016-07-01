@@ -73,7 +73,7 @@ public:
   double iter(int t);
   
   // Update LH, LF, XF, XH sequentially
-  void step(int I, int k);
+  void step(int t, int I, int k);
   
   // Use h matrices to compute convergence
   double calc_converge_H(int I, int k, bool inner);

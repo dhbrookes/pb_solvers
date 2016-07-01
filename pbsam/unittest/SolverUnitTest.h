@@ -416,7 +416,7 @@ TEST_F(SolverUTest, LHN_test)
   {
     for (int k = 0; k < sys->get_Ns_i(i); k++)
     {
-      solvTest.step(i,k);
+      solvTest.step(0,i,k);
     }
   }
   solvTest.update_LHN_all();
@@ -544,9 +544,7 @@ TEST_F(SolverUTest, mutual_pol_test)
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
                   true, true, imat_loc, exp_loc);
-//  solvTest.solve(1e-15, 150);
-  solvTest.iter(0);
-  solvTest.iter(1);
+  solvTest.solve(1e-15, 150);
   
   for (int i = 0; i < sys->get_n(); i++)
   {
