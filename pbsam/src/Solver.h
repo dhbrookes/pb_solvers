@@ -99,6 +99,9 @@ public:
   
   void update_LHN_all();
   
+  
+  shared_ptr<TMatrix> get_T()              {return _T_;}
+  
 };
 
 
@@ -135,7 +138,9 @@ public:
              shared_ptr<TMatrix> _T, vector<shared_ptr<FMatrix> > _F,
              vector<shared_ptr<HMatrix> > _H, int p);
   
-  void solve();
+  void solve(double tol, int maxiter);
+  
+  double iter(int t);
   
 };
 

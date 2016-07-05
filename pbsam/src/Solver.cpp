@@ -416,8 +416,22 @@ dLHN_(_sys->get_n(), vector<shared_ptr<GradLHNMatrix> > (_sys->get_n()))
 
 
 
-void GradSolver::solve()
+void GradSolver::solve(double tol, int maxiter)
 {
+  double mu;
+  for (int t = 0; t < maxiter; t++)
+  {
+    if ((t%10) == 0) cout << "this is t " << t << endl;
+    mu = iter(t);
+    //    cout << "Mu " << mu << endl;
+    if (mu < tol) break;
+  }
+}
+
+
+double GradSolver::iter(int t)
+{
+  double mu(0);
   shared_ptr<Molecule> molI;
   vector<double> besseli, besselk;
   for (int J = 0; J < _sys_->get_n(); J++)  // with respect to
@@ -445,5 +459,6 @@ void GradSolver::solve()
       }
     }
   }
+  return mu;
 }
 
