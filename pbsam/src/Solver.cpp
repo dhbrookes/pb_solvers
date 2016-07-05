@@ -26,6 +26,7 @@ _XH_(_sys->get_n()),
 _H_(_sys->get_n()),
 _F_(_sys->get_n()),
 _outerH_(_sys->get_n()),
+_rotH_(_sys->get_n()),
 _prevH_(_sys->get_n()),
 _shCalc_(_shCalc),
 _bCalc_(_bCalc),
@@ -76,6 +77,7 @@ kappa_(_consts->get_kappa())
 
     _outerH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
+    _rotH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     
     _IE_[I] = make_shared<IEMatrix>(I, _mol, _shCalc, p_, _expConsts_, false);
     if (readImat)
@@ -201,7 +203,10 @@ void Solver::step(int t, int I, int k)
     _LF_[I]->init(_sys_->get_molecule(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
     _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
     
-    _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
+    if (_sys_->get_n()>1)
+      _LHN_[I]->calc_vals(_sys_, _T_, _rotH_, k); // use rotated H for mpol
+    else
+      _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
   }
   
   _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
@@ -215,9 +220,9 @@ double Solver::iter(int t)
   double mu_int(0), mu_mpol(0);
   if ( t == 0 ) mu_ = 0.0;
   Ns_tot_ = 0;
-  cout << "This is MAXDEV " << mu_ << endl;
+//  cout << "This is MAXDEV " << mu_ << endl;
 
-  if ((_sys_->get_n()>1) && (t==0))
+  if ((_sys_->get_n()>1) && (t==0)) // For 1st step of mpol
     for (int I = 0; I < _sys_->get_n(); I++)
     {
       auto molI = _sys_->get_molecule(I);
@@ -227,18 +232,13 @@ double Solver::iter(int t)
         _LH_[I]->calc_vals(_T_, _H_[I], k);
         _LF_[I]->init(molI,_F_[I],_shCalc_,_bCalc_,_expConsts_);
         _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+
         _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
       }
     }
 
   for (int I = 0; I < _sys_->get_n(); I++)
   {
-//    if (t > 0)
-//    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
-//      if (_LHN_[I]->get_interPol(k) == 0)
-//        cout << "This is dev I " << I << " k " << k << ": "
-//        << dev_sph_Ik_[I][k]<<endl;
-    cout << endl;
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
       bool pol = true;
@@ -252,9 +252,12 @@ double Solver::iter(int t)
         step(t, I, k);
         iter_innerH(I, k);
         
+        if ( t == 0 )
+          update_rotH(I, k);
+        
         dev_sph_Ik_[I][k] = calc_converge_H(I,k,false);
         
-        cout << "This is curr I " << I << " k " << k << ": " << dev_sph_Ik_[I][k]<<endl;
+//        cout << "This is curr I " << I << " k " << k << ": " << dev_sph_Ik_[I][k]<<endl;
         mu_mpol += dev_sph_Ik_[I][k];
         Ns_tot_ ++;
         if ( dev_sph_Ik_[I][k] > mu_int )
@@ -321,14 +324,26 @@ void Solver::update_prevH(int I, int k)
   }
 }
 
+void Solver::update_rotH(int I, int k)
+{
+  
+  for (int n = 0; n < p_; n++)
+  {
+    for (int m = -n; m <= n; m++)
+    {
+      _rotH_[I]->set_mat_knm(k, n, m, _H_[I]->get_mat_knm(k, n, m));
+    }
+  }
+}
+
 void Solver::solve(double tol, int maxiter)
 {
   double mu;
   for (int t = 0; t < maxiter; t++)
   {
-    if ((t%1) == 0) cout << "this is t " << t << endl;
+    if ((t%10) == 0) cout << "this is t " << t << endl;
     mu = iter(t);
-    cout << "Mu " << mu << endl;
+//    cout << "Mu " << mu << endl;
     if (mu < tol) break;
   }
 
@@ -351,6 +366,8 @@ void Solver::reset_all()
       _H_[I]->reset_mat(k);
       _F_[I]->reset_mat(k);
       _prevH_[I]->reset_mat(k);
+      _outerH_[I]->reset_mat(k);
+      _rotH_[I]->reset_mat(k);
     }
     _IE_[I]->reset_mat();
   }

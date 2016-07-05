@@ -37,6 +37,7 @@ protected:
   vector<shared_ptr<XHMatrix> >     _XH_;
   
   vector<shared_ptr<HMatrix> >      _H_;
+  vector<shared_ptr<HMatrix> >      _rotH_; // This is for out of molecule?
   vector<shared_ptr<HMatrix> >      _prevH_;
   vector<shared_ptr<HMatrix> >      _outerH_;
   
@@ -55,7 +56,8 @@ protected:
   
   double                            mu_; // SCF deviation max
   
-  // update prevH and outerH
+  // update prevH and outerH and rotH
+  void update_rotH(int I, int k);
   void update_outerH(int I, int k);
   void update_prevH(int I, int k);
   void update_prev_all();

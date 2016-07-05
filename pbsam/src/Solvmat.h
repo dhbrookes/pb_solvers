@@ -93,14 +93,14 @@ public:
           if(abs(real) < 1e-15 ) real = 0.0;
           if(abs(imag) < 1e-15 ) imag = 0.0;
 //          fout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
-          fout << setprecision(9) << imag << ",";
+          fout << setprecision(9) << real << ",";
         }
 //        fout << endl;
       }
       fout << "},{" ;
 //      fout << endl;
     }
-//    fout << "},{" << endl;
+    fout << "},{" << endl;
     return fout;
   }
   

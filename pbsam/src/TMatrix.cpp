@@ -133,7 +133,7 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
   
 //  int map_idx = idxMap_[{I, k, J, l}];
   
-  if (isF ) whichS = FBASE;
+  if (isF) whichS = FBASE;
 //  else
 //    T_[map_idx]->print_S();
   
