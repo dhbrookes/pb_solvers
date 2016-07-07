@@ -1,6 +1,7 @@
 
 import numpy as np 
 import matplotlib.pyplot as plt
+import random
 
 def dist(p1, p2):
 	d = 0
@@ -56,9 +57,6 @@ def make_grid_coords(nmol, d):
 				coord = (pt[0], pt[1], z)
 				coords.append(coord)
 	return coords
-	  			
-
-
 
 def make_rand_coords(nmol, molr, maxr):
 	coords = []
@@ -75,8 +73,10 @@ def make_rand_coords(nmol, molr, maxr):
 			i += 1
 	return coords
 
-def write_to_xyz(nmol, coords):
-	f = open("pos%i_grid.xyz" % nmol, 'w+')
+def write_to_xyz(nmol, coords, outname=None):
+	if outname is None:
+		outname = "pos%i_grid.xyz" % nmol
+	f = open(outname, 'w+')
 	for coord in coords:
 		x, y, z = coord
 		line = "%f\t%f\t%f\n" % (x, y, z)
@@ -102,7 +102,7 @@ def write_3bd_infile(nmol, salt):
 	f.write("xyz 1 pos%i_grid.xyz\n" % nmol)
 	f.close()
 
-def write_energyforce_infile(nmol, salt):
+def write_energyforce_infile(nmol, salt, mix=False):
 	descriptor = "_%i_%.2f" % (nmol, salt)
 	f = open("run.energyforce%s.inp" % descriptor, 'w+')
 	f.write("runtype energyforce 1\n")
@@ -115,9 +115,23 @@ def write_energyforce_infile(nmol, salt):
 	# f.write("randorient\n")
 	f.write("attypes 1\n")
 	f.write("type 1 %i\n" % nmol)
-	f.write("pqr 1 mol.pqr\n")
+	f.write("pqr 1 mol_pos.pqr\n")
 	f.write("xyz 1 pos%i_grid.xyz\n" % nmol)
 	f.close()
+
+def split_coords(coords, m=2, rand=False):
+	csets = [[] for _ in range(m)]
+	if rand:
+		random.shuffle(coords)
+
+	i = 0
+	while i < len(coords):
+		for j in range(m):
+			csets[j].append(coords[i])
+			i += 1
+			if i >= len(coords):
+				break
+	return csets
 
 
 num_mols = [16, 27, 125]
@@ -129,10 +143,12 @@ max_rad = 20
 for n in num_mols:
 	# rand_coords = make_rand_coords(n, mol_rad, max_rad)
 	grid_coords = make_grid_coords(n, 5)
-	write_to_xyz(n, grid_coords)
-	for s in salts:
-		write_3bd_infile(n, s)
-		write_energyforce_infile(n, s)
+	split = split_coords(grid_coords)
+	write_to_xyz(n, split[0], outname="pos%i_grid_half1.xyz" % n)
+	write_to_xyz(n, split[1], outname="pos%i_grid_half2.xyz" % n)
+	# for s in salts:
+	# 	write_3bd_infile(n, s)
+	# 	write_energyforce_infile(n, s)
 
 # energy_force_timings = [(1.360217, 1.360518, 1.374350), 
 # 						(8.289805, 8.606490, 9.198424), 

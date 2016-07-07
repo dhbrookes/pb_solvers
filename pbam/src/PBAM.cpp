@@ -363,11 +363,12 @@ void PBAM::run_bodyapprox()
 
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
                                                     consts_, poles_);
-  ThreeBody threeBodTest( ASolv, consts_->get_unitsEnum() );
+  
+  ThreeBody threeBodTest( ASolv, consts_->get_unitsEnum(), setp_->getRunName());
   threeBodTest.solveNmer(2);
   threeBodTest.solveNmer(3);
-  t3 = clock() - t3;
   threeBodTest.calcTBDEnForTor();
+  t3 = clock() - t3;
 
 
   threeBodTest.printTBDEnForTor(setp_->getMBDLoc());
