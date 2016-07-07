@@ -507,88 +507,100 @@ void GradSolver::pre_compute_gradT_A()
           if (_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
                      (cut_er+aIk+aJl) )
           {
-            cout << "Reex 10A for mol (org) " << I << " sph " << k
-            << " to dest : " << J << " and sph " << l  << endl;
-            cout << "This is H going in " << endl;
-            _H_[I]->print_kmat(k);
             reex = _T_->re_expandX_gradT(_H_[J]->get_mat_k(l), I, k, J, l);
             gradT_A_[I][J]->add_mat_k(k, reex);
             
-            reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
-            gradT_A_[J][J]->add_mat_k(l, reex);
-            cout << "after x:" << endl;
-            for (int n2 = 0; n2 < p_; n2++)
+            if (interpol_[J][l] == 0)
             {
-              for (int m2 = 0; m2 < n2+1; m2++)
-                cout << reex( n2, m2+p_).x()<< ", " ;
-              cout << endl;
-            } cout << " y : "  << endl;
-            for (int n2 = 0; n2 < p_; n2++)
-            {
-              for (int m2 = 0; m2 < n2+1; m2++)
-                cout << reex( n2, m2+p_).y()<< ", " ;
-              cout << endl;
-            } cout << " z : "  << endl;
-            for (int n2 = 0; n2 < p_; n2++)
-            {
-              for (int m2 = 0; m2 < n2+1; m2++)
-                cout << reex( n2, m2+p_).z()<< ", " ;
-              cout << endl;
+              reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
+              gradT_A_[J][J]->add_mat_k(l, reex);
             }
-          } else if (_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
-                     (cut_act+aIk+aJl) )
+          } else if ((_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
+                     (cut_act+aIk+aJl)) && (interpol_[J][l] == 0))
           {
-            cout << "Reex 100A for mol (org) " << I << " sph " << k
-            << " to dest : " << J << " and sph " << l  << endl;
-            cout << "This is H going in " << endl;
-            _H_[I]->print_kmat(k);
+//            cout << "Reex 100A for mol (org) " << I << " sph " << k
+//            << " to dest : " << J << " and sph " << l  << endl;
             reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
             gradT_A_[J][J]->add_mat_k(l, reex);
             
-            cout << "after x:" << endl;
-            for (int n2 = 0; n2 < p_; n2++)
-            {
-              for (int m2 = 0; m2 < n2+1; m2++)
-                cout << reex( n2, m2+p_).x()<< ", " ;
-              cout << endl;
-            } cout << " y : "  << endl;
-            for (int n2 = 0; n2 < p_; n2++)
-            {
-              for (int m2 = 0; m2 < n2+1; m2++)
-                cout << reex( n2, m2+p_).y()<< ", " ;
-              cout << endl;
-            } cout << " z : "  << endl;
-            for (int n2 = 0; n2 < p_; n2++)
-            {
-              for (int m2 = 0; m2 < n2+1; m2++)
-                cout << reex( n2, m2+p_).z()<< ", " ;
-              cout << endl;
-            }
+//            cout << "after x:" << endl;
+//            for (int n2 = 0; n2 < p_; n2++)
+//            {
+//              for (int m2 = 0; m2 < n2+1; m2++)
+//                cout << reex( n2, m2+p_).x()<< ", " ;
+//              cout << endl;
+//            } cout << " y : "  << endl;
+//            for (int n2 = 0; n2 < p_; n2++)
+//            {
+//              for (int m2 = 0; m2 < n2+1; m2++)
+//                cout << reex( n2, m2+p_).y()<< ", " ;
+//              cout << endl;
+//            } cout << " z : "  << endl;
+//            for (int n2 = 0; n2 < p_; n2++)
+//            {
+//              for (int m2 = 0; m2 < n2+1; m2++)
+//                cout << reex( n2, m2+p_).z()<< ", " ;
+//              cout << endl;
+//            }
           }
         } // end l
-        
-//        cout << "after x:" << endl;
-//        for (int n2 = 0; n2 < p_; n2++)
-//        {
-//          for (int m2 = 0; m2 < n2+1; m2++)
-//            cout << gradT_A_[I][J]->get_mat_knm(k, n2, m2).x()<< ", " ;
-//          cout << endl;
-//        } cout << " y : "  << endl;
-//        for (int n2 = 0; n2 < p_; n2++)
-//        {
-//          for (int m2 = 0; m2 < n2+1; m2++)
-//            cout << gradT_A_[I][J]->get_mat_knm(k, n2, m2).y()<< ", " ;
-//          cout << endl;
-//        } cout << " z : "  << endl;
-//        for (int n2 = 0; n2 < p_; n2++)
-//        {
-//          for (int m2 = 0; m2 < n2+1; m2++)
-//            cout << gradT_A_[I][J]->get_mat_knm(k, n2, m2).z()<< ", " ;
-//          cout << endl;
-//        }
       }
     }
   }
-  
+
+//  double re;
+//  for (int I = 0; I < _sys_->get_n(); I++)
+//  {
+//    cout << ",{";
+//  for (int J = 0; J < _sys_->get_n(); J++)
+//  {
+//    cout << "{{";
+//    for (int k = 0; k < _sys_->get_Ns_i(J); k++)
+//    {
+//      cout << "{{";
+////      cout << "Reex " << J << " and sph " << k  << endl;
+////      cout << "This is ipol " << interpol_[J][k] << endl;
+////      cout << "after x:" << endl;
+//      for (int n2 = 0; n2 < p_; n2++)
+//      {
+//        for (int m2 = 0; m2 < n2+1; m2++)
+//        {
+//          re = ((fabs(gradT_A_[I][J]->get_mat_knm(k, n2, m2).x().real()) < 1e-15 )
+//                ? 0.0 : gradT_A_[I][J]->get_mat_knm(k, n2, m2).x().real() );
+//          cout << setprecision(9) << re << "," ;
+//        }
+////        cout << endl;
+//      }
+//      cout << "},{";
+////      cout << " y : "  << endl;
+//      for (int n2 = 0; n2 < p_; n2++)
+//      {
+//        for (int m2 = 0; m2 < n2+1; m2++)
+//        {
+//          re = ((fabs(gradT_A_[I][J]->get_mat_knm(k, n2, m2).y().real()) < 1e-15 )
+//                ? 0.0 : gradT_A_[I][J]->get_mat_knm(k, n2, m2).y().real() );
+//          cout << setprecision(9) << re << "," ;
+//        }
+////        cout << endl;
+//      }
+//      cout << "},{";
+////      cout << " z : "  << endl;
+//      for (int n2 = 0; n2 < p_; n2++)
+//      {
+//        for (int m2 = 0; m2 < n2+1; m2++)
+//        {
+//          re = ((fabs(gradT_A_[I][J]->get_mat_knm(k, n2, m2).z().real()) < 1e-15 )
+//                ? 0.0 : gradT_A_[I][J]->get_mat_knm(k, n2, m2).z().real() );
+//          cout << setprecision(9) << re << "," ;
+//        }
+////        cout << endl;
+////        cout << "},";
+//      }
+//      cout << "}},";
+//    }
+//    cout << "}},";
+//  }
+//    cout << "}";
+//  }
   
 }

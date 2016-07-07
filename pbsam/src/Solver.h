@@ -154,6 +154,9 @@ public:
   
   void pre_compute_gradT_A();
   
+  Ptx get_gradT_A_Ik_nm(int I, int wrt, int k, int n, int m)
+  { return gradT_A_[I][wrt]->get_mat_knm(k, n, m); }
+  
   double iter(int t);
   
 };
