@@ -9,7 +9,7 @@ read the following steps:
 2. `mkdir build`
 3. `cd build`
 4. `cmake -DENABLE_PBAM_SPHINX=on ../`
-5. `make`
+5. `make pbam_sph`
 6. `cp pbam_sph.so ../../`
 
 
