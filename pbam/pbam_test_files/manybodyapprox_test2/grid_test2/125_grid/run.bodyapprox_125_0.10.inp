@@ -1,0 +1,13 @@
+runtype bodyapprox
+runname bodyapprox_125_0.10.out
+3bdloc 3bd_125_0.10.dat
+2bdloc 2bd_125_0.10.dat
+units kT
+salt 0.10
+temp 298
+idiel 4
+sdiel 78
+attypes 1
+type 1 125
+pqr 1 mol_pos.pqr
+xyz 1 pos125_grid_all.xyz
