@@ -273,7 +273,7 @@ protected:
   
 public:
   ThreeBody(shared_ptr<ASolver> _asolver, Units unt = INTERNAL,
-            double cutoff = 1e48 );
+            string outfname="", double cutoff = 1e48);
   
   // Solve the N body problem, only 2 or 3 right now
   void solveNmer( int num, double preclim = 1e-4);
@@ -391,35 +391,5 @@ public:
 
 };
 
-class ThreeBodyPhysCalc : public BasePhysCalc, ThreeBody
-{
-protected:
-//  shared_ptr<ThreeBody> _threeBody_;
-  bool solved_;  // whether the three body problem has been solved
-  int num_;  // number of bodies (2 or 3 right now)
-  string outfname_;
-  
-public:
-  ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num=3, string outfname = "",
-                    Units unit = INTERNAL, double cutoff=1e48);
-  
-  void calc_force() { if (!solved_) solveNmer(num_); solved_ = true; }
-  void calc_energy() { if (!solved_) solveNmer(num_); solved_ = true; }
-  void calc_torque() { if (!solved_) solveNmer(num_); solved_ = true; }
-  
-//  void print_all() { }
-  
-  virtual shared_ptr<vector<Pt> > get_Tau()
-  { return get_torque_approx(); }
-  virtual shared_ptr<vector<Pt> > get_F()
-  { return get_force_approx();   }
-  virtual shared_ptr<vector<double> > get_omega()
-  { return get_energy_approx(); }
-  
-  virtual Pt get_taui(int i) { return get_torquei_approx(i); }
-  virtual Pt get_forcei(int i) { return get_forcei_approx(i); }
-  virtual double get_omegai(int i) {return get_energyi_approx(i); }
-  
-};
 
 #endif /* EnergyForce_h */

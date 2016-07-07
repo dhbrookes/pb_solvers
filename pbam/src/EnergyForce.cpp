@@ -234,13 +234,15 @@ void TorqueCalc::calc_tau()
   }
 }
 
-ThreeBody::ThreeBody( shared_ptr<ASolver> _asolver, Units unt, double cutoff )
+ThreeBody::ThreeBody( shared_ptr<ASolver> _asolver, Units unt, string outfname,
+                     double cutoff )
 : N_(_asolver->get_N()), p_(_asolver->get_p()), cutoffTBD_(cutoff),
 _besselCalc_(_asolver->get_bessel()),
 _shCalc_(_asolver->get_sh()),
 _consts_(_asolver->get_consts()),
 _sys_(_asolver->get_sys()),
-unt_(unt)
+unt_(unt),
+outfname_(outfname)
 {
   energy_approx_ = make_shared<vector<double> >(N_);
   force_approx_ = make_shared<vector<Pt> >(N_);
@@ -403,6 +405,7 @@ void ThreeBody::solveNmer( int num, double preclim )
   }
   
   cout << num << "mers done " << endl;
+//  cout << energy_tri_[0][0] << endl;
 }
 
 // Three body approximation
@@ -467,7 +470,7 @@ void ThreeBody::calcTBDEnForTor( )
 
 void ThreeBody::printTBDEnForTor( vector<string> outfile )
 {
-  int i, j;
+  int i;
   streambuf * buf;
   ofstream of;
   
@@ -480,16 +483,6 @@ void ThreeBody::printTBDEnForTor( vector<string> outfile )
   }
   
   ostream out(buf);
-  for ( j = 0; j < N_; j++)
-  {
-    out << "This is mol " << j << endl;
-    out << " Energy: " << get_energyi_approx(j) << "\t";
-    out << " Force: " << get_forcei_approx(j).norm() << "\t [";
-    out << get_forcei_approx(j).x();
-    out << ", " << get_forcei_approx(j).y()<< ", ";
-    out << get_forcei_approx(j).z()<< "]"<< endl;
-  }
-  
   out << "My units are " << unit_ << ". Time: " << _sys_->get_time() << endl;
   
   for ( i = 0; i < N_; i++)
@@ -498,12 +491,12 @@ void ThreeBody::printTBDEnForTor( vector<string> outfile )
     out << "\tPOSITION: [" << _sys_->get_centeri(i).x() << ", "
         << _sys_->get_centeri(i).y() << ", ";
     out << _sys_->get_centeri(i).z() << "]" << endl;
-    out << "\tENERGY: " << unit_conv_ * get_energyi_approx(j) << endl;
+    out << "\tENERGY: " <<  get_energyi_approx(i) << endl;
     
-    out << "\tFORCE: " << unit_conv_ * get_forcei_approx(j).norm() << ", [";
-    out << unit_conv_ * get_forcei_approx(j).x() << " "
-        << unit_conv_ * get_forcei_approx(j).y() << " "
-        << unit_conv_ * get_forcei_approx(j).z()<< "]"<<endl;
+    out << "\tFORCE: " << get_forcei_approx(i).norm() << ", [";
+    out << get_forcei_approx(i).x() << " "
+        << get_forcei_approx(i).y() << " "
+        << get_forcei_approx(i).z()<< "]"<<endl;
 //    out << "\tTORQUE: " << sqrt(torque_norm) << ", [";
 //    out << torque_i.x() << " " << torque_i.y()<<" "<<torque_i.z()<< "]"<<endl;
   }
@@ -682,13 +675,4 @@ void PhysCalc::print_all()
   }
   
 }
-
-
-ThreeBodyPhysCalc::ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num,
-                                     string outfname, Units unit, double cutoff)
-:BasePhysCalc(), ThreeBody(_asolv, unit, cutoff), solved_(false), num_(num),
-outfname_(outfname)
-{
-}
-
 
