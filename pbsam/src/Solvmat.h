@@ -339,7 +339,8 @@ protected:
 public:
   LHNMatrix(int I, int ns, int p, shared_ptr<System> sys);
   
-  int get_interPol(int k)  { return interPol_[k]; }
+  int get_interPol_k(int k)    { return interPol_[k]; }
+  vector<int> get_interPol() { return interPol_; }
   
   void calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
                  vector<shared_ptr<HMatrix> > H, int k);

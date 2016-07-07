@@ -31,7 +31,6 @@ GradWFMatrix::GradWFMatrix(int I, int wrt, int ns, int p,
 {
 }
 
-
 void GradWFMatrix::calc_all_vals(shared_ptr<Molecule> mol,
                                  shared_ptr<BesselCalc> bcalc,
                                  shared_ptr<GradHMatrix> dH,
@@ -303,7 +302,7 @@ MyMatrix<Ptx> GradLFMatrix::numeric_reex(int k, int j,
         inner = fpj * (1/rb_k.r());
         inner *= pow(mol->get_ak(k)/ rb_k.r(), n);
         inner *= conj(shcalc->get_result(n, m));
-        dLF_Ik.set_val(n, m, inner);
+        dLF_Ik.set_val(n, m+p_, inner);
       }
     }
   }
@@ -439,6 +438,7 @@ void GradLHNMatrix::calc_val_k(int k, shared_ptr<System> sys,
   lhn_k = MyMatrix<Ptx> (p_, 2*p_+1);
   for (int M=0; M < sys->get_n(); M++)
   {
+    if (M == I_) continue;
     for (int m=0; m < sys->get_Ns_i(M); m++)
     {
       inner = T->re_expandX_gradT(H[M]->get_mat_k(m), I_, k, M, m);

@@ -47,6 +47,19 @@ public:
   { mat_[k].set_val(n, m+p_, val); }
   
   MyMatrix<Ptx> get_mat_k(int k) const { return mat_[k]; }
+  void set_mat_k(int k, MyMatrix<Ptx> mat )
+  {
+    for (int n = 0; n < p_; n++)
+      for (int m = -n; m <= n; m++)
+        mat_[k].set_val(n, m+p_, mat(n, m+p_));
+  }
+  
+  void add_mat_k(int k, MyMatrix<Ptx> mat )
+  {
+    for (int n = 0; n < p_; n++)
+      for (int m = -n; m <= n; m++)
+        mat_[k].set_val(n, m+p_, mat_[k](n, m+p_) + mat(n, m+p_));
+  }
   
   void reset_mat();
 };

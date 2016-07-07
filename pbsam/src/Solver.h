@@ -97,6 +97,13 @@ public:
   cmplx getLHN_ik_nm(int I, int k, int n, int m)
                   {return _LHN_[I]->get_mat_knm(k, n, m);}
   
+  vector<vector<int> > get_interpol_list()
+  {
+    vector<vector<int> > ipol(_sys_->get_n());
+    for (int i=0; i<_sys_->get_n(); i++) ipol[i]=_LHN_[i]->get_interPol();
+    return ipol;
+  }
+  
   void update_LHN_all();
   
   
@@ -127,18 +134,25 @@ protected:
   vector<vector<shared_ptr<GradLHMatrix> > >  dLH_;
   vector<vector<shared_ptr<GradLHNMatrix> > > dLHN_;
   
+  vector<vector<shared_ptr<GradCmplxMolMat> > > gradT_A_; // pre-computed part
+  
   shared_ptr<System>                _sys_;
   shared_ptr<SHCalc>                _shCalc_;
   shared_ptr<BesselCalc>            _bCalc_;
   shared_ptr<Constants>             _consts_;
+  
+  vector<vector<int> > interpol_; // whether sphere Ik is w/in 10A of other mol
 
 public:
   GradSolver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
              shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
              shared_ptr<TMatrix> _T, vector<shared_ptr<FMatrix> > _F,
-             vector<shared_ptr<HMatrix> > _H, int p);
+             vector<shared_ptr<HMatrix> > _H, vector<vector<int> > interpol,
+             int p);
   
   void solve(double tol, int maxiter);
+  
+  void pre_compute_gradT_A();
   
   double iter(int t);
   

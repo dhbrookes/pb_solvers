@@ -204,6 +204,8 @@ public:
               shared_ptr<ReExpCoeffsConstants> _consts, vector<double> kappa,
               vector<double> lambda, bool grad = false);
   
+  void calc_derivatives();
+  
   MyVector<double> calc_SH_spec( double val ); // for singularities
   
   vector<double> get_lambdas()   { return lam_sam_; };

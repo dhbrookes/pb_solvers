@@ -136,8 +136,10 @@ public:
   
 
   int get_nmol() const { return Nmol_; }
-  
   int get_nsi(int i)   { return Nsi_[i]; }
+  int get_T_ct()       { return (int) T_.size();}
+  
+  void compute_derivatives_i(int i)  { T_[i]->calc_derivatives();}
   
   
   // convert a matrix of Pts into a vector of 3 matrices

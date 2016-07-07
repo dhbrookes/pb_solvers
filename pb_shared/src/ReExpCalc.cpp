@@ -166,13 +166,17 @@ prefacSing_(2*p, MyMatrix<double>(p, 2))
   calc_s(true); // Calculating S with given kappa
   calc_s(false); // Calculating S with k = 0 for F matrix
   
-  if (grad_)
-  {
-    if (!rSing_)  calc_dr_dtheta();
-    else          calc_dR_pre();
-    calc_ds_dr();
-  }
+  if (grad_) calc_derivatives();
 }
+
+void ReExpCoeffs::calc_derivatives()
+{
+  if (!rSing_)  calc_dr_dtheta();
+  else          calc_dR_pre();
+  calc_ds_dr();
+  
+}
+
 
 void ReExpCoeffs::calc_dR_pre()
 {
@@ -453,11 +457,6 @@ void ReExpCoeffs::calc_ds_dr()
   int m, n, l;
   double val;
   double r = v_.r();
-//  dSdR_ = MyVector<MyMatrix<double> > ( 2 * p_ );
-//  for (n = 0; n < 2*p_; n++)
-//  {
-//    dSdR_.set_val(n, MyMatrix<double> ( 2*p_, 4*p_));
-//  }
   
   for (l = 0; l < 2 * p_; l++)
   {
@@ -467,10 +466,12 @@ void ReExpCoeffs::calc_ds_dr()
     set_dsdr_val( l, 0, 0, pow(-1.0, l) * val );
   }
   
+  double lamOI = lam_sam_[1]/lam_sam_[0];
+  
   for (l = 1; l < 2 * p_ - 2; l++)
   {
-    val  = _consts_->get_beta(l-1, 0) * get_dsdr_val( 0, l-1, 0);
-    val += _consts_->get_alpha( l, 0) * get_dsdr_val( 0, l+1, 0);
+    val  = s_prefac_[0] * _consts_->get_beta(l-1, 0) * get_dsdr_val( 0, l-1, 0);
+    val += lamOI * _consts_->get_alpha( l, 0) * get_dsdr_val( 0, l+1, 0);
     val *= -1.0 / _consts_->get_alpha(0, 0);
     set_dsdr_val( 1, l, 0, val );
   }
@@ -479,9 +480,9 @@ void ReExpCoeffs::calc_ds_dr()
   {
     for(l = n + 1; l < 2*p_ - n - 2; l++)
     {
-      val  = _consts_->get_beta(l-1, 0) * get_dsdr_val(  n, l-1, 0);
-      val += _consts_->get_beta(n-1, 0) * get_dsdr_val(n-1,   l, 0);
-      val += _consts_->get_alpha( l, 0) * get_dsdr_val(  n, l+1, 0);
+      val  = s_prefac_[0]*_consts_->get_beta(l-1,0)*get_dsdr_val(  n, l-1,0);
+      val += s_prefac_[1]*_consts_->get_beta(n-1,0)*get_dsdr_val(n-1,   l,0);
+      val += lamOI*_consts_->get_alpha( l, 0) * get_dsdr_val(  n, l+1, 0);
       val *= -1.0 / _consts_->get_alpha(n, 0);
       set_dsdr_val(n+1, l, 0, val);
     }
@@ -492,8 +493,8 @@ void ReExpCoeffs::calc_ds_dr()
   {
     for (l = m; l < 2*p_ - m - 1; l++)
     {
-      val  = _consts_->get_mu(  l,  -m) * get_dsdr_val(m-1, l-1, m-1);
-      val += _consts_->get_nu(l+1,m-1) * get_dsdr_val( m-1, l+1, m-1);
+      val  = s_prefac_[0]*_consts_->get_mu(l,-m)*get_dsdr_val(m-1,l-1,m-1);
+      val += lamOI*_consts_->get_nu(l+1,m-1)*get_dsdr_val( m-1, l+1, m-1);
       val *= ( -1.0 / _consts_->get_nu( m, -m) );
       set_dsdr_val(m, l, m, val);
     }
@@ -502,9 +503,9 @@ void ReExpCoeffs::calc_ds_dr()
     {
       for (l = n + 1; l < 2*p_ - n - 2; l++)
       {
-        val2  = _consts_->get_beta(l-1, m) * get_dsdr_val(  n, l-1, m);
-        val2 += _consts_->get_beta(n-1, m) * get_dsdr_val(n-1,   l, m);
-        val2 += _consts_->get_alpha( l, m) * get_dsdr_val(  n, l+1, m);
+        val2  = s_prefac_[0]*_consts_->get_beta(l-1, m)*get_dsdr_val(n,l-1,m);
+        val2 += s_prefac_[1]*_consts_->get_beta(n-1, m)*get_dsdr_val(n-1,l,m);
+        val2 += lamOI*_consts_->get_alpha( l, m) * get_dsdr_val(  n, l+1, m);
         val2 *= (-1.0 / _consts_->get_alpha(n, m));
         set_dsdr_val(n+1, l, m, val2);
       }

@@ -131,23 +131,10 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
   MyMatrix<cmplx> X1, X2, Z;
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE;
   
-//  int map_idx = idxMap_[{I, k, J, l}];
-  
   if (isF) whichS = FBASE;
-//  else
-//    T_[map_idx]->print_S();
-  
   X1 = expand_RX(X, I, k, J, l, whichR);
   X2 = expand_SX(X1, I, k, J, l, whichS);
   Z  = expand_RHX(X2, I, k, J, l, whichRH);
-//  for (int n = 0; n < p_; n++)
-//  {
-//    for (int m = 0; m <= n; m++)
-//    {
-//      cout << X2(n,m+p_) << ", ";
-//    }
-//    cout << endl;
-//  }
   return Z;
 }
 
@@ -219,7 +206,7 @@ MyMatrix<Ptx> TMatrix::re_expandX_gradT(MyMatrix<cmplx> X,
   x2 = expand_SX(x1, I, k, J, l, whichS);
   z2 = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(1, z1 + z2);
-  
+
   // dT/dphi:
   whichR = BASE;
   whichRH = DDPHI;
@@ -248,15 +235,10 @@ bool TMatrix::is_Jl_greater(int I, int k, int J, int l)
 // perform first part of T*A and return results
 MyMatrix<cmplx> TMatrix::expand_RX(MyMatrix<cmplx> X,
                                    int I, int k, int J, int l,
-                                   WhichReEx whichR
-                                   )
+                                   WhichReEx whichR)
 {
 
   int n, m, s, map_idx;
-//  bool jl_greater = is_Jl_greater(I, k, J, l);
-//  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
-//  else            map_idx = idxMap_[{J, l, I, k}];
-  
   map_idx = idxMap_[{I, k, J, l}];
   
   MyMatrix<cmplx> x1(p_, 2*p_ + 1);
@@ -273,18 +255,18 @@ MyMatrix<cmplx> TMatrix::expand_RX(MyMatrix<cmplx> X,
         Pt vec = T_[map_idx]->get_TVec();
         if (whichR == BASE)
         {
-          aval = X(n, -m+p_); // Not sure if this is right
+          aval = X(n, -m+p_); //TODO: check if this is right
           if (vec.theta() > M_PI/2.0)
             x1.set_val(n, m+p_, (n%2 == 0 ? aval : -aval));
-          else x1.set_val(n, m+p_, X(n, m+p_));  // Not sure if this is right
+          else x1.set_val(n, m+p_, X(n, m+p_));
         } else if (whichR == DDTHETA)
         {
-          x1 = expand_dRdtheta_sing(X, I, k, J, l, vec.theta(), false);  // not sure if this is right
+          x1 = expand_dRdtheta_sing(X, I, k, J, l, vec.theta(), false);
           return x1;
         }
         else
         {
-          x1 = expand_dRdphi_sing(X, I, k, J, l, vec.theta(), false);  // not sure if this is right
+          x1 = expand_dRdphi_sing(X, I, k, J, l, vec.theta(), false);
           return x1;
         }
       } else
@@ -314,16 +296,11 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
                                    int I, int k, int J, int l,
                                    WhichReEx whichS)
 {
+  double fac;
   cmplx inter, sval;
   MyMatrix<cmplx> x2(p_, 2*p_ + 1);
   
   int n, m, s, map_idx = idxMap_[{I, k, J, l}];
-  //TODO: see if this is_greater is still needed
-//  bool jl_greater = is_Jl_greater(I, k, J, l);
-//  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
-//  else            map_idx = idxMap_[{J, l, I, k}];
-  
-  double fac;
   vector<double> lam = T_[map_idx]->get_lambdas();
   vector<double> lamScl = T_[map_idx]->get_lam_scale();
   
@@ -336,17 +313,9 @@ MyMatrix<cmplx> TMatrix::expand_SX(MyMatrix<cmplx> x1,
       for (s = abs(m); s < p_; s++)
       {
         fac = ( s <= n ) ? lamScl[n-s] : 1.0;
-//        if ( jl_greater )
-//        {
-          if (whichS == DDR) sval = T_[map_idx]->get_sval(n, s, m);
-          else if (whichS == FBASE) sval = T_[map_idx]->get_s_fval(n, s, m);
-          else sval = T_[map_idx]->get_sval(n, s, m);
-//        }
-//        else
-//        {
-//          if (whichS == DDR) sval = T_[map_idx]->get_sval(s, n, m);
-//          else sval = T_[map_idx]->get_sval(s, n, m);
-//        }
+        if (whichS == DDR) sval = T_[map_idx]->get_dsdr_val(n, s, m);
+        else if (whichS == FBASE) sval = T_[map_idx]->get_s_fval(n, s, m);
+        else sval = T_[map_idx]->get_sval(n, s, m);
         inter += fac * sval * x1(s, m+p_);
       } // end l
       x2.set_val(n, m+p_, inter);
@@ -530,26 +499,23 @@ VecOfMats<cmplx>::type TMatrix::conv_to_cart(VecOfMats<cmplx>::type dZ,
   double the, r, phi;
   VecOfMats<cmplx>::type Zcart (3); vector<double> con1(3), con2(3), con3(3);
   
-  bool jl_greater = is_Jl_greater(I, k, J, l);
-  if (jl_greater) map_idx = idxMap_[{I, k, J, l}];
-  else            map_idx = idxMap_[{J, l, I, k}];
-  
+  map_idx = idxMap_[{I, k, J, l}];
   Pt v = T_[map_idx]->get_TVec();
   the = v.theta(); r = v.r(); phi = v.phi();
-  
+
   if (T_[map_idx]->isSingular())
   {
     double cost = (the < M_PI/2) ? 1.0 : -1.0;
     con1 = {  0.0, cost/r,   0.0};
     con2 = {  0.0,    0.0, 1.0/r};
     con3 = { cost,    0.0,   0.0};
-  }else
+  } else
   {
     con1 = {sin(the)*cos(phi),  cos(the)*cos(phi)/r, -sin(phi)/sin(the)/r};
     con2 = {sin(the)*sin(phi),  cos(the)*sin(phi)/r,  cos(phi)/sin(the)/r};
     con3 = {         cos(the),          -sin(the)/r,                  0.0};
   }
-  
+
   for (n = 0; n < 3; n++)
     Zcart[n] = MyMatrix<cmplx> (p_, 2*p_ + 1);
   
@@ -572,10 +538,12 @@ VecOfMats<cmplx>::type TMatrix::convert_from_ptx(MyMatrix<Ptx> X)
 {
   VecOfMats<cmplx>::type result (3, MyMatrix<cmplx> (X.get_ncols(),
                                                      X.get_nrows()));
-  for (int i = 0 ; i < 3; i++)
-    for (int j = 0; j < X.get_nrows(); j++)
-      for (int k = 0; k < X.get_ncols(); k++)
-        result[i].set_val(j, k, X(j, k)[i]);
+  
+  //TODO: fix this!
+//  for (int i = 0 ; i < 3; i++)
+//    for (int j = 0; j < X.get_nrows(); j++)
+//      for (int k = 0; k < X.get_ncols(); k++)
+//        result[i].set_val(j, k, X(j, k)[i]);
   
   return result;
      
@@ -585,8 +553,8 @@ VecOfMats<cmplx>::type TMatrix::convert_from_ptx(MyMatrix<Ptx> X)
 MyMatrix<Ptx> TMatrix::convert_to_ptx(VecOfMats<cmplx>::type X)
 {
   MyMatrix<Ptx> result (X[0].get_nrows(), X[1].get_ncols());
-  for (int j = 0; j < X.get_nrows(); j++)
-    for (int k = 0; k < X.get_ncols(); k++)
+  for (int j = 0; j < X[0].get_nrows(); j++)
+    for (int k = 0; k < X[0].get_ncols(); k++)
     {
       result(j, k).set_x(X[0](j, k));
       result(j, k).set_y(X[1](j, k));
