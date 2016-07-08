@@ -43,6 +43,13 @@ public:
   const int get_p() const   { return p_; }
   const int get_ns() const  { return (int) mat_.size(); }
   Ptx get_mat_knm(int k, int n, int m) { return mat_[k](n, m+p_); }
+  
+  cmplx get_mat_knm_d(int k, int n, int m, int d)
+  {
+    if ( d == 0 )      return mat_[k](n, m+p_).x();
+    else if ( d == 1 ) return mat_[k](n, m+p_).y();
+    return mat_[k](n, m+p_).z();
+  }
   void set_mat_knm(int k, int n, int m, Ptx val)
   { mat_[k].set_val(n, m+p_, val); }
   
@@ -62,6 +69,175 @@ public:
   }
   
   void reset_mat();
+  
+  friend ostream & operator<<(ostream & fout, GradCmplxMolMat & M)
+  {
+    //    fout << "{{";
+    for (int k = 0; k < M.get_ns(); k++)
+    {
+      fout << "For sphere " << k << endl;
+      for (int d = 0; d < 3; d++)
+      {
+        fout << " Dim: " << d <<  endl;
+        for (int n = 0; n < M.get_p(); n++)
+        {
+          for (int m = 0; m <= n; m++)
+          {
+            double real = M.get_mat_knm_d( k, n, m, d).real();
+            double imag = M.get_mat_knm_d( k, n, m, d).imag();
+            if(abs(real) < 1e-15 ) real = 0.0;
+            if(abs(imag) < 1e-15 ) imag = 0.0;
+            fout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
+            //          fout << setprecision(9) << real << ",";
+          }
+          fout << endl;
+        }
+        //      fout << "},{" ;
+        fout << endl;
+      }
+      //      fout << "},{" ;
+      fout << endl;
+    }
+    //    fout << "},{" << endl;
+    return fout;
+  }
+  
+  void print_kmat(int k)
+  {
+    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    for (int d = 0; d < 3; d++)
+    {
+      cout << " Dim: " << d <<  endl;
+      for (int n = 0; n < get_p(); n++)
+      {
+        for (int m = 0; m <= n; m++)
+        {
+          double real = get_mat_knm_d( k, n, m, d).real();
+          double imag = get_mat_knm_d( k, n, m, d).imag();
+          if(abs(real) < 1e-15 ) real = 0.0;
+          if(abs(imag) < 1e-15 ) imag = 0.0;
+          cout << setprecision(9) << "(" << real << ", " << imag << ") ";
+        }
+        cout << endl;
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
+
+};
+
+/*
+ Base class for gradients of NumericalMatrix objects
+ */
+class GradNumericalMat
+{
+protected:
+  int p_;
+  int I_;
+  int wrt_;  // with respect to
+  vector<MyMatrix<Ptx> > mat_cmplx_;  // each gradient has 3 parts (use Pt)
+  vector<vector<Pt> > mat_;
+  
+  
+  
+public:
+  GradNumericalMat(int I, int wrt, int ns, int p)
+  :p_(p), mat_(ns), mat_cmplx_(ns, MyMatrix<Ptx> (p, 2*p+1)), I_(I), wrt_(wrt)
+  {
+  }
+  
+  const int get_wrt() const   { return wrt_; }
+  const int get_I() const   { return I_; }
+  const int get_p() const   { return p_; }
+  const int get_ns() const  { return (int) mat_.size(); }
+
+  Pt get_mat_kh(int k, int h)           { return mat_[k][h]; }
+  Ptx get_mat_knm(int k, int n, int m)  { return mat_cmplx_[k](n,m+p_); }
+  void set_mat_kh(int k, int h, Pt val) { mat_[k][h] = val; }
+  vector<Pt> get_mat_k(int k)           { return mat_[k]; }
+  vector<vector<Pt> > get_mat()         { return mat_; }
+  int get_mat_k_len(int k)                 { return (int)mat_[k].size(); }
+  
+  void reset_mat(int k);
+  
+  friend ostream & operator<<(ostream & fout, GradNumericalMat & M)
+  {
+    for (int k = 0; k < M.get_ns(); k++)
+    {
+      fout << "For sphere " << k << endl;
+      for (int d = 0; d < 3; d++)
+      {
+        fout << " Dim: " << d <<  endl;
+        for (int h = 0; h < M.get_mat_k_len(k); h++)
+        {
+          double real;
+          if (d == 0)       real = M.get_mat_kh( k, h).x();
+          else if (d == 1)  real = M.get_mat_kh( k, h).y();
+          else              real = M.get_mat_kh( k, h).z();
+          if(abs(real) < 1e-15 ) real = 0.0;
+          fout << real << ", ";
+        }
+        fout << endl;
+      }
+    }
+    return fout;
+  }
+  
+  void print_kmat(int k)
+  {
+    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    for (int d = 0; d < 3; d++)
+    {
+      cout << " Dim: " << d <<  endl;
+      for (int h = 0; h < get_mat_k_len(k); h++)
+      {
+        double real;
+        if (d == 0)       real = get_mat_kh( k, h).x();
+        else if (d == 1)  real = get_mat_kh( k, h).y();
+        else              real = get_mat_kh( k, h).z();
+        if(abs(real) < 1e-15 ) real = 0.0;
+        cout << real << ", ";
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
+  
+  void print_analytical(int k)
+  {
+    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    for (int d = 0; d < 3; d++)
+    {
+      cout << " Dim: " << d <<  endl;
+      for (int n = 0; n < get_p(); n++)
+      {
+        for (int m = 0; m <= n; m++)
+        {
+          double real, imag;
+          if (d == 0)
+          {
+            real = (get_mat_knm( k, n, m).x()).real();
+            imag = (get_mat_knm( k, n, m).x()).imag();
+          } else if (d == 1)
+          {
+            real = (get_mat_knm( k, n, m).y()).real();
+            imag = (get_mat_knm( k, n, m).y()).imag();
+          } else
+          {
+            real = (get_mat_knm( k, n, m).z()).real();
+            imag = (get_mat_knm( k, n, m).z()).imag();
+          }
+          
+          if(abs(real) < 1e-15 ) real = 0.0;
+          if(abs(imag) < 1e-15 ) imag = 0.0;
+          cout << setprecision(9)<< "(" << real << ", " << imag << ") ";
+        }
+        cout << endl;
+      }
+    }
+  }
+
 };
 
 // gradient matrices:
@@ -190,38 +366,33 @@ public:
 /*
  Eq. 13 [2]
  */
-class GradLFMatrix : public GradCmplxMolMat
+class GradLFMatrix : public GradNumericalMat
 {
 public:
   GradLFMatrix(int I, int wrt, int ns, int p);
   
-  void calc_all_vals(shared_ptr<Molecule> mol,
-                     shared_ptr<SHCalc> shcalc,
-                     shared_ptr<TMatrix> T,
-                     shared_ptr<GradFMatrix> dF,
-                     int Mp=-1);
+  void init(shared_ptr<Molecule> mol, shared_ptr<GradFMatrix> dF,
+            shared_ptr<SHCalc> shcalc,
+            shared_ptr<ExpansionConstants> _expconst);
   
-  void calc_val_k(int k, shared_ptr<Molecule> mol,
-                  shared_ptr<SHCalc> shcalc,
+  void calc_all_vals(shared_ptr<Molecule> mol, vector<int> interpol,
+                     shared_ptr<TMatrix> T, shared_ptr<GradFMatrix> dF);
+  
+  void calc_val_k(int k, shared_ptr<Molecule> mol, vector<int> interpol,
                   shared_ptr<TMatrix> T,
-                  shared_ptr<GradFMatrix> dF,
-                  int Mp=-1);
+                  shared_ptr<GradFMatrix> dF);
   
-  MyMatrix<Ptx> numeric_reex(int k, int j,
-                             shared_ptr<Molecule> mol,
-                             shared_ptr<SHCalc> shcalc,
-                             shared_ptr<GradFMatrix> dF,
-                             int Mp=-1);
-  
-  // calculate the gradient of f at point P (Eq. S5b)
-
-  
+//  MyMatrix<Ptx> numeric_reex(int k, int j,
+//                             shared_ptr<Molecule> mol,
+//                             shared_ptr<SHCalc> shcalc,
+//                             shared_ptr<GradFMatrix> dF,
+//                             int Mp=-1);
 };
 
 /*
  Eq. 13 [2]
  */
-class GradLHMatrix : public GradCmplxMolMat
+class GradLHMatrix : public GradNumericalMat
 {
 protected:
   double kappa_;
@@ -229,26 +400,23 @@ protected:
 public:
   GradLHMatrix(int I, int wrt, int ns, int p, double kappa);
   
-  void calc_all_vals(shared_ptr<Molecule> mol,
-                     shared_ptr<BesselCalc> bcalc,
-                     shared_ptr<SHCalc> shcalc,
-                     shared_ptr<TMatrix> T,
-                     shared_ptr<GradHMatrix> dH, int Mp=-1);
+  void init(shared_ptr<Molecule> mol, shared_ptr<GradHMatrix> dH,
+            shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
+            shared_ptr<ExpansionConstants> _expconst);
   
-  void calc_val_k(int k, shared_ptr<Molecule> mol,
-                  vector<double> besseli,
-                  vector<double> besselk,
-                  shared_ptr<SHCalc> shcalc,
-                  shared_ptr<TMatrix> T,
-                  shared_ptr<GradHMatrix> dH, int Mp=-1);
+  void calc_all_vals(shared_ptr<Molecule> mol, vector<int> interpol,
+                     shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
   
-  MyMatrix<Ptx> numeric_reex(int k, int j,
-                             shared_ptr<Molecule> mol,
-                             vector<double> besseli,
-                             vector<double> besselk,
-                             shared_ptr<SHCalc> shcalc,
-                             shared_ptr<GradHMatrix> dH,
-                             int Mp=-1);
+  void calc_val_k(int k, shared_ptr<Molecule> mol, vector<int> interpol,
+                  shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
+  
+//  MyMatrix<Ptx> numeric_reex(int k, int j,
+//                             shared_ptr<Molecule> mol,
+//                             vector<double> besseli,
+//                             vector<double> besselk,
+//                             shared_ptr<SHCalc> shcalc,
+//                             shared_ptr<GradHMatrix> dH,
+//                             int Mp=-1);
   
 
   
@@ -263,12 +431,12 @@ public:
   GradLHNMatrix(int I, int wrt, int ns, int p);
   
   void calc_all_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
-                     vector<shared_ptr<HMatrix> > H,
+                     vector<shared_ptr<GradCmplxMolMat> > gradT_A,
                      vector<shared_ptr<GradHMatrix> > dH);
   
   void calc_val_k(int k, shared_ptr<System> sys,
                   shared_ptr<TMatrix> T,
-                  vector<shared_ptr<HMatrix> > H,
+                  vector<shared_ptr<GradCmplxMolMat> > gradT_A,
                   vector<shared_ptr<GradHMatrix> > dH);
   
 };

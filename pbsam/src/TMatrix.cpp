@@ -172,7 +172,9 @@ MyMatrix<Ptx> TMatrix::re_expand_gradX(MyMatrix<Ptx> dX,
   z  = expand_RHX(x2, I, k, J, l, whichRH);
   Z.set_val(2, z);
   
-  return convert_to_ptx(Z);
+  MyMatrix<Ptx> Zpt = convert_to_ptx(Z);
+  return Zpt;
+//  return convert_to_ptx(Z);
 }
 
 
@@ -225,6 +227,44 @@ MyMatrix<Ptx> TMatrix::re_expandX_gradT(MyMatrix<cmplx> X,
   return convert_to_ptx(Z);
 }
 
+// Perform local expansion from J, l onto I, k
+MyMatrix<Ptx> TMatrix::re_expandgradX_numeric(vector<vector<Pt> > X,
+                                                int I, int k,
+                                                int J, int l, double kappa)
+{
+  int h, n, m;
+  cmplx val;
+  double chgscl, rscl, ekr, xval;
+  VecOfMats<cmplx>::type Z (3, MyMatrix<cmplx> (p_, 2*p_+1));
+  vector<int> exp_pts = _system_->get_gdpt_expij(J, l);
+  for (int d = 0; d < 3; d++)
+  {
+    for (h = 0; h < X[l].size(); h++)
+    {
+      if (d == 0)       xval = X[l][h].x();
+      else if (d == 1)  xval = X[l][h].y();
+      else              xval = X[l][h].z();
+      
+      Pt sph_dist = _system_->get_centerik(I, k) - _system_->get_centerik(J, l);
+      Pt loc = _system_->get_gridijh(J, l, exp_pts[h]) - sph_dist;
+      _shCalc_->calc_sh(loc.theta(), loc.phi());
+      vector<double> bessI = _besselCalc_->calc_mbfK(p_+1, kappa*loc.r());
+      rscl = _system_->get_aik(I, k) / loc.r();
+      chgscl = xval / loc.r();
+      ekr = exp(-kappa*loc.r());
+      for (n = 0; n < p_; n++)
+      {
+        for (m = -n; m <= n; m++)
+        {
+          val = bessI[n]*ekr*chgscl*_shCalc_->get_result(n, m) + Z[d](n, m+p_);
+          Z[d](n, m+p_)  = val;
+        }
+        chgscl *= rscl;
+      }
+    }
+  }
+  return convert_to_ptx(Z);
+}
 
 bool TMatrix::is_Jl_greater(int I, int k, int J, int l)
 {
@@ -536,14 +576,14 @@ VecOfMats<cmplx>::type TMatrix::conv_to_cart(VecOfMats<cmplx>::type dZ,
 // convert a matrix of Point objects into a vector of 3 matrices
 VecOfMats<cmplx>::type TMatrix::convert_from_ptx(MyMatrix<Ptx> X)
 {
-  VecOfMats<cmplx>::type result (3, MyMatrix<cmplx> (X.get_ncols(),
-                                                     X.get_nrows()));
+  VecOfMats<cmplx>::type result (3, MyMatrix<cmplx> (X.get_nrows(),
+                                                     X.get_ncols()));
   
   //TODO: fix this!
-//  for (int i = 0 ; i < 3; i++)
-//    for (int j = 0; j < X.get_nrows(); j++)
-//      for (int k = 0; k < X.get_ncols(); k++)
-//        result[i].set_val(j, k, X(j, k)[i]);
+  for (int i = 0 ; i < 3; i++)
+    for (int j = 0; j < X.get_nrows(); j++)
+      for (int k = 0; k < X.get_ncols(); k++)
+        result[i].set_val(j, k, X(j, k)[i]);
   
   return result;
      
@@ -552,7 +592,7 @@ VecOfMats<cmplx>::type TMatrix::convert_from_ptx(MyMatrix<Ptx> X)
 
 MyMatrix<Ptx> TMatrix::convert_to_ptx(VecOfMats<cmplx>::type X)
 {
-  MyMatrix<Ptx> result (X[0].get_nrows(), X[1].get_ncols());
+  MyMatrix<Ptx> result (X[0].get_nrows(), X[0].get_ncols());
   for (int j = 0; j < X[0].get_nrows(); j++)
     for (int k = 0; k < X[0].get_ncols(); k++)
     {

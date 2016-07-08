@@ -381,11 +381,13 @@ GradSolver::GradSolver(shared_ptr<System> _sys,
                        shared_ptr<TMatrix> _T,
                        vector<shared_ptr<FMatrix> > _F,
                        vector<shared_ptr<HMatrix> > _H,
+                       vector<shared_ptr<IEMatrix> > _IE,
                        vector<vector<int > > interpol,
+                       shared_ptr<ExpansionConstants> _expConst,
                        int p)
 :p_(p), _F_(_F), _H_(_H), _T_(_T), _bCalc_(_bCalc), _shCalc_(_shCalc),
 _sys_(_sys), _consts_(_consts), kappa_(_consts->get_kappa()),
-interpol_(interpol),
+interpol_(interpol), _IE_(_IE), _expConsts_(_expConst),
 dF_(_sys->get_n(), vector<shared_ptr<GradFMatrix> > (_sys->get_n())),
 dH_(_sys->get_n(), vector<shared_ptr<GradHMatrix> > (_sys->get_n())),
 dWF_(_sys->get_n(), vector<shared_ptr<GradWFMatrix> > (_sys->get_n())),
@@ -419,7 +421,6 @@ gradT_A_(_sys->get_n(), vector<shared_ptr<GradCmplxMolMat> > (_sys->get_n()))
   }
   
   for (int i = 0; i < _T_->get_T_ct(); i++)  _T_->compute_derivatives_i(i);
-  
 }
 
 
@@ -439,7 +440,7 @@ void GradSolver::solve(double tol, int maxiter)
     cng = scale_dev;
     while((cng/scale_dev) > tol)
     {
-      mu = iter(ct);
+      mu = iter(ct, j);
       if (ct > MAX_POL_ROUNDS*_sys_->get_n())
       {
         cout << "Polz doesn't converge! dev="<< cng << " " << ct << endl;
@@ -451,40 +452,42 @@ void GradSolver::solve(double tol, int maxiter)
 }
 
 
-double GradSolver::iter(int t)
+double GradSolver::iter(int t, int wrt)
 {
   double mu(0);
   shared_ptr<Molecule> molI;
   vector<double> besseli, besselk;
-  for (int J = 0; J < _sys_->get_n(); J++)  // with respect to
+  for (int I = 0; I < _sys_->get_n(); I++)
   {
-    for (int I = 0; I < _sys_->get_n(); I++)
+    molI = _sys_->get_molecule(I);
+    cout << "This is " << I << " wrt " << wrt << endl;
+    
+    dLHN_[wrt][I]->calc_all_vals(_sys_, _T_, gradT_A_[wrt], dH_[wrt]);
+    dLF_[wrt][I]->init(molI, dF_[wrt][I], _shCalc_, _expConsts_);
+    dLH_[wrt][I]->init(molI, dH_[wrt][I], _shCalc_, _bCalc_, _expConsts_);
+    
+    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      molI = _sys_->get_molecule(I);
+      besseli = _bCalc_->calc_mbfI(p_+1, kappa_*molI->get_ak(k));
+      besselk = _bCalc_->calc_mbfK(p_+1, kappa_*molI->get_ak(k));
       
-      for (int k = 0; k < _sys_->get_Ns_i(I); k++)
-      {
-        besseli = _bCalc_->calc_mbfI(p_+1, kappa_*molI->get_ak(k));
-        besselk = _bCalc_->calc_mbfK(p_+1, kappa_*molI->get_ak(k));
-        
-        dLF_[J][I]->calc_val_k(k, molI, _shCalc_, _T_, dF_[J][I]);
-        dLH_[J][I]->calc_val_k(k, molI, besseli, besselk, _shCalc_, _T_, dH_[J][I]);
-        dLHN_[J][I]->calc_val_k(k, _sys_, _T_, _H_, dH_[J]);
-
-        dWF_[J][I]->calc_val_k(k, molI, besseli, besselk, dH_[J][I], dF_[J][I],
-                               dLH_[J][I], dLHN_[J][I], dLF_[J][I]);
-        dWH_[J][I]->calc_val_k(k, molI, besseli, besselk, dH_[J][I], dF_[J][I],
-                               dLH_[J][I], dLHN_[J][I], dLF_[J][I]);
-        
-        dF_[J][I]->calc_val_k(k, _IE_[I], dWF_[J][I]);
-        dH_[J][I]->calc_val_k(k, besseli, _IE_[I], dWH_[J][I]);
-      }
+      dLF_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dF_[wrt][I]);
+      dLH_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dH_[wrt][I]);
+      
+      dWF_[wrt][I]->calc_val_k(k,molI,besseli,besselk,dH_[wrt][I],dF_[wrt][I],
+                             dLH_[wrt][I], dLHN_[wrt][I], dLF_[wrt][I]);
+      dWH_[wrt][I]->calc_val_k(k, molI, besseli, besselk, dH_[wrt][I],
+                               dF_[wrt][I], dLH_[wrt][I], dLHN_[wrt][I],
+                               dLF_[wrt][I]);
+      
+      dF_[wrt][I]->calc_val_k(k, _IE_[I], dWF_[wrt][I]);
+      dH_[wrt][I]->calc_val_k(k, besseli, _IE_[I], dWH_[wrt][I]);
     }
   }
   return mu;
 }
 
-// precompute gradT times A(i,j) for all pairs of molecules
+// precompute gradT times H(i,j) for all pairs of molecules
 void GradSolver::pre_compute_gradT_A()
 {
   shared_ptr<Molecule> molI;
@@ -508,7 +511,7 @@ void GradSolver::pre_compute_gradT_A()
                      (cut_er+aIk+aJl) )
           {
             reex = _T_->re_expandX_gradT(_H_[J]->get_mat_k(l), I, k, J, l);
-            gradT_A_[I][J]->add_mat_k(k, reex);
+            gradT_A_[J][I]->add_mat_k(k, reex);
             
             if (interpol_[J][l] == 0)
             {
@@ -518,8 +521,6 @@ void GradSolver::pre_compute_gradT_A()
           } else if ((_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
                      (cut_act+aIk+aJl)) && (interpol_[J][l] == 0))
           {
-//            cout << "Reex 100A for mol (org) " << I << " sph " << k
-//            << " to dest : " << J << " and sph " << l  << endl;
             reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
             gradT_A_[J][J]->add_mat_k(l, reex);
             
@@ -547,7 +548,6 @@ void GradSolver::pre_compute_gradT_A()
       }
     }
   }
-
 //  double re;
 //  for (int I = 0; I < _sys_->get_n(); I++)
 //  {
@@ -602,5 +602,4 @@ void GradSolver::pre_compute_gradT_A()
 //  }
 //    cout << "}";
 //  }
-  
 }

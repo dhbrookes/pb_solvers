@@ -134,6 +134,14 @@ public:
                                  int I, int k,
                                  int J, int l);
   
+  /*
+   Locally re-expand X with element (I, k, J, l) of grad(T) and return
+   a matrix of Point objects containing each element of the gradient
+   */
+  MyMatrix<Ptx> re_expandgradX_numeric(vector<vector<Pt> > X,
+                                       int I, int k,
+                                       int J, int l, double kappa);
+  
 
   int get_nmol() const { return Nmol_; }
   int get_nsi(int i)   { return Nsi_[i]; }

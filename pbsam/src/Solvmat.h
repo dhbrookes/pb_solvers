@@ -285,7 +285,6 @@ public:
       }
       cout << endl;
     }
-    
   }
   
 };

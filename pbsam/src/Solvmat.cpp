@@ -554,16 +554,7 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
     if (T->is_analytic(I_, k, I_, j))
     {
       bool isF = true;
-//      cout << "Initialize LF For k " << k << " j: " << j << endl;
       reex = T->re_expandX(F->get_mat_k(j), I_, k, I_, j, isF );
-//      for (int n2 = 0; n2 < p_; n2++)
-//      {
-//        for (int m2 = 0; m2 < n2+1; m2++)
-//        {
-//          cout << setprecision(9)<< reex(n2, m2+p_) ;
-//        }
-//        cout << endl;
-//      }
     }
     else
     {
@@ -572,8 +563,6 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
     
     mat_cmplx_[k] += reex;
   }
-//  cout << "This is LFS " << I_ << " and sph  " << k << endl;
-//  print_analytical(k);
 }
 
 LHMatrix::LHMatrix(int I, int ns, int p, double kappa)
@@ -624,34 +613,10 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
     if (j==k) continue;
 
     if (T->is_analytic(I_, k, I_, j))
-    {
-//      cout << "Initialize LH For k " << k << " j: " << j << endl;
       reex = T->re_expandX(H->get_mat_k(j), I_, k, I_, j );
-      
-//      for (int n2 = 0; n2 < p_; n2++)
-//      {
-//        for (int m2 = 0; m2 < n2+1; m2++)
-//        {
-//          cout << setprecision(9)<< reex(n2, m2+p_) ;
-//        }
-//        cout << endl;
-//      }
-    }
-    
     else
       reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j, kappa_ );
     
-//        cout << "For k " << k << " j: " << j << endl;
-//    
-//        for (int n2 = 0; n2 < p_; n2++)
-//        {
-//          for (int m2 = 0; m2 < n2+1; m2++)
-//          {
-//            cout << reex(n2, m2+p_) ;
-//          }
-//          cout << endl;
-//        }
-
     mat_cmplx_[k] += reex;
   }
 }
