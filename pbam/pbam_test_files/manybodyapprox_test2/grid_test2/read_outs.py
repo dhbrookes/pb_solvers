@@ -33,7 +33,7 @@ def read_3bd_out(fname):
 			fs.append(float(split[3]))
 	return ens, fs
 
-num_mols = [16, 27]
+num_mols = [16, 27, 125]
 salts = [0.00, 0.05, 0.10]
 
 e_ave_errors = [[0 for _ in range(len(num_mols))] for _ in range(len(salts))]
@@ -43,12 +43,12 @@ for k in range(len(num_mols)):
 	nmol = num_mols[k]
 	folder = "%i_grid" % nmol
 	for j in range(len(salts)):
-		if k == 2:
-			break
+		# if k == 2:
+		# 	break
 		salt = salts[j]
 		descriptor = "_%i_%.2f" % (nmol, salt)
-		enf_fname = "%s/energyforce%s_posneg.out" % (folder,descriptor)
-		three_fname = "%s/bodyapprox%s_posneg.out" % (folder,descriptor)
+		enf_fname = "%s/energyforce%s.out" % (folder,descriptor)
+		three_fname = "%s/bodyapprox%s.out" % (folder,descriptor)
 		ens1, fs1, tors1 = read_en_force_out(enf_fname)
 		ens2, fs2, tors2 = read_en_force_out(three_fname)
 
@@ -58,10 +58,9 @@ for k in range(len(num_mols)):
 
 		en_errors = []
 		f_errors = []
-		print enf_fname, ens1
 		for i in range(nmol):
-			en_errors.append( np.abs(ens1[i] - ens2[i]) / ens1[i] )
-			f_errors.append( np.abs(fs1[i] - fs2[i]) / fs1[i] )
+			en_errors.append(np.abs( np.abs(ens1[i] - ens2[i]) / ens1[i] ))
+			f_errors.append(np.abs( np.abs(fs1[i] - fs2[i]) / fs1[i] ))
 
 		e_ave_errors[j][k] = sum(en_errors) / nmol
 		f_ave_errors[j][k] = sum(f_errors) / nmol
@@ -95,9 +94,9 @@ print [idx + 1.5*bar_width for idx in index]
 ax.set_xticks([idx + 1.5*bar_width for idx in index])
 ax.set_xticklabels(num_mols)
 # ax.set_ylim(0, 0.035)
-ax.set_xlim(-0.2, 2.3+0.2)
+ax.set_xlim(-0.2, 3)
 plt.tight_layout()
-plt.savefig("threebody_en_error_posneg.pdf")
+plt.savefig("threebody_en_error.pdf")
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -125,7 +124,7 @@ ax.set_xticklabels(num_mols)
 # ax.set_ylim(0, 0.035)
 ax.set_xlim(-0.2, 3)
 plt.tight_layout()
-plt.savefig("threebody_f_error_posneg.pdf")
+plt.savefig("threebody_f_error.pdf")
 
 
 # grid_times = [(3.124841, 2.991938, 3.146087),
