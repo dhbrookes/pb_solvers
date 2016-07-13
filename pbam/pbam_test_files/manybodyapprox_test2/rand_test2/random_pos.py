@@ -120,7 +120,7 @@ def write_3bd_infile(nmol, salt, posneg=False):
 
 	f.close()
 
-def write_energyforce_infile(nmol, salt, posneg=False, intra_pn):
+def write_energyforce_infile(nmol, salt, posneg=False):
 	descriptor = "_%i_%.2f" % (nmol, salt)
 
 	if posneg:
@@ -150,34 +150,9 @@ def write_energyforce_infile(nmol, salt, posneg=False, intra_pn):
 		f.write("xyz 1 pos%i_rand_half1.xyz\n" % nmol)
 		f.write("type 2 %i\n" % math.floor(float(nmol)/2))
 		f.write("pqr 2 mol_neg.pqr\n")
-		f.write("xyz 2 pos%i_ramd_half2.xyz\n" % nmol)
+		f.write("xyz 2 pos%i_rand_half2.xyz\n" % nmol)
 
 	f.close()
-
-def write_qsub(nmol, salt, posneg=False, bodyapprox=False):
-	descriptor = "_%i_%.2f" % (nmol, salt)
-	if bodyapprox:
-		innername = 'bodyapprox%s' % descriptor
-	else:
-		innername = "energyforce%s" % descriptor
-
-	if posneg:
-		innername += "_posneg"
-
-	f = open("qsub.%s" % innername, 'w+')
-	f.write('#!/bin/bash\n')
-	f.write('#$ -S /bin/bash\n')
-	f.write('#$ -cwd\n')
-	f.write('#$ -o out.%s\n' % innername)
-	f.write('#$ -j y\n')
-	f.write('#$ -q lfelber*\n')
-	if bodyapprox:
-		f.write('$ -pe threaded 64\n\n')
-	else:
-		f.write('$ -pe threaded 4\n\n')
-
-	f.write('EXEC="../../../../../build/bin/pbam"\n\n')
-	f.write('$EXEC run.%s.inp' % innername)
 
 def split_coords(coords, m=2, rand=False):
 	csets = [[] for _ in range(m)]
@@ -195,26 +170,23 @@ def split_coords(coords, m=2, rand=False):
 
 
 num_mols = [16, 27, 125]
-# salts = [0.00, 0.05, 0.10]
+salts = [0.00, 0.05, 0.10]
 
-# mol_rad = 2
-# max_rad = 20
+mol_rad = 2
+max_rad = 20
 
-# for n in num_mols:
-# 	rand_coords = make_grid_coords(n, mol_rad, max_rad)
-# 	# grid_coords = make_grid_coords(n, 5)
-# 	split = split_coords(rand_coords)
-# 	write_to_xyz(n, split[0], outname="pos%i_grid_half1.xyz" % n)
-# 	write_to_xyz(n, split[1], outname="pos%i_grid_half2.xyz" % n)
-# 	for s in salts:
-# 		write_3bd_infile(n, s, posneg=False)
-# 		write_3bd_infile(n, s, posneg=True)
-# 		write_energyforce_infile(n, s, posneg=False)
-# 		write_energyforce_infile(n, s, posneg=True)
-# 		write_qsub(n, s, posneg=False, bodyapprox=True)
-# 		write_qsub(n, s, posneg=True, bodyapprox=True)
-# 		write_qsub(n, s, posneg=False, bodyapprox=False)
-# 		write_qsub(n, s, posneg=True, bodyapprox=False)
+for n in num_mols:
+	rand_coords = make_rand_coords(n, mol_rad, max_rad)
+	# grid_coords = make_grid_coords(n, 5)
+	split = split_coords(rand_coords)
+	write_to_xyz(n, rand_coords, outname="pos%i_rand_all.xyz" % n)
+	write_to_xyz(n, split[0], outname="pos%i_rand_half1.xyz" % n)
+	write_to_xyz(n, split[1], outname="pos%i_rand_half2.xyz" % n)
+	for s in salts:
+		write_3bd_infile(n, s, posneg=False)
+		write_3bd_infile(n, s, posneg=True)
+		write_energyforce_infile(n, s, posneg=False)
+		write_energyforce_infile(n, s, posneg=True)
 
 # energy_force_timings = [(1.360217, 1.360518, 1.374350), 
 # 						(8.289805, 8.606490, 9.198424), 
@@ -225,25 +197,13 @@ num_mols = [16, 27, 125]
 # 					(41.614868, 41.433807, 41.466129),
 # 					(4118.210938, 4168.622559, 4173.109863)]
 
+energyforce_posneg_timings = [(2.371118, 2.381114, 2.318310), (11.503941, 11.391362, 11.322046), ()]
 
+energy_force_timings = [(2.383368, 2.372415, 2.396405), (12.768782, 12.464165, 12.664582), ()]
 
-# energy_force_timings = [[3.104860, 3.233538, 3.188471], [16.384448, 17.101291, 17.772231], [4357.287391, 4285.507531, 4281.552028]]
-# energyforce_posneg_timings = [[3.072360, 3.024434, 3.175623], [17.259114, 22.168932, 17.823449], [4273.846933, 4397.991233 ]]
+threebod_timings = [(10.502109, 10.695383, 10.613747), (55.062054, 55.616417, 53.813110), ()]
 
-# threebod_timings = [[3.986207, 4.096700, 3.936497], [18.326186, 18.045504, 18.055232], [1650.810066, 1625.927128, 1818.160031]]
-# threebod_posneg_timings = [[3.696165, 3.761368, 4.236010], [17.280824, 17.973294, 17.523028], [1629.626951]]
-
-# threebod_64_timings = [[49.2, 50.05, 50.029], [197.31, 195.73, 194.32], [16793.38, 16784.16, 16784.83]]
-# threebod_64_posneg_timings = [[49.41, 48.96, 49.18], [195.69, 195.68, 195.34], [16875.17, 16885.66, 16864.92]]
-
-# for i in range(len(energy_force_timings)):
-# 	ave1 = (sum(energy_force_timings[i]) + sum(energyforce_posneg_timings[i])) / (len(energy_force_timings[i]) + len(energyforce_posneg_timings[i])) 
-# 	ave2 = (sum(threebod_timings[i]) + sum(threebod_posneg_timings[i])) / (len(threebod_timings[i]) + len(threebod_posneg_timings[i]))
-# 	ave3 = (sum(threebod_64_timings[i]) + sum(threebod_64_posneg_timings[i])) / (len(threebod_64_timings[i]) + len(threebod_64_posneg_timings[i]))
-# 	ave3 /= 64
-# 	print "%i energyforce: %f" % (num_mols[i], ave1)
-# 	print "%i bodyapprox: %f" % (num_mols[i], ave2)
-# 	print "%i bodyapprox64: %f" % (num_mols[i], ave3)
+threebod_posneg_timings = [(10.545219, 10.409265, 10.381590), (), ()]
 
 # def make_time_plot(nmols, enforce_times, threebod_times):
 # 	fig = plt.figure()
