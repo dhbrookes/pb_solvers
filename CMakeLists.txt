@@ -4,39 +4,11 @@ project(pb_solvers)
 ################################################
 ################################################
 
-set( CMAKE_VERBOSE_MAKEFILE false )
+set(CMAKE_VERBOSE_MAKEFILE false)
 set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
 set(PBSOLV_BUILD ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PBSOLV_BUILD}/bin)
 set(EXECUTABLE_INSTALL_PATH bin)
-
-
-################################################
-### For APBS Sphinx
-################################################
-option(ENABLE_PBAM_SPHINX "pbam SPHINX" OFF)
-if(ENABLE_PBAM_SPHINX)
-
-  if(APPLE)
-    list(APPEND CMAKE_MODULE_LINKER_FLAGS "-Wl,-undefined,dynamic_lookup")
-  endif()
-  if(WIN32)
-    list(APPEND CMAKE_MODULE_LINKER_FLAGS "/LIBPATH:C:\Python34\libs")
-  endif()
-
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
-
-  find_package(PythonInterp 3.4 REQUIRED)
-  find_package(PythonInclude REQUIRED)
-  find_package(Cython REQUIRED)
- 
-  include_directories("${PYTHON_INCLUDE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
-  add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
-                     COMMAND "${PYTHON_EXECUTABLE}" -m cython
-                     -o "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
-                     "${CMAKE_CURRENT_SOURCE_DIR}/pbam_sph.pyx"
-                     MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/pbam_sph.pyx")
-endif()
 
 ################################################
 ##### Need a compiler for C++11
@@ -53,6 +25,13 @@ else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+################################################
+### Compiler flags for optimization
+################################################
+if(CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3") ## Optimize
+##  set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
+endif()
 
 ################################################
 ###### OMP paralleization
@@ -66,6 +45,32 @@ if (ENABLE_OPENMP)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
   endif()
+endif()
+
+################################################
+### For APBS Sphinx
+################################################
+option(ENABLE_PBAM_SPHINX "pbam SPHINX" OFF)
+if(ENABLE_PBAM_SPHINX)
+
+  if(APPLE)
+    list(APPEND CMAKE_MODULE_LINKER_FLAGS "-Wl,-undefined,dynamic_lookup")
+  endif()
+  if(WIN32)
+    list(APPEND CMAKE_MODULE_LINKER_FLAGS "/LIBPATH:C:\Python34\libs")
+  endif()
+
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
+  find_package(PythonInterp 3.4 REQUIRED)
+  find_package(PythonInclude REQUIRED)
+  find_package(Cython REQUIRED)
+ 
+  include_directories("${PYTHON_INCLUDE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
+  add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
+                     COMMAND "${PYTHON_EXECUTABLE}" -m cython
+                     -o "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
+                     "${CMAKE_CURRENT_SOURCE_DIR}/pbam_sph.pyx"
+                     MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/pbam_sph.pyx")
 endif()
 
 
