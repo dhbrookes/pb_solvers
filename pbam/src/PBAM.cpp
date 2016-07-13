@@ -31,9 +31,9 @@ PBAM::PBAM() : PBAMInput()
 
   diffcon[0][0] = 0.0; diffcon[0][1] = 0.0;
   setp_ = make_shared<Setup>( 300.0, 0.05, 2., 80., 1, "electrostatics", "tst",
-                             false, 100, 0, 15, "tst.map", 1, grid2d, 
+                             false, 100, 0, 15, "tst.map", 1, grid2d,
                              gridax, gridloc, "tst.dx", 1, false, difftype,
-                             diffcon, termtype, termval, termnu, confil, 
+                             diffcon, termtype, termval, termnu, confil,
                              conpad, xyzf);
   syst_ = make_shared<System> ();
   consts_ = make_shared<Constants> ();
@@ -41,7 +41,7 @@ PBAM::PBAM() : PBAMInput()
 
 
 PBAM::PBAM(string infile)
-: 
+:
 poles_(5),
 solveTol_(1e-4)
 {
@@ -50,14 +50,14 @@ solveTol_(1e-4)
 
   syst_ = make_shared<System> ();
   consts_ = make_shared<Constants> (*setp_);
-  
+
   check_system();
   init_write_system();
 }
 
 
-PBAM::PBAM(const struct PBAMInput& pbami, vector<Molecule> mls )
-: 
+PBAM::PBAM(const PBAMInput& pbami, vector<Molecule> mls )
+:
 poles_(5),
 solveTol_(1e-4)
 {
@@ -73,7 +73,7 @@ solveTol_(1e-4)
     grid2Dax[i] = string(pbami.grid2Dax_[i]);
     grid2Dloc[i] = pbami.grid2Dloc_[i];
   }
-  
+
   // Dynamics
   bool termcomb = true;
   if (string(pbami.termCombine_) == "or")  termcomb = false;
@@ -124,12 +124,12 @@ solveTol_(1e-4)
                              pbami.boxLen_, pbami.pbcType_, pbami.gridPts_,
                              string(pbami.map3D_), pbami.grid2Dct_,
                              grid2Dname, grid2Dax, grid2Dloc,
-                             string(pbami.dxname_), pbami.ntraj_, termcomb, 
+                             string(pbami.dxname_), pbami.ntraj_, termcomb,
                              difftype, diffcon, termcond, termval, termnu,
                              confil, conpad, xyzf);
 
   check_setup();
-  syst_ = make_shared<System> (mls, pbami.boxLen_);
+  syst_ = make_shared<System> (mls, Constants::FORCE_CUTOFF, pbami.boxLen_);
   consts_ = make_shared<Constants> (*setp_);
   init_write_system();
 }
@@ -166,7 +166,7 @@ void PBAM::check_system()
   }
   cout << "Molecule setup okay " << endl;
 }
-  
+
 
 // Rotate molecules if needed and then write out config to pqr
 void PBAM::init_write_system()
@@ -176,7 +176,7 @@ void PBAM::init_write_system()
     for ( int i = 0; i < syst_->get_n(); i++)
       syst_->rotate_mol(i, Quat().chooseRandom());
   }
-  
+
   // writing initial configuration out
   syst_->write_to_pqr( setp_->getRunName() + ".pqr");
   cout << "Written config" << endl;
@@ -200,7 +200,7 @@ int PBAM::run()
   return 0;
 }
 
-struct PBAMOutput PBAM::run_apbs()
+PBAMOutput PBAM::run_apbs()
 {
   if ( setp_->getRunType() == "dynamics")
     run_dynamics();
@@ -213,7 +213,7 @@ struct PBAMOutput PBAM::run_apbs()
   else
     cout << "Runtype not recognized! See manual for options" << endl;
 
-  struct PBAMOutput pbamO;
+  PBAMOutput pbamO;
   return pbamO;
 }
 
@@ -224,10 +224,10 @@ void PBAM::run_dynamics()
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
   auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
-  
+
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
                                                     consts_, poles_);
-  
+
   vector<shared_ptr<BaseTerminate > >  terms(setp_->get_numterms());
   for (i = 0; i < setp_->get_numterms(); i++)
   {
@@ -235,7 +235,7 @@ void PBAM::run_dynamics()
     string bdtype = type.substr(1,1);
     double val = setp_->get_termval(i);
     BoundaryType btype = ( bdtype == "<" ) ? LEQ : GEQ;
-    
+
     if ( type == "contact" )
     {
       cout << "Contact termination found" << endl;
@@ -275,22 +275,22 @@ void PBAM::run_dynamics()
       terms[i] = make_shared<TimeTerminate>( val);
     } else cout << "Termination type not recognized!" << endl;
   }
-  
+
   cout << "Done making termination conds " << endl;
   HowTermCombine com = (setp_->get_andCombine() ? ALL : ONE);
   auto term_conds = make_shared<CombineTerminate> (terms, com);
-  
+
   char buff[100], outb[100];
   sprintf( outb, "%s.stat", setp_->getRunName().c_str());
   string statfile = outb;
-  
+
   for (traj = 0; traj < setp_->getNTraj(); traj++)
   {
     sprintf( buff, "%s_%d.xyz", setp_->getRunName().c_str(), traj);
     string xyztraj = buff;
     sprintf( outb, "%s_%d.dat", setp_->getRunName().c_str(), traj);
     string outfile = outb;
-    
+
     string stats = setp_->getRunName();
     syst_->reset_positions( setp_->get_trajn_xyz(traj));
     syst_->set_time(0.0);
@@ -309,18 +309,18 @@ void PBAM::run_electrostatics()
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
   auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
-  
+
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
                                                     consts_, poles_);
   ASolv->solve_A(solveTol_); ASolv->solve_gradA(solveTol_);
   Electrostatic Estat( ASolv, setp_->getGridPts());
-  
+
   if ( setp_->getDXoutName() != "" )
     Estat.print_dx( setp_->getDXoutName());
-  
+
   if ( setp_->get_3dmap_name() != "" )
     Estat.print_3d_heat( setp_->get_3dmap_name());
-  
+
   for ( i = 0; i < setp_->getGridCt(); i++ )
   {
     Estat.print_grid(setp_->getGridAx(i), setp_->getGridAxLoc(i),
@@ -338,10 +338,10 @@ void PBAM::run_energyforce()
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
   auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
-  
+
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
                                                         consts_, poles_);
-  
+
   ASolv->solve_A(solveTol_); ASolv->solve_gradA(solveTol_);
   PhysCalc calcEnFoTo( ASolv, setp_->getRunName(), consts_->get_unitsEnum());
   calcEnFoTo.calc_all();
@@ -360,18 +360,20 @@ void PBAM::run_bodyapprox()
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
   auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
-  
+
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
                                                     consts_, poles_);
-  ThreeBody threeBodTest( ASolv, consts_->get_unitsEnum() );
+  
+  ThreeBody threeBodTest( ASolv, consts_->get_unitsEnum(),
+                         setp_->getRunName());
   threeBodTest.solveNmer(2);
   threeBodTest.solveNmer(3);
-  t3 = clock() - t3;
   threeBodTest.calcTBDEnForTor();
+  t3 = clock() - t3;
 
-  
+
   threeBodTest.printTBDEnForTor(setp_->getMBDLoc());
-  
+
   printf ("manybody approx calc took me %f seconds.\n",
           ((float)t3)/CLOCKS_PER_SEC);
 

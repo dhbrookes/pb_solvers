@@ -1,3 +1,18 @@
+
+### Building for Sphinx
+
+This should be similar to the Geoflow build, the only difference is that you need to 
+use the flag `-DENABLE_PBAM_SPHINX=ON` when you run cmake. Or you can ignore this and
+read the following steps:
+
+1. `cd prototype/plugins/PB_S_AM/src`
+2. `mkdir build`
+3. `cd build`
+4. `cmake -DENABLE_PBAM_SPHINX=on ../`
+5. `make pbam_sph`
+6. `cp pbam_sph.so ../../`
+
+
 ### General XCode set-up: ###
 
 #### Adding a new target ####

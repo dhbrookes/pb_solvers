@@ -2,6 +2,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 import random
+import math
 
 def dist(p1, p2):
 	d = 0
@@ -75,7 +76,7 @@ def make_rand_coords(nmol, molr, maxr):
 
 def write_to_xyz(nmol, coords, outname=None):
 	if outname is None:
-		outname = "pos%i_grid.xyz" % nmol
+		outname = "pos%i_rand.xyz" % nmol
 	f = open(outname, 'w+')
 	for coord in coords:
 		x, y, z = coord
@@ -83,40 +84,74 @@ def write_to_xyz(nmol, coords, outname=None):
 		f.write(line)
 	f.close()
 
-def write_3bd_infile(nmol, salt):
+def write_3bd_infile(nmol, salt, posneg=False):
 	descriptor = "_%i_%.2f" % (nmol, salt)
-	f = open("run.manybodyapprox%s.inp" % descriptor, 'w+')
-	f.write("runname bodyapprox%s\n" % descriptor )
+
+	if posneg:
+		innername = "bodyapprox%s_posneg"  % descriptor
+	else:
+		innername = "bodyapprox%s" % descriptor
+
+	f = open("run.%s.inp" % innername, 'w+')
 	f.write("runtype bodyapprox\n")
-	f.write("3bdloc 3bd%s.dat\n" % descriptor)
-	f.write("2bdloc 2bd%s.dat\n" % descriptor)
+	f.write("runname %s.out\n" % innername )
+	f.write('3bdloc 3bd%s.dat\n' % descriptor)
+	f.write('2bdloc 2bd%s.dat\n' % descriptor)
+	f.write("units kT\n")
 	f.write("salt %.2f\n" % salt)
 	f.write("temp 298\n")
 	f.write("idiel 4\n")
 	f.write("sdiel 78\n")
 	# f.write("randorient\n")
-	f.write("attypes 1\n")
-	f.write("units kT\n")
-	f.write("type 1 %i\n" % nmol)
-	f.write("pqr 1 mol.pqr\n")
-	f.write("xyz 1 pos%i_grid.xyz\n" % nmol)
+
+	if not posneg:
+		f.write("attypes 1\n")
+		f.write("type 1 %i\n" % nmol)
+		f.write("pqr 1 mol_pos.pqr\n")
+		f.write("xyz 1 pos%i_rand_all.xyz\n" % nmol)
+	else:
+		f.write("attypes 2\n")
+		f.write("type 1 %i\n" % math.ceil(float(nmol)/2))
+		f.write("pqr 1 mol_pos.pqr\n")
+		f.write("xyz 1 pos%i_rand_half1.xyz\n" % nmol)
+		f.write("type 2 %i\n" % math.floor(float(nmol)/2))
+		f.write("pqr 2 mol_neg.pqr\n")
+		f.write("xyz 2 pos%i_rand_half2.xyz\n" % nmol)
+
 	f.close()
 
-def write_energyforce_infile(nmol, salt, mix=False):
+def write_energyforce_infile(nmol, salt, posneg=False):
 	descriptor = "_%i_%.2f" % (nmol, salt)
-	f = open("run.energyforce%s.inp" % descriptor, 'w+')
-	f.write("runtype energyforce 1\n")
-	f.write("runname energyforce%s.out\n" % descriptor )
+
+	if posneg:
+		innername = "energyforce%s_posneg"  % descriptor
+	else:
+		innername = "energyforce%s" % descriptor
+
+	f = open("run.%s.inp" % innername, 'w+')
+	f.write("runtype energyforce\n")
+	f.write("runname %s.out\n" % innername )
 	f.write("units kT\n")
 	f.write("salt %.2f\n" % salt)
 	f.write("temp 298\n")
 	f.write("idiel 4\n")
 	f.write("sdiel 78\n")
 	# f.write("randorient\n")
-	f.write("attypes 1\n")
-	f.write("type 1 %i\n" % nmol)
-	f.write("pqr 1 mol_pos.pqr\n")
-	f.write("xyz 1 pos%i_grid.xyz\n" % nmol)
+
+	if not posneg:
+		f.write("attypes 1\n")
+		f.write("type 1 %i\n" % nmol)
+		f.write("pqr 1 mol_pos.pqr\n")
+		f.write("xyz 1 pos%i_rand_all.xyz\n" % nmol)
+	else:
+		f.write("attypes 2\n")
+		f.write("type 1 %i\n" % math.ceil(float(nmol)/2))
+		f.write("pqr 1 mol_pos.pqr\n")
+		f.write("xyz 1 pos%i_rand_half1.xyz\n" % nmol)
+		f.write("type 2 %i\n" % math.floor(float(nmol)/2))
+		f.write("pqr 2 mol_neg.pqr\n")
+		f.write("xyz 2 pos%i_ramd_half2.xyz\n" % nmol)
+
 	f.close()
 
 def split_coords(coords, m=2, rand=False):
@@ -141,14 +176,16 @@ mol_rad = 2
 max_rad = 20
 
 for n in num_mols:
-	# rand_coords = make_rand_coords(n, mol_rad, max_rad)
-	grid_coords = make_grid_coords(n, 5)
-	split = split_coords(grid_coords)
-	write_to_xyz(n, split[0], outname="pos%i_grid_half1.xyz" % n)
-	write_to_xyz(n, split[1], outname="pos%i_grid_half2.xyz" % n)
-	# for s in salts:
-	# 	write_3bd_infile(n, s)
-	# 	write_energyforce_infile(n, s)
+	rand_coords = make_rand_coords(n, mol_rad, max_rad)
+	# grid_coords = make_grid_coords(n, 5)
+	split = split_coords(rand_coords)
+	write_to_xyz(n, split[0], outname="pos%i_rand_half1.xyz" % n)
+	write_to_xyz(n, split[1], outname="pos%i_rand_half2.xyz" % n)
+	for s in salts:
+		write_3bd_infile(n, s, posneg=False)
+		write_3bd_infile(n, s, posneg=True)
+		write_energyforce_infile(n, s, posneg=False)
+		write_energyforce_infile(n, s, posneg=True)
 
 # energy_force_timings = [(1.360217, 1.360518, 1.374350), 
 # 						(8.289805, 8.606490, 9.198424), 
@@ -159,6 +196,13 @@ for n in num_mols:
 # 					(41.614868, 41.433807, 41.466129),
 # 					(4118.210938, 4168.622559, 4173.109863)]
 
+
+
+energy_force_timings = [(3.104860, 3.233538, 3.188471), (16.384448, 17.101291, 17.772231), ()]
+energyforce_posneg_timings = [(3.072360, 3.024434, 3.175623), (17.259114, 22.168932, 17.823449), ()]
+
+threebod_timings = [(3.986207, 4.096700, 3.936497), (18.326186, 18.045504, 18.055232), ()]
+threebod_posneg_timings = [(3.696165, 3.761368, 4.236010), (17.280824, 17.973294, 17.523028), ()]
 
 # def make_time_plot(nmols, enforce_times, threebod_times):
 # 	fig = plt.figure()

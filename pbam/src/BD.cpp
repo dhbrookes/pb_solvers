@@ -175,7 +175,7 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
 :maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
 {
   if (num == 0) _physCalc_ = make_shared<PhysCalc>(_asolver_, outfname);
-  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolver_, num, outfname);
+//  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolver_, num, outfname);
   
   _stepper_ = make_shared<BDStep> (_asolver_->get_sys(),
                                    _asolver_->get_consts(), diff, force);
