@@ -358,9 +358,11 @@ void ThreeBody::solveNmer( int num, double preclim )
                                             make_shared<vector<vector<int> > >(dimer_) :
                                             make_shared<vector<vector<int> > >(trimer_));
   
+
   #pragma omp parallel for
   for( i = 0; i < nmer->size(); i++)
   {
+//    cout << omp_get_num_threads() << endl;
     vector<int> tempmol;
     int poles;
     #pragma omp critical

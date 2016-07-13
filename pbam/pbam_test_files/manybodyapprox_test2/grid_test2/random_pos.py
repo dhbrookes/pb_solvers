@@ -154,6 +154,31 @@ def write_energyforce_infile(nmol, salt, posneg=False):
 
 	f.close()
 
+def write_qsub(nmol, salt, posneg=False, bodyapprox=False):
+	descriptor = "_%i_%.2f" % (nmol, salt)
+	if bodyapprox:
+		innername = 'bodyapprox%s' % descriptor
+	else:
+		innername = "energyforce%s" % descriptor
+
+	if posneg:
+		innername += "_posneg"
+
+	f = open("qsub.%s" % innername, 'w+')
+	f.write('#!/bin/bash\n')
+	f.write('#$ -S /bin/bash\n')
+	f.write('#$ -cwd\n')
+	f.write('#$ -o out.%s\n' % innername)
+	f.write('#$ -j y\n')
+	f.write('#$ -q lfelber*\n')
+	if bodyapprox:
+		f.write('$ -pe threaded 64\n\n')
+	else:
+		f.write('$ -pe threaded 4\n\n')
+
+	f.write('EXEC="../../../../../build/bin/pbam"\n\n')
+	f.write('$EXEC run.%s.inp' % innername)
+
 def split_coords(coords, m=2, rand=False):
 	csets = [[] for _ in range(m)]
 	if rand:
@@ -186,6 +211,10 @@ for n in num_mols:
 		write_3bd_infile(n, s, posneg=True)
 		write_energyforce_infile(n, s, posneg=False)
 		write_energyforce_infile(n, s, posneg=True)
+		write_qsub(n, s, posneg=False, bodyapprox=True)
+		write_qsub(n, s, posneg=True, bodyapprox=True)
+		write_qsub(n, s, posneg=False, bodyapprox=False)
+		write_qsub(n, s, posneg=True, bodyapprox=False)
 
 # energy_force_timings = [(1.360217, 1.360518, 1.374350), 
 # 						(8.289805, 8.606490, 9.198424), 
@@ -198,10 +227,10 @@ for n in num_mols:
 
 
 
-energy_force_timings = [(3.104860, 3.233538, 3.188471), (16.384448, 17.101291, 17.772231), ()]
+energy_force_timings = [(3.104860, 3.233538, 3.188471), (16.384448, 17.101291, 17.772231), (4357.287391, 4285.507531)]
 energyforce_posneg_timings = [(3.072360, 3.024434, 3.175623), (17.259114, 22.168932, 17.823449), ()]
 
-threebod_timings = [(3.986207, 4.096700, 3.936497), (18.326186, 18.045504, 18.055232), ()]
+threebod_timings = [(3.986207, 4.096700, 3.936497), (18.326186, 18.045504, 18.055232), (1650.810066, 1625.927128, 1818.160031)]
 threebod_posneg_timings = [(3.696165, 3.761368, 4.236010), (17.280824, 17.973294, 17.523028), ()]
 
 # def make_time_plot(nmols, enforce_times, threebod_times):

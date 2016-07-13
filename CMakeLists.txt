@@ -37,7 +37,7 @@ endif()
 ###### OMP paralleization
 ################################################
 
-option(ENABLE_OPENMP "Enable OpenMP parallelism" OFF)
+option(ENABLE_OPENMP "Enable OpenMP parallelism" ON)
 
 if (ENABLE_OPENMP)
   find_package(OpenMP)
