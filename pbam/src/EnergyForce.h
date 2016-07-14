@@ -35,7 +35,10 @@
 #include <stdio.h>
 #include <memory>
 #include "ASolver.h"
+
+#ifdef __OMP
 #include <omp.h>
+#endif
 
 using namespace std;
 

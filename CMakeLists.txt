@@ -4,7 +4,7 @@ project(pb_solvers)
 ################################################
 ################################################
 
-set(CMAKE_VERBOSE_MAKEFILE false)
+set(CMAKE_VERBOSE_MAKEFILE true)
 set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
 set(PBSOLV_BUILD ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PBSOLV_BUILD}/bin)
@@ -37,11 +37,12 @@ endif()
 ###### OMP paralleization
 ################################################
 
-option(ENABLE_OPENMP "Enable OpenMP parallelism" ON)
+option(ENABLE_OPENMP "Enable OpenMP parallelism" OFF)
 
 if (ENABLE_OPENMP)
   find_package(OpenMP)
   if (OPENMP_FOUND)
+    add_definitions(-D__OMP)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
   endif()
