@@ -1,4 +1,4 @@
-runname bodyapprox_125_0.00
+runname bodyapprox_125_0.00.out
 runtype bodyapprox
 3bdloc 3bd_125_0.00.dat
 2bdloc 2bd_125_0.00.dat

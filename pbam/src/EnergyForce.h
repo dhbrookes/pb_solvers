@@ -276,7 +276,7 @@ protected:
   
 public:
   ThreeBody(shared_ptr<ASolver> _asolver, Units unt = INTERNAL,
-            string outfname="", double cutoff = 1e48 );
+            string outfname="", double cutoff = 1e48);
   
   // Solve the N body problem, only 2 or 3 right now
   void solveNmer( int num, double preclim = 1e-4);
@@ -394,6 +394,7 @@ public:
 
 };
 
+
 class ThreeBodyPhysCalc : public BasePhysCalc, ThreeBody
 {
 protected:
@@ -403,7 +404,7 @@ protected:
   string outfname_;
   
 public:
-  ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num=3, string outfname = "",
+  ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num=3, string outfname = "", 
                     Units unit = INTERNAL, double cutoff=1e48);
   
   void calc_force() { if (!solved_) solveNmer(num_); solved_ = true; }
@@ -415,7 +416,7 @@ public:
   virtual shared_ptr<vector<Pt> > get_Tau()
   { return get_torque_approx(); }
   virtual shared_ptr<vector<Pt> > get_F()
-  { return get_force_approx();   }
+  { return get_force_approx();   }   
   virtual shared_ptr<vector<double> > get_omega()
   { return get_energy_approx(); }
   

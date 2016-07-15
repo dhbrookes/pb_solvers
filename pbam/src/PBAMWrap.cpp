@@ -115,6 +115,7 @@ PBAMOutput runPBAMSphinxWrap( double xyzrc[][AT_MAX][XYZRCWIDTH],
 {
    // convert xyzrc to a vector of Molecules
   printf("Inside pbamrun sphinx\n");
+  printPBAMStruct(pbamfin);
   vector<Molecule> mols;
   for (int mol=0; mol < nmol; mol++)
   {

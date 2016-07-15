@@ -358,9 +358,11 @@ void ThreeBody::solveNmer( int num, double preclim )
                                             make_shared<vector<vector<int> > >(dimer_) :
                                             make_shared<vector<vector<int> > >(trimer_));
   
+
   #pragma omp parallel for
   for( i = 0; i < nmer->size(); i++)
   {
+//    cout << omp_get_num_threads() << endl;
     vector<int> tempmol;
     int poles;
     #pragma omp critical
@@ -405,6 +407,7 @@ void ThreeBody::solveNmer( int num, double preclim )
   }
   
   cout << num << "mers done " << endl;
+//  cout << energy_tri_[0][0] << endl;
 }
 
 // Three body approximation
@@ -666,5 +669,3 @@ ThreeBodyPhysCalc::ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num,
 outfname_(outfname)
 {
 }
-
-

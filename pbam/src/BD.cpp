@@ -175,13 +175,13 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
 :maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
 {
   if (num == 0) _physCalc_ = make_shared<PhysCalc>(_asolver_, outfname);
-  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolver_, num, outfname);
+//  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolver_, num, outfname);
   
   _stepper_ = make_shared<BDStep> (_asolver_->get_sys(),
                                    _asolver_->get_consts(), diff, force);
 }
 
-void BDRun::run(string xyzfile, string statfile)
+void BDRun::run(string xyzfile, string statfile, int nSCF)
 {
   int i = 0;
   int WRITEFREQ = 2000;
@@ -199,9 +199,16 @@ void BDRun::run(string xyzfile, string statfile)
     }
     
     _asolver_->reset_all(_stepper_->get_system());
-    _asolver_->solve_A(prec_);
-    _asolver_->solve_gradA(prec_);
-    
+    if (nSCF == 0)
+    {
+      _asolver_->solve_A(prec_);
+      _asolver_->solve_gradA(prec_);
+    } else
+    {
+      _asolver_->solve_A(prec_, nSCF);
+      _asolver_->solve_gradA(prec_, nSCF);
+    }
+
     _physCalc_->calc_force();
     _physCalc_->calc_torque();
     

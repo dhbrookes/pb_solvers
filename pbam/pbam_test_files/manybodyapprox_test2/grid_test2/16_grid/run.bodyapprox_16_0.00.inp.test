@@ -1,0 +1,13 @@
+runtype bodyapprox
+runname /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/16_grid/bodyapprox_16_0.00.out
+3bdloc /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/16_grid/3bd_16_0.00.dat
+2bdloc /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/16_grid/2bd_16_0.00.dat
+units kT
+salt 0.00
+temp 298
+idiel 4
+sdiel 78
+attypes 1
+type 1 16
+pqr 1 /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/16_grid/mol_pos.pqr
+xyz 1 /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/16_grid/pos16_grid_all.xyz

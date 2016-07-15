@@ -40,10 +40,8 @@ _consts_(_consts)
 }
 
 // perform many iterations of the solution for A
-void ASolver::solve_A(double prec)
+void ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
 {
-  int MAX_POL_ROUNDS = 1000;
-
   double scale_dev = (double)(p_*(p_+1)*0.5);
   double cng = scale_dev;
   int ct = 0;
@@ -54,8 +52,7 @@ void ASolver::solve_A(double prec)
     cng = calc_change();
     if (ct > MAX_POL_ROUNDS*N_)
     {
-      cout << "Polz doesn't converge! dev="<< cng << " " << ct << endl;
-      exit(0);
+      break;
     }
     ct++;
   }
@@ -63,12 +60,12 @@ void ASolver::solve_A(double prec)
   calc_L();
 }
 
-void ASolver::solve_gradA(double prec)
+void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
 {
   assert(solvedA_); // must solve a before this
   double scale_dev = (double)(p_*(p_+1)*0.5*3.0);
   double cng;
-  int j, ct, MAX_POL_ROUNDS = 1000;
+  int j, ct;
   
   pre_compute_gradT_A();
 
@@ -82,8 +79,7 @@ void ASolver::solve_gradA(double prec)
       cng = calc_grad_change(j);
       if (ct > MAX_POL_ROUNDS*N_)
       {
-        cout << "Polz doesn't converge! dev="<< cng << " " << ct << endl;
-        exit(0);
+        break;
       }
       ct++;
     }
