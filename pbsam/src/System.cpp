@@ -14,10 +14,14 @@ Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
           vector<double> as, double drot, double dtrans)
 :type_(type), typeIdx_(type_idx), moveType_(movetype), qs_(qs), pos_(pos),
 vdwr_(vdwr), centers_(cens), as_(as), drot_(drot), dtrans_(dtrans),
-Nc_((int) qs.size()), Ns_((int) cens.size()), cgCharges_((int) cens.size())
+Nc_((int) qs.size()), Ns_((int) cens.size()), cgCharges_((int) cens.size()),
+cgGridPts_((int) cens.size()),
+cgGdPtExp_((int) cens.size()), cgGdPtBur_((int) cens.size())
 {
   map_repos_charges();
+  check_connect();
   calc_cog();
+  for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
 }
 
 Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
@@ -30,6 +34,7 @@ vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
 {
   find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
   check_connect();
+  for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
   map_repos_charges();
   calc_cog();
 }
@@ -38,7 +43,10 @@ Molecule::Molecule(const Molecule& mol)
 :moveType_(mol.moveType_), type_(mol.type_), typeIdx_(mol.typeIdx_),
 drot_(mol.drot_), dtrans_(mol.dtrans_), Nc_(mol.Nc_), qs_(mol.qs_),
 pos_(mol.pos_), vdwr_(mol.vdwr_), Ns_(mol.Ns_), centers_(mol.centers_),
-as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_)
+as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_),
+cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
+cgNeighs_(mol.cgNeighs_),cgGridPts_(mol.cgGridPts_),
+cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_)
 {
   calc_cog();
 }
@@ -47,13 +55,43 @@ as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_)
 void Molecule::map_repos_charges()
 {
   int closest;
-  for (int i = 0; i < Nc_; i++)
+  for (int cg = 0; cg < Nc_; cg++)
   {
-    closest = find_closest_center(pos_[i]);
-    cgCharges_[closest].push_back(i);
-    pos_[i] = pos_[i] - centers_[closest];  // reposition charge
-    chToCG_[i] = closest;
+    closest = find_closest_center(pos_[cg]);
+    cgCharges_[closest].push_back(cg);
+    pos_[cg] = pos_[cg] - centers_[closest];  // reposition charge
+    chToCG_[cg] = closest;
   }
+  
+  // Assigning all charges to either in or out of molecule
+  cgChargesIn_.resize(Ns_); cgChargesOut_.resize(Ns_);
+  for (int i = 0; i < Ns_; i++)
+  {
+    for (int cg = 0; cg < Nc_; cg++)
+    {
+      if ( get_posj_realspace(cg).dist(get_centerk(i)) < get_ak(i))
+        cgChargesIn_[i].push_back(cg);
+      else cgChargesOut_[i].push_back(cg);
+    }
+  }
+}
+
+//TODO: In old code just find first encompassing charge - does this matter?
+int Molecule::find_closest_center(Pt pos)
+{
+  int idx = 0;
+  double dmin = __DBL_MAX__;
+  double d;
+  for (int k = 0; k < Ns_; k++)
+  {
+    d = pos.dist(centers_[k]);
+    if (d < dmin)
+    {
+      idx = k;
+      dmin = d;
+    }
+  }
+  return idx;
 }
 
 void Molecule::calc_cog()
@@ -83,24 +121,6 @@ double Molecule::random_norm()
   
   double fac = sqrt( -2.0*log(rsq)/rsq);
   return fac*v2;
-}
-
-
-int Molecule::find_closest_center(Pt pos)
-{
-  int idx = 0;
-  double dmin = __DBL_MAX__;
-  double d;
-  for (int k = 0; k < Ns_; k++)
-  {
-    d = pos.dist(centers_[k]);
-    if (d < dmin)
-    {
-      idx = k;
-      dmin = d;
-    }
-  }
-  return idx;
 }
 
 void Molecule::translate(Pt dr, double boxlen)
@@ -163,9 +183,6 @@ void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
     {
       m++;
       CGSphere best = find_best_center(sp, np, unbound, tol_sp, beta);
-      // cout << "Trial no: " << m << " and bd points: " << best.get_n() 
-      //      << " and center: " << best.get_center().x() << ", " 
-      //      << best.get_center().y() << ", " << best.get_center().z() << endl;
       if (best.get_n() > n_max)
       {
         centers_[j] = best.get_center();
@@ -198,7 +215,9 @@ void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
     ct++;
   }
 
+  // Setting important vals and vectors
   Ns_ = (int) centers_.size();
+  cgGridPts_.resize(Ns_); cgGdPtExp_.resize(Ns_); cgGdPtBur_.resize(Ns_);
   cout << "End of find_centers" << endl;
 }
 
@@ -289,7 +308,7 @@ void Molecule::check_connect()
     {
       vector<int> neigh;
       neigh = find_neighbors( i );
-      if (neigh.size() == 0 )
+      if ((neigh.size() == 0 ) && (Ns_ > 1))
       {
         all_con = false;
         cout << "Incrementing CG sphere " << i << " radius" << endl;
@@ -300,6 +319,7 @@ void Molecule::check_connect()
   }
   if (ct == maxct) 
     cout << "Warning: Spheres may not all be connected!" << endl;
+
 }
 
 vector<int> Molecule::find_neighbors( int i )
@@ -311,7 +331,7 @@ vector<int> Molecule::find_neighbors( int i )
   {
     if ( i != j )
     {
-      sum_rad2 = (as_[i] + as_[j]) * (as_[i] + as_[j]);
+      sum_rad2 = (as_[i] + as_[j]) * (as_[i] +  as_[j]);
       if ( (centers_[i]-centers_[j]).norm2() < sum_rad2)
         neighs.push_back(j);
     }
@@ -320,7 +340,7 @@ vector<int> Molecule::find_neighbors( int i )
 }
 
 
-System::System(const vector<Molecule>& mols, double cutoff,
+System::System(vector<shared_ptr<Molecule> > mols, double cutoff,
                double boxlength)
 :molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
 boxLength_(boxlength), t_(0)
@@ -329,8 +349,8 @@ boxLength_(boxlength), t_(0)
   vector<int> maxj, keys(2);
   for ( k = 0; k < N_; k++)
   {
-    i = molecules_[k].get_type();
-    j = molecules_[k].get_type_idx();
+    i = molecules_[k]->get_type();
+    j = molecules_[k]->get_type_idx();
     keys = {i,j};
     typeIdxToIdx_[keys] = k;
     maxi = ( maxi > i ) ? maxi : i;
@@ -353,10 +373,10 @@ boxLength_(boxlength), t_(0)
 System::System(Setup setup, double cutoff)
 :t_(0), ntype_(setup.getNType()), typect_(setup.get_type_nct())
 {
-  vector<Molecule> mols;
+  vector<shared_ptr<Molecule> > mols;
   int i, j, k=0;
   string pqrpath;
-  Molecule mol;
+  shared_ptr<Molecule> mol;
   vector<int> keys(2);
   for (i = 0; i < setup.getNType(); i++)
   {
@@ -364,23 +384,28 @@ System::System(Setup setup, double cutoff)
     // First a build a representative molecule of this type (which will
     // be repositioned below
     PQRFile pqrI (setup.getTypeNPQR(i));
-    Molecule type_mol;
+    shared_ptr<Molecule> type_mol;
     if (pqrI.get_Ns() == 0)
     {
       MSMSFile surf_file (setup.getTypeNSurf(i));
-      type_mol = Molecule(i, 0, setup.getTypeNDef(i), pqrI.get_charges(),
-                          pqrI.get_atom_pts(), pqrI.get_radii(),
-                          surf_file.get_sp(), surf_file.get_np(),
-                          setup.get_tol_sp(), setup.get_n_trials(),
-                          setup.get_max_trials(), setup.get_sph_beta(),
-                          setup.getDrot(i), setup.getDtr(i));
+      type_mol = make_shared<Molecule> (i, 0, setup.getTypeNDef(i),
+                                        pqrI.get_charges(),
+                                        pqrI.get_atom_pts(), pqrI.get_radii(),
+                                        surf_file.get_sp(), surf_file.get_np(),
+                                        setup.get_tol_sp(), setup.get_n_trials(),
+                                        setup.get_max_trials(),
+                                        setup.get_sph_beta(),
+                                        setup.getDrot(i), setup.getDtr(i));
     }
     else
     {
-      type_mol = Molecule(i, -1, setup.getTypeNDef(i), pqrI.get_charges(),
-                          pqrI.get_atom_pts(), pqrI.get_radii(),
-                          pqrI.get_cg_centers(), pqrI.get_cg_radii(),
-                          setup.getDrot(i), setup.getDtr(i));
+      type_mol = make_shared<Molecule>(i, -1, setup.getTypeNDef(i),
+                                       pqrI.get_charges(),
+                                       pqrI.get_atom_pts(),
+                                       pqrI.get_radii(),
+                                       pqrI.get_cg_centers(),
+                                       pqrI.get_cg_radii(),
+                                       setup.getDrot(i), setup.getDtr(i));
     }
     
     TransRotFile transrot;
@@ -399,8 +424,8 @@ System::System(Setup setup, double cutoff)
       // now copy the representative molecule and reposition it
       Pt trans;
       MyMatrix<double> rot;
-      Molecule mol (type_mol);
-      mol.set_type_idx(j);
+      shared_ptr<Molecule> mol (type_mol);
+      mol->set_type_idx(j);
       
       Pt com = pqrI.get_center_geo();
       
@@ -418,8 +443,8 @@ System::System(Setup setup, double cutoff)
         rot.set_val(2, 2, 1.0);
       }
       
-      mol.rotate(rot);
-      mol.translate(trans, setup.getBLen());
+      mol->rotate(rot);
+      mol->translate(trans, setup.getBLen());
       
       molecules_.push_back(mol);
       typeIdxToIdx_[keys] = k;
@@ -469,14 +494,14 @@ void System::check_for_overlap()
   {
     for (j = i+1; j < N_; j++)
     {
-      for (k1 = 0; k1 < molecules_[i].get_ns(); k1++)
+      for (k1 = 0; k1 < molecules_[i]->get_ns(); k1++)
       {
-        for (k2 = 0; k2 < molecules_[j].get_ns(); k2++)
+        for (k2 = 0; k2 < molecules_[j]->get_ns(); k2++)
         {
-          aik = molecules_[i].get_ak(k1);
-          ajk = molecules_[j].get_ak(k2);
-          cen_ik = molecules_[i].get_centerk(k1);
-          cen_jk = molecules_[j].get_centerk(k2);
+          aik = molecules_[i]->get_ak(k1);
+          ajk = molecules_[j]->get_ak(k2);
+          cen_ik = molecules_[i]->get_centerk(k1);
+          cen_jk = molecules_[j]->get_centerk(k2);
           dist = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
           if (dist < (aik + ajk))
             throw OverlappingMoleculeException(i, j);

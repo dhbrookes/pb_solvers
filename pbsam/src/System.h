@@ -72,13 +72,27 @@ protected:
   vector<double>      vdwr_; // van der waal radius of each chargeGoogle
   Pt                  cog_; // Molecule center of geometry
   
-  int                     Ns_;  // number of coarse grained spheres
-  vector<Pt>              centers_; //coarse-grained sphere centers
-  vector<double>          as_; // coarse-grained sphere radii
-  vector<vector<int> >    cgCharges_; // list of indices of charges within each
-                                      // coarse grained sphere
-  map<int, int>           chToCG_; // maps index of charge to
-                                    //index of its coarse-grained sphere
+  int                  Ns_;  // number of coarse grained spheres
+  vector<Pt>           centers_; //coarse-grained sphere centers
+  vector<double>       as_; // coarse-grained sphere radii
+  vector<vector<int> > cgNeighs_; // list of indices of CG centers that neighbor
+                                   // each coarse grained sphere
+  vector<vector<Pt> >  cgGridPts_; // grid points on the surface of
+                                  // each coarse grained sphere
+  vector<vector<int> > cgGdPtExp_; // indices of grid points on the surface of
+                                   // each CG sphere that are solvent exposed
+  vector<vector<int> > cgGdPtBur_; // indices of grid points on the surface of
+                                  // each CG sphere that are buried
+  vector<vector<int> > cgCharges_; // indices of charges within each
+                                   // coarse grained sphere
+  vector<vector<int> > cgChargesIn_; // indices of charges within each
+                                   // coarse grained sphere
+  vector<vector<int> > cgChargesOut_; // indices of charges not within each
+                                   // coarse grained sphere
+
+  
+  map<int, int>        chToCG_; // maps index of charge to
+                                //index of its coarse-grained sphere
   
   int find_closest_center(Pt pos);
   
@@ -123,6 +137,9 @@ public:
   void map_repos_charges();
   
   void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
+  void set_gridj(int j, vector<Pt> grid) {cgGridPts_[j] = grid;}
+  void set_gridexpj(int j, vector<int> grid_exp) {cgGdPtExp_[j] = grid_exp;}
+  void set_gridburj(int j, vector<int> grid_bur) {cgGdPtBur_[j] = grid_bur;}
   
   void translate(Pt dr, double boxlen);
   void rotate(Quat qrot); // This will rotate with respect to origin!
@@ -136,10 +153,20 @@ public:
   int get_nc() const                  { return Nc_; }
   int get_ns() const                  { return Ns_; }
   int get_nc_k(int k) const           { return (int) cgCharges_[k].size(); }
+  vector<int> get_neighj(int j) const { return cgNeighs_[j]; }
+  vector<Pt> get_gridj(int j) const   { return cgGridPts_[j]; }
+  Pt get_gridjh(int j, int h) const   { return cgGridPts_[j][h]; }
+  vector<int> get_gdpt_expj(int j) const { return cgGdPtExp_[j]; }
+  vector<int> get_gdpt_burj(int j) const { return cgGdPtBur_[j]; }
+  
+  vector<int> get_ch_allin_k(int k)   { return cgChargesIn_[k]; }
+  vector<int> get_ch_allout_k(int k)  { return cgChargesOut_[k]; }
+  
   int get_ch_k_alpha(int k, int alpha){ return cgCharges_[k][alpha]; }
   double get_drot() const             { return drot_; }
   double get_dtrans() const           { return dtrans_; }
   Pt get_posj(int j) const            { return pos_[j]; }
+  
   Pt get_posj_realspace(int j)        { return pos_[j] + centers_[chToCG_[j]];}
   Pt get_centerk(int k) const         { return centers_[k]; }
   Pt get_cog() const                  { return cog_;}
@@ -165,7 +192,7 @@ protected:
     
   int                          N_; // number of molecules
   double                       lambda_; // average molecular radius
-  vector<Molecule>             molecules_;
+  vector<shared_ptr<Molecule> >             molecules_;
   
   double                       boxLength_;
   double                       cutoff_;
@@ -183,7 +210,7 @@ protected:
 public:
   System() { }
   
-  System(const vector<Molecule>& mols,
+  System(vector<shared_ptr<Molecule> > mols,
          double cutoff=Constants::FORCE_CUTOFF,
          double boxlength=Constants::MAX_DIST);
   
@@ -192,24 +219,29 @@ public:
   const int get_n() const                  {return N_;}
   const int get_ntype()                    {return ntype_;}
   const int get_typect(int i)              {return typect_[i];}
-  const double get_aik(int i, int k) const {return molecules_[i].get_ak(k);}
-  const double get_Nc_i(int i) const       {return molecules_[i].get_nc();}
-  const double get_Ns_i(int i) const       {return molecules_[i].get_ns();}
-  const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
-  const double get_droti(int i) const      {return molecules_[i].get_drot();}
-  const double get_dtransi(int i) const    {return molecules_[i].get_dtrans();}
+  const double get_aik(int i, int k) const {return molecules_[i]->get_ak(k);}
+  const double get_Nc_i(int i) const       {return molecules_[i]->get_nc();}
+  const double get_Ns_i(int i) const       {return molecules_[i]->get_ns();}
+  const double get_qij(int i, int j) const {return molecules_[i]->get_qj(j);}
+  const double get_droti(int i) const      {return molecules_[i]->get_drot();}
+  const double get_dtransi(int i) const    {return molecules_[i]->get_dtrans();}
   const double get_boxlength() const       {return boxLength_;}
   const double get_cutoff() const          {return cutoff_;}
   const double get_time() const            {return t_;}
   const double get_lambda() const          {return lambda_;}
-  Molecule get_molecule(int i) const       {return molecules_[i];}
-  Pt get_cogi(int i) const                {return molecules_[i].get_cog();}
-  Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
-  Pt get_centerik(int i, int k) const   {return molecules_[i].get_centerk(k);}
-  const string get_typei(int i) const   {return molecules_[i].get_move_type();}
+  shared_ptr<Molecule> get_molecule(int i) const       {return molecules_[i];}
+  Pt get_cogi(int i) const                {return molecules_[i]->get_cog();}
+  Pt get_posij(int i, int j)               {return molecules_[i]->get_posj(j);}
+  Pt get_centerik(int i, int k) const   {return molecules_[i]->get_centerk(k);}
+  const string get_typei(int i) const   {return molecules_[i]->get_move_type();}
   const double get_radij(int i, int j) 
-                                     const {return molecules_[i].get_radj(j);}
-  Pt get_posijreal(int i, int j) {return molecules_[i].get_posj_realspace(j);}
+                                     const {return molecules_[i]->get_radj(j);}
+  Pt get_posijreal(int i, int j) {return molecules_[i]->get_posj_realspace(j);}
+  
+  Pt get_gridijh(int i, int j, int h) const
+        { return molecules_[i]->get_gridjh(j, h); }
+  vector<int> get_gdpt_expij(int i, int j) const
+        { return molecules_[i]->get_gdpt_expj(j); }
   
   const int get_mol_global_idx(int type, int ty_idx)
   {
@@ -224,10 +256,10 @@ public:
   void set_time(double val) { t_ = val; }
   
   // translate every charge in molecule i by the vector dr
-  void translate_mol(int i, Pt dr) { molecules_[i].translate(dr, boxLength_); }
+  void translate_mol(int i, Pt dr) { molecules_[i]->translate(dr, boxLength_); }
   
   // rotate every charge in molecule i
-  void rotate_mol(int i, Quat qrot) { molecules_[i].rotate(qrot); }
+  void rotate_mol(int i, Quat qrot) { molecules_[i]->rotate(qrot); }
   
   // Check to determine if any molecules are overlapping
   void check_for_overlap();

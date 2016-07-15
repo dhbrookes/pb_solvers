@@ -13,7 +13,7 @@ add_executable(pbam
   EnergyForce.cpp
   main.cpp
   PBAM.cpp
-  ReExpCalc.cpp
+  ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/setup.cpp
   ../../pb_shared/src/SHCalc.cpp
   System.cpp
@@ -45,7 +45,7 @@ if(ENABLE_PBAM_APBS)
               EnergyForce.cpp
               PBAM.cpp
               PBAMWrap.cpp
-              ReExpCalc.cpp
+              ../../pb_shared/src/ReExpCalc.cpp
               ../../pb_shared/src/setup.cpp
               ../../pb_shared/src/SHCalc.cpp
               System.cpp
@@ -56,7 +56,7 @@ if(ENABLE_PBAM_APBS)
                  runPBAMWrap.c
                  )
 
-target_link_libraries(PBAMWrap PBAMLib)
+  target_link_libraries(PBAMWrap PBAMLib)
 endif()
 
 

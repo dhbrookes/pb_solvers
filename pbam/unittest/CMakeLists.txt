@@ -16,7 +16,7 @@ ADD_EXECUTABLE(pbamtest
   ../../pb_shared/src/Constants.cpp
   ../src/Electrostatics.cpp
   ../src/EnergyForce.cpp
-  ../src/ReExpCalc.cpp
+  ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/SHCalc.cpp
   ../src/System.cpp
   ../../pb_shared/src/setup.cpp

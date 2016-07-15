@@ -76,6 +76,7 @@ protected:
 public:
     
   static const int MAX_NUM_POLES;
+  static const int IMAT_GRID;
   
   //Absolute constants:
   static const double PERMITTIVITY_VAC;  // [F/m]=[C2/J/m] , F = Farad
@@ -123,6 +124,10 @@ public:
   {
     saltConcentration_ = val;
     update_kappa();
+  }
+  void set_kappa(double val)
+  {
+    kappa_ = val;
   }
   void set_temp(double val)
   {

@@ -332,12 +332,8 @@ void PBAM::run_electrostatics()
 
 void PBAM::run_energyforce()
 {
-  struct timeval start, end;
-  double delta;
-  gettimeofday(&start, NULL);
+  clock_t t3 = clock();  
   
-//  clock_t t;
-//  t = clock();
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
   auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
@@ -351,22 +347,15 @@ void PBAM::run_energyforce()
   calcEnFoTo.calc_all();
   calcEnFoTo.print_all();
   
-  gettimeofday(&end, NULL);
-  delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
-           end.tv_usec - start.tv_usec) / 1.e6;
-//  t = clock() - t;
-  printf ("energyforce calc took me %f seconds.\n", delta);
-
+  t = clock() - t;
+  printf ("energyforce calc took me %f seconds.\n",
+          ((float)t)/CLOCKS_PER_SEC);
 }
 
 void PBAM::run_bodyapprox()
 {
-  struct timeval start, end;
-  double delta;
-  gettimeofday(&start, NULL);
+  clock_t t3 = clock();  
   
-//  clock_t t3;
-//  t3 = clock();
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
   auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
@@ -378,17 +367,12 @@ void PBAM::run_bodyapprox()
   ThreeBody threeBodTest( ASolv, consts_->get_unitsEnum(), setp_->getRunName());
   threeBodTest.solveNmer(2);
   threeBodTest.solveNmer(3);
+  t3 = clock() - t3; 
   threeBodTest.calcTBDEnForTor();
-//  t3 = clock() - t3;
-  
-  gettimeofday(&end, NULL);
-  delta = ((end.tv_sec  - start.tv_sec) * 1000000u +
-           end.tv_usec - start.tv_usec) / 1.e6;
 
-  threeBodTest.printTBDEnForTor(setp_->getMBDLoc());
-
-  printf ("manybody approx calc took me %f seconds.\n", delta);
-
+  threeBodTest.printTBDEnForTor(setp_->getRunName(), setp_->getMBDLoc());
+  printf ("manybody approx calc took me %f seconds.\n",
+          ((float)t3)/CLOCKS_PER_SEC);
 }
 
 

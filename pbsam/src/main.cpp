@@ -8,10 +8,9 @@
 
 #include <stdio.h>
 #include "Solver.h"
-//#include "System.h"
-//#include "SHCalc.h"
-//#include "BesselCalc.h"
-//#include "Constants.h"
+#include "Solvmat.h"
+#include "Gradsolvmat.h"
+#include "PhysCalc.h"
 
 int main( int argc, const char* argv[] )
 {

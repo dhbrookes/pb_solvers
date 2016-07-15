@@ -256,11 +256,11 @@ public:
   void print_dAi( int i, int j, int p);
 
   //numerically solve for A given the desired precision
-  void solve_A(double prec, int MAX_POL_ROUNDS=5);
+  void solve_A(double prec, int MAX_POL_ROUNDS=500);
   
   // numerically solve for grad(A) given the desired precision
   // must solve for A before this
-  void solve_gradA(double prec, int MAX_POL_ROUNDS=5);
+  void solve_gradA(double prec, int MAX_POL_ROUNDS=500);
   
   /*
    Reset all relevant members given a new system
