@@ -33,9 +33,10 @@
 
 #include "EnergyForce.h"
 #include <time.h> 
-//#include <omp.h>
 
-
+#ifdef __OMP
+#include <omp.h>
+#endif
 
 // Exception class to ensure that molecule
 class ValueOutOfRange: public exception

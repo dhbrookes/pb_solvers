@@ -234,13 +234,15 @@ void TorqueCalc::calc_tau()
   }
 }
 
-ThreeBody::ThreeBody( shared_ptr<ASolver> _asolver, Units unt, double cutoff )
+ThreeBody::ThreeBody( shared_ptr<ASolver> _asolver, Units unt, string outfname,
+                     double cutoff )
 : N_(_asolver->get_N()), p_(_asolver->get_p()), cutoffTBD_(cutoff),
 _besselCalc_(_asolver->get_bessel()),
 _shCalc_(_asolver->get_sh()),
 _consts_(_asolver->get_consts()),
 _sys_(_asolver->get_sys()),
-unt_(unt)
+unt_(unt),
+outfname_(outfname)
 {
   energy_approx_ = make_shared<vector<double> >(N_);
   force_approx_ = make_shared<vector<Pt> >(N_);
@@ -660,7 +662,7 @@ void PhysCalc::print_all()
 
 ThreeBodyPhysCalc::ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num,
                                      string outfname, Units unit, double cutoff)
-:BasePhysCalc(), ThreeBody(_asolv, unit, cutoff), solved_(false), num_(num),
+:BasePhysCalc(), ThreeBody(_asolv, unit, "", cutoff), solved_(false), num_(num),
 outfname_(outfname)
 {
 }

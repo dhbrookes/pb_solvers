@@ -35,7 +35,10 @@
 #include <stdio.h>
 #include <memory>
 #include "ASolver.h"
-//#include <omp.h>
+
+#ifdef __OMP
+#include <omp.h>
+#endif
 
 using namespace std;
 
@@ -273,7 +276,7 @@ protected:
   
 public:
   ThreeBody(shared_ptr<ASolver> _asolver, Units unt = INTERNAL,
-            double cutoff = 1e48 );
+            string outfname="", double cutoff = 1e48 );
   
   // Solve the N body problem, only 2 or 3 right now
   void solveNmer( int num, double preclim = 1e-4);

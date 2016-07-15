@@ -62,16 +62,12 @@ typedef struct _PBAMInput {
    idiel_(1.5), // Solute dielectric
    sdiel_(80.0),
    nmol_(1),
-   runType_("energyforce"),
-   runName_("tst"),
    randOrient_(0),
    boxLen_(1.4e18),
    pbcType_(0),
    gridPts_(15),
-   map3D_("tst.map"),
    grid2Dct_(0),
    ntraj_(1),
-   termCombine_("or"),
    termct_(1),
    contct_(0)
  	{ }

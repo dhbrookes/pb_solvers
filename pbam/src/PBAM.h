@@ -32,7 +32,7 @@
 #define PBAM_H
 
 #include <memory>
-#include <time.h>
+#include <sys/time.h>
 #include "PBAMStruct.h"
 #include "BD.h"
 
