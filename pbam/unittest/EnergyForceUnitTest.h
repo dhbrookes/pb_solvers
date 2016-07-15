@@ -86,7 +86,7 @@ TEST_F(EnergyForceUTest, checkEnergy)
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals);
-  ASolvTest->solve_A(1E-20);
+  ASolvTest->solve_A(1E-20, 1000);
   
   EnergyCalc EnTest(ASolvTest);
   EnTest.calc_energy();
@@ -108,7 +108,7 @@ TEST_F(EnergyForceUTest, checkEnergySing)
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals);
-  ASolvTest->solve_A(1E-20);
+  ASolvTest->solve_A(1E-20, 1000);
   
   EnergyCalc EnTest(ASolvTest);
   EnTest.calc_energy();
@@ -142,7 +142,7 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals);
-  ASolvTest->solve_A(1E-20);
+  ASolvTest->solve_A(1E-20, 1000);
   
   EnergyCalc EnTest(ASolvTest);
   EnTest.calc_energy();
@@ -176,7 +176,7 @@ TEST_F(EnergyForceUTest, checkForce)
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals);
-  ASolvTest->solve_A(1E-40); ASolvTest->solve_gradA(1E-40);
+  ASolvTest->solve_A(1E-40, 1000); ASolvTest->solve_gradA(1E-40, 1000);
   ForceCalc FoTest(ASolvTest);
   FoTest.calc_force();
   for (int n=0; n<mol_.size(); n++)
@@ -199,7 +199,7 @@ TEST_F(EnergyForceUTest, checkForceSing)
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals);
-  ASolvTest->solve_A(1E-40); ASolvTest->solve_gradA(1E-40);
+  ASolvTest->solve_A(1E-40, 1000); ASolvTest->solve_gradA(1E-40, 1000);
   
   ForceCalc FoTest(ASolvTest);
   FoTest.calc_force();
@@ -237,7 +237,7 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals);
-  ASolvTest->solve_A(1E-30); ASolvTest->solve_gradA(1E-30);
+  ASolvTest->solve_A(1E-30, 1000); ASolvTest->solve_gradA(1E-30, 1000);
 
   EnergyCalc EnTest(ASolvTest);
   ForceCalc FoTest(ASolvTest);
@@ -280,7 +280,7 @@ TEST_F(EnergyForceUTest, checkTorque)
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals);
-  ASolvTest->solve_A(1E-20); ASolvTest->solve_gradA(1E-20);
+  ASolvTest->solve_A(1E-20, 1000); ASolvTest->solve_gradA(1E-20, 1000);
   
   ForceCalc FoTest(ASolvTest);
   TorqueCalc TorTest( ASolvTest);
@@ -306,7 +306,7 @@ TEST_F(EnergyForceUTest, checkTorqueSing)
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals);
-  ASolvTest->solve_A(1E-20); ASolvTest->solve_gradA(1E-20);
+  ASolvTest->solve_A(1E-20, 1000); ASolvTest->solve_gradA(1E-20, 1000);
   
   ForceCalc FoTest(ASolvTest);
   TorqueCalc TorTest(ASolvTest);
@@ -344,7 +344,7 @@ TEST_F(EnergyForceUTest, checkTorqueSing3)
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals);
-  ASolvTest->solve_A(1E-20); ASolvTest->solve_gradA(1E-20);
+  ASolvTest->solve_A(1E-20, 1000); ASolvTest->solve_gradA(1E-20, 1000);
   
   ForceCalc FoTest(ASolvTest);
   TorqueCalc TorTest(ASolvTest);

@@ -50,10 +50,7 @@ void ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
   {
     iter();
     cng = calc_change();
-    if (ct > MAX_POL_ROUNDS*N_)
-    {
-      break;
-    }
+    if (ct > MAX_POL_ROUNDS) break;
     ct++;
   }
   solvedA_ = true;
@@ -77,10 +74,7 @@ void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
     {
       grad_iter(j);
       cng = calc_grad_change(j);
-      if (ct > MAX_POL_ROUNDS*N_)
-      {
-        break;
-      }
+      if (ct > MAX_POL_ROUNDS) break;
       ct++;
     }
   }
