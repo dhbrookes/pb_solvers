@@ -347,9 +347,9 @@ void PBAM::run_energyforce()
   calcEnFoTo.calc_all();
   calcEnFoTo.print_all();
   
-  t = clock() - t;
+  t3 = clock() - t3;
   printf ("energyforce calc took me %f seconds.\n",
-          ((float)t)/CLOCKS_PER_SEC);
+          ((float)t3)/CLOCKS_PER_SEC);
 }
 
 void PBAM::run_bodyapprox()
