@@ -181,7 +181,7 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
                                    _asolver_->get_consts(), diff, force);
 }
 
-void BDRun::run(string xyzfile, string statfile)
+void BDRun::run(string xyzfile, string statfile, int nSCF)
 {
   int i = 0;
   int WRITEFREQ = 2000;
@@ -199,9 +199,16 @@ void BDRun::run(string xyzfile, string statfile)
     }
     
     _asolver_->reset_all(_stepper_->get_system());
-    _asolver_->solve_A(prec_);
-    _asolver_->solve_gradA(prec_);
-    
+    if (nSCF == 0)
+    {
+      _asolver_->solve_A(prec_);
+      _asolver_->solve_gradA(prec_);
+    } else
+    {
+      _asolver_->solve_A(prec_, nSCF);
+      _asolver_->solve_gradA(prec_, nSCF);
+    }
+
     _physCalc_->calc_force();
     _physCalc_->calc_torque();
     
