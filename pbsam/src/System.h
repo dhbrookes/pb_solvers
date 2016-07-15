@@ -33,6 +33,7 @@
 #define System_hpp
 
 #include <map>
+#include <memory>
 #include "Constants.h"
 
 using namespace std;
