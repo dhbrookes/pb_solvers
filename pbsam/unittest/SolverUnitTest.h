@@ -617,7 +617,7 @@ TEST_F(SolverUTest, grad_pre_test)
                          SHCalcTest, pol, _expcons, true, 0, true);
   
   string istart = test_dir_loc + "imat_test/imat.sp";
-  string estart = test_dir_loc + "grad_test/mpol.";
+  string estart = test_dir_loc + "grad_dT_A_test/mpol.";
   vector<vector<string> > imat_loc(sys->get_n());
   vector<vector<vector<string > > > exp_loc(sys->get_n());
   
@@ -637,47 +637,47 @@ TEST_F(SolverUTest, grad_pre_test)
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
                   true, true, imat_loc, exp_loc);
-//  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
-//                       solvTest.get_all_F(), solvTest.get_all_H(),
-//                       solvTest.get_IE(),
-//                       solvTest.get_interpol_list(), _expcons, pol);
-//  gsolvTest.pre_compute_gradT_A();
-//  
-//  for (int i = 0; i < sys->get_n(); i++)
-//  {
-//    for (int j = 0; j < sys->get_n(); j++)
-//    {
-//      for (int k = 0; k < sys->get_Ns_i(i); k++)
-//      {
-//        int ct = 0;
-//        for(int n=0; n<pol; n++)
-//        {
-//          for(int m=0; m <= n; m++)
-//          {
-//            EXPECT_NEAR(delTAre[i][j][k][0][ct],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).real(),
-//                        preclim);
-//            EXPECT_NEAR(delTAre[i][j][k][1][ct],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).real(),
-//                        preclim);
-//            EXPECT_NEAR(delTAre[i][j][k][2][ct],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).real(),
-//                        preclim);
-//            EXPECT_NEAR(delTAim[i][j][k][0][ct],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).imag(),
-//                        preclim);
-//            EXPECT_NEAR(delTAim[i][j][k][1][ct],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).imag(),
-//                        preclim);
-//            EXPECT_NEAR(delTAim[i][j][k][2][ct],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).imag(),
-//                        preclim);
-//            ct++;
-//          }
-//        }
-//      }
-//    }
-//  }
+  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
+                       solvTest.get_all_F(), solvTest.get_all_H(),
+                       solvTest.get_IE(),
+                       solvTest.get_interpol_list(), _expcons, pol);
+  gsolvTest.pre_compute_gradT_A();
+  
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    for (int j = 0; j < sys->get_n(); j++)
+    {
+      for (int k = 0; k < sys->get_Ns_i(i); k++)
+      {
+        int ct = 0;
+        for(int n=0; n<pol; n++)
+        {
+          for(int m=0; m <= n; m++)
+          {
+            EXPECT_NEAR(delTAre[i][j][k][0][ct],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).real(),
+                        preclim);
+            EXPECT_NEAR(delTAre[i][j][k][1][ct],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).real(),
+                        preclim);
+            EXPECT_NEAR(delTAre[i][j][k][2][ct],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).real(),
+                        preclim);
+            EXPECT_NEAR(delTAim[i][j][k][0][ct],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).imag(),
+                        preclim);
+            EXPECT_NEAR(delTAim[i][j][k][1][ct],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).imag(),
+                        preclim);
+            EXPECT_NEAR(delTAim[i][j][k][2][ct],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).imag(),
+                        preclim);
+            ct++;
+          }
+        }
+      }
+    }
+  }
 }
 
 
@@ -704,7 +704,7 @@ TEST_F(SolverUTest, grad_test)
   
 //  cout << "This is cog of i " << sys->get_cogi(0).x() << ", " << sys->get_cogi(0).y() << ", " << sys->get_cogi(0).z() << endl;
 //  cout << "This is cog of i " << sys->get_cogi(1).x() << ", " << sys->get_cogi(1).y() << ", " << sys->get_cogi(1).z() << endl;
-//  
+//
 //  for (int j = 0; j < sys->get_n(); j++)
 //  {
 //    cout << "For molecule  " << j << endl;

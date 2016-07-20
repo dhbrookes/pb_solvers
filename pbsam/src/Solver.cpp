@@ -235,7 +235,7 @@ double Solver::iter(int t)
         
         dev_sph_Ik_[I][k] = calc_converge_H(I,k,false);
         mu_mpol += dev_sph_Ik_[I][k];
-        Ns_tot_ ++;
+        Ns_tot_++;
         if ( dev_sph_Ik_[I][k] > mu_int )
           mu_int = dev_sph_Ik_[I][k];
       }
@@ -360,6 +360,7 @@ GradSolver::GradSolver(shared_ptr<System> _sys,
 :p_(p), _F_(_F), _H_(_H), _T_(_T), _bCalc_(_bCalc), _shCalc_(_shCalc),
 _sys_(_sys), _consts_(_consts), kappa_(_consts->get_kappa()),
 interpol_(interpol), _IE_(_IE), _expConsts_(_expConst),
+dev_sph_Ik_(_sys->get_n()),
 dF_(_sys->get_n(), vector<shared_ptr<GradFMatrix> > (_sys->get_n())),
 dH_(_sys->get_n(), vector<shared_ptr<GradHMatrix> > (_sys->get_n())),
 prev_dH_(_sys->get_n(), vector<shared_ptr<GradHMatrix> > (_sys->get_n())),
@@ -397,6 +398,7 @@ gradT_A_(_sys->get_n(), vector<shared_ptr<GradCmplxMolMat> > (_sys->get_n()))
       gradT_A_[I][J] = make_shared<GradCmplxMolMat> (J,I,_sys_->get_Ns_i(I),
                                                   p_);
     }
+    dev_sph_Ik_[I].resize(_sys_->get_Ns_i(I));
   }
   
   for (int i = 0; i < _T_->get_T_ct(); i++)  _T_->compute_derivatives_i(i);
@@ -432,7 +434,10 @@ void GradSolver::solve(double tol, int maxiter)
 
 double GradSolver::iter(int t, int wrt)
 {
-  double mu(0);
+  double mu_int(0), mu_mpol(0);
+  if ( t == 0 ) mu_ = 0.0;
+  Ns_tot_ = 0;
+  
   shared_ptr<Molecule> molI;
   vector<double> besseli, besselk;
   for (int I = 0; I < _sys_->get_n(); I++)
@@ -450,21 +455,27 @@ double GradSolver::iter(int t, int wrt)
       if (interpol_[I][k] != 0) continue;
       cout << "In iter, this is LHN " << endl;
       dLHN_[wrt][I]->print_kmat(k);
+      
       besseli = _bCalc_->calc_mbfI(p_+1, kappa_*molI->get_ak(k));
       besselk = _bCalc_->calc_mbfK(p_+1, kappa_*molI->get_ak(k));
       
       update_outer_gradH(I, wrt, k);
       step( t, I, wrt, k, besseli, besselk);
-      iter_inner_gradH(I, wrt, k, besseli);
+      iter_inner_gradH(I, wrt, k, besseli, besselk);
       
-//      dF_[wrt][I]->calc_val_k(k, _IE_[I], dWF_[wrt][I]);
-//      dH_[wrt][I]->calc_val_k(k, besseli, _IE_[I], dWH_[wrt][I]);
+      dev_sph_Ik_[I][k] = calc_converge_gradH(I, wrt, k, false);
+      mu_mpol += dev_sph_Ik_[I][k];
+      Ns_tot_++;
+      if ( dev_sph_Ik_[I][k] > mu_int )
+        mu_int = dev_sph_Ik_[I][k];
     }
   }
-  return mu;
+  
+  mu_ = mu_int;
+  return (mu_mpol / (double) Ns_tot_);
 }
 
-
+// Perform updates of various expansions
 void GradSolver::step(int t, int I, int wrt, int k, vector<double> &besseli,
                       vector<double> &besselk)
 {
@@ -472,50 +483,60 @@ void GradSolver::step(int t, int I, int wrt, int k, vector<double> &besseli,
   dLF_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dF_[wrt][I]);
   dLH_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dH_[wrt][I]);
   
-  dWF_[wrt][I]->calc_val_k(k,molI,besseli,besselk,dH_[wrt][I],dF_[wrt][I],
-                           dLH_[wrt][I], dLHN_[wrt][I], dLF_[wrt][I]);
-  dWH_[wrt][I]->calc_val_k(k, molI, besseli, besselk, dH_[wrt][I],
-                           dF_[wrt][I], dLH_[wrt][I], dLHN_[wrt][I],
-                           dLF_[wrt][I]);
+  cout << "In iter, this is LH " << endl;
+  dLH_[wrt][I]->print_analytical(k);
+  
+//  dWF_[wrt][I]->calc_val_k(k,molI,besseli,besselk,dH_[wrt][I],dF_[wrt][I],
+//                           dLH_[wrt][I], dLHN_[wrt][I], dLF_[wrt][I]);
+//  dWH_[wrt][I]->calc_val_k(k, molI, besseli, besselk, dH_[wrt][I],
+//                           dF_[wrt][I], dLH_[wrt][I], dLHN_[wrt][I],
+//                           dLF_[wrt][I]);
 }
 
 
 void GradSolver::iter_inner_gradH(int I, int wrt, int k,
-                                  vector<double> &besseli)
+                                  vector<double> &besseli,
+                                  vector<double> &besselk)
 {
   double dev(1e20), toli(1e-6);
   int ct(0), mxCt(20);
   
   auto mol = _sys_->get_molecule(I);
-  //  cout << "Mol I " << I << " and sph " << k << endl;
-  
-  //   Inner H loop
-  //  cout << "This is F " << endl; _F_[I]->print_kmat(k);
-  //  cout << "This is H " << endl; _H_[I]->print_kmat(k);
-  //  cout << "This is LF " << endl; _LF_[I]->print_analytical(k);
-  //  cout << "This is LH " << endl; _LH_[I]->print_analytical(k);
-  //      cout << "within LH+LHN" << endl;
-  //      for (int n2 = 0; n2 < p_; n2++)
-  //      {
-  //        for (int m2 = 0; m2 < n2+1; m2++)
-  //        {
-  //          cout << _LH_[I]->get_mat_knm(k, n2, m2)+_LHN_[I]->get_mat_knm(k, n2, m2) << ", " ;
-  //        }
-  //        cout << endl;
-  //      }
-  
-  //  cout << "This is XF " << endl; _XF_[I]->print_kmat(k);
-  //  cout << "This is XH Hbase " << endl; _XH_[I]->print_kmat(k);
+  cout << "Mol I " << I << " and sph " << k << endl;
+
+
   while ( dev > toli && ct < mxCt )
   {
+    dWF_[wrt][I]->calc_val_k(k,mol,besseli,besselk,dH_[wrt][I],dF_[wrt][I],
+                             dLH_[wrt][I], dLHN_[wrt][I], dLF_[wrt][I]);
     dF_[wrt][I]->calc_val_k(k, _IE_[I], dWF_[wrt][I]);
+    dWH_[wrt][I]->calc_val_k(k, mol, besseli, besselk, dH_[wrt][I],
+                             dF_[wrt][I], dLH_[wrt][I], dLHN_[wrt][I],
+                             dLF_[wrt][I]);
     dH_[wrt][I]->calc_val_k(k, besseli, _IE_[I], dWH_[wrt][I]);
+    
+    
+      cout << "This is WH " << endl;
+      dWH_[wrt][I]->print_kmat(k);
+      cout << "This is WF " << endl;
+      dWF_[wrt][I]->print_kmat(k);
+    
+//    cout << "INSIDE inner iter " << endl;
+//    cout << "This is dF mol " <<I << " sph " << k<< " wrt " << wrt << endl;
+//    dF_[wrt][I]->print_kmat(k);
+//    cout << "This is dH mol "  <<I<< " sph " << k << " wrt " << wrt << endl;
+//    dH_[wrt][I]->print_kmat(k);
     
     dev = calc_converge_gradH(I, wrt, k, true);
     update_prev_gradH(I, wrt, k);
     
     ct++;
   }
+  cout << "This is dF " <<I<< " wrt " << wrt << endl;
+  dF_[wrt][I]->print_kmat(k);
+  cout << "This is dH "  <<I<< " wrt " << wrt << endl;
+  dH_[wrt][I]->print_kmat(k);
+  
 }
 
 
@@ -616,113 +637,102 @@ void GradSolver::pre_compute_gradT_A()
         {
           Jl = _sys_->get_centerik(J, l);
           aJl = _sys_->get_aik(J, l);
-          cout << "This is Ik, Jl pair : "  << I << ", "<< k
-          << " & "  << J << ", "<< l << endl;
-          cout<< " dist: " << Ik.dist(Jl) << " and aIk "
-          << aIk << " and ajl "
-          << aJl << " dis1 : " <<  Ik.dist(Jl) - aIk - aJl << endl;
-          cout << "This is pos ik " << Ik.x() << ", " << Ik.y() << ", " << Ik.z() << endl;
-          cout << "This is pos jl " << Jl.x() << ", " << Jl.y() << ", " << Jl.z() << endl;
+//          cout << "This is Ik, Jl pair : "  << I << ", "<< k
+//          << " & "  << J << ", "<< l << endl;
+//          cout<< " dist: " << Ik.dist(Jl) << " and aIk "
+//          << aIk << " and ajl "
+//          << aJl << " dis1 : " <<  Ik.dist(Jl) - aIk - aJl << endl;
+//          cout << "This is pos ik " << Ik.x() << ", " << Ik.y() << ", " << Ik.z() << endl;
+//          cout << "This is pos jl " << Jl.x() << ", " << Jl.y() << ", " << Jl.z() << endl;
           if (_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
                      (cut_er+aIk+aJl) )
           {
-            cout << "Reex 10A for mol (org) " << I << " sph " << k
-            << " to dest : " << J << " and sph " << l  << endl;
             reex = _T_->re_expandX_gradT(_H_[J]->get_mat_k(l), I, k, J, l);
             gradT_A_[J][I]->add_mat_k(k, reex);
             
             if (interpol_[J][l] == 0)
             {
-              cout << "Reex 10A for mol (org) " << I << " sph " << k
-              << " to dest : " << J << " and sph " << l  << endl;
+//              cout << "interpol == 0 mol (org) " << I << " sph " << k
+//              << " to dest : " << J << " and sph " << l  << endl;
+//              _H_[I]->print_kmat(k);
               reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
               gradT_A_[J][J]->add_mat_k(l, reex);
             }
           } else if ((_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
                      (cut_act+aIk+aJl)) && (interpol_[J][l] == 0))
           {
-            cout << "Reex 100A for mol (org) " << I << " sph " << k
-            << " to dest : " << J << " and sph " << l  << endl;
+//            cout << "Reex 100A for mol (org) " << I << " sph " << k
+//            << " to dest : " << J << " and sph " << l  << endl;
             reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
             gradT_A_[J][J]->add_mat_k(l, reex);
             
-            cout << "after x:" << endl;
-            for (int n2 = 0; n2 < p_; n2++)
-            {
-              for (int m2 = 0; m2 < n2+1; m2++)
-                cout << reex( n2, m2+p_).x()<< ", " ;
-              cout << endl;
-            } cout << " y : "  << endl;
-            for (int n2 = 0; n2 < p_; n2++)
-            {
-              for (int m2 = 0; m2 < n2+1; m2++)
-                cout << reex( n2, m2+p_).y()<< ", " ;
-              cout << endl;
-            } cout << " z : "  << endl;
-            for (int n2 = 0; n2 < p_; n2++)
-            {
-              for (int m2 = 0; m2 < n2+1; m2++)
-                cout << reex( n2, m2+p_).z()<< ", " ;
-              cout << endl;
-            }
+//            cout << "after x:" << endl;
+//            for (int n2 = 0; n2 < p_; n2++)
+//            {
+//              for (int m2 = 0; m2 < n2+1; m2++)
+//                cout << reex( n2, m2+p_).x()<< ", " ;
+//              cout << endl;
+//            } cout << " y : "  << endl;
+//            for (int n2 = 0; n2 < p_; n2++)
+//            {
+//              for (int m2 = 0; m2 < n2+1; m2++)
+//                cout << reex( n2, m2+p_).y()<< ", " ;
+//              cout << endl;
+//            } cout << " z : "  << endl;
+//            for (int n2 = 0; n2 < p_; n2++)
+//            {
+//              for (int m2 = 0; m2 < n2+1; m2++)
+//                cout << reex( n2, m2+p_).z()<< ", " ;
+//              cout << endl;
+//            }
           }
         } // end l
       }
     }
   }
-  double re;
-  for (int I = 0; I < _sys_->get_n(); I++)
-  {
-//    cout << ",{";
-  for (int J = 0; J < _sys_->get_n(); J++)
-  {
-//    cout << "{{";
-    for (int k = 0; k < _sys_->get_Ns_i(J); k++)
-    {
-//      cout << "{{";
-      cout << " Derv " << I << " Reex " << J << " and sph " << k  << endl;
-//      cout << "This is ipol " << interpol_[J][k] << endl;
-      cout << "after x:" << endl;
-      for (int n2 = 0; n2 < p_; n2++)
-      {
-        for (int m2 = 0; m2 < n2+1; m2++)
-        {
-          re = ((fabs(gradT_A_[I][J]->get_mat_knm(k, n2, m2).x().real()) < 1e-15 )
-                ? 0.0 : gradT_A_[I][J]->get_mat_knm(k, n2, m2).x().real() );
-          cout << setprecision(9) << re << "," ;
-        }
-        cout << endl;
-      }
-//      cout << "},{";
-      cout << " y : "  << endl;
-      for (int n2 = 0; n2 < p_; n2++)
-      {
-        for (int m2 = 0; m2 < n2+1; m2++)
-        {
-          re = ((fabs(gradT_A_[I][J]->get_mat_knm(k, n2, m2).y().real()) < 1e-15 )
-                ? 0.0 : gradT_A_[I][J]->get_mat_knm(k, n2, m2).y().real() );
-          cout << setprecision(9) << re << "," ;
-        }
-        cout << endl;
-      }
-//      cout << "},{";
-      cout << " z : "  << endl;
-      for (int n2 = 0; n2 < p_; n2++)
-      {
-        for (int m2 = 0; m2 < n2+1; m2++)
-        {
-          re = ((fabs(gradT_A_[I][J]->get_mat_knm(k, n2, m2).z().real()) < 1e-15 )
-                ? 0.0 : gradT_A_[I][J]->get_mat_knm(k, n2, m2).z().real() );
-          cout << setprecision(9) << re << "," ;
-        }
-        cout << endl;
-//        cout << "},";
-      }
-      cout << endl;
-//      cout << "}},";
-    }
-//    cout << "}},";
-  }
-//    cout << "}";
-  }
+//  double re;
+//  for (int I = 0; I < _sys_->get_n(); I++)
+//  {
+//  for (int J = 0; J < _sys_->get_n(); J++)
+//  {
+//    for (int k = 0; k < _sys_->get_Ns_i(J); k++)
+//    {
+//      cout << " Derv " << I << " Reex " << J << " and sph " << k  << endl;
+//      cout << "after x:" << endl;
+//      for (int n2 = 0; n2 < p_; n2++)
+//      {
+//        for (int m2 = 0; m2 < n2+1; m2++)
+//        {
+//          re = ((fabs(gradT_A_[I][J]->get_mat_knm(k, n2, m2).x().real()) < 1e-15 )
+//                ? 0.0 : gradT_A_[I][J]->get_mat_knm(k, n2, m2).x().real() );
+//          cout << setprecision(9) << re << "," ;
+//        }
+//        cout << endl;
+//      }
+//      cout << " y : "  << endl;
+//      for (int n2 = 0; n2 < p_; n2++)
+//      {
+//        for (int m2 = 0; m2 < n2+1; m2++)
+//        {
+//          re = ((fabs(gradT_A_[I][J]->get_mat_knm(k, n2, m2).y().real()) < 1e-15 )
+//                ? 0.0 : gradT_A_[I][J]->get_mat_knm(k, n2, m2).y().real() );
+//          cout << setprecision(9) << re << "," ;
+//        }
+//        cout << endl;
+//      }
+//      cout << " z : "  << endl;
+//      for (int n2 = 0; n2 < p_; n2++)
+//      {
+//        for (int m2 = 0; m2 < n2+1; m2++)
+//        {
+//          re = ((fabs(gradT_A_[I][J]->get_mat_knm(k, n2, m2).z().real()) < 1e-15 )
+//                ? 0.0 : gradT_A_[I][J]->get_mat_knm(k, n2, m2).z().real() );
+//          cout << setprecision(9) << re << "," ;
+//        }
+//        cout << endl;
+//      }
+//      cout << endl;
+//    }
+//  }
+//  }
 }

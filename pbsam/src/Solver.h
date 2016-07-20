@@ -119,6 +119,8 @@ class GradSolver
 protected:
   int p_;
   double kappa_;
+  double mu_;  // error from scf cycle
+  int Ns_tot_; // measure of number of spheres in the system
   
   vector<shared_ptr<FMatrix> >      _F_;  // converged solutions for these
   vector<shared_ptr<HMatrix> >      _H_;
@@ -147,9 +149,10 @@ protected:
   shared_ptr<Constants>             _consts_;
   
   vector<vector<int> > interpol_; // whether sphere Ik is w/in 10A of other mol
-
+  vector<vector<double > > dev_sph_Ik_; // record of deviations
   
-  void iter_inner_gradH(int I, int wrt, int k, vector<double> &besseli);
+  void iter_inner_gradH(int I, int wrt, int k, vector<double> &besseli,
+                        vector<double> &besselk);
   double calc_converge_gradH( int I, int wrt, int k, bool inner);
   
   void step(int t, int I, int wrt, int k, vector<double> &besseli,

@@ -53,6 +53,13 @@ public:
   void set_mat_knm(int k, int n, int m, Ptx val)
   { mat_[k].set_val(n, m+p_, val); }
   
+  void set_mat_knm_d(int k, int n, int m, int d, cmplx val)
+  {
+    if ( d == 0 )      mat_[k](n, m+p_).set_x(val);
+    else if ( d == 1 ) mat_[k](n, m+p_).set_y(val);
+    else               mat_[k](n, m+p_).set_z(val);
+  }
+  
   MyMatrix<Ptx> get_mat_k(int k) const { return mat_[k]; }
   void set_mat_k(int k, MyMatrix<Ptx> mat )
   {
@@ -120,7 +127,7 @@ public:
         }
         cout << endl;
       }
-      cout << endl;
+//      cout << endl;
     }
     cout << endl;
   }
