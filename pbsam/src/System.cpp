@@ -126,6 +126,11 @@ double Molecule::random_norm()
 void Molecule::translate(Pt dr, double boxlen)
 {
   Pt dv_cen  = cog_ + dr;
+  
+  cog_ = Pt(dv_cen.x() - round(dv_cen.x()/boxlen)*boxlen,
+               dv_cen.y() - round(dv_cen.y()/boxlen)*boxlen,
+               dv_cen.z() - round(dv_cen.z()/boxlen)*boxlen);
+  
   for (int k = 0; k < Ns_; k++)
   {
     Pt dv  = centers_[k] + dr;

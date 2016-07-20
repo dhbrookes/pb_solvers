@@ -130,6 +130,8 @@ protected:
   // that this derivative is with respect to
   vector<vector<shared_ptr<GradFMatrix> > >   dF_;
   vector<vector<shared_ptr<GradHMatrix> > >   dH_;
+  vector<vector<shared_ptr<GradHMatrix> > >   prev_dH_;
+  vector<vector<shared_ptr<GradHMatrix> > >   outer_dH_;
   vector<vector<shared_ptr<GradWFMatrix> > >  dWF_;
   vector<vector<shared_ptr<GradWHMatrix> > >  dWH_;
   vector<vector<shared_ptr<GradLFMatrix> > >  dLF_;
@@ -146,6 +148,17 @@ protected:
   
   vector<vector<int> > interpol_; // whether sphere Ik is w/in 10A of other mol
 
+  
+  void iter_inner_gradH(int I, int wrt, int k, vector<double> &besseli);
+  double calc_converge_gradH( int I, int wrt, int k, bool inner);
+  
+  void step(int t, int I, int wrt, int k, vector<double> &besseli,
+            vector<double> &besselk);
+  
+  // Updating dHs
+  void update_prev_gradH(int I, int wrt, int k);
+  void update_outer_gradH(int I, int wrt, int k);
+  
 public:
   GradSolver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
              shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,

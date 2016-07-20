@@ -637,47 +637,47 @@ TEST_F(SolverUTest, grad_pre_test)
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
                   true, true, imat_loc, exp_loc);
-  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
-                       solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
-  gsolvTest.pre_compute_gradT_A();
-  
-  for (int i = 0; i < sys->get_n(); i++)
-  {
-    for (int j = 0; j < sys->get_n(); j++)
-    {
-      for (int k = 0; k < sys->get_Ns_i(i); k++)
-      {
-        int ct = 0;
-        for(int n=0; n<pol; n++)
-        {
-          for(int m=0; m <= n; m++)
-          {
-            EXPECT_NEAR(delTAre[i][j][k][0][ct],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).real(),
-                        preclim);
-            EXPECT_NEAR(delTAre[i][j][k][1][ct],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).real(),
-                        preclim);
-            EXPECT_NEAR(delTAre[i][j][k][2][ct],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).real(),
-                        preclim);
-            EXPECT_NEAR(delTAim[i][j][k][0][ct],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).imag(),
-                        preclim);
-            EXPECT_NEAR(delTAim[i][j][k][1][ct],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).imag(),
-                        preclim);
-            EXPECT_NEAR(delTAim[i][j][k][2][ct],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).imag(),
-                        preclim);
-            ct++;
-          }
-        }
-      }
-    }
-  }
+//  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
+//                       solvTest.get_all_F(), solvTest.get_all_H(),
+//                       solvTest.get_IE(),
+//                       solvTest.get_interpol_list(), _expcons, pol);
+//  gsolvTest.pre_compute_gradT_A();
+//  
+//  for (int i = 0; i < sys->get_n(); i++)
+//  {
+//    for (int j = 0; j < sys->get_n(); j++)
+//    {
+//      for (int k = 0; k < sys->get_Ns_i(i); k++)
+//      {
+//        int ct = 0;
+//        for(int n=0; n<pol; n++)
+//        {
+//          for(int m=0; m <= n; m++)
+//          {
+//            EXPECT_NEAR(delTAre[i][j][k][0][ct],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).real(),
+//                        preclim);
+//            EXPECT_NEAR(delTAre[i][j][k][1][ct],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).real(),
+//                        preclim);
+//            EXPECT_NEAR(delTAre[i][j][k][2][ct],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).real(),
+//                        preclim);
+//            EXPECT_NEAR(delTAim[i][j][k][0][ct],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).imag(),
+//                        preclim);
+//            EXPECT_NEAR(delTAim[i][j][k][1][ct],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).imag(),
+//                        preclim);
+//            EXPECT_NEAR(delTAim[i][j][k][2][ct],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).imag(),
+//                        preclim);
+//            ct++;
+//          }
+//        }
+//      }
+//    }
+//  }
 }
 
 
@@ -691,6 +691,7 @@ TEST_F(SolverUTest, grad_test)
                                          pqr.get_atom_pts(), pqr.get_radii(),
                                          pqr.get_cg_centers(),
                                          pqr.get_cg_radii()));
+  
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
   auto sys = make_shared<System>(mols);
@@ -701,8 +702,19 @@ TEST_F(SolverUTest, grad_test)
   cst->set_temp(298.15);
   cst->set_kappa(0.0325628352);
   
-  cout << "This is cog of i " << sys->get_cogi(0).x() << ", " << sys->get_cogi(0).y() << ", " << sys->get_cogi(0).z() << endl;
-  cout << "This is cog of i " << sys->get_cogi(1).x() << ", " << sys->get_cogi(1).y() << ", " << sys->get_cogi(1).z() << endl;
+//  cout << "This is cog of i " << sys->get_cogi(0).x() << ", " << sys->get_cogi(0).y() << ", " << sys->get_cogi(0).z() << endl;
+//  cout << "This is cog of i " << sys->get_cogi(1).x() << ", " << sys->get_cogi(1).y() << ", " << sys->get_cogi(1).z() << endl;
+//  
+//  for (int j = 0; j < sys->get_n(); j++)
+//  {
+//    cout << "For molecule  " << j << endl;
+//    for (int k = 0; k < sys->get_Ns_i(j); k++)
+//    {
+//      for (int d = 0; d < 3; d++)
+//        cout << sys->get_centerik(j,k).get_cart(d) << ",";
+//      cout << endl;
+//    }
+//  }
   
   auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
   auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
@@ -737,15 +749,15 @@ TEST_F(SolverUTest, grad_test)
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
                   true, true, imat_loc, exp_loc);
   
-  for (int j = 0; j < sys->get_n(); j++)
-  {
-    cout << "For molecule  " << j << endl;
-    for (int k = 0; k < solvTest.get_interpol_list()[j].size(); k++)
-    {
-      cout << solvTest.get_interpol_list()[j][k] << ", ";
-    }
-    cout << endl;
-  }
+//  for (int j = 0; j < sys->get_n(); j++)
+//  {
+//    cout << "For molecule  " << j << endl;
+//    for (int k = 0; k < solvTest.get_interpol_list()[j].size(); k++)
+//    {
+//      cout << solvTest.get_interpol_list()[j][k] << ", ";
+//    }
+//    cout << endl;
+//  }
   
   GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
                        solvTest.get_all_F(), solvTest.get_all_H(),
@@ -753,6 +765,9 @@ TEST_F(SolverUTest, grad_test)
                        solvTest.get_interpol_list(), _expcons, pol);
   gsolvTest.pre_compute_gradT_A();
   gsolvTest.iter(0, 1);
+  gsolvTest.iter(1, 1);
+//  gsolvTest.iter(2, 1);
+//  gsolvTest.iter(3, 1);
   
   for (int i = 0; i < sys->get_n(); i++)
   {

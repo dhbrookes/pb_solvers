@@ -261,6 +261,17 @@ public:
     return Point<T>(x, y, z);
   }
   
+  // Method to get xyz using numbers 0=x, 1=y, 2=z
+  const T& get_cart(int val)
+  {
+    if (sph_) convert_to_euclidean();
+    
+    if (val == 0)       return p1_;
+    else if (val == 1)  return p2_;
+    
+    return p3_;
+  }
+  
   // Getter methods perform necessary conversions:
   const T& x()
   {
