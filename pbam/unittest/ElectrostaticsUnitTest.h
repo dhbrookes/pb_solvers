@@ -92,7 +92,7 @@ TEST_F(ElecUTest, detailsCheck)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
+  ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   
@@ -122,7 +122,7 @@ TEST_F(ElecUTest, detailsCheck2)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
+  ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
   Electrostatic EstatTest( ASolvTest, 20);
   vector<double>  mins = EstatTest.get_mins();
@@ -151,7 +151,7 @@ TEST_F(ElecUTest, checkPot)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
+  ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   vector<vector<vector<double > > > esp = EstatTest.get_potential();
@@ -179,7 +179,7 @@ TEST_F(ElecUTest, printDX)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
+  ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   EstatTest.print_dx(test_dir_loc+"test.dx");
@@ -209,7 +209,7 @@ TEST_F(ElecUTest, checkPOTZ)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
+  ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   
@@ -245,7 +245,7 @@ TEST_F(ElecUTest, checkGridOutRange)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-4); ASolvTest->solve_gradA(1E-4);
+  ASolvTest->solve_A(1E-4, 1000); ASolvTest->solve_gradA(1E-4, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   
@@ -277,7 +277,7 @@ TEST_F(ElecUTest, checkGridOutRange2)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-4); ASolvTest->solve_gradA(1E-4);
+  ASolvTest->solve_A(1E-4, 1000); ASolvTest->solve_gradA(1E-4, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   
@@ -309,7 +309,7 @@ TEST_F(ElecUTest, printPOTX)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
+  ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   
@@ -343,7 +343,7 @@ TEST_F(ElecUTest, printPOTY)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
+  ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   
@@ -377,7 +377,7 @@ TEST_F(ElecUTest, printPOTZ)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-12); ASolvTest->solve_gradA(1E-12);
+  ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   
@@ -428,7 +428,7 @@ TEST_F(ElecUTest, printPOT)
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
-  ASolvTest->solve_A(1E-3); ASolvTest->solve_gradA(1E-3);
+  ASolvTest->solve_A(1E-3, 1000); ASolvTest->solve_gradA(1E-3, 1000);
   
   Electrostatic EstatTest( ASolvTest, 11);
   double val = 0; char pot[50];

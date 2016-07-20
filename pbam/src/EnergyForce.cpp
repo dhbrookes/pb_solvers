@@ -658,8 +658,14 @@ void PhysCalc::print_all()
     out << get_taui(i).x() * unit_conv_ << " "
         << get_taui(i).y() * unit_conv_ << " "
         << get_taui(i).z() * unit_conv_ << "]"<<endl;
-  }
-  
+  }  
+}
+
+ThreeBodyPhysCalc::ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num,
+                                     string outfname, Units unit, double cutoff)
+:BasePhysCalc(), ThreeBody(_asolv, unit, "", cutoff), solved_(false), num_(num),
+outfname_(outfname)
+{
 }
 
 

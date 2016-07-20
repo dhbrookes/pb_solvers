@@ -91,7 +91,7 @@ protected:
   cmplx calc_indi_e(int i, int n, int m);
   
   void copy_to_prevA(); // copy contents of _A_ to _prevA_
-  void copy_to_prevGradA();
+  void copy_to_prevGradA(int j);
   
   // pre-compute spherical harmonics matrices for every charge in the system
   void pre_compute_all_sh();
@@ -230,6 +230,15 @@ public:
   cmplx get_prev_dAdphi_ni(int i, int j, int n, int m)
   { return _prevGradA_->operator()(i, j)[2](n, m+p_);}
   
+  void set_prev_dAdr_ni(int i, int j, int n, int m, cmplx val)
+  { _prevGradA_->operator()(i, j)[0].set_val(n, m+p_, val); }
+  
+  void set_prev_dAdtheta_ni(int i, int j, int n, int m, cmplx val)
+  { _prevGradA_->operator()(i, j)[1].set_val(n, m+p_, val); }
+  
+  void set_prev_dAdphi_ni(int i, int j, int n, int m, cmplx val)
+  { _prevGradA_->operator()(i, j)[2].set_val(n, m+p_, val); }
+  
   // get elements of grad_j(A^(i))
   cmplx get_dAdx_ni(int i, int j, int n, int m)
   { return _gradA_->operator()(i, j)[0](n, m+p_);}
@@ -256,11 +265,11 @@ public:
   void print_dAi( int i, int j, int p);
 
   //numerically solve for A given the desired precision
-  void solve_A(double prec, int MAX_POL_ROUNDS=5);
+  void solve_A(double prec, int MAX_POL_ROUNDS=2);
   
   // numerically solve for grad(A) given the desired precision
   // must solve for A before this
-  void solve_gradA(double prec, int MAX_POL_ROUNDS=5);
+  void solve_gradA(double prec, int MAX_POL_ROUNDS=2);
   
   /*
    Reset all relevant members given a new system

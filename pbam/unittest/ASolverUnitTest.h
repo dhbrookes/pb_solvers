@@ -565,7 +565,7 @@ TEST_F(ASolverUTest, checkAMulti)
   shared_ptr<System> sys = make_shared<System>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40);
+  ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -617,7 +617,7 @@ TEST_F(ASolverUTest, checkAMultiPBC)
   shared_ptr<System> sys = make_shared<System>(mol_, 85, 175);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40);
+  ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -673,7 +673,7 @@ TEST_F(ASolverUTest, checkAPBC)
   shared_ptr<System> sys = make_shared<System>(mol_, 40, 175);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40);
+  ASolvTest.solve_A(1E-40, 1000);
 
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -724,7 +724,7 @@ TEST_F(ASolverUTest, checkAPBCoutside)
   shared_ptr<System> sys = make_shared<System>(mol_, 25, 150);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40);
+  ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -765,7 +765,7 @@ TEST_F(ASolverUTest, checkA)
   shared_ptr<System> sys = make_shared<System>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-20);
+  ASolvTest.solve_A(1E-20, 1000);
 
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -808,7 +808,7 @@ TEST_F(ASolverUTest, checkASingMult)
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40);
+  ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -855,7 +855,7 @@ TEST_F(ASolverUTest, checkASingMultFlip)
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40);
+  ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -893,7 +893,7 @@ TEST_F(ASolverUTest, checkASing)
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-30);
+  ASolvTest.solve_A(1E-30, 1000);
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -935,7 +935,7 @@ TEST_F(ASolverUTest, checkgradT_A)
   shared_ptr<System> sys = make_shared<System>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
+  ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
   
   VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
   VecOfMats<cmplx>::type dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
@@ -1057,7 +1057,7 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
+  ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
   
   VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
   VecOfMats<cmplx>::type dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
@@ -1179,7 +1179,7 @@ TEST_F(ASolverUTest, checkgradA)
   shared_ptr<System> sys = make_shared<System>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-25); ASolvTest.solve_gradA(1E-50);
+  ASolvTest.solve_A(1E-25, 1000); ASolvTest.solve_gradA(1E-50, 1000);
   
   int ct = 0;
   for ( int n = 0; n < 3; n++ )
@@ -1292,7 +1292,7 @@ TEST_F(ASolverUTest, checkgradASing)
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-30);
+  ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
 
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -1442,7 +1442,7 @@ TEST_F(ASolverUTest, checkL)
   shared_ptr<System> sys = make_shared<System>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40);
+  ASolvTest.solve_A(1E-40, 1000);
   shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -1484,7 +1484,7 @@ TEST_F(ASolverUTest, checkLSing)
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40);
+  ASolvTest.solve_A(1E-40, 1000);
   shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   
   int ct = 0;
@@ -1536,7 +1536,7 @@ TEST_F(ASolverUTest, checkdL)
   shared_ptr<System> sys = make_shared<System>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-30);
+  ASolvTest.solve_A(1E-20, 1000); ASolvTest.solve_gradA(1E-30, 1000);
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
 
   int ct = 0;
@@ -1631,7 +1631,7 @@ TEST_F(ASolverUTest, checkdLSing)
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
-  ASolvTest.solve_A(1E-40); ASolvTest.solve_gradA(1E-40);
+  ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-40, 1000);
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
   
   int ct = 0;

@@ -442,7 +442,7 @@ TEST_F(BDUTest, TorquePos)
                       make_shared<SHCalc> (SHCalcu),
                       BDTest.get_system(),
                       make_shared<Constants> (const_), vals);
-    ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+    ASolvTest.solve_A(1E-20, 100); ASolvTest.solve_gradA(1E-20, 100);
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
@@ -501,7 +501,7 @@ TEST_F(BDUTest, TorqueOpp)
                       make_shared<SHCalc> (SHCalcu),
                       BDTest.get_system(),
                       make_shared<Constants> (const_), vals);
-    ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+    ASolvTest.solve_A(1E-20, 100); ASolvTest.solve_gradA(1E-20, 100);
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));

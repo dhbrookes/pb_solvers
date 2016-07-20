@@ -36,11 +36,13 @@ using namespace std;
 int main(int argc, const char * argv[])
 {
   string input_file = argv[1];
+//    string input_file = "/Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/27_grid/run.energyforce_27_0.00.inp";
 //  string input_file = "/Users/davidbrookes/data/2fgr/electrostatics/run.electrostatic.inp";
 //  string input_file = "/Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/dynamics_test/contact_1BRS_nam/run.dyn.hard.refs";
 //  string input_file = "/Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/electrostatic_test/run.electrostatic_david.inp";
 //  string input_file = "/Users/felb315/pb_solvers/pbam/pbam_test_files/energyforce_test/barnase_barstar/run.energyforce.hardrefs.inp";
 //  string input_file = "/Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/16_grid/run.bodyapprox_16_0.00.inp.test";
+  
   PBAM pbam_run(input_file);
   pbam_run.run();
     
