@@ -78,7 +78,6 @@ void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
       ct++;
     }
   }
-  
   calc_gradL();
 }
 
@@ -91,14 +90,23 @@ void ASolver::copy_to_prevA()
   }
 }
 
-void ASolver::copy_to_prevGradA()
+void ASolver::copy_to_prevGradA(int j)
 {
   for (int i=0; i < _A_->get_nrows(); i++)
   {
-    for (int j = 0; j < _gradA_->get_ncols(); j++)
-    {
-      _prevGradA_->set_val(i, j, _gradA_->operator()(i, j));
-    }
+//    for (int j = 0; j < _gradA_->get_ncols(); j++)
+//    {
+//      _prevGradA_->set_val(i, j, _gradA_->operator()(i, j));
+      for (int n = 0; n < p_; n++)
+      {
+        for (int m = -n; m < n+1; m++)
+        {
+          set_prev_dAdr_ni(i, j, n, m, get_dAdr_ni(i, j, n, m));
+          set_prev_dAdtheta_ni(i, j, n, m, get_dAdtheta_ni(i, j, n, m));
+          set_prev_dAdphi_ni(i, j, n, m, get_dAdphi_ni(i, j, n, m));
+        }
+      }
+//    }
   }
 }
 
@@ -143,11 +151,11 @@ void ASolver::grad_iter(int j)
   MyMatrix<cmplx> gamma_delta;
   Pt v;
   bool prev = true; //want to re-expand previous
+  copy_to_prevGradA(j);
   for (i = 0; i < N_; i++) // molecule of interest
   {
-    copy_to_prevGradA();
     aij = VecOfMats<cmplx>::type (3, MyMatrix<cmplx>(p_,2*p_+1));
-    aij = get_gradT_Aij( j, i);
+    aij = get_gradT_Aij(j, i);
     
     for (k = 0; k < N_; k++) // other molecules
     {

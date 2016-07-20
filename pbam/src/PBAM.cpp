@@ -332,7 +332,11 @@ void PBAM::run_electrostatics()
 
 void PBAM::run_energyforce()
 {
-  clock_t t3 = clock();  
+  
+
+  
+  clock_t t3 = clock();
+
   
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);

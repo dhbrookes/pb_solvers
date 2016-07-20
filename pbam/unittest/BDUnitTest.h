@@ -442,7 +442,7 @@ TEST_F(BDUTest, TorquePos)
                       make_shared<SHCalc> (SHCalcu),
                       BDTest.get_system(),
                       make_shared<Constants> (const_), vals);
-    ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+    ASolvTest.solve_A(1E-20, 100); ASolvTest.solve_gradA(1E-20, 100);
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
@@ -501,7 +501,7 @@ TEST_F(BDUTest, TorqueOpp)
                       make_shared<SHCalc> (SHCalcu),
                       BDTest.get_system(),
                       make_shared<Constants> (const_), vals);
-    ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+    ASolvTest.solve_A(1E-20, 100); ASolvTest.solve_gradA(1E-20, 100);
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
@@ -588,7 +588,7 @@ TEST_F(BDUTest, BDrunTimeTermY)
 
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
-  BDTest.run();
+  BDTest.run("","", 100);
   
   EXPECT_NEAR(sys->get_time()/10, 1, preclim);
   for (int mi = 0; mi < ml; mi ++ )
@@ -626,7 +626,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
   
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
-  BDTest.run();
+  BDTest.run("", "", 100);
   
   EXPECT_NEAR(sys->get_time()/31.361344, 1, preclim);
   

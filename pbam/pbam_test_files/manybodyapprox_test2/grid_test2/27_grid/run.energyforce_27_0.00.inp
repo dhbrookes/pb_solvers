@@ -1,5 +1,5 @@
 runtype energyforce
-runname energyforce_27_0.00.out
+runname /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/27_grid/energyforce_27_0.00.out
 units kT
 salt 0.00
 temp 298
@@ -7,5 +7,5 @@ idiel 4
 sdiel 78
 attypes 1
 type 1 27
-pqr 1 mol_pos.pqr
-xyz 1 pos27_grid_all.xyz
+pqr 1 /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/27_grid/mol_pos.pqr
+xyz 1 /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/27_grid/pos27_grid_all.xyz
