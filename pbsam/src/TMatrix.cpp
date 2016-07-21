@@ -180,7 +180,7 @@ MyMatrix<Ptx> TMatrix::re_expand_gradX(MyMatrix<Ptx> dX,
 //  }
 //  cout << endl;
 //  
-//  return Zpt;  
+//  return Zpt;
   
   return convert_to_ptx(Z);
 }

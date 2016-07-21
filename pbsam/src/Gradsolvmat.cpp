@@ -400,8 +400,8 @@ void GradLFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
     
     if (T->is_analytic(I_, k, I_, j))
     {
-//      cout << "LF Reexp Analyt " << I_ << " sph " << j << " to " <<
-//      I_ << " sph " << k << endl;
+      cout << "LF Reexp Analyt " << I_ << " sph " << j << " to " <<
+      I_ << " sph " << k << endl;
 //      dF->print_kmat(k);
       reex = T->re_expand_gradX(dF->get_mat_k(j), I_, k, I_, j);
     }
@@ -499,8 +499,8 @@ void GradLHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
     
     if (T->is_analytic(I_, k, I_, j))
     {
-//      cout << "LH Reexp Analyt " << I_ << " sph " << j << " to " <<
-//      I_ << " sph " << k << endl;
+      cout << "LH Reexp Analyt " << I_ << " sph " << j << " to " <<
+      I_ << " sph " << k << endl;
 //      dH->print_kmat(j);
       reex = T->re_expand_gradX(dH->get_mat_k(j), I_, k, I_, j);
     }
@@ -613,8 +613,8 @@ void GradLHNMatrix::calc_val_k(int k, shared_ptr<System> sys,
       
       if ( sys->get_pbc_dist_vec_base(Ik, Mm).norm() < (interPolcut+aIk+aMm))
       {
-//        cout << "Reex " << I_ << " and sph " << k  << " with xforms from "
-//        << M << " sph " << m << endl;
+        cout << "Reex " << I_ << " and sph " << k  << " with xforms from "
+        << M << " sph " << m << endl;
 //        dH[M]->print_kmat(m);
         inner = T->re_expand_gradX(dH[M]->get_mat_k(m), I_, k, M, m);
         
