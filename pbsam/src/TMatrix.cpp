@@ -145,7 +145,7 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
  */
 MyMatrix<Ptx> TMatrix::re_expand_gradX(MyMatrix<Ptx> dX,
                                         int I, int k,
-                                        int J, int l)
+                                        int J, int l, bool isF)
 
 {
   VecOfMats<cmplx>::type dX_comps = convert_from_ptx(dX);
@@ -154,6 +154,7 @@ MyMatrix<Ptx> TMatrix::re_expand_gradX(MyMatrix<Ptx> dX,
   VecOfMats<cmplx>::type Z (3);
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE;
   
+  if (isF) whichS = FBASE;
   // dA/dR = 0, dA/dtheta = 1, dA/dphi = 2
   for (int d = 0; d < 3; d++)
   {

@@ -119,7 +119,6 @@ class GradSolver
 protected:
   int p_;
   double kappa_;
-  double mu_;  // error from scf cycle
   int Ns_tot_; // measure of number of spheres in the system
   
   vector<shared_ptr<FMatrix> >      _F_;  // converged solutions for these

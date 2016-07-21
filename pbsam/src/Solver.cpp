@@ -410,48 +410,58 @@ void GradSolver::solve(double tol, int maxiter)
 {
   double mu;
   double scale_dev = (double)(p_*(p_+1)*0.5*3.0);
-  double cng;
   int j, ct, MAX_POL_ROUNDS(1000);
   
   pre_compute_gradT_A();
   
-  for ( j = 0; j < _sys_->get_n(); j++ )
+  for ( j = 0; j < _sys_->get_n(); j++ ) // gradient WRT j
   {
     ct = 0;
-    cng = scale_dev;
-    while((cng/scale_dev) > tol)
+    mu = scale_dev;
+    while(mu > tol)
     {
       mu = iter(ct, j);
-      if (ct > MAX_POL_ROUNDS*_sys_->get_n())
-      {
-        cout << "Polz doesn't converge! dev="<< cng << " " << ct << endl;
-        exit(0);
-      }
+      if (ct > MAX_POL_ROUNDS)  break;
       ct++;
+    }
+    cout << "This is ct " << ct << endl;
+
+    cout << "This is derv wrt " << j << endl;
+    for (int I = 0; I < _sys_->get_n(); I++)
+    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+    {
+      dH_[j][I]->print_kmat(k);
     }
   }
 }
 
 double GradSolver::iter(int t, int wrt)
 {
-  double mu_int(0), mu_mpol(0);
-  if ( t == 0 ) mu_ = 0.0;
+  double mu_mpol(0);
   Ns_tot_ = 0;
   
   shared_ptr<Molecule> molI;
   vector<double> besseli, besselk;
+  vector<int> mol_loop;
+  
   for (int I = 0; I < _sys_->get_n(); I++)
+    if ( I != wrt ) mol_loop.push_back(I);
+  mol_loop.push_back(wrt);
+  
+  for (int ind = 0; ind < mol_loop.size(); ind++)
   {
+    int I = mol_loop[ind];
     molI = _sys_->get_molecule(I);
-    cout << "This is " << I << " wrt " << wrt << endl;
+//    cout << "This is " << I << " wrt " << wrt << endl;
     
     dLHN_[wrt][I]->calc_all_vals(_sys_, _T_, gradT_A_[wrt], dH_[wrt]);
     
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
       if (interpol_[I][k] != 0) continue;
-      cout << "In iter, this is LHN " << endl;
-      dLHN_[wrt][I]->print_kmat(k);
+//      cout << "This is " << I << " sph " << k << " wrt " << wrt << endl;
+//      cout << "In iter, this is LHN ";
+//      dLHN_[wrt][I]->print_kmat(k);
       
       besseli = _bCalc_->calc_mbfI(p_+1, kappa_*molI->get_ak(k));
       besselk = _bCalc_->calc_mbfK(p_+1, kappa_*molI->get_ak(k));
@@ -463,18 +473,17 @@ double GradSolver::iter(int t, int wrt)
       dLF_[wrt][I]->init_k(k,molI,dF_[wrt][I],_shCalc_,_expConsts_);
       dLH_[wrt][I]->init_k(k,molI,dH_[wrt][I],_shCalc_,_bCalc_,_expConsts_);
       
-//      cout << "This is computed dLH " << k << endl;
-//      dLH_[wrt][I]->print_kmat(k);
-      
       dev_sph_Ik_[I][k] = calc_converge_gradH(I, wrt, k, false);
+      
+//      cout << "This is dH " << endl;
+//      dH_[wrt][I]->print_kmat(k);
+      
       mu_mpol += dev_sph_Ik_[I][k];
       Ns_tot_++;
-      if ( dev_sph_Ik_[I][k] > mu_int )
-        mu_int = dev_sph_Ik_[I][k];
     }
   }
-  
-  mu_ = mu_int;
+
+  cout << " mu " << (mu_mpol / (double) Ns_tot_) << endl;
   return (mu_mpol / (double) Ns_tot_);
 }
 
@@ -486,8 +495,10 @@ void GradSolver::step(int t, int I, int wrt, int k, vector<double> &besseli,
   dLF_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dF_[wrt][I]);
   dLH_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dH_[wrt][I]);
   
-//  cout << "This is LH " << endl;
+//  cout << "This is computed dLH " << k << " ";
 //  dLH_[wrt][I]->print_analytical(k);
+//  cout << "This is computed dLF " << k << " ";
+//  dLF_[wrt][I]->print_analytical(k);
 }
 
 
@@ -499,7 +510,7 @@ void GradSolver::iter_inner_gradH(int I, int wrt, int k,
   int ct(0), mxCt(20);
   
   auto mol = _sys_->get_molecule(I);
-  cout << "Mol I " << I << " and sph " << k << endl;
+//  cout << "Mol I " << I << " and sph " << k << endl;
 
   while ( dev > toli && ct < mxCt )
   {
@@ -511,25 +522,27 @@ void GradSolver::iter_inner_gradH(int I, int wrt, int k,
                              dLF_[wrt][I]);
     dH_[wrt][I]->calc_val_k(k, besseli, _IE_[I], dWH_[wrt][I]);
     
-      cout << "This is WH " << endl;
-      dWH_[wrt][I]->print_kmat(k);
-      cout << "This is WF " << endl;
-      dWF_[wrt][I]->print_kmat(k);
+//    cout << "This is WH " << ct << " ";
+//    dWH_[wrt][I]->print_kmat(k);
+//    cout << "This is WF "<< ct << " ";
+//    dWF_[wrt][I]->print_kmat(k);
 //    cout << "INSIDE inner iter " << endl;
-//    cout << "This is dF mol " <<I << " sph " << k<< " wrt " << wrt << endl;
-//    dF_[wrt][I]->print_kmat(k);
-//    cout << "This is dH mol "  <<I<< " sph " << k << " wrt " << wrt << endl;
-//    dH_[wrt][I]->print_kmat(k);
+
     
     dev = calc_converge_gradH(I, wrt, k, true);
+//    cout << "Inner dev " << dev << endl;
+//    cout << "This is dF mol " <<I << " sph " << k<< " wrt " <<wrt<< " it "<< ct << " ";
+//    dF_[wrt][I]->print_kmat(k);
+//    cout << "This is dH mol "  <<I<< " sph " << k << " wrt " << wrt<< " it "<< ct << " ";
+//    dH_[wrt][I]->print_kmat(k);
     update_prev_gradH(I, wrt, k);
     
     ct++;
   }
-  cout << "This is dF " <<I<< " wrt " << wrt << endl;
-  dF_[wrt][I]->print_kmat(k);
-  cout << "This is dH "  <<I<< " wrt " << wrt << endl;
-  dH_[wrt][I]->print_kmat(k);
+//  cout << "This is dF " <<I<< " wrt " << wrt << endl;
+//  dF_[wrt][I]->print_kmat(k);
+//  cout << "This is dH "  <<I<< " wrt " << wrt << endl;
+//  dH_[wrt][I]->print_kmat(k);
   
 }
 
@@ -538,10 +551,11 @@ double GradSolver::calc_converge_gradH(int I, int wrt, int k, bool inner)
 {
   double mu(0), rt(0), num(0), den(0);
   cmplx hnm_curr, hnm_prev;
+  double PRC_LM = 1e-30;
   
   for (int d = 0; d < 3; d++)
   {
-    for (int n = 0; n < _H_[I]->get_p(); n++)
+    for (int n = 0; n < dH_[wrt][I]->get_p(); n++)
     {
       for (int m = -n; m < n+1; m++)
       {
@@ -550,18 +564,19 @@ double GradSolver::calc_converge_gradH(int I, int wrt, int k, bool inner)
                     outer_dH_[wrt][I]->get_mat_knm_d(k, n, m, d));
         if (inner)
         {
-          if ( norm(hnm_prev) < 1e-15 ) // checking for mat values = 0
+          if ( m < 0 ) continue;
+          if ((fabs(hnm_prev.real())<PRC_LM)&&(fabs(hnm_prev.imag())<PRC_LM))
           {
-            if ( norm(hnm_curr) < 1e-15 )
+            if ((fabs(hnm_curr.real())<PRC_LM)&&(fabs(hnm_curr.imag())<PRC_LM))
               continue;
             else
               rt = 1.0;
           } else
           {
-            if ( norm(hnm_curr) < 1e-15 )
+            if ((fabs(hnm_curr.real())<PRC_LM)&&(fabs(hnm_curr.imag())<PRC_LM))
               rt = 1.0;
             else
-              rt = norm(hnm_curr - hnm_prev)/(norm(hnm_curr) + norm(hnm_prev));
+              rt = 2.0*norm(hnm_curr-hnm_prev)/(norm(hnm_curr)+norm(hnm_prev));
           }
           mu += rt;
         }
@@ -582,7 +597,7 @@ double GradSolver::calc_converge_gradH(int I, int wrt, int k, bool inner)
       mu = (num / den);
     else
       mu = 0.0;
-    return mu / 4.0;
+    return mu / 4.0 / 3.0;
   }
 }
 
@@ -618,6 +633,12 @@ void GradSolver::pre_compute_gradT_A()
   double aIk, aJl, cut_act(100.0), cut_er(10.0);
   Pt Ik, Jl, v;
   MyMatrix<Ptx> reex(p_, 2*p_+1);
+  
+  for (int I = 0; I < _sys_->get_n(); I++)
+    for (int J = 0; J < _sys_->get_n(); J++)
+      gradT_A_[J][I]->reset_mat();
+  
+//  for (int wrt = 0; wrt < _sys_->get_n(); wrt++)
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     for (int J = 0; J < _sys_->get_n(); J++)

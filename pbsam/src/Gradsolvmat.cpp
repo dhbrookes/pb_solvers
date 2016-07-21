@@ -74,7 +74,7 @@ void GradWFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
   double ak = mol->get_ak(k);
   double exp_ka = exp(-kappa_*ak);
   double bin, bin1, bkn, bkn1;
-  Ptx val1, val2, val3, val4;
+  Ptx tot, val1, val2, val3, val4;
   double inner;
   for (int n = 0; n < p_; n++)
   {
@@ -90,6 +90,11 @@ void GradWFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
       inner=(n*bin)+((bin1*pow(kappa_*ak,2))/(double)(2*n+3));
       val4 = (dLH->get_mat_knm(k,n,m)+dLHN->get_mat_knm(k,n,m)) * inner * ak;
       set_mat_knm(k, n, m, val1+val2-val3+val4);
+      
+//      tot = val1+val2-val3+val4;
+//      set_mat_knm(k, n, m, tot);
+//      if (m>0)
+//        set_mat_knm(k,n,-m,Ptx(conj(tot.x()),conj(tot.y()),conj(tot.z())));
     }
   }
   
@@ -135,13 +140,18 @@ void GradWHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
   double ak = mol->get_ak(k);
   double exp_ka = exp(-kappa_*ak);
   double bin, bkn, inner;
-  Ptx val1, val2, val3, val4;
+  Ptx tot, val1, val2, val3, val4;
   
 //  cout << "Inside WH" << endl;
-//  cout << "This is dLH " << endl;
+//  cout << "This is dLH ";
 //  dLH->print_analytical(k);
-//  cout << "This is dLHN " << endl;
+//  cout << "This is dLHN ";
 //  dLHN->print_kmat(k);
+  
+//  cout << "This is dLF ";
+//  dLF->print_analytical(k);
+//  cout << "This is dF ";
+//  dF->print_kmat(k);
   
   for (int n = 0; n < p_; n++)
   {
@@ -154,7 +164,10 @@ void GradWHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
       val2 = dF->get_mat_knm(k, n, m);
       val3 = dLF->get_mat_knm(k, n, m) * ak;
       val4 = (dLH->get_mat_knm(k,n,m)+dLHN->get_mat_knm(k,n,m))*ak*bin;
-      set_mat_knm(k, n, m, val1+val2+val3-val4);
+      tot = val1+val2+val3-val4;
+      set_mat_knm(k, n, m, tot);
+//      if (m>0)
+//        set_mat_knm(k,n,-m,Ptx(conj(tot.x()),conj(tot.y()),conj(tot.z())));
     }
   }
   
@@ -400,34 +413,39 @@ void GradLFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
     
     if (T->is_analytic(I_, k, I_, j))
     {
-      cout << "LF Reexp Analyt " << I_ << " sph " << j << " to " <<
-      I_ << " sph " << k << endl;
-//      dF->print_kmat(k);
-      reex = T->re_expand_gradX(dF->get_mat_k(j), I_, k, I_, j);
+//      cout << "LF Reexp Analyt " << I_ << " sph " << j << " to " <<
+//      I_ << " sph " << k << endl;
+//      dF->print_kmat(j);
+      reex = T->re_expand_gradX(dF->get_mat_k(j), I_, k, I_, j, true);
+      
+//      cout << "~~~~~~ output ~~~~~~~~~~~~~~" << endl;
+//      for (int d = 0; d < 3; d++)
+//      {
+//        cout << " Dim: " << d <<  endl;
+//        for (int n = 0; n < p_; n++)
+//        {
+//          for (int m = 0; m <= n; m++)
+//          {
+//            double real = reex( n, m+p_).get_cart(d).real();
+//            double imag = reex( n, m+p_).get_cart(d).imag();
+//            if(abs(real) < 1e-15 ) real = 0.0;
+//            if(abs(imag) < 1e-15 ) imag = 0.0;
+//            cout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
+//          }
+//          cout << endl;
+//        }
+//        cout << endl;
+//      }
+
     }
     else
     {
       // From (I,j) -> (I,k) is re_exp_numeric( , I, k, I, j)
+//      cout << "LF Reexp Numer " << I_ << " sph " << j << " to " <<
+//      I_ << " sph " << k << endl;
+//      print_kmat(j);
       reex = T->re_expandgradX_numeric(get_mat(), I_, k, I_, j, 0.0 );
     }
-//    cout << "~~~~~~ output ~~~~~~~~~~~~~~" << endl;
-//    for (int d = 0; d < 3; d++)
-//    {
-//      cout << " Dim: " << d <<  endl;
-//      for (int n = 0; n < p_; n++)
-//      {
-//        for (int m = 0; m <= n; m++)
-//        {
-//          double real = reex( n, m+p_).get_cart(d).real();
-//          double imag = reex( n, m+p_).get_cart(d).imag();
-//          if(abs(real) < 1e-15 ) real = 0.0;
-//          if(abs(imag) < 1e-15 ) imag = 0.0;
-//          cout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
-//        }
-//        cout << endl;
-//      }
-//      cout << endl;
-//    }
     
     inner += reex;
   }
@@ -613,8 +631,8 @@ void GradLHNMatrix::calc_val_k(int k, shared_ptr<System> sys,
       
       if ( sys->get_pbc_dist_vec_base(Ik, Mm).norm() < (interPolcut+aIk+aMm))
       {
-        cout << "Reex " << I_ << " and sph " << k  << " with xforms from "
-        << M << " sph " << m << endl;
+//        cout << "Reex " << I_ << " and sph " << k  << " with xforms from "
+//        << M << " sph " << m << endl;
 //        dH[M]->print_kmat(m);
         inner = T->re_expand_gradX(dH[M]->get_mat_k(m), I_, k, M, m);
         
