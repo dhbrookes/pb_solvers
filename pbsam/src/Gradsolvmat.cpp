@@ -499,8 +499,8 @@ void GradLHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
     
     if (T->is_analytic(I_, k, I_, j))
     {
-      cout << "LH Reexp Analyt " << I_ << " sph " << j << " to " <<
-      I_ << " sph " << k << endl;
+//      cout << "LH Reexp Analyt " << I_ << " sph " << j << " to " <<
+//      I_ << " sph " << k << endl;
 //      dH->print_kmat(j);
       reex = T->re_expand_gradX(dH->get_mat_k(j), I_, k, I_, j);
     }

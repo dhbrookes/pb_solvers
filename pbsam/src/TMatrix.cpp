@@ -245,13 +245,13 @@ MyMatrix<Ptx> TMatrix::re_expandgradX_numeric(vector<vector<Pt> > X,
   double chgscl, rscl, ekr, xval;
   VecOfMats<cmplx>::type Z (3, MyMatrix<cmplx> (p_, 2*p_+1));
   vector<int> exp_pts = _system_->get_gdpt_expij(J, l);
-  for (int d = 0; d < 3; d++)
+  
+  for (h = 0; h < X[l].size(); h++)
   {
-    for (h = 0; h < X[l].size(); h++)
+    if (X[l][h].norm2() < 1e-15) continue;
+    for (int d = 0; d < 3; d++)
     {
-      if (d == 0)       xval = X[l][h].x();
-      else if (d == 1)  xval = X[l][h].y();
-      else              xval = X[l][h].z();
+      xval = X[l][h].get_cart(d);
       
       Pt sph_dist = _system_->get_centerik(I, k) - _system_->get_centerik(J, l);
       Pt loc = _system_->get_gridijh(J, l, exp_pts[h]) - sph_dist;
@@ -265,7 +265,7 @@ MyMatrix<Ptx> TMatrix::re_expandgradX_numeric(vector<vector<Pt> > X,
         for (m = -n; m <= n; m++)
         {
           val = bessI[n]*ekr*chgscl*_shCalc_->get_result(n, m) + Z[d](n, m+p_);
-          Z[d](n, m+p_)  = val;
+          Z[d](n, m+p_) = val;
         }
         chgscl *= rscl;
       }

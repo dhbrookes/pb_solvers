@@ -450,8 +450,8 @@ double GradSolver::iter(int t, int wrt)
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
       if (interpol_[I][k] != 0) continue;
-//      cout << "In iter, this is LHN " << endl;
-//      dLHN_[wrt][I]->print_kmat(k);
+      cout << "In iter, this is LHN " << endl;
+      dLHN_[wrt][I]->print_kmat(k);
       
       besseli = _bCalc_->calc_mbfI(p_+1, kappa_*molI->get_ak(k));
       besselk = _bCalc_->calc_mbfK(p_+1, kappa_*molI->get_ak(k));
@@ -501,7 +501,6 @@ void GradSolver::iter_inner_gradH(int I, int wrt, int k,
   auto mol = _sys_->get_molecule(I);
   cout << "Mol I " << I << " and sph " << k << endl;
 
-
   while ( dev > toli && ct < mxCt )
   {
     dWF_[wrt][I]->calc_val_k(k,mol,besseli,besselk,dH_[wrt][I],dF_[wrt][I],
@@ -512,10 +511,10 @@ void GradSolver::iter_inner_gradH(int I, int wrt, int k,
                              dLF_[wrt][I]);
     dH_[wrt][I]->calc_val_k(k, besseli, _IE_[I], dWH_[wrt][I]);
     
-//      cout << "This is WH " << endl;
-//      dWH_[wrt][I]->print_kmat(k);
-//      cout << "This is WF " << endl;
-//      dWF_[wrt][I]->print_kmat(k);
+      cout << "This is WH " << endl;
+      dWH_[wrt][I]->print_kmat(k);
+      cout << "This is WF " << endl;
+      dWF_[wrt][I]->print_kmat(k);
 //    cout << "INSIDE inner iter " << endl;
 //    cout << "This is dF mol " <<I << " sph " << k<< " wrt " << wrt << endl;
 //    dF_[wrt][I]->print_kmat(k);
