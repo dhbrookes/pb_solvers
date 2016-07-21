@@ -765,7 +765,7 @@ TEST_F(SolverUTest, grad_test)
                        solvTest.get_interpol_list(), _expcons, pol);
   gsolvTest.pre_compute_gradT_A();
   gsolvTest.iter(0, 1);
-  gsolvTest.iter(1, 1);
+//  gsolvTest.iter(1, 1);
 //  gsolvTest.iter(2, 1);
 //  gsolvTest.iter(3, 1);
   

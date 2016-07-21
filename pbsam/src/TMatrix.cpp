@@ -154,27 +154,35 @@ MyMatrix<Ptx> TMatrix::re_expand_gradX(MyMatrix<Ptx> dX,
   VecOfMats<cmplx>::type Z (3);
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE;
   
-  // first dA/dR
-  x1 = expand_RX(dX_comps[0], I, k, J, l, whichR);
-  x2 = expand_SX(x1, I, k, J, l, whichS);
-  z  = expand_RHX(x2, I, k, J, l, whichRH);
-  Z.set_val(0, z);
+  // dA/dR = 0, dA/dtheta = 1, dA/dphi = 2
+  for (int d = 0; d < 3; d++)
+  {
+    x1 = expand_RX(dX_comps[d], I, k, J, l, whichR);
+    x2 = expand_SX(x1, I, k, J, l, whichS);
+    z  = expand_RHX(x2, I, k, J, l, whichRH);
+    Z.set_val(d, z);
+  }
   
-  // dA/dtheta:
-  x1 = expand_RX(dX_comps[0], I, k, J, l, whichR);
-  x2 = expand_SX(x1, I, k, J, l, whichS);
-  z  = expand_RHX(x2, I, k, J, l, whichRH);
-  Z.set_val(1, z);
+//  MyMatrix<Ptx> Zpt = convert_to_ptx(Z);
+//  
+//  cout << "after re_exp_grad" << endl;
+//  for (int d = 0; d < 3; d++)
+//  {
+//    cout << " Dim: " << d <<  endl;
+//    for (int n = 0; n < p_; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        cout << Zpt(n,m+p_).get_cart(d) << ", ";
+//      }
+//      cout << endl;
+//    }
+//  }
+//  cout << endl;
+//  
+//  return Zpt;  
   
-  // dA/dphiL
-  x1 = expand_RX(dX_comps[0], I, k, J, l, whichR);
-  x2 = expand_SX(x1, I, k, J, l, whichS);
-  z  = expand_RHX(x2, I, k, J, l, whichRH);
-  Z.set_val(2, z);
-  
-  MyMatrix<Ptx> Zpt = convert_to_ptx(Z);
-  return Zpt;
-//  return convert_to_ptx(Z);
+  return convert_to_ptx(Z);
 }
 
 
@@ -600,7 +608,5 @@ MyMatrix<Ptx> TMatrix::convert_to_ptx(VecOfMats<cmplx>::type X)
       result(j, k).set_y(X[1](j, k));
       result(j, k).set_z(X[2](j, k));
     }
-  
   return result;
-  
 }

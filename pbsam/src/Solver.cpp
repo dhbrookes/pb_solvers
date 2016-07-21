@@ -447,14 +447,11 @@ double GradSolver::iter(int t, int wrt)
     
     dLHN_[wrt][I]->calc_all_vals(_sys_, _T_, gradT_A_[wrt], dH_[wrt]);
     
-    dLF_[wrt][I]->init(molI, dF_[wrt][I], _shCalc_, _expConsts_);
-    dLH_[wrt][I]->init(molI, dH_[wrt][I], _shCalc_, _bCalc_, _expConsts_);
-    
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
       if (interpol_[I][k] != 0) continue;
-      cout << "In iter, this is LHN " << endl;
-      dLHN_[wrt][I]->print_kmat(k);
+//      cout << "In iter, this is LHN " << endl;
+//      dLHN_[wrt][I]->print_kmat(k);
       
       besseli = _bCalc_->calc_mbfI(p_+1, kappa_*molI->get_ak(k));
       besselk = _bCalc_->calc_mbfK(p_+1, kappa_*molI->get_ak(k));
@@ -462,6 +459,12 @@ double GradSolver::iter(int t, int wrt)
       update_outer_gradH(I, wrt, k);
       step( t, I, wrt, k, besseli, besselk);
       iter_inner_gradH(I, wrt, k, besseli, besselk);
+      
+      dLF_[wrt][I]->init_k(k,molI,dF_[wrt][I],_shCalc_,_expConsts_);
+      dLH_[wrt][I]->init_k(k,molI,dH_[wrt][I],_shCalc_,_bCalc_,_expConsts_);
+      
+//      cout << "This is computed dLH " << k << endl;
+//      dLH_[wrt][I]->print_kmat(k);
       
       dev_sph_Ik_[I][k] = calc_converge_gradH(I, wrt, k, false);
       mu_mpol += dev_sph_Ik_[I][k];
@@ -483,14 +486,8 @@ void GradSolver::step(int t, int I, int wrt, int k, vector<double> &besseli,
   dLF_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dF_[wrt][I]);
   dLH_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dH_[wrt][I]);
   
-  cout << "In iter, this is LH " << endl;
-  dLH_[wrt][I]->print_analytical(k);
-  
-//  dWF_[wrt][I]->calc_val_k(k,molI,besseli,besselk,dH_[wrt][I],dF_[wrt][I],
-//                           dLH_[wrt][I], dLHN_[wrt][I], dLF_[wrt][I]);
-//  dWH_[wrt][I]->calc_val_k(k, molI, besseli, besselk, dH_[wrt][I],
-//                           dF_[wrt][I], dLH_[wrt][I], dLHN_[wrt][I],
-//                           dLF_[wrt][I]);
+//  cout << "This is LH " << endl;
+//  dLH_[wrt][I]->print_analytical(k);
 }
 
 
@@ -515,12 +512,10 @@ void GradSolver::iter_inner_gradH(int I, int wrt, int k,
                              dLF_[wrt][I]);
     dH_[wrt][I]->calc_val_k(k, besseli, _IE_[I], dWH_[wrt][I]);
     
-    
-      cout << "This is WH " << endl;
-      dWH_[wrt][I]->print_kmat(k);
-      cout << "This is WF " << endl;
-      dWF_[wrt][I]->print_kmat(k);
-    
+//      cout << "This is WH " << endl;
+//      dWH_[wrt][I]->print_kmat(k);
+//      cout << "This is WF " << endl;
+//      dWF_[wrt][I]->print_kmat(k);
 //    cout << "INSIDE inner iter " << endl;
 //    cout << "This is dF mol " <<I << " sph " << k<< " wrt " << wrt << endl;
 //    dF_[wrt][I]->print_kmat(k);

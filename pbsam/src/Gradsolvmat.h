@@ -378,9 +378,9 @@ class GradLFMatrix : public GradNumericalMat
 public:
   GradLFMatrix(int I, int wrt, int ns, int p);
   
-  void init(shared_ptr<Molecule> mol, shared_ptr<GradFMatrix> dF,
-            shared_ptr<SHCalc> shcalc,
-            shared_ptr<ExpansionConstants> _expconst);
+  void init_k(int k, shared_ptr<Molecule> mol, shared_ptr<GradFMatrix> dF,
+              shared_ptr<SHCalc> shcalc,
+              shared_ptr<ExpansionConstants> _expconst);
   
   void calc_all_vals(shared_ptr<Molecule> mol, vector<int> interpol,
                      shared_ptr<TMatrix> T, shared_ptr<GradFMatrix> dF);
@@ -388,12 +388,6 @@ public:
   void calc_val_k(int k, shared_ptr<Molecule> mol, vector<int> interpol,
                   shared_ptr<TMatrix> T,
                   shared_ptr<GradFMatrix> dF);
-  
-//  MyMatrix<Ptx> numeric_reex(int k, int j,
-//                             shared_ptr<Molecule> mol,
-//                             shared_ptr<SHCalc> shcalc,
-//                             shared_ptr<GradFMatrix> dF,
-//                             int Mp=-1);
 };
 
 /*
@@ -407,26 +401,15 @@ protected:
 public:
   GradLHMatrix(int I, int wrt, int ns, int p, double kappa);
   
-  void init(shared_ptr<Molecule> mol, shared_ptr<GradHMatrix> dH,
-            shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
-            shared_ptr<ExpansionConstants> _expconst);
+  void init_k(int k, shared_ptr<Molecule> mol, shared_ptr<GradHMatrix> dH,
+              shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
+              shared_ptr<ExpansionConstants> _expconst);
   
   void calc_all_vals(shared_ptr<Molecule> mol, vector<int> interpol,
                      shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
   
   void calc_val_k(int k, shared_ptr<Molecule> mol, vector<int> interpol,
                   shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
-  
-//  MyMatrix<Ptx> numeric_reex(int k, int j,
-//                             shared_ptr<Molecule> mol,
-//                             vector<double> besseli,
-//                             vector<double> besselk,
-//                             shared_ptr<SHCalc> shcalc,
-//                             shared_ptr<GradHMatrix> dH,
-//                             int Mp=-1);
-  
-
-  
 };
 
 /*
