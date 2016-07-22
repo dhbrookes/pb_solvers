@@ -90,16 +90,8 @@ void GradWFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
       inner=(n*bin)+((bin1*pow(kappa_*ak,2))/(double)(2*n+3));
       val4 = (dLH->get_mat_knm(k,n,m)+dLHN->get_mat_knm(k,n,m)) * inner * ak;
       set_mat_knm(k, n, m, val1+val2-val3+val4);
-      
-//      tot = val1+val2-val3+val4;
-//      set_mat_knm(k, n, m, tot);
-//      if (m>0)
-//        set_mat_knm(k,n,-m,Ptx(conj(tot.x()),conj(tot.y()),conj(tot.z())));
     }
   }
-  
-//  cout << "This is WF " << endl;
-//  print_kmat(k);
 }
 
 
@@ -166,13 +158,8 @@ void GradWHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
       val4 = (dLH->get_mat_knm(k,n,m)+dLHN->get_mat_knm(k,n,m))*ak*bin;
       tot = val1+val2+val3-val4;
       set_mat_knm(k, n, m, tot);
-//      if (m>0)
-//        set_mat_knm(k,n,-m,Ptx(conj(tot.x()),conj(tot.y()),conj(tot.z())));
     }
   }
-  
-//  cout << "This is WH " << endl;
-//  print_kmat(k);
 }
 
 GradFMatrix::GradFMatrix(int I, int wrt, int ns, int p)

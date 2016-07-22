@@ -421,17 +421,41 @@ void GradSolver::solve(double tol, int maxiter)
     while(mu > tol)
     {
       mu = iter(ct, j);
+      if (ct % 10 == 0) cout << "Iter step " << ct << endl;
       if (ct > MAX_POL_ROUNDS)  break;
       ct++;
     }
-    cout << "This is ct " << ct << endl;
-
-    cout << "This is derv wrt " << j << endl;
-    for (int I = 0; I < _sys_->get_n(); I++)
-    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
-    {
-      dH_[j][I]->print_kmat(k);
-    }
+//    cout << "This is ct " << ct << endl;
+//    
+//    cout << "This is derv wrt " << j << endl;
+//    for (int I = 0; I < _sys_->get_n(); I++)
+//    {
+//      cout << "{";
+//      for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+//      {
+//        if  (interpol_[I][k] != 0) continue;
+//        cout << "{";
+//        dH_[j][I]->print_kmat(k);
+//        cout << "},";
+//      }
+//      cout << "},";
+//    }
+//    
+//    cout << endl;
+//    cout << "FFF wrt " << j << endl;
+//    for (int I = 0; I < _sys_->get_n(); I++)
+//    {
+//      cout << "{";
+//      for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+//      {
+//        if  (interpol_[I][k] != 0) continue;
+//        cout << "{";
+//        dF_[j][I]->print_kmat(k);
+//        cout << "},";
+//      }
+//      cout << "},";
+//    }
+//    cout << endl;
   }
 }
 
