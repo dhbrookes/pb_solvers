@@ -425,8 +425,7 @@ void GradSolver::solve(double tol, int maxiter)
       if (ct > MAX_POL_ROUNDS)  break;
       ct++;
     }
-//    cout << "This is ct " << ct << endl;
-//    
+    
 //    cout << "This is derv wrt " << j << endl;
 //    for (int I = 0; I < _sys_->get_n(); I++)
 //    {
@@ -441,7 +440,7 @@ void GradSolver::solve(double tol, int maxiter)
 //      cout << "},";
 //    }
 //    
-//    cout << endl;
+//    cout << endl;cout << endl;
 //    cout << "FFF wrt " << j << endl;
 //    for (int I = 0; I < _sys_->get_n(); I++)
 //    {
@@ -455,13 +454,13 @@ void GradSolver::solve(double tol, int maxiter)
 //      }
 //      cout << "},";
 //    }
-//    cout << endl;
+//    cout << endl;cout << endl;
   }
 }
 
 double GradSolver::iter(int t, int wrt)
 {
-  double mu_mpol(0);
+  double inter_pol_d(10.), mu_mpol(0);
   Ns_tot_ = 0;
   
   shared_ptr<Molecule> molI;
@@ -469,13 +468,16 @@ double GradSolver::iter(int t, int wrt)
   vector<int> mol_loop;
   
   for (int I = 0; I < _sys_->get_n(); I++)
-    if ( I != wrt ) mol_loop.push_back(I);
+    if (( I != wrt ) && ( _sys_->get_min_dist(wrt, I) < inter_pol_d))
+      mol_loop.push_back(I);
+  
   mol_loop.push_back(wrt);
   
   for (int ind = 0; ind < mol_loop.size(); ind++)
   {
     int I = mol_loop[ind];
     molI = _sys_->get_molecule(I);
+    if ((_sys_->get_min_dist(wrt, I) > inter_pol_d) && (I != wrt)) continue;
 //    cout << "This is " << I << " wrt " << wrt << endl;
     
     dLHN_[wrt][I]->calc_all_vals(_sys_, _T_, gradT_A_[wrt], dH_[wrt]);
@@ -483,6 +485,9 @@ double GradSolver::iter(int t, int wrt)
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
       if (interpol_[I][k] != 0) continue;
+      if (!_sys_->get_molecule(I)->is_J_in_interk(k, wrt) && (I != wrt))
+        continue;
+      
 //      cout << "This is " << I << " sph " << k << " wrt " << wrt << endl;
 //      cout << "In iter, this is LHN ";
 //      dLHN_[wrt][I]->print_kmat(k);
@@ -502,12 +507,13 @@ double GradSolver::iter(int t, int wrt)
 //      cout << "This is dH " << endl;
 //      dH_[wrt][I]->print_kmat(k);
       
+//      cout << "This is dev_sph_Ik_[I][k] " << dev_sph_Ik_[I][k] << endl;
       mu_mpol += dev_sph_Ik_[I][k];
       Ns_tot_++;
     }
   }
 
-  cout << " mu " << (mu_mpol / (double) Ns_tot_) << endl;
+//  cout << "For t " << t << " mu " << (mu_mpol / (double) Ns_tot_) << endl;
   return (mu_mpol / (double) Ns_tot_);
 }
 
@@ -567,7 +573,7 @@ void GradSolver::iter_inner_gradH(int I, int wrt, int k,
 //  dF_[wrt][I]->print_kmat(k);
 //  cout << "This is dH "  <<I<< " wrt " << wrt << endl;
 //  dH_[wrt][I]->print_kmat(k);
-  
+//  
 }
 
 
@@ -730,7 +736,7 @@ void GradSolver::pre_compute_gradT_A()
     }
   }
 //  double re;
-//  for (int I = 0; I < _sys_->get_n(); I++)
+//  for (int I = 1; I < _sys_->get_n(); I++)
 //  {
 //  for (int J = 0; J < _sys_->get_n(); J++)
 //  {

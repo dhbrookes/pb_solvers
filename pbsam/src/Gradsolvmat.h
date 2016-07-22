@@ -81,12 +81,12 @@ public:
   {
     for (int k = 0; k < M.get_ns(); k++)
     {
-//      fout << "For sphere " << k << endl;
-      fout << "{";
+      fout << "For sphere " << k << endl;
+//      fout << "{";
       for (int d = 0; d < 3; d++)
       {
-        fout << "{";
-//        fout << " Dim: " << d <<  endl;
+//        fout << "{";
+        fout << " Dim: " << d <<  endl;
         for (int n = 0; n < M.get_p(); n++)
         {
           for (int m = 0; m <= n; m++)
@@ -95,16 +95,16 @@ public:
             double imag = M.get_mat_knm_d( k, n, m, d).imag();
             if(abs(real) < 1e-15 ) real = 0.0;
             if(abs(imag) < 1e-15 ) imag = 0.0;
-//            fout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
-            fout << setprecision(9) <<"{"<< real << ","<<imag<<"},";
+            fout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
+//            fout << setprecision(9) <<"{"<< real << ","<<imag<<"},";
           }
-//          fout << endl;
+          fout << endl;
         }
-              fout << "}," ;
-//        fout << endl;
+//              fout << "}," ;
+        fout << endl;
       }
-            fout << "}," ;
-//      fout << endl;
+//            fout << "}," ;
+      fout << endl;
     }
     return fout;
   }
@@ -132,7 +132,7 @@ public:
       cout << "},";
 //      cout << endl;
     }
-//    cout << endl;
+    cout << endl;
   }
 
 };

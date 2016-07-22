@@ -173,9 +173,12 @@ public:
   
   void pre_compute_gradT_A();
   
-  cmplx get_gradH(int I, int wrt, int k, int n, int m, int d)
+  shared_ptr<GradHMatrix> get_gradH(int I, int wrt) { return dH_[wrt][I];}
+  shared_ptr<GradFMatrix> get_gradF(int I, int wrt) { return dF_[wrt][I];}
+  
+  cmplx get_gradH_Ik_nm_d(int I, int wrt, int k, int n, int m, int d)
   { return dH_[wrt][I]->get_mat_knm_d(k, n, m, d); }
-  cmplx get_gradF(int I, int wrt, int k, int n, int m, int d)
+  cmplx get_gradF_Ik_nm_d(int I, int wrt, int k, int n, int m, int d)
   { return dF_[wrt][I]->get_mat_knm_d(k, n, m, d); }
   
   Ptx get_gradT_A_Ik_nm(int I, int wrt, int k, int n, int m)

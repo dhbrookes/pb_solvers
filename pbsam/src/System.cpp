@@ -22,6 +22,7 @@ cgGdPtExp_((int) cens.size()), cgGdPtBur_((int) cens.size())
   check_connect();
   calc_cog();
   for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
+  interPol_.resize(Ns_);
 }
 
 Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
@@ -35,6 +36,8 @@ vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
   find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
   check_connect();
   for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
+  interPol_.resize(Ns_);
+  
   map_repos_charges();
   calc_cog();
 }
@@ -46,7 +49,7 @@ pos_(mol.pos_), vdwr_(mol.vdwr_), Ns_(mol.Ns_), centers_(mol.centers_),
 as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_),
 cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 cgNeighs_(mol.cgNeighs_),cgGridPts_(mol.cgGridPts_),
-cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_)
+cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_), interPol_(mol.interPol_)
 {
   calc_cog();
 }
@@ -373,6 +376,10 @@ boxLength_(boxlength), t_(0)
   check_for_overlap();
   lambda_ = calc_average_radius();
   if (boxLength_/2. < cutoff_)  compute_cutoff();
+  
+  min_dist_.resize(N_);
+  for (int i=0; i<N_; i++) min_dist_[i].resize(N_);
+  save_min_dist();
 }
 
 System::System(Setup setup, double cutoff)
@@ -463,6 +470,10 @@ System::System(Setup setup, double cutoff)
   if (boxLength_/2. < cutoff_)  compute_cutoff();
   check_for_overlap();
   lambda_ = calc_average_radius();
+  
+  min_dist_.resize(N_);
+  for (int i=0; i<N_; i++) min_dist_[i].resize(N_);
+  save_min_dist();
 }
 
 const double System::calc_average_radius() const
@@ -480,7 +491,7 @@ const double System::calc_average_radius() const
   ave  =  ave / (double) total_sphere;
   return ave;
 }
-//
+
 
 void System::compute_cutoff()
 {
@@ -489,6 +500,44 @@ void System::compute_cutoff()
   cout << ". Resetting cutoff to 1/2 the boxlength: " << cutoff_ << endl;
 }
 
+double System::calc_min_dist(int I, int J)
+{
+  int k1, k2;
+  double dist(__DBL_MAX__), inter_pol_d(10.), c2c, aik, ajk;
+  Pt cen_ik, cen_jk;
+  for (k1 = 0; k1 < molecules_[I]->get_ns(); k1++)
+  {
+    for (k2 = 0; k2 < molecules_[J]->get_ns(); k2++)
+    {
+      cen_ik = molecules_[I]->get_centerk(k1);
+      cen_jk = molecules_[J]->get_centerk(k2);
+      aik = molecules_[I]->get_ak(k1);
+      ajk = molecules_[J]->get_ak(k2);
+      c2c = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
+//      cout << "This is Ik, Jl pair : "  << I << ", "<< k1
+//                << " & "  << J << ", "<< k2 << " dist: " << c2c << endl;
+      if ((inter_pol_d+aik+ajk) > c2c)
+      {
+        molecules_[I]->add_Jl_to_interk(k1, J, k2);
+        molecules_[J]->add_Jl_to_interk(k2, I, k1);
+      }
+      if (dist > (c2c-aik-ajk)) dist = c2c-aik-ajk;
+    }
+  }
+  return dist;
+}
+
+void System::save_min_dist()
+{
+  int i, j;
+  for (i = 0; i < N_; i++)
+  {
+    for (j = i+1; j < N_; j++)
+    {
+      min_dist_[i][j] = calc_min_dist(i, j);
+    }
+  }
+}
 
 void System::check_for_overlap()
 {
