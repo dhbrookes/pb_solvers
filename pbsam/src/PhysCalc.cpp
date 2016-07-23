@@ -9,14 +9,17 @@
 #include "PhysCalc.h"
 
 
-cmplx EnergyCalc::calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN)
+double EnergyCalc::calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN)
 {
-  cmplx E = 0;
+  double E = 0;
   for (int k = 0; k < H->get_ns(); k++)
+  {
     for (int n = 0; n < H->get_p(); n++)
       for (int m = - n; m < n+1; m++)
-        E += LHN->get_mat_knm(k, n, m) * conj(H->get_mat_knm(k, n, m));
-  
+        E += (LHN->get_mat_knm(k, n, m).real()*H->get_mat_knm(k, n, m).real()
+              +LHN->get_mat_knm(k, n, m).imag()*H->get_mat_knm(k, n, m).imag());
+    
+  }
   return E;
 }
 

@@ -24,7 +24,7 @@ class EnergyCalc
 public:
   EnergyCalc() { }
   
-  cmplx calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN);
+  double calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN);
   
 };
 
