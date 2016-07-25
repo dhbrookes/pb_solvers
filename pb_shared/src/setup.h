@@ -47,6 +47,7 @@ protected:
   int     PBCs_;			// PBC in 0, pseudo-2, or 3 dimensions
   int     maxtime_;
   int     ntraj_;
+  int     npoles_;
   int     srand_;			// random seed
   double  saltConc_;
   double  blen_; 		// boxlength for PBC
@@ -109,6 +110,7 @@ protected:
   void setIDiel( double idiel )       { idiel_ = idiel; }
   void setSDiel( double sdiel )       { sdiel_ = sdiel;}
   void setTemp( double temp )         { temp_ = temp;}
+  void setNPoles( int np )            { npoles_ = np; }
   void setRand( int rand )            { srand_ = rand; }
   void setRandOrient()                { orientRand_ = true; }
   void setOMP( int ompT )             { ompThreads_ = ompT ; }
@@ -244,6 +246,7 @@ public:
   double getSDiel()                { return sdiel_; }
   double getSaltConc()             { return saltConc_; }
   double getTemp()                 { return temp_; }
+  int getNPoles()                  { return npoles_; }
   double getDtr( int n )           { return typeDiff_[n][0]; }
   double getDrot( int n )          { return typeDiff_[n][1]; }
   double getKappa()                { return kappa_; }

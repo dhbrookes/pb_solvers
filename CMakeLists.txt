@@ -4,7 +4,7 @@ project(pb_solvers)
 ################################################
 ################################################
 
-set(CMAKE_VERBOSE_MAKEFILE true)
+set(CMAKE_VERBOSE_MAKEFILE false)
 set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
 set(PBSOLV_BUILD ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PBSOLV_BUILD}/bin)
