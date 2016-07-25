@@ -24,6 +24,7 @@ gridCt_(0),
 idiel_( 4.0 ),
 sdiel_( 78.0 ),
 temp_( 298.0 ),
+npoles_( 5 ),
 srand_( (unsigned)time(NULL) ),
 nTypenCount_(2),
 typeDef_(2),
@@ -308,6 +309,10 @@ void Setup::findKeyword(vector<string> fline)
   {
     cout << "Solvent dielectric command found" << endl;
     setSDiel( atof(fline[1].c_str()) );
+  } else if (keyword == "poles")
+  {
+    cout << "Number of poles command found" << endl;
+    setNPoles( atoi(fline[1].c_str()) );
   }else if (keyword == "termct")
   {
     cout << "Termination count command found" << endl;
