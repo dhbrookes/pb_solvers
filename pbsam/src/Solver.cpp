@@ -410,7 +410,7 @@ void GradSolver::solve(double tol, int maxiter)
 {
   double mu;
   double scale_dev = (double)(p_*(p_+1)*0.5*3.0);
-  int j, ct, MAX_POL_ROUNDS(1000);
+  int j, ct;
   
   pre_compute_gradT_A();
   
@@ -422,10 +422,23 @@ void GradSolver::solve(double tol, int maxiter)
     {
       mu = iter(ct, j);
       if (ct % 10 == 0) cout << "Iter step " << ct << endl;
-      if (ct > MAX_POL_ROUNDS)  break;
+      if (ct > maxiter)  break;
       ct++;
     }
     
+    double interAct(100.0);
+    for (int I = 0; I < _sys_->get_n(); I++)
+    {
+      for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+      {
+//        cout << "This is " << k << " mol " << I << endl;
+        if ((interpol_[I][k] != 0) &&
+            (_sys_->get_molecule(I)->get_inter_act_k(k).size() != 0))
+          dLHN_[j][I]->calc_val_k(k, _sys_, _T_, gradT_A_[j],
+                                  dH_[j], interAct);
+        
+      }
+    }
 //    cout << "This is derv wrt " << j << endl;
 //    for (int I = 0; I < _sys_->get_n(); I++)
 //    {
@@ -456,6 +469,8 @@ void GradSolver::solve(double tol, int maxiter)
 //    }
 //    cout << endl;cout << endl;
   }
+  
+  
 }
 
 double GradSolver::iter(int t, int wrt)
@@ -478,7 +493,6 @@ double GradSolver::iter(int t, int wrt)
     int I = mol_loop[ind];
     molI = _sys_->get_molecule(I);
     if ((_sys_->get_min_dist(wrt, I) > inter_pol_d) && (I != wrt)) continue;
-//    cout << "This is " << I << " wrt " << wrt << endl;
     
     dLHN_[wrt][I]->calc_all_vals(_sys_, _T_, gradT_A_[wrt], dH_[wrt]);
     
@@ -503,17 +517,10 @@ double GradSolver::iter(int t, int wrt)
       dLH_[wrt][I]->init_k(k,molI,dH_[wrt][I],_shCalc_,_bCalc_,_expConsts_);
       
       dev_sph_Ik_[I][k] = calc_converge_gradH(I, wrt, k, false);
-      
-//      cout << "This is dH " << endl;
-//      dH_[wrt][I]->print_kmat(k);
-      
-//      cout << "This is dev_sph_Ik_[I][k] " << dev_sph_Ik_[I][k] << endl;
       mu_mpol += dev_sph_Ik_[I][k];
       Ns_tot_++;
     }
   }
-
-//  cout << "For t " << t << " mu " << (mu_mpol / (double) Ns_tot_) << endl;
   return (mu_mpol / (double) Ns_tot_);
 }
 

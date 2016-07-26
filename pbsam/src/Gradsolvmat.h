@@ -111,11 +111,11 @@ public:
   
   void print_kmat(int k)
   {
-//    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    cout << "Molecule " << I_ << " For sphere " << k << endl;
     for (int d = 0; d < 3; d++)
     {
-//      cout << " Dim: " << d <<  endl;
-      cout << "{";
+      cout << " Dim: " << d <<  endl;
+//      cout << "{";
       for (int n = 0; n < get_p(); n++)
       {
         for (int m = 0; m <= n; m++)
@@ -124,12 +124,12 @@ public:
           double imag = get_mat_knm_d( k, n, m, d).imag();
           if(abs(real) < 1e-15 ) real = 0.0;
           if(abs(imag) < 1e-15 ) imag = 0.0;
-//          cout << setprecision(9) << "(" << real << ", " << imag << ") ";
-          cout<< setprecision(9) <<"{"<< real << ","<<imag<<"},";
+          cout << setprecision(9) << "(" << real << ", " << imag << ") ";
+//          cout<< setprecision(9) <<"{"<< real << ","<<imag<<"},";
         }
-//        cout << endl;
+        cout << endl;
       }
-      cout << "},";
+//      cout << "},";
 //      cout << endl;
     }
     cout << endl;
@@ -430,7 +430,8 @@ public:
   void calc_val_k(int k, shared_ptr<System> sys,
                   shared_ptr<TMatrix> T,
                   vector<shared_ptr<GradCmplxMolMat> > gradT_A,
-                  vector<shared_ptr<GradHMatrix> > dH);
+                  vector<shared_ptr<GradHMatrix> > dH,
+                  double dist_cut = 10.0);
   
 };
 

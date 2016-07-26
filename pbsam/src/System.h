@@ -93,6 +93,8 @@ protected:
 
   vector<vector<vector<int> > > interPol_; // For each sph in mol, list of
                                        // mol/sph pairs that are within 10A
+  vector<vector<vector<int> > > interAct_; // For each sph in mol, list of
+                                      // mol/sph pairs that are btw 100 & 10A
   
   map<int, int>        chToCG_; // maps index of charge to
                                 //index of its coarse-grained sphere
@@ -145,6 +147,8 @@ public:
   void set_gridburj(int j, vector<int> grid_bur) {cgGdPtBur_[j] = grid_bur;}
   
   void add_Jl_to_interk( int k, int J, int l) {interPol_[k].push_back({J,l});}
+  void add_Jl_to_inter_act_k( int k, int J, int l)
+  {interAct_[k].push_back({J,l});}
   
   bool is_J_in_interk( int k, int J )
   {
@@ -188,6 +192,8 @@ public:
   const double get_radj(int j) const  { return vdwr_[j]; }
   const double get_ak(int k) const    { return as_[k]; }
   const int get_cg_of_ch(int j)       { return chToCG_[j]; }
+  
+  vector<vector<int> > get_inter_act_k(int k) {return interAct_[k];}
   
   /* Choose a random orientation for a Pt vector  */
   Pt random_pt();

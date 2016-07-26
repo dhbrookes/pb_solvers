@@ -22,7 +22,7 @@ cgGdPtExp_((int) cens.size()), cgGdPtBur_((int) cens.size())
   check_connect();
   calc_cog();
   for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
-  interPol_.resize(Ns_);
+  interPol_.resize(Ns_); interAct_.resize(Ns_);
 }
 
 Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
@@ -36,7 +36,7 @@ vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
   find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
   check_connect();
   for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
-  interPol_.resize(Ns_);
+  interPol_.resize(Ns_);  interAct_.resize(Ns_);
   
   map_repos_charges();
   calc_cog();
@@ -49,7 +49,8 @@ pos_(mol.pos_), vdwr_(mol.vdwr_), Ns_(mol.Ns_), centers_(mol.centers_),
 as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_),
 cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 cgNeighs_(mol.cgNeighs_),cgGridPts_(mol.cgGridPts_),
-cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_), interPol_(mol.interPol_)
+cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_),
+interPol_(mol.interPol_), interAct_(mol.interAct_)
 {
   calc_cog();
 }
@@ -141,7 +142,6 @@ void Molecule::translate(Pt dr, double boxlen)
                  dv.y() - round(dv_cen.y()/boxlen)*boxlen,
                  dv.z() - round(dv_cen.z()/boxlen)*boxlen);
   }
-  calc_cog();
 }
 
 void Molecule::rotate(Quat qrot)
@@ -503,7 +503,7 @@ void System::compute_cutoff()
 double System::calc_min_dist(int I, int J)
 {
   int k1, k2;
-  double dist(__DBL_MAX__), inter_pol_d(10.), c2c, aik, ajk;
+  double dist(__DBL_MAX__), inter_act_d(100.), inter_pol_d(10.), c2c, aik, ajk;
   Pt cen_ik, cen_jk;
   for (k1 = 0; k1 < molecules_[I]->get_ns(); k1++)
   {
@@ -520,6 +520,10 @@ double System::calc_min_dist(int I, int J)
       {
         molecules_[I]->add_Jl_to_interk(k1, J, k2);
         molecules_[J]->add_Jl_to_interk(k2, I, k1);
+      } else if ((inter_act_d+aik+ajk) > c2c)
+      {
+        molecules_[I]->add_Jl_to_inter_act_k(k1, J, k2);
+        molecules_[J]->add_Jl_to_inter_act_k(k2, I, k1);
       }
       if (dist > (c2c-aik-ajk)) dist = c2c-aik-ajk;
     }

@@ -66,8 +66,10 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           }
           
 //          cout << "This is Ik, Jl pair : "  << I << ", "<< k
-//              << " & "  << J << ", "<< l
-//              << " dist: " << c_Ik.dist(c_Jl) << " and aIk "
+//              << " & "  << J << ", "<< l << " IK " << c_Ik.x() << ", "
+//          << c_Ik.y() << ", "<< c_Ik.z() << " and " << c_Jl.x() << ", "
+//          << c_Jl.y() << ", "<< c_Jl.z() << endl;
+//          cout << " dist: " << c_Ik.dist(c_Jl) << " and aIk "
 //              << ak << " and ajl "
 //              << al << " dis1 : " <<  c_Ik.dist(c_Jl) - ak - al << endl;
           if ( I == J ) kapVal = {0.0, kappa_};

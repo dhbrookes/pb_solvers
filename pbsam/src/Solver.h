@@ -94,6 +94,7 @@ public:
   cmplx getF_ik_nm(int I, int k, int n, int m)
                   {return _F_[I]->get_mat_knm(k, n, m);}
   
+  vector<shared_ptr<LHNMatrix> >  get_all_LHN() {return _LHN_;}
   cmplx getLHN_ik_nm(int I, int k, int n, int m)
                   {return _LHN_[I]->get_mat_knm(k, n, m);}
   
@@ -175,6 +176,11 @@ public:
   
   shared_ptr<GradHMatrix> get_gradH(int I, int wrt) { return dH_[wrt][I];}
   shared_ptr<GradFMatrix> get_gradF(int I, int wrt) { return dF_[wrt][I];}
+  
+  vector<vector<shared_ptr<GradHMatrix> > > get_gradH_all() { return dH_;}
+  vector<vector<shared_ptr<GradFMatrix> > > get_gradF_all() { return dF_;}
+  
+  vector<vector<shared_ptr<GradLHNMatrix> > > get_gradLHN_all() {return dLHN_;}
   
   cmplx get_gradH_Ik_nm_d(int I, int wrt, int k, int n, int m, int d)
   { return dH_[wrt][I]->get_mat_knm_d(k, n, m, d); }
