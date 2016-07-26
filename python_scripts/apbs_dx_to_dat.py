@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 '''
 Program to convert DX to a 2D version of the ESP
 '''
-dirName= '/Users/lfelberg'
-dirName += '/PBSAM/pb_solvers/python_scripts/APBS_compare/'
+dirName= '/Users/felb315'
+dirName += '/Desktop/APBS_compare/'
 fileName= dirName + '1BRS.dx'
-outFile=dirName + 'barn_apbs_x_-20.jpg'
+outFile=dirName + 'barn_apbs_x_0.png'
 ind = 0 # chose 0 = x, 1 = y and 2 = z
 
 barnCOM = [0, 0, 0]
@@ -31,7 +31,7 @@ def FileOpen(fileName):
             grid[0], grid[1] = int(temp[5]), int(temp[6])
             grid[2] = int(temp[7])
             pot = np.zeros((grid[0], grid[1], grid[2]))
-            print np.shape(pot)
+            print (np.shape(pot))
         elif 'origin' in line[0:10]:
             org[0], org[1] = float(temp[1]), float(temp[2])
             org[2] = float(temp[3])
@@ -78,7 +78,7 @@ def dispPlot( org, bn, count, potential,
     X = np.arange(org[0], org[0]+ nb[0]*bn[0], bn[0])
     Y = np.arange(org[1], org[1]+ nb[1]*bn[1], bn[1])
     big = max( abs(mn)-abs(0.1*mn), abs(mx)+abs(mx)*0.1)
-    plt.pcolor(X, Y, potential, cmap = 'jet_r',
+    plt.pcolor(X, Y, potential, cmap = 'seismic_r',
                     vmin=-big, vmax=big)
     plt.colorbar()
 
@@ -92,11 +92,11 @@ def dispPlot( org, bn, count, potential,
     ax.yaxis.labelpad = -1.4
 
     for tick in ax.xaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
+        tick.label.set_fontsize(10)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
+        tick.label.set_fontsize(10)
     if outFile != None:
-        plt.savefig(outFile,bbox_inches='tight', dpi = 200)
+        plt.savefig(outFile,bbox_inches='tight', dpi = 300)
     plt.close()
 
     return X, Y
@@ -106,23 +106,23 @@ def dispPlot( org, bn, count, potential,
 
 esp3D, org, dl, mx, mn  = FileOpen(fileName)
 
-pos = -20.5 #barnCOM[ind]
+pos = -0.0 #barnCOM[ind]
 idx = round((pos-org[ind]) / dl[ind])
 
 ax = 'x'
-xla = r'$Y \, (\AA)$'; yla = r'$Z \, (\AA)$'
+xla = r'Y ($\AA$)'; yla = r'Z ($\AA$)'
 esp = esp3D[idx, :, :]
 mx, mn = 2.0, -2.0
 if ind == 1:
     ax = 'y'
     esp = esp3D[:, idx, :]
-    xla = r'$X \, (\AA)$'; yla = r'$Z \, (\AA)$'
+    xla = r'X ($\AA$)'; yla = r'Z ($\AA$)'
     mx = 3.52078
     mx =  -3.52078
 elif ind == 2:
     ax = 'z'
     esp = esp3D[:, :, idx]
-    xla = r'$X \, (\AA)$'; yla = r'$Y \, (\AA)$'
+    xla = r'X ($\AA$)'; yla = r'Y ($\AA$)'
     mx = 3.52078
     mx =  -3.52078
 

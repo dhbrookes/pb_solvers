@@ -675,7 +675,6 @@ void GradSolver::pre_compute_gradT_A()
     for (int J = 0; J < _sys_->get_n(); J++)
       gradT_A_[J][I]->reset_mat();
   
-//  for (int wrt = 0; wrt < _sys_->get_n(); wrt++)
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     for (int J = 0; J < _sys_->get_n(); J++)
@@ -711,10 +710,10 @@ void GradSolver::pre_compute_gradT_A()
               gradT_A_[J][J]->add_mat_k(l, reex);
             }
           } else if ((_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
-                     (cut_act+aIk+aJl)) && (interpol_[J][l] == 0))
+                     (cut_act+aIk+aJl))) // && (interpol_[J][l] == 0))
           {
-//            cout << "Reex 100A for mol (org) " << I << " sph " << k
-//            << " to dest : " << J << " and sph " << l  << endl;
+            cout << "Reex 100A for mol (org) " << I << " sph " << k
+            << " to dest : " << J << " and sph " << l  << endl;
             reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
             gradT_A_[J][J]->add_mat_k(l, reex);
             

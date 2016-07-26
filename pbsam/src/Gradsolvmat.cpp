@@ -587,24 +587,27 @@ void GradLHNMatrix::calc_val_k(int k, shared_ptr<System> sys,
   MyMatrix<Ptx> lhn_k(p_, 2*p_+1), inner;
   lhn_k = gradT_A[I_]->get_mat_k(k);
   
-//  cout << "~~~~~~ " << I_ << " and k " << k <<" gT * A ~~~~~~~~~~~~~~" << endl;
-//  for (int d = 0; d < 3; d++)
-//  {
-//    cout << " Dim: " << d <<  endl;
-//    for (int n = 0; n < p_; n++)
-//    {
-//      for (int m = 0; m <= n; m++)
-//      {
-//        double real = lhn_k( n, m+p_).get_cart(d).real();
-//        double imag = lhn_k( n, m+p_).get_cart(d).imag();
-//        if(abs(real) < 1e-15 ) real = 0.0;
-//        if(abs(imag) < 1e-15 ) imag = 0.0;
-//        cout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
-//      }
-//      cout << endl;
-//    }
-//  }
-//  cout << "~~~~~~~~~~~~~~~~~~~~" << endl;
+  if ( fabs(interPolcut-100) < 1e-2)
+  {
+  cout << "~~~~~~ " << I_ << " and k " << k <<" gT * A ~~~~~~~~~~~~~~" << endl;
+  for (int d = 0; d < 3; d++)
+  {
+    cout << " Dim: " << d <<  endl;
+    for (int n = 0; n < p_; n++)
+    {
+      for (int m = 0; m <= n; m++)
+      {
+        double real = lhn_k( n, m+p_).get_cart(d).real();
+        double imag = lhn_k( n, m+p_).get_cart(d).imag();
+        if(abs(real) < 1e-15 ) real = 0.0;
+        if(abs(imag) < 1e-15 ) imag = 0.0;
+        cout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
+      }
+      cout << endl;
+    }
+  }
+  cout << "~~~~~~~~~~~~~~~~~~~~" << endl;
+  }
   
   Ik = sys->get_centerik(I_, k);
   aIk = sys->get_aik(I_, k);
