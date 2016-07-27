@@ -5,7 +5,7 @@
 
 # executable ignores
 bin
-build
+build*
 
 ## PBAM output ignores
 *.dx 

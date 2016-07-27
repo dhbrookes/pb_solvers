@@ -40,21 +40,24 @@ _consts_(_consts)
 }
 
 // perform many iterations of the solution for A
-void ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
+bool ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
 {
   double scale_dev = (double)(p_*(p_+1)*0.5);
   double cng = scale_dev;
   int ct = 0;
+  bool polz;
   
   while((cng/scale_dev) > prec)
   {
-    iter();
+    polz = iter();
+    if (!polz) break;
     cng = calc_change();
     if (ct > MAX_POL_ROUNDS) break;
     ct++;
   }
   solvedA_ = true;
   calc_L();
+  return polz;
 }
 
 void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
@@ -111,13 +114,15 @@ void ASolver::copy_to_prevGradA(int j)
 }
 
 // one iteration of numerical solution for A (eq 51 in Lotan 2006)
-void ASolver::iter()
+bool ASolver::iter()
 {
   int i, j;
   MyMatrix<cmplx> Z, zj, ai;
+  double pol_cut(10.0);
   Pt v;
   copy_to_prevA();
   bool prev = true;  // want to re-expand previous
+  bool polz(false), interact(true);
   for (i = 0; i <  N_; i++)
   {
     // relevant re-expansions:
@@ -128,16 +133,26 @@ void ASolver::iter()
       
       v = _sys_->get_pbc_dist_vec(i, j);
       if (! _sys_->less_than_cutoff(v) ) continue;
+      if (v.norm() > pol_cut )
+      {
+        interact = false; //TODO: figure out the polarization
+        continue;
+      }
       
       zj = re_expandA(i, j, prev);
       Z += zj;
+      polz = true;
     }
     
-    ai = _delta_->operator[](i) * Z;
-    ai += _E_->operator[](i);
-    ai = _gamma_->operator[](i) * ai;
-    _A_->set_val(i, ai);
+    if (polz)
+    {
+      ai = _delta_->operator[](i) * Z;
+      ai += _E_->operator[](i);
+      ai = _gamma_->operator[](i) * ai;
+      _A_->set_val(i, ai);
+    }
   }
+  return polz;
 }
 
 // one iteration of numerical solution for grad(A) WRT j (eq 53 in Lotan 2006)
