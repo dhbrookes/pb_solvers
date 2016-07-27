@@ -12,13 +12,15 @@ ASolver::ASolver(shared_ptr<BesselCalc> _bcalc,
                   shared_ptr<SHCalc> _shCalc,
                   shared_ptr<System> _sys,
                   shared_ptr<Constants> _consts,
-                  const int p)
+                  const int p,
+                  double polz_cutoff)
 :p_(p),
 N_(_sys->get_n()),
 a_avg_(_sys->get_lambda()),
 solvedA_(false),
 _besselCalc_(_bcalc),
 _shCalc_(_shCalc),
+polz_cutoff_(polz_cutoff),
 _consts_(_consts)
 {
   _gamma_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, p_));
@@ -118,11 +120,9 @@ bool ASolver::iter()
 {
   int i, j;
   MyMatrix<cmplx> Z, zj, ai;
-  double pol_cut(10.0);
   Pt v;
   copy_to_prevA();
-  bool prev = true;  // want to re-expand previous
-  bool polz(false), interact(true);
+  bool polz(false), interact(false), prev(true);
   for (i = 0; i <  N_; i++)
   {
     // relevant re-expansions:
@@ -132,12 +132,9 @@ bool ASolver::iter()
       if (i == j) continue;
       
       v = _sys_->get_pbc_dist_vec(i, j);
-      if (! _sys_->less_than_cutoff(v) ) continue;
-      if (v.norm() > pol_cut )
-      {
-        interact = false; //TODO: figure out the polarization
-        continue;
-      }
+      if (! _sys_->less_than_cutoff(v) ) continue; // cutoff for interaction
+      interact = true; //TODO: figure out the polarization
+      if (v.norm() > polz_cutoff_+_sys_->get_ai(i)+_sys_->get_ai(j)) continue;
       
       zj = re_expandA(i, j, prev);
       Z += zj;
@@ -150,6 +147,9 @@ bool ASolver::iter()
       ai += _E_->operator[](i);
       ai = _gamma_->operator[](i) * ai;
       _A_->set_val(i, ai);
+    } else if (interact)
+    {
+      _A_->set_val(i, _gamma_->operator[](i) * _E_->operator[](i));
     }
   }
   return polz;

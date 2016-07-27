@@ -365,8 +365,9 @@ void ThreeBody::solveNmer( int num, double preclim )
   #pragma omp parallel for
   for( i = 0; i < nmer->size(); i++)
   {
-  //cout << omp_get_num_threads() << endl;
+#ifdef __OMP
     printf("In parallel TID : %d\n", omp_get_thread_num() );
+#endif
     vector<int> tempmol;
     int poles;
     #pragma omp critical

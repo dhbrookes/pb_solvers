@@ -63,6 +63,7 @@ protected:
   int                         N_;  // number of molecules
   int                         p_;  // max value for n (2*numVals_ usually)
   double                  a_avg_;  // the average radius of particles in syst
+  double            polz_cutoff_; // cutoff between mol surfaces for polarization
 
   shared_ptr<VecOfMats<cmplx>::type>      _gamma_, _delta_, _E_, _L_;
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL_;
@@ -179,7 +180,8 @@ public:
           shared_ptr<SHCalc> shCalc,
           shared_ptr<System> _sys,
           shared_ptr<Constants> _consts,
-          const int p=Constants::MAX_NUM_POLES);
+          const int p=Constants::MAX_NUM_POLES,
+          double polz_cutoff = 10.0);
   
   shared_ptr<VecOfMats<cmplx>::type>  get_gamma() { return _gamma_; }
   shared_ptr<VecOfMats<cmplx>::type>  get_delta() { return _delta_; }
