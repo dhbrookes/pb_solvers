@@ -473,10 +473,9 @@ protected:
     
     int psqRead = pRead*pRead;
     int pmin = min(psqRead, ps);
-    int pmax = max(psqRead, ps);
     for(int k=0; k<pmin; k++) fin >> vec_[k];
     
-    for(int k=pmin; k<pmax; k++)
+    for(int k=pmin; k<ps; k++)
     {
       if( pRead < p_)
       {
