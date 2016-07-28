@@ -12,13 +12,15 @@ ASolver::ASolver(shared_ptr<BesselCalc> _bcalc,
                   shared_ptr<SHCalc> _shCalc,
                   shared_ptr<System> _sys,
                   shared_ptr<Constants> _consts,
-                  const int p)
+                  const int p,
+                  double polz_cutoff)
 :p_(p),
 N_(_sys->get_n()),
 a_avg_(_sys->get_lambda()),
 solvedA_(false),
 _besselCalc_(_bcalc),
 _shCalc_(_shCalc),
+polz_cutoff_(polz_cutoff),
 _consts_(_consts)
 {
   _gamma_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, p_));
@@ -40,21 +42,24 @@ _consts_(_consts)
 }
 
 // perform many iterations of the solution for A
-void ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
+bool ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
 {
   double scale_dev = (double)(p_*(p_+1)*0.5);
   double cng = scale_dev;
   int ct = 0;
+  bool polz;
   
   while((cng/scale_dev) > prec)
   {
-    iter();
+    polz = iter();
+    if (!polz) break;
     cng = calc_change();
     if (ct > MAX_POL_ROUNDS) break;
     ct++;
   }
   solvedA_ = true;
   calc_L();
+  return polz;
 }
 
 void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
@@ -111,13 +116,13 @@ void ASolver::copy_to_prevGradA(int j)
 }
 
 // one iteration of numerical solution for A (eq 51 in Lotan 2006)
-void ASolver::iter()
+bool ASolver::iter()
 {
   int i, j;
   MyMatrix<cmplx> Z, zj, ai;
   Pt v;
   copy_to_prevA();
-  bool prev = true;  // want to re-expand previous
+  bool polz(false), interact(false), prev(true);
   for (i = 0; i <  N_; i++)
   {
     // relevant re-expansions:
@@ -127,17 +132,27 @@ void ASolver::iter()
       if (i == j) continue;
       
       v = _sys_->get_pbc_dist_vec(i, j);
-      if (! _sys_->less_than_cutoff(v) ) continue;
+      if (! _sys_->less_than_cutoff(v) ) continue; // cutoff for interaction
+      interact = true; //TODO: figure out the polarization
+      if (v.norm() > polz_cutoff_+_sys_->get_ai(i)+_sys_->get_ai(j)) continue;
       
       zj = re_expandA(i, j, prev);
       Z += zj;
+      polz = true;
     }
     
-    ai = _delta_->operator[](i) * Z;
-    ai += _E_->operator[](i);
-    ai = _gamma_->operator[](i) * ai;
-    _A_->set_val(i, ai);
+    if (polz)
+    {
+      ai = _delta_->operator[](i) * Z;
+      ai += _E_->operator[](i);
+      ai = _gamma_->operator[](i) * ai;
+      _A_->set_val(i, ai);
+    } else if (interact)
+    {
+      _A_->set_val(i, _gamma_->operator[](i) * _E_->operator[](i));
+    }
   }
+  return polz;
 }
 
 // one iteration of numerical solution for grad(A) WRT j (eq 53 in Lotan 2006)

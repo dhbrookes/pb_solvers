@@ -63,6 +63,7 @@ protected:
   int                         N_;  // number of molecules
   int                         p_;  // max value for n (2*numVals_ usually)
   double                  a_avg_;  // the average radius of particles in syst
+  double            polz_cutoff_; // cutoff between mol surfaces for polarization
 
   shared_ptr<VecOfMats<cmplx>::type>      _gamma_, _delta_, _E_, _L_;
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL_;
@@ -160,7 +161,7 @@ protected:
                    int m, int wrt=-1);
 
   // perform one iteration of the solution for A (eq 51 in Lotan 2006)
-  void iter();
+  bool iter();
   
   // perform one iterations of the solution for grad(A) (eq53 in Lotan 2006)
   void grad_iter(int j);
@@ -179,7 +180,8 @@ public:
           shared_ptr<SHCalc> shCalc,
           shared_ptr<System> _sys,
           shared_ptr<Constants> _consts,
-          const int p=Constants::MAX_NUM_POLES);
+          const int p=Constants::MAX_NUM_POLES,
+          double polz_cutoff = 10.0);
   
   shared_ptr<VecOfMats<cmplx>::type>  get_gamma() { return _gamma_; }
   shared_ptr<VecOfMats<cmplx>::type>  get_delta() { return _delta_; }
@@ -265,7 +267,7 @@ public:
   void print_dAi( int i, int j, int p);
 
   //numerically solve for A given the desired precision
-  void solve_A(double prec, int MAX_POL_ROUNDS=2);
+  bool solve_A(double prec, int MAX_POL_ROUNDS=2);
   
   // numerically solve for grad(A) given the desired precision
   // must solve for A before this

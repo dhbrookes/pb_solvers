@@ -452,7 +452,7 @@ TEST_F(ASolverUTest, checkGamma)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
 
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1).real(),  1.463995711, preclim);
   EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5).real(),  1.760111936, preclim);
@@ -470,7 +470,7 @@ TEST_F(ASolverUTest, checkDelta)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1).real(),   0.87554313, preclim);
   EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5).real(),   0.06832297, preclim);
@@ -489,7 +489,7 @@ TEST_F(ASolverUTest, checkE)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   
   EXPECT_NEAR(ASolvTest.get_E_ni( 0, 0, 0).real(), 5.0, preclim);
   EXPECT_NEAR(ASolvTest.get_E_ni( 0, 0, 0).imag(), 0.0, preclim);
@@ -519,7 +519,7 @@ TEST_F(ASolverUTest, checkSH)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
 
   EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 0, 0).real(), 1.0, preclim);
   EXPECT_NEAR(ASolvTest.get_SH_ij( 0, 0, 0, 0).imag(), 0.0, preclim);
@@ -564,7 +564,7 @@ TEST_F(ASolverUTest, checkAMulti)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
@@ -616,7 +616,7 @@ TEST_F(ASolverUTest, checkAMultiPBC)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_, 85, 175);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
@@ -672,7 +672,7 @@ TEST_F(ASolverUTest, checkAPBC)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_, 40, 175);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
 
   int ct = 0;
@@ -723,7 +723,7 @@ TEST_F(ASolverUTest, checkAPBCoutside)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_, 25, 150);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
@@ -764,7 +764,7 @@ TEST_F(ASolverUTest, checkA)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-20, 1000);
 
   int ct = 0;
@@ -807,7 +807,7 @@ TEST_F(ASolverUTest, checkASingMult)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
@@ -854,7 +854,7 @@ TEST_F(ASolverUTest, checkASingMultFlip)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
   
   int ct = 0;
@@ -892,7 +892,7 @@ TEST_F(ASolverUTest, checkASing)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-30, 1000);
   
   int ct = 0;
@@ -934,7 +934,7 @@ TEST_F(ASolverUTest, checkgradT_A)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
   
   VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
@@ -1056,7 +1056,7 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
   
   VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
@@ -1178,7 +1178,7 @@ TEST_F(ASolverUTest, checkgradA)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-25, 1000); ASolvTest.solve_gradA(1E-50, 1000);
   
   int ct = 0;
@@ -1291,7 +1291,7 @@ TEST_F(ASolverUTest, checkgradASing)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
 
   int ct = 0;
@@ -1441,7 +1441,7 @@ TEST_F(ASolverUTest, checkL)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
   shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   int ct = 0;
@@ -1483,7 +1483,7 @@ TEST_F(ASolverUTest, checkLSing)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
   shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   
@@ -1535,7 +1535,7 @@ TEST_F(ASolverUTest, checkdL)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-20, 1000); ASolvTest.solve_gradA(1E-30, 1000);
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
 
@@ -1630,7 +1630,7 @@ TEST_F(ASolverUTest, checkdLSing)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol_sing_);
   
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals);
+  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-40, 1000);
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
   

@@ -398,7 +398,6 @@ void Setup::findKeyword(vector<string> fline)
   {
     string xyz;
     int traj, typeNo = atoi(fline[1].c_str())-1;
-    cout << "XYZ command found" << endl;
     
     if ( fline.size() == 4 )
     {
@@ -412,6 +411,7 @@ void Setup::findKeyword(vector<string> fline)
     if (typeNo > getNType()-1)
       return;
     setTypeNXYZ( typeNo, traj, xyz );
+    cout << "XYZ command found " << xyz << endl;
     setTypeNisTransRot(typeNo, traj, false);
   } else if (keyword == "transrot")
   {
