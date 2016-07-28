@@ -31,7 +31,8 @@
 #ifndef Electrostatics_h
 #define Electrostatics_h
 
-#include "EnergyForce.h"
+#include "PhysCalc.h"
+#include "Solver.h"
 #include <time.h> 
 
 #ifdef __OMP
@@ -87,7 +88,7 @@ protected:
   vector<vector<vector<double > > > esp_; // vector of ESP values
   vector<vector<double > > grid_;  // 2D cross section of ESP
   
-  shared_ptr<VecOfMats<cmplx>::type> _A_;
+  vector<shared_ptr<HMatrix> > _H_;
   shared_ptr<System> _sys_;
   shared_ptr<SHCalc> _shCalc_;
   shared_ptr<BesselCalc> _bCalc_;
@@ -106,12 +107,12 @@ protected:
   double lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p);
   
 public:
-  Electrostatic(shared_ptr<VecOfMats<cmplx>::type> _A, shared_ptr<System> _sys,
+  Electrostatic(vector<shared_ptr<HMatrix> > H, shared_ptr<System> _sys,
                 shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                 shared_ptr<Constants> _consts,
                 int p, int npts = 150);
   
-  Electrostatic(shared_ptr<ASolver> _asolv, int npts=150);
+  Electrostatic(shared_ptr<Solver> solve, int npts=150);
   
   // print APBS file
   void print_dx(string ifname);

@@ -85,6 +85,8 @@ public:
   
   void reset_all();
   
+  void update_LHN_all();
+  
   vector<shared_ptr<HMatrix> > get_all_H() {return _H_;}
   vector<shared_ptr<FMatrix> > get_all_F() {return _F_;}
   MyMatrix<cmplx> getH_ik(int I, int k) {return _H_[I]->get_mat_k(k);}
@@ -107,11 +109,12 @@ public:
     return ipol;
   }
   
-  void update_LHN_all();
-  
-  
   shared_ptr<TMatrix> get_T()              {return _T_;}
-  
+  int get_p()                              {return p_;}
+  shared_ptr<System> get_sys()             {return _sys_; }
+  shared_ptr<Constants> get_consts()       {return _consts_; }
+  shared_ptr<SHCalc> get_sh()              {return _shCalc_;}
+  shared_ptr<BesselCalc> get_bessel()      {return _bCalc_;}
 };
 
 

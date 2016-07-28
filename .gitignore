@@ -12,7 +12,7 @@ build
 *.dat
 dyn_*
 *.stat
-*.out.pqr
+*out.pqr
 test_cged_out.pqr
 
 ## Latex ignores
@@ -20,6 +20,8 @@ test_cged_out.pqr
 *.log
 *.synctex.gz
 *.out
+*.bbl
+*.blg
 
 ## Files for work on APBS comparison
 APBS_compare/

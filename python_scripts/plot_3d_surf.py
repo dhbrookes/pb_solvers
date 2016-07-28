@@ -9,12 +9,13 @@ rcParams.update({'figure.autolayout': True})
 '''
 Program to plot a 3D version of the ESP from PB-AM
 '''
-dirName='/Users/felb315/'\
-                 + 'Desktop/electrostatic_test/electro_barnase_test/0.05M/'
-fileName = dirName + 'bars_0.05M_map.out'
+dirName='/Users/felb315/pb_solvers/'\
+                 + 'pbsam/pbsam_test_files/gtest/'
+#fileName = dirName + 'onemol_map.out'
+fileName = dirName + 'threemol_map.out'
 #fileName = dirName + 'data/2fgr/2fgr_tri_move_map.out'
-outFile= '/Users/felb315/Desktop/barnase_out.surf'
-outFile= dirName + 'barnase_0.05M_3d_'
+outFile= '/Users/felb315/Desktop/onemol'
+#outFile= dirName + 'barnase_0.05M_3d_'
 
 
 def FileOpen(fileName):
@@ -52,30 +53,31 @@ def dispPlot( org, bn, xv, yv, zv, potential,
     fig = plt.figure(1, figsize = (4, 4));
     ax = fig.add_subplot(111,projection='3d')
 
-    n = len(xv)
-    for i in range(n):
-        if xv[i] < 0:
-            break
-    xv = xv[:i]
-    yv = yv[:i]
-    zv = zv[:i]
-    potential=potential[:i]
+   #n = len(xv)
+   #for i in range(n):
+   #    if xv[i] < 0:
+   #        break
+   #xv = xv[:i]
+   #yv = yv[:i]
+   #zv = zv[:i]
+   #potential=potential[:i]
 
-    xv -= np.mean(xv)
-    yv -= np.mean(yv)
-    zv -= np.mean(zv)
+   #xv -= np.mean(xv)
+   #yv -= np.mean(yv)
+   #zv -= np.mean(zv)
 
     minl = min(min(xv), min(yv), min(zv))
     maxl = max(max(xv), max(yv), max(zv))
 
     big = max( abs(potential))
-    cm = plt.get_cmap('seismic_r')
+    print(minl, maxl, big)
+    cm = plt.get_cmap('jet_r')
     cNorm = matplotlib.colors.Normalize(vmin=-big,
                                                                vmax=big)
     scalarMap = cmx.ScalarMappable(norm=cNorm,
                                                            cmap=cm)
 
-    ax.scatter(xv, yv, zv, s = 85,
+    ax.scatter(xv, yv, zv, s = 95,
                      c=scalarMap.to_rgba(potential),
                      lw = 0)
     scalarMap.set_array(potential)
@@ -108,8 +110,8 @@ def dispPlot( org, bn, xv, yv, zv, potential,
             plt.savefig(outFile+str(ii)+'.png',
                              bbox_inches='tight') #,dpi = 300)
 
-    # plt.close()
-    plt.show()
+    plt.close()
+   #plt.show()
 
 #------------------------------------------------------------------------------
 # main

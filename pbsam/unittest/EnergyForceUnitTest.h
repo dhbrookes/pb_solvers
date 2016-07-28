@@ -204,6 +204,7 @@ TEST_F(ForceUTest, two_mol_test)
   
   string istart = test_dir_loc + "imat_test/imat.sp";
   string estart = test_dir_loc + "grad_test/mpol.";
+//  string estart = test_dir_loc + "spol_test/test_0.00_p3.0.";
   vector<vector<string> > imat_loc(sys->get_n());
   vector<vector<vector<string > > > exp_loc(sys->get_n());
   
@@ -218,18 +219,29 @@ TEST_F(ForceUTest, two_mol_test)
       imat_loc[i][k] = istart+to_string(k) + ".out.bin";
       exp_loc[i][k][0] = estart+to_string(i)+"."+to_string(k)+ ".H.exp";
       exp_loc[i][k][1] = estart+to_string(i)+"."+to_string(k)+ ".F.exp";
+//      exp_loc[i][k][0] = estart+to_string(k)+ ".H.exp";
+//      exp_loc[i][k][1] = estart+to_string(k)+ ".F.exp";
     }
   }
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
+//  solvTest.solve(1e-15, 200);
+  
+//  for (int i = 0; i < sys->get_n(); i++)
+//  {
+//    for (int k = 0; k < sys->get_Ns_i(i); k++)
+//    {
+//      solvTest.get_all_H()[i]->print_kmat(k);
+//    }
+//  }
   
   GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
                        solvTest.get_all_F(), solvTest.get_all_H(),
                        solvTest.get_IE(),
                        solvTest.get_interpol_list(), _expcons, pol);
-  gsolvTest.solve(1e-16, 75);
+  gsolvTest.solve(1e-16, 2);
   
   ForceCalc focal(SHCalcTest, BesselCal);
   vector<Pt> fo;
@@ -300,23 +312,32 @@ TEST_F(ForceUTest, three_mol_test)
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
   
-  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
-                       solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
-  gsolvTest.solve(1e-16, 72);
-  
-  ForceCalc focal(SHCalcTest, BesselCal);
-  vector<Pt> fo;
-  fo = focal.calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
-                        gsolvTest.get_gradH_all(), gsolvTest.get_gradLHN_all());
-  
   for (int i = 0; i < sys->get_n(); i++)
   {
-    cout << "This is force "<< setprecision(9) << fo[i].x()
-    << ", " << fo[i].y()<< ", " << fo[i].z()  << endl;
-//    EXPECT_NEAR(ene[i]/en3[i], 1.0, preclim);
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      solvTest.get_all_H()[i]->print_kmat(k);
+    }
   }
+  
+//
+//  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
+//                       solvTest.get_all_F(), solvTest.get_all_H(),
+//                       solvTest.get_IE(),
+//                       solvTest.get_interpol_list(), _expcons, pol);
+//  gsolvTest.solve(1e-16, 72);
+//  
+//  ForceCalc focal(SHCalcTest, BesselCal);
+//  vector<Pt> fo;
+//  fo = focal.calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
+//                        gsolvTest.get_gradH_all(), gsolvTest.get_gradLHN_all());
+//  
+//  for (int i = 0; i < sys->get_n(); i++)
+//  {
+//    cout << "This is force "<< setprecision(9) << fo[i].x()
+//    << ", " << fo[i].y()<< ", " << fo[i].z()  << endl;
+////    EXPECT_NEAR(ene[i]/en3[i], 1.0, preclim);
+//  }
 }
 
 
