@@ -471,8 +471,6 @@ protected:
     fin >> kappa_;
     fin >> rcut_;
     
-    cout << "Read p " << pRead << " and p " << p_  << endl;
-    
     int psqRead = pRead*pRead;
     int pmin = min(psqRead, ps);
     int pmax = max(psqRead, ps);
