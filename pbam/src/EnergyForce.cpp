@@ -672,11 +672,3 @@ ThreeBodyPhysCalc::ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num,
 outfname_(outfname)
 {
 }
-
-
-ThreeBodyPhysCalc::ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num,
-                                     string outfname, Units unit, double cutoff)
-:BasePhysCalc(), ThreeBody(_asolv, unit, "", cutoff), solved_(false), num_(num),
-outfname_(outfname)
-{
-}
