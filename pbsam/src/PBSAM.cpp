@@ -40,7 +40,7 @@ PBSAM::PBSAM() : PBSAMInput()
 }
 
 
-PBAM::PBAM(string infile)
+PBSAM::PBSAM(string infile)
 :
 poles_(5),
 solveTol_(1e-4)
@@ -129,7 +129,11 @@ solveTol_(1e-4)
                              confil, conpad, xyzf);
 
   check_setup();
-  syst_ = make_shared<System> (mls, Constants::FORCE_CUTOFF, pbami.boxLen_);
+  
+  vector<shared_ptr<Molecule> > molP(mls.size());
+  for (int i = 0; i < mls.size(); i++) molP[i] = make_shared<Molecule>(mls[i]);
+  
+  syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
   consts_ = make_shared<Constants> (*setp_);
   init_write_system();
 }
@@ -213,8 +217,8 @@ PBSAMOutput PBSAM::run_apbs()
   else
     cout << "Runtype not recognized! See manual for options" << endl;
 
-  PBAMOutput pbamO;
-  return pbamO;
+  PBSAMOutput pbsamO;
+  return pbsamO;
 }
 
 void PBSAM::run_dynamics()
@@ -309,22 +313,22 @@ void PBSAM::run_electrostatics()
   auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
 
-  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
-                                                    consts_, poles_);
-  ASolv->solve_A(solveTol_); ASolv->solve_gradA(solveTol_);
-  Electrostatic Estat( ASolv, setp_->getGridPts());
-
-  if ( setp_->getDXoutName() != "" )
-    Estat.print_dx( setp_->getDXoutName());
-
-  if ( setp_->get_3dmap_name() != "" )
-    Estat.print_3d_heat( setp_->get_3dmap_name());
-
-  for ( i = 0; i < setp_->getGridCt(); i++ )
-  {
-    Estat.print_grid(setp_->getGridAx(i), setp_->getGridAxLoc(i),
-                     setp_->getGridOutName(i));
-  }
+//  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
+//                                                    consts_, poles_);
+//  ASolv->solve_A(solveTol_); ASolv->solve_gradA(solveTol_);
+//  Electrostatic Estat( ASolv, setp_->getGridPts());
+//
+//  if ( setp_->getDXoutName() != "" )
+//    Estat.print_dx( setp_->getDXoutName());
+//
+//  if ( setp_->get_3dmap_name() != "" )
+//    Estat.print_3d_heat( setp_->get_3dmap_name());
+//
+//  for ( i = 0; i < setp_->getGridCt(); i++ )
+//  {
+//    Estat.print_grid(setp_->getGridAx(i), setp_->getGridAxLoc(i),
+//                     setp_->getGridOutName(i));
+//  }
 
 }
 
@@ -333,18 +337,18 @@ void PBSAM::run_energyforce()
 {
   clock_t t3 = clock();
   
-  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
-  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
-  auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
-  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
-
-  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
-                                                        consts_, poles_);
-
-  ASolv->solve_A(solveTol_); ASolv->solve_gradA(solveTol_);
-  PhysCalc calcEnFoTo( ASolv, setp_->getRunName(), consts_->get_unitsEnum());
-  calcEnFoTo.calc_all();
-  calcEnFoTo.print_all();
+//  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
+//  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
+//  auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
+//  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
+//
+//  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
+//                                                        consts_, poles_);
+//
+//  ASolv->solve_A(solveTol_); ASolv->solve_gradA(solveTol_);
+//  PhysCalc calcEnFoTo( ASolv, setp_->getRunName(), consts_->get_unitsEnum());
+//  calcEnFoTo.calc_all();
+//  calcEnFoTo.print_all();
   
   t3 = clock() - t3;
   printf ("energyforce calc took me %f seconds.\n",
