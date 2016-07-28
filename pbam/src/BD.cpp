@@ -42,6 +42,12 @@ double BDStep::compute_dt( )
     return 2.0 + ( min_dist_ - DISTCUTOFF_TIME )/15.0;
   else
     return 2.0;
+/*
+  double DISTCUTOFF_TIME = 3.5;
+  if ( min_dist_ - DISTCUTOFF_TIME > 0 )
+    return ( min_dist_*min_dist_ )/(240.0*368.0);
+  else
+    return 0.001;*/
 }
 
 void BDStep::compute_min_dist( )
@@ -183,9 +189,9 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
 
 void BDRun::run(string xyzfile, string statfile, int nSCF)
 {
-  int i = 0;
+  int i(0), scf(0);
   int WRITEFREQ = 2000;
-  bool term = false;
+  bool term(false), polz(true);
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
   stats.open(statfile, fstream::in | fstream::out | fstream::app);
@@ -199,22 +205,24 @@ void BDRun::run(string xyzfile, string statfile, int nSCF)
     }
     
     _asolver_->reset_all(_stepper_->get_system());
-    if (nSCF == 0)
+    if (nSCF != 0) scf = nSCF;
+    polz = _asolver_->solve_A(prec_, scf);
+    
+    if (polz)
     {
-      _asolver_->solve_A(prec_);
-      _asolver_->solve_gradA(prec_);
+      _asolver_->solve_gradA(prec_, scf);
+      _physCalc_->calc_force();
+      _physCalc_->calc_torque();
+      _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
     } else
     {
-      _asolver_->solve_A(prec_, nSCF);
-      _asolver_->solve_gradA(prec_, nSCF);
+      int N = _stepper_->get_system()->get_n();
+      auto fo = make_shared<vector<Pt> > (N, Pt(0.0,0.0,0.0));
+      auto to = make_shared<vector<Pt> > (N, Pt(0.0,0.0,0.0));
+      _stepper_->bd_update(fo,to);
     }
 
-    _physCalc_->calc_force();
-    _physCalc_->calc_torque();
-    
-    _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
-
-    if ( (i % 100) == 0 ) cout << "This is step " << i << endl;
+    if ( (i % 100) == 0 ) cout << "This is step " << i << " and polz " << polz<< endl;
 
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {

@@ -289,7 +289,8 @@ void ThreeBody::generatePairsTrips()
     for( j = i+1; j < N_; j++)
     {
       dist[0] = _sys_->get_pbc_dist_vec( i, j).norm();
-      if (cutoffTBD_ > dist[0])
+    //if (cutoffTBD_ > dist[0])
+      if (1e17 > dist[0])
       {
         temp2[0] = i; temp2[1] = j;
         dimer_.push_back(temp2);
@@ -333,6 +334,9 @@ void ThreeBody::generatePairsTrips()
     cout << "Cutoffs implemented, using " << cutoffTBD_ << endl;
   cout << "Max # of di: "  << M2 << " Act used: " << dimer_.size() <<endl;
   cout << "Max # of tri: " << M3 << " Act used: " << trimer_.size() <<endl;
+#ifdef __OMP
+  cout << "Including omp.h with threads " << omp_get_num_threads() << endl;
+#endif
 } //end cutoffTBD
 
 
@@ -357,12 +361,13 @@ void ThreeBody::solveNmer( int num, double preclim )
   shared_ptr<vector<vector<int> > > nmer = (( num == 2 ) ?
                                             make_shared<vector<vector<int> > >(dimer_) :
                                             make_shared<vector<vector<int> > >(trimer_));
-  
-
+  cout << "Entering parallel " << endl;
   #pragma omp parallel for
   for( i = 0; i < nmer->size(); i++)
   {
-//    cout << omp_get_num_threads() << endl;
+#ifdef __OMP
+    printf("In parallel TID : %d\n", omp_get_thread_num() );
+#endif
     vector<int> tempmol;
     int poles;
     #pragma omp critical
