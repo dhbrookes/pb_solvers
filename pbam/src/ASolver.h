@@ -161,7 +161,7 @@ protected:
                    int m, int wrt=-1);
 
   // perform one iteration of the solution for A (eq 51 in Lotan 2006)
-  bool iter();
+  void iter();
   
   // perform one iterations of the solution for grad(A) (eq53 in Lotan 2006)
   void grad_iter(int j);
@@ -267,7 +267,7 @@ public:
   void print_dAi( int i, int j, int p);
 
   //numerically solve for A given the desired precision
-  bool solve_A(double prec, int MAX_POL_ROUNDS=2);
+  void solve_A(double prec, int MAX_POL_ROUNDS=2);
   
   // numerically solve for grad(A) given the desired precision
   // must solve for A before this

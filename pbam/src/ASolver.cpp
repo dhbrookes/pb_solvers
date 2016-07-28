@@ -42,24 +42,21 @@ _consts_(_consts)
 }
 
 // perform many iterations of the solution for A
-bool ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
+void ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
 {
   double scale_dev = (double)(p_*(p_+1)*0.5);
   double cng = scale_dev;
   int ct = 0;
-  bool polz;
   
   while((cng/scale_dev) > prec)
   {
-    polz = iter();
-    if (!polz) break;
+    iter();
     cng = calc_change();
     if (ct > MAX_POL_ROUNDS) break;
     ct++;
   }
   solvedA_ = true;
   calc_L();
-  return polz;
 }
 
 void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
@@ -116,7 +113,7 @@ void ASolver::copy_to_prevGradA(int j)
 }
 
 // one iteration of numerical solution for A (eq 51 in Lotan 2006)
-bool ASolver::iter()
+void ASolver::iter()
 {
   int i, j;
   MyMatrix<cmplx> Z, zj, ai;
@@ -125,6 +122,8 @@ bool ASolver::iter()
   bool polz(false), interact(false), prev(true);
   for (i = 0; i <  N_; i++)
   {
+    interact = false;
+    polz = false;
     // relevant re-expansions:
     Z = MyMatrix<cmplx> (p_, 2*p_ + 1);
     for (j = 0; j < N_; j++)
@@ -133,11 +132,14 @@ bool ASolver::iter()
       
       v = _sys_->get_pbc_dist_vec(i, j);
       if (! _sys_->less_than_cutoff(v) ) continue; // cutoff for interaction
+
+      _sys_->add_J_to_interact_I(i,j);
       interact = true; //TODO: figure out the polarization
       if (v.norm() > polz_cutoff_+_sys_->get_ai(i)+_sys_->get_ai(j)) continue;
       
       zj = re_expandA(i, j, prev);
       Z += zj;
+      _sys_->add_J_to_pol_I(i,j);
       polz = true;
     }
     
@@ -152,7 +154,6 @@ bool ASolver::iter()
       _A_->set_val(i, _gamma_->operator[](i) * _E_->operator[](i));
     }
   }
-  return polz;
 }
 
 // one iteration of numerical solution for grad(A) WRT j (eq 53 in Lotan 2006)
@@ -165,10 +166,12 @@ void ASolver::grad_iter(int j)
   VecOfMats<cmplx>::type aij, add;
   MyMatrix<cmplx> gamma_delta;
   Pt v;
-  bool prev = true; //want to re-expand previous
+  bool prev(true), polz(false), interact(false); //want to re-expand previous
   copy_to_prevGradA(j);
   for (i = 0; i < N_; i++) // molecule of interest
   {
+    interact = false;
+    polz = false;
     aij = VecOfMats<cmplx>::type (3, MyMatrix<cmplx>(p_,2*p_+1));
     aij = get_gradT_Aij(j, i);
     
@@ -177,16 +180,21 @@ void ASolver::grad_iter(int j)
       if (k == i) continue;
       v = _sys_->get_pbc_dist_vec(i, k);
       if (! _sys_->less_than_cutoff(v) ) continue;
+      interact = true;
+      if (v.norm() > polz_cutoff_+_sys_->get_ai(i)+_sys_->get_ai(j)) continue;
       add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
       aij += add;
+      polz = true;
     }
-    
-    gamma_delta = _gamma_->operator[](i) * _delta_->operator[](i);
-    aij.set_val(0, gamma_delta * aij[0]);
-    aij.set_val(1, gamma_delta * aij[1]);
-    aij.set_val(2, gamma_delta * aij[2]);
-    _gradA_->set_val(i, j, aij);
-    
+   
+    if (interact) 
+    {
+      gamma_delta = _gamma_->operator[](i) * _delta_->operator[](i);
+      aij.set_val(0, gamma_delta * aij[0]);
+      aij.set_val(1, gamma_delta * aij[1]);
+      aij.set_val(2, gamma_delta * aij[2]);
+      _gradA_->set_val(i, j, aij);
+    }
   }
 }
 

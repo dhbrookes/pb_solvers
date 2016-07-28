@@ -189,8 +189,8 @@ BDRun::BDRun(shared_ptr<ASolver> _asolv,
 
 void BDRun::run(string xyzfile, string statfile, int nSCF)
 {
-  int i(0), scf(0);
-  int WRITEFREQ = 2000;
+  int i(0), scf(2);
+  int WRITEFREQ = 200;
   bool term(false), polz(true);
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
@@ -204,23 +204,21 @@ void BDRun::run(string xyzfile, string statfile, int nSCF)
       if (i != 0)  _physCalc_->print_all();
     }
     
+    _stepper_->get_system()->clear_all_lists();
     _asolver_->reset_all(_stepper_->get_system());
     if (nSCF != 0) scf = nSCF;
-    polz = _asolver_->solve_A(prec_, scf);
-    
-    if (polz)
-    {
-      _asolver_->solve_gradA(prec_, scf);
-      _physCalc_->calc_force();
-      _physCalc_->calc_torque();
-      _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
-    } else
-    {
-      int N = _stepper_->get_system()->get_n();
+
+    _asolver_->solve_A(prec_, scf);
+    _asolver_->solve_gradA(prec_, scf);
+    _physCalc_->calc_force();
+    _physCalc_->calc_torque();
+    _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
+   
+    /*int N = _stepper_->get_system()->get_n();
       auto fo = make_shared<vector<Pt> > (N, Pt(0.0,0.0,0.0));
       auto to = make_shared<vector<Pt> > (N, Pt(0.0,0.0,0.0));
       _stepper_->bd_update(fo,to);
-    }
+   */
 
     if ( (i % 100) == 0 ) cout << "This is step " << i << " and polz " << polz<< endl;
 

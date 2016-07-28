@@ -131,8 +131,6 @@ protected:
   int N_;
   int p_;
   shared_ptr<Constants> _const_;
-  
-//  shared_ptr<VecOfVecs<double>::type> _F_;
   shared_ptr<vector<Pt> > _F_;
   
 public:
@@ -147,6 +145,7 @@ public:
   ForceCalc(shared_ptr<ASolver> _asolv);
   
   void calc_force();  // fill F_
+  void calc_force_interact( shared_ptr<System> sys);
   
   // calculate force on one molecule
   Pt calc_fi(int i);
@@ -175,15 +174,9 @@ protected:
   shared_ptr<System> _sys_;
   shared_ptr<VecOfMats<cmplx>::type> _gamma_;
   
-//  double epsS_;
   int N_;
   int p_;
 
-//  /*
-//   Calculate H vector (eq 42 and 43 in Lotan 2006)
-//   */
-//  VecOfMats<cmplx>::type calc_H(int i);
-  
 public:
   TorqueCalc() { }
   
@@ -368,6 +361,7 @@ public:
   Pt calc_tau_i(int i)    { return _torCalc_->calc_tau_i(i); }
   MyVector<double> calc_ei(int i)       { return _eCalc_->calc_ei(i); }
   
+  void calc_force_interact()   { _fCalc_->calc_force_interact(_sys_); }
   void calc_force()   { _fCalc_->calc_force(); }
   void calc_energy()  { _eCalc_->calc_energy(); }
   void calc_torque()  { _torCalc_->calc_tau(); }
