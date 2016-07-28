@@ -29,14 +29,21 @@ read the following steps:
     Add source .cpp and .h Files to pbsolvers Project
     Under Build Phases --> Compile Sources : only need .cpp files
     
-
-
 #### For the simple schemes: ####
 
 Need to change the Search Paths : User Header Search Paths
 to where your code is on the local machine!
 
+### Linear algebra Setup ###
+Mac comes with built in blas and lapack.  
+
+1. In Finder, open to the directory: `/System/Library/Frameworks/Accelerate.framework/Frameworks/`
+2. Drag the `vecLib.framework` file into the pbsam XCode project.
+3. Add path to gtest.framework to Build Settings --> Search Paths --> Framework Search Paths
+4. Add path to gtest.framework to Build Settings --> Search Paths --> Runpath Search Paths
+
 ### GTest Setup ###
+
 For gtest, it's a little more complicated...
 
 
