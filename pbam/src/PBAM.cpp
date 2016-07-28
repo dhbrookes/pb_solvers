@@ -332,11 +332,7 @@ void PBAM::run_electrostatics()
 
 void PBAM::run_energyforce()
 {
-  
-
-  
   clock_t t3 = clock();
-
   
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
@@ -376,17 +372,8 @@ void PBAM::run_bodyapprox()
   threeBodTest.calcTBDEnForTor();
 
   threeBodTest.printTBDEnForTor(setp_->getRunName(), setp_->getMBDLoc());
+  t3 = clock() - t3;
   printf ("manybody approx calc took me %f seconds.\n",
           ((float)t3)/CLOCKS_PER_SEC);
 }
-
-
-
-
-
-
-
-
-
-
 

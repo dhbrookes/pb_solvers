@@ -682,14 +682,12 @@ void LHNMatrix::calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
 //          }
 //          cout << endl;
 //        }
-        
       }
     }
   }
-//  
+  
 //  cout << "This is LHN I " << I_ << " and k " << k << endl;
 //  print_kmat(k);
-
 }
 
 XHMatrix::XHMatrix(int I, int ns, int p,

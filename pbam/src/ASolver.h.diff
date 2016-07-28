@@ -1,0 +1,8 @@
+259c259
+<   void solve_A(double prec);
+---
+>   void solve_A(double prec, int MAX_POL_ROUNDS=5);
+263c263
+<   void solve_gradA(double prec);
+---
+>   void solve_gradA(double prec, int MAX_POL_ROUNDS=5);

@@ -38,7 +38,6 @@
 #include <omp.h>
 #endif
 
-
 // Exception class to ensure that molecule
 class ValueOutOfRange: public exception
 {
@@ -131,7 +130,6 @@ public:
   vector<double> get_maxs()  { return range_max_; }
   vector<int> get_npts()     { return npts_; }
   vector<double> get_bins()  { return step_; }
-  
 };
 
 

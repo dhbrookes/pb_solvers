@@ -91,6 +91,10 @@ protected:
   vector<vector<int> > cgChargesOut_; // indices of charges not within each
                                    // coarse grained sphere
 
+  vector<vector<vector<int> > > interPol_; // For each sph in mol, list of
+                                       // mol/sph pairs that are within 10A
+  vector<vector<vector<int> > > interAct_; // For each sph in mol, list of
+                                      // mol/sph pairs that are btw 100 & 10A
   
   map<int, int>        chToCG_; // maps index of charge to
                                 //index of its coarse-grained sphere
@@ -142,6 +146,19 @@ public:
   void set_gridexpj(int j, vector<int> grid_exp) {cgGdPtExp_[j] = grid_exp;}
   void set_gridburj(int j, vector<int> grid_bur) {cgGdPtBur_[j] = grid_bur;}
   
+  void add_Jl_to_interk( int k, int J, int l) {interPol_[k].push_back({J,l});}
+  void add_Jl_to_inter_act_k( int k, int J, int l)
+  {interAct_[k].push_back({J,l});}
+  
+  bool is_J_in_interk( int k, int J )
+  {
+    int j;
+    for (j = 0; j < interPol_[k].size(); j++)
+      if ( interPol_[k][j][0] == J) return true;
+    
+    return false;
+  }
+  
   void translate(Pt dr, double boxlen);
   void rotate(Quat qrot); // This will rotate with respect to origin!
   void rotate(MyMatrix<double> rotmat);
@@ -176,6 +193,8 @@ public:
   const double get_ak(int k) const    { return as_[k]; }
   const int get_cg_of_ch(int j)       { return chToCG_[j]; }
   
+  vector<vector<int> > get_inter_act_k(int k) {return interAct_[k];}
+  
   /* Choose a random orientation for a Pt vector  */
   Pt random_pt();
   
@@ -202,6 +221,7 @@ protected:
   
   int                          ntype_;  //count of unique molecule types
   vector<int>                  typect_; //count of molecule of each unique type
+  vector<vector<double> >      min_dist_; // minimum dist between mols
   map<vector<int>, int>        typeIdxToIdx_;
   
   const double calc_average_radius() const;
@@ -249,6 +269,14 @@ public:
     vector<int> keys = {type, ty_idx};
     return typeIdxToIdx_[keys];
   }
+  
+  double get_min_dist(int I, int J) { return min_dist_[min(I, J)][max(I, J)];}
+  
+  // Compute min sphere center 2 center distance between 2 mols
+  double calc_min_dist(int I, int J);
+  
+  // Save min distances for all molecule pairs
+  void save_min_dist();
   
   // Compute cutoff for force calcs
   void compute_cutoff();

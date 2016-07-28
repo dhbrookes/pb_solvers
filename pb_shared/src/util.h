@@ -261,6 +261,27 @@ public:
     return Point<T>(x, y, z);
   }
   
+  // Method to set xyz using numbers 0=x, 1=y, 2=z
+  void set_cart(int dim, T val)
+  {
+    if (sph_) convert_to_euclidean();
+    
+    if (dim == 0)       p1_ = val;
+    else if (dim == 1)  p2_ = val;
+    else                p3_ = val;
+  }
+  
+  // Method to get xyz using numbers 0=x, 1=y, 2=z
+  const T& get_cart(int val)
+  {
+    if (sph_) convert_to_euclidean();
+    
+    if (val == 0)       return p1_;
+    else if (val == 1)  return p2_;
+    
+    return p3_;
+  }
+  
   // Getter methods perform necessary conversions:
   const T& x()
   {

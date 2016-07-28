@@ -53,6 +53,13 @@ public:
   void set_mat_knm(int k, int n, int m, Ptx val)
   { mat_[k].set_val(n, m+p_, val); }
   
+  void set_mat_knm_d(int k, int n, int m, int d, cmplx val)
+  {
+    if ( d == 0 )      mat_[k](n, m+p_).set_x(val);
+    else if ( d == 1 ) mat_[k](n, m+p_).set_y(val);
+    else               mat_[k](n, m+p_).set_z(val);
+  }
+  
   MyMatrix<Ptx> get_mat_k(int k) const { return mat_[k]; }
   void set_mat_k(int k, MyMatrix<Ptx> mat )
   {
@@ -72,12 +79,13 @@ public:
   
   friend ostream & operator<<(ostream & fout, GradCmplxMolMat & M)
   {
-    //    fout << "{{";
     for (int k = 0; k < M.get_ns(); k++)
     {
       fout << "For sphere " << k << endl;
+//      fout << "{";
       for (int d = 0; d < 3; d++)
       {
+//        fout << "{";
         fout << " Dim: " << d <<  endl;
         for (int n = 0; n < M.get_p(); n++)
         {
@@ -88,17 +96,16 @@ public:
             if(abs(real) < 1e-15 ) real = 0.0;
             if(abs(imag) < 1e-15 ) imag = 0.0;
             fout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
-            //          fout << setprecision(9) << real << ",";
+//            fout << setprecision(9) <<"{"<< real << ","<<imag<<"},";
           }
           fout << endl;
         }
-        //      fout << "},{" ;
+//              fout << "}," ;
         fout << endl;
       }
-      //      fout << "},{" ;
+//            fout << "}," ;
       fout << endl;
     }
-    //    fout << "},{" << endl;
     return fout;
   }
   
@@ -108,6 +115,7 @@ public:
     for (int d = 0; d < 3; d++)
     {
       cout << " Dim: " << d <<  endl;
+//      cout << "{";
       for (int n = 0; n < get_p(); n++)
       {
         for (int m = 0; m <= n; m++)
@@ -117,10 +125,12 @@ public:
           if(abs(real) < 1e-15 ) real = 0.0;
           if(abs(imag) < 1e-15 ) imag = 0.0;
           cout << setprecision(9) << "(" << real << ", " << imag << ") ";
+//          cout<< setprecision(9) <<"{"<< real << ","<<imag<<"},";
         }
         cout << endl;
       }
-      cout << endl;
+//      cout << "},";
+//      cout << endl;
     }
     cout << endl;
   }
@@ -371,9 +381,9 @@ class GradLFMatrix : public GradNumericalMat
 public:
   GradLFMatrix(int I, int wrt, int ns, int p);
   
-  void init(shared_ptr<Molecule> mol, shared_ptr<GradFMatrix> dF,
-            shared_ptr<SHCalc> shcalc,
-            shared_ptr<ExpansionConstants> _expconst);
+  void init_k(int k, shared_ptr<Molecule> mol, shared_ptr<GradFMatrix> dF,
+              shared_ptr<SHCalc> shcalc,
+              shared_ptr<ExpansionConstants> _expconst);
   
   void calc_all_vals(shared_ptr<Molecule> mol, vector<int> interpol,
                      shared_ptr<TMatrix> T, shared_ptr<GradFMatrix> dF);
@@ -381,12 +391,6 @@ public:
   void calc_val_k(int k, shared_ptr<Molecule> mol, vector<int> interpol,
                   shared_ptr<TMatrix> T,
                   shared_ptr<GradFMatrix> dF);
-  
-//  MyMatrix<Ptx> numeric_reex(int k, int j,
-//                             shared_ptr<Molecule> mol,
-//                             shared_ptr<SHCalc> shcalc,
-//                             shared_ptr<GradFMatrix> dF,
-//                             int Mp=-1);
 };
 
 /*
@@ -400,26 +404,15 @@ protected:
 public:
   GradLHMatrix(int I, int wrt, int ns, int p, double kappa);
   
-  void init(shared_ptr<Molecule> mol, shared_ptr<GradHMatrix> dH,
-            shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
-            shared_ptr<ExpansionConstants> _expconst);
+  void init_k(int k, shared_ptr<Molecule> mol, shared_ptr<GradHMatrix> dH,
+              shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
+              shared_ptr<ExpansionConstants> _expconst);
   
   void calc_all_vals(shared_ptr<Molecule> mol, vector<int> interpol,
                      shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
   
   void calc_val_k(int k, shared_ptr<Molecule> mol, vector<int> interpol,
                   shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
-  
-//  MyMatrix<Ptx> numeric_reex(int k, int j,
-//                             shared_ptr<Molecule> mol,
-//                             vector<double> besseli,
-//                             vector<double> besselk,
-//                             shared_ptr<SHCalc> shcalc,
-//                             shared_ptr<GradHMatrix> dH,
-//                             int Mp=-1);
-  
-
-  
 };
 
 /*
@@ -437,7 +430,8 @@ public:
   void calc_val_k(int k, shared_ptr<System> sys,
                   shared_ptr<TMatrix> T,
                   vector<shared_ptr<GradCmplxMolMat> > gradT_A,
-                  vector<shared_ptr<GradHMatrix> > dH);
+                  vector<shared_ptr<GradHMatrix> > dH,
+                  double dist_cut = 10.0);
   
 };
 

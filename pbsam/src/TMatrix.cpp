@@ -66,8 +66,10 @@ void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
           }
           
 //          cout << "This is Ik, Jl pair : "  << I << ", "<< k
-//              << " & "  << J << ", "<< l
-//              << " dist: " << c_Ik.dist(c_Jl) << " and aIk "
+//              << " & "  << J << ", "<< l << " IK " << c_Ik.x() << ", "
+//          << c_Ik.y() << ", "<< c_Ik.z() << " and " << c_Jl.x() << ", "
+//          << c_Jl.y() << ", "<< c_Jl.z() << endl;
+//          cout << " dist: " << c_Ik.dist(c_Jl) << " and aIk "
 //              << ak << " and ajl "
 //              << al << " dis1 : " <<  c_Ik.dist(c_Jl) - ak - al << endl;
           if ( I == J ) kapVal = {0.0, kappa_};
@@ -145,7 +147,7 @@ MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
  */
 MyMatrix<Ptx> TMatrix::re_expand_gradX(MyMatrix<Ptx> dX,
                                         int I, int k,
-                                        int J, int l)
+                                        int J, int l, bool isF)
 
 {
   VecOfMats<cmplx>::type dX_comps = convert_from_ptx(dX);
@@ -154,27 +156,36 @@ MyMatrix<Ptx> TMatrix::re_expand_gradX(MyMatrix<Ptx> dX,
   VecOfMats<cmplx>::type Z (3);
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE;
   
-  // first dA/dR
-  x1 = expand_RX(dX_comps[0], I, k, J, l, whichR);
-  x2 = expand_SX(x1, I, k, J, l, whichS);
-  z  = expand_RHX(x2, I, k, J, l, whichRH);
-  Z.set_val(0, z);
+  if (isF) whichS = FBASE;
+  // dA/dR = 0, dA/dtheta = 1, dA/dphi = 2
+  for (int d = 0; d < 3; d++)
+  {
+    x1 = expand_RX(dX_comps[d], I, k, J, l, whichR);
+    x2 = expand_SX(x1, I, k, J, l, whichS);
+    z  = expand_RHX(x2, I, k, J, l, whichRH);
+    Z.set_val(d, z);
+  }
   
-  // dA/dtheta:
-  x1 = expand_RX(dX_comps[0], I, k, J, l, whichR);
-  x2 = expand_SX(x1, I, k, J, l, whichS);
-  z  = expand_RHX(x2, I, k, J, l, whichRH);
-  Z.set_val(1, z);
+//  MyMatrix<Ptx> Zpt = convert_to_ptx(Z);
+//  
+//  cout << "after re_exp_grad" << endl;
+//  for (int d = 0; d < 3; d++)
+//  {
+//    cout << " Dim: " << d <<  endl;
+//    for (int n = 0; n < p_; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        cout << Zpt(n,m+p_).get_cart(d) << ", ";
+//      }
+//      cout << endl;
+//    }
+//  }
+//  cout << endl;
+//  
+//  return Zpt;
   
-  // dA/dphiL
-  x1 = expand_RX(dX_comps[0], I, k, J, l, whichR);
-  x2 = expand_SX(x1, I, k, J, l, whichS);
-  z  = expand_RHX(x2, I, k, J, l, whichRH);
-  Z.set_val(2, z);
-  
-  MyMatrix<Ptx> Zpt = convert_to_ptx(Z);
-  return Zpt;
-//  return convert_to_ptx(Z);
+  return convert_to_ptx(Z);
 }
 
 
@@ -237,13 +248,13 @@ MyMatrix<Ptx> TMatrix::re_expandgradX_numeric(vector<vector<Pt> > X,
   double chgscl, rscl, ekr, xval;
   VecOfMats<cmplx>::type Z (3, MyMatrix<cmplx> (p_, 2*p_+1));
   vector<int> exp_pts = _system_->get_gdpt_expij(J, l);
-  for (int d = 0; d < 3; d++)
+  
+  for (h = 0; h < X[l].size(); h++)
   {
-    for (h = 0; h < X[l].size(); h++)
+    if (X[l][h].norm2() < 1e-15) continue;
+    for (int d = 0; d < 3; d++)
     {
-      if (d == 0)       xval = X[l][h].x();
-      else if (d == 1)  xval = X[l][h].y();
-      else              xval = X[l][h].z();
+      xval = X[l][h].get_cart(d);
       
       Pt sph_dist = _system_->get_centerik(I, k) - _system_->get_centerik(J, l);
       Pt loc = _system_->get_gridijh(J, l, exp_pts[h]) - sph_dist;
@@ -257,7 +268,7 @@ MyMatrix<Ptx> TMatrix::re_expandgradX_numeric(vector<vector<Pt> > X,
         for (m = -n; m <= n; m++)
         {
           val = bessI[n]*ekr*chgscl*_shCalc_->get_result(n, m) + Z[d](n, m+p_);
-          Z[d](n, m+p_)  = val;
+          Z[d](n, m+p_) = val;
         }
         chgscl *= rscl;
       }
@@ -600,7 +611,5 @@ MyMatrix<Ptx> TMatrix::convert_to_ptx(VecOfMats<cmplx>::type X)
       result(j, k).set_y(X[1](j, k));
       result(j, k).set_z(X[2](j, k));
     }
-  
   return result;
-  
 }

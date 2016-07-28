@@ -9,35 +9,93 @@
 #include "PhysCalc.h"
 
 
-cmplx EnergyCalc::calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN)
+double EnergyCalc::calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN)
 {
-  cmplx E = 0;
+  double E = 0;
   for (int k = 0; k < H->get_ns(); k++)
+  {
+//    cout << "This is H " << endl; H->print_kmat(k);
+//    cout << "This is LHN " << endl; LHN->print_kmat(k);
     for (int n = 0; n < H->get_p(); n++)
-      for (int m = - n; m < n+1; m++)
-        E += LHN->get_mat_knm(k, n, m) * conj(H->get_mat_knm(k, n, m));
-  
+      for (int m = -n; m < n+1; m++)
+        E += (LHN->get_mat_knm(k, n, m).real()*H->get_mat_knm(k, n, m).real()
+              +LHN->get_mat_knm(k, n, m).imag()*H->get_mat_knm(k, n, m).imag());
+//    cout << "This is E " << E << endl;
+    
+  }
   return E;
 }
 
+vector<double> EnergyCalc::calc_all_energy(vector<shared_ptr<HMatrix> > H,
+                                           vector<shared_ptr<LHNMatrix> > LHN)
+{
+  vector<double> E(H.size(), 0.0);
+  for (int i = 0; i < H.size(); i++)
+  {
+//    cout << "This is i " << i << endl;
+    E[i] = calc_energy(H[i], LHN[i]);
+  }
+  return E;
+}
 
-Ptx ForceCalc::calc_fI(shared_ptr<HMatrix> H,
+Pt ForceCalc::calc_fI(shared_ptr<HMatrix> H,
                        shared_ptr<LHNMatrix> LHN,
                        shared_ptr<GradHMatrix> dH,
                        shared_ptr<GradLHNMatrix> dLHN)
 {
-  Ptx f, fIk, inner1, inner2;
+  Pt f(0.0,0.0,0.0), fIk, inner1, inner2, inn1, inn2;
   for (int k = 0; k < H->get_ns(); k++)
+  {
+    inn1 = Pt(0.0,0.0,0.0);
+    inn2 = Pt(0.0,0.0,0.0);
+    cout << "This is H" << endl; H->print_kmat(k);
+    cout << "This is dLHN" << endl; dLHN->print_kmat(k);
+    cout << "This is dH" << endl; dH->print_kmat(k);
+    cout << "This is LHN" << endl; LHN->print_kmat(k);
     for (int n = 0; n < H->get_p(); n++)
       for (int m = - n; m < n+1; m++)
       {
-        inner1 = dLHN->get_mat_knm(k, n, m) * H->get_mat_knm(k, n, m);
-        inner2 = dH->get_mat_knm(k, n, m) * LHN->get_mat_knm(k, n, m);
-        fIk = inner1 * (-1) + inner2;
-        fIk *= -1;
-        f += fIk;
+        for (int d = 0; d < 3; d++)
+        {
+          inner1.set_cart(d, dLHN->get_mat_knm(k, n, m).get_cart(d).real()
+                          * H->get_mat_knm(k, n, m).real() +
+                          dLHN->get_mat_knm(k, n, m).get_cart(d).imag()
+                          * H->get_mat_knm(k, n, m).imag() );
+          inner2.set_cart(d, dH->get_mat_knm(k, n, m).get_cart(d).real()
+                          * LHN->get_mat_knm(k, n, m).real() +
+                          dH->get_mat_knm(k, n, m).get_cart(d).imag()
+                          * LHN->get_mat_knm(k, n, m).imag());
+          fIk = inner1 + inner2;
+          
+          fIk *= -1;
+          f += fIk;
+        }
+        inn1 = inn1 + inner1;
+        inn2 = inn2 + inner2;
       }
+    
+    cout << "For k " << k << " & H*gLHN " << inn1.x() << ", " << inn1.y()
+    << ", " << inn1.z() << endl;
+    cout << " gH*gLHN " << inn2.x() << ", " << inn2.y()
+    << ", " << inn2.z() << endl;
+    
+  }
   return f;
+}
+
+vector<Pt> ForceCalc::calc_all_f(vector<shared_ptr<HMatrix> > H,
+                                 vector<shared_ptr<LHNMatrix> > LHN,
+                                 vector<vector<shared_ptr<GradHMatrix> > > dH,
+                            vector<vector<shared_ptr<GradLHNMatrix> > > dLHN)
+{
+  vector<Pt> F(H.size(), 0.0);
+  for (int i = 0; i < H.size(); i++)
+  {
+    cout << "This is i " << i << endl;
+    F[i] = calc_fI(H[i], LHN[i], dH[i][i], dLHN[i][i]);
+  }
+  return F;
+  
 }
 
 Ptx ForceCalc::calc_fp(Pt P, shared_ptr<Molecule> mol,
@@ -78,14 +136,15 @@ Ptx TorqueCalc::calc_tauI(shared_ptr<Molecule> mol, shared_ptr<ForceCalc> fcalc,
                           shared_ptr<GradLHNMatrix> dLHN)
 {
   Pt ck, rpk;
-  Ptx fk, fp;
+  Pt fk, fp;
   Ptx tauI, tau1, tau2, tau3;
   vector<int> ch_in_k; // charges in sphere k
   for (int k = 0; k < mol->get_ns(); k++)
   {
     ck = mol->get_centerk(k);
-    fk = fcalc->calc_fI(H, LHN, dH, dLHN);
-    tau1 = cross_prod(ck, fk);
+    //TODO: fix the tau
+//    fk = fcalc->calc_fI(H, LHN, dH, dLHN);
+//    tau1 = cross_prod(ck, fk);
     
     // calculate for every charge on sphere
     tau2 = Ptx();

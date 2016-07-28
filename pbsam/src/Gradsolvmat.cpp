@@ -74,14 +74,10 @@ void GradWFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
   double ak = mol->get_ak(k);
   double exp_ka = exp(-kappa_*ak);
   double bin, bin1, bkn, bkn1;
-  Ptx val1, val2, val3, val4;
+  Ptx tot, val1, val2, val3, val4;
   double inner;
   for (int n = 0; n < p_; n++)
   {
-//    bin = bcalc->get_in_Ik(I_, k, n);
-//    bin1 = bcalc->get_in_Ik(I_, k, n+1);
-//    bkn = bcalc->get_kn_Ik(I_, k, n);
-//    bkn1 = bcalc->get_kn_Ik(I_, k, n+1);
     bin = besseli[n];
     bin1 = besseli[n+1];
     bkn = besselk[n];
@@ -91,10 +87,9 @@ void GradWFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
       val1=dH->get_mat_knm(k,n,m)*exp_ka*(n*bkn-(2*n+1)*bkn1);
       val2=dF->get_mat_knm(k,n,m)*(2*n+1-n*eps_);
       val3=dLF->get_mat_knm(k, n, m)*n*eps_*ak;
-      inner=(n*bin)+((bin1*kappa_*ak)/(2*n+3));
-      inner+=(bin1*kappa_*ak)/(2*n+3);
-      val4 = (dLH->get_mat_knm(k,n,m)+dLHN->get_mat_knm(k,n,m)) * inner;
-      set_mat_knm(k, n, m, val1+val2+val3+val4);
+      inner=(n*bin)+((bin1*pow(kappa_*ak,2))/(double)(2*n+3));
+      val4 = (dLH->get_mat_knm(k,n,m)+dLHN->get_mat_knm(k,n,m)) * inner * ak;
+      set_mat_knm(k, n, m, val1+val2-val3+val4);
     }
   }
 }
@@ -137,21 +132,32 @@ void GradWHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
   double ak = mol->get_ak(k);
   double exp_ka = exp(-kappa_*ak);
   double bin, bkn, inner;
-  Ptx val1, val2, val3, val4;
+  Ptx tot, val1, val2, val3, val4;
+  
+//  cout << "Inside WH" << endl;
+//  cout << "This is dLH ";
+//  dLH->print_analytical(k);
+//  cout << "This is dLHN ";
+//  dLHN->print_kmat(k);
+  
+//  cout << "This is dLF ";
+//  dLF->print_analytical(k);
+//  cout << "This is dF ";
+//  dF->print_kmat(k);
+  
   for (int n = 0; n < p_; n++)
   {
-//    bin = bcalc->get_in_Ik(I_, k, n);
-//    bkn = bcalc->get_kn_Ik(I_, k, n);
     bin = besseli[n];
     bkn = besselk[n];
     for (int m = -n; m < n+1; m++)
     {
-      inner = ((2 * n + 1) / bin) - (exp_ka * bkn);
+      inner = ((2.0*n+1.0) / bin) - (exp_ka * bkn);
       val1 = dH->get_mat_knm(k, n, m) * inner;
       val2 = dF->get_mat_knm(k, n, m);
       val3 = dLF->get_mat_knm(k, n, m) * ak;
       val4 = (dLH->get_mat_knm(k,n,m)+dLHN->get_mat_knm(k,n,m))*ak*bin;
-      set_mat_knm(k, n, m, val1+val2+val3+val4);
+      tot = val1+val2+val3-val4;
+      set_mat_knm(k, n, m, tot);
     }
   }
 }
@@ -171,23 +177,51 @@ void GradFMatrix::calc_all_vals(shared_ptr<IEMatrix> IE,
 void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
                              shared_ptr<GradWFMatrix> dWF)
 {
-  Ptx in, in2;
-  for (int n = 0; n < p_; n++)
+  int ct;
+  vector<MyMatrix<double> > df_in(3, MyMatrix<double> (p_*p_, 1));
+  vector<MyMatrix<double> > df_out(3, MyMatrix<double> (p_*p_, 1));
+  for (int d = 0; d < 3; d++)  // 3 dimensions
   {
-    for (int m = -n; m < n+1; m++)
+    ct = 0;
+    for (int l = 0; l < p_; l++)  // rows in old matrix
     {
-      in = Ptx();
-      //compute inner product
-      for (int l = 0; l < p_; l++)
+      for (int s = 0; s < l+1; s++)  //columns in old matrix
       {
-        for (int s = 0; s < p_; s++)
+        df_in[d](ct,0) = dWF->get_mat_knm_d(k, l, s, d).real();
+        ct++;
+        if ( s > 0 )
         {
-          in2=dWF->get_mat_knm(k,l,s);
-          //*IE->get_IE_k_nm_ls(k,n,m,l,s).real();
-          in += in;
+          df_in[d](ct,0) = dWF->get_mat_knm_d(k, l, s, d).imag();
+          ct++;
         }
       }
-      set_mat_knm(k, n, m, in);
+    }
+    //TODO: replace with matMul
+    df_out[d] = IE->get_IE_k(k) * df_in[d];  // Matrix vector multiplication
+  }
+
+  for (int d = 0; d < 3; d++)  // 3 dimensions
+  {
+    int ctr(0);
+    for (int n = 0; n < p_; n++)  // rows in new matrix
+    {
+      double scl = 1.0 / (double)(2.0*n+1.0);
+      for (int m = 0; m < n+1; m++)  // columns in new matrix
+      {
+        double fRe, fIm;
+        fRe = df_out[d](ctr,0);
+        ctr++;
+        
+        if ( m > 0 )
+        {
+          fIm = df_out[d](ctr,0);
+          ctr++;
+        } else
+          fIm = 0.0;
+        
+        set_mat_knm_d(k,n,m,d, scl*complex<double> (fRe,fIm));
+        if ( m > 0 ) set_mat_knm_d(k,n,-m,d,scl*complex<double> (fRe,-fIm));
+      }
     }
   }
 }
@@ -231,23 +265,72 @@ void GradHMatrix::calc_val_k(int k, vector<double> besseli,
                              shared_ptr<IEMatrix> IE,
                              shared_ptr<GradWHMatrix> dWH)
 {
-  Ptx in, in2;
-  for (int n = 0; n < p_; n++)
+  int ct, d, l, s, n, m;
+  MyMatrix<double> dh_in(p_*p_, 1);
+  vector<MyMatrix<double> > dh_out(3, MyMatrix<double> (p_*p_, 1));
+  for (d = 0; d < 3; d++)  // 3 dimensions
   {
-    for (int m = -n; m < n+1; m++)
+    ct = 0;
+    for (l = 0; l < p_; l++)  // rows in old matrix
     {
-      in = Ptx();
-      //compute inner product
-      for (int l = 0; l < p_; l++)
+      for (s = 0; s < l+1; s++)  //columns in old matrix
       {
-        for (int s = 0; s < p_; s++)
+        dh_in(ct,0) = dWH->get_mat_knm_d(k, l, s, d).real();
+        ct++;
+        if ( s > 0 )
         {
-          in2 = dWH->get_mat_knm(k,l,s);
-          //*IE->get_IE_k_nm_ls(k,n,m,l,s);
-          in += in2;
+          dh_in(ct,0) = dWH->get_mat_knm_d(k, l, s, d).imag();
+          ct++;
         }
       }
-      set_mat_knm(k, n, m, in * besseli[n]);
+    }
+    //TODO: replace with matMul
+    dh_out[d] = IE->get_IE_k(k) * dh_in;  // Matrix vector multiplication
+  }
+  
+//  
+//  cout << "~~~~~~ output ~~~~~~~~~~~~~~" << endl;
+//  for (int d = 0; d < 3; d++)
+//  {
+//    ct = 0;
+//    cout << " Dim: " << d <<  endl;
+//    for (int n = 0; n < p_; n++)
+//    {
+//      for (int m = 0; m < p_; m++)
+//      {
+//        double real = dh_out[d](ct, 0); //.real();
+//        if(abs(real) < 1e-15 ) real = 0.0;
+//        cout << setprecision(7)<<  real << ", ";
+//        ct++;
+//      }
+//      cout << endl;
+//    }
+//    cout << endl;
+//  }
+//  
+  
+  for (d = 0; d < 3; d++)  // 3 dimensions
+  {
+    int ctr(0);
+    for (n = 0; n < p_; n++)  // rows in new matrix
+    {
+      double scl = besseli[n] / (double)(2.0*n+1.0);
+      for (m = 0; m < n+1; m++)  // columns in new matrix
+      {
+        double dhR, dhI;
+        dhR = dh_out[d](ctr,0);
+        ctr++;
+        
+        if ( m > 0 )
+        {
+          dhI = dh_out[d](ctr,0);
+          ctr++;
+        } else
+          dhI = 0.0;
+        
+        set_mat_knm_d(k,n,m,d,scl*complex<double> (dhR,dhI));
+        if ( m > 0 ) set_mat_knm_d(k,n,-m,d,scl*complex<double> (dhR,-dhI));
+      }
     }
   }
 }
@@ -257,9 +340,10 @@ GradLFMatrix::GradLFMatrix(int I, int wrt, int ns, int p)
 {
 }
 
-void GradLFMatrix::init(shared_ptr<Molecule> mol, shared_ptr<GradFMatrix> dF,
-                        shared_ptr<SHCalc> shcalc,
-                        shared_ptr<ExpansionConstants> _expconst)
+void GradLFMatrix::init_k(int k, shared_ptr<Molecule> mol,
+                          shared_ptr<GradFMatrix> dF,
+                          shared_ptr<SHCalc> shcalc,
+                          shared_ptr<ExpansionConstants> _expconst)
 {
   double rl, im;
   
@@ -312,24 +396,44 @@ void GradLFMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
   for (int j = 0; j < get_ns(); j++)
   {
     if (j == k) continue;
-    
     if ((interpol[k] != 0) || (interpol[j] != 0)) continue;
+    
     if (T->is_analytic(I_, k, I_, j))
     {
-      cout << "LF Reexp Analyt " << I_ << " sph " << k << " to " <<
-      I_ << " sph " << j << endl;
-//      dF->print_kmat(k);
-      reex = T->re_expand_gradX(dF->get_mat_k(k), I_, k, I_, j);
+//      cout << "LF Reexp Analyt " << I_ << " sph " << j << " to " <<
+//      I_ << " sph " << k << endl;
+//      dF->print_kmat(j);
+      reex = T->re_expand_gradX(dF->get_mat_k(j), I_, k, I_, j, true);
+      
+//      cout << "~~~~~~ output ~~~~~~~~~~~~~~" << endl;
+//      for (int d = 0; d < 3; d++)
+//      {
+//        cout << " Dim: " << d <<  endl;
+//        for (int n = 0; n < p_; n++)
+//        {
+//          for (int m = 0; m <= n; m++)
+//          {
+//            double real = reex( n, m+p_).get_cart(d).real();
+//            double imag = reex( n, m+p_).get_cart(d).imag();
+//            if(abs(real) < 1e-15 ) real = 0.0;
+//            if(abs(imag) < 1e-15 ) imag = 0.0;
+//            cout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
+//          }
+//          cout << endl;
+//        }
+//        cout << endl;
+//      }
+
     }
     else
     {
-      cout << "LF Reexp Numer " << I_ << " sph " << k << " to " <<
-      I_ << " sph " << j << endl;
-//      dF->print_kmat(k);
-//      reex = numeric_reex(k, j, mol, shcalc, dF);
-      //TODO: make a re_expand_gradX_numeric
+      // From (I,j) -> (I,k) is re_exp_numeric( , I, k, I, j)
+//      cout << "LF Reexp Numer " << I_ << " sph " << j << " to " <<
+//      I_ << " sph " << k << endl;
+//      print_kmat(j);
       reex = T->re_expandgradX_numeric(get_mat(), I_, k, I_, j, 0.0 );
     }
+    
     inner += reex;
   }
   mat_cmplx_[k] = inner;
@@ -341,41 +445,40 @@ GradLHMatrix::GradLHMatrix(int I, int wrt, int ns, int p, double kappa)
 {
 }
 
-void GradLHMatrix::init(shared_ptr<Molecule> mol, shared_ptr<GradHMatrix> dH,
-                        shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
-                        shared_ptr<ExpansionConstants> _expconst)
+void GradLHMatrix::init_k(int k, shared_ptr<Molecule> mol,
+                          shared_ptr<GradHMatrix> dH,
+                          shared_ptr<SHCalc> shcalc,
+                          shared_ptr<BesselCalc> bcalc,
+                          shared_ptr<ExpansionConstants> _expconst)
 {
   double rl, im;
+
+  vector <int> exp_pts = mol->get_gdpt_expj(k);
+  mat_[k].resize( (int) exp_pts.size() );
+  double dA = 4 * M_PI / (double) mol->get_gridj(k).size();
   
-  for (int k=0; k< mol->get_ns(); k++)
+  for (int h = 0; h < exp_pts.size(); h++)
   {
-    vector <int> exp_pts = mol->get_gdpt_expj(k);
-    mat_[k].resize( (int) exp_pts.size() );
-    double dA = 4 * M_PI / (double) mol->get_gridj(k).size();
+    vector<double> val(3, 0.0);
+    Pt q = mol->get_gridjh(k, exp_pts[h]);
+    shcalc->calc_sh(q.theta(), q.phi());
+    vector<double> bessI = bcalc->calc_mbfI(p_+1, kappa_*q.r());
     
-    for (int h = 0; h < exp_pts.size(); h++)
+    for (int d = 0; d < 3; d++)
     {
-      vector<double> val(3, 0.0);
-      Pt q = mol->get_gridjh(k, exp_pts[h]);
-      shcalc->calc_sh(q.theta(), q.phi());
-      vector<double> bessI = bcalc->calc_mbfI(p_+1, kappa_*q.r());
-      
-      for (int d = 0; d < 3; d++)
+      for (int n=0; n<p_; n++)
       {
-        for (int n=0; n<p_; n++)
+        for (int m = -n; m <= n; m++)
         {
-          for (int m = -n; m <= n; m++)
-          {
-            rl = (shcalc->get_result(n,m).real()*
-                  dH->get_mat_knm_d(k,n,m,d).real());
-            im = (shcalc->get_result(n,m).imag()*
-                  dH->get_mat_knm_d(k,n,m,d).imag());
-            val[d] += dA*_expconst->get_const1_l(n) * ( rl + im )/bessI[n];
-          }
+          rl = (shcalc->get_result(n,m).real()*
+                dH->get_mat_knm_d(k,n,m,d).real());
+          im = (shcalc->get_result(n,m).imag()*
+                dH->get_mat_knm_d(k,n,m,d).imag());
+          val[d] += dA*_expconst->get_const1_l(n) * ( rl + im )/bessI[n];
         }
       }
-      set_mat_kh(k, h, Pt(val[0], val[1], val[2]));
     }
+    set_mat_kh(k, h, Pt(val[0], val[1], val[2]));
   }
 }
 
@@ -397,22 +500,41 @@ void GradLHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
   for (int j = 0; j < get_ns(); j++)
   {
     if (j == k) continue;
-    if ((abs(interpol[k]-1) < 1e-10) || (abs(interpol[j]-1) < 1e-10)) continue;
+    if ((interpol[k] != 0) || (interpol[j] != 0)) continue;
     
     if (T->is_analytic(I_, k, I_, j))
     {
-      cout << "Reexp Analyt " << I_ << " sph " << k << " to " <<
-      I_ << " sph " << j << endl;
-      //      dH->print_kmat(k);
-      reex = T->re_expand_gradX(dH->get_mat_k(k), I_, k, I_, j);
+//      cout << "LH Reexp Analyt " << I_ << " sph " << j << " to " <<
+//      I_ << " sph " << k << endl;
+//      dH->print_kmat(j);
+      reex = T->re_expand_gradX(dH->get_mat_k(j), I_, k, I_, j);
     }
     else
     {
-      cout << "Reexp Numer " << I_ << " sph " << k << " to " <<
-      I_ << " sph " << j << endl;
-      //      dH->print_kmat(k);
+//      cout << "LH Reexp Numer " << I_ << " sph " << j << " to " <<
+//      I_ << " sph " << k << endl;
+//      print_kmat(j);
       reex = T->re_expandgradX_numeric(get_mat(), I_, k, I_, j, kappa_);
     }
+    
+//    cout << "~~~~~~ output ~~~~~~~~~~~~~~" << endl;
+//    for (int d = 0; d < 3; d++)
+//    {
+//      cout << " Dim: " << d <<  endl;
+//      for (int n = 0; n < p_; n++)
+//      {
+//        for (int m = 0; m <= n; m++)
+//        {
+//          double real = reex( n, m+p_).get_cart(d).real();
+//          double imag = reex( n, m+p_).get_cart(d).imag();
+//          if(abs(real) < 1e-15 ) real = 0.0;
+//          if(abs(imag) < 1e-15 ) imag = 0.0;
+//          cout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
+//        }
+//        cout << endl;
+//      }
+//      cout << endl;
+//    }
     inner += reex;
   }
   mat_cmplx_[k] = inner;
@@ -457,12 +579,35 @@ void GradLHNMatrix::calc_all_vals(shared_ptr<System> sys,
 void GradLHNMatrix::calc_val_k(int k, shared_ptr<System> sys,
                                shared_ptr<TMatrix> T,
                                vector<shared_ptr<GradCmplxMolMat> > gradT_A,
-                               vector<shared_ptr<GradHMatrix> > dH)
+                               vector<shared_ptr<GradHMatrix> > dH,
+                               double dist_cut)
 {
   Pt Ik, Mm;
-  double aIk, aMm, interPolcut = 10.0;
+  double aIk, aMm, interPolcut = dist_cut;
   MyMatrix<Ptx> lhn_k(p_, 2*p_+1), inner;
   lhn_k = gradT_A[I_]->get_mat_k(k);
+  
+//  if ( fabs(interPolcut-100) < 1e-2)
+//  {
+//  cout << "~~~~~~ " << I_ << " and k " << k <<" gT * A ~~~~~~~~~~~~~~" << endl;
+//  for (int d = 0; d < 3; d++)
+//  {
+//    cout << " Dim: " << d <<  endl;
+//    for (int n = 0; n < p_; n++)
+//    {
+//      for (int m = 0; m <= n; m++)
+//      {
+//        double real = lhn_k( n, m+p_).get_cart(d).real();
+//        double imag = lhn_k( n, m+p_).get_cart(d).imag();
+//        if(abs(real) < 1e-15 ) real = 0.0;
+//        if(abs(imag) < 1e-15 ) imag = 0.0;
+//        cout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
+//      }
+//      cout << endl;
+//    }
+//  }
+//  cout << "~~~~~~~~~~~~~~~~~~~~" << endl;
+//  }
   
   Ik = sys->get_centerik(I_, k);
   aIk = sys->get_aik(I_, k);
@@ -477,9 +622,36 @@ void GradLHNMatrix::calc_val_k(int k, shared_ptr<System> sys,
       
       if ( sys->get_pbc_dist_vec_base(Ik, Mm).norm() < (interPolcut+aIk+aMm))
       {
+//        if ( fabs(interPolcut-100) < 1e-2)
+//        {
 //        cout << "Reex " << I_ << " and sph " << k  << " with xforms from "
 //        << M << " sph " << m << endl;
+//        dH[M]->print_kmat(m);
+//        }
         inner = T->re_expand_gradX(dH[M]->get_mat_k(m), I_, k, M, m);
+        
+//        if ( fabs(interPolcut-100) < 1e-2)
+//        {
+//        cout << "~~~~~~ output ~~~~~~~~~~~~~~" << endl;
+//        for (int d = 0; d < 3; d++)
+//        {
+//          cout << " Dim: " << d <<  endl;
+//          for (int n = 0; n < p_; n++)
+//          {
+//            for (int m = 0; m <= n; m++)
+//            {
+//              double real = inner( n, m+p_).get_cart(d).real();
+//              double imag = inner( n, m+p_).get_cart(d).imag();
+//              if(abs(real) < 1e-15 ) real = 0.0;
+//              if(abs(imag) < 1e-15 ) imag = 0.0;
+//              cout << "(" << setprecision(7)<<  real << ", " << imag << ") ";
+//            }
+//            cout << endl;
+//          }
+//          cout << endl;
+//        }
+//        }
+        
         lhn_k += inner;
       }
     }

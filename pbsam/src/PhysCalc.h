@@ -24,8 +24,9 @@ class EnergyCalc
 public:
   EnergyCalc() { }
   
-  cmplx calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN);
-  
+  double calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN);
+  vector<double> calc_all_energy(vector<shared_ptr<HMatrix> > H,
+                                 vector<shared_ptr<LHNMatrix> > LHN);
 };
 
 
@@ -46,8 +47,13 @@ public:
    Calculate translational force on a molecule given dI_LHN^(I,k), H^(I,k),
    LHN^(I,k) and dI_H^(I,k)
    */
-  Ptx calc_fI(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
+  Pt calc_fI(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
               shared_ptr<GradHMatrix> dH, shared_ptr<GradLHNMatrix> dLHN);
+  
+  vector<Pt> calc_all_f(vector<shared_ptr<HMatrix> > H,
+                        vector<shared_ptr<LHNMatrix> > LHN,
+                        vector<vector<shared_ptr<GradHMatrix> > > dH,
+                        vector<vector<shared_ptr<GradLHNMatrix> > > dLHN);
   
   //calc force at a point
   Ptx calc_fp(Pt P, shared_ptr<Molecule> mol,

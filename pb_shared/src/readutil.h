@@ -471,10 +471,14 @@ protected:
     fin >> kappa_;
     fin >> rcut_;
     
-    int psqRead = pRead*pRead;
-    for(int k=0; k<psqRead; k++) fin >> vec_[k];
+    cout << "Read p " << pRead << " and p " << p_  << endl;
     
-    for(int k=psqRead; k<ps; k++)
+    int psqRead = pRead*pRead;
+    int pmin = min(psqRead, ps);
+    int pmax = max(psqRead, ps);
+    for(int k=0; k<pmin; k++) fin >> vec_[k];
+    
+    for(int k=pmin; k<pmax; k++)
     {
       if( pRead < p_)
       {
@@ -484,9 +488,8 @@ protected:
       }
       else
         fin >> vec_[k];
-      
-      fin.close();
     }
+    fin.close();
   }
   
   void convert_to_mat()
@@ -507,8 +510,8 @@ protected:
         } else
           im = 0.0;
         
-        mat_(n, m+p_) = complex<double> (re, im);
-        if ( m > 0 ) mat_(n, -m+p_) = complex<double> (re, -im);
+        mat_.set_val(n, m+p_, complex<double> (re, im));
+        if ( m > 0 ) mat_.set_val(n, -m+p_, complex<double> (re, -im));
       }
     }
   }

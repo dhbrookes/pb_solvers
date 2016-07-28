@@ -589,7 +589,7 @@ TEST_F(BDUTest, BDrunTimeTermY)
 
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
-  BDTest.run("","", 100);
+  BDTest.run( "", "", 500);
   
   EXPECT_NEAR(sys->get_time()/10, 1, preclim);
   for (int mi = 0; mi < ml; mi ++ )
@@ -628,7 +628,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
   
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
-  BDTest.run("", "", 100);
+  BDTest.run( "", "", 500);
   
   EXPECT_NEAR(sys->get_time()/31.361344, 1, preclim);
   
@@ -668,7 +668,7 @@ TEST_F(BDUTest, BDrunTimeTermRot)
   
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-30);
-  BDTest.run("", "", 500);
+  BDTest.run( "", "", 500);
   
   for (int mi = 0; mi < ml; mi ++ )
   {

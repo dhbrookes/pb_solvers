@@ -679,4 +679,3 @@ ThreeBodyPhysCalc::ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num,
 outfname_(outfname)
 {
 }
-

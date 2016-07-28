@@ -122,7 +122,7 @@ public:
    the three components of grad(X)
    */
   MyMatrix<Ptx> re_expand_gradX(MyMatrix<Ptx> dX,
-                                int I, int k, int J, int l);
+                                int I, int k, int J, int l, bool isF = false);
   
   
   

@@ -85,6 +85,8 @@ public:
   
   void reset_all();
   
+  void update_LHN_all();
+  
   vector<shared_ptr<HMatrix> > get_all_H() {return _H_;}
   vector<shared_ptr<FMatrix> > get_all_F() {return _F_;}
   MyMatrix<cmplx> getH_ik(int I, int k) {return _H_[I]->get_mat_k(k);}
@@ -94,6 +96,7 @@ public:
   cmplx getF_ik_nm(int I, int k, int n, int m)
                   {return _F_[I]->get_mat_knm(k, n, m);}
   
+  vector<shared_ptr<LHNMatrix> >  get_all_LHN() {return _LHN_;}
   cmplx getLHN_ik_nm(int I, int k, int n, int m)
                   {return _LHN_[I]->get_mat_knm(k, n, m);}
   
@@ -106,11 +109,12 @@ public:
     return ipol;
   }
   
-  void update_LHN_all();
-  
-  
   shared_ptr<TMatrix> get_T()              {return _T_;}
-  
+  int get_p()                              {return p_;}
+  shared_ptr<System> get_sys()             {return _sys_; }
+  shared_ptr<Constants> get_consts()       {return _consts_; }
+  shared_ptr<SHCalc> get_sh()              {return _shCalc_;}
+  shared_ptr<BesselCalc> get_bessel()      {return _bCalc_;}
 };
 
 
@@ -119,6 +123,7 @@ class GradSolver
 protected:
   int p_;
   double kappa_;
+  int Ns_tot_; // measure of number of spheres in the system
   
   vector<shared_ptr<FMatrix> >      _F_;  // converged solutions for these
   vector<shared_ptr<HMatrix> >      _H_;
@@ -130,6 +135,8 @@ protected:
   // that this derivative is with respect to
   vector<vector<shared_ptr<GradFMatrix> > >   dF_;
   vector<vector<shared_ptr<GradHMatrix> > >   dH_;
+  vector<vector<shared_ptr<GradHMatrix> > >   prev_dH_;
+  vector<vector<shared_ptr<GradHMatrix> > >   outer_dH_;
   vector<vector<shared_ptr<GradWFMatrix> > >  dWF_;
   vector<vector<shared_ptr<GradWHMatrix> > >  dWH_;
   vector<vector<shared_ptr<GradLFMatrix> > >  dLF_;
@@ -145,7 +152,19 @@ protected:
   shared_ptr<Constants>             _consts_;
   
   vector<vector<int> > interpol_; // whether sphere Ik is w/in 10A of other mol
-
+  vector<vector<double > > dev_sph_Ik_; // record of deviations
+  
+  void iter_inner_gradH(int I, int wrt, int k, vector<double> &besseli,
+                        vector<double> &besselk);
+  double calc_converge_gradH( int I, int wrt, int k, bool inner);
+  
+  void step(int t, int I, int wrt, int k, vector<double> &besseli,
+            vector<double> &besselk);
+  
+  // Updating dHs
+  void update_prev_gradH(int I, int wrt, int k);
+  void update_outer_gradH(int I, int wrt, int k);
+  
 public:
   GradSolver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
              shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
@@ -157,6 +176,19 @@ public:
   void solve(double tol, int maxiter);
   
   void pre_compute_gradT_A();
+  
+  shared_ptr<GradHMatrix> get_gradH(int I, int wrt) { return dH_[wrt][I];}
+  shared_ptr<GradFMatrix> get_gradF(int I, int wrt) { return dF_[wrt][I];}
+  
+  vector<vector<shared_ptr<GradHMatrix> > > get_gradH_all() { return dH_;}
+  vector<vector<shared_ptr<GradFMatrix> > > get_gradF_all() { return dF_;}
+  
+  vector<vector<shared_ptr<GradLHNMatrix> > > get_gradLHN_all() {return dLHN_;}
+  
+  cmplx get_gradH_Ik_nm_d(int I, int wrt, int k, int n, int m, int d)
+  { return dH_[wrt][I]->get_mat_knm_d(k, n, m, d); }
+  cmplx get_gradF_Ik_nm_d(int I, int wrt, int k, int n, int m, int d)
+  { return dF_[wrt][I]->get_mat_knm_d(k, n, m, d); }
   
   Ptx get_gradT_A_Ik_nm(int I, int wrt, int k, int n, int m)
   { return gradT_A_[wrt][I]->get_mat_knm(k, n, m); }
