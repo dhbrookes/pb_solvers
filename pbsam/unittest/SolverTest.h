@@ -10,6 +10,7 @@
 #define SolverTest_h
 
 #include "Solver.h"
+#include "Electrostatics.h"
 
 class SolverTest
 {

@@ -1,11 +1,10 @@
+//
+// PBSAM.h
+// pbsam
 /*
- main.cpp
- 
- Main for PBSAM runs, electrostatics, dynamics and energyforce
- 
  Copyright (c) 2015, Teresa Head-Gordon, Lisa Felberg, Enghui Yap, David Brookes
  All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright
@@ -16,7 +15,7 @@
  * Neither the name of UC Berkeley nor the
  names of its contributors may be used to endorse or promote products
  derived from this software without specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,17 +28,55 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "PBSAM.h"
+#ifndef PBSAM_H
+#define PBSAM_H
+
+#include <memory>
+#include <time.h>
+#include "PBSAMStruct.h"
+#include "BD.h"
+
 
 using namespace std;
 
-int main(int argc, const char * argv[])
+class PBSAM : protected PBSAMInput
 {
-  string input_file = argv[1];
-  //  string input_file = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/energyforce_test/barnase_barstar/run.energyforce.hardrefs.inp";
+protected:
+  shared_ptr<Setup> setp_;
+  shared_ptr<System> syst_;
+  shared_ptr<Constants> consts_;
 
-  PBSAM pbsam_run(input_file);
-  pbsam_run.run();
-  
-  return 0;
-}
+  int poles_;
+  double solveTol_;
+
+public:
+
+  // Constructors
+  PBSAM();
+  PBSAM(string infile);
+  // For APBS
+  PBSAM(const PBSAMInput& pbsami, vector<Molecule> mls );
+
+  friend PBSAMInput getPBSAMParams();
+
+  // Copy constructors
+  PBSAM( const PBSAM& pbam ) ;
+  PBSAM( const PBSAM* pbam ) ;
+
+  void check_setup();
+  void check_system();
+
+  void init_write_system();
+
+  int run();
+  // for running the APBS version
+  PBSAMOutput run_apbs( );
+
+  void run_bodyapprox();
+  void run_dynamics();
+  void run_electrostatics();
+  void run_energyforce();
+};
+
+
+#endif
