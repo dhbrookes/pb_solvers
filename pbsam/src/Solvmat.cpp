@@ -896,20 +896,17 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
       inner *= prev->get_mat_knm(k, l, s);
       inner += F->get_mat_knm(k, l, s);
       inner += XH->get_mat_knm(k, l, s);
-      
-//      h_in1(ct,0) = inner.real();
+
       h_in[ct] = inner.real();
       ct++;
       if ( s > 0 )
       {
-//        h_in1(ct,0) = inner.imag();
         h_in[ct] = inner.imag();
         ct++;
       }
     }
   }
   
-  //TODO: replace with matMul
   const int p2 = p_*p_;
 #ifdef __LAU  
   applyMMat(&IE->get_IE_k_org(k)[0], &h_in[0], &h_out[0], 1.0, 0.0, p2, 1, p2);
@@ -994,12 +991,11 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
                         shared_ptr<IEMatrix> IE,
                         shared_ptr<BesselCalc> bcalc, int k, double kappa)
 {
-  int ct = 0;
+  int ct(0), p2(p_*p_);
   cmplx inner;
-  double ak = mol->get_ak(k);
+  double ak = mol->get_ak(k), fRe, fIm, scl;
   vector<double> bessel_i = bcalc->calc_mbfI(p_+1, kappa*ak);
   vector<double> bessel_k = bcalc->calc_mbfK(p_+1, kappa*ak);
-//  MyMatrix<double> f_in(p_*p_, 1), f_out(p_*p_, 1);
   double f_in[p_*p_], f_out[p_*p_];
   
   for (int l = 0; l < p_; l++)
@@ -1011,12 +1007,10 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
       inner += XF->get_mat_knm(k, l, s);
       inner += (double(2*l + 1 - l * XF->get_eps()) *
                 prev->get_mat_knm(k, l, s));
-//      f_in(ct,0) = inner.real();
       f_in[ct] = inner.real();
       ct++;
       if ( s > 0 )
       {
-//        f_in(ct,0) = inner.imag();
         f_in[ct] = inner.imag();
         ct++;
       }
@@ -1024,7 +1018,6 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
   }
 
   //TODO: replace with matMul
-  int p2 = p_*p_;
 #ifdef __LAU  
   applyMMat(&IE->get_IE_k_org(k)[0], &f_in[0], &f_out[0], 1.0, 0.0, p2, 1, p2);
 #else  
@@ -1033,28 +1026,27 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
   f_out1 = IE->get_IE_k(k) * f_in1;  // Matrix vector multiplication
 #endif  
 
-  int ctr(0);
+  ct = 0;
   for (int n = 0; n < p_; n++)  // rows in new matrix
   {
-    double scl = 1.0 / (double)(2.0*n+1.0);
+    scl = 1.0 / (double)(2.0*n+1.0);
     for (int m = 0; m < n+1; m++)  // columns in new matrix
     {
-      double fRe, fIm;
 #ifdef __LAU  
-      fRe = f_out[ctr];
+      fRe = f_out[ct];
 #else  
-      fRe = f_out1(ctr,0);
+      fRe = f_out1(ct,0);
 #endif
-      ctr++;
+      ct++;
      
       if ( m > 0 )
       {    
 #ifdef __LAU  
-        fIm = f_out[ctr];
+        fIm = f_out[ct];
 #else
-        fIm = f_out1(ctr,0);
+        fIm = f_out1(ct,0);
 #endif
-        ctr++;
+        ct++;
       } else
         fIm = 0.0;
       

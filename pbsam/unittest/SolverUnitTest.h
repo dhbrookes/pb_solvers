@@ -689,226 +689,226 @@ TEST_F(SolverUTest, LHN_test)
 }
 
 
-TEST_F(SolverUTest, spol_test)
-{
-  int pol = 3;
-  PQRFile pqr(test_dir_loc + "test_cged.pqr");
-  vector<shared_ptr<Molecule> > mols;
-  mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-                                       pqr.get_atom_pts(), pqr.get_radii(),
-                                       pqr.get_cg_centers(),
-                                       pqr.get_cg_radii()));
-  auto sys = make_shared<System>(mols);
-  auto cst = make_shared<Constants> ();
-  cst->set_dielectric_water(80);
-  cst->set_dielectric_prot(4);
-  cst->set_salt_concentration(0.01);
-  cst->set_temp(298.15);
-  cst->set_kappa(0.0325628352);
-  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
-  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
-  auto BesselCons = make_shared<BesselConstants> (2*pol);
-  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
-  auto _expcons = make_shared<ExpansionConstants> (pol);
-  
-  // Generate surface integrals
-  IEMatrix ieMatTest(0, sys->get_molecule(0),
-                     SHCalcTest, pol, _expcons, true, 0, true);
-
-  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
-  solvTest.solve(1e-13, 80);
-  
-  for (int i = 0; i < sys->get_Ns_i(0); i++)
-  {
-    int ct = 0;
-    for(int n=0; n<pol; n++)
-    {
-      for(int m=0; m <= n; m++)
-      {
-        EXPECT_NEAR(spolFre[i][ct],solvTest.getF_ik_nm(0,i,n,m).real(),preclim);
-        EXPECT_NEAR(spolHre[i][ct],solvTest.getH_ik_nm(0,i,n,m).real(),preclim);
-        EXPECT_NEAR(spolFim[i][ct],solvTest.getF_ik_nm(0,i,n,m).imag(),preclim);
-        EXPECT_NEAR(spolHim[i][ct],solvTest.getH_ik_nm(0,i,n,m).imag(),preclim);
-         ct++;
-      }
-    }
-  }
-}
-
-
-TEST_F(SolverUTest, mutual_pol_test)
-{
-  int pol(3), nmol(2);
-  PQRFile pqr(test_dir_loc + "test_cged.pqr");
-  vector<shared_ptr<Molecule> > mols;
-  for (int i=0; i<nmol; i++)
-    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-                                         pqr.get_atom_pts(), pqr.get_radii(),
-                                         pqr.get_cg_centers(),
-                                         pqr.get_cg_radii()));
-  mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
-  mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
-  auto cst = make_shared<Constants> ();
-  cst->set_dielectric_water(80);
-  cst->set_dielectric_prot(4);
-  cst->set_salt_concentration(0.01);
-  cst->set_temp(298.15);
-  cst->set_kappa(0.0325628352);
-  
-  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
-  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
-  auto BesselCons = make_shared<BesselConstants> (2*pol);
-  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
-  auto _expcons = make_shared<ExpansionConstants> (pol);
-  
-  // Generate surface integrals
-  for (int i=0; i<nmol; i++)
-    IEMatrix ieMatTest(0, sys->get_molecule(i),
-                       SHCalcTest, pol, _expcons, true, 0, true);
-  
-  string istart = test_dir_loc + "imat_test/imat.sp";
-  string estart = test_dir_loc + "spol_test/test_0.00_p3.0.";
-  vector<vector<string> > imat_loc(sys->get_n());
-  vector<vector<vector<string > > > exp_loc(sys->get_n());
-  
-  // Generate surface integrals
-  for (int i = 0; i < sys->get_n(); i++)
-  {
-    imat_loc[i].resize(sys->get_Ns_i(i));
-    exp_loc[i].resize(sys->get_Ns_i(i));
-    for (int k = 0; k < sys->get_Ns_i(i); k++)
-    {
-      exp_loc[i][k].resize(2);
-      imat_loc[i][k] = istart+to_string(k) + ".out.bin";
-      exp_loc[i][k][0] = estart+to_string(k) + ".H.exp";
-      exp_loc[i][k][1] = estart+to_string(k) + ".F.exp";
-    }
-  }
-  
-  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
-                  true, true, imat_loc, exp_loc);
-  solvTest.solve(1e-15, 150);
-  
-  for (int i = 0; i < sys->get_n(); i++)
-  {
-    for (int k = 0; k < sys->get_Ns_i(i); k++)
-    {
-      int ct = 0;
-      for(int n=0; n<pol; n++)
-      {
-        for(int m=0; m <= n; m++)
-        {
-          EXPECT_NEAR(mpolFre[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).real(),
-                                preclim);
-          EXPECT_NEAR(mpolHre[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).real(),
-                                preclim);
-          EXPECT_NEAR(mpolFim[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).imag(),
-                      preclim);
-          EXPECT_NEAR(mpolHim[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).imag(),
-                      preclim);
-          ct++;
-        }
-      }
-    }
-  }
-}
-
-
-TEST_F(SolverUTest, grad_pre_test)
-{
-  int pol(3), nmol(2);
-  PQRFile pqr(test_dir_loc + "test_cged.pqr");
-  vector<shared_ptr<Molecule> > mols;
-  for (int i=0; i<nmol; i++)
-    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-                                         pqr.get_atom_pts(), pqr.get_radii(),
-                                         pqr.get_cg_centers(),
-                                         pqr.get_cg_radii()));
-    mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
-    mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
-    auto sys = make_shared<System>(mols);
-    auto cst = make_shared<Constants> ();
-    cst->set_dielectric_water(80);
-    cst->set_dielectric_prot(4);
-    cst->set_salt_concentration(0.01);
-    cst->set_temp(298.15);
-    cst->set_kappa(0.0325628352);
-    
-    auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
-    auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
-    auto BesselCons = make_shared<BesselConstants> (2*pol);
-    auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
-    auto _expcons = make_shared<ExpansionConstants> (pol);
-    
-    // Generate surface integrals
-    for (int i=0; i<nmol; i++)
-      IEMatrix ieMatTest(0, sys->get_molecule(i),
-                         SHCalcTest, pol, _expcons, true, 0, true);
-  
-  string istart = test_dir_loc + "imat_test/imat.sp";
-  string estart = test_dir_loc + "grad_dT_A_test/mpol.";
-  vector<vector<string> > imat_loc(sys->get_n());
-  vector<vector<vector<string > > > exp_loc(sys->get_n());
-  
-  // Generate surface integrals
-  for (int i = 0; i < sys->get_n(); i++)
-  {
-    imat_loc[i].resize(sys->get_Ns_i(i));
-    exp_loc[i].resize(sys->get_Ns_i(i));
-    for (int k = 0; k < sys->get_Ns_i(i); k++)
-    {
-      exp_loc[i][k].resize(2);
-      imat_loc[i][k] = istart+to_string(k)+ ".out.bin";
-      exp_loc[i][k][0] = estart+to_string(i)+"."+to_string(k)+".H.exp";
-      exp_loc[i][k][1] = estart+to_string(i)+"."+to_string(k)+".F.exp";
-    }
-  }
-  
-  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
-                  true, true, imat_loc, exp_loc);
-  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
-                       solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
-  gsolvTest.pre_compute_gradT_A();
-  
-  for (int i = 0; i < sys->get_n(); i++)
-  {
-    for (int j = 0; j < sys->get_n(); j++)
-    {
-      for (int k = 0; k < sys->get_Ns_i(i); k++)
-      {
-        int ct = 0;
-        for(int n=0; n<pol; n++)
-        {
-          for(int m=0; m <= n; m++)
-          {
-            EXPECT_NEAR(delTAre[i][j][k][ct][0],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).real(),
-                        preclim);
-            EXPECT_NEAR(delTAre[i][j][k][ct][1],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).real(),
-                        preclim);
-            EXPECT_NEAR(delTAre[i][j][k][ct][2],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).real(),
-                        preclim);
-            EXPECT_NEAR(delTAim[i][j][k][ct][0],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).imag(),
-                        preclim);
-            EXPECT_NEAR(delTAim[i][j][k][ct][1],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).imag(),
-                        preclim);
-            EXPECT_NEAR(delTAim[i][j][k][ct][2],
-                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).imag(),
-                        preclim);
-            ct++;
-          }
-        }
-      }
-    }
-  }
-}
+//TEST_F(SolverUTest, spol_test)
+//{
+//  int pol = 3;
+//  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+//  vector<shared_ptr<Molecule> > mols;
+//  mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+//                                       pqr.get_atom_pts(), pqr.get_radii(),
+//                                       pqr.get_cg_centers(),
+//                                       pqr.get_cg_radii()));
+//  auto sys = make_shared<System>(mols);
+//  auto cst = make_shared<Constants> ();
+//  cst->set_dielectric_water(80);
+//  cst->set_dielectric_prot(4);
+//  cst->set_salt_concentration(0.01);
+//  cst->set_temp(298.15);
+//  cst->set_kappa(0.0325628352);
+//  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+//  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+//  auto BesselCons = make_shared<BesselConstants> (2*pol);
+//  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+//  auto _expcons = make_shared<ExpansionConstants> (pol);
+//  
+//  // Generate surface integrals
+//  IEMatrix ieMatTest(0, sys->get_molecule(0),
+//                     SHCalcTest, pol, _expcons, true, 0, true);
+//
+//  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
+//  solvTest.solve(1e-13, 80);
+//  
+//  for (int i = 0; i < sys->get_Ns_i(0); i++)
+//  {
+//    int ct = 0;
+//    for(int n=0; n<pol; n++)
+//    {
+//      for(int m=0; m <= n; m++)
+//      {
+//        EXPECT_NEAR(spolFre[i][ct],solvTest.getF_ik_nm(0,i,n,m).real(),preclim);
+//        EXPECT_NEAR(spolHre[i][ct],solvTest.getH_ik_nm(0,i,n,m).real(),preclim);
+//        EXPECT_NEAR(spolFim[i][ct],solvTest.getF_ik_nm(0,i,n,m).imag(),preclim);
+//        EXPECT_NEAR(spolHim[i][ct],solvTest.getH_ik_nm(0,i,n,m).imag(),preclim);
+//         ct++;
+//      }
+//    }
+//  }
+//}
+//
+//
+//TEST_F(SolverUTest, mutual_pol_test)
+//{
+//  int pol(3), nmol(2);
+//  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+//  vector<shared_ptr<Molecule> > mols;
+//  for (int i=0; i<nmol; i++)
+//    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+//                                         pqr.get_atom_pts(), pqr.get_radii(),
+//                                         pqr.get_cg_centers(),
+//                                         pqr.get_cg_radii()));
+//  mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
+//  mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
+//  auto sys = make_shared<System>(mols);
+//  auto cst = make_shared<Constants> ();
+//  cst->set_dielectric_water(80);
+//  cst->set_dielectric_prot(4);
+//  cst->set_salt_concentration(0.01);
+//  cst->set_temp(298.15);
+//  cst->set_kappa(0.0325628352);
+//  
+//  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+//  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+//  auto BesselCons = make_shared<BesselConstants> (2*pol);
+//  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+//  auto _expcons = make_shared<ExpansionConstants> (pol);
+//  
+//  // Generate surface integrals
+//  for (int i=0; i<nmol; i++)
+//    IEMatrix ieMatTest(0, sys->get_molecule(i),
+//                       SHCalcTest, pol, _expcons, true, 0, true);
+//  
+//  string istart = test_dir_loc + "imat_test/imat.sp";
+//  string estart = test_dir_loc + "spol_test/test_0.00_p3.0.";
+//  vector<vector<string> > imat_loc(sys->get_n());
+//  vector<vector<vector<string > > > exp_loc(sys->get_n());
+//  
+//  // Generate surface integrals
+//  for (int i = 0; i < sys->get_n(); i++)
+//  {
+//    imat_loc[i].resize(sys->get_Ns_i(i));
+//    exp_loc[i].resize(sys->get_Ns_i(i));
+//    for (int k = 0; k < sys->get_Ns_i(i); k++)
+//    {
+//      exp_loc[i][k].resize(2);
+//      imat_loc[i][k] = istart+to_string(k) + ".out.bin";
+//      exp_loc[i][k][0] = estart+to_string(k) + ".H.exp";
+//      exp_loc[i][k][1] = estart+to_string(k) + ".F.exp";
+//    }
+//  }
+//  
+//  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
+//                  true, true, imat_loc, exp_loc);
+//  solvTest.solve(1e-15, 150);
+//  
+//  for (int i = 0; i < sys->get_n(); i++)
+//  {
+//    for (int k = 0; k < sys->get_Ns_i(i); k++)
+//    {
+//      int ct = 0;
+//      for(int n=0; n<pol; n++)
+//      {
+//        for(int m=0; m <= n; m++)
+//        {
+//          EXPECT_NEAR(mpolFre[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).real(),
+//                                preclim);
+//          EXPECT_NEAR(mpolHre[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).real(),
+//                                preclim);
+//          EXPECT_NEAR(mpolFim[i][k][ct],solvTest.getF_ik_nm(i,k,n,m).imag(),
+//                      preclim);
+//          EXPECT_NEAR(mpolHim[i][k][ct],solvTest.getH_ik_nm(i,k,n,m).imag(),
+//                      preclim);
+//          ct++;
+//        }
+//      }
+//    }
+//  }
+//}
+//
+//
+//TEST_F(SolverUTest, grad_pre_test)
+//{
+//  int pol(3), nmol(2);
+//  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+//  vector<shared_ptr<Molecule> > mols;
+//  for (int i=0; i<nmol; i++)
+//    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+//                                         pqr.get_atom_pts(), pqr.get_radii(),
+//                                         pqr.get_cg_centers(),
+//                                         pqr.get_cg_radii()));
+//    mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
+//    mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
+//    auto sys = make_shared<System>(mols);
+//    auto cst = make_shared<Constants> ();
+//    cst->set_dielectric_water(80);
+//    cst->set_dielectric_prot(4);
+//    cst->set_salt_concentration(0.01);
+//    cst->set_temp(298.15);
+//    cst->set_kappa(0.0325628352);
+//    
+//    auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+//    auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+//    auto BesselCons = make_shared<BesselConstants> (2*pol);
+//    auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+//    auto _expcons = make_shared<ExpansionConstants> (pol);
+//    
+//    // Generate surface integrals
+//    for (int i=0; i<nmol; i++)
+//      IEMatrix ieMatTest(0, sys->get_molecule(i),
+//                         SHCalcTest, pol, _expcons, true, 0, true);
+//  
+//  string istart = test_dir_loc + "imat_test/imat.sp";
+//  string estart = test_dir_loc + "grad_dT_A_test/mpol.";
+//  vector<vector<string> > imat_loc(sys->get_n());
+//  vector<vector<vector<string > > > exp_loc(sys->get_n());
+//  
+//  // Generate surface integrals
+//  for (int i = 0; i < sys->get_n(); i++)
+//  {
+//    imat_loc[i].resize(sys->get_Ns_i(i));
+//    exp_loc[i].resize(sys->get_Ns_i(i));
+//    for (int k = 0; k < sys->get_Ns_i(i); k++)
+//    {
+//      exp_loc[i][k].resize(2);
+//      imat_loc[i][k] = istart+to_string(k)+ ".out.bin";
+//      exp_loc[i][k][0] = estart+to_string(i)+"."+to_string(k)+".H.exp";
+//      exp_loc[i][k][1] = estart+to_string(i)+"."+to_string(k)+".F.exp";
+//    }
+//  }
+//  
+//  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
+//                  true, true, imat_loc, exp_loc);
+//  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
+//                       solvTest.get_all_F(), solvTest.get_all_H(),
+//                       solvTest.get_IE(),
+//                       solvTest.get_interpol_list(), _expcons, pol);
+//  gsolvTest.pre_compute_gradT_A();
+//  
+//  for (int i = 0; i < sys->get_n(); i++)
+//  {
+//    for (int j = 0; j < sys->get_n(); j++)
+//    {
+//      for (int k = 0; k < sys->get_Ns_i(i); k++)
+//      {
+//        int ct = 0;
+//        for(int n=0; n<pol; n++)
+//        {
+//          for(int m=0; m <= n; m++)
+//          {
+//            EXPECT_NEAR(delTAre[i][j][k][ct][0],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).real(),
+//                        preclim);
+//            EXPECT_NEAR(delTAre[i][j][k][ct][1],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).real(),
+//                        preclim);
+//            EXPECT_NEAR(delTAre[i][j][k][ct][2],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).real(),
+//                        preclim);
+//            EXPECT_NEAR(delTAim[i][j][k][ct][0],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).imag(),
+//                        preclim);
+//            EXPECT_NEAR(delTAim[i][j][k][ct][1],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).imag(),
+//                        preclim);
+//            EXPECT_NEAR(delTAim[i][j][k][ct][2],
+//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).imag(),
+//                        preclim);
+//            ct++;
+//          }
+//        }
+//      }
+//    }
+//  }
+//}
 
 
 TEST_F(SolverUTest, grad_test)

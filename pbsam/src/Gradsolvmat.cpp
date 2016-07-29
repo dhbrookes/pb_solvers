@@ -133,18 +133,7 @@ void GradWHMatrix::calc_val_k(int k, shared_ptr<Molecule> mol,
   double exp_ka = exp(-kappa_*ak);
   double bin, bkn, inner;
   Ptx tot, val1, val2, val3, val4;
-  
-//  cout << "Inside WH" << endl;
-//  cout << "This is dLH ";
-//  dLH->print_analytical(k);
-//  cout << "This is dLHN ";
-//  dLHN->print_kmat(k);
-  
-//  cout << "This is dLF ";
-//  dLF->print_analytical(k);
-//  cout << "This is dF ";
-//  dF->print_kmat(k);
-  
+
   for (int n = 0; n < p_; n++)
   {
     bin = besseli[n];
@@ -177,50 +166,69 @@ void GradFMatrix::calc_all_vals(shared_ptr<IEMatrix> IE,
 void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
                              shared_ptr<GradWFMatrix> dWF)
 {
-  int ct;
-  vector<MyMatrix<double> > df_in(3, MyMatrix<double> (p_*p_, 1));
-  vector<MyMatrix<double> > df_out(3, MyMatrix<double> (p_*p_, 1));
-  for (int d = 0; d < 3; d++)  // 3 dimensions
+  int ct(0), dim(3), p2(p_*p_);
+  double dfRe, dfIm;
+  double df_in[p_*p_*dim], df_out[p_*p_*dim];
+  
+  for (int d = 0; d < dim; d++)  // 3 dimensions
   {
-    ct = 0;
     for (int l = 0; l < p_; l++)  // rows in old matrix
     {
       for (int s = 0; s < l+1; s++)  //columns in old matrix
       {
-        df_in[d](ct,0) = dWF->get_mat_knm_d(k, l, s, d).real();
+        df_in[ct] = dWF->get_mat_knm_d(k, l, s, d).real();
         ct++;
         if ( s > 0 )
         {
-          df_in[d](ct,0) = dWF->get_mat_knm_d(k, l, s, d).imag();
+          df_in[ct] = dWF->get_mat_knm_d(k, l, s, d).imag();
           ct++;
         }
       }
     }
-    //TODO: replace with matMul
-    df_out[d] = IE->get_IE_k(k) * df_in[d];  // Matrix vector multiplication
   }
+  
+#ifdef __LAU
+  applyMMat(&IE->get_IE_k_org(k)[0],&df_in[0],&df_out[0],1.0,0.0,p2,dim,p2);
+#else
+  vector<MyMatrix<double> > df_out1(3, MyMatrix<double> (p2, 1));
+  for (int d = 0; d < dim; d++)  // 3 dimensions
+  {
+    MyMatrix<double> df_in1(p2, 1, df_in[d*p2]);
+    df_out1[d] = IE->get_IE_k(k) * df_in1;  // Matrix vector multiplication
+  }
+#endif
 
+  ct = 0;
   for (int d = 0; d < 3; d++)  // 3 dimensions
   {
-    int ctr(0);
+#ifndef __LAU
+    ct = 0;
+#endif
     for (int n = 0; n < p_; n++)  // rows in new matrix
     {
       double scl = 1.0 / (double)(2.0*n+1.0);
       for (int m = 0; m < n+1; m++)  // columns in new matrix
       {
-        double fRe, fIm;
-        fRe = df_out[d](ctr,0);
-        ctr++;
+#ifdef __LAU
+        dfRe = df_out[ct];
+#else
+        dfRe = df_out1[d](ct,0);
+#endif
+        ct++;
         
         if ( m > 0 )
         {
-          fIm = df_out[d](ctr,0);
-          ctr++;
+#ifdef __LAU
+          dfIm = df_out[ct];
+#else
+          dfIm = df_out1[d](ct,0);
+#endif
+          ct++;
         } else
-          fIm = 0.0;
+          dfIm = 0.0;
         
-        set_mat_knm_d(k,n,m,d, scl*complex<double> (fRe,fIm));
-        if ( m > 0 ) set_mat_knm_d(k,n,-m,d,scl*complex<double> (fRe,-fIm));
+        set_mat_knm_d(k,n,m,d, scl*complex<double> (dfRe,dfIm));
+        if ( m > 0 ) set_mat_knm_d(k,n,-m,d,scl*complex<double> (dfRe,-dfIm));
       }
     }
   }
@@ -265,28 +273,38 @@ void GradHMatrix::calc_val_k(int k, vector<double> besseli,
                              shared_ptr<IEMatrix> IE,
                              shared_ptr<GradWHMatrix> dWH)
 {
-  int ct, d, l, s, n, m;
-  MyMatrix<double> dh_in(p_*p_, 1);
-  vector<MyMatrix<double> > dh_out(3, MyMatrix<double> (p_*p_, 1));
-  for (d = 0; d < 3; d++)  // 3 dimensions
+  int ct(0), d, l, s, n, m, dim(3), p2(p_*p_);
+  double dhR, dhI;
+  double dh_in[p_*p_*dim], dh_out[p_*p_*dim];
+  
+  for (d = 0; d < dim; d++)  // 3 dimensions
   {
-    ct = 0;
     for (l = 0; l < p_; l++)  // rows in old matrix
     {
       for (s = 0; s < l+1; s++)  //columns in old matrix
       {
-        dh_in(ct,0) = dWH->get_mat_knm_d(k, l, s, d).real();
+        dh_in[ct] = dWH->get_mat_knm_d(k, l, s, d).real();
         ct++;
         if ( s > 0 )
         {
-          dh_in(ct,0) = dWH->get_mat_knm_d(k, l, s, d).imag();
+          dh_in[ct] = dWH->get_mat_knm_d(k, l, s, d).imag();
           ct++;
         }
       }
     }
-    //TODO: replace with matMul
-    dh_out[d] = IE->get_IE_k(k) * dh_in;  // Matrix vector multiplication
   }
+
+#ifdef __LAU
+  applyMMat(&IE->get_IE_k_org(k)[0],&dh_in[0],&dh_out[0],1.0,0.0,p2,dim,p2);
+#else
+  vector<MyMatrix<double> > dh_out1(3, MyMatrix<double> (p2, 1));
+  for (int d = 0; d < dim; d++)  // 3 dimensions
+  {
+    MyMatrix<double> dh_in1(p2, 1, dh_in[d*p2]);
+//    cout << "Made it to here" << endl;
+    dh_out1[d] = IE->get_IE_k(k) * dh_in1;  // Matrix vector multiplication
+  }
+#endif
   
 //  
 //  cout << "~~~~~~ output ~~~~~~~~~~~~~~" << endl;
@@ -308,23 +326,32 @@ void GradHMatrix::calc_val_k(int k, vector<double> besseli,
 //    cout << endl;
 //  }
 //  
-  
+  ct = 0;
   for (d = 0; d < 3; d++)  // 3 dimensions
   {
-    int ctr(0);
+#ifndef __LAU
+    ct = 0;
+#endif
     for (n = 0; n < p_; n++)  // rows in new matrix
     {
       double scl = besseli[n] / (double)(2.0*n+1.0);
       for (m = 0; m < n+1; m++)  // columns in new matrix
       {
-        double dhR, dhI;
-        dhR = dh_out[d](ctr,0);
-        ctr++;
+#ifdef __LAU
+        dhR = dh_out[ct];
+#else
+        dhR = dh_out1[d](ct,0);
+#endif
+        ct++;
         
         if ( m > 0 )
         {
-          dhI = dh_out[d](ctr,0);
-          ctr++;
+#ifdef __LAU
+          dhI = dh_out[ct];
+#else
+          dhI = dh_out1[d](ct,0);
+#endif
+          ct++;
         } else
           dhI = 0.0;
         
