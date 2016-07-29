@@ -193,9 +193,12 @@ void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
   vector<MyMatrix<double> > df_out1(3, MyMatrix<double> (p2, 1));
   for (int d = 0; d < dim; d++)  // 3 dimensions
   {
-    MyMatrix<double> df_in1(p2, 1, df_in[d*p2]);
+    MyMatrix<double> df_in1(p2, 1, &df_in[d*p2]);
     df_out1[d] = IE->get_IE_k(k) * df_in1;  // Matrix vector multiplication
   }
+  
+  for (int o = 0; o<p2; o++)
+    
 #endif
 
   ct = 0;
@@ -300,8 +303,7 @@ void GradHMatrix::calc_val_k(int k, vector<double> besseli,
   vector<MyMatrix<double> > dh_out1(3, MyMatrix<double> (p2, 1));
   for (int d = 0; d < dim; d++)  // 3 dimensions
   {
-    MyMatrix<double> dh_in1(p2, 1, dh_in[d*p2]);
-//    cout << "Made it to here" << endl;
+    MyMatrix<double> dh_in1(p2, 1, &dh_in[d*p2]);
     dh_out1[d] = IE->get_IE_k(k) * dh_in1;  // Matrix vector multiplication
   }
 #endif
