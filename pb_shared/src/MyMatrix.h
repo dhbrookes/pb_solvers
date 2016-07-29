@@ -124,6 +124,17 @@ public:
   {
   }
   
+  MyMatrix(const int nrows, const int ncols, T * val)
+  :nrows_(nrows), ncols_(ncols), vals_(nrows, vector<T> (ncols))
+  {
+    int i, j, ct(0);
+    for (i = 0; i < nrows; i++)
+      for (j = 0; j < ncols; j++)
+      {
+        vals_[i][j] = val[ct];
+        ct++;
+      }
+  }
   /*
    Fill with a default value (good for initializing memory)
    */
@@ -135,7 +146,6 @@ public:
     {
       for (j = 0; j < ncols; j++)
       {
-//        set_val(i, j, default_val);
         vals_[i][j] = default_val;
       }
     }
@@ -286,6 +296,16 @@ public:
   MyVector(const int size=1)
   :MyMatrix<T>(size, 1)
   {
+  }
+
+  MyVector(T * vals, int size)
+  :MyMatrix<T>(size, 1)
+  {
+    int i;
+    for (i = 0; i < size; i++)
+    {   
+      this->vals_[i][0] = vals[i];
+    }   
   }
   
   MyVector(vector<T> vals)

@@ -4,6 +4,12 @@ project(pb_solvers)
 ################################################
 ################################################
 
+# ---[ Using cmake scripts and modules
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+include(ExternalProject)
+include(cmake/Dependencies.cmake)
+include(cmake/Utils.cmake)
+
 set(CMAKE_VERBOSE_MAKEFILE true)
 set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
 set(PBSOLV_BUILD ${PROJECT_BINARY_DIR})
@@ -30,7 +36,6 @@ endif()
 ################################################
 if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3") ## Optimize
-    set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
 
 ################################################
@@ -55,11 +60,8 @@ endif()
 option(ENABLE_DGEMM "Enable LA utils" ON)
 
 if (ENABLE_DGEMM)
-  find_package(OpenMP)
   if(APPLE)
     add_definitions(-D__MACOS)
-    FIND_LIBRARY(ACCELERATE_LIBRARY  Accelerate)
-    SET(EXTRA_LIBS ${ACCELERATE_LIBRARY} )
   endif()
 endif()
 

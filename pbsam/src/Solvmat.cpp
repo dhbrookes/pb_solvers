@@ -37,12 +37,13 @@ void applyMMat(const double * A, const double * X, double * Y,
 #endif // ifMKL
   
 //#ifdef __MACOS
+#ifdef __LAU
   CBLAS_ORDER Order = CblasColMajor;
   CBLAS_TRANSPOSE TransA = CblasNoTrans;
   CBLAS_TRANSPOSE TransB = CblasNoTrans;
   cblas_dgemm(Order, TransA, TransB, M, N, K, alpha, A, lda,
               X,  ldb, beta, Y, ldc);
-//#endif
+#endif
   
   return;
 }
@@ -883,7 +884,6 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
   int ct = 0;
   cmplx inner;
   double ak = mol->get_ak(k);
-//  MyMatrix<double> h_in1(p_*p_, 1), h_out1(p_*p_, 1);
   double h_in[p_*p_], h_out[p_*p_];
   vector<double> bessel_i = bcalc->calc_mbfI(p_+1, kappa_*ak);
   vector<double> bessel_k = bcalc->calc_mbfK(p_+1, kappa_*ak);
@@ -912,11 +912,14 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
   
   //TODO: replace with matMul
   const int p2 = p_*p_;
-//  vector<double> ie_v = IE->get_IE_k_org(k);
-  
+#ifdef __LAU  
   applyMMat(&IE->get_IE_k_org(k)[0], &h_in[0], &h_out[0], 1.0, 0.0, p2, 1, p2);
-//  h_out1 = IE->get_IE_k(k) * h_in1;  // Matrix vector multiplication
-  
+#else  
+  MyMatrix<double> h_out1(p2, 1);
+  MyMatrix<double> h_in1 (p2, 1, h_in); 
+  h_out1 = IE->get_IE_k(k) * h_in1;  // Matrix vector multiplication
+#endif  
+
   int ctr(0);
   for (int n = 0; n < p_; n++)  // rows in new matrix
   {
@@ -924,14 +927,20 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
     for (int m = 0; m < n+1; m++)  // columns in new matrix
     {
       double hRe, hIm;
-//      hRe = h_out1(ctr,0);
+#ifdef __LAU  
       hRe = h_out[ctr];
+#else  
+      hRe = h_out1(ctr,0);
+#endif
       ctr++;
       
       if ( m > 0 )
       {
-//        hIm = h_out1(ctr,0);
+#ifdef __LAU  
         hIm = h_out[ctr];
+#else
+        hIm = h_out1(ctr,0);
+#endif
         ctr++;
       } else
         hIm = 0.0;
@@ -1017,9 +1026,14 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
 
   //TODO: replace with matMul
   int p2 = p_*p_;
+#ifdef __LAU  
   applyMMat(&IE->get_IE_k_org(k)[0], &f_in[0], &f_out[0], 1.0, 0.0, p2, 1, p2);
-//  f_out = IE->get_IE_k(k) * f_in;  // Matrix vector multiplication
-  
+#else  
+  MyMatrix<double> f_out1(p2, 1);
+  MyMatrix<double> f_in1 (p2, 1, f_in); 
+  f_out1 = IE->get_IE_k(k) * f_in1;  // Matrix vector multiplication
+#endif  
+
   int ctr(0);
   for (int n = 0; n < p_; n++)  // rows in new matrix
   {
@@ -1027,14 +1041,20 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
     for (int m = 0; m < n+1; m++)  // columns in new matrix
     {
       double fRe, fIm;
-//      fRe = f_out(ctr,0);
+#ifdef __LAU  
       fRe = f_out[ctr];
+#else  
+      fRe = f_out1(ctr,0);
+#endif
       ctr++;
-      
+     
       if ( m > 0 )
-      {
-//        fIm = f_out(ctr,0);
+      {    
+#ifdef __LAU  
         fIm = f_out[ctr];
+#else
+        fIm = f_out1(ctr,0);
+#endif
         ctr++;
       } else
         fIm = 0.0;

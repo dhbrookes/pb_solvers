@@ -32,8 +32,9 @@
 #endif
 
 //#ifdef __MACOS
+#ifdef __LAU
 #include "vecLib/cblas.h"
-//#endif
+#endif
 
 void applyMMat(const double * A, const double * X, double * Y,
                const double alpha, const double beta, int ma, int nc, int na);
