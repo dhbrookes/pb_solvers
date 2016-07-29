@@ -5,10 +5,11 @@ project(pb_solvers)
 ################################################
 
 # ---[ Using cmake scripts and modules
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 include(ExternalProject)
-include(cmake/Dependencies.cmake)
 include(cmake/Utils.cmake)
+include(cmake/Dependencies.cmake)
+include(cmake/Summary.cmake)
 
 set(CMAKE_VERBOSE_MAKEFILE true)
 set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
@@ -116,3 +117,5 @@ add_subdirectory(pbsam/unittest)
 ##### Make a directory for the executable
 ################################################
 file(MAKE_DIRECTORY build/bin)
+
+pbsam_print_configuration_summary()

@@ -1,4 +1,20 @@
 ################################################################################################
+# Function merging lists of compiler flags to single string.
+# Usage:
+#   pbsam_merge_flag_lists(out_variable <list1> [<list2>] [<list3>] ...)
+function(pbsam_merge_flag_lists out_var)
+  set(__result "")
+  foreach(__list ${ARGN})
+    foreach(__flag ${${__list}})
+      string(STRIP ${__flag} __flag)
+      set(__result "${__result} ${__flag}")
+    endforeach()
+  endforeach()
+  string(STRIP ${__result} __result)
+  set(${out_var} ${__result} PARENT_SCOPE)
+endfunction()
+
+################################################################################################
 # Helper function to parse current linker libs into link directories, libflags and osx frameworks
 # Usage:
 #   PBSAM_parse_linker_libs(<PBSAM_LINKER_LIBS_var> <directories_var> <libflags_var> <frameworks_var>)

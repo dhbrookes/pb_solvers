@@ -36,8 +36,7 @@ void applyMMat(const double * A, const double * X, double * Y,
         const_cast<double*>(X), &ldb, &beta, Y, &ldc);
 #endif // ifMKL
   
-//#ifdef __MACOS
-#ifdef __LAU
+#if defined(__MACOS) || defined(__XCODE)
   CBLAS_ORDER Order = CblasColMajor;
   CBLAS_TRANSPOSE TransA = CblasNoTrans;
   CBLAS_TRANSPOSE TransB = CblasNoTrans;

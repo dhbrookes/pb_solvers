@@ -12,8 +12,8 @@ endif()
 
 set(__veclib_include_suffix "Frameworks/vecLib.framework/Versions/Current/Headers")
 
-find_path(vecLib_INCLUDE_DIR vecLib.h
-          DOC "vecLib include directory"
+find_path(vecLib_INCLUDE_DIR clapack.h
+         #DOC "vecLib include directory"
           PATHS /System/Library/${__veclib_include_suffix}
                 /System/Library/Frameworks/Accelerate.framework/Versions/Current/${__veclib_include_suffix}
                 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/)
