@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 include(ExternalProject)
 include(cmake/Utils.cmake)
 include(cmake/Dependencies.cmake)
+include(cmake/Summary.cmake)
 
 set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
 set(PBSOLV_BUILD ${PROJECT_BINARY_DIR})
@@ -50,18 +51,6 @@ if (ENABLE_OPENMP)
     add_definitions(-D__OMP)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-  endif()
-endif()
-
-################################################
-###### Blas/MKL/LA Utilities
-################################################
-
-option(ENABLE_DGEMM "Enable LA utils" ON)
-
-if (ENABLE_DGEMM)
-  if(APPLE)
-    add_definitions(-D__MACOS)
   endif()
 endif()
 
@@ -116,3 +105,5 @@ add_subdirectory(pbsam/unittest)
 ##### Make a directory for the executable
 ################################################
 file(MAKE_DIRECTORY build/bin)
+
+pbsam_print_configuration_summary()

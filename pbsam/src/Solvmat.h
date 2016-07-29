@@ -23,16 +23,17 @@
 #ifdef __ACML
 #include "acml.h"
 #include "clapack.h"
-#include "cblas_forNonMac.h"
 #endif
 
 #ifdef __MKL
 #include "mkl.h"
-#include "clapack.h"
 #endif
 
-//#ifdef __MACOS
-#ifdef __LAU
+#ifdef __MACOS
+#include "cblas.h"
+#endif
+
+#ifdef __XCODE
 #include "vecLib/cblas.h"
 #endif
 

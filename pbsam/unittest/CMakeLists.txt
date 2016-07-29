@@ -24,12 +24,11 @@ ADD_EXECUTABLE(pbsamtest
   main.cpp
   )
 
-TARGET_LINK_LIBRARIES(pbsamtest
-    libgtest
-)
-
 add_test(NAME pbamtest
          COMMAND pbamtest)
 
+TARGET_LINK_LIBRARIES(pbsamtest
+                      libgtest
+                      ${PBSAM_LINKER_LIBS})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 install(TARGETS pbsamtest RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/bin)
