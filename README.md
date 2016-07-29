@@ -41,6 +41,7 @@ Mac comes with built in blas and lapack.
 2. Drag the `vecLib.framework` file into the pbsam XCode project.
 3. Add path to gtest.framework to Build Settings --> Search Paths --> Framework Search Paths
 4. Add path to gtest.framework to Build Settings --> Search Paths --> Runpath Search Paths
+5. Add in the preprocessor definitions to both targets: Build Settings --> Apple LLVM 7.1 - Preprocessing -> __LAU=1 __XCODE=1
 
 ### GTest Setup ###
 
