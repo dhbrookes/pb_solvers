@@ -307,29 +307,36 @@ void PBSAM::run_dynamics()
 
 void PBSAM::run_electrostatics()
 {
+  //TODO: add in options for reading in Hmat files, imat, etc
   int i;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
   auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
+  auto _expcons = make_shared<ExpansionConstants> (poles_);
 
-//  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
-//                                                    consts_, poles_);
-//  ASolv->solve_A(solveTol_); ASolv->solve_gradA(solveTol_);
-//  Electrostatic Estat( ASolv, setp_->getGridPts());
-//
-//  if ( setp_->getDXoutName() != "" )
-//    Estat.print_dx( setp_->getDXoutName());
-//
-//  if ( setp_->get_3dmap_name() != "" )
-//    Estat.print_3d_heat( setp_->get_3dmap_name());
-//
-//  for ( i = 0; i < setp_->getGridCt(); i++ )
-//  {
-//    Estat.print_grid(setp_->getGridAx(i), setp_->getGridAxLoc(i),
-//                     setp_->getGridOutName(i));
-//  }
+  // Generate surface integrals
+  for (int i=0; i<syst_->get_n(); i++)
+    IEMatrix ieMatTest(0, syst_->get_molecule(i),
+                       SHCalcu, poles_, _expcons, true, 0, true);
+  
+  Solver solv( syst_, consts_, SHCalcu, bCalcu, poles_);
+  solv.solve(solveTol_, 10);
+  
+  Electrostatic estat(solv.get_all_H(), syst_, SHCalcu, bCalcu, consts_,
+                      poles_, setp_->getGridPts());
 
+  if ( setp_->getDXoutName() != "" )
+    estat.print_dx( setp_->getDXoutName());
+
+  if ( setp_->get_3dmap_name() != "" )
+    estat.print_3d_heat( setp_->get_3dmap_name());
+
+  for ( i = 0; i < setp_->getGridCt(); i++ )
+  {
+    estat.print_grid(setp_->getGridAx(i), setp_->getGridAxLoc(i),
+                     setp_->getGridOutName(i));
+  }
 }
 
 

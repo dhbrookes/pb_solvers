@@ -49,6 +49,22 @@ if (ENABLE_OPENMP)
 endif()
 
 ################################################
+###### Blas/MKL/LA Utilities
+################################################
+
+option(ENABLE_DGEMM "Enable LA utils" ON)
+
+if (ENABLE_DGEMM)
+  find_package(OpenMP)
+  if(APPLE)
+    add_definitions(-D__MACOS)
+    FIND_LIBRARY(ACCELERATE_LIBRARY  Accelerate)
+    SET(EXTRA_LIBS ${ACCELERATE_LIBRARY} )
+  endif()
+endif()
+
+################################################
+################################################
 ### For APBS Sphinx
 ################################################
 option(ENABLE_PBAM_SPHINX "pbam SPHINX" OFF)

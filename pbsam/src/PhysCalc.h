@@ -11,8 +11,7 @@
 
 #include <stdio.h>
 #include <memory>
-#include "Solvmat.h"
-#include "Gradsolvmat.h"
+#include "Solver.h"
 
 
 /*

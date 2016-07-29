@@ -34,9 +34,7 @@
 #include <memory>
 #include <time.h>
 #include "PBSAMStruct.h"
-#include "PhysCalc.h"
-//#include "BD.h"
-
+#include "Electrostatics.h"
 
 using namespace std;
 

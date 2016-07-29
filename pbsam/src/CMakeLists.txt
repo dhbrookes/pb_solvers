@@ -5,8 +5,10 @@ include_directories("./")
 add_executable(pbsam
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp
+  Electrostatics.cpp
   Gradsolvmat.cpp  
   main.cpp
+  PBSAM.cpp 
   ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/setup.cpp
   ../../pb_shared/src/SHCalc.cpp
