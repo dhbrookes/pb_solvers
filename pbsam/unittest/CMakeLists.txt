@@ -11,10 +11,12 @@ include_directories("../../pb_shared/unittest")
 ADD_EXECUTABLE(pbsamtest 
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp
+  ../src/Electrostatics.cpp
   ../src/Gradsolvmat.cpp
   ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/SHCalc.cpp
   ../../pb_shared/src/setup.cpp
+  ../src/PBSAM.cpp
   ../src/Solver.cpp
   ../src/Solvmat.cpp
   ../src/System.cpp

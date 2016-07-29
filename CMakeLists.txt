@@ -1,10 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
 project(pb_solvers)
+set(CMAKE_VERBOSE_MAKEFILE true)
 
 ################################################
 ################################################
 
-set(CMAKE_VERBOSE_MAKEFILE false)
+# ---[ Using cmake scripts and modules
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+include(ExternalProject)
+include(cmake/Utils.cmake)
+include(cmake/Dependencies.cmake)
+
 set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
 set(PBSOLV_BUILD ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PBSOLV_BUILD}/bin)
@@ -47,6 +53,19 @@ if (ENABLE_OPENMP)
   endif()
 endif()
 
+################################################
+###### Blas/MKL/LA Utilities
+################################################
+
+option(ENABLE_DGEMM "Enable LA utils" ON)
+
+if (ENABLE_DGEMM)
+  if(APPLE)
+    add_definitions(-D__MACOS)
+  endif()
+endif()
+
+################################################
 ################################################
 ### For APBS Sphinx
 ################################################

@@ -9,6 +9,46 @@
 #include "Solvmat.h"
 
 
+// computes Y = alpha*A*X + beta*Y
+//applyMMat(IMat, &(fin), &(fout), 1.0, 0.0, p2, D, p2);
+void applyMMat(const double * A, const double * X, double * Y,
+               const double alpha, const double beta, int ma, int nc, int na)
+
+{
+  const int M = ma;
+  const int N = nc;
+  const int K = na;
+  const int lda = M;
+  const int ldb = K;
+  const int ldc = M;
+  
+#ifdef __ACML
+  char transA = 'N';
+  char transB = 'N';
+  dgemm(transA, transB, M, N, &K, alpha, const_cast<double*>(A), lda,
+        const_cast<double*>(X), ldb, beta, Y, ldc);
+#endif // ifACML
+  
+#ifdef __MKL
+  char transA = 'N';
+  char transB = 'N';
+  dgemm(&transA, &transB, &M, &N, &K, &alpha, const_cast<double*>(A), &lda,
+        const_cast<double*>(X), &ldb, &beta, Y, &ldc);
+#endif // ifMKL
+  
+//#ifdef __MACOS
+#ifdef __LAU
+  CBLAS_ORDER Order = CblasColMajor;
+  CBLAS_TRANSPOSE TransA = CblasNoTrans;
+  CBLAS_TRANSPOSE TransB = CblasNoTrans;
+  cblas_dgemm(Order, TransA, TransB, M, N, K, alpha, A, lda,
+              X,  ldb, beta, Y, ldc);
+#endif
+  
+  return;
+}
+
+
 vector<Pt> make_uniform_sph_grid(int m_grid, double r)
 {
   vector<Pt> grid (m_grid);
@@ -115,14 +155,6 @@ NumericalMatrix::NumericalMatrix(int I, int ns, int p)
 
 void NumericalMatrix::reset_mat(int k)
 {
-  //  for (int k = 0; k < mat_.size(); k++)
-  //  {
-  //    for (int i = 0; i < mat_[k].size(); i++)
-  //    {
-  //      mat_[k][i] = 0.0;
-  //    }
-  //  }
-
   for (int i = 0; i < mat_cmplx_[k].get_nrows(); i++)
   {
     for (int j = 0; j < mat_cmplx_[k].get_ncols(); j++)
@@ -245,6 +277,26 @@ MyMatrix<double> IEMatrix::get_IE_k(int k)
         }
   
   return IMat;
+}
+
+vector<double> IEMatrix::get_IE_k_org(int k)
+{
+//  vector<double> IMat(p_*p_*p_*p_);
+  return IE_orig_[k];
+//  int ind(0);
+//  for (int l = 0; l < p_; l++)  // rows in old matrix
+//    for (int s = 0; s < 2*l+1; s++)  //columns in old matrix
+//      for (int n = 0; n < p_; n++)  // rows in new matrix
+//        for (int m = 0; m < 2*n+1; m++)  // columns in new matrix
+//        {
+////          cout << get_IE_k_ind(k, ind) ; //(n*p_+m)*p_+(l*p_+s)*p_ << endl;
+//          IMat[(n*n+m)+p_*p_*(l*l+s)] = get_IE_k_ind(k, ind);
+//          ind++;
+//        }
+//  
+//  cout << endl;
+//  
+//  return IMat;
 }
 
 void IEMatrix::compute_grid_pts(shared_ptr<Molecule> _mol)
@@ -832,7 +884,7 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
   int ct = 0;
   cmplx inner;
   double ak = mol->get_ak(k);
-  MyMatrix<double> h_in(p_*p_, 1), h_out(p_*p_, 1);
+  double h_in[p_*p_], h_out[p_*p_];
   vector<double> bessel_i = bcalc->calc_mbfI(p_+1, kappa_*ak);
   vector<double> bessel_k = bcalc->calc_mbfK(p_+1, kappa_*ak);
   
@@ -846,19 +898,28 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
       inner += F->get_mat_knm(k, l, s);
       inner += XH->get_mat_knm(k, l, s);
       
-      h_in(ct,0) = inner.real();
+//      h_in1(ct,0) = inner.real();
+      h_in[ct] = inner.real();
       ct++;
       if ( s > 0 )
       {
-        h_in(ct,0) = inner.imag();
+//        h_in1(ct,0) = inner.imag();
+        h_in[ct] = inner.imag();
         ct++;
       }
     }
   }
   
   //TODO: replace with matMul
-  h_out = IE->get_IE_k(k) * h_in;  // Matrix vector multiplication
-  
+  const int p2 = p_*p_;
+#ifdef __LAU  
+  applyMMat(&IE->get_IE_k_org(k)[0], &h_in[0], &h_out[0], 1.0, 0.0, p2, 1, p2);
+#else  
+  MyMatrix<double> h_out1(p2, 1);
+  MyMatrix<double> h_in1 (p2, 1, h_in); 
+  h_out1 = IE->get_IE_k(k) * h_in1;  // Matrix vector multiplication
+#endif  
+
   int ctr(0);
   for (int n = 0; n < p_; n++)  // rows in new matrix
   {
@@ -866,12 +927,20 @@ void HMatrix::calc_vals(shared_ptr<Molecule> mol,
     for (int m = 0; m < n+1; m++)  // columns in new matrix
     {
       double hRe, hIm;
-      hRe = h_out(ctr,0);
+#ifdef __LAU  
+      hRe = h_out[ctr];
+#else  
+      hRe = h_out1(ctr,0);
+#endif
       ctr++;
       
       if ( m > 0 )
       {
-        hIm = h_out(ctr,0);
+#ifdef __LAU  
+        hIm = h_out[ctr];
+#else
+        hIm = h_out1(ctr,0);
+#endif
         ctr++;
       } else
         hIm = 0.0;
@@ -886,13 +955,10 @@ cmplx HMatrix::make_hb_Ik(int k, Pt rb,
                           shared_ptr<SHCalc> shcalc,
                           vector<double> besseli)
 {
-  //  vector<double> besseli;
   cmplx hb_inner, hbj;
   vector<cmplx> h;
   
   shcalc->calc_sh(rb.theta(), rb.phi());
-  //  besseli = bcalc->calc_mbfI(p_+1,
-  //                             kappa_*rb.r());
   hbj = 0;
   for (int n = 0; n < p_; n++)
   {
@@ -934,7 +1000,8 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
   double ak = mol->get_ak(k);
   vector<double> bessel_i = bcalc->calc_mbfI(p_+1, kappa*ak);
   vector<double> bessel_k = bcalc->calc_mbfK(p_+1, kappa*ak);
-  MyMatrix<double> f_in(p_*p_, 1), f_out(p_*p_, 1);
+//  MyMatrix<double> f_in(p_*p_, 1), f_out(p_*p_, 1);
+  double f_in[p_*p_], f_out[p_*p_];
   
   for (int l = 0; l < p_; l++)
   {
@@ -945,19 +1012,28 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
       inner += XF->get_mat_knm(k, l, s);
       inner += (double(2*l + 1 - l * XF->get_eps()) *
                 prev->get_mat_knm(k, l, s));
-      f_in(ct,0) = inner.real();
+//      f_in(ct,0) = inner.real();
+      f_in[ct] = inner.real();
       ct++;
       if ( s > 0 )
       {
-        f_in(ct,0) = inner.imag();
+//        f_in(ct,0) = inner.imag();
+        f_in[ct] = inner.imag();
         ct++;
       }
     }
   }
 
   //TODO: replace with matMul
-  f_out = IE->get_IE_k(k) * f_in;  // Matrix vector multiplication
-  
+  int p2 = p_*p_;
+#ifdef __LAU  
+  applyMMat(&IE->get_IE_k_org(k)[0], &f_in[0], &f_out[0], 1.0, 0.0, p2, 1, p2);
+#else  
+  MyMatrix<double> f_out1(p2, 1);
+  MyMatrix<double> f_in1 (p2, 1, f_in); 
+  f_out1 = IE->get_IE_k(k) * f_in1;  // Matrix vector multiplication
+#endif  
+
   int ctr(0);
   for (int n = 0; n < p_; n++)  // rows in new matrix
   {
@@ -965,12 +1041,20 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
     for (int m = 0; m < n+1; m++)  // columns in new matrix
     {
       double fRe, fIm;
-      fRe = f_out(ctr,0);
+#ifdef __LAU  
+      fRe = f_out[ctr];
+#else  
+      fRe = f_out1(ctr,0);
+#endif
       ctr++;
-      
+     
       if ( m > 0 )
-      {
-        fIm = f_out(ctr,0);
+      {    
+#ifdef __LAU  
+        fIm = f_out[ctr];
+#else
+        fIm = f_out1(ctr,0);
+#endif
         ctr++;
       } else
         fIm = 0.0;

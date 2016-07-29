@@ -19,6 +19,26 @@
  [2] Yap, E., Head-Gordon, T. 2013. JCTC
  */
 
+//TODO: Figure out MATMul
+#ifdef __ACML
+#include "acml.h"
+#include "clapack.h"
+#include "cblas_forNonMac.h"
+#endif
+
+#ifdef __MKL
+#include "mkl.h"
+#include "clapack.h"
+#endif
+
+//#ifdef __MACOS
+#ifdef __LAU
+#include "vecLib/cblas.h"
+#endif
+
+void applyMMat(const double * A, const double * X, double * Y,
+               const double alpha, const double beta, int ma, int nc, int na);
+
 // For calculating the n grid points on surface
 int calc_n_grid_pts(int poles, double r);
 
@@ -200,6 +220,8 @@ public:
   void set_IE_k(int k, vector<double> ie) { IE_orig_[k] = ie;}
   
   double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
+  vector<double> get_IE_k_org(int k);
+  
   MyMatrix<double> get_IE_k( int k );
   
   void compute_grid_pts(shared_ptr<Molecule> _mol);

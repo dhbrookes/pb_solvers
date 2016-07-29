@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <memory>
-#include "Solvmat.h"
 #include "Gradsolvmat.h"
 
 

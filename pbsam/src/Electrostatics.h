@@ -32,7 +32,6 @@
 #define Electrostatics_h
 
 #include "PhysCalc.h"
-#include "Solver.h"
 #include <time.h> 
 
 #ifdef __OMP
