@@ -7,6 +7,11 @@
 bin
 build
 
+
+# Python script ignores
+*.force
+*.torque
+
 ## PBAM output ignores
 *.dx 
 *.dat
