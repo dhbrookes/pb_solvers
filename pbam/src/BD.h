@@ -35,8 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <random>
 #include <memory>
-#include "EnergyForce.h"
-#include "readutil.h"
+#include "Electrostatics.h"
 
 /*
  Base class for implementing termination conditions in BD
@@ -431,7 +430,8 @@ public:
         string outfname, int num=0, bool diff = true, bool force = true,
         int maxiter=1e8, double prec=1e-4);
   
-  void run(string xyzfile = "test.xyz", string statfile = "stats.dat");
+  void run(string xyzfile = "test.xyz", string statfile = "stats.dat", 
+           int nSCF = 0);
 };
 
 

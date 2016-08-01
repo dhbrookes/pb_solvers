@@ -150,7 +150,7 @@ TEST_F(BDUTest, dtTest)
   ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                     make_shared<SHCalc> (SHCalcu),
                     BDTest.get_system(),
-                    make_shared<Constants> (const_), vals);
+                    make_shared<Constants> (const_), vals, sys.get_cutoff());
   ASolvTest.solve_A(1E-4); ASolvTest.solve_gradA(1E-4);
   
   ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
@@ -193,7 +193,7 @@ TEST_F(BDUTest, dtLargeTest)
   ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                     make_shared<SHCalc> (SHCalcu),
                     BDTest.get_system(),
-                    make_shared<Constants> (const_), vals);
+                    make_shared<Constants> (const_), vals, sys.get_cutoff());
   ASolvTest.solve_A(1E-4); ASolvTest.solve_gradA(1E-4);
   
   ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
@@ -238,7 +238,7 @@ TEST_F(BDUTest, distPBCTest)
   ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                     make_shared<SHCalc> (SHCalcu),
                     BDTest.get_system(),
-                    make_shared<Constants> (const_), vals);
+                    make_shared<Constants> (const_), vals, sys.get_cutoff());
   ASolvTest.solve_A(1E-4); ASolvTest.solve_gradA(1E-4);
   
   ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
@@ -284,7 +284,7 @@ TEST_F(BDUTest, ForcePos)
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
                       BDTest.get_system(),
-                      make_shared<Constants> (const_), vals);
+                      make_shared<Constants> (const_), vals, sys.get_cutoff());
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
@@ -336,7 +336,7 @@ TEST_F(BDUTest, ForcePosZ)
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
                       BDTest.get_system(),
-                      make_shared<Constants> (const_), vals);
+                      make_shared<Constants> (const_), vals, sys.get_cutoff());
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
@@ -388,7 +388,7 @@ TEST_F(BDUTest, ForceOpp)
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
                       BDTest.get_system(), 
-                      make_shared<Constants> (const_), vals);
+                      make_shared<Constants> (const_), vals, sys.get_cutoff());
     ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
@@ -441,8 +441,8 @@ TEST_F(BDUTest, TorquePos)
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
                       BDTest.get_system(),
-                      make_shared<Constants> (const_), vals);
-    ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+                      make_shared<Constants> (const_), vals, sys.get_cutoff());
+    ASolvTest.solve_A(1E-20, 100); ASolvTest.solve_gradA(1E-20, 100);
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
@@ -500,8 +500,8 @@ TEST_F(BDUTest, TorqueOpp)
     ASolver ASolvTest(make_shared<BesselCalc> (bCalcu),
                       make_shared<SHCalc> (SHCalcu),
                       BDTest.get_system(),
-                      make_shared<Constants> (const_), vals);
-    ASolvTest.solve_A(1E-20); ASolvTest.solve_gradA(1E-20);
+                      make_shared<Constants> (const_), vals, sys.get_cutoff());
+    ASolvTest.solve_A(1E-20, 100); ASolvTest.solve_gradA(1E-20, 100);
     
     ForceCalc FoTest( make_shared<ASolver> (ASolvTest));
     TorqueCalc TorTest( make_shared<ASolver> (ASolvTest));
@@ -584,11 +584,12 @@ TEST_F(BDUTest, BDrunTimeTermY)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol);
   auto ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys,
-                                        make_shared<Constants> (const_), vals);
+                                        make_shared<Constants> (const_), vals,
+                                        sys->get_cutoff());
 
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
-  BDTest.run();
+  BDTest.run( "", "", 500);
   
   EXPECT_NEAR(sys->get_time()/10, 1, preclim);
   for (int mi = 0; mi < ml; mi ++ )
@@ -622,11 +623,12 @@ TEST_F(BDUTest, BDrunTimeTermXY)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol);
   auto ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys,
-                                  make_shared<Constants> (const_), vals);
+                                        make_shared<Constants> (const_), vals,
+                                        sys->get_cutoff());
   
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
-  BDTest.run();
+  BDTest.run( "", "", 500);
   
   EXPECT_NEAR(sys->get_time()/31.361344, 1, preclim);
   
@@ -661,11 +663,12 @@ TEST_F(BDUTest, BDrunTimeTermRot)
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
   shared_ptr<System> sys = make_shared<System>(mol);
   auto ASolvTest = make_shared<ASolver>( bCalcu, SHCalcu, sys,
-                                        make_shared<Constants> (const_), vals);
+                                        make_shared<Constants> (const_), vals,
+                                        sys->get_cutoff());
   
   shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRun BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-30);
-  BDTest.run();
+  BDTest.run( "", "", 500);
   
   for (int mi = 0; mi < ml; mi ++ )
   {

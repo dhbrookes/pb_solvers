@@ -35,7 +35,10 @@
 #include <stdio.h>
 #include <memory>
 #include "ASolver.h"
-//#include <omp.h>
+
+#ifdef __OMP
+#include <omp.h>
+#endif
 
 using namespace std;
 
@@ -128,8 +131,6 @@ protected:
   int N_;
   int p_;
   shared_ptr<Constants> _const_;
-  
-//  shared_ptr<VecOfVecs<double>::type> _F_;
   shared_ptr<vector<Pt> > _F_;
   
 public:
@@ -144,6 +145,7 @@ public:
   ForceCalc(shared_ptr<ASolver> _asolv);
   
   void calc_force();  // fill F_
+  void calc_force_interact( shared_ptr<System> sys);
   
   // calculate force on one molecule
   Pt calc_fi(int i);
@@ -172,15 +174,9 @@ protected:
   shared_ptr<System> _sys_;
   shared_ptr<VecOfMats<cmplx>::type> _gamma_;
   
-//  double epsS_;
   int N_;
   int p_;
 
-//  /*
-//   Calculate H vector (eq 42 and 43 in Lotan 2006)
-//   */
-//  VecOfMats<cmplx>::type calc_H(int i);
-  
 public:
   TorqueCalc() { }
   
@@ -237,7 +233,9 @@ protected:
   
   double cutoffTBD_;  // distance for cutoff of tbd approx
   
-  Units unit_; // String value of units
+  string unit_; // String value of units
+  Units unt_; // String value of units
+  double unit_conv_; // Conversion factor for units from internal
   
   vector<vector<int > > dimer_;   // list of all pairs by their index #
   vector<vector<int > > trimer_;  // list of all triplets by their index #
@@ -262,6 +260,8 @@ protected:
   
   string outfname_;
   
+  void compute_units(Units unt);
+  
   shared_ptr<System> make_subsystem(vector<int> mol_idx);
   
   int find_di( int i, int j);
@@ -269,7 +269,7 @@ protected:
   
 public:
   ThreeBody(shared_ptr<ASolver> _asolver, Units unt = INTERNAL,
-            double cutoff = 1e48 );
+            string outfname="", double cutoff = 1e48);
   
   // Solve the N body problem, only 2 or 3 right now
   void solveNmer( int num, double preclim = 1e-4);
@@ -280,7 +280,7 @@ public:
   void calcTBDEnForTor( );
   void calcTwoBDEnForTor( );
   
-  void printTBDEnForTor( vector<string> outfile );
+  void printTBDEnForTor( string outf, vector<string> outfile );
   
   vector<vector<int > > getDimers()  { return dimer_; }
   vector<vector<int > > getTrimers() { return trimer_; }
@@ -361,6 +361,7 @@ public:
   Pt calc_tau_i(int i)    { return _torCalc_->calc_tau_i(i); }
   MyVector<double> calc_ei(int i)       { return _eCalc_->calc_ei(i); }
   
+  void calc_force_interact()   { _fCalc_->calc_force_interact(_sys_); }
   void calc_force()   { _fCalc_->calc_force(); }
   void calc_energy()  { _eCalc_->calc_energy(); }
   void calc_torque()  { _torCalc_->calc_tau(); }
@@ -387,6 +388,7 @@ public:
 
 };
 
+
 class ThreeBodyPhysCalc : public BasePhysCalc, ThreeBody
 {
 protected:
@@ -396,7 +398,7 @@ protected:
   string outfname_;
   
 public:
-  ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num=3, string outfname = "",
+  ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num=3, string outfname = "", 
                     Units unit = INTERNAL, double cutoff=1e48);
   
   void calc_force() { if (!solved_) solveNmer(num_); solved_ = true; }
@@ -408,7 +410,7 @@ public:
   virtual shared_ptr<vector<Pt> > get_Tau()
   { return get_torque_approx(); }
   virtual shared_ptr<vector<Pt> > get_F()
-  { return get_force_approx();   }
+  { return get_force_approx();   }   
   virtual shared_ptr<vector<double> > get_omega()
   { return get_energy_approx(); }
   

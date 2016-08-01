@@ -9,12 +9,13 @@ rcParams.update({'figure.autolayout': True})
 '''
 Program to plot a 3D version of the ESP from PB-AM
 '''
-dirName='/Users/lfelberg/'\
-                 + 'PBSAM/pb_solvers/pbam/pbam_test_files/electro_porin/'
-fileName = dirName + 'porin_trip_0.05M_map.out'
+dirName='/Users/felb315/pb_solvers/'\
+                 + 'pbsam/pbsam_test_files/gtest/'
+#fileName = dirName + 'onemol_map.out'
+fileName = dirName + 'threemol_map.out'
 #fileName = dirName + 'data/2fgr/2fgr_tri_move_map.out'
-outFile= dirName + 'Desktop/trimer_monoview_out.surf'
-outFile= dirName + 'porin_triple1_0.05M_3d_'
+outFile= '/Users/felb315/Desktop/onemol'
+#outFile= dirName + 'barnase_0.05M_3d_'
 
 
 def FileOpen(fileName):
@@ -52,30 +53,31 @@ def dispPlot( org, bn, xv, yv, zv, potential,
     fig = plt.figure(1, figsize = (4, 4));
     ax = fig.add_subplot(111,projection='3d')
 
-    n = len(xv)
-    for i in range(n):
-        if xv[i] < 0:
-            break
-    xv = xv[:i]
-    yv = yv[:i]
-    zv = zv[:i]
-    potential=potential[:i]
+   #n = len(xv)
+   #for i in range(n):
+   #    if xv[i] < 0:
+   #        break
+   #xv = xv[:i]
+   #yv = yv[:i]
+   #zv = zv[:i]
+   #potential=potential[:i]
 
-    xv -= np.mean(xv)
-    yv -= np.mean(yv)
-    zv -= np.mean(zv)
+   #xv -= np.mean(xv)
+   #yv -= np.mean(yv)
+   #zv -= np.mean(zv)
 
     minl = min(min(xv), min(yv), min(zv))
     maxl = max(max(xv), max(yv), max(zv))
 
     big = max( abs(potential))
+    print(minl, maxl, big)
     cm = plt.get_cmap('jet_r')
     cNorm = matplotlib.colors.Normalize(vmin=-big,
                                                                vmax=big)
     scalarMap = cmx.ScalarMappable(norm=cNorm,
                                                            cmap=cm)
 
-    ax.scatter(xv, yv, zv, s = 85,
+    ax.scatter(xv, yv, zv, s = 95,
                      c=scalarMap.to_rgba(potential),
                      lw = 0)
     scalarMap.set_array(potential)
@@ -102,14 +104,14 @@ def dispPlot( org, bn, xv, yv, zv, potential,
     ax.tick_params(pad=-5.5)
 
     if outFile != None:
-        for ii in xrange(0,360,180):
+        for ii in range(0,360,180):
             ax.view_init(elev=20., azim=ii)
             #plt.gcf().subplots_adjust(bottom=0.15)
-            plt.savefig(outFile+str(ii)+'.jpg',
-                             bbox_inches='tight',dpi = 300)
+            plt.savefig(outFile+str(ii)+'.png',
+                             bbox_inches='tight') #,dpi = 300)
 
     plt.close()
-    #plt.show()
+   #plt.show()
 
 #------------------------------------------------------------------------------
 # main
@@ -119,6 +121,8 @@ esp, org, dl, units = FileOpen(fileName)
 if units == "jmol":
     units = "$J/$mol"
 titl = 'Potential at surfaces in %s' % units
+
+print(outFile)
 
 dispPlot( org, dl, esp[:,0], esp[:,1], esp[:,2], esp[:,3],
           titl, outFile=outFile)

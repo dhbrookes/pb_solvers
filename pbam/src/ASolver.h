@@ -33,7 +33,6 @@
 #define ASolver_h
 
 #include "ReExpCalc.h"
-#include "System.h"
 #include <memory>
 
 /*
@@ -64,6 +63,7 @@ protected:
   int                         N_;  // number of molecules
   int                         p_;  // max value for n (2*numVals_ usually)
   double                  a_avg_;  // the average radius of particles in syst
+  double            polz_cutoff_; // cutoff between mol surfaces for polarization
 
   shared_ptr<VecOfMats<cmplx>::type>      _gamma_, _delta_, _E_, _L_;
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL_;
@@ -92,7 +92,7 @@ protected:
   cmplx calc_indi_e(int i, int n, int m);
   
   void copy_to_prevA(); // copy contents of _A_ to _prevA_
-  void copy_to_prevGradA();
+  void copy_to_prevGradA(int j);
   
   // pre-compute spherical harmonics matrices for every charge in the system
   void pre_compute_all_sh();
@@ -180,7 +180,8 @@ public:
           shared_ptr<SHCalc> shCalc,
           shared_ptr<System> _sys,
           shared_ptr<Constants> _consts,
-          const int p=Constants::MAX_NUM_POLES);
+          const int p=Constants::MAX_NUM_POLES,
+          double polz_cutoff = 10.0);
   
   shared_ptr<VecOfMats<cmplx>::type>  get_gamma() { return _gamma_; }
   shared_ptr<VecOfMats<cmplx>::type>  get_delta() { return _delta_; }
@@ -231,6 +232,15 @@ public:
   cmplx get_prev_dAdphi_ni(int i, int j, int n, int m)
   { return _prevGradA_->operator()(i, j)[2](n, m+p_);}
   
+  void set_prev_dAdr_ni(int i, int j, int n, int m, cmplx val)
+  { _prevGradA_->operator()(i, j)[0].set_val(n, m+p_, val); }
+  
+  void set_prev_dAdtheta_ni(int i, int j, int n, int m, cmplx val)
+  { _prevGradA_->operator()(i, j)[1].set_val(n, m+p_, val); }
+  
+  void set_prev_dAdphi_ni(int i, int j, int n, int m, cmplx val)
+  { _prevGradA_->operator()(i, j)[2].set_val(n, m+p_, val); }
+  
   // get elements of grad_j(A^(i))
   cmplx get_dAdx_ni(int i, int j, int n, int m)
   { return _gradA_->operator()(i, j)[0](n, m+p_);}
@@ -257,11 +267,11 @@ public:
   void print_dAi( int i, int j, int p);
 
   //numerically solve for A given the desired precision
-  void solve_A(double prec);
+  void solve_A(double prec, int MAX_POL_ROUNDS=2);
   
   // numerically solve for grad(A) given the desired precision
   // must solve for A before this
-  void solve_gradA(double prec);
+  void solve_gradA(double prec, int MAX_POL_ROUNDS=2);
   
   /*
    Reset all relevant members given a new system

@@ -5,7 +5,7 @@
 
 # executable ignores
 bin
-build
+build*
 
 
 # Python script ignores
@@ -17,13 +17,16 @@ build
 *.dat
 dyn_*
 *.stat
-*.out.pqr
+*out.pqr
+test_cged_out.pqr
 
 ## Latex ignores
 *.aux
 *.log
 *.synctex.gz
 *.out
+*.bbl
+*.blg
 
 ## Files for work on APBS comparison
 APBS_compare/
@@ -33,3 +36,13 @@ APBS_compare/
 *.jpg
 *.jpeg
 *.pdf
+
+# Dynamics ignores
+[0-2][0-9]
+contact_1BRS_other/
+pbcs
+porin
+
+# manybody
+grid_test
+random_test

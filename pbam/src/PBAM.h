@@ -4,7 +4,7 @@
 /*
  Copyright (c) 2015, Teresa Head-Gordon, Lisa Felberg, Enghui Yap, David Brookes
  All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright
@@ -15,7 +15,7 @@
  * Neither the name of UC Berkeley nor the
  names of its contributors may be used to endorse or promote products
  derived from this software without specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,10 +33,8 @@
 
 #include <memory>
 #include <time.h>
-#include "setup.h"
-#include "BD.h"
 #include "PBAMStruct.h"
-#include "Electrostatics.h"
+#include "BD.h"
 
 
 using namespace std;
@@ -50,16 +48,16 @@ protected:
 
   int poles_;
   double solveTol_;
-  
+
 public:
-  
+
   // Constructors
   PBAM();
   PBAM(string infile);
   // For APBS
-  PBAM(const struct PBAMInput& pbami, vector<Molecule> mls ); 
+  PBAM(const PBAMInput& pbami, vector<Molecule> mls );
 
-  friend struct PBAMInput getPBAMParams();
+  friend PBAMInput getPBAMParams();
 
   // Copy constructors
   PBAM( const PBAM& pbam ) ;
@@ -72,7 +70,7 @@ public:
 
   int run();
   // for running the APBS version
-  struct PBAMOutput run_apbs( );
+  PBAMOutput run_apbs( );
 
   void run_bodyapprox();
   void run_dynamics();

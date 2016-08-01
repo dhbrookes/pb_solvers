@@ -1,6 +1,6 @@
 ///  @file PBAMWrap.h
 ///  @author  Lisa Felberg
-///  @brief c interface for the C++ PBAM class 
+///  @brief c interface for the C++ PBAM class
 ///  @ingroup PBAM
 ///  @version $Id$
 ///  @attention
@@ -62,16 +62,19 @@
 extern "C"{
 #endif
 
-void printPBAMStruct( struct PBAMInput pbamIn );
+void printPBAMStruct( PBAMInput pbamIn );
 
 #ifdef PBAM_APBS
-struct PBAMOutput runPBAMWrapAPBS( struct PBAMInput pbamIn, 
-	                               Valist* molecules[], int nmls ); 
-//#else
-//struct PBAMOutput runPBAMWrap( struct PBAMInput pbamParams );
+PBAMOutput runPBAMWrapAPBS( PBAMInput pbamIn,
+	                          Valist* molecules[], int nmls );
 #endif //PBAM_APBS
 
-struct PBAMInput getPBAMParams();
+PBAMOutput runPBAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
+                             int nmol,
+                             int natm[],
+                             PBAMInput pbamfin);
+
+PBAMInput getPBAMParams();
 
 #ifdef __cplusplus
 }

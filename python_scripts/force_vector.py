@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 '''
 Program to write VMD script for
 '''
-dirName='/Users/lfelberg/PBSAM/pb_solvers/pbam/'\
+dirName='/Users/felb315/pb_solvers/pbam/'\
                     'pbam_test_files/energyforce_test/'\
                     'porin/'
 fileName = dirName + 'enfor_porin_trip.kT_0.05M.out'
@@ -45,12 +45,13 @@ def FileOpen(fileName):
     return(rad, pos, energy, force, torque)
 
 rad, ps, nrg, frc, tor = FileOpen(fileName)
-scale = 0.25
-torscal = .65
+scale = 0.0009
+torscal = .05
 rad = np.array(rad)
 ps = np.array(ps)
 nrg = np.array(nrg)
 frc = np.array(frc)/scale
+#frc *= -1
 tor = np.array(tor)/torscal
 
 vmd_scr = open(outFile+'force', 'w')

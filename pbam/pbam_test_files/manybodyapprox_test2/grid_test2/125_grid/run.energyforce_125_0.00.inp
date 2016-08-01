@@ -1,0 +1,11 @@
+runtype energyforce
+runname /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/125_grid/energyforce_125_0.00.out
+units kT
+salt 0.00
+temp 298
+idiel 4
+sdiel 78
+attypes 1
+type 1 125
+pqr 1 /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/125_grid/mol_pos.pqr
+xyz 1 /Users/davidbrookes/Projects/pb_solvers/pbam/pbam_test_files/manybodyapprox_test2/grid_test2/125_grid/pos125_grid_all.xyz

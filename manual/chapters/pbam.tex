@@ -60,22 +60,21 @@ In a similar manner to the interaction energy calculations in the Physical Calcu
 
 To install this program, first download the source code from the GitHub repository: \\
 
-\hspace{1cm}\texttt{\$ git clone https://github.com/davas301/pb\_solvers.git} \\
+\hspace{1cm}\texttt{\$ git clone https://github.com/davas301/pb\_solvers.git clone\_dir} \\
 
-Then navigate to the directory \texttt{pb\_solvers/pbam}. From here, make a \texttt{build} and \texttt{bin} directory, use CMake to create a make file and then make the program.  This is done as follows: \\
+Then navigate to the cloned directory \texttt{clone\_dir}. From here, make a \texttt{build} directory, use CMake to create a make file and then make the program.  This is done as follows: \\
 
-\hspace{1cm}\texttt{\$ cd pb\_solvers/pbam} 
+\hspace{1cm}\texttt{\$ cd clone\_dir} 
 
-\hspace{1cm}\texttt{\$ mkdir build bin}
+\hspace{1cm}\texttt{\$ mkdir build}
 
 \hspace{1cm}\texttt{\$ cd build}
 
 \hspace{1cm}\texttt{\$ cmake ..} 
 
-\hspace{1cm}\texttt{\$ make install} \\
+\hspace{1cm}\texttt{\$ make pbam} \\
 
-
-An executable named \texttt{pbam} will now be in \texttt{pb\_solvers/bin}.
+An executable named \texttt{pbam} will now be in \texttt{clone\_dir/build/bin}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

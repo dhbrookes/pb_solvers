@@ -12,13 +12,15 @@ ASolver::ASolver(shared_ptr<BesselCalc> _bcalc,
                   shared_ptr<SHCalc> _shCalc,
                   shared_ptr<System> _sys,
                   shared_ptr<Constants> _consts,
-                  const int p)
+                  const int p,
+                  double polz_cutoff)
 :p_(p),
 N_(_sys->get_n()),
 a_avg_(_sys->get_lambda()),
 solvedA_(false),
 _besselCalc_(_bcalc),
 _shCalc_(_shCalc),
+polz_cutoff_(polz_cutoff),
 _consts_(_consts)
 {
   _gamma_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, p_));
@@ -40,10 +42,8 @@ _consts_(_consts)
 }
 
 // perform many iterations of the solution for A
-void ASolver::solve_A(double prec)
+void ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
 {
-  int MAX_POL_ROUNDS = 1000;
-
   double scale_dev = (double)(p_*(p_+1)*0.5);
   double cng = scale_dev;
   int ct = 0;
@@ -52,23 +52,19 @@ void ASolver::solve_A(double prec)
   {
     iter();
     cng = calc_change();
-    if (ct > MAX_POL_ROUNDS*N_)
-    {
-      cout << "Polz doesn't converge! dev="<< cng << " " << ct << endl;
-      exit(0);
-    }
+    if (ct > MAX_POL_ROUNDS) break;
     ct++;
   }
   solvedA_ = true;
   calc_L();
 }
 
-void ASolver::solve_gradA(double prec)
+void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
 {
   assert(solvedA_); // must solve a before this
   double scale_dev = (double)(p_*(p_+1)*0.5*3.0);
   double cng;
-  int j, ct, MAX_POL_ROUNDS = 1000;
+  int j, ct;
   
   pre_compute_gradT_A();
 
@@ -80,15 +76,10 @@ void ASolver::solve_gradA(double prec)
     {
       grad_iter(j);
       cng = calc_grad_change(j);
-      if (ct > MAX_POL_ROUNDS*N_)
-      {
-        cout << "Polz doesn't converge! dev="<< cng << " " << ct << endl;
-        exit(0);
-      }
+      if (ct > MAX_POL_ROUNDS) break;
       ct++;
     }
   }
-  
   calc_gradL();
 }
 
@@ -101,14 +92,23 @@ void ASolver::copy_to_prevA()
   }
 }
 
-void ASolver::copy_to_prevGradA()
+void ASolver::copy_to_prevGradA(int j)
 {
   for (int i=0; i < _A_->get_nrows(); i++)
   {
-    for (int j = 0; j < _gradA_->get_ncols(); j++)
-    {
-      _prevGradA_->set_val(i, j, _gradA_->operator()(i, j));
-    }
+//    for (int j = 0; j < _gradA_->get_ncols(); j++)
+//    {
+//      _prevGradA_->set_val(i, j, _gradA_->operator()(i, j));
+      for (int n = 0; n < p_; n++)
+      {
+        for (int m = -n; m < n+1; m++)
+        {
+          set_prev_dAdr_ni(i, j, n, m, get_dAdr_ni(i, j, n, m));
+          set_prev_dAdtheta_ni(i, j, n, m, get_dAdtheta_ni(i, j, n, m));
+          set_prev_dAdphi_ni(i, j, n, m, get_dAdphi_ni(i, j, n, m));
+        }
+      }
+//    }
   }
 }
 
@@ -119,9 +119,11 @@ void ASolver::iter()
   MyMatrix<cmplx> Z, zj, ai;
   Pt v;
   copy_to_prevA();
-  bool prev = true;  // want to re-expand previous
+  bool polz(false), interact(false), prev(true);
   for (i = 0; i <  N_; i++)
   {
+    interact = false;
+    polz = false;
     // relevant re-expansions:
     Z = MyMatrix<cmplx> (p_, 2*p_ + 1);
     for (j = 0; j < N_; j++)
@@ -129,16 +131,28 @@ void ASolver::iter()
       if (i == j) continue;
       
       v = _sys_->get_pbc_dist_vec(i, j);
-      if (! _sys_->less_than_cutoff(v) ) continue;
+      if (! _sys_->less_than_cutoff(v) ) continue; // cutoff for interaction
+
+      _sys_->add_J_to_interact_I(i,j);
+      interact = true; //TODO: figure out the polarization
+      if (v.norm() > polz_cutoff_+_sys_->get_ai(i)+_sys_->get_ai(j)) continue;
       
       zj = re_expandA(i, j, prev);
       Z += zj;
+      _sys_->add_J_to_pol_I(i,j);
+      polz = true;
     }
     
-    ai = _delta_->operator[](i) * Z;
-    ai += _E_->operator[](i);
-    ai = _gamma_->operator[](i) * ai;
-    _A_->set_val(i, ai);
+    if (polz)
+    {
+      ai = _delta_->operator[](i) * Z;
+      ai += _E_->operator[](i);
+      ai = _gamma_->operator[](i) * ai;
+      _A_->set_val(i, ai);
+    } else if (interact)
+    {
+      _A_->set_val(i, _gamma_->operator[](i) * _E_->operator[](i));
+    }
   }
 }
 
@@ -152,28 +166,35 @@ void ASolver::grad_iter(int j)
   VecOfMats<cmplx>::type aij, add;
   MyMatrix<cmplx> gamma_delta;
   Pt v;
-  bool prev = true; //want to re-expand previous
+  bool prev(true), polz(false), interact(false); //want to re-expand previous
+  copy_to_prevGradA(j);
   for (i = 0; i < N_; i++) // molecule of interest
   {
-    copy_to_prevGradA();
+    interact = false;
+    polz = false;
     aij = VecOfMats<cmplx>::type (3, MyMatrix<cmplx>(p_,2*p_+1));
-    aij = get_gradT_Aij( j, i);
+    aij = get_gradT_Aij(j, i);
     
     for (k = 0; k < N_; k++) // other molecules
     {
       if (k == i) continue;
       v = _sys_->get_pbc_dist_vec(i, k);
       if (! _sys_->less_than_cutoff(v) ) continue;
+      interact = true;
+      if (v.norm() > polz_cutoff_+_sys_->get_ai(i)+_sys_->get_ai(j)) continue;
       add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
       aij += add;
+      polz = true;
     }
-    
-    gamma_delta = _gamma_->operator[](i) * _delta_->operator[](i);
-    aij.set_val(0, gamma_delta * aij[0]);
-    aij.set_val(1, gamma_delta * aij[1]);
-    aij.set_val(2, gamma_delta * aij[2]);
-    _gradA_->set_val(i, j, aij);
-    
+   
+    if (interact) 
+    {
+      gamma_delta = _gamma_->operator[](i) * _delta_->operator[](i);
+      aij.set_val(0, gamma_delta * aij[0]);
+      aij.set_val(1, gamma_delta * aij[1]);
+      aij.set_val(2, gamma_delta * aij[2]);
+      _gradA_->set_val(i, j, aij);
+    }
   }
 }
 
@@ -624,7 +645,7 @@ MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i, int j, double theta,
       for (int m = 1; m < n; m++)
       {
         x.set_val(n, m+p_,
-            rec*(cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,0))*mat(n,m-1+p_)
+            rec*(cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m, 0))*mat(n,m-1+p_)
                 - cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat(n,m+1+p_)));
         x.set_val( n, -m+p_, conj(x(n, m+p_)));
       }
@@ -865,8 +886,8 @@ void ASolver::compute_T()
       _shCalc_->calc_sh(v.theta(), v.phi());
       vector<double> besselK = _besselCalc_->calc_mbfK(2*p_, kappa * v.r());
       T_.set_val(i, j, ReExpCoeffs(p_, v, _shCalc_->get_full_result(),
-                    besselK, _reExpConsts_,
-                    kappa, _sys_->get_lambda(), true));
+                                   besselK, _reExpConsts_,
+                                   {kappa,kappa}, {_sys_->get_lambda()},true));
     }
   }
 }

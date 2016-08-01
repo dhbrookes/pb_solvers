@@ -1,23 +1,22 @@
 PB-AM code: Poisson-Boltzmann Semi-Analytical Method
 ============
 
-Welcome to the home for the [PB-AM code](https://github.com/davas301/pb_solvers/tree/pbsam_dev)!
+Welcome to the home for the [PB-AM code](https://github.com/davas301/pb_solvers)!
 
 ## Building
 
-
-To build this branch, follow the instructions below:
+To build this method, follow the instructions below:
 
 ~~~
+cd [pb_solvers_home]
 mkdir build
 cd build
 cmake ..
-make
+make pbam pbamtest
 ~~~
 
 This will make executables for pbam and pbamtest. Right now, the pbam 
-Both executables can be found in the build directory subdirectories
-`pbam/` and `pbam_test_code/`
+Both executables can be found in the build subdirectory `bin/`
 
 ## Running
 
@@ -25,9 +24,8 @@ To run, simply execute the following on the command line:
 
 ### For PBAM
 
-
 ~~~
-./build/pbam/pbam
+./build/bin/pbam runfile.inp
 ~~~
 
 
@@ -35,7 +33,7 @@ To run, simply execute the following on the command line:
 
 ~~~
 cd build # if not already in build
-./build/pbsamtest/pbsamtest
+./build/bin/pbsamtest
 ~~~
 
 Note that some tests are looking for paths relative to build for files,

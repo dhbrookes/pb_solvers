@@ -162,14 +162,14 @@ boxLength_(boxlength), t_(0)
 }
 
 System::System(Setup setup, double cutoff)
-:t_(0), ntype_(setup.get_ntype()), typect_(setup.get_type_nct())
+:t_(0), ntype_(setup.getNType()), typect_(setup.get_type_nct())
 {
   vector<Molecule> mols;
   int chg, i, j, k=0;
   string pqrpath;
   Molecule mol;
   vector<int> keys(2);
-  for (i = 0; i < setup.get_ntype(); i++)
+  for (i = 0; i < setup.getNType(); i++)
   { 
     PQRFile pqrI (setup.getTypeNPQR(i));
     TransRotFile transrot;
@@ -187,7 +187,7 @@ System::System(Setup setup, double cutoff)
       Pt trans;
       MyMatrix<double> rot;
       
-      Pt com = pqrI.get_cg_centers()[0];
+      Pt com = pqrI.get_center_geo();
       
       if (setup.getTypeIsTransRot(i))
       {
@@ -204,15 +204,15 @@ System::System(Setup setup, double cutoff)
       }
       
       keys = { i, j };
-      vector<Pt> repos_charges(pqrI.get_M());
+      vector<Pt> repos_charges(pqrI.get_Nc());
       Pt new_pt;
       
-      for ( chg = 0; chg < pqrI.get_M(); chg ++)
+      for ( chg = 0; chg < pqrI.get_Nc(); chg ++)
       {
         repos_charges[chg] = pqrI.get_atom_pts()[chg].rotate(rot) + trans;
       }
       
-      if (pqrI.get_cg())  // coarse graining is in pqr
+      if (pqrI.get_Ns() != 0)  // coarse graining is in pqr
       {
         mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
                         pqrI.get_charges(), repos_charges,

@@ -4,11 +4,13 @@
 #define CHR_MAX 1000
 #define FIL_MAX 15
 #define MOL_MAX 150
+#define AT_MAX  50000
+#define XYZRCWIDTH 5
 
 //
 //  input
 //
-struct PBAMInput {
+typedef struct _PBAMInput {
 
   double temp_;
   double salt_;
@@ -25,7 +27,7 @@ struct PBAMInput {
   // Electrostatics
   int gridPts_;
   char map3D_[CHR_MAX];
-  
+
   int grid2Dct_;
   char grid2D_[FIL_MAX][CHR_MAX];
   char grid2Dax_[FIL_MAX][CHR_MAX];
@@ -53,42 +55,38 @@ struct PBAMInput {
   int xyzct_[MOL_MAX];
 
 
-#ifdef __cplusplus
-PBAMInput() :
-  temp_(298.15),
-  salt_(0.01),
-  idiel_(1.5), // Solute dielectric
-  sdiel_(80.0),
-  nmol_(1),
-  runType_("energyforce"),
-  runName_("tst"),
-  randOrient_(0),
-  boxLen_(1.4e18),
-  pbcType_(0),
-  gridPts_(15),
-  map3D_("tst.map"),
-  grid2Dct_(0),
-  ntraj_(1),
-  termCombine_("or"),
-  termct_(1),
-  contct_(0)
-	{ }
-#endif
+ #ifdef __cplusplus
+ _PBAMInput() :
+   temp_(298.15),
+   salt_(0.01),
+   idiel_(1.5), // Solute dielectric
+   sdiel_(80.0),
+   nmol_(1),
+   randOrient_(0),
+   boxLen_(1.4e18),
+   pbcType_(0),
+   gridPts_(15),
+   grid2Dct_(0),
+   ntraj_(1),
+   termct_(1),
+   contct_(0)
+ 	{ }
+ #endif
 
-} ;
+} PBAMInput;
 
 //
 //  output
 //
-struct PBAMOutput {
+typedef struct _PBAMOutput {
 
   double energies_[MOL_MAX];
   double forces_[MOL_MAX][3];
 
-#ifdef __cplusplus
-  PBAMOutput() {}
-#endif
+ #ifdef __cplusplus
+   _PBAMOutput() {}
+ #endif
 
-} ;
+} PBAMOutput;
 
 #endif

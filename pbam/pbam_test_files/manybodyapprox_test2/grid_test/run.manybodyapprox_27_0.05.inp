@@ -1,4 +1,4 @@
-runname bodyapprox_27_0.05
+runname bodyapprox_27_0.05.out
 runtype bodyapprox
 3bdloc 3bd_27_0.05.dat
 2bdloc 2bd_27_0.05.dat

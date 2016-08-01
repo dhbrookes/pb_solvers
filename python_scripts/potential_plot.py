@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 '''
 Program to plot a 2D version of the ESP from PB-AM
 '''
-dirName='/Users/lfelberg/PBSAM/pb_solvers/pbam/'\
-                    'pbam_test_files/electro_barnase_test/'
+dirName='/Users/felb315/Desktop/electrostatic_test/'\
+                    'electro_barnase_test/'
 #fileName = dirName + 'porin_sing_0.05M.z.0.dat'
-fileName = dirName + 'barnase.x.-20.dat'
+fileName = dirName + 'barnase.x.0.dat'
 #outFile= dirName + 'porin_sing_0.05M.z.0.jpg'
-outFile= dirName + 'barnase.x.-20.jpg'
+outFile= dirName + 'barnase.x.0.png'
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):
@@ -57,8 +57,8 @@ def dispPlot( org, bn, count, potential,
 
     X = np.arange(org[0], org[0]+ nbins*bn[0], bn[0])
     Y = np.arange(org[1], org[1]+ nbins*bn[1], bn[1])
-    big = max( abs(mn)-abs(0.1*mn), abs(mx)+abs(mx)*0.1)
-    plt.pcolor(X, Y, potential, cmap = 'jet_r',
+    big = 2.0 #max( abs(mn)-abs(0.1*mn), abs(mx)+abs(mx)*0.1)
+    plt.pcolor(X, Y, potential, cmap = 'seismic_r',
                     vmin=-big, vmax=big)
     plt.colorbar()
 
@@ -78,11 +78,11 @@ def dispPlot( org, bn, count, potential,
     ax.set_xlabel(xlab, fontsize = 10)
 
     for tick in ax.xaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
+        tick.label.set_fontsize(10)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
+        tick.label.set_fontsize(10)
     if outFile != None:
-        plt.savefig(outFile,bbox_inches='tight', dpi = 200)
+        plt.savefig(outFile,bbox_inches='tight', dpi = 300)
     plt.close()
 
 #--------------------------------------------------------------------------------
@@ -98,11 +98,11 @@ for i in range(len(esp)):
 
 titl = 'Cross section at ' + ax + ' = ' + str(axval)
 titl += ' in ' + units
-xla = r'$Y \, (\AA)$'; yla = r'$Z \, (\AA)$'
+xla = r'Y ($\AA$)'; yla = r'Z ($\AA$)'
 if ax == 'y':
-    xla = r'$X \, (\AA)$'; yla = r'$Z \, (\AA)$'
+    xla = r'X ($\AA$)'; yla = r'Z ($\AA$)'
 elif ax == 'z':
-    xla = r'$X \, (\AA)$'; yla = r'$Y \, (\AA)$'
+    xla = r'X ($\AA$)'; yla = r'Y ($\AA$)'
 
 dispPlot( org, dl, len(esp[0]), np.transpose(esp),
                 mx, mn, titl,

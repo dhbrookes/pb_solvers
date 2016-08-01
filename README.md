@@ -1,4 +1,23 @@
+
+### Building for Sphinx
+
+This should be similar to the Geoflow build, the only difference is that you need to 
+use the flag `-DENABLE_PBAM_SPHINX=ON` when you run cmake. Or you can ignore this and
+read the following steps:
+
+1. `cd prototype/plugins/PB_S_AM/src`
+2. `mkdir build`
+3. `cd build`
+4. `cmake -DENABLE_PBAM_SPHINX=on ../`
+5. `make pbam_sph`
+6. `cp pbam_sph.so ../../`
+
+
 ### General XCode set-up: ###
+
+#### Adding a new target ####
+1. Editor --> Add target
+2. OS X --> Application --> Command Line Tool 
 
 #### Steps ####
 1. Add path to user-made header files to Build Settings --> Search Paths --> User Header Search Paths for all Targets
@@ -10,14 +29,22 @@
     Add source .cpp and .h Files to pbsolvers Project
     Under Build Phases --> Compile Sources : only need .cpp files
     
-
-
 #### For the simple schemes: ####
 
 Need to change the Search Paths : User Header Search Paths
 to where your code is on the local machine!
 
+### Linear algebra Setup ###
+Mac comes with built in blas and lapack.  
+
+1. In Finder, open to the directory: `/System/Library/Frameworks/Accelerate.framework/Frameworks/`
+2. Drag the `vecLib.framework` file into the pbsam XCode project.
+3. Add path to gtest.framework to Build Settings --> Search Paths --> Framework Search Paths
+4. Add path to gtest.framework to Build Settings --> Search Paths --> Runpath Search Paths
+5. Add in the preprocessor definitions to both targets: Build Settings --> Apple LLVM 7.1 - Preprocessing -> __LAU=1 __XCODE=1
+
 ### GTest Setup ###
+
 For gtest, it's a little more complicated...
 
 

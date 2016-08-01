@@ -1,0 +1,22 @@
+runtype energyforce
+runname energyforce.kT_0.00M.out
+
+units jmol
+salt 0.00
+temp 353
+idiel 1
+sdiel 1
+
+attypes 1
+type 1 2
+pqr 1 pos_sing.pqr
+xyz 1 pos_sing.xyz
+
+#attypes 2
+#type 1 1
+#pqr 1 neg_charge.pqr
+#xyz 1 positions_neg.xyz
+
+#type 2 1
+#pqr 2 pos_charge.pqr
+#xyz 2 positions_pos.xyz
