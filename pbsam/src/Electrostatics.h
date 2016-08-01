@@ -101,7 +101,7 @@ protected:
   void compute_pot();
   double compute_pot_at( Pt point );
   
-  MyMatrix<cmplx> get_local_exp( Pt dist );
+  MyMatrix<cmplx> get_local_exp( Pt dist, double lambda );
   
   double lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p);
   
