@@ -22,7 +22,6 @@ EnergyCalc::EnergyCalc(shared_ptr<ASolver> _asolv)
 N_(_asolv->get_N()), p_(_asolv->get_p())
 {
   _omega_ = make_shared<vector<double> > (N_);
-//  calc_energy();
 }
 
 double EnergyCalc::calc_ei(int i)
@@ -53,7 +52,6 @@ void EnergyCalc::calc_energy()
 {
   for (int i = 0; i < N_; i++)
   {
-//    _omega_->set_val(i, calc_ei(i));
     (*_omega_)[i] = calc_ei(i);
   }
 }
@@ -67,7 +65,6 @@ ForceCalc::ForceCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
 _gradL_(_gradL)
 {
   _F_ = make_shared<vector<Pt> > (N_, Pt());
-//  calc_force();
 }
 
 ForceCalc::ForceCalc(shared_ptr<ASolver> _asolv)
@@ -76,7 +73,6 @@ _gradL_(_asolv->get_gradL()), _const_(_asolv->get_consts()),
 N_(_asolv->get_N()), p_(_asolv->get_p())
 {
   _F_ = make_shared<vector<Pt> > (N_);
-//  calc_force();
 }
 
 Pt ForceCalc::calc_fi(int i)
@@ -120,6 +116,16 @@ Pt ForceCalc::calc_fi(int i)
 
 }
 
+void ForceCalc::calc_force_interact(shared_ptr<System> sys)
+{
+  for (int i = 0; i < N_; i++)
+  {
+    if (sys->get_act_I(i).size() != 0 )
+      (*_F_)[i] = calc_fi(i);
+    else
+      (*_F_)[i] = Pt(0.0, 0.0, 0.0);
+  }
+}
 
 void ForceCalc::calc_force()
 {
@@ -139,7 +145,6 @@ TorqueCalc::TorqueCalc(shared_ptr<SHCalc> _shCalc,
 _shCalc_(_shCalc), _bCalc_(_bCalc), _gradL_(_gradL), _gamma_(_gamma)
 {
   _tau_ = make_shared<vector<Pt> > (N_);
-//  calc_tau();
 }
 
 TorqueCalc::TorqueCalc(shared_ptr<ASolver> _asolv)
@@ -151,7 +156,6 @@ _sys_(_asolv->get_sys()),
 _gradL_(_asolv->get_gradL())
 {
   _tau_ = make_shared<vector<Pt> > (N_);
-//  calc_tau();
 }
 
 
@@ -230,7 +234,10 @@ void TorqueCalc::calc_tau()
 {
   for (int i = 0; i < N_; i++)
   {
-    (*_tau_)[i] = calc_tau_i(i);
+    if (_sys_->get_act_I(i).size() != 0 )
+      (*_tau_)[i] = calc_tau_i(i);
+    else
+      (*_tau_)[i] = Pt(0.0, 0.0, 0.0);
   }
 }
 

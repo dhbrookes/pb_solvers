@@ -1,4 +1,55 @@
 ################################################################################################
+# Clears variables from list
+# Usage:
+#   pbsam_clear_vars(<variables_list>)
+macro(pbsam_clear_vars)
+  foreach(_var ${ARGN})
+    unset(${_var})
+  endforeach()
+endmacro()
+
+########################################################################################################
+# An option that the user can select. Can accept condition to control when option is available for user.
+# Usage:
+#   pbsam_option(<option_variable> "doc string" <initial value or boolean expression> [IF <condition>])
+function(pbsam_option variable description value)
+  set(__value ${value})
+  set(__condition "")
+  set(__varname "__value")
+  foreach(arg ${ARGN})
+    if(arg STREQUAL "IF" OR arg STREQUAL "if")
+      set(__varname "__condition")
+    else()
+      list(APPEND ${__varname} ${arg})
+    endif()
+  endforeach()
+  unset(__varname)
+  if("${__condition}" STREQUAL "")
+    set(__condition 2 GREATER 1)
+  endif()
+
+  if(${__condition})
+    if("${__value}" MATCHES ";")
+      if(${__value})
+        option(${variable} "${description}" ON)
+      else()
+        option(${variable} "${description}" OFF)
+      endif()
+    elseif(DEFINED ${__value})
+      if(${__value})
+        option(${variable} "${description}" ON)
+      else()
+        option(${variable} "${description}" OFF)
+      endif()
+    else()
+      option(${variable} "${description}" ${__value})
+    endif()
+  else()
+    unset(${variable} CACHE)
+  endif()
+endfunction()
+
+################################################################################################
 # Function merging lists of compiler flags to single string.
 # Usage:
 #   pbsam_merge_flag_lists(out_variable <list1> [<list2>] [<list3>] ...)
@@ -70,7 +121,7 @@ function(PBSAM_parse_linker_libs PBSAM_LINKER_LIBS_variable folders_var flags_va
     endif()
   endforeach()
 
-  PBSAM_list_unique(libflags folders)
+  pbsam_list_unique(libflags folders)
 
   set(${folders_var} ${folders} PARENT_SCOPE)
   set(${flags_var} ${libflags} PARENT_SCOPE)

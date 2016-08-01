@@ -27,7 +27,6 @@
 
 #ifdef __MKL
 #include "mkl.h"
-#include "clapack.h"
 #endif
 
 #ifdef __MACOS

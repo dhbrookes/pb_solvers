@@ -56,6 +56,9 @@ protected:
   vector<double>      qs_;  // magnitude of each charge in the molecule
   vector<Pt>          pos_;  // position of each charge in the molecule
   vector<double>      vdwr_; // van der waal radius of each charge
+
+  vector<int>         interPol_; // List of other mols that are within 10A
+  vector<int>         interAct_; // For mol, list of other are btw cutoff & 10A
   
   // Set coefficients according to the type indicated
   void set_Dtr_Drot(string type);
@@ -108,6 +111,30 @@ public:
   
   double get_drot() const               { return drot_; }
   double get_dtrans() const             { return dtrans_; }
+
+  vector<int> get_pol()                 { return interPol_;}
+  vector<int> get_act()                 { return interAct_;}
+
+  void clear_inter_pol()                { interPol_.clear(); }
+  void clear_inter_act()                { interAct_.clear(); }
+  void add_J_to_pol(int J)              {interPol_.push_back(J);}
+  void add_J_to_interact(int J)         {interAct_.push_back(J);}
+  
+  bool is_J_in_pol( int J )
+  {
+    int j;
+    for (j = 0; j < interPol_.size(); j++)
+      if ( interPol_[j] == J) return true;
+    
+    return false;
+  }
+  bool is_J_in_interact( int J )
+  {
+    int j;
+    for (j = 0; j < interAct_.size(); j++)
+      if ( interAct_[j] == J) return true;
+    return false;
+  }  
   
   void translate(Pt dr, double boxlen);
   void rotate(Quat qrot);
@@ -199,7 +226,26 @@ public:
   // get distance vector between any two points taking into account periodic
   // boundary conditions
   Pt get_pbc_dist_vec_base(Pt p1, Pt p2);
+
+  // Interaction and polarization lists
+  void add_J_to_pol_I( int i, int j) { molecules_[i].add_J_to_pol(j);}
+  void add_J_to_interact_I(int i, int j) { molecules_[i].add_J_to_interact(j);}
   
+  bool is_J_in_pol_I( int i, int j)  { return molecules_[i].is_J_in_pol(j);}
+  bool is_J_in_act_I( int i, int j)  { return molecules_[i].is_J_in_interact(j);}
+  
+  vector<int> get_pol_I(int i)       { return molecules_[i].get_pol();}
+  vector<int> get_act_I(int i)       { return molecules_[i].get_act();}
+
+  void clear_all_lists()
+  {
+    for ( int i = 0; i < N_; i++)
+    {
+      molecules_[i].clear_inter_pol();
+      molecules_[i].clear_inter_act();
+    }
+  }  
+
   // given a distance vector, determine whether it is in the cutoff
   bool less_than_cutoff(Pt v);
   
