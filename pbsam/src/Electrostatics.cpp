@@ -34,6 +34,7 @@ _bCalc_(_bCalc), _consts_(_consts), lam_(_sys->get_lambda())
   
   compute_units();
   compute_pot();
+
 }
 
 Electrostatic::Electrostatic(shared_ptr<Solver> solve, int npts)
@@ -155,7 +156,7 @@ void Electrostatic::print_dx( string dxname )
       {
         out = ((esp_[xct][yct][zct] != esp_[xct][yct][zct])
                 ? 0.0 : esp_[xct][yct][zct]);
-        sprintf( pot, "%12.9f,", out);
+        sprintf( pot, "%12.9f ", out);
         dx << pot;
         
         ct++;
