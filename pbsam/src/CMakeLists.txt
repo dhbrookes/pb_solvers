@@ -9,6 +9,7 @@ add_executable(pbsam
   Gradsolvmat.cpp  
   main.cpp
   PBSAM.cpp 
+  PhysCalc.cpp
   ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/setup.cpp
   ../../pb_shared/src/SHCalc.cpp

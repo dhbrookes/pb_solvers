@@ -27,10 +27,10 @@ elseif(APPLE)
   list(APPEND PBSAM_LINKER_LIBS ${vecLib_LINKER_LIBS})
   add_definitions(-D__MACOS)
   
-  MESSAGE( STATUS "sys root " ${CMAKE_OSX_SYSROOT} )
-  MESSAGE( STATUS "Dependencies: " ${vecLib_INCLUDE_DIR} )
-  MESSAGE( STATUS "linkers: " ${vecLib_LINKER_LIBS} )
+# MESSAGE( STATUS "sys root " ${CMAKE_OSX_SYSROOT} )
+# MESSAGE( STATUS "Dependencies: " ${vecLib_INCLUDE_DIR} )
+# MESSAGE( STATUS "linkers: " ${vecLib_LINKER_LIBS} )
   
 endif()
 
-#add_definitions(-D__LAU)
+add_definitions(-D__LAU)

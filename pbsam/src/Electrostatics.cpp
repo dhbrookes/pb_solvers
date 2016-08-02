@@ -156,7 +156,6 @@ void Electrostatic::print_dx( string dxname )
         out = ((esp_[xct][yct][zct] != esp_[xct][yct][zct])
                 ? 0.0 : esp_[xct][yct][zct]);
         sprintf( pot, "%12.9f,", out);
-        if (ct % 100 == 0) cout << pot;
         dx << pot;
         
         ct++;
