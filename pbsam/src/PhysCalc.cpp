@@ -50,8 +50,8 @@ Pt ForceCalc::calc_fI(shared_ptr<HMatrix> H,
     inn2 = Pt(0.0,0.0,0.0);
     cout << "This is H" << endl; H->print_kmat(k);
     cout << "This is dLHN" << endl; dLHN->print_kmat(k);
-    cout << "This is dH" << endl; dH->print_kmat(k);
-    cout << "This is LHN" << endl; LHN->print_kmat(k);
+//    cout << "This is dH" << endl; dH->print_kmat(k);
+//    cout << "This is LHN" << endl; LHN->print_kmat(k);
     for (int n = 0; n < H->get_p(); n++)
       for (int m = - n; m < n+1; m++)
       {
@@ -76,7 +76,7 @@ Pt ForceCalc::calc_fI(shared_ptr<HMatrix> H,
     
     cout << "For k " << k << " & H*gLHN " << inn1.x() << ", " << inn1.y()
     << ", " << inn1.z() << endl;
-    cout << " gH*gLHN " << inn2.x() << ", " << inn2.y()
+    cout << "For k " << k << " & gH*gLHN " << inn2.x() << ", " << inn2.y()
     << ", " << inn2.z() << endl;
     
   }

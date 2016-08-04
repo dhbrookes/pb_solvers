@@ -564,6 +564,10 @@ void GradSolver::iter_inner_gradH(int I, int wrt, int k,
 //    cout << "This is WF "<< ct << " ";
 //    dWF_[wrt][I]->print_kmat(k);
 //    cout << "INSIDE inner iter " << endl;
+//    cout << "This is dF mol " <<I << " sph " << k<< " wrt " <<wrt<< " it "<< ct << " ";
+//    dF_[wrt][I]->print_kmat(k);
+//    cout << "This is dH mol "  <<I<< " sph " << k << " wrt " << wrt<< " it "<< ct << " ";
+//    dH_[wrt][I]->print_kmat(k);
 
     
     dev = calc_converge_gradH(I, wrt, k, true);
@@ -708,9 +712,29 @@ void GradSolver::pre_compute_gradT_A()
 //              _H_[I]->print_kmat(k);
               reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
               gradT_A_[J][J]->add_mat_k(l, reex);
+//              cout << "after x:" << endl;
+//              for (int n2 = 0; n2 < p_; n2++)
+//              {
+//                for (int m2 = 0; m2 < n2+1; m2++)
+//                  cout << reex( n2, m2+p_).x()<< ", " ;
+//                cout << endl;
+//              } cout << " y : "  << endl;
+//              for (int n2 = 0; n2 < p_; n2++)
+//              {
+//                for (int m2 = 0; m2 < n2+1; m2++)
+//                  cout << reex( n2, m2+p_).y()<< ", " ;
+//                cout << endl;
+//              } cout << " z : "  << endl;
+//              for (int n2 = 0; n2 < p_; n2++)
+//              {
+//                for (int m2 = 0; m2 < n2+1; m2++)
+//                  cout << reex( n2, m2+p_).z()<< ", " ;
+//                cout << endl;
+//              }
+
             }
           } else if ((_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
-                     (cut_act+aIk+aJl))) // && (interpol_[J][l] == 0))
+                     (cut_act+aIk+aJl)))// && (interpol_[J][l] == 0))
           {
 //            cout << "Reex 100A for mol (org) " << I << " sph " << k
 //            << " to dest : " << J << " and sph " << l  << endl;
@@ -743,7 +767,7 @@ void GradSolver::pre_compute_gradT_A()
     }
   }
 //  double re;
-//  for (int I = 1; I < _sys_->get_n(); I++)
+//  for (int I = 0; I < _sys_->get_n(); I++)
 //  {
 //  for (int J = 0; J < _sys_->get_n(); J++)
 //  {
