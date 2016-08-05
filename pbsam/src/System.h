@@ -240,9 +240,15 @@ public:
   const int get_n() const                  {return N_;}
   const int get_ntype()                    {return ntype_;}
   const int get_typect(int i)              {return typect_[i];}
+  vector<int> get_all_Ik()
+  {
+    vector<int> ns_i;
+    for ( int i = 0; i< N_; i++) ns_i.push_back(get_Ns_i(i));
+    return ns_i;
+  }
   const double get_aik(int i, int k) const {return molecules_[i]->get_ak(k);}
-  const double get_Nc_i(int i) const       {return molecules_[i]->get_nc();}
-  const double get_Ns_i(int i) const       {return molecules_[i]->get_ns();}
+  const int get_Nc_i(int i) const       {return molecules_[i]->get_nc();}
+  const int get_Ns_i(int i) const       {return molecules_[i]->get_ns();}
   const double get_qij(int i, int j) const {return molecules_[i]->get_qj(j);}
   const double get_droti(int i) const      {return molecules_[i]->get_drot();}
   const double get_dtransi(int i) const    {return molecules_[i]->get_dtrans();}

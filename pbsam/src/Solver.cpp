@@ -357,7 +357,8 @@ GradSolver::GradSolver(shared_ptr<System> _sys,
                        vector<vector<int > > interpol,
                        shared_ptr<ExpansionConstants> _expConst,
                        int p)
-:p_(p), _F_(_F), _H_(_H), _T_(_T), _bCalc_(_bCalc), _shCalc_(_shCalc),
+:p_(p), _F_(_F), _H_(_H), _T_(_T),
+_bCalc_(_bCalc), _shCalc_(_shCalc),
 _sys_(_sys), _consts_(_consts), kappa_(_consts->get_kappa()),
 interpol_(interpol), _IE_(_IE), _expConsts_(_expConst),
 dev_sph_Ik_(_sys->get_n()),
@@ -426,19 +427,6 @@ void GradSolver::solve(double tol, int maxiter)
       ct++;
     }
     
-    double interAct(100.0);
-    for (int I = 0; I < _sys_->get_n(); I++)
-    {
-      for (int k = 0; k < _sys_->get_Ns_i(I); k++)
-      {
-//        cout << "This is " << k << " mol " << I << endl;
-        if ((interpol_[I][k] != 0) &&
-            (_sys_->get_molecule(I)->get_inter_act_k(k).size() != 0))
-          dLHN_[j][I]->calc_val_k(k, _sys_, _T_, gradT_A_[j],
-                                  dH_[j], interAct);
-        
-      }
-    }
 //    cout << "This is derv wrt " << j << endl;
 //    for (int I = 0; I < _sys_->get_n(); I++)
 //    {
@@ -469,8 +457,6 @@ void GradSolver::solve(double tol, int maxiter)
 //    }
 //    cout << endl;cout << endl;
   }
-  
-  
 }
 
 double GradSolver::iter(int t, int wrt)
@@ -671,7 +657,7 @@ void GradSolver::update_prev_gradH(int I, int wrt, int k)
 void GradSolver::pre_compute_gradT_A()
 {
   shared_ptr<Molecule> molI;
-  double aIk, aJl, cut_act(100.0), cut_er(10.0);
+  double aIk, aJl, dist, cut_act(100.0), cut_er(10.0);
   Pt Ik, Jl, v;
   MyMatrix<Ptx> reex(p_, 2*p_+1);
   
@@ -679,19 +665,21 @@ void GradSolver::pre_compute_gradT_A()
     for (int J = 0; J < _sys_->get_n(); J++)
       gradT_A_[J][I]->reset_mat();
   
+  for (int J = 0; J < _sys_->get_n(); J++)
+  {
   for (int I = 0; I < _sys_->get_n(); I++)
   {
-    for (int J = 0; J < _sys_->get_n(); J++)
-    {
       if ( I == J ) continue;
+      for (int l = 0; l < _sys_->get_Ns_i(J); l++)
+      {
+        Jl = _sys_->get_centerik(J, l);
+        aJl = _sys_->get_aik(J, l);
       for (int k = 0; k < _sys_->get_Ns_i(I); k++)
       {
         Ik = _sys_->get_centerik(I, k);
         aIk = _sys_->get_aik(I, k);
-        for (int l = 0; l < _sys_->get_Ns_i(J); l++)
-        {
-          Jl = _sys_->get_centerik(J, l);
-          aJl = _sys_->get_aik(J, l);
+        
+          dist = _sys_->get_pbc_dist_vec_base(Ik, Jl).norm();
 //          cout << "This is Ik, Jl pair : "  << I << ", "<< k
 //          << " & "  << J << ", "<< l << endl;
 //          cout<< " dist: " << Ik.dist(Jl) << " and aIk "
@@ -699,8 +687,7 @@ void GradSolver::pre_compute_gradT_A()
 //          << aJl << " dis1 : " <<  Ik.dist(Jl) - aIk - aJl << endl;
 //          cout << "This is pos ik " << Ik.x() << ", " << Ik.y() << ", " << Ik.z() << endl;
 //          cout << "This is pos jl " << Jl.x() << ", " << Jl.y() << ", " << Jl.z() << endl;
-          if (_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
-                     (cut_er+aIk+aJl) )
+          if ( dist < (cut_er+aIk+aJl) )
           {
             reex = _T_->re_expandX_gradT(_H_[J]->get_mat_k(l), I, k, J, l);
             gradT_A_[J][I]->add_mat_k(k, reex);
@@ -733,12 +720,19 @@ void GradSolver::pre_compute_gradT_A()
 //              }
 
             }
-          } else if ((_sys_->get_pbc_dist_vec_base(Ik, Jl).norm() <
-                     (cut_act+aIk+aJl)))// && (interpol_[J][l] == 0))
+          } else if ((dist < (cut_act+aIk+aJl)) && (interpol_[J][l] == 0))
+          {
+
+            reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
+            gradT_A_[J][J]->add_mat_k(l, reex);
+            
+
+          } else if ((interpol_[J][l] != 0) &&
+                     (_sys_->get_molecule(J)->get_inter_act_k(l).size() != 0) &&
+                     (dist < (cut_act+aIk+aJl)))
           {
 //            cout << "Reex 100A for mol (org) " << I << " sph " << k
 //            << " to dest : " << J << " and sph " << l  << endl;
-//            _H_[I]->print_kmat(k);
             reex = _T_->re_expandX_gradT(_H_[I]->get_mat_k(k), J, l, I, k);
             gradT_A_[J][J]->add_mat_k(l, reex);
             
@@ -760,7 +754,7 @@ void GradSolver::pre_compute_gradT_A()
 //              for (int m2 = 0; m2 < n2+1; m2++)
 //                cout << reex( n2, m2+p_).z()<< ", " ;
 //              cout << endl;
-//            }
+//            } cout << endl;
           }
         } // end l
       }
