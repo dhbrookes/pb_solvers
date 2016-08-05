@@ -1017,7 +1017,6 @@ void FMatrix::calc_vals(shared_ptr<Molecule> mol,
     }
   }
 
-  //TODO: replace with matMul
 #ifdef __LAU  
   applyMMat(&IE->get_IE_k_org(k)[0], &f_in[0], &f_out[0], 1.0, 0.0, p2, 1, p2);
 #else  

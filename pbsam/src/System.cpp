@@ -80,7 +80,6 @@ void Molecule::map_repos_charges()
   }
 }
 
-//TODO: In old code just find first encompassing charge - does this matter?
 int Molecule::find_closest_center(Pt pos)
 {
   int idx = 0;
@@ -134,6 +133,8 @@ void Molecule::translate(Pt dr, double boxlen)
   cog_ = Pt(dv_cen.x() - round(dv_cen.x()/boxlen)*boxlen,
                dv_cen.y() - round(dv_cen.y()/boxlen)*boxlen,
                dv_cen.z() - round(dv_cen.z()/boxlen)*boxlen);
+  
+  
   
   for (int k = 0; k < Ns_; k++)
   {

@@ -40,10 +40,13 @@ const int nvals = 10 ;      //! standard number of poles for testing
 string test_dir_loc = "../pbsam/pbsam_test_files/gtest/";
 //string test_dir_loc = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/gtest/";
 //string test_dir_loc = "/Users/davidbrookes/Projects/pb_solvers/pbsam/pbsam_test_files/gtest/";
-//string test_dir_loc = "/Users/lfelberg/Documents/pb_solvers/pbsam/pbsam_test_files/gtest/";
+
+//string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/gtest/";
 
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
+#include "ElectrostaticsUnitTest.h"
+#include "EnergyForceUnitTest.h"
 #include "MyMatrixUnitTest.h"
 #include "readutilUnitTest.h"
 #include "ReExpCalcUnitTest.h"
@@ -58,7 +61,6 @@ string test_dir_loc = "../pbsam/pbsam_test_files/gtest/";
 
 int main(int argc, char * argv[])
 {
-
   bool test = false;
   if (test)
   {
@@ -74,5 +76,4 @@ int main(int argc, char * argv[])
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
   }
-  
 }

@@ -34,6 +34,7 @@ _bCalc_(_bCalc), _consts_(_consts), lam_(_sys->get_lambda())
   
   compute_units();
   compute_pot();
+
 }
 
 Electrostatic::Electrostatic(shared_ptr<Solver> solve, int npts)
@@ -155,13 +156,15 @@ void Electrostatic::print_dx( string dxname )
       {
         out = ((esp_[xct][yct][zct] != esp_[xct][yct][zct])
                 ? 0.0 : esp_[xct][yct][zct]);
-        sprintf( pot, "%8.6f ", out);
+        sprintf( pot, "%12.9f ", out);
         dx << pot;
+        
         ct++;
         if ((ct % 5) == 0) dx << "\n";
         
         if (esp_[xct][yct][zct] < pot_min_)      pot_min_ = esp_[xct][yct][zct];
         else if (esp_[xct][yct][zct] > pot_max_) pot_max_ = esp_[xct][yct][zct];
+        
       }
     }
   }
@@ -206,7 +209,7 @@ void Electrostatic::print_3d_heat( string td_name )
         pos = Pt( pos.r()*1.05, pos.theta(), pos.phi(), true);
         ptl = (units_*compute_pot_at(pos))/e_s;
         
-        sprintf(pot, "%9.5f %9.5f %9.5f %8.6f ",
+        sprintf(pot, "%12.7f %12.7f %12.7f %12.7f ",
                 pos.x(), pos.y(), pos.z(), ptl);
         ht << pot << endl;
       }
@@ -369,20 +372,17 @@ double Electrostatic::compute_pot_at( Pt point )
       center = _sys_->get_centerik(mol, sph);
       rad    = _sys_->get_aik(mol, sph);
       dist   = point - center;
-      localK = get_local_exp(dist);
+      localK = get_local_exp(dist, rad);
       pot += lotan_inner_prod( _H_[mol]->get_mat_k(sph), localK, p_);
     }
   }
- 
   return pot;
 }
 
-MyMatrix<cmplx> Electrostatic::get_local_exp( Pt dist )
+MyMatrix<cmplx> Electrostatic::get_local_exp( Pt dist, double lambda )
 {
   int n, m;
-  double lambda = _sys_->get_lambda();
-  double kap    = _consts_->get_kappa();
-  double expKR;
+  double expKR, kap    = _consts_->get_kappa();
   vector<double> bessK;
   MyMatrix<cmplx> localK(p_, 2*p_);
   
@@ -398,7 +398,6 @@ MyMatrix<cmplx> Electrostatic::get_local_exp( Pt dist )
                                 _shCalc_->get_result(n, m) * bessK[n]));
     }
   }
-  
   return localK;
 }
 
