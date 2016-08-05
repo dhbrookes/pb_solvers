@@ -363,10 +363,18 @@ void PBSAM::run_energyforce()
                    solv.get_all_F(), solv.get_all_H(),
                    solv.get_IE(),
                    solv.get_interpol_list(), _expcons, poles_);
-
-//  PhysCalc calcEnFoTo( ASolv, setp_->getRunName(), consts_->get_unitsEnum());
-//  calcEnFoTo.calc_all();
-//  calcEnFoTo.print_all();
+  gsolv.solve(1e-16, 85);
+  
+  auto focal = make_shared<ForceCalc> (syst_->get_n(), syst_->get_all_Ik(),
+                                       consts_->get_dielectric_water(),
+                                       SHCalcu, bCalcu);
+  focal->calc_all_f(solv.get_all_H(), solv.get_all_LHN(),
+                    gsolv.get_gradH_all(), gsolv.get_gradLHN_all());
+  vector<Pt> fo = focal->get_all_f();
+  
+  TorqueCalc tocal(syst_->get_n());
+  tocal.calc_all_tau(syst_, focal);
+  vector<Pt> to = tocal.get_all_tau();
   
   t3 = clock() - t3;
   printf ("energyforce calc took me %f seconds.\n",
