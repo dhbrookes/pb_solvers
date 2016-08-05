@@ -2,18 +2,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 '''
-Program to plot a 2D version of the ESP from PB-AM
+Program to plot a 2D version of the ESP from PB-[S]AM
 '''
-dirName='/Users/felb315/Desktop/electrostatic_test/'\
-                    'electro_barnase_test/'
+dirName='/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/'\
+                    'electrostatic_test/'\
+                    'barnase_barstar/barnase/'
 #fileName = dirName + 'porin_sing_0.05M.z.0.dat'
-fileName = dirName + 'barnase.x.0.dat'
+fileName = dirName + 'barnase.z.0.dat'
 #outFile= dirName + 'porin_sing_0.05M.z.0.jpg'
-outFile= dirName + 'barnase.x.0.png'
+outFile= dirName + 'barnase.z.0.png'
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):
-    """Gets data from 2D plot output of PB-AM"""
+    """Gets data from 2D plot output of PB-SAM"""
     lines = open(fileName).readlines()
 
     grid,org,dl = np.zeros(2), np.zeros(2),np.zeros(2)
@@ -27,7 +28,7 @@ def FileOpen(fileName):
             units = temp[1]
         elif 'grid' in line[0:10]:
             grid[0], grid[1] = int(temp[1]), int(temp[2])
-            pot = np.zeros((grid[0], grid[1]))
+            pot = np.zeros((int(grid[0]), int(grid[1])))
         elif 'axis' in line[0:10]:
             ax, axval = temp[1], float(temp[2])
         elif 'origin' in line[0:10]:

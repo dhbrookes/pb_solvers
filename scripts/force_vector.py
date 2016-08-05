@@ -51,7 +51,6 @@ rad = np.array(rad)
 ps = np.array(ps)
 nrg = np.array(nrg)
 frc = np.array(frc)/scale
-#frc *= -1
 tor = np.array(tor)/torscal
 
 vmd_scr = open(outFile+'force', 'w')

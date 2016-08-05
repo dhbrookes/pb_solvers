@@ -720,7 +720,6 @@ void LHNMatrix::calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
 //        cout << "This is H before I " << I_ << " and k " << k
 //        << " and j " << J << " and l " << l<< endl;
 //        H[J]->print_kmat(l);
-//        cout << " Rot1 " << endl;
         reex = T->re_expandX(H[J]->get_mat_k(l), I_, k, J, l);
         mat_[k] += reex;
         

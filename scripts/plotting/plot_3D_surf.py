@@ -7,14 +7,15 @@ from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
 
 '''
-Program to plot a 3D version of the ESP from PB-AM
+Program to plot a 3D version of the ESP from PB-[S]AM
 '''
-dirName='/Users/felb315/pb_solvers/'\
-                 + 'pbsam/pbsam_test_files/gtest/'
+dirName='/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/'\
+                    'electrostatic_test/'\
+                    'barnase_barstar/barstar/'
 #fileName = dirName + 'onemol_map.out'
-fileName = dirName + 'threemol_map.out'
+fileName = dirName + 'barstar_map.out'
 #fileName = dirName + 'data/2fgr/2fgr_tri_move_map.out'
-outFile= '/Users/felb315/Desktop/onemol'
+outFile= '/Users/lfelberg/Desktop/barstar_'
 #outFile= dirName + 'barnase_0.05M_3d_'
 
 
@@ -71,13 +72,13 @@ def dispPlot( org, bn, xv, yv, zv, potential,
 
     big = max( abs(potential))
     print(minl, maxl, big)
-    cm = plt.get_cmap('jet_r')
+    cm = plt.get_cmap('seismic_r')
     cNorm = matplotlib.colors.Normalize(vmin=-big,
                                                                vmax=big)
     scalarMap = cmx.ScalarMappable(norm=cNorm,
                                                            cmap=cm)
 
-    ax.scatter(xv, yv, zv, s = 95,
+    ax.scatter(xv, yv, zv, s = 65,
                      c=scalarMap.to_rgba(potential),
                      lw = 0)
     scalarMap.set_array(potential)
