@@ -1,16 +1,12 @@
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
 '''
 Program to plot a 2D version of the ESP from PB-[S]AM
 '''
-dirName='/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/'\
-                    'electrostatic_test/'\
-                    'barnase_barstar/barnase/'
-#fileName = dirName + 'porin_sing_0.05M.z.0.dat'
-fileName = dirName + 'barnase.z.0.dat'
-#outFile= dirName + 'porin_sing_0.05M.z.0.jpg'
-outFile= dirName + 'barnase.z.0.png'
+fileName = sys.argv[1]
+outFile  = sys.argv[2]
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):
@@ -58,25 +54,20 @@ def dispPlot( org, bn, count, potential,
 
     X = np.arange(org[0], org[0]+ nbins*bn[0], bn[0])
     Y = np.arange(org[1], org[1]+ nbins*bn[1], bn[1])
-    big = 2.0 #max( abs(mn)-abs(0.1*mn), abs(mx)+abs(mx)*0.1)
+    big = max( abs(mn)-abs(0.1*mn), abs(mx)+abs(mx)*0.1)
     plt.pcolor(X, Y, potential, cmap = 'seismic_r',
                     vmin=-big, vmax=big)
     plt.colorbar()
 
-    xl = [-28.0, 32.5]      # for comparing w APBS
-    yl = [-29.10, 25.49]
-    zl = [-33.84, 30.2]
-    ax.set_xlim(yl)
-    ax.set_ylim(zl)
-    #ax.set_xlim([X[0], X[-1]])
-    #ax.set_ylim([Y[0], Y[-1]])
+    ax.set_xlim([X[0], X[-1]])
+    ax.set_ylim([Y[0], Y[-1]])
 
     ax.xaxis.labelpad = -1.4
     ax.yaxis.labelpad = -1.4
 
     plt.title(title, fontsize = 13);
-    ax.set_ylabel(ylab, fontsize = 10);
-    ax.set_xlabel(xlab, fontsize = 10)
+    ax.set_ylabel(ylab, fontsize = 12);
+    ax.set_xlabel(xlab, fontsize = 12)
 
     for tick in ax.xaxis.get_major_ticks():
         tick.label.set_fontsize(10)
