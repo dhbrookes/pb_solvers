@@ -8,6 +8,7 @@ Welcome to the home for the [PB-[S]AM code](https://github.com/davas301/pb_solve
 To build these methods, follow the instructions below:
 
 ~~~
+git clone https://github.com/davas301/pb_solvers.git [pb_solvers_home]
 cd [pb_solvers_home]
 mkdir build
 cd build
