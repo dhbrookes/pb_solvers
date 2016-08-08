@@ -42,7 +42,7 @@ is the distance from the origin that this point will be, and
 ### pdb_rot_trans.py
 
 Given a list of rotational and translational matrices (taken from REMARK 350
-of a PDB file, rotate and translate a PDB or a PQR.
+of a PDB file), rotate and translate a PDB or a PQR.
 
 `python pdb_rot_trans.py [PDB or PQR fname] [Rot and trans fname]`
 
@@ -98,6 +98,6 @@ from the PB-AM run.
 ## Analysis
 
 After the systems are run, other analysis beyond plots may be performed. For now they 
-are as follows:
+are rough and untested.
 
 
