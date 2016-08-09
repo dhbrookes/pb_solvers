@@ -41,9 +41,18 @@ using namespace std;
 class PBSAM : protected PBSAMInput
 {
 protected:
-  shared_ptr<Setup> setp_;
-  shared_ptr<System> syst_;
-  shared_ptr<Constants> consts_;
+  shared_ptr<Setup> _setp_;
+  shared_ptr<System> _syst_;
+  shared_ptr<Constants> _consts_;
+  
+  
+  shared_ptr<BesselConstants> _bessl_consts_;
+  shared_ptr<BesselCalc> _bessl_calc_;
+  shared_ptr<SHCalcConstants> _sh_consts_;
+  shared_ptr<SHCalc> _sh_calc_;
+  shared_ptr<ExpansionConstants> _exp_consts_;
+  
+  shared_ptr<Solver> solvr_;
 
   int poles_;
   double solveTol_;
@@ -66,6 +75,7 @@ public:
   void check_system();
 
   void init_write_system();
+  void initialize_pbsam();
 
   int run();
   // for running the APBS version
@@ -75,6 +85,8 @@ public:
   void run_dynamics();
   void run_electrostatics();
   void run_energyforce();
+  
+  shared_ptr<System> make_subsystem(vector<int> mol_idx);
 };
 
 

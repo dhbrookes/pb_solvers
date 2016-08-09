@@ -278,26 +278,6 @@ MyMatrix<double> IEMatrix::get_IE_k(int k)
   return IMat;
 }
 
-vector<double> IEMatrix::get_IE_k_org(int k)
-{
-//  vector<double> IMat(p_*p_*p_*p_);
-  return IE_orig_[k];
-//  int ind(0);
-//  for (int l = 0; l < p_; l++)  // rows in old matrix
-//    for (int s = 0; s < 2*l+1; s++)  //columns in old matrix
-//      for (int n = 0; n < p_; n++)  // rows in new matrix
-//        for (int m = 0; m < 2*n+1; m++)  // columns in new matrix
-//        {
-////          cout << get_IE_k_ind(k, ind) ; //(n*p_+m)*p_+(l*p_+s)*p_ << endl;
-//          IMat[(n*n+m)+p_*p_*(l*l+s)] = get_IE_k_ind(k, ind);
-//          ind++;
-//        }
-//  
-//  cout << endl;
-//  
-//  return IMat;
-}
-
 void IEMatrix::compute_grid_pts(shared_ptr<Molecule> _mol)
 {
   Pt real_grid;

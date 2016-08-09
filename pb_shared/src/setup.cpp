@@ -31,6 +31,8 @@ typeDef_(2),
 typeDiff_(2),
 pqr_names_(2),
 surfNames_(2),
+imatNames_(2),
+expNames_(2),
 xyz_names_(2),
 isTransRot_(2),
 runSpecs_(2),
@@ -65,6 +67,12 @@ nTrials_(1200)
   
   mbdfile_loc_[0] = "";
   mbdfile_loc_[1] = "";
+  
+  imatNames_[0] = "";
+  imatNames_[1] = "";
+  
+  expNames_[0] = "";
+  expNames_[1] = "";
   
   units_ = "internal";
   
@@ -439,6 +447,20 @@ void Setup::findKeyword(vector<string> fline)
     if (typeNo > getNType()-1)
       return;
     setTypeNSurf( typeNo, fline[2].c_str() );
+  } else if (keyword == "imat")
+  {
+    cout << "IMAT prefix command found" << endl;
+    int typeNo = atoi(fline[1].c_str())-1;
+    if (typeNo > getNType()-1)
+      return;
+    setTypeNImat( typeNo, fline[2].c_str() );
+  } else if (keyword == "exp")
+  {
+    cout << "Expansion prefix command found" << endl;
+    int typeNo = atoi(fline[1].c_str())-1;
+    if (typeNo > getNType()-1)
+      return;
+    setTypeNExp( typeNo, fline[2].c_str() );
   } else if (keyword == "randorient")
   {
     cout << "Random orientation command found" << endl;
@@ -486,10 +508,15 @@ void Setup::resizeVecs()
   pqr_names_.resize(nType_);
   xyz_names_.resize(nType_);
   surfNames_.resize(nType_);
+  imatNames_.resize(nType_);
+  expNames_.resize(nType_);
   isTransRot_.resize(nType_);
   for(int i = 0; i < nType_; i++)
   {
     xyz_names_[i].resize(ntraj);
+    surfNames_[i] = "";
+    imatNames_[i] = "";
+    expNames_[i] = "";
     isTransRot_[i].resize(nType_);
   }
 

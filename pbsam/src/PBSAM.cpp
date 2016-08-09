@@ -12,6 +12,12 @@ PBSAM::PBSAM() : PBSAMInput()
 {
   poles_ = 5;
   solveTol_ = 1e-4;
+  
+  _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
+  _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
+  _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
+  _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
+   _exp_consts_ = make_shared<ExpansionConstants> (poles_);
 
   vector<string> grid2d = {"tst.2d"};
   vector<string> gridax = {"x"};
@@ -30,13 +36,13 @@ PBSAM::PBSAM() : PBSAMInput()
 
 
   diffcon[0][0] = 0.0; diffcon[0][1] = 0.0;
-  setp_ = make_shared<Setup>( 300.0, 0.05, 2., 80., 1, "electrostatics", "tst",
+  _setp_ = make_shared<Setup>( 300.0, 0.05, 2., 80., 1, "electrostatics", "tst",
                              false, 100, 0, 15, "tst.map", 1, grid2d,
                              gridax, gridloc, "tst.dx", 1, false, difftype,
                              diffcon, termtype, termval, termnu, confil,
                              conpad, xyzf);
-  syst_ = make_shared<System> ();
-  consts_ = make_shared<Constants> ();
+  _syst_ = make_shared<System> ();
+  _consts_ = make_shared<Constants> ();
 }
 
 
@@ -45,14 +51,22 @@ PBSAM::PBSAM(string infile)
 poles_(5),
 solveTol_(1e-4)
 {
-  setp_ = make_shared<Setup>(infile);
+  _setp_ = make_shared<Setup>(infile);
   check_setup();
 
-  syst_ = make_shared<System> ();
-  consts_ = make_shared<Constants> (*setp_);
+  _syst_ = make_shared<System> ();
+  _consts_ = make_shared<Constants> (*_setp_);
 
   check_system();
   init_write_system();
+  
+  _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
+  _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
+  _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
+  _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
+  _exp_consts_ = make_shared<ExpansionConstants> (poles_);
+  
+  initialize_pbsam();
 }
 
 
@@ -61,6 +75,12 @@ PBSAM::PBSAM(const PBSAMInput& pbami, vector<Molecule> mls )
 poles_(5),
 solveTol_(1e-4)
 {
+  _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
+  _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
+  _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
+  _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
+  _exp_consts_ = make_shared<ExpansionConstants> (poles_);
+  
   // Electrostatics
   int i, j;
   vector<string> grid2Dname(pbami.grid2Dct_);
@@ -118,7 +138,7 @@ solveTol_(1e-4)
     }
   }
 
-  setp_ = make_shared<Setup>(pbami.temp_, pbami.salt_, pbami.idiel_,
+  _setp_ = make_shared<Setup>(pbami.temp_, pbami.salt_, pbami.idiel_,
                              pbami.sdiel_, pbami.nmol_, string(pbami.runType_),
                              string(pbami.runName_), pbami.randOrient_,
                              pbami.boxLen_, pbami.pbcType_, pbami.gridPts_,
@@ -133,8 +153,8 @@ solveTol_(1e-4)
   vector<shared_ptr<Molecule> > molP(mls.size());
   for (int i = 0; i < mls.size(); i++) molP[i] = make_shared<Molecule>(mls[i]);
   
-  syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
-  consts_ = make_shared<Constants> (*setp_);
+  _syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
+  _consts_ = make_shared<Constants> (*_setp_);
   init_write_system();
 }
 
@@ -142,7 +162,7 @@ solveTol_(1e-4)
 void PBSAM::check_setup()
 {
   try {
-    setp_->check_inputs();
+    _setp_->check_inputs();
   } catch (const BadInputException& ex)
   {
     cout << ex.what() << endl;
@@ -156,7 +176,7 @@ void PBSAM::check_setup()
 void PBSAM::check_system()
 {
   try {
-    syst_ = make_shared<System>(*setp_);
+    _syst_ = make_shared<System>(*_setp_);
   } catch(const OverlappingMoleculeException& ex1)
   {
     cout << ex1.what() << endl;
@@ -175,28 +195,94 @@ void PBSAM::check_system()
 // Rotate molecules if needed and then write out config to pqr
 void PBSAM::init_write_system()
 {
-  if (setp_->get_randOrient())
+  if (_setp_->get_randOrient())
   {
-    for ( int i = 0; i < syst_->get_n(); i++)
-      syst_->rotate_mol(i, Quat().chooseRandom());
+    for ( int i = 0; i < _syst_->get_n(); i++)
+      _syst_->rotate_mol(i, Quat().chooseRandom());
   }
 
   // writing initial configuration out
-  syst_->write_to_pqr( setp_->getRunName() + ".pqr");
+  _syst_->write_to_pqr( _setp_->getRunName() + ".pqr");
   cout << "Written config" << endl;
 }
 
+shared_ptr<System> PBSAM::make_subsystem(vector<int> mol_idx)
+{
+  vector<shared_ptr<Molecule> > sub_mols (mol_idx.size());
+  for (int i = 0; i < mol_idx.size(); i++)
+  {
+    sub_mols[i] = _syst_->get_molecule(mol_idx[i]);
+  }
+  
+  shared_ptr<System> _subsys = make_shared<System>(sub_mols,
+                                                   _syst_->get_cutoff(),
+                                                   _syst_->get_boxlength());
+  _subsys -> set_time(_syst_->get_time());
+  return _subsys;
+}
+
+// Check to see if there are interaction
+// matrices provided and if there are expansions from self-polarization
+void PBSAM::initialize_pbsam()
+{
+  int i, k, idx;
+  vector<vector<vector<string > > > exp_loc(_syst_->get_n());
+  vector<vector<string> > imat_loc(_syst_->get_n());
+  
+  for (i = 0; i < _setp_->getNType(); i++)
+  {
+    if (_setp_->getTypeNImat(i) != "" )
+    {
+      string istart = _setp_->getTypeNImat(i);
+      for (int k = 0; k < _syst_->get_Ns_i(i); k++)
+        imat_loc[i][k] = istart+to_string(k)+".bin";
+    } else
+    {
+      cout << "Generating IMatrices" << endl;
+      // This is done in Solver!
+    }
+    
+    // Generate surface integrals
+    for (k=0; k<_setp_->getTypeNCount(i); k++)
+    {
+      idx = _syst_->get_mol_global_idx(i,k);
+      IEMatrix ieMatTest(0, _syst_->get_molecule(idx),
+                         _sh_calc_, poles_, _exp_consts_, true, 0, true);
+    }
+      
+    if (_setp_->getTypeNExp(i) != "" )
+    {
+      string estart = _setp_->getTypeNExp(i);
+      exp_loc[i].resize(_syst_->get_Ns_i(i));
+      for (int k = 0; k < _syst_->get_Ns_i(i); k++)
+      {
+        exp_loc[i][k].resize(2);
+        exp_loc[i][k][0] = estart+to_string(k) + ".H.exp";
+        exp_loc[i][k][1] = estart+to_string(k) + ".F.exp";
+      }
+    } else if ( _syst_->get_n() != 1 )
+    {
+      cout << "Solving for self polarization for mol type " << i << endl;
+      // Make one molecule system for each type to solve for self-polarization
+      auto sub_syst = make_subsystem({_syst_->get_mol_global_idx(i,0)});
+      Solver self_pol( sub_syst, _consts_, _sh_calc_, _bessl_calc_, poles_);
+      self_pol.solve(solveTol_, 100);
+    }
+    
+    
+  }
+}
 
 
 int PBSAM::run()
 {
-  if ( setp_->getRunType() == "dynamics")
+  if ( _setp_->getRunType() == "dynamics")
     run_dynamics();
-  else if ( setp_->getRunType() == "electrostatics")
+  else if ( _setp_->getRunType() == "electrostatics")
     run_electrostatics( );
-  else if ( setp_->getRunType() == "energyforce")
+  else if ( _setp_->getRunType() == "energyforce")
     run_energyforce( );
-  else if ( setp_->getRunType() == "bodyapprox")
+  else if ( _setp_->getRunType() == "bodyapprox")
     run_bodyapprox( );
   else
     cout << "Runtype not recognized! See manual for options" << endl;
@@ -206,13 +292,13 @@ int PBSAM::run()
 
 PBSAMOutput PBSAM::run_apbs()
 {
-  if ( setp_->getRunType() == "dynamics")
+  if ( _setp_->getRunType() == "dynamics")
     run_dynamics();
-  else if ( setp_->getRunType() == "electrostatics")
+  else if ( _setp_->getRunType() == "electrostatics")
     run_electrostatics( );
-  else if ( setp_->getRunType() == "energyforce")
+  else if ( _setp_->getRunType() == "energyforce")
     run_energyforce( );
-  else if ( setp_->getRunType() == "bodyapprox")
+  else if ( _setp_->getRunType() == "bodyapprox")
     run_bodyapprox( );
   else
     cout << "Runtype not recognized! See manual for options" << endl;
@@ -229,22 +315,22 @@ void PBSAM::run_dynamics()
 //  auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
 //  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
 //
-//  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
-//                                                    consts_, poles_);
+//  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, _syst_,
+//                                                    _consts_, poles_);
 //
-//  vector<shared_ptr<BaseTerminate > >  terms(setp_->get_numterms());
-//  for (i = 0; i < setp_->get_numterms(); i++)
+//  vector<shared_ptr<BaseTerminate > >  terms(_setp_->get_numterms());
+//  for (i = 0; i < _setp_->get_numterms(); i++)
 //  {
-//    string type = setp_->get_termtype(i);
+//    string type = _setp_->get_termtype(i);
 //    string bdtype = type.substr(1,1);
-//    double val = setp_->get_termval(i);
+//    double val = _setp_->get_termval(i);
 //    BoundaryType btype = ( bdtype == "<" ) ? LEQ : GEQ;
 //
 //    if ( type == "contact" )
 //    {
 //      cout << "Contact termination found" << endl;
-//      double pad = setp_->get_conpad(j);
-//      ContactFile confile (setp_->get_confile(j));
+//      double pad = _setp_->get_conpad(j);
+//      ContactFile confile (_setp_->get_confile(j));
 //      auto conterm = make_shared<ContactTerminate2>(confile, pad);
 //
 //      terms[i] = make_shared<ContactTerminate2>(confile, pad);
@@ -252,26 +338,26 @@ void PBSAM::run_dynamics()
 //    } else if (type.substr(0,1) == "x")
 //    {
 //      cout << type << " termination found for molecule ";
-//      cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-//      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
+//      cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
+//      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
 //                                             X, btype, val);
 //    } else if (type.substr(0,1) == "y")
 //    {
 //      cout << type << " termination found for molecule ";
-//      cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-//      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
+//      cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
+//      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
 //                                             Y, btype, val);
 //    } else if (type.substr(0,1) == "z")
 //    {
 //      cout << type << " termination found for molecule ";
-//      cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-//      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
+//      cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
+//      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
 //                                             Z, btype, val);
 //    } else if (type.substr(0,1) == "r")
 //    {
 //      cout << type << " termination found for molecule ";
-//      cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-//      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
+//      cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
+//      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
 //                                             R, btype, val);
 //    } else if (type == "time")
 //    {
@@ -281,23 +367,23 @@ void PBSAM::run_dynamics()
 //  }
 //
 //  cout << "Done making termination conds " << endl;
-//  HowTermCombine com = (setp_->get_andCombine() ? ALL : ONE);
+//  HowTermCombine com = (_setp_->get_andCombine() ? ALL : ONE);
 //  auto term_conds = make_shared<CombineTerminate> (terms, com);
 //
 //  char buff[100], outb[100];
-//  sprintf( outb, "%s.stat", setp_->getRunName().c_str());
+//  sprintf( outb, "%s.stat", _setp_->getRunName().c_str());
 //  string statfile = outb;
 //
-//  for (traj = 0; traj < setp_->getNTraj(); traj++)
+//  for (traj = 0; traj < _setp_->getNTraj(); traj++)
 //  {
-//    sprintf( buff, "%s_%d.xyz", setp_->getRunName().c_str(), traj);
+//    sprintf( buff, "%s_%d.xyz", _setp_->getRunName().c_str(), traj);
 //    string xyztraj = buff;
-//    sprintf( outb, "%s_%d.dat", setp_->getRunName().c_str(), traj);
+//    sprintf( outb, "%s_%d.dat", _setp_->getRunName().c_str(), traj);
 //    string outfile = outb;
 //
-//    string stats = setp_->getRunName();
-//    syst_->reset_positions( setp_->get_trajn_xyz(traj));
-//    syst_->set_time(0.0);
+//    string stats = _setp_->getRunName();
+//    _syst_->reset_positions( _setp_->get_trajn_xyz(traj));
+//    _syst_->set_time(0.0);
 //    BDRun dynamic_run( ASolv, term_conds, outfile);
 //    dynamic_run.run(xyztraj, statfile);
 //    cout << "Done with trajectory " << traj << endl;
@@ -307,35 +393,24 @@ void PBSAM::run_dynamics()
 
 void PBSAM::run_electrostatics()
 {
-  //TODO: add in options for reading in Hmat files, imat, etc
   int i;
-  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
-  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
-  auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
-  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
-  auto _expcons = make_shared<ExpansionConstants> (poles_);
 
-  // Generate surface integrals
-  for (i=0; i<syst_->get_n(); i++)
-    IEMatrix ieMatTest(0, syst_->get_molecule(i),
-                       SHCalcu, poles_, _expcons, true, 0, true);
-  
-  Solver solv( syst_, consts_, SHCalcu, bCalcu, poles_);
+  Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_);
   solv.solve(solveTol_, 100);
   
-  Electrostatic estat(solv.get_all_H(), syst_, SHCalcu, bCalcu, consts_,
-                      poles_, setp_->getGridPts());
+  Electrostatic estat(solv.get_all_H(), _syst_, _sh_calc_, _bessl_calc_,
+                      _consts_, poles_, _setp_->getGridPts());
 
-  if ( setp_->getDXoutName() != "" )
-    estat.print_dx( setp_->getDXoutName());
+  if ( _setp_->getDXoutName() != "" )
+    estat.print_dx( _setp_->getDXoutName());
 
-  if ( setp_->get_3dmap_name() != "" )
-    estat.print_3d_heat( setp_->get_3dmap_name());
+  if ( _setp_->get_3dmap_name() != "" )
+    estat.print_3d_heat( _setp_->get_3dmap_name());
 
-  for ( i = 0; i < setp_->getGridCt(); i++ )
+  for ( i = 0; i < _setp_->getGridCt(); i++ )
   {
-    estat.print_grid(setp_->getGridAx(i), setp_->getGridAxLoc(i),
-                     setp_->getGridOutName(i));
+    estat.print_grid(_setp_->getGridAx(i), _setp_->getGridAxLoc(i),
+                     _setp_->getGridOutName(i));
   }
 }
 
@@ -343,37 +418,24 @@ void PBSAM::run_electrostatics()
 void PBSAM::run_energyforce()
 {
   clock_t t3 = clock();
-  //TODO: add in options for reading in Hmat files, imat, etc
-  int i;
-  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
-  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
-  auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
-  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
-  auto _expcons = make_shared<ExpansionConstants> (poles_);
-  
-  // Generate surface integrals
-  for (i=0; i<syst_->get_n(); i++)
-    IEMatrix ieMatTest(0, syst_->get_molecule(i),
-                       SHCalcu, poles_, _expcons, true, 0, true);
-  
-  Solver solv( syst_, consts_, SHCalcu, bCalcu, poles_);
+  Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_);
   solv.solve(solveTol_, 100);
   
-  GradSolver gsolv(syst_, consts_, SHCalcu, bCalcu, solv.get_T(),
+  GradSolver gsolv(_syst_, _consts_, _sh_calc_, _bessl_calc_, solv.get_T(),
                    solv.get_all_F(), solv.get_all_H(),
                    solv.get_IE(),
-                   solv.get_interpol_list(), _expcons, poles_);
+                   solv.get_interpol_list(), _exp_consts_, poles_);
   gsolv.solve(1e-16, 85);
   
-  auto focal = make_shared<ForceCalc> (syst_->get_n(), syst_->get_all_Ik(),
-                                       consts_->get_dielectric_water(),
-                                       SHCalcu, bCalcu);
+  auto focal = make_shared<ForceCalc> (_syst_->get_n(), _syst_->get_all_Ik(),
+                                       _consts_->get_dielectric_water(),
+                                       _sh_calc_, _bessl_calc_);
   focal->calc_all_f(solv.get_all_H(), solv.get_all_LHN(),
                     gsolv.get_gradH_all(), gsolv.get_gradLHN_all());
   vector<Pt> fo = focal->get_all_f();
   
-  TorqueCalc tocal(syst_->get_n());
-  tocal.calc_all_tau(syst_, focal);
+  TorqueCalc tocal(_syst_->get_n());
+  tocal.calc_all_tau(_syst_, focal);
   vector<Pt> to = tocal.get_all_tau();
   
   t3 = clock() - t3;
@@ -390,17 +452,17 @@ void PBSAM::run_bodyapprox()
 //  auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
 //  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
 //
-//  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, syst_,
-//                                                    consts_, poles_);
+//  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, _syst_,
+//                                                    _consts_, poles_);
 //  
-//  ThreeBody threeBodTest( ASolv, consts_->get_unitsEnum(), 
-//                         setp_->getRunName(), 100.0);
+//  ThreeBody threeBodTest( ASolv, _consts_->get_unitsEnum(), 
+//                         _setp_->getRunName(), 100.0);
 //  threeBodTest.solveNmer(2);
 //  threeBodTest.solveNmer(3);
 //  t3 = clock() - t3; 
 //  threeBodTest.calcTBDEnForTor();
 //
-//  threeBodTest.printTBDEnForTor(setp_->getRunName(), setp_->getMBDLoc());
+//  threeBodTest.printTBDEnForTor(_setp_->getRunName(), _setp_->getMBDLoc());
 //  t3 = clock() - t3;
 //  printf ("manybody approx calc took me %f seconds.\n",
 //          ((float)t3)/CLOCKS_PER_SEC);

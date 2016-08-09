@@ -221,7 +221,7 @@ public:
   void set_IE_k(int k, vector<double> ie) { IE_orig_[k] = ie;}
   
   double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
-  vector<double> get_IE_k_org(int k);
+  vector<double> get_IE_k_org(int k)  { return IE_orig_[k]; }
   
   MyMatrix<double> get_IE_k( int k );
   

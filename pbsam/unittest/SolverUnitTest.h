@@ -604,136 +604,136 @@ TEST_F(SolverUTest, LHinit_test)
   }
 }
 
-//TEST_F(SolverUTest, LHN_test)
-//{
-//  int pol(3), nmol(2);
-//  PQRFile pqr(test_dir_loc + "test_cged.pqr");
-//  vector<shared_ptr<Molecule> > mols;
-//  for (int i=0; i<nmol; i++)
-//    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-//                                         pqr.get_atom_pts(), pqr.get_radii(),
-//                                         pqr.get_cg_centers(),
-//                                         pqr.get_cg_radii()));
-//  mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
-//  mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
-//  auto sys = make_shared<System>(mols);
-//  auto cst = make_shared<Constants> ();
-//  cst->set_dielectric_water(80);
-//  cst->set_dielectric_prot(4);
-//  cst->set_salt_concentration(0.01);
-//  cst->set_temp(298.15);
-//  cst->set_kappa(0.0325628352);
-//  
-//  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
-//  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
-//  auto BesselCons = make_shared<BesselConstants> (2*pol);
-//  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
-//  auto _expcons = make_shared<ExpansionConstants> (pol);
-//  
-//  // Generate surface integrals
-//  for (int i=0; i<nmol; i++)
-//    IEMatrix ieMatTest(0, sys->get_molecule(i),
-//                       SHCalcTest, pol, _expcons, true, 0, true);
-//  
-//  string istart = test_dir_loc + "imat_test/imat.sp";
-//  string estart = test_dir_loc + "spol_test/test_0.00_p3.0.";
-//  vector<vector<string> > imat_loc(sys->get_n());
-//  vector<vector<vector<string > > > exp_loc(sys->get_n());
-//  
-//  // Generate surface integrals
-//  for (int i = 0; i < sys->get_n(); i++)
-//  {
-//    imat_loc[i].resize(sys->get_Ns_i(i));
-//    exp_loc[i].resize(sys->get_Ns_i(i));
-//    for (int k = 0; k < sys->get_Ns_i(i); k++)
-//    {
-//      exp_loc[i][k].resize(2);
-//      imat_loc[i][k] = istart+to_string(k) + ".out.bin";
-//      exp_loc[i][k][0] = estart+to_string(k) + ".H.exp";
-//      exp_loc[i][k][1] = estart+to_string(k) + ".F.exp";
-//    }
-//  }
-//  
-//  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
-//                  true, true, imat_loc, exp_loc);
-//  
-//  for (int i = 0; i < sys->get_n(); i++)
-//  {
-//    for (int k = 0; k < sys->get_Ns_i(i); k++)
-//    {
-//      solvTest.step(0,i,k);
-//    }
-//  }
-//  solvTest.update_LHN_all();
-//  
-//  int mi, si, molct = 0;
-//  vector<int> molind = {0,0,0,0,0,0,0, 0, 0, 0, 0,1,1,1,1,1,1, 1, 1, 1, 1, 1};
-//  vector<int> sphind = {0,2,3,5,7,8,9,10,11,12,13,0,1,4,5,6,8,11,12,14,15,16};
-//  for (int i = 0; i < sys->get_n(); i++)
-//  {
-//    int ct = 0;
-//    for(int n=0; n<pol; n++)
-//    {
-//      for(int m=0; m <= n; m++)
-//      {
-//        mi = molind[molct]; si = sphind[molct];
-//        EXPECT_NEAR(LHNre[molct][ct],
-//                    solvTest.getLHN_ik_nm(mi,si,n,m).real(),preclim);
-//        EXPECT_NEAR(LHNim[molct][ct],
-//                    solvTest.getLHN_ik_nm(mi,si,n,m).imag(),preclim);
-//        ct++;
-//      }
-//    }
-//    molct++;
-//  }
-//}
-//
-//TEST_F(SolverUTest, spol_test)
-//{
-//  int pol = 3;
-//  PQRFile pqr(test_dir_loc + "test_cged.pqr");
-//  vector<shared_ptr<Molecule> > mols;
-//  mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-//                                       pqr.get_atom_pts(), pqr.get_radii(),
-//                                       pqr.get_cg_centers(),
-//                                       pqr.get_cg_radii()));
-//  auto sys = make_shared<System>(mols);
-//  auto cst = make_shared<Constants> ();
-//  cst->set_dielectric_water(80);
-//  cst->set_dielectric_prot(4);
-//  cst->set_salt_concentration(0.01);
-//  cst->set_temp(298.15);
-//  cst->set_kappa(0.0325628352);
-//  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
-//  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
-//  auto BesselCons = make_shared<BesselConstants> (2*pol);
-//  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
-//  auto _expcons = make_shared<ExpansionConstants> (pol);
-//  
-//  // Generate surface integrals
-//  IEMatrix ieMatTest(0, sys->get_molecule(0),
-//                     SHCalcTest, pol, _expcons, true, 0, true);
-//
-//  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
-//  solvTest.solve(1e-13, 80);
-//  
-//  for (int i = 0; i < sys->get_Ns_i(0); i++)
-//  {
-//    int ct = 0;
-//    for(int n=0; n<pol; n++)
-//    {
-//      for(int m=0; m <= n; m++)
-//      {
-//        EXPECT_NEAR(spolFre[i][ct],solvTest.getF_ik_nm(0,i,n,m).real(),preclim);
-//        EXPECT_NEAR(spolHre[i][ct],solvTest.getH_ik_nm(0,i,n,m).real(),preclim);
-//        EXPECT_NEAR(spolFim[i][ct],solvTest.getF_ik_nm(0,i,n,m).imag(),preclim);
-//        EXPECT_NEAR(spolHim[i][ct],solvTest.getH_ik_nm(0,i,n,m).imag(),preclim);
-//         ct++;
-//      }
-//    }
-//  }
-//}
-//
+TEST_F(SolverUTest, LHN_test)
+{
+  int pol(3), nmol(2);
+  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+  vector<shared_ptr<Molecule> > mols;
+  for (int i=0; i<nmol; i++)
+    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                         pqr.get_atom_pts(), pqr.get_radii(),
+                                         pqr.get_cg_centers(),
+                                         pqr.get_cg_radii()));
+  mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
+  mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
+  auto sys = make_shared<System>(mols);
+  auto cst = make_shared<Constants> ();
+  cst->set_dielectric_water(80);
+  cst->set_dielectric_prot(4);
+  cst->set_salt_concentration(0.01);
+  cst->set_temp(298.15);
+  cst->set_kappa(0.0325628352);
+  
+  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+  auto BesselCons = make_shared<BesselConstants> (2*pol);
+  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+  auto _expcons = make_shared<ExpansionConstants> (pol);
+  
+  // Generate surface integrals
+  for (int i=0; i<nmol; i++)
+    IEMatrix ieMatTest(0, sys->get_molecule(i),
+                       SHCalcTest, pol, _expcons, true, 0, true);
+  
+  string istart = test_dir_loc + "imat_test/imat.sp";
+  string estart = test_dir_loc + "spol_test/test_0.00_p3.0.";
+  vector<vector<string> > imat_loc(sys->get_n());
+  vector<vector<vector<string > > > exp_loc(sys->get_n());
+  
+  // Generate surface integrals
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    imat_loc[i].resize(sys->get_Ns_i(i));
+    exp_loc[i].resize(sys->get_Ns_i(i));
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      exp_loc[i][k].resize(2);
+      imat_loc[i][k] = istart+to_string(k) + ".out.bin";
+      exp_loc[i][k][0] = estart+to_string(k) + ".H.exp";
+      exp_loc[i][k][1] = estart+to_string(k) + ".F.exp";
+    }
+  }
+  
+  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
+                  true, true, imat_loc, exp_loc);
+  
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      solvTest.step(0,i,k);
+    }
+  }
+  solvTest.update_LHN_all();
+  
+  int mi, si, molct = 0;
+  vector<int> molind = {0,0,0,0,0,0,0, 0, 0, 0, 0,1,1,1,1,1,1, 1, 1, 1, 1, 1};
+  vector<int> sphind = {0,2,3,5,7,8,9,10,11,12,13,0,1,4,5,6,8,11,12,14,15,16};
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    int ct = 0;
+    for(int n=0; n<pol; n++)
+    {
+      for(int m=0; m <= n; m++)
+      {
+        mi = molind[molct]; si = sphind[molct];
+        EXPECT_NEAR(LHNre[molct][ct],
+                    solvTest.getLHN_ik_nm(mi,si,n,m).real(),preclim);
+        EXPECT_NEAR(LHNim[molct][ct],
+                    solvTest.getLHN_ik_nm(mi,si,n,m).imag(),preclim);
+        ct++;
+      }
+    }
+    molct++;
+  }
+}
+
+TEST_F(SolverUTest, spol_test)
+{
+  int pol = 3;
+  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+  vector<shared_ptr<Molecule> > mols;
+  mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                       pqr.get_atom_pts(), pqr.get_radii(),
+                                       pqr.get_cg_centers(),
+                                       pqr.get_cg_radii()));
+  auto sys = make_shared<System>(mols);
+  auto cst = make_shared<Constants> ();
+  cst->set_dielectric_water(80);
+  cst->set_dielectric_prot(4);
+  cst->set_salt_concentration(0.01);
+  cst->set_temp(298.15);
+  cst->set_kappa(0.0325628352);
+  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+  auto BesselCons = make_shared<BesselConstants> (2*pol);
+  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+  auto _expcons = make_shared<ExpansionConstants> (pol);
+  
+  // Generate surface integrals
+  IEMatrix ieMatTest(0, sys->get_molecule(0),
+                     SHCalcTest, pol, _expcons, true, 0, true);
+
+  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol);
+  solvTest.solve(1e-13, 80);
+  
+  for (int i = 0; i < sys->get_Ns_i(0); i++)
+  {
+    int ct = 0;
+    for(int n=0; n<pol; n++)
+    {
+      for(int m=0; m <= n; m++)
+      {
+        EXPECT_NEAR(spolFre[i][ct],solvTest.getF_ik_nm(0,i,n,m).real(),preclim);
+        EXPECT_NEAR(spolHre[i][ct],solvTest.getH_ik_nm(0,i,n,m).real(),preclim);
+        EXPECT_NEAR(spolFim[i][ct],solvTest.getF_ik_nm(0,i,n,m).imag(),preclim);
+        EXPECT_NEAR(spolHim[i][ct],solvTest.getH_ik_nm(0,i,n,m).imag(),preclim);
+         ct++;
+      }
+    }
+  }
+}
+
 
 TEST_F(SolverUTest, mutual_pol_test)
 {
@@ -812,335 +812,335 @@ TEST_F(SolverUTest, mutual_pol_test)
     }
   }
 }
-//
-//
-//TEST_F(SolverUTest, grad_pre_test)
-//{
-//  int pol(3), nmol(2);
-//  PQRFile pqr(test_dir_loc + "test_cged.pqr");
-//  vector<shared_ptr<Molecule> > mols;
-//  for (int i=0; i<nmol; i++)
-//    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-//                                         pqr.get_atom_pts(), pqr.get_radii(),
-//                                         pqr.get_cg_centers(),
-//                                         pqr.get_cg_radii()));
-//    mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
-//    mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
-//    auto sys = make_shared<System>(mols);
-//    auto cst = make_shared<Constants> ();
-//    cst->set_dielectric_water(80);
-//    cst->set_dielectric_prot(4);
-//    cst->set_salt_concentration(0.01);
-//    cst->set_temp(298.15);
-//    cst->set_kappa(0.0325628352);
-//    
-//    auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
-//    auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
-//    auto BesselCons = make_shared<BesselConstants> (2*pol);
-//    auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
-//    auto _expcons = make_shared<ExpansionConstants> (pol);
-//    
-//    // Generate surface integrals
-//    for (int i=0; i<nmol; i++)
-//      IEMatrix ieMatTest(0, sys->get_molecule(i),
-//                         SHCalcTest, pol, _expcons, true, 0, true);
-//  
-//  string istart = test_dir_loc + "imat_test/imat.sp";
-//  string estart = test_dir_loc + "grad_dT_A_test/mpol.";
-//  vector<vector<string> > imat_loc(sys->get_n());
-//  vector<vector<vector<string > > > exp_loc(sys->get_n());
-//  
-//  // Generate surface integrals
-//  for (int i = 0; i < sys->get_n(); i++)
-//  {
-//    imat_loc[i].resize(sys->get_Ns_i(i));
-//    exp_loc[i].resize(sys->get_Ns_i(i));
-//    for (int k = 0; k < sys->get_Ns_i(i); k++)
-//    {
-//      exp_loc[i][k].resize(2);
-//      imat_loc[i][k] = istart+to_string(k)+ ".out.bin";
-//      exp_loc[i][k][0] = estart+to_string(i)+"."+to_string(k)+".H.exp";
-//      exp_loc[i][k][1] = estart+to_string(i)+"."+to_string(k)+".F.exp";
-//    }
-//  }
-//  
-//  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
-//                  true, true, imat_loc, exp_loc);
-//  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
-//                       solvTest.get_all_F(), solvTest.get_all_H(),
-//                       solvTest.get_IE(),
-//                       solvTest.get_interpol_list(), _expcons, pol);
-//  gsolvTest.pre_compute_gradT_A();
-//  
-//  for (int i = 0; i < sys->get_n(); i++)
-//  {
-//    for (int j = 0; j < sys->get_n(); j++)
-//    {
-//      for (int k = 0; k < sys->get_Ns_i(i); k++)
-//      {
-//        int ct = 0;
-//        for(int n=0; n<pol; n++)
-//        {
-//          for(int m=0; m <= n; m++)
-//          {
-//            EXPECT_NEAR(delTAre[i][j][k][ct][0],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).real(),
-//                        preclim);
-//            EXPECT_NEAR(delTAre[i][j][k][ct][1],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).real(),
-//                        preclim);
-//            EXPECT_NEAR(delTAre[i][j][k][ct][2],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).real(),
-//                        preclim);
-//            EXPECT_NEAR(delTAim[i][j][k][ct][0],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).imag(),
-//                        preclim);
-//            EXPECT_NEAR(delTAim[i][j][k][ct][1],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).imag(),
-//                        preclim);
-//            EXPECT_NEAR(delTAim[i][j][k][ct][2],
-//                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).imag(),
-//                        preclim);
-//            ct++;
-//          }
-//        }
-//      }
-//    }
-//  }
-//}
 
+
+TEST_F(SolverUTest, grad_pre_test)
+{
+  int pol(3), nmol(2);
+  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+  vector<shared_ptr<Molecule> > mols;
+  for (int i=0; i<nmol; i++)
+    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                         pqr.get_atom_pts(), pqr.get_radii(),
+                                         pqr.get_cg_centers(),
+                                         pqr.get_cg_radii()));
+    mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
+    mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
+    auto sys = make_shared<System>(mols);
+    auto cst = make_shared<Constants> ();
+    cst->set_dielectric_water(80);
+    cst->set_dielectric_prot(4);
+    cst->set_salt_concentration(0.01);
+    cst->set_temp(298.15);
+    cst->set_kappa(0.0325628352);
+    
+    auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+    auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+    auto BesselCons = make_shared<BesselConstants> (2*pol);
+    auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+    auto _expcons = make_shared<ExpansionConstants> (pol);
+    
+    // Generate surface integrals
+    for (int i=0; i<nmol; i++)
+      IEMatrix ieMatTest(0, sys->get_molecule(i),
+                         SHCalcTest, pol, _expcons, true, 0, true);
+  
+  string istart = test_dir_loc + "imat_test/imat.sp";
+  string estart = test_dir_loc + "grad_dT_A_test/mpol.";
+  vector<vector<string> > imat_loc(sys->get_n());
+  vector<vector<vector<string > > > exp_loc(sys->get_n());
+  
+  // Generate surface integrals
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    imat_loc[i].resize(sys->get_Ns_i(i));
+    exp_loc[i].resize(sys->get_Ns_i(i));
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      exp_loc[i][k].resize(2);
+      imat_loc[i][k] = istart+to_string(k)+ ".out.bin";
+      exp_loc[i][k][0] = estart+to_string(i)+"."+to_string(k)+".H.exp";
+      exp_loc[i][k][1] = estart+to_string(i)+"."+to_string(k)+".F.exp";
+    }
+  }
+  
+  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
+                  true, true, imat_loc, exp_loc);
+  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
+                       solvTest.get_all_F(), solvTest.get_all_H(),
+                       solvTest.get_IE(),
+                       solvTest.get_interpol_list(), _expcons, pol);
+  gsolvTest.pre_compute_gradT_A();
+  
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    for (int j = 0; j < sys->get_n(); j++)
+    {
+      for (int k = 0; k < sys->get_Ns_i(i); k++)
+      {
+        int ct = 0;
+        for(int n=0; n<pol; n++)
+        {
+          for(int m=0; m <= n; m++)
+          {
+            EXPECT_NEAR(delTAre[i][j][k][ct][0],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).real(),
+                        preclim);
+            EXPECT_NEAR(delTAre[i][j][k][ct][1],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).real(),
+                        preclim);
+            EXPECT_NEAR(delTAre[i][j][k][ct][2],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).real(),
+                        preclim);
+            EXPECT_NEAR(delTAim[i][j][k][ct][0],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).x()).imag(),
+                        preclim);
+            EXPECT_NEAR(delTAim[i][j][k][ct][1],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).y()).imag(),
+                        preclim);
+            EXPECT_NEAR(delTAim[i][j][k][ct][2],
+                        (gsolvTest.get_gradT_A_Ik_nm(i,j,k,n,m).z()).imag(),
+                        preclim);
+            ct++;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+TEST_F(SolverUTest, grad_test)
+{
+  int pol(3), nmol(2);
+  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+  vector<shared_ptr<Molecule> > mols;
+  for (int i=0; i<nmol; i++)
+    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                         pqr.get_atom_pts(), pqr.get_radii(),
+                                         pqr.get_cg_centers(),
+                                         pqr.get_cg_radii()));
+  
+  mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
+  mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
+  auto sys = make_shared<System>(mols);
+  auto cst = make_shared<Constants> ();
+  cst->set_dielectric_water(80);
+  cst->set_dielectric_prot(4);
+  cst->set_salt_concentration(0.01);
+  cst->set_temp(298.15);
+  cst->set_kappa(0.0325628352);
+  
+//  cout << "This is cog of i " << sys->get_cogi(0).x() << ", " << sys->get_cogi(0).y() << ", " << sys->get_cogi(0).z() << endl;
+//  cout << "This is cog of i " << sys->get_cogi(1).x() << ", " << sys->get_cogi(1).y() << ", " << sys->get_cogi(1).z() << endl;
 //
-//TEST_F(SolverUTest, grad_test)
-//{
-//  int pol(3), nmol(2);
-//  PQRFile pqr(test_dir_loc + "test_cged.pqr");
-//  vector<shared_ptr<Molecule> > mols;
-//  for (int i=0; i<nmol; i++)
-//    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-//                                         pqr.get_atom_pts(), pqr.get_radii(),
-//                                         pqr.get_cg_centers(),
-//                                         pqr.get_cg_radii()));
-//  
-//  mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
-//  mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
-//  auto sys = make_shared<System>(mols);
-//  auto cst = make_shared<Constants> ();
-//  cst->set_dielectric_water(80);
-//  cst->set_dielectric_prot(4);
-//  cst->set_salt_concentration(0.01);
-//  cst->set_temp(298.15);
-//  cst->set_kappa(0.0325628352);
-//  
-////  cout << "This is cog of i " << sys->get_cogi(0).x() << ", " << sys->get_cogi(0).y() << ", " << sys->get_cogi(0).z() << endl;
-////  cout << "This is cog of i " << sys->get_cogi(1).x() << ", " << sys->get_cogi(1).y() << ", " << sys->get_cogi(1).z() << endl;
-////
-////  for (int j = 0; j < sys->get_n(); j++)
-////  {
-////    cout << "For molecule  " << j << endl;
-////    for (int k = 0; k < sys->get_Ns_i(j); k++)
-////    {
-////      for (int d = 0; d < 3; d++)
-////        cout << sys->get_centerik(j,k).get_cart(d) << ",";
-////      cout << endl;
-////    }
-////  }
-//  
-//  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
-//  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
-//  auto BesselCons = make_shared<BesselConstants> (2*pol);
-//  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
-//  auto _expcons = make_shared<ExpansionConstants> (pol);
-//  
-//  // Generate surface integrals
-//  for (int i=0; i<nmol; i++)
-//    IEMatrix ieMatTest(0, sys->get_molecule(i),
-//                       SHCalcTest, pol, _expcons, true, 0, true);
-//  
-//  string istart = test_dir_loc + "imat_test/imat.sp";
-//  string estart = test_dir_loc + "grad_test/mpol.";
-//  vector<vector<string> > imat_loc(sys->get_n());
-//  vector<vector<vector<string > > > exp_loc(sys->get_n());
-//  
-//  // Generate surface integrals
-//  for (int i = 0; i < sys->get_n(); i++)
+//  for (int j = 0; j < sys->get_n(); j++)
 //  {
-//    imat_loc[i].resize(sys->get_Ns_i(i));
-//    exp_loc[i].resize(sys->get_Ns_i(i));
-//    for (int k = 0; k < sys->get_Ns_i(i); k++)
+//    cout << "For molecule  " << j << endl;
+//    for (int k = 0; k < sys->get_Ns_i(j); k++)
 //    {
-//      exp_loc[i][k].resize(2);
-//      imat_loc[i][k] = istart+to_string(k)+ ".out.bin";
-//      exp_loc[i][k][0] = estart+to_string(i)+"."+to_string(k)+".H.exp";
-//      exp_loc[i][k][1] = estart+to_string(i)+"."+to_string(k)+".F.exp";
+//      for (int d = 0; d < 3; d++)
+//        cout << sys->get_centerik(j,k).get_cart(d) << ",";
+//      cout << endl;
 //    }
 //  }
-//  
-//  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
-//                  true, true, imat_loc, exp_loc);
-//  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
-//                       solvTest.get_all_F(), solvTest.get_all_H(),
-//                       solvTest.get_IE(),
-//                       solvTest.get_interpol_list(), _expcons, pol);
-//
-//  gsolvTest.solve(1e-16, 75);
-//  
-//  for (int i = 0; i < sys->get_n(); i++) // molecule
-//  {
-//    int kc = 0;
-//    for (int k = 0; k < sys->get_Ns_i(i); k++) // sphere
-//    {
-//      if (solvTest.get_interpol_list()[i][k] != 0) continue;
-//      for (int d = 0; d < 3; d++) // dimension
-//      {
-//        int ct = 0;
-//        for(int n=0; n<pol; n++)
-//        {
-//          for(int m=0; m <= n; m++)
-//          {
-//            cmplx ghval = gsolvTest.get_gradH_Ik_nm_d(i, 0, k, n, m, d);
-//            cmplx gfval = gsolvTest.get_gradF_Ik_nm_d(i, 0, k, n, m, d);
-//            if (ghval.real() != 0)
-//              EXPECT_NEAR(grad0_H[i][kc][d][ct][0]/ghval.real(), 1.0, preclim);
-//            if (ghval.imag() != 0)
-//              EXPECT_NEAR(grad0_H[i][kc][d][ct][1]/ghval.imag(), 1.0, preclim);
-//            if (gfval.real() != 0)
-//              EXPECT_NEAR(grad0_F[i][kc][d][ct][0]/gfval.real(), 1.0, preclim);
-//            if (gfval.imag() != 0)
-//              EXPECT_NEAR(grad0_F[i][kc][d][ct][1]/gfval.imag(), 1.0, preclim);
-//
-//            ghval = gsolvTest.get_gradH_Ik_nm_d(i, 1, k, n, m, d);
-//            gfval = gsolvTest.get_gradF_Ik_nm_d(i, 1, k, n, m, d);
-//            if (ghval.real() != 0)
-//              EXPECT_NEAR(grad1_H[i][kc][d][ct][0]/ghval.real(), 1.0, preclim);
-//            if (ghval.imag() != 0)
-//              EXPECT_NEAR(grad1_H[i][kc][d][ct][1]/ghval.imag(), 1.0, preclim);
-//            if (gfval.real() != 0)
-//              EXPECT_NEAR(grad1_F[i][kc][d][ct][0]/gfval.real(), 1.0, preclim);
-//            if (gfval.imag() != 0)
-//              EXPECT_NEAR(grad1_F[i][kc][d][ct][1]/gfval.imag(), 1.0, preclim);
-//
-//            ct++;
-//          }
-//        }
-//      }
-//      kc++;
-//    }
-//  }
-//}
-//
-//TEST_F(SolverUTest, grad3_test)
-//{
-//  int pol(3), nmol(3);
-//  PQRFile pqr(test_dir_loc + "test_cged.pqr");
-//  vector<shared_ptr<Molecule> > mols;
-//  for (int i=0; i<nmol; i++)
-//    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
-//                                         pqr.get_atom_pts(), pqr.get_radii(),
-//                                         pqr.get_cg_centers(),
-//                                         pqr.get_cg_radii()));
-//  
-//  mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
-//  mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
-//  mols[2]->translate(Pt(-22.28786458,-14.35779167,-15.15628125), 1e14);
-//  auto sys = make_shared<System>(mols);
-//  auto cst = make_shared<Constants> ();
-//  cst->set_dielectric_water(80);
-//  cst->set_dielectric_prot(4);
-//  cst->set_salt_concentration(0.01);
-//  cst->set_temp(298.15);
-//  cst->set_kappa(0.0325628352);
-//  
-//  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
-//  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
-//  auto BesselCons = make_shared<BesselConstants> (2*pol);
-//  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
-//  auto _expcons = make_shared<ExpansionConstants> (pol);
-//  
-//  // Generate surface integrals
-//  for (int i=0; i<nmol; i++)
-//    IEMatrix ieMatTest(0, sys->get_molecule(i),
-//                       SHCalcTest, pol, _expcons, true, 0, true);
-//  
-//  string istart = test_dir_loc + "imat_test/imat.sp";
-//  string estart = test_dir_loc + "grad_test/mpol3.";
-//  vector<vector<string> > imat_loc(sys->get_n());
-//  vector<vector<vector<string > > > exp_loc(sys->get_n());
-//  
-//  // Generate surface integrals
-//  for (int i = 0; i < sys->get_n(); i++)
-//  {
-//    imat_loc[i].resize(sys->get_Ns_i(i));
-//    exp_loc[i].resize(sys->get_Ns_i(i));
-//    for (int k = 0; k < sys->get_Ns_i(i); k++)
-//    {
-//      exp_loc[i][k].resize(2);
-//      imat_loc[i][k] = istart+to_string(k)+ ".out.bin";
-//      exp_loc[i][k][0] = estart+to_string(i)+"."+to_string(k)+".H.exp";
-//      exp_loc[i][k][1] = estart+to_string(i)+"."+to_string(k)+".F.exp";
-//    }
-//  }
-//  
-//  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
-//                  true, true, imat_loc, exp_loc);
-//  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
-//                       solvTest.get_all_F(), solvTest.get_all_H(),
-//                       solvTest.get_IE(),
-//                       solvTest.get_interpol_list(), _expcons, pol);
-//  
-//  gsolvTest.solve(1e-16, 75);
-//  for (int i = 0; i < sys->get_n(); i++) // molecule
-//  {
-//    int kc = 0;
-//    for (int k = 0; k < sys->get_Ns_i(i); k++) // sphere
-//    {
-//      if (solvTest.get_interpol_list()[i][k] != 0) continue;
-//      for (int d = 0; d < 3; d++) // dimension
-//      {
-//        int ct = 0;
-//        for(int n=0; n<pol; n++)
-//        {
-//          for(int m=0; m <= n; m++)
-//          {
-//            cmplx ghval = gsolvTest.get_gradH_Ik_nm_d(i, 0, k, n, m, d);
-//            cmplx gfval = gsolvTest.get_gradF_Ik_nm_d(i, 0, k, n, m, d);
-//            if (ghval.real() != 0)
-//              EXPECT_NEAR(grad3_0_H[i][kc][d][ct][0]/ghval.real(),1.0,preclim);
-//            if (ghval.imag() != 0)
-//              EXPECT_NEAR(grad3_0_H[i][kc][d][ct][1]/ghval.imag(),1.0,preclim);
-//            if (gfval.real() != 0)
-//              EXPECT_NEAR(grad3_0_F[i][kc][d][ct][0]/gfval.real(),1.0,preclim);
-//            if (gfval.imag() != 0)
-//              EXPECT_NEAR(grad3_0_F[i][kc][d][ct][1]/gfval.imag(),1.0,preclim);
-//            
-//            ghval = gsolvTest.get_gradH_Ik_nm_d(i, 1, k, n, m, d);
-//            gfval = gsolvTest.get_gradF_Ik_nm_d(i, 1, k, n, m, d);
-//            if (ghval.real() != 0)
-//              EXPECT_NEAR(grad3_1_H[i][kc][d][ct][0]/ghval.real(),1.0,preclim);
-//            if (ghval.imag() != 0)
-//              EXPECT_NEAR(grad3_1_H[i][kc][d][ct][1]/ghval.imag(),1.0,preclim);
-//            if (gfval.real() != 0)
-//              EXPECT_NEAR(grad3_1_F[i][kc][d][ct][0]/gfval.real(),1.0,preclim);
-//            if (gfval.imag() != 0)
-//              EXPECT_NEAR(grad3_1_F[i][kc][d][ct][1]/gfval.imag(),1.0,preclim);
-//            
-//            ghval = gsolvTest.get_gradH_Ik_nm_d(i, 2, k, n, m, d);
-//            gfval = gsolvTest.get_gradF_Ik_nm_d(i, 2, k, n, m, d);
-//            if (ghval.real() != 0)
-//              EXPECT_NEAR(grad3_2_H[i][kc][d][ct][0]/ghval.real(),1.0,preclim);
-//            if (ghval.imag() != 0)
-//              EXPECT_NEAR(grad3_2_H[i][kc][d][ct][1]/ghval.imag(),1.0,preclim);
-//            if (gfval.real() != 0)
-//              EXPECT_NEAR(grad3_2_F[i][kc][d][ct][0]/gfval.real(),1.0,preclim);
-//            if (gfval.imag() != 0)
-//              EXPECT_NEAR(grad3_2_F[i][kc][d][ct][1]/gfval.imag(),1.0,preclim);
-//            ct++;
-//          }
-//        }
-//      }
-//      kc++;
-//    }
-//  }
-//}
-//
-//
+  
+  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+  auto BesselCons = make_shared<BesselConstants> (2*pol);
+  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+  auto _expcons = make_shared<ExpansionConstants> (pol);
+  
+  // Generate surface integrals
+  for (int i=0; i<nmol; i++)
+    IEMatrix ieMatTest(0, sys->get_molecule(i),
+                       SHCalcTest, pol, _expcons, true, 0, true);
+  
+  string istart = test_dir_loc + "imat_test/imat.sp";
+  string estart = test_dir_loc + "grad_test/mpol.";
+  vector<vector<string> > imat_loc(sys->get_n());
+  vector<vector<vector<string > > > exp_loc(sys->get_n());
+  
+  // Generate surface integrals
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    imat_loc[i].resize(sys->get_Ns_i(i));
+    exp_loc[i].resize(sys->get_Ns_i(i));
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      exp_loc[i][k].resize(2);
+      imat_loc[i][k] = istart+to_string(k)+ ".out.bin";
+      exp_loc[i][k][0] = estart+to_string(i)+"."+to_string(k)+".H.exp";
+      exp_loc[i][k][1] = estart+to_string(i)+"."+to_string(k)+".F.exp";
+    }
+  }
+  
+  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
+                  true, true, imat_loc, exp_loc);
+  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
+                       solvTest.get_all_F(), solvTest.get_all_H(),
+                       solvTest.get_IE(),
+                       solvTest.get_interpol_list(), _expcons, pol);
+
+  gsolvTest.solve(1e-16, 75);
+  
+  for (int i = 0; i < sys->get_n(); i++) // molecule
+  {
+    int kc = 0;
+    for (int k = 0; k < sys->get_Ns_i(i); k++) // sphere
+    {
+      if (solvTest.get_interpol_list()[i][k] != 0) continue;
+      for (int d = 0; d < 3; d++) // dimension
+      {
+        int ct = 0;
+        for(int n=0; n<pol; n++)
+        {
+          for(int m=0; m <= n; m++)
+          {
+            cmplx ghval = gsolvTest.get_gradH_Ik_nm_d(i, 0, k, n, m, d);
+            cmplx gfval = gsolvTest.get_gradF_Ik_nm_d(i, 0, k, n, m, d);
+            if (ghval.real() != 0)
+              EXPECT_NEAR(grad0_H[i][kc][d][ct][0]/ghval.real(), 1.0, preclim);
+            if (ghval.imag() != 0)
+              EXPECT_NEAR(grad0_H[i][kc][d][ct][1]/ghval.imag(), 1.0, preclim);
+            if (gfval.real() != 0)
+              EXPECT_NEAR(grad0_F[i][kc][d][ct][0]/gfval.real(), 1.0, preclim);
+            if (gfval.imag() != 0)
+              EXPECT_NEAR(grad0_F[i][kc][d][ct][1]/gfval.imag(), 1.0, preclim);
+
+            ghval = gsolvTest.get_gradH_Ik_nm_d(i, 1, k, n, m, d);
+            gfval = gsolvTest.get_gradF_Ik_nm_d(i, 1, k, n, m, d);
+            if (ghval.real() != 0)
+              EXPECT_NEAR(grad1_H[i][kc][d][ct][0]/ghval.real(), 1.0, preclim);
+            if (ghval.imag() != 0)
+              EXPECT_NEAR(grad1_H[i][kc][d][ct][1]/ghval.imag(), 1.0, preclim);
+            if (gfval.real() != 0)
+              EXPECT_NEAR(grad1_F[i][kc][d][ct][0]/gfval.real(), 1.0, preclim);
+            if (gfval.imag() != 0)
+              EXPECT_NEAR(grad1_F[i][kc][d][ct][1]/gfval.imag(), 1.0, preclim);
+
+            ct++;
+          }
+        }
+      }
+      kc++;
+    }
+  }
+}
+
+TEST_F(SolverUTest, grad3_test)
+{
+  int pol(3), nmol(3);
+  PQRFile pqr(test_dir_loc + "test_cged.pqr");
+  vector<shared_ptr<Molecule> > mols;
+  for (int i=0; i<nmol; i++)
+    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+                                         pqr.get_atom_pts(), pqr.get_radii(),
+                                         pqr.get_cg_centers(),
+                                         pqr.get_cg_radii()));
+  
+  mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
+  mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
+  mols[2]->translate(Pt(-22.28786458,-14.35779167,-15.15628125), 1e14);
+  auto sys = make_shared<System>(mols);
+  auto cst = make_shared<Constants> ();
+  cst->set_dielectric_water(80);
+  cst->set_dielectric_prot(4);
+  cst->set_salt_concentration(0.01);
+  cst->set_temp(298.15);
+  cst->set_kappa(0.0325628352);
+  
+  auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
+  auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
+  auto BesselCons = make_shared<BesselConstants> (2*pol);
+  auto BesselCal = make_shared<BesselCalc>(2*pol, BesselCons);
+  auto _expcons = make_shared<ExpansionConstants> (pol);
+  
+  // Generate surface integrals
+  for (int i=0; i<nmol; i++)
+    IEMatrix ieMatTest(0, sys->get_molecule(i),
+                       SHCalcTest, pol, _expcons, true, 0, true);
+  
+  string istart = test_dir_loc + "imat_test/imat.sp";
+  string estart = test_dir_loc + "grad_test/mpol3.";
+  vector<vector<string> > imat_loc(sys->get_n());
+  vector<vector<vector<string > > > exp_loc(sys->get_n());
+  
+  // Generate surface integrals
+  for (int i = 0; i < sys->get_n(); i++)
+  {
+    imat_loc[i].resize(sys->get_Ns_i(i));
+    exp_loc[i].resize(sys->get_Ns_i(i));
+    for (int k = 0; k < sys->get_Ns_i(i); k++)
+    {
+      exp_loc[i][k].resize(2);
+      imat_loc[i][k] = istart+to_string(k)+ ".out.bin";
+      exp_loc[i][k][0] = estart+to_string(i)+"."+to_string(k)+".H.exp";
+      exp_loc[i][k][1] = estart+to_string(i)+"."+to_string(k)+".F.exp";
+    }
+  }
+  
+  Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
+                  true, true, imat_loc, exp_loc);
+  GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
+                       solvTest.get_all_F(), solvTest.get_all_H(),
+                       solvTest.get_IE(),
+                       solvTest.get_interpol_list(), _expcons, pol);
+  
+  gsolvTest.solve(1e-16, 75);
+  for (int i = 0; i < sys->get_n(); i++) // molecule
+  {
+    int kc = 0;
+    for (int k = 0; k < sys->get_Ns_i(i); k++) // sphere
+    {
+      if (solvTest.get_interpol_list()[i][k] != 0) continue;
+      for (int d = 0; d < 3; d++) // dimension
+      {
+        int ct = 0;
+        for(int n=0; n<pol; n++)
+        {
+          for(int m=0; m <= n; m++)
+          {
+            cmplx ghval = gsolvTest.get_gradH_Ik_nm_d(i, 0, k, n, m, d);
+            cmplx gfval = gsolvTest.get_gradF_Ik_nm_d(i, 0, k, n, m, d);
+            if (ghval.real() != 0)
+              EXPECT_NEAR(grad3_0_H[i][kc][d][ct][0]/ghval.real(),1.0,preclim);
+            if (ghval.imag() != 0)
+              EXPECT_NEAR(grad3_0_H[i][kc][d][ct][1]/ghval.imag(),1.0,preclim);
+            if (gfval.real() != 0)
+              EXPECT_NEAR(grad3_0_F[i][kc][d][ct][0]/gfval.real(),1.0,preclim);
+            if (gfval.imag() != 0)
+              EXPECT_NEAR(grad3_0_F[i][kc][d][ct][1]/gfval.imag(),1.0,preclim);
+            
+            ghval = gsolvTest.get_gradH_Ik_nm_d(i, 1, k, n, m, d);
+            gfval = gsolvTest.get_gradF_Ik_nm_d(i, 1, k, n, m, d);
+            if (ghval.real() != 0)
+              EXPECT_NEAR(grad3_1_H[i][kc][d][ct][0]/ghval.real(),1.0,preclim);
+            if (ghval.imag() != 0)
+              EXPECT_NEAR(grad3_1_H[i][kc][d][ct][1]/ghval.imag(),1.0,preclim);
+            if (gfval.real() != 0)
+              EXPECT_NEAR(grad3_1_F[i][kc][d][ct][0]/gfval.real(),1.0,preclim);
+            if (gfval.imag() != 0)
+              EXPECT_NEAR(grad3_1_F[i][kc][d][ct][1]/gfval.imag(),1.0,preclim);
+            
+            ghval = gsolvTest.get_gradH_Ik_nm_d(i, 2, k, n, m, d);
+            gfval = gsolvTest.get_gradF_Ik_nm_d(i, 2, k, n, m, d);
+            if (ghval.real() != 0)
+              EXPECT_NEAR(grad3_2_H[i][kc][d][ct][0]/ghval.real(),1.0,preclim);
+            if (ghval.imag() != 0)
+              EXPECT_NEAR(grad3_2_H[i][kc][d][ct][1]/ghval.imag(),1.0,preclim);
+            if (gfval.real() != 0)
+              EXPECT_NEAR(grad3_2_F[i][kc][d][ct][0]/gfval.real(),1.0,preclim);
+            if (gfval.imag() != 0)
+              EXPECT_NEAR(grad3_2_F[i][kc][d][ct][1]/gfval.imag(),1.0,preclim);
+            ct++;
+          }
+        }
+      }
+      kc++;
+    }
+  }
+}
+
+
 #endif /* SolverUnitTest_h */

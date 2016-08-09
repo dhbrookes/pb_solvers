@@ -90,6 +90,8 @@ protected:
                                       //and runname [1]
   vector<string>          pqr_names_;  // PQR file names
   vector<string>          surfNames_;  // MSMS surface file names
+  vector<string>          imatNames_;  // surface integral matrix file names
+  vector<string>          expNames_;   // H, F prefix file names
   vector<vector<string> > xyz_names_;  // XYZ file names
   vector<vector<bool> >   isTransRot_;
   
@@ -183,6 +185,12 @@ protected:
   void setTypeNSurf( int typeCount, string path )
   { surfNames_[typeCount] = path; }
   
+  void setTypeNImat( int typeCount, string path )
+  { imatNames_[typeCount] = path; }
+  
+  void setTypeNExp( int typeCount, string path )
+  { expNames_[typeCount] = path; }
+  
   void setTypeNXYZ( int typeCount, int traj, string xyz )
   { xyz_names_[typeCount][traj] = xyz; }
   
@@ -259,6 +267,8 @@ public:
   string getTypeNDef(int type)                { return typeDef_[type]; }
   string getTypeNPQR(int type)                { return pqr_names_[type]; }
   string getTypeNSurf(int type)               { return surfNames_[type]; }
+  string getTypeNImat(int type)               { return imatNames_[type]; }
+  string getTypeNExp(int type)                { return expNames_[type]; }
   string getTypeNXYZ(int type, int traj)      { return xyz_names_[type][traj];}
   bool getTypeIsTransRot(int type, int traj)  { return isTransRot_[type][traj];}
   bool getTypeIsTransRot(int type)            { return isTransRot_[type][0]; }
