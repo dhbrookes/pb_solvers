@@ -463,6 +463,9 @@ System::System(Setup setup, double cutoff)
       typeIdxToIdx_[keys] = k;
       k++;
     } // end j
+    
+    if (pqrI.get_Ns() == 0)
+      write_to_pqr(setup.getTypeNPQR(i)+"cg", molecules_.size()-1);
   } // end i
   N_ = (int) molecules_.size();
   boxLength_ = setup.getBLen();
@@ -587,15 +590,25 @@ bool System::less_than_cutoff(Pt v)
   else return false;
 }
 
-void System::write_to_pqr(string outfile)
+void System::write_to_pqr(string outfile, int mid)
 {
-  int i, j, k, ct = 0;
+  int i, j, k, upper, lower, ct(0);
   ofstream pqr_out;
   char pqrlin[400];
   
+  if ( mid == -1 )
+  {
+    lower = 0;
+    upper = N_;
+  } else
+  {
+    lower = mid;
+    upper = mid+1;
+  }
+  
   pqr_out.open( outfile );
   
-  for ( i = 0; i < N_; i++ )
+  for ( i = lower; i < upper; i++ )
   {
     for ( j = 0; j < get_Nc_i(i); j++)
     {

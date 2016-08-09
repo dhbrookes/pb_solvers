@@ -111,7 +111,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[R]{ PB-AM manual}
+\fancyhead[R]{ PB-[S]AM manual}
 \fancyfoot[R]{\thepage\ }
 
 
@@ -125,27 +125,19 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 
 \begin{document}
 
-
 \include{chapters/titlepg}
 \include{chapters/frontmatter}
-
 
 \tableofcontents
 
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
-
-
 \include{chapters/intro}
 \include{chapters/pbam}
-% \include{chapters/mcpbsam}
-% \include{chapters/pbsam}
-% \include{chapters/bd}
+\include{chapters/pbsam}
 \include{chapters/analysis}
-% \include{chapters/tutorials}
-
-
+\include{chapters/errors}
 
 \phantomsection
 \addcontentsline{toc}{chapter}{Bibliography}

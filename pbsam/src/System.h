@@ -306,8 +306,9 @@ public:
   // given a distance vector, determine whether it is in the cutoff
   bool less_than_cutoff(Pt v);
   
-  // write current system to PQR file
-  void write_to_pqr( string outfile );
+  // write current system to PQR file, mid=-1 is print all molecules,
+  // else only print one
+  void write_to_pqr( string outfile, int mid = -1 );
   
   // write current system configuration to XYZ file
   void write_to_xyz(ofstream &xyz_out);

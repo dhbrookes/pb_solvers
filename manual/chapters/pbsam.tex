@@ -1,23 +1,37 @@
 
-\chapter{The Poisson-Boltzmann Analytical Method}
+\chapter{The Poisson-Boltzmann Semi Analytical Method}
 
 
 
-\section{PB-AM formulation}
+\section{PB-SAM formulation}
 
-PB-AM is an analytical solution to the linearized Poisson-Boltzmann equations for multiple spherical objects of arbitrary charge distribution in an ionic solution.  The linearized Poisson-Boltzmann equation is given as:
+PB-SAM builds on the PB-AM solution to the linearized Poisson-Boltzmann equation (LPBE). 
+While PB-AM gives a general solution to the LPBE for an arbitrary number of spherical objects, 
+the PB-SAM formulation extends that solution to arbitrary shape. 
+Instead of representing a macromolecule (denoted as $I$) as a single sphere, 
+each molecule is represented as a collection of overlapping spheres 
+(with each sphere denoted as $k$).
+The computation of the interaction energies remains essentially the same self-consistent equation 
+as Eqn.~\ref{eq:energy_pbam}
+\begin{equation}
+	\label{eq:energy_pbsam}
+	\Omega^{(i)}=\frac{1}{\epsilon_s} \sum_{k=1}^{N_S^{(I)}} 
+		\langle  \underline{\underline{T}} \cdot \underline{A}^{(i,k)} ,  \underline{A}^{(i,k)} \rangle
+\end{equation}
+However, now the interaction energy of a molecule $\Omega^{(i)}$ is the sum of the 
+interaction energies of all its constituent spheres. 
 
-\[ \nabla [\epsilon(r) \nabla\phi(r)] - \epsilon(r) \kappa^2\phi(r) = 4 \pi \rho(r) \] %∇[ϵ(r)∇Φ(r)]-ϵ(r) κ^2 Φ(r)=4πρ(r)
+Additional complexity is due to overlap between spheres. 
+Whereas PB-AM has a single type of interaction (between separated spheres),
+PB-SAM has three types of interactions:
+\begin{itemize}
+\item[i.     ]  between spheres in different molecules
+\item[ii.    ]  between overlapping spheres within the same molecule
+\item[iii.   ]  between non-overlapping spheres within the same molecule
+\end{itemize}
 
-\[ \phi_{out}^{(i)}= \phi_{out}^{(i)} \biggr |_{r=a_i } \]
-
-\[\epsilon_s \frac{\partial \phi_{out}^{(i)}}{\partial r} =   \epsilon_s \frac{\partial \phi_{out}^{(i)}}{\partial r} \biggr |_{r=a_i } \]
-
-Exploiting fast-multipole methods, this boundary value problem can be reduced to the following system of linear equations.  
-
-\[ A = \Gamma \cdot (\Delta \cdot T \cdot A + E) \]
-
-A(i) represents the effective multipole expansion of the charge distributions of molecule (i). E(i) is the free charge distribution of molecule (i). $\Gamma$ is a dielectric boundary-crossing operator, $\Delta$ a cavity polarization operator, T an operator that transforms the multipole expansion to a local coordinate frame.  More details on the method are available in Lotan, Head-Gordon (2006). \\
+There is no dielectric discontinuity 
+between spheres within the same macromolecule. More details on the method are available in Yap, Head-Gordon (2010). \\
 
 \subsection{Physical Calculations}
 
@@ -72,9 +86,9 @@ Then navigate to the cloned directory \texttt{clone\_dir}. From here, make a \te
 
 \hspace{1cm}\texttt{\$ cmake ..} 
 
-\hspace{1cm}\texttt{\$ make pbam} \\
+\hspace{1cm}\texttt{\$ make pbsam} \\
 
-An executable named \texttt{pbam} will now be in \texttt{clone\_dir/build/bin}.
+An executable named \texttt{pbsam} will now be in \texttt{clone\_dir/build/bin}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -90,15 +104,6 @@ The program executable requires an input file as a command line parameter. The i
 Each keyword is described in the table below, along with its associated parameters.
 
 
-\newcommand{\param}[1]{$\textless\texttt{#1}\textgreater$}
-\newcommand\T{\rule{0pt}{3.5ex}}       % Top strut
-\newcommand\B{\rule[-2ex]{0pt}{0pt}}
-
-\newlength{\colthree}
-\setlength{\colthree}{10.1cm}
-\newlength{\coltwo}
-\setlength{\coltwo}{2.9cm}
-
 \begin{tabular}{ c | l | l  }
     \textbf{Keyword} & \textbf{Parameters} & \textbf{Description} \\ \hline
 \T runname & \param{name} & \parbox[t]{\colthree}{\param{name} is desired internal name of this run.} \\
@@ -107,7 +112,7 @@ Each keyword is described in the table below, along with its associated paramete
 \T xyz & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this xyz file. Provide input XYZ file at \param{fpath}.} \\
 \T transrot & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule type index for this translation/rotation file that can be input instead of a xyz file. Provide input file at \param{fpath}.}\\
 \T randorient &  & \parbox[t]{\colthree}{If you want your molecules to be randomly rotated, use this flag} \\
-\T units & \param{units} & \parbox[t]{\colthree}{Set the units of output to \param{units}. The current options are: \texttt{jmol} (Joules/mole), \texttt{kT} (kT/e) and \texttt{kcalmol} (kCal/mole).}\\
+\T units & \param{units} & \parbox[t]{\colthree}{Set the units of output to \param{units}. The current options are: \texttt{jmol} (Joules/mole), \texttt{kT} and \texttt{kcalmol} (kCal/mole).}\\
 \T salt & \param{con} & \parbox[t]{\colthree}{Set salt concentration in the system to \param{con}.}\\
 \T temp & \param{T} & \parbox[t]{\colthree}{Set system temperature to \param{T}}\\
 \T idiel & \param{ival} & \parbox[t]{\colthree}{Set the interior dielectric constant to \param{ival}.} \\
@@ -215,7 +220,7 @@ simulation should be terminated (e.g. terminate a simulation after two proteins 
 where \texttt{moltype1} and \texttt{moltype2} are indices of the molecular types, \texttt{at1} is the index of an atom from the first 
 molecular type, \texttt{at2} is the index of an atom from the second molecular type and \texttt{dist} is the maximum distance between
 the two atoms that defines the contact.  Note that sometimes these distances cannot be reached due to the assumption in this model that 
-the molecule is spherical. To correct for this case, one must specify a "pad"  distance that is defined as the maximum distance between 
+the molecule is spherical. To correct for this case, one must specify a \"pad\"  distance that is defined as the maximum distance between 
 the radial projections of the atoms onto the surface of their respective spheres that defines a contact.
 
 \clearpage
@@ -488,7 +493,7 @@ And the resulting files:
 name: \texttt{out.dx}:
 \begin{lstlisting}[style = MyBash]
 # Data from PBAM Electrostat run
-# My runname is out.dx and units kT/e
+# My runname is out.dx and units kT
 object 1 class gridpositions counts 140 140 140
 origin -4 -9 -9
 delta 0.0571429 0.0e+00 0.0e+00
@@ -513,7 +518,7 @@ component "data" value 3
 name: \texttt{electro\_map.out}:
 \begin{lstlisting}[style = MyBash]
 # Data from PBAM Electrostat run
-# My runname is electro_map.out and units kT/e
+# My runname is electro_map.out and units kT
 grid 10 10 10
 origin -4 -9 -9
 delta 0.8 1.8 1.8
@@ -534,6 +539,11 @@ delta 0.128571 0.128571
 maxmin 39.23 -39.23
    0.3605004     0.4030045     0.4474874     0.4940082     0.5426260     0.5933995
 \end{lstlisting}
+
+
+
+
+
 
 
 

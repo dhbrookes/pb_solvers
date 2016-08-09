@@ -126,7 +126,7 @@ TEST_F(ElectroUTest, three_mol_test)
   auto sys = make_shared<System>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
-  cst->set_dielectric_prot(4);a
+  cst->set_dielectric_prot(4);
   cst->set_salt_concentration(0.01);
   cst->set_temp(298.15);
   cst->set_kappa(0.0325628352);

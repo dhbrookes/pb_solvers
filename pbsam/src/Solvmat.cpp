@@ -278,6 +278,24 @@ MyMatrix<double> IEMatrix::get_IE_k(int k)
   return IMat;
 }
 
+
+void IEMatrix::write_mat_k(string imatFname, int k)
+{
+  ofstream fout;
+  fout.open(imatFname, ofstream::binary); //for writing
+  if (!fout)
+  {
+    cout << "file "<< imatFname << " could not be opened."<< endl;
+    exit(1);
+  }
+  int length = p_*p_*p_*p_;
+  fout.write( reinterpret_cast<char const *> (&p_), sizeof(p_)); // pole order
+  fout.write( reinterpret_cast<char const *>(&IE_orig_[k][0]),
+             length*sizeof(double) ); //mat
+  
+  fout.close();
+}
+
 void IEMatrix::compute_grid_pts(shared_ptr<Molecule> _mol)
 {
   Pt real_grid;
