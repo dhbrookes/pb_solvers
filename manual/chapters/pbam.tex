@@ -90,10 +90,6 @@ The program executable requires an input file as a command line parameter. The i
 Each keyword is described in the table below, along with its associated parameters.
 
 
-\newcommand{\param}[1]{$\textless\texttt{#1}\textgreater$}
-\newcommand\T{\rule{0pt}{3.5ex}}       % Top strut
-\newcommand\B{\rule[-2ex]{0pt}{0pt}}
-
 \newlength{\colthree}
 \setlength{\colthree}{10.1cm}
 \newlength{\coltwo}
@@ -159,7 +155,9 @@ Each keyword is described in the table below, along with its associated paramete
 
 \clearpage
 
-\subsubsection{System inputs: PQR, XYZ, Translation/Rotation and Contact files }
+\subsection{System inputs: PQR, XYZ, Translation/Rotation and Contact files }
+
+\subsubsection{PQR File}
 
 All the options above require a \textbf{PQR} file name. A PQR file can be generated from a PDB file using the PDB2PQR program, available as a web server or for download at: \\
 
@@ -184,7 +182,7 @@ It may also be formatted manually. The general format of a PQR file is as follow
     \hline
   \end{tabular}
 
-\medskip\medskip\medskip \medskip
+\subsubsection{XYZ File}
 
 The \textbf{XYZ} file simply specifies the desired molecule centers for a given molecule type. \\
 
@@ -192,6 +190,7 @@ The \textbf{XYZ} file simply specifies the desired molecule centers for a given 
 \texttt{mol2X  mol2Y  mol2Z }\\
 \texttt{mol3X  mol3Y  mol3Z }\\
 
+\subsubsection{Translation/Rotation File}
 
 \textbf{Translation/Rotation} Instead of a XYZ file, one can input a file specifying the translations and rotations that should be applied to 
 each molecule of a particular type. For these files, we follow the PDB standard for rotation matrices and translation vectors, 
@@ -207,6 +206,7 @@ which is as follows: \\
 where \texttt{mol1} and \texttt{mol2} are indices of the molecule of the type this file applies to, \texttt{rot\_i\_jk} is the \texttt{j,k} index
 of the rotation matrix for molecule \texttt{i} and \texttt{trans\_i\_j} is the \texttt{j}th element in the translation vector for molecule \texttt{i}.
 
+\subsubsection{Contact File}
 \textbf{Contact} files describe contacts between two molecular types. Generally this information is used to determine if a dynamics 
 simulation should be terminated (e.g. terminate a simulation after two proteins have docked). The contact file contains lines with the format: \\
 
@@ -225,9 +225,9 @@ the radial projections of the atoms onto the surface of their respective spheres
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Example files and outputs}
+\section{Example files and outputs}
 
-\section{Physical calculations}
+\subsection{Physical calculations}
 
 \textbf{Example physical calculations runfile} \\
 
@@ -290,7 +290,7 @@ MOLECULE #2
 \end{lstlisting}
 
 
-\section{Brownian Dynamics}
+\subsection{Brownian Dynamics}
 
 \textbf{Example dynamics runfile} \\
 
@@ -409,7 +409,7 @@ System has fulfilled condition: Type 0 and Type 1 are within  2.50;	 at time (ps
 \end{lstlisting}
 
 
-\section{Electrostatics}
+\subsection{Electrostatics}
 
 \textbf{Example electrostatics runfile} \\
 
