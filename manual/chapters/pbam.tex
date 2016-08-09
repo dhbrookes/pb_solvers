@@ -17,7 +17,12 @@ Exploiting fast-multipole methods, this boundary value problem can be reduced to
 
 \[ A = \Gamma \cdot (\Delta \cdot T \cdot A + E) \]
 
-A(i) represents the effective multipole expansion of the charge distributions of molecule (i). E(i) is the free charge distribution of molecule (i). $\Gamma$ is a dielectric boundary-crossing operator, $\Delta$ a cavity polarization operator, T an operator that transforms the multipole expansion to a local coordinate frame.  More details on the method are available in Lotan, Head-Gordon (2006). \\
+A(i) represents the effective multipole expansion of the charge distributions of molecule (i). 
+E(i) is the free charge distribution of molecule (i). $\Gamma$ is a dielectric boundary-crossing 
+operator, $\Delta$ a cavity polarization operator, T an operator that transforms the multipole 
+expansion to a local coordinate frame.  More details on the method are available in Lotan, 
+Head-Gordon (2006)\footnote{Lotan, I.; Head-Gordon, T. L. . \textit{J. Chem. Theor. Comp.} 2006, 
+\textit{2}, 541\---555.}. \\
 
 \subsection{Physical Calculations}
 
@@ -74,7 +79,20 @@ Then navigate to the cloned directory \texttt{clone\_dir}. From here, make a \te
 
 \hspace{1cm}\texttt{\$ make pbam} \\
 
-An executable named \texttt{pbam} will now be in \texttt{clone\_dir/build/bin}.
+An executable named \texttt{pbam} will now be in \texttt{clone\_dir/build/bin}. \clearpage
+
+\section{Program flow}
+
+Here is the general setup of a PB-AM run.
+
+\begin{figure}[!htbp]
+  \centering
+  \begin{minipage}[b]{0.85\textwidth}
+    \includegraphics[width=\textwidth]{pbam_flow}
+    \caption{Flowchart of PB-AM algorithm.}
+    \label{fig:pbsam_cart}
+  \end{minipage}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -242,6 +242,8 @@ void PBSAM::initialize_pbsam()
       // This is done in Solver!
     }
     
+    clock_t t3 = clock();
+
     // Generate surface integrals
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
@@ -251,7 +253,11 @@ void PBSAM::initialize_pbsam()
       if (k==0) //Only write once for each type
         ieMatTest.write_all_mat(_setp_->getTypeNPQR(i));
     }
-      
+    
+    t3 = clock() - t3;
+    printf ("Imat took me %f seconds.\n",
+            ((float)t3)/CLOCKS_PER_SEC);
+    
     if (_setp_->getTypeNExp(i) != "" )
     {
       string estart = _setp_->getTypeNExp(i);
@@ -404,9 +410,13 @@ void PBSAM::run_dynamics()
 void PBSAM::run_electrostatics()
 {
   int i;
-
+  clock_t t3 = clock();
   Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_);
   solv.solve(solveTol_, 100);
+  
+  t3 = clock() - t3;
+  printf ("Solve took me %f seconds.\n",
+          ((float)t3)/CLOCKS_PER_SEC);
   
   Electrostatic estat(solv.get_all_H(), _syst_, _sh_calc_, _bessl_calc_,
                       _consts_, poles_, _setp_->getGridPts());

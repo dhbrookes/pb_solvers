@@ -9,14 +9,14 @@ Instead of representing a macromolecule (denoted as $I$) as a single sphere,
 each molecule is represented as a collection of overlapping spheres 
 (with each sphere denoted as $k$). \\
 
-\begin{figure}[!htbp]
-  \centering
-  \begin{minipage}[b]{0.65\textwidth}
-    \includegraphics[width=\textwidth]{pbsam_cartoon}
-    \caption{Cartoon representation of PB-SAM.}
-    \label{fig:pbsam_cart}
-  \end{minipage}
-\end{figure}
+%\begin{figure}[!htbp]
+%  \centering
+%  \begin{minipage}[b]{0.65\textwidth}
+%    \includegraphics[width=\textwidth]{pbsam_cartoon}
+%    \caption{Cartoon representation of PB-SAM.}
+%    \label{fig:pbsam_cart}
+%  \end{minipage}
+%\end{figure}
 
 Additional complexity is due to overlap between spheres. 
 Whereas PB-AM has a single type of interaction (between separated spheres),
@@ -28,7 +28,9 @@ PB-SAM has three types of interactions:
 \end{itemize}
 
 There is no dielectric discontinuity 
-between spheres within the same macromolecule. More details on the method are available in Yap, Head-Gordon (2010). \\
+between spheres within the same macromolecule. More details on the method are available 
+in Yap, Head-Gordon (2010)\footnote{Yap, E.H.; Head-Gordon, T. L. \textit{J. Chem. Theor. Comp.} 
+2010, \textit{6}, 2214\---2224.}. \\
 
 \subsection{Physical Calculations}
 
@@ -39,28 +41,40 @@ as Eqn. \ref{eq:energy_pbsam}
 		\langle  {{T}} \cdot {H}^{(j,l)} ,  {H}^{(i,k)} \rangle
 	\label{eq:energy_pbsam}
 \end{equation}
-However, now the interaction energy of a molecule $\Omega^{(i)}$ is the sum of the 
-interaction energies of all its constituent spheres, and \({H}\) replaces \({A}\) Where $\langle  M, N \rangle$ denotes the inner product. When energy is computed, forces follow as:
+ Where $\langle  M, N \rangle$ denotes the inner product. However, now the interaction 
+ energy of a molecule $\Omega^{(i)}$ is the sum of the 
+interaction energies of all its constituent spheres, and \({H}\) replaces \({A}\).
+When energy is computed, forces follow as:
 
-\[ \textbf{F}^{(i)} = \nabla_i \Omega^{(i)}=\frac{1}{\epsilon_s} [ \langle \nabla_i \,T \cdot H^{(j,l) } ,  H^{(i) } \rangle +  \langle T \cdot H^{(j,l) } ,   \nabla_i \, H^{(i) } \rangle ]\]
+\[ \textbf{F}^{(i)} = \nabla_i \Omega^{(i)}=\frac{1}{\epsilon_s} [ \langle \nabla_i \,T \cdot H^{(j,l) } , 
+ H^{(i) } \rangle +  \langle T \cdot H^{(j,l) } ,   \nabla_i \, H^{(i) } \rangle ]\]
 
-The method to calculate the torque $\boldsymbol{\tau}^{(i)}$ on molecule is outside the scope of this manual, but is discussed extensively in Yap, Head-Gordon (2013).
+The method to calculate the torque $\boldsymbol{\tau}^{(i)}$ on molecule is outside the 
+scope of this manual, but is discussed extensively in Yap, Head-Gordon (2013).
 
 \subsection{Brownian Dynamics}
 
-Brownian dynamics simulations are implemented by treating each molecule as a Brownian particle experiencing a conservative force $\textbf{F}^{(i)}$ and torque $\boldsymbol{\tau}^{(i)}$, as well as friction and random force due to the solvent. The translation $\Delta r_i$ and rotation $\Delta \theta_i$ for a time step $\Delta t$ are then given by
+Brownian dynamics simulations are implemented by treating each molecule as a 
+Brownian particle experiencing a conservative force $\textbf{F}^{(i)}$ and torque 
+$\boldsymbol{\tau}^{(i)}$, as well as friction and random force due to the solvent. The 
+translation $\Delta r_i$ and rotation $\Delta \theta_i$ for a time step $\Delta t$ are then given by
 
 \[\Delta r^{(i)} = \frac{D_{i, trans} \Delta t}{k_B T} \textbf{F}^{(i)} + \textbf{S}_i(\Delta t)\]
 \[\Delta \theta^{(i)} = \frac{D_{i, rot} \Delta t}{k_B T} \boldsymbol{\tau}^{(i)} + \boldsymbol{\Theta}_i(\Delta t)\]
 
-where $D_{i, trans}$ and $D_{i, rot}$ are the translation and rotational diffusion coefficients for molecule $i$, respectively and $\textbf{S}_i(\Delta t)$ and $\boldsymbol{\Theta}_i(\Delta t)$ are the stochastic components of translation and rotation, respectively, which have the following properties:
+where $D_{i, trans}$ and $D_{i, rot}$ are the translation and rotational diffusion coefficients 
+for molecule $i$, respectively and $\textbf{S}_i(\Delta t)$ and $\boldsymbol{\Theta}_i(\Delta t)$ 
+are the stochastic components of translation and rotation, respectively, which have the following properties:
 
 \[\langle \textbf{S}_i \rangle=0, \qquad \langle \textbf{S}_i^2 \rangle=2D_{i, trans}\Delta t\]
 \[\langle \boldsymbol{\Theta}_i \rangle=0, \qquad \langle \boldsymbol{\Theta}_i^2 \rangle=2D_{i, rot}\Delta t\]
 
 \subsection{Electrostatics}
 
-In a similar manner to the interaction energy calculations in the Physical Calculations section, the electrostatics computes the potential at any point in space exterior to the molecules, \textbf{r}, as the inner product of all the solved effective multipole expansions \(H^{(j)}\) with a local multipole expansion of a single positive charge at position, \textbf{r}.
+In a similar manner to the interaction energy calculations in the Physical Calculations section, 
+the electrostatics computes the potential at any point in space exterior to the molecules, 
+\textbf{r}, as the inner product of all the solved effective multipole expansions \(H^{(j)}\) 
+with a local multipole expansion of a single positive charge at position, \textbf{r}.
 
 \[\Phi_{out}(\textbf{r})= \frac{1}{\epsilon_s} \left \langle \sum_{j = 1}^N  T \cdot H^{(j) } , \,  H(\textbf{r})  \right \rangle \]
 
@@ -75,7 +89,8 @@ To install this program, first download the source code from the GitHub reposito
 
 \hspace{1cm}\texttt{\$ git clone https://github.com/davas301/pb\_solvers.git clone\_dir} \\
 
-Then navigate to the cloned directory \texttt{clone\_dir}. From here, make a \texttt{build} directory, use CMake to create a make file and then make the program.  This is done as follows: \\
+Then navigate to the cloned directory \texttt{clone\_dir}. From here, make a \texttt{build} 
+directory, use CMake to create a make file and then make the program.  This is done as follows: \\
 
 \hspace{1cm}\texttt{\$ cd clone\_dir} 
 
@@ -95,12 +110,16 @@ An executable named \texttt{pbsam} will now be in \texttt{clone\_dir/build/bin}.
 
 \subsubsection{Input Files}
 
-The program executable requires an input file as a command line parameter. The input file contains the various arguments and parameters that one may wish to set when running the program. Each line of the input file contains a keyword followed by a variable number of whitespace-delimited parameters, e.g.: \\
+The program executable requires an input file as a command line parameter. The input file 
+contains the various arguments and parameters that one may wish to set when running 
+the program. Each line of the input file contains a keyword followed by a variable number 
+of whitespace-delimited parameters, e.g.: \\
 
 \texttt{keyword1\qquad param1\qquad param2} \\
 \texttt{keyword2\qquad param1\qquad param2\qquad param3} \\
 
-Each keyword is described in the table below, along with its associated parameters. They are pretty similar to the PB-AM inputs, but we repeat them here for PB-SAM inputs.
+Each keyword is described in the table below, along with its associated parameters. 
+They are pretty similar to the PB-AM inputs, but we repeat them here for PB-SAM inputs.
 
 \setlength{\colthree}{10.1cm}
 \setlength{\coltwo}{2.5cm}
@@ -248,12 +267,12 @@ The vertex file is given as follows: \\
 
 Where the first line is the number of vertex points, followed by information on the density of the surface, and the lines that follow indicate the cartesian locations of each vertex point, followed by the unit norm of the surface. This vertex file is used to coarse-grain the molecule.
 
-\begin{figure}[!htbp]
-  \centering
-    \includegraphics[width=0.40\textwidth]{tolsp_var}
-    \caption{Representation of (a) solvent excluded surface generated by MSMS, (b) the CG surface with tolsp = 2\(\AA\), (c) CG surface with tolsp = 1\(\AA\), (d) CG surface with tolsp = 0.5\(\AA\).}
-    \label{fig:pbsam_cart}
-\end{figure}
+%\begin{figure}[!htbp]
+%  \centering
+%    \includegraphics[width=0.40\textwidth]{tolsp_var}
+%    \caption{Representation of (a) solvent excluded surface generated by MSMS, (b) the CG surface with tolsp = 2\(\AA\), (c) CG surface with tolsp = 1\(\AA\), (d) CG surface with tolsp = 0.5\(\AA\).}
+%    \label{fig:pbsam_cart}
+%\end{figure}
 
 \clearpage
 
