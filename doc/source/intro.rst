@@ -26,7 +26,7 @@ Running
 
 To run the programs, simply execute the following on the command line::
 
-For PBSAM
+For PBAM
 ^^^^^^^^^
 :code:`$ ./build/bin/pbam <input_file>`
 
