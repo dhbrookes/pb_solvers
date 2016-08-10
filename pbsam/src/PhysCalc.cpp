@@ -44,7 +44,6 @@ void ForceCalc::calc_fI(int I, shared_ptr<HMatrix> H,
                         shared_ptr<GradLHNMatrix> dLHN)
 {
   Pt fIk, inner1, inner2;
-  cout << "{";
   for (int k = 0; k < H->get_ns(); k++)
   {
     forces_[I][k] = 0.0;
@@ -74,9 +73,8 @@ void ForceCalc::calc_fI(int I, shared_ptr<HMatrix> H,
 //    << ", " << inn1.z() << endl;
 //    cout << "For k " << k << " & gH*gLHN " << inn2.x() << ", " << inn2.y()
 //    << ", " << inn2.z() << endl;
-    cout << "{" <<setprecision(9)<< forces_[I][k].x() << "," << forces_[I][k].y() << "," << forces_[I][k].z() << "},"; //<< endl;
+//    cout << "{" <<setprecision(9)<< forces_[I][k].x() << "," << forces_[I][k].y() << "," << forces_[I][k].z() << "},"; //<< endl;
   }
-  cout << "},";
 }
 
 void ForceCalc::calc_all_f(vector<shared_ptr<HMatrix> > H,

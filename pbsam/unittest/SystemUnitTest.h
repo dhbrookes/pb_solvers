@@ -159,14 +159,6 @@ TEST_F(MoleculeUTest, checkCreateCen)
   
   System sys( mols);
   sys.write_to_pqr(test_dir_loc + "test_cged_out.pqr");
-
-//  for (int i=0; i<mols[0].get_ns(); i++)
-//  {
-//    EXPECT_NEAR( cen_x[i], mols[0].get_centerk(i).x(), preclim);
-//    EXPECT_NEAR( cen_y[i], mols[0].get_centerk(i).y(), preclim);
-//    EXPECT_NEAR( cen_z[i], mols[0].get_centerk(i).z(), preclim);
-//    EXPECT_NEAR( cen_r[i], mols[0].get_ak(i), preclim);
-//  }
 }
 
 TEST_F(MoleculeUTest, check1BRSCGtoAtMap)

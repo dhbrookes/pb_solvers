@@ -1,60 +1,82 @@
+\chapter{The Poisson-Boltzmann Semi Analytical Method}
 
-\chapter{The Poisson-Boltzmann Analytical Method}
+\section{PB-SAM formulation}
 
+PB-SAM builds on the PB-AM solution to the linearized Poisson-Boltzmann equation (LPBE). 
+While PB-AM gives a general solution to the LPBE for an arbitrary number of spherical objects, 
+the PB-SAM formulation extends that solution to arbitrary shape. 
+Instead of representing a macromolecule (denoted as $I$) as a single sphere, 
+each molecule is represented as a collection of overlapping spheres 
+(with each sphere denoted as $k$). \\
 
+%\begin{figure}[!htbp]
+%  \centering
+%  \begin{minipage}[b]{0.65\textwidth}
+%    \includegraphics[width=\textwidth]{pbsam_cartoon}
+%    \caption{Cartoon representation of PB-SAM.}
+%    \label{fig:pbsam_cart}
+%  \end{minipage}
+%\end{figure}
 
-\section{PB-AM formulation}
+Additional complexity is due to overlap between spheres. 
+Whereas PB-AM has a single type of interaction (between separated spheres),
+PB-SAM has three types of interactions:
+\begin{itemize}
+\item[i.     ]  between spheres in different molecules
+\item[ii.    ]  between overlapping spheres within the same molecule
+\item[iii.   ]  between non-overlapping spheres within the same molecule
+\end{itemize}
 
-PB-AM is an analytical solution to the linearized Poisson-Boltzmann equations for multiple spherical objects of arbitrary charge distribution in an ionic solution.  The linearized Poisson-Boltzmann equation is given as:
-
-\[ \nabla [\epsilon(r) \nabla\phi(r)] - \epsilon(r) \kappa^2\phi(r) = 4 \pi \rho(r) \] %∇[ϵ(r)∇Φ(r)]-ϵ(r) κ^2 Φ(r)=4πρ(r)
-
-\[ \phi_{out}^{(i)}= \phi_{out}^{(i)} \biggr |_{r=a_i } \]
-
-\[\epsilon_s \frac{\partial \phi_{out}^{(i)}}{\partial r} =   \epsilon_s \frac{\partial \phi_{out}^{(i)}}{\partial r} \biggr |_{r=a_i } \]
-
-Exploiting fast-multipole methods, this boundary value problem can be reduced to the following system of linear equations.  
-
-\[ A = \Gamma \cdot (\Delta \cdot T \cdot A + E) \]
-
-A(i) represents the effective multipole expansion of the charge distributions of molecule (i). 
-E(i) is the free charge distribution of molecule (i). $\Gamma$ is a dielectric boundary-crossing 
-operator, $\Delta$ a cavity polarization operator, T an operator that transforms the multipole 
-expansion to a local coordinate frame.  More details on the method are available in Lotan, 
-Head-Gordon (2006)\footnote{Lotan, I.; Head-Gordon, T. L. . \textit{J. Chem. Theor. Comp.} 2006, 
-\textit{2}, 541\---555.}. \\
+There is no dielectric discontinuity 
+between spheres within the same macromolecule. More details on the method are available 
+in Yap, Head-Gordon (2010)\footnote{Yap, E.H.; Head-Gordon, T. L. \textit{J. Chem. Theor. Comp.} 
+2010, \textit{6}, 2214\---2224.}. \\
 
 \subsection{Physical Calculations}
 
-From the above formulation, computation of the interaction energies ($\Omega^{(i)}$) is given as follows:
+The computation of the interaction energies ($\Omega^{(i)}$) remains essentially the same self-consistent equation 
+as Eqn. \ref{eq:energy_pbsam}
+\begin{equation}
+	\Omega^{(i)}=\frac{1}{\epsilon_s} \sum_{k=1}^{N_S^{(I)}}  \sum_{j=1, j\ne I}^{N} \sum_{l=1}^{N_S^{(j)}} 
+		\langle  {{T}} \cdot {H}^{(j,l)} ,  {H}^{(i,k)} \rangle
+	\label{eq:energy_pbsam}
+\end{equation}
+ Where $\langle  M, N \rangle$ denotes the inner product. However, now the interaction 
+ energy of a molecule $\Omega^{(i)}$ is the sum of the 
+interaction energies of all its constituent spheres, and \({H}\) replaces \({A}\).
+When energy is computed, forces follow as:
 
-\[\Omega^{(i)}=\frac{1}{\epsilon_s} \left \langle \sum_{j \ne i}^N  T \cdot A^{(j) } ,  A^{(i) } \right \rangle \]
+\[ \textbf{F}^{(i)} = \nabla_i \Omega^{(i)}=\frac{1}{\epsilon_s} [ \langle \nabla_i \,T \cdot H^{(j,l) } , 
+ H^{(i) } \rangle +  \langle T \cdot H^{(j,l) } ,   \nabla_i \, H^{(i) } \rangle ]\]
 
-Where $\langle  M, N \rangle$ denotes the inner product. When energy is computed, forces follow as:
-
-\[ \textbf{F}^{(i)} = \nabla_i \Omega^{(i)}=\frac{1}{\epsilon_s} [ \langle \nabla_i \,T \cdot A^{(i) } ,  A^{(i) } \rangle +  \langle T \cdot A^{(i) } ,   \nabla_i \, A^{(i) } \rangle ]\]
-
-
-% Additonally, the torque $\tau^{(i)}_j$ on molecule $i$ due to a charge $q^{(i)}_j$ is calculated as follows:
-The method to calculate the torque $\boldsymbol{\tau}^{(i)}$ on molecule is outside the scope of this manual, but is discussed extensively in Lotan, Head-Gordon (2006).
+The method to calculate the torque $\boldsymbol{\tau}^{(i)}$ on molecule is outside the 
+scope of this manual, but is discussed extensively in Yap, Head-Gordon (2013).
 
 \subsection{Brownian Dynamics}
 
-Brownian dynamics simulations are implemented by treating each molecule as a Brownian particle experiencing a conservative force $\textbf{F}^{(i)}$ and torque $\boldsymbol{\tau}^{(i)}$, as well as friction and random force due to the solvent. The translation $\Delta r_i$ and rotation $\Delta \theta_i$ for a time step $\Delta t$ are then given by
+Brownian dynamics simulations are implemented by treating each molecule as a 
+Brownian particle experiencing a conservative force $\textbf{F}^{(i)}$ and torque 
+$\boldsymbol{\tau}^{(i)}$, as well as friction and random force due to the solvent. The 
+translation $\Delta r_i$ and rotation $\Delta \theta_i$ for a time step $\Delta t$ are then given by
 
 \[\Delta r^{(i)} = \frac{D_{i, trans} \Delta t}{k_B T} \textbf{F}^{(i)} + \textbf{S}_i(\Delta t)\]
 \[\Delta \theta^{(i)} = \frac{D_{i, rot} \Delta t}{k_B T} \boldsymbol{\tau}^{(i)} + \boldsymbol{\Theta}_i(\Delta t)\]
 
-where $D_{i, trans}$ and $D_{i, rot}$ are the translation and rotational diffusion coefficients for molecule $i$, respectively and $\textbf{S}_i(\Delta t)$ and $\boldsymbol{\Theta}_i(\Delta t)$ are the stochastic components of translation and rotation, respectively, which have the following properties:
+where $D_{i, trans}$ and $D_{i, rot}$ are the translation and rotational diffusion coefficients 
+for molecule $i$, respectively and $\textbf{S}_i(\Delta t)$ and $\boldsymbol{\Theta}_i(\Delta t)$ 
+are the stochastic components of translation and rotation, respectively, which have the following properties:
 
 \[\langle \textbf{S}_i \rangle=0, \qquad \langle \textbf{S}_i^2 \rangle=2D_{i, trans}\Delta t\]
 \[\langle \boldsymbol{\Theta}_i \rangle=0, \qquad \langle \boldsymbol{\Theta}_i^2 \rangle=2D_{i, rot}\Delta t\]
 
 \subsection{Electrostatics}
 
-In a similar manner to the interaction energy calculations in the Physical Calculations section, the electrostatics computes the potential at any point in space exterior to the molecules, \textbf{r}, as the inner product of all the solved effective multipole expansions \(A^{(j)}\) with a local multipole expansion of a single positive charge at position, \textbf{r}.
+In a similar manner to the interaction energy calculations in the Physical Calculations section, 
+the electrostatics computes the potential at any point in space exterior to the molecules, 
+\textbf{r}, as the inner product of all the solved effective multipole expansions \(H^{(j)}\) 
+with a local multipole expansion of a single positive charge at position, \textbf{r}.
 
-\[\Phi_{out}(\textbf{r})= \frac{1}{\epsilon_s} \left \langle \sum_{j = 1}^N  T \cdot A^{(j) } , \,  A(\textbf{r})  \right \rangle \]
+\[\Phi_{out}(\textbf{r})= \frac{1}{\epsilon_s} \left \langle \sum_{j = 1}^N  T \cdot H^{(j) } , \,  H(\textbf{r})  \right \rangle \]
 
 \clearpage
 
@@ -67,7 +89,8 @@ To install this program, first download the source code from the GitHub reposito
 
 \hspace{1cm}\texttt{\$ git clone https://github.com/davas301/pb\_solvers.git clone\_dir} \\
 
-Then navigate to the cloned directory \texttt{clone\_dir}. From here, make a \texttt{build} directory, use CMake to create a make file and then make the program.  This is done as follows: \\
+Then navigate to the cloned directory \texttt{clone\_dir}. From here, make a \texttt{build} 
+directory, use CMake to create a make file and then make the program.  This is done as follows: \\
 
 \hspace{1cm}\texttt{\$ cd clone\_dir} 
 
@@ -77,22 +100,9 @@ Then navigate to the cloned directory \texttt{clone\_dir}. From here, make a \te
 
 \hspace{1cm}\texttt{\$ cmake ..} 
 
-\hspace{1cm}\texttt{\$ make pbam} \\
+\hspace{1cm}\texttt{\$ make pbsam} \\
 
-An executable named \texttt{pbam} will now be in \texttt{clone\_dir/build/bin}. \clearpage
-
-\section{Program flow}
-
-Here is the general setup of a PB-AM run.
-
-\begin{figure}[!htbp]
-  \centering
-  \begin{minipage}[b]{0.85\textwidth}
-    \includegraphics[width=\textwidth]{pbam_flow}
-    \caption{Flowchart of PB-AM algorithm.}
-    \label{fig:pbsam_cart}
-  \end{minipage}
-\end{figure}
+An executable named \texttt{pbsam} will now be in \texttt{clone\_dir/build/bin}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,18 +110,19 @@ Here is the general setup of a PB-AM run.
 
 \subsubsection{Input Files}
 
-The program executable requires an input file as a command line parameter. The input file contains the various arguments and parameters that one may wish to set when running the program. Each line of the input file contains a keyword followed by a variable number of whitespace-delimited parameters, e.g.: \\
+The program executable requires an input file as a command line parameter. The input file 
+contains the various arguments and parameters that one may wish to set when running 
+the program. Each line of the input file contains a keyword followed by a variable number 
+of whitespace-delimited parameters, e.g.: \\
 
 \texttt{keyword1\qquad param1\qquad param2} \\
 \texttt{keyword2\qquad param1\qquad param2\qquad param3} \\
 
-Each keyword is described in the table below, along with its associated parameters.
+Each keyword is described in the table below, along with its associated parameters. 
+They are pretty similar to the PB-AM inputs, but we repeat them here for PB-SAM inputs.
 
-
-\newlength{\colthree}
 \setlength{\colthree}{10.1cm}
-\newlength{\coltwo}
-\setlength{\coltwo}{2.9cm}
+\setlength{\coltwo}{2.5cm}
 
 \begin{tabular}{ c | l | l  }
     \textbf{Keyword} & \textbf{Parameters} & \textbf{Description} \\ \hline
@@ -119,9 +130,13 @@ Each keyword is described in the table below, along with its associated paramete
 \T attypes & \param{numtypes} & \parbox[t]{\colthree}{Set the number of different atom types to \param{numtypes}.}\\
 \T pqr & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this xyz file. Provide input PQR file at \param{fpath}.} \\
 \T xyz & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this xyz file. Provide input XYZ file at \param{fpath}.} \\
+\T surf & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this vertex file. Provide input surface vertex file at \param{fpath}.} \\
+\T imat & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this surface integral file. Provide input interaction matrix file prefix at \param{fpath}. There will be one for each CG sphere in the molecule.} \\
+\T exp & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule index for this vertex file. Provide expansion file prefix at \param{fpath}. There will be one for each CG sphere in the molecule, and are terminated by \texttt{sph[number].[H/F].exp}.} \\
 \T transrot & \param{idx} \param{fpath} & \parbox[t]{\colthree}{The molecule type index for this translation/rotation file that can be input instead of a xyz file. Provide input file at \param{fpath}.}\\
 \T randorient &  & \parbox[t]{\colthree}{If you want your molecules to be randomly rotated, use this flag} \\
-\T units & \param{units} & \parbox[t]{\colthree}{Set the units of output to \param{units}. The current options are: \texttt{jmol} (Joules/mole), \texttt{kT} (kT/e) and \texttt{kcalmol} (kCal/mole).}\\
+\T units & \param{units} & \parbox[t]{\colthree}{Set the units of output to \param{units}. The current options are: \texttt{jmol} (Joules/mole), \texttt{kT} and \texttt{kcalmol} (kCal/mole).}\\
+\T tolsp & \param{tolerance} & \parbox[t]{\colthree}{Set coarse-graining tolerance in the system to \param{tolerance}.}\\
 \T salt & \param{con} & \parbox[t]{\colthree}{Set salt concentration in the system to \param{con}.}\\
 \T temp & \param{T} & \parbox[t]{\colthree}{Set system temperature to \param{T}}\\
 \T idiel & \param{ival} & \parbox[t]{\colthree}{Set the interior dielectric constant to \param{ival}.} \\
@@ -173,10 +188,10 @@ Each keyword is described in the table below, along with its associated paramete
 
 \clearpage
 
-\subsection{System inputs: PQR, XYZ, Translation/Rotation and Contact files }
+\subsection{System inputs: PQR, XYZ, Translation/Rotation, Contact and Vertex files }
 
-\subsubsection{PQR File}
 
+\subsubsection{PQR file}
 All the options above require a \textbf{PQR} file name. A PQR file can be generated from a PDB file using the PDB2PQR program, available as a web server or for download at: \\
 
 http://nbcr-222.ucsd.edu/pdb2pqr\_1.9.0/  \\
@@ -200,15 +215,15 @@ It may also be formatted manually. The general format of a PQR file is as follow
     \hline
   \end{tabular}
 
-\subsubsection{XYZ File}
+\subsubsection{XYZ file}
 
 The \textbf{XYZ} file simply specifies the desired molecule centers for a given molecule type. \\
 
 \texttt{mol1X  mol1Y  mol1Z }\\
 \texttt{mol2X  mol2Y  mol2Z }\\
-\texttt{mol3X  mol3Y  mol3Z }\\
+\texttt{mol3X  mol3Y  mol3Z }
 
-\subsubsection{Translation/Rotation File}
+\subsubsection{Translation/Rotation file}
 
 \textbf{Translation/Rotation} Instead of a XYZ file, one can input a file specifying the translations and rotations that should be applied to 
 each molecule of a particular type. For these files, we follow the PDB standard for rotation matrices and translation vectors, 
@@ -224,7 +239,7 @@ which is as follows: \\
 where \texttt{mol1} and \texttt{mol2} are indices of the molecule of the type this file applies to, \texttt{rot\_i\_jk} is the \texttt{j,k} index
 of the rotation matrix for molecule \texttt{i} and \texttt{trans\_i\_j} is the \texttt{j}th element in the translation vector for molecule \texttt{i}.
 
-\subsubsection{Contact File}
+\subsubsection{Contact file}
 \textbf{Contact} files describe contacts between two molecular types. Generally this information is used to determine if a dynamics 
 simulation should be terminated (e.g. terminate a simulation after two proteins have docked). The contact file contains lines with the format: \\
 
@@ -233,8 +248,31 @@ simulation should be terminated (e.g. terminate a simulation after two proteins 
 where \texttt{moltype1} and \texttt{moltype2} are indices of the molecular types, \texttt{at1} is the index of an atom from the first 
 molecular type, \texttt{at2} is the index of an atom from the second molecular type and \texttt{dist} is the maximum distance between
 the two atoms that defines the contact.  Note that sometimes these distances cannot be reached due to the assumption in this model that 
-the molecule is spherical. To correct for this case, one must specify a "pad"  distance that is defined as the maximum distance between 
+the molecule is spherical. To correct for this case, one must specify a \"pad\"  distance that is defined as the maximum distance between 
 the radial projections of the atoms onto the surface of their respective spheres that defines a contact.
+
+\subsubsection{Vertex file}
+
+The vertex file is given as follows: \\ 
+
+\texttt{   1669      95  3.00  1.50} \\
+\texttt{    2.965    12.871    -1.084    -0.751    -0.636    -0.175       0      81  2 } \\
+\texttt{    3.241    11.952    -0.817    -0.936    -0.024    -0.353       0      69  2 } \\
+\texttt{    3.026    11.791    -0.439    -0.792     0.084    -0.604       0      79  2 } \\
+\texttt{    4.481    14.391    -3.026    -0.879    -0.246    -0.409       0      73  2 } \\
+\texttt{    5.413    15.674    -0.948    -0.337     0.499     0.798       0      73  2 } \\
+\texttt{    4.478    15.093    -0.297     0.286     0.886     0.365       0      81  2} \\
+\texttt{    4.930    15.004    -0.240    -0.015     0.945     0.326       0      71  2} \\
+\texttt{    4.072    13.663     0.763    -0.465     0.242     0.852       0      71  2 } \\
+
+Where the first line is the number of vertex points, followed by information on the density of the surface, and the lines that follow indicate the cartesian locations of each vertex point, followed by the unit norm of the surface. This vertex file is used to coarse-grain the molecule.
+
+%\begin{figure}[!htbp]
+%  \centering
+%    \includegraphics[width=0.40\textwidth]{tolsp_var}
+%    \caption{Representation of (a) solvent excluded surface generated by MSMS, (b) the CG surface with tolsp = 2\(\AA\), (c) CG surface with tolsp = 1\(\AA\), (d) CG surface with tolsp = 0.5\(\AA\).}
+%    \label{fig:pbsam_cart}
+%\end{figure}
 
 \clearpage
 
@@ -463,95 +501,98 @@ xyz 2 positions_pos.xyz
 
 The files for PQR and XYZ files are: 
 
-name:  \texttt{single\_charge.pqr}:
-\begin{lstlisting}[style = MyBash]
-ATOM      1  N   NTR     0       0.000   1.000   0.000  4.0000 0.3200
-ATOM      1  N   NTR     0       0.000   0.000  -1.000  4.0000 0.3200
-ATOM      1  X   CEN     0       0.000   0.000   0.000  0.0000 2.0000
-\end{lstlisting}
+%name:  \texttt{single\_charge.pqr}:
+%\begin{lstlisting}[style = MyBash]
+%ATOM      1  N   NTR     0       0.000   1.000   0.000  4.0000 0.3200
+%ATOM      1  N   NTR     0       0.000   0.000  -1.000  4.0000 0.3200
+%ATOM      1  X   CEN     0       0.000   0.000   0.000  0.0000 2.0000
+%\end{lstlisting}
+%
+%\medskip
+%
+%name:  \texttt{positions\_2.xyz}:
+%\begin{lstlisting}[style = MyBash]
+%  0.0   0.0  -5.0
+%  0.0   0.0   5.0
+%\end{lstlisting}
+%\medskip
+%
+%name:  \texttt{pos\_charge.pqr}:
+%\begin{lstlisting}[style = MyBash]
+%ATOM      1  N   NTR     0       0.000   1.000   0.000 -4.0000 0.3200
+%ATOM      1  N   NTR     0       0.000   0.000  -1.000 -4.0000 0.3200
+%ATOM      1  X   CEN     0       0.000   0.000   0.000  0.0000 2.0000
+%\end{lstlisting}
+%
+%\medskip
+%
+%name:  \texttt{positions\_pos.xyz}:
+%\begin{lstlisting}[style = MyBash]
+%  0.0   5.0   0.0
+%  0.0  -5.0   0.0
+%\end{lstlisting}
+%\medskip
+%
+%To run: 
+%\begin{lstlisting}[style = MyBash]
+%$$ ../../bin/pbam run.electrostatic.inp
+%\end{lstlisting}
+%\medskip
+%
+%And the resulting files: 
+%
+%name: \texttt{out.dx}:
+%\begin{lstlisting}[style = MyBash]
+%# Data from PBSAM Electrostat run
+%# My runname is out.dx and units kT
+%object 1 class gridpositions counts 140 140 140
+%origin -4 -9 -9
+%delta 0.0571429 0.0e+00 0.0e+00
+%delta 0.0e00 0.128571 0.0e+00
+%delta 0.0e00 0.0e+00 0.128571
+%object 2 class gridconnections counts 140 140 140
+%object 3 class array type double rank 0 items 2744000 data follows
+%2.7203115e-01  3.0271755e-01  3.3459723e-01  
+%3.6769040e-01  4.0201595e-01  4.3759129e-01 
+%.....
+%-1.3185519e-01  -1.5849252e-01  -1.8359631e-01
+%-2.0722087e-01  -2.2942006e-01  -2.5024714e-01
+%-2.6975467e-01  -2.8799442e-01
+%attribute "dep" string "positions"
+%object "regular positions regular connections" class field
+%component "positions" value 1
+%component "connections" value 2
+%component "data" value 3
+%\end{lstlisting}
+%\medskip
+%
+%name: \texttt{electro\_map.out}:
+%\begin{lstlisting}[style = MyBash]
+%# Data from PBSAM Electrostat run
+%# My runname is electro_map.out and units kT
+%grid 10 10 10
+%origin -4 -9 -9
+%delta 0.8 1.8 1.8
+%  0.00825   0.00006  -2.90002 -5.899956 
+%  0.00822   0.00071  -2.90002 -5.902602 
+%\end{lstlisting}
+%\medskip
+%
+%name: \texttt{out.x.0.dat}:
+%\begin{lstlisting}[style = MyBash]
+%# Data from PBSAM Electrostat run
+%# My runname is out.x.0.dat
+%units kT
+%grid 140 140 
+%axis x 0 
+%origin -9 -9
+%delta 0.128571 0.128571
+%maxmin 39.23 -39.23
+%   0.3605004     0.4030045     0.4474874     0.4940082     0.5426260     0.5933995
+%\end{lstlisting}
 
-\medskip
 
-name:  \texttt{positions\_2.xyz}:
-\begin{lstlisting}[style = MyBash]
-  0.0   0.0  -5.0
-  0.0   0.0   5.0
-\end{lstlisting}
-\medskip
 
-name:  \texttt{pos\_charge.pqr}:
-\begin{lstlisting}[style = MyBash]
-ATOM      1  N   NTR     0       0.000   1.000   0.000 -4.0000 0.3200
-ATOM      1  N   NTR     0       0.000   0.000  -1.000 -4.0000 0.3200
-ATOM      1  X   CEN     0       0.000   0.000   0.000  0.0000 2.0000
-\end{lstlisting}
-
-\medskip
-
-name:  \texttt{positions\_pos.xyz}:
-\begin{lstlisting}[style = MyBash]
-  0.0   5.0   0.0
-  0.0  -5.0   0.0
-\end{lstlisting}
-\medskip
-
-To run: 
-\begin{lstlisting}[style = MyBash]
-$$ ../../bin/pbam run.electrostatic.inp
-\end{lstlisting}
-\medskip
-
-And the resulting files: 
-
-name: \texttt{out.dx}:
-\begin{lstlisting}[style = MyBash]
-# Data from PBAM Electrostat run
-# My runname is out.dx and units kT/e
-object 1 class gridpositions counts 140 140 140
-origin -4 -9 -9
-delta 0.0571429 0.0e+00 0.0e+00
-delta 0.0e00 0.128571 0.0e+00
-delta 0.0e00 0.0e+00 0.128571
-object 2 class gridconnections counts 140 140 140
-object 3 class array type double rank 0 items 2744000 data follows
-2.7203115e-01  3.0271755e-01  3.3459723e-01  
-3.6769040e-01  4.0201595e-01  4.3759129e-01 
-.....
--1.3185519e-01  -1.5849252e-01  -1.8359631e-01
--2.0722087e-01  -2.2942006e-01  -2.5024714e-01
--2.6975467e-01  -2.8799442e-01
-attribute "dep" string "positions"
-object "regular positions regular connections" class field
-component "positions" value 1
-component "connections" value 2
-component "data" value 3
-\end{lstlisting}
-\medskip
-
-name: \texttt{electro\_map.out}:
-\begin{lstlisting}[style = MyBash]
-# Data from PBAM Electrostat run
-# My runname is electro_map.out and units kT/e
-grid 10 10 10
-origin -4 -9 -9
-delta 0.8 1.8 1.8
-  0.00825   0.00006  -2.90002 -5.899956 
-  0.00822   0.00071  -2.90002 -5.902602 
-\end{lstlisting}
-\medskip
-
-name: \texttt{out.x.0.dat}:
-\begin{lstlisting}[style = MyBash]
-# Data from PBAM Electrostat run
-# My runname is out.x.0.dat
-units kT
-grid 140 140 
-axis x 0 
-origin -9 -9
-delta 0.128571 0.128571
-maxmin 39.23 -39.23
-   0.3605004     0.4030045     0.4474874     0.4940082     0.5426260     0.5933995
-\end{lstlisting}
 
 
 

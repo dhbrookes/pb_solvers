@@ -51,7 +51,6 @@ string test_dir_loc = "../pbam/pbam_test_files/gtest/";
 #include "setupUnitTest.h"
 #include "SHCalcUnitTest.h"
 #include "SystemUnitTest.h"
-//#include "ThreeBodyUnitTest.h"
 #include "utilUnitTest.h"
 
 #include "BDUnitTest.h"

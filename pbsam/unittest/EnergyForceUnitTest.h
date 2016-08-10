@@ -274,10 +274,6 @@ TEST_F(ForceUTest, two_mol_test)
           EXPECT_NEAR(forIk2[i][k][d]/fI[k].get_cart(d), 1.0, preclim);
       }
     }
-    cout << "This is force "<< setprecision(9) << fo[i].x()
-    << ", " << fo[i].y()<< ", " << fo[i].z()  << endl;
-    cout << "This is torque "<< setprecision(9) << to[i].x()
-    << ", " << to[i].y()<< ", " << to[i].z()  << endl;
   }
 }
 
@@ -371,11 +367,10 @@ TEST_F(ForceUTest, three_mol_test)
           EXPECT_NEAR(forIk3[i][k][d]/fI[k].get_cart(d), 1.0, preclim);
       }
     }
-    cout << "This is force "<< setprecision(9) << fo[i].x()
-    << ", " << fo[i].y()<< ", " << fo[i].z()  << endl;
-    cout << "This is torque "<< setprecision(9) << to[i].x()
-    << ", " << to[i].y()<< ", " << to[i].z()  << endl;
-    
+//    cout << "This is force "<< setprecision(9) << fo[i].x()
+//    << ", " << fo[i].y()<< ", " << fo[i].z()  << endl;
+//    cout << "This is torque "<< setprecision(9) << to[i].x()
+//    << ", " << to[i].y()<< ", " << to[i].z()  << endl;
   }
 }
 

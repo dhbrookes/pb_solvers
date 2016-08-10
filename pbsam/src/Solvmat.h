@@ -137,7 +137,40 @@ public:
         if(abs(real) < 1e-15 ) real = 0.0;
         if(abs(imag) < 1e-15 ) imag = 0.0;
         cout << setprecision(9) << "(" << real << ", " << imag << ") ";
-        
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
+  
+  void print_all_to_file(string exp_prefix, double kappa, double rcut)
+  {
+    for (int k = 0; k < mat_.size(); k++)
+    {
+      print_kmat_to_file(exp_prefix+"."+to_string(k)+".exp", k, kappa, rcut);
+    }
+  }
+  
+  void print_kmat_to_file(string expansion, int k, double kappa, double rcut)
+  {
+    ofstream fout;
+    fout.open(expansion);
+    
+    fout << p_ << endl;
+    fout << kappa << endl;
+    fout << rcut << endl;
+    for (int n = 0; n < get_p(); n++)
+    {
+      for (int m = 0; m <= n; m++)
+      {
+        double real = get_mat_knm( k, n, m).real();
+        double imag = get_mat_knm( k, n, m).imag();
+        if(abs(real) < 1e-15 ) real = 0.0;
+        if(abs(imag) < 1e-15 ) imag = 0.0;
+        if (m > 0)
+          fout << setprecision(9) << real << " " << imag << " ";
+        else
+          fout << setprecision(9) << real << " ";
       }
       cout << endl;
     }
@@ -221,7 +254,7 @@ public:
   void set_IE_k(int k, vector<double> ie) { IE_orig_[k] = ie;}
   
   double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
-  vector<double> get_IE_k_org(int k);
+  vector<double> get_IE_k_org(int k)  { return IE_orig_[k]; }
   
   MyMatrix<double> get_IE_k( int k );
   
@@ -232,6 +265,15 @@ public:
   void populate_mat(vector<MatOfMats<cmplx>::type > Ys, int k);
   void calc_vals(shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc);
   void reset_mat();
+  
+  void write_all_mat(string imat_prefix)
+  {
+    for (int k = 0; k < IE_orig_.size(); k++)
+    {
+      write_mat_k(imat_prefix+"sph"+to_string(k)+".bin", k);
+    }
+  }
+  void write_mat_k(string imat_prefix, int k);
 };
 
 
