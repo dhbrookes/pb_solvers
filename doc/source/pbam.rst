@@ -22,13 +22,13 @@ system can be computed, as detailed in the next section.
 Physical calculations
 ---------------------
 
-Interactions energies
+Interaction energies
 ^^^^^^^^^^^^^^^^^^^^^
 
 From the above formulation, computation of the interaction energy 
 (\\(\\Omega^{(i)}\\)) for molecule i, is given as follows:
 
-\\[\\Omega^{(i)}=\\frac{1}{\\epsilon_s} \\left \\langle \\sum_{j \\ne i}^N  T \\cdot A^{(j)} ,  A^{(i)} \\right \\rangle \\]
+\\[\\Omega^{(i)}=\\frac{1}{\\epsilon_s} \\sum_{j \\ne i}^N \\left \\langle  T \\cdot A^{(j)} ,  A^{(i)} \\right \\rangle \\]
 
 Where \\(\\langle . . . \\rangle\\) denotes an inner product.
 

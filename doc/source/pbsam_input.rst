@@ -1,6 +1,6 @@
 
 PB-SAM Inputs
-============
+=============
 
 Here are the inputs that are used in a PB-SAM run, and
 their meanings. There is much overlap between PB-AM inputs and PB-SAM, but 
@@ -322,8 +322,11 @@ Vertex/Surface File
 
 As part of the coarse-graining process a definition of the molecular
 surface is necessary. For this we have historically used the program
-`MSMS by M. Sanner<http://mgltools.scripps.edu/packages/MSMS>`_, or on
-the `online web server<http://mgl.scripps.edu/people/sanner/html/msms_server.html>`_.
+MSMS_ by M. Sanner, or on the online web server_
+
+.. _MSMS: http://mgltools.scripps.edu/packages/MSMS
+
+.. _server: http://mgl.scripps.edu/people/sanner/html/msms_server.html
 
 If using the command line tool, after downloading it for the correct platform, 
 it can be run as follows on the command line. It requires an xyzr file as input, which

@@ -25,14 +25,14 @@ For details on the method, please see [YaHe10]_ and [YaHe13]_.
 Physical calculations
 ---------------------
 
-Interactions energies
+Interaction energies
 ^^^^^^^^^^^^^^^^^^^^^
 
 From the above formulation, computation of the interaction energy 
 (\\(\\Omega^{(i)}\\)) for molecule i, is given as a sum of all the interactions
 of spheres \\(k\\) within it with all external spheres (in a simplified form) as follows:
 
-\\[\\Omega^{(i)}=\\frac{1}{\\epsilon_s} \\left \\langle \\sum_{k \\, in\\, i} \\sum_{j \\ne i}^N \\sum_{l\\, in \\, j}  T \\cdot H^{(j,l)} ,  H^{(i,k)} \\right \\rangle \\]
+\\[\\Omega^{(i)}=\\frac{1}{\\epsilon_s} \\sum_{k \\, in\\, i} \\sum_{j \\ne i}^N \\sum_{l\\, in \\, j} \\left \\langle  T \\cdot H^{(j,l)} ,  H^{(i,k)} \\right \\rangle \\]
 
 Where \\(\\langle . . . \\rangle\\) denotes an inner product.
 
