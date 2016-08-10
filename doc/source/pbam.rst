@@ -37,7 +37,7 @@ Forces and Torques
 
 When energy is computed, forces follow as:
 
-\\[ \\textbf{F}^{(i)} = \\nabla_i \\Omega^{(i)}=\\frac{1}{\\epsilon_s} [ \\langle \\nabla_i \\,T \\cdot A^{(i)} ,  A^{(i)} \\rangle +  \\langle T \\cdot A^{(i)} ,   \\nabla_i \\, A^{(i)} \\rangle ]\\]
+\\[ \\textbf{F}^{(i)} = \\nabla_i \\Omega^{(i)}=\\frac{1}{\\epsilon_s} [ \\langle \\nabla_i \\,T \\cdot A^{(j)} ,  A^{(i)} \\rangle +  \\langle T \\cdot A^{(j)} ,   \\nabla_i \\, A^{(i)} \\rangle ]\\]
 
 The method to calculate the torque \\(\\boldsymbol{\\tau}^{(i)}\\) on 
 molecule is outside the scope of this manual, but is discussed extensively in [LoHe06]_
