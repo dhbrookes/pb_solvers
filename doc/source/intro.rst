@@ -24,14 +24,14 @@ This will make executables for pbam and pbsam. Both executables can then be foun
 Running
 -------
 
-To run the programs, simply execute the following on the command line::
+To run the programs, simply execute the following on the command line:
 
-For PBSAM
+For PB-AM
 ^^^^^^^^^
 :code:`$ ./build/bin/pbam <input_file>`
 
-For PBSAM
-^^^^^^^^^
+For PB-SAM
+^^^^^^^^^^
 :code:`$ ./build/bin/pbsam <input_file>`
 
 where :code:`<input_file>` is a PB-[S]AM input file described in detail in the proceeding sections of this documentation

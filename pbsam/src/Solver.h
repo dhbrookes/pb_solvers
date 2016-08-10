@@ -126,6 +126,7 @@ protected:
   
   vector<shared_ptr<FMatrix> >      _F_;  // converged solutions for these
   vector<shared_ptr<HMatrix> >      _H_;
+//  vector<shared_ptr<HMatrix> >      _H_spol_; // self polarize solutions
   vector<shared_ptr<IEMatrix> >     _IE_;
 
   shared_ptr<TMatrix>               _T_;

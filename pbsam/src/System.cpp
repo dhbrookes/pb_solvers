@@ -400,6 +400,7 @@ System::System(Setup setup, double cutoff)
     shared_ptr<Molecule> type_mol;
     if (pqrI.get_Ns() == 0)
     {
+      clock_t t3 = clock();
       MSMSFile surf_file (setup.getTypeNSurf(i));
       type_mol = make_shared<Molecule> (i, 0, setup.getTypeNDef(i),
                                         pqrI.get_charges(),
@@ -409,6 +410,8 @@ System::System(Setup setup, double cutoff)
                                         setup.get_max_trials(),
                                         setup.get_sph_beta(),
                                         setup.getDrot(i), setup.getDtr(i));
+      t3 = clock() - t3;
+      printf ("Coarse-Graining took me %f sec.\n", ((float)t3)/CLOCKS_PER_SEC);
     }
     else
     {
@@ -463,6 +466,9 @@ System::System(Setup setup, double cutoff)
       typeIdxToIdx_[keys] = k;
       k++;
     } // end j
+    
+    if (pqrI.get_Ns() == 0)
+      write_to_pqr(setup.getTypeNPQR(i)+"cg", (int) molecules_.size()-1);
   } // end i
   N_ = (int) molecules_.size();
   boxLength_ = setup.getBLen();
@@ -587,15 +593,25 @@ bool System::less_than_cutoff(Pt v)
   else return false;
 }
 
-void System::write_to_pqr(string outfile)
+void System::write_to_pqr(string outfile, int mid)
 {
-  int i, j, k, ct = 0;
+  int i, j, k, upper, lower, ct(0);
   ofstream pqr_out;
   char pqrlin[400];
   
+  if ( mid == -1 )
+  {
+    lower = 0;
+    upper = N_;
+  } else
+  {
+    lower = mid;
+    upper = mid+1;
+  }
+  
   pqr_out.open( outfile );
   
-  for ( i = 0; i < N_; i++ )
+  for ( i = lower; i < upper; i++ )
   {
     for ( j = 0; j < get_Nc_i(i); j++)
     {
