@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>PB-AM Examples &mdash; pb_solvers 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="pb_solvers 0.1 documentation" href="index.html"/>
+        <link rel="next" title="References" href="references.html"/>
+        <link rel="prev" title="PB-AM Inputs" href="pbam_input.html"/> 
+
+  
+  <script src="static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pb_solvers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbam.html">PB-AM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_input.html">PB-AM Inputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PB-AM Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#physical-calculation-run">Physical Calculation run</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#input-files">Input Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#output-files">Output Files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#electrostatics-run">Electrostatics run</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Input Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Output Files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamics-run">Dynamics run</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Input Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Output Files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pb_solvers</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>PB-AM Examples</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="sources/pbam_examples.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pb-am-examples">
+<h1>PB-AM Examples<a class="headerlink" href="#pb-am-examples" title="Permalink to this headline">¶</a></h1>
+<p>This is a few examples of input files
+and their expected outputs for each type of PB-AM run.</p>
+<div class="section" id="physical-calculation-run">
+<h2>Physical Calculation run<a class="headerlink" href="#physical-calculation-run" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="input-files">
+<h3>Input Files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h3>
+<p>name:  <code class="docutils literal"><span class="pre">run.energyforce.inp</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>runtype energyforce
+runname energyforce.2sp.jmol.out
+
+units jmol
+salt 0.01
+temp 353
+idiel 4
+sdiel 78
+
+attypes 1
+<span class="nb">type</span> <span class="m">1</span> 2
+pqr <span class="m">1</span> single_charge.pqr
+xyz <span class="m">1</span> positions_2.xyz
+</pre></div>
+</div>
+<p>The files for PQR and XYZ are:</p>
+<p>name:  <code class="docutils literal"><span class="pre">single_charge.pqr</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       1.000   0.000   0.000 -1.0000 3.7300
+ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   1.000   0.000 -1.0000 6.3200
+</pre></div>
+</div>
+<p>name:  <code class="docutils literal"><span class="pre">positions_2.xyz</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>-10.0  23.4  -8.7
+  0.0   0.0  -2.5
+</pre></div>
+</div>
+<p>To run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">$$</span> ../../bin/pbam run.energyforce.inp
+</pre></div>
+</div>
+</div>
+<div class="section" id="output-files">
+<h3>Output Files<a class="headerlink" href="#output-files" title="Permalink to this headline">¶</a></h3>
+<p>And the resulting file:</p>
+<p>name: <code class="docutils literal"><span class="pre">energyforce.2sp.jmol.out</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>My units are Joules/Mol
+MOLECULE <span class="c1">#1</span>
+        POSITION: <span class="o">[</span>-10, 23.4, -8.7<span class="o">]</span>
+        ENERGY: 1328.86
+        FORCE: 1.19858e+08, <span class="o">[</span>-36.6012 1.19858e+08 -1.65408e-05<span class="o">]</span>
+        TORQUE: 1.78426e+06, <span class="o">[</span>1.28425 1.78426e+06 1.9978e-06<span class="o">]</span>
+MOLECULE <span class="c1">#2</span>
+        POSITION: <span class="o">[</span>0, 0, -2.5<span class="o">]</span>
+        ENERGY: 1328.86
+        FORCE: 1.19858e+08, <span class="o">[</span>36.6012 -1.19858e+08 1.65408e-05<span class="o">]</span>
+        TORQUE: 1.78354e+06, <span class="o">[</span>1.28372 1.78354e+06 1.99699e-06<span class="o">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="electrostatics-run">
+<h2>Electrostatics run<a class="headerlink" href="#electrostatics-run" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Input Files<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>name:  <code class="docutils literal"><span class="pre">run.electrostatic.inp</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>runtype electrostatics 140
+runname electrostatic
+
+units kT
+salt 0.01
+temp 298
+idiel 4
+sdiel 78
+
+dx out.dx
+
+3dmap electro_map.out
+
+gridct 2
+grid2D <span class="m">1</span> out.x.0.dat x 0
+grid2D <span class="m">2</span> out.x.-1.dat x -1
+
+attypes 2
+<span class="nb">type</span> <span class="m">1</span> 2
+pqr <span class="m">1</span> single_charge.pqr
+xyz <span class="m">1</span> positions_2.xyz
+
+<span class="nb">type</span> <span class="m">2</span> 2
+pqr <span class="m">2</span> pos_charge.pqr
+xyz <span class="m">2</span> positions_pos.xyz
+</pre></div>
+</div>
+<p>The files for PQR and XYZ files are:</p>
+<p>name:  <code class="docutils literal"><span class="pre">single_charge.pqr</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   1.000   0.000  4.0000 0.3200
+ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   0.000  -1.000  4.0000 0.3200
+ATOM      <span class="m">1</span>  X   CEN     <span class="m">0</span>       0.000   0.000   0.000  0.0000 2.0000
+</pre></div>
+</div>
+<p>name:  <code class="docutils literal"><span class="pre">positions_2.xyz</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>0.0   0.0  -5.0
+0.0   0.0   5.0
+</pre></div>
+</div>
+<p>name:  <code class="docutils literal"><span class="pre">pos_charge.pqr</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   1.000   0.000 -4.0000 0.3200
+ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   0.000  -1.000 -4.0000 0.3200
+ATOM      <span class="m">1</span>  X   CEN     <span class="m">0</span>       0.000   0.000   0.000  0.0000 2.0000
+</pre></div>
+</div>
+<p>name:  <code class="docutils literal"><span class="pre">positions_pos.xyz</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>0.0   5.0   0.0
+0.0  -5.0   0.0
+</pre></div>
+</div>
+<p>To run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">$$</span> ../../bin/pbam run.electrostatic.inp
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>Output Files<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>And the resulting files:</p>
+<p>name: <code class="docutils literal"><span class="pre">out.dx</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># Data from PBAM Electrostat run</span>
+<span class="c1"># My runname is out.dx and units kT/e</span>
+object <span class="m">1</span> class gridpositions counts <span class="m">140</span> <span class="m">140</span> 140
+origin -4 -9 -9
+delta 0.0571429 0.0e+00 0.0e+00
+delta 0.0e00 0.128571 0.0e+00
+delta 0.0e00 0.0e+00 0.128571
+object <span class="m">2</span> class gridconnections counts <span class="m">140</span> <span class="m">140</span> 140
+object <span class="m">3</span> class array <span class="nb">type</span> double rank <span class="m">0</span> items <span class="m">2744000</span> data follows
+2.7203115e-01  3.0271755e-01  3.3459723e-01
+3.6769040e-01  4.0201595e-01  4.3759129e-01
+.....
+-1.3185519e-01  -1.5849252e-01  -1.8359631e-01
+-2.0722087e-01  -2.2942006e-01  -2.5024714e-01
+-2.6975467e-01  -2.8799442e-01
+attribute <span class="s2">&quot;dep&quot;</span> string <span class="s2">&quot;positions&quot;</span>
+object <span class="s2">&quot;regular positions regular connections&quot;</span> class field
+component <span class="s2">&quot;positions&quot;</span> value 1
+component <span class="s2">&quot;connections&quot;</span> value 2
+component <span class="s2">&quot;data&quot;</span> value 3
+</pre></div>
+</div>
+<p>name: <code class="docutils literal"><span class="pre">electro_map.out</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># Data from PBAM Electrostat run</span>
+<span class="c1"># My runname is electro_map.out and units kT/e</span>
+grid <span class="m">10</span> <span class="m">10</span> 10
+origin -4 -9 -9
+delta 0.8 1.8 1.8
+  0.00825   0.00006  -2.90002 -5.899956
+  0.00822   0.00071  -2.90002 -5.902602
+</pre></div>
+</div>
+<p>name: <code class="docutils literal"><span class="pre">out.x.0.dat</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># Data from PBAM Electrostat run</span>
+<span class="c1"># My runname is out.x.0.dat</span>
+units kT
+grid <span class="m">140</span> 140
+axis x 0
+origin -9 -9
+delta 0.128571 0.128571
+maxmin 39.23 -39.23
+   0.3605004     0.4030045     0.4474874     0.4940082     0.5426260     0.5933995
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="dynamics-run">
+<h2>Dynamics run<a class="headerlink" href="#dynamics-run" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h3>Input Files<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>name:  <code class="docutils literal"><span class="pre">run.dynamics.inp</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>runtype dynamics 2
+runname dyn_cont_barn
+
+salt 0.01
+temp 298
+idiel 4
+sdiel 78
+
+termct 1
+termcombine or
+term <span class="m">1</span> contact 2.5 <span class="m">1</span> 2
+
+attypes 2
+<span class="nb">type</span> <span class="m">1</span> <span class="m">2</span> move 0.015 0.000045
+pqr <span class="m">1</span> 1BRS_chainA.pqr
+xyz <span class="m">1</span> <span class="m">1</span> pos_1_1.xyz
+xyz <span class="m">1</span> <span class="m">2</span> pos_1_2.xyz
+
+<span class="nb">type</span> <span class="m">2</span> <span class="m">2</span> move 0.015 0.000045
+pqr <span class="m">2</span> 1BRS_chainD.pqr
+xyz <span class="m">2</span> <span class="m">1</span> pos_2_1.xyz
+xyz <span class="m">2</span> <span class="m">2</span> pos_2_2.xyz
+</pre></div>
+</div>
+<p>The files for PQR (first 5 lines) and XYZ files for the first trajectories are:</p>
+<p>name:  <code class="docutils literal"><span class="pre">1BRS_chainA.pqr</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ATOM   <span class="m">1700</span>  N    ALA B   <span class="m">1</span>      20.757 52.394 30.692     0.1414  1.8240
+ATOM   <span class="m">1702</span>  CA   ALA B   <span class="m">1</span>      20.602 52.680 29.268     0.0962  1.9080
+ATOM   <span class="m">1703</span>  C    ALA B   <span class="m">1</span>      19.286 52.138 28.675     0.6163  1.9080
+ATOM   <span class="m">1704</span>  O    ALA B   <span class="m">1</span>      18.578 51.351 29.318    -0.5722  1.6612
+ATOM   <span class="m">1705</span>  CB   ALA B   <span class="m">1</span>      21.739 52.033 28.476    -0.0597  1.9080
+</pre></div>
+</div>
+<p>name:  <code class="docutils literal"><span class="pre">pos_1_1.xyz</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>61.25 61.25 61.25
+-26.25 61.25 -26.25
+</pre></div>
+</div>
+<p>name:  <code class="docutils literal"><span class="pre">1BRS_chainD.pqr</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ATOM      <span class="m">1</span>  N    LYS D   <span class="m">1</span>      48.330 40.393  9.798     0.0966  1.8240
+ATOM      <span class="m">2</span>  CA   LYS D   <span class="m">1</span>      47.401 39.287  9.370    -0.0015  1.9080
+ATOM      <span class="m">3</span>  C    LYS D   <span class="m">1</span>      47.507 38.911  7.890     0.7214  1.9080
+ATOM      <span class="m">4</span>  O    LYS D   <span class="m">1</span>      47.126 39.582  6.905    -0.6013  1.6612
+ATOM      <span class="m">5</span>  CB   LYS D   <span class="m">1</span>      45.995 39.632  9.817     0.0212  1.9080
+</pre></div>
+</div>
+<p>name:  <code class="docutils literal"><span class="pre">pos_2_1.xyz</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>-26.25 61.25 61.25
+61.25 -26.25 61.25
+</pre></div>
+</div>
+<p>To run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">$$</span> ../../bin/pbam run.dynamics.inp
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>Output Files<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>And the resulting files:</p>
+<p>name: <code class="docutils literal"><span class="pre">dyn_cont_barn_[traj#].xyz</span></code> VMD readable XYZ file
+that shows the trajectory of molecules in the system. The
+time that is snapshot was printed from is given on the
+same line as the word Atom. The atoms of your input file are
+currently labeled N, and the coarse-grain center is labeled &#8220;X&#8221;
+in the first column of the XYZ file.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>3135
+Atoms. Timestep <span class="o">(</span>ps<span class="o">)</span>: 0
+N   -7.241   -0.530   18.703
+N   -6.015   -0.503   17.910
+N   -5.784    0.840   17.188
+N   -6.682    1.690   17.128
+N   -6.066   -1.580   16.827
+N   -7.519   -1.481   18.863
+N   -7.084   -0.079   19.584
+</pre></div>
+</div>
+<p>name: <code class="docutils literal"><span class="pre">dyn_cont_barn_[traj\#].dat</span></code> Statistics from simulation
+printed out at the same time as each XYZ snapshot. The energy
+is not computed and should be ignored.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>My units are Internal. Time <span class="o">(</span>ps<span class="o">)</span> 500.4
+MOLECULE <span class="c1">#1</span>
+    POSITION: <span class="o">[</span>0, 0, 0<span class="o">]</span>
+    ENERGY: 0
+    FORCE: 3.39124e-06, <span class="o">[</span>1.69863e-06 2.07547e-06 6.5356e-07<span class="o">]</span>
+    TORQUE: 2.55224e-05, <span class="o">[</span>-2.11728e-05 1.00774e-05 3.08631e-05<span class="o">]</span>
+MOLECULE <span class="c1">#2</span>
+    POSITION: <span class="o">[</span>87.211, 43.861, 21.691<span class="o">]</span>
+    ENERGY: 0
+    FORCE: 3.65373e-06, <span class="o">[</span>-1.87502e-06 -2.21744e-06 -7.27314e-07<span class="o">]</span>
+    TORQUE: 1.91656e-05, <span class="o">[</span>8.14396e-06 -1.22678e-05 1.56284e-05<span class="o">]</span>
+</pre></div>
+</div>
+<p>name: <code class="docutils literal"><span class="pre">dyn_nam_barn.stat</span></code> Details about how each simulation has
+terminated and the time at which this occurred.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>Molecule <span class="nb">type</span> <span class="m">1</span> has fulfilled condition: r &gt;<span class="o">=</span> 500.00<span class="p">;</span>    at <span class="nb">time</span> <span class="o">(</span>ps<span class="o">)</span> 1.32367e+06
+Molecule <span class="nb">type</span> <span class="m">1</span> has fulfilled condition: r &gt;<span class="o">=</span> 500.00<span class="p">;</span>    at <span class="nb">time</span> <span class="o">(</span>ps<span class="o">)</span> 1.15712e+06
+System has fulfilled condition: Type <span class="m">0</span> and Type <span class="m">1</span> are within  2.50<span class="p">;</span>  at <span class="nb">time</span> <span class="o">(</span>ps<span class="o">)</span> 1.90603e+06
+Molecule <span class="nb">type</span> <span class="m">1</span> has fulfilled condition: r &gt;<span class="o">=</span> 500.00<span class="p">;</span>    at <span class="nb">time</span> <span class="o">(</span>ps<span class="o">)</span> 2.18533e+06
+System has fulfilled condition: Type <span class="m">0</span> and Type <span class="m">1</span> are within  2.50<span class="p">;</span>  at <span class="nb">time</span> <span class="o">(</span>ps<span class="o">)</span> 1.59066e+06
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="references.html" class="btn btn-neutral float-right" title="References" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pbam_input.html" class="btn btn-neutral" title="PB-AM Inputs" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Lisa Felberg and David Brookes.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="static/jquery.js"></script>
+      <script type="text/javascript" src="static/underscore.js"></script>
+      <script type="text/javascript" src="static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

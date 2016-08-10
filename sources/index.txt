@@ -10,7 +10,7 @@ This is documentation for PBAM and PBSAM, analytic and semi-analytic solvers for
 were developed and are maintained by the THG lab at UC Berkeley.
 
 
-.. image:: _static/seal.png
+.. image:: images/seal.png
    :width: 30%
 
 Table of Contents
@@ -21,6 +21,8 @@ Table of Contents
 
    intro
    pbam
+   pbam_input
+   pbam_examples
    references
 
 ..

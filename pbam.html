@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PBAM &mdash; pb_solvers 0.1 documentation</title>
+  <title>PB-AM &mdash; pb_solvers 0.1 documentation</title>
   
 
   
@@ -31,7 +31,7 @@
 
   
     <link rel="top" title="pb_solvers 0.1 documentation" href="index.html"/>
-        <link rel="next" title="References" href="references.html"/>
+        <link rel="next" title="PBAM Inputs" href="pbam_input.html"/>
         <link rel="prev" title="Getting Started" href="intro.html"/> 
 
   
@@ -84,7 +84,7 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Getting Started</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">PBAM</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PB-AM</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#physical-calculations">Physical calculations</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#interactions-energies">Interactions energies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#forces-and-torques">Forces and Torques</a></li>
@@ -92,6 +92,8 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_input.html">PBAM Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_examples.html">PBAM Inputs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
@@ -127,7 +129,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>PBAM</li>
+    <li>PB-AM</li>
     <li class="wy-breadcrumbs-aside">
       
           
@@ -141,8 +143,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pbam">
-<h1>PBAM<a class="headerlink" href="#pbam" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pb-am">
+<h1>PB-AM<a class="headerlink" href="#pb-am" title="Permalink to this headline">¶</a></h1>
 <p>PB-AM is an analytical solution to the linearized Poisson-Boltzmann equation for multiple spherical objects of arbitrary charge distribution in an ionic solution. The solution can be reduced to a simple system of equations as follows:</p>
 <p>\[ A = \Gamma \cdot (\Delta \cdot T \cdot A + E) \]</p>
 <p>Where \(A^{(i)}\) represents the effective multipole expansion of the charge distributions of molecule \(i\). \(E^{(i)}\) is the free charge distribution of molecule \(i\).  \(\Gamma\) is a dielectric boundary-crossing operator, \(Delta\) is a cavity polarization operator, \(T\) an operator that transforms the multipole expansion to a local coordinate frame.  More details on the method are available in <a class="reference internal" href="references.html#lohe06" id="id1">[LoHe06]</a>. Once \(A^{(i)}\) has been solved, through an iterative SCF method, physical properties of the system can be computed, as detailed in the next section.</p>
@@ -170,7 +172,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="references.html" class="btn btn-neutral float-right" title="References" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pbam_input.html" class="btn btn-neutral float-right" title="PBAM Inputs" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="intro.html" class="btn btn-neutral" title="Getting Started" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
