@@ -12,10 +12,8 @@
 Molecule::Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
                    vector<double> vdwr, Pt cen, int type, int typeIdx,
                    double drot, double dtrans)
-:moveType_(movetype), drot_(drot), dtrans_(dtrans),
-qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()),
-a_(a), center_(cen), unwrappedCenter_(cen)
+:BaseMolecule(type, typeIdx, movetype, qs, pos, vdwr, cen, a, drot, dtrans),
+unwrappedCenter_(cen)
 {
   set_Dtr_Drot(movetype);
   reposition_charges();
@@ -25,13 +23,13 @@ a_(a), center_(cen), unwrappedCenter_(cen)
 Molecule::Molecule(string movetype, double a, vector<double> qs,
                    vector<Pt> pos, vector<double> vdwr, int type, int typeIdx,
                    double drot, double dtrans)
-:moveType_(movetype), drot_(drot), dtrans_(dtrans),
-qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()),
-a_(a)
+:BaseMolecule(type, typeIdx, movetype, qs, pos, vdwr, drot, dtrans)
 {
   set_Dtr_Drot(movetype);
-  calc_center();
+  
+  centers_[0] = calc_center();
+  as_[0] = a;
+  
   reposition_charges();
 }
 
@@ -39,11 +37,13 @@ a_(a)
 Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
                    vector<double> vdwr, Pt cen, int type, int typeIdx,
                    double drot, double dtrans)
-:moveType_(movetype), drot_(drot), dtrans_(dtrans),
-qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()), center_(cen), unwrappedCenter_(cen), a_(0)
+:BaseMolecule(type, typeIdx, movetype, qs, pos, vdwr, drot, dtrans)
 {
   set_Dtr_Drot(movetype);
+  centers_[0] = cen;
+  as_[0] = 0;
+
+//  as_[0] = calc_a();
   reposition_charges();
 }
 
@@ -51,83 +51,87 @@ M_((int) pos.size()), center_(cen), unwrappedCenter_(cen), a_(0)
 Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
                    vector<double> vdwr,  int type, int typeIdx,
                    double drot, double dtrans)
-:moveType_(movetype), drot_(drot), dtrans_(dtrans),
-qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(typeIdx),
-M_((int) pos.size()), a_(0)
+:BaseMolecule(type, typeIdx, movetype, qs, pos, vdwr, drot, dtrans)
 {
   set_Dtr_Drot(movetype);
-  calc_center();
+  centers_[0] = calc_center();
+  as_[0] = 0;
   reposition_charges();
 }
 
-
-void Molecule::set_Dtr_Drot(string type)
-{
-  if ((type == "stat") or (type == "rot"))  dtrans_ = 0.0;
-  if (type == "stat") drot_ = 0.0;
-}
-
-void Molecule::calc_center()
+Pt Molecule::calc_center()
 {
   // calculate the center of the molecule (for now using center):
   double xc, yc, zc;
   xc = 0;
   yc = 0;
   zc = 0;
-  for (int i = 0; i < M_; i++)
+  for (int i = 0; i < Nc_; i++)
   {
     xc += pos_[i].x();
     yc += pos_[i].y();
     zc += pos_[i].z();
   }
-  xc /= (double) M_;
-  yc /= (double) M_;
-  zc /= (double) M_;
+  xc /= (double) Nc_;
+  yc /= (double) Nc_;
+  zc /= (double) Nc_;
   
-  center_ = Pt(xc, yc, zc);
-  unwrappedCenter_ = center_;
+  Pt center = Pt(xc, yc, zc);
+//  unwrappedCenter_ = center;
+  return center;
 }
 
-void Molecule::calc_a()
+double Molecule::calc_a()
 {
-  a_ = 0;
+  double a = 0;
   double dist;
-  for (int i = 0; i < M_; i++)
+  for (int i = 0; i < Nc_; i++)
   {
     dist = pos_[i].norm() + vdwr_[i];
-    if (dist > a_) a_ = dist;
+    if (dist > a) a = dist;
   }
+  return a;
 }
 
 void Molecule::reposition_charges()
 {
   bool recalc_a = false;
   // repositioning the charges WRT center of charge
-  for (int i = 0; i < M_; i++)
+  for (int i = 0; i < Nc_; i++)
   {
     // check that the charge is encompassed by the the center and radius:
-    if (pos_[i].dist(center_)+vdwr_[i] > a_)   recalc_a = true;
-    pos_[i] = pos_[i] - center_;
+    if (pos_[i].dist(centers_[0])+vdwr_[i] > as_[0])
+      recalc_a = true;
+    pos_[i] = pos_[i] - centers_[0];
   }
   
-  if (recalc_a) calc_a();
+  if (recalc_a) as_[0] = calc_a();
 }
 
 void Molecule::translate(Pt dr, double boxlen)
 {
-  Pt dv  = center_ + dr;
+  Pt dv  = centers_[0] + dr;
   
   unwrappedCenter_ = unwrappedCenter_ + dr; // unwrapped position
-  center_ = Pt(dv.x() - round(dv.x()/boxlen)*boxlen,
+  centers_[0] = Pt(dv.x() - round(dv.x()/boxlen)*boxlen,
             dv.y() - round(dv.y()/boxlen)*boxlen,
             dv.z() - round(dv.z()/boxlen)*boxlen);
 }
 
 void Molecule::rotate(Quat qrot)
 {
-  for (int i = 0; i < M_; i++)
+  for (int i = 0; i < Nc_; i++)
   {
     pos_[i] = qrot.rotate_point(pos_[i]);
+  }
+}
+
+
+void Molecule::rotate(MyMatrix<double> rotmat)
+{
+  for (int i = 0; i < Nc_; i++)
+  {
+    pos_[i] = pos_[i].rotate(rotmat);
   }
 }
 

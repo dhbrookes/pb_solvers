@@ -35,6 +35,7 @@
 #include <map>
 #include <memory>
 #include "Constants.h"
+#include "BaseSys.h"
 
 using namespace std;
 
@@ -58,24 +59,24 @@ public:
 };
 
 
-class Molecule
+class Molecule : public BaseMolecule
 {
 protected:
-  string              moveType_;
-  int                 type_; // int index of type of molecule, 0 based
-  int                 typeIdx_; // int index of mol within given type_, 0 based
-  double              drot_;  // rotational diffusion coefficient
-  double              dtrans_; // translational diffusion coefficients
-  
-  int                 Nc_;  // number of charges in this molecule
-  vector<double>      qs_;  // magnitude of each charge in the molecule
-  vector<Pt>          pos_;  // position of each charge in the molecule
-  vector<double>      vdwr_; // van der waal radius of each chargeGoogle
+//  string              moveType_;
+//  int                 type_; // int index of type of molecule, 0 based
+//  int                 typeIdx_; // int index of mol within given type_, 0 based
+//  double              drot_;  // rotational diffusion coefficient
+//  double              dtrans_; // translational diffusion coefficients
+//  
+//  int                 Nc_;  // number of charges in this molecule
+//  vector<double>      qs_;  // magnitude of each charge in the molecule
+//  vector<Pt>          pos_;  // position of each charge in the molecule
+//  vector<double>      vdwr_; // van der waal radius of each chargeGoogle
   Pt                  cog_; // Molecule center of geometry
   
-  int                  Ns_;  // number of coarse grained spheres
-  vector<Pt>           centers_; //coarse-grained sphere centers
-  vector<double>       as_; // coarse-grained sphere radii
+//  int                  Ns_;  // number of coarse grained spheres
+//  vector<Pt>           centers_; //coarse-grained sphere centers
+//  vector<double>       as_; // coarse-grained sphere radii
   vector<vector<int> > cgNeighs_; // list of indices of CG centers that neighbor
                                    // each coarse grained sphere
   vector<vector<Pt> >  cgGridPts_; // grid points on the surface of
@@ -122,6 +123,14 @@ protected:
   /* For CG sphere i, find a vector of CG spheres it's in contact w */
   vector <int> find_neighbors( int i);
   
+  // random number from normal distribution
+  double random_norm();
+  
+  /* Choose a random orientation for a Pt vector  */
+  Pt random_pt();
+
+  void map_repos_charges();
+  
 public:
   
   Molecule() { }
@@ -139,12 +148,8 @@ public:
              int max_trials=40, double beta=2.0, double drot=0,
              double dtrans=0);
   
-  void map_repos_charges();
-  
   void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
-  void set_gridj(int j, vector<Pt> grid) {cgGridPts_[j] = grid;}
-  void set_gridexpj(int j, vector<int> grid_exp) {cgGdPtExp_[j] = grid_exp;}
-  void set_gridburj(int j, vector<int> grid_bur) {cgGdPtBur_[j] = grid_bur;}
+
   
   void add_Jl_to_interk( int k, int J, int l) {interPol_[k].push_back({J,l});}
   void add_Jl_to_inter_act_k( int k, int J, int l)
@@ -159,17 +164,21 @@ public:
     return false;
   }
   
+  void set_gridj(int j, vector<Pt> grid) {cgGridPts_[j] = grid;}
+  void set_gridexpj(int j, vector<int> grid_exp) {cgGdPtExp_[j] = grid_exp;}
+  void set_gridburj(int j, vector<int> grid_bur) {cgGdPtBur_[j] = grid_bur;}
+  
   void translate(Pt dr, double boxlen);
   void rotate(Quat qrot); // This will rotate with respect to origin!
   void rotate(MyMatrix<double> rotmat);
   
   void calc_cog();
   
-  string get_move_type() const        { return moveType_; }
-  int get_type() const                { return type_; }
-  int get_type_idx() const            { return typeIdx_; }
-  int get_nc() const                  { return Nc_; }
-  int get_ns() const                  { return Ns_; }
+//  string get_move_type() const        { return moveType_; }
+//  int get_type() const                { return type_; }
+//  int get_type_idx() const            { return typeIdx_; }
+//  int get_nc() const                  { return Nc_; }
+//  int get_ns() const                  { return Ns_; }
   int get_nc_k(int k) const           { return (int) cgCharges_[k].size(); }
   vector<int> get_neighj(int j) const { return cgNeighs_[j]; }
   vector<Pt> get_gridj(int j) const   { return cgGridPts_[j]; }
@@ -181,26 +190,21 @@ public:
   vector<int> get_ch_allout_k(int k)  { return cgChargesOut_[k]; }
   
   int get_ch_k_alpha(int k, int alpha){ return cgCharges_[k][alpha]; }
-  double get_drot() const             { return drot_; }
-  double get_dtrans() const           { return dtrans_; }
-  Pt get_posj(int j) const            { return pos_[j]; }
+//  double get_drot() const             { return drot_; }
+//  double get_dtrans() const           { return dtrans_; }
+//  Pt get_posj(int j) const            { return pos_[j]; }
   
-  Pt get_posj_realspace(int j)        { return pos_[j] + centers_[chToCG_[j]];}
+//  Pt get_posj_realspace(int j)        { return pos_[j] + centers_[chToCG_[j]];}
+  Pt get_cen_j(int j)                 { return centers_[chToCG_[j]]; }
   Pt get_centerk(int k) const         { return centers_[k]; }
   Pt get_cog() const                  { return cog_;}
-  const double get_qj(int j) const    { return qs_[j]; }
-  const double get_radj(int j) const  { return vdwr_[j]; }
+//  const double get_qj(int j) const    { return qs_[j]; }
+//  const double get_radj(int j) const  { return vdwr_[j]; }
   const double get_ak(int k) const    { return as_[k]; }
   const int get_cg_of_ch(int j)       { return chToCG_[j]; }
   
   vector<vector<int> > get_inter_act_k(int k) {return interAct_[k];}
-  
-  /* Choose a random orientation for a Pt vector  */
-  Pt random_pt();
-  
-  // random number from normal distribution
-  double random_norm();
-  
+
 };
 
 /*

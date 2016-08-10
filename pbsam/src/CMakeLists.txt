@@ -3,6 +3,7 @@ include_directories("../../pb_shared/src")
 include_directories("./")
 
 add_executable(pbsam
+  ../../pb_shared/src/BaseSys.cpp
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp
   Electrostatics.cpp

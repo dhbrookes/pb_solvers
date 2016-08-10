@@ -34,6 +34,7 @@
 
 #include <map>
 #include "Constants.h"
+#include "BaseSys.h"
 
 using namespace std;
 
@@ -41,37 +42,37 @@ using namespace std;
 /*
  Class for storing relevant data about each molecule
  */
-class Molecule
+class Molecule : public BaseMolecule
 {
 protected:
-  string              moveType_;
-  int                 type_; // int index of type of molecule, 0 based
-  int                 typeIdx_; // int index of mol within given type_, 0 based
-  double              drot_;  // rotational diffusion coefficient
-  double              dtrans_; // translational diffusion coefficients
-  int                 M_;  // number of charges in this molecule
-  double              a_;  // radius of this molecule
-  Pt                  center_; // wrapped center position
+//  string              moveType_;
+//  int                 type_; // int index of type of molecule, 0 based
+//  int                 typeIdx_; // int index of mol within given type_, 0 based
+//  double              drot_;  // rotational diffusion coefficient
+//  double              dtrans_; // translational diffusion coefficients
+//  int                 M_;  // number of charges in this molecule
+//  double              a_;  // radius of this molecule
+//  Pt                  center_; // wrapped center position
   Pt                  unwrappedCenter_; // unwrapped center to check for term
-  vector<double>      qs_;  // magnitude of each charge in the molecule
-  vector<Pt>          pos_;  // position of each charge in the molecule
-  vector<double>      vdwr_; // van der waal radius of each charge
+//  vector<double>      qs_;  // magnitude of each charge in the molecule
+//  vector<Pt>          pos_;  // position of each charge in the molecule
+//  vector<double>      vdwr_; // van der waal radius of each charge
 
   vector<int>         interPol_; // List of other mols that are within 10A
   vector<int>         interAct_; // For mol, list of other are btw cutoff & 10A
   
-  // Set coefficients according to the type indicated
-  void set_Dtr_Drot(string type);
+//  // Set coefficients according to the type indicated
+//  void set_Dtr_Drot(string type);
   
   // calculate the center of the molecule
-  void calc_center();
+  Pt calc_center();
   
   // calculate the radius of the molecule
-  void calc_a();
+  double calc_a();
   
   // reposition charges wrt the center
   void reposition_charges();
-    
+  
 public:
   
   Molecule() {}
@@ -96,29 +97,31 @@ public:
            vector<double> vdwr, int type, int typeIdx,
            double drot_=0, double dtrans=0);
   
-  const int get_m() const               { return M_; }
-  const double get_a() const            { return a_; }
-  const double get_qj(int j) const      { return qs_[j]; }
-  const double get_radj(int j) const    { return vdwr_[j]; }
-  Pt get_posj(int j) const              { return pos_[j]; }
-  Pt get_posj_realspace(int j)          { return center_ + pos_[j]; }
-  Pt get_center() const                 { return center_; }
+//  const int get_m() const               { return M_; }
+  const double get_a() const            { return as_[0]; }
+//  const double get_qj(int j) const      { return qs_[j]; }
+//  const double get_radj(int j) const    { return vdwr_[j]; }
+//  Pt get_posj(int j) const              { return pos_[j]; }
+//  Pt get_posj_realspace(int j)          { return center_ + pos_[j]; }
+  Pt get_center() const                 { return centers_[0]; }
   Pt get_unwrapped_center() const       { return unwrappedCenter_; }
   
-  string get_move_type() const          { return moveType_; }
-  int get_type() const                  { return type_; }
-  int get_type_idx() const              { return typeIdx_; }
+  Pt get_cen_j(int j)                   { return centers_[0]; }
   
-  double get_drot() const               { return drot_; }
-  double get_dtrans() const             { return dtrans_; }
+//  string get_move_type() const          { return moveType_; }
+//  int get_type() const                  { return type_; }
+//  int get_type_idx() const              { return typeIdx_; }
+//  
+//  double get_drot() const               { return drot_; }
+//  double get_dtrans() const             { return dtrans_; }
 
   vector<int> get_pol()                 { return interPol_;}
   vector<int> get_act()                 { return interAct_;}
 
   void clear_inter_pol()                { interPol_.clear(); }
   void clear_inter_act()                { interAct_.clear(); }
-  void add_J_to_pol(int J)              {interPol_.push_back(J);}
-  void add_J_to_interact(int J)         {interAct_.push_back(J);}
+  void add_J_to_pol(int J)              { interPol_.push_back(J);}
+  void add_J_to_interact(int J)         { interAct_.push_back(J);}
   
   bool is_J_in_pol( int J )
   {
@@ -136,8 +139,9 @@ public:
     return false;
   }  
   
-  void translate(Pt dr, double boxlen);
-  void rotate(Quat qrot);
+  virtual void translate(Pt dr, double boxlen);
+  virtual void rotate(Quat qrot);
+  virtual void rotate(MyMatrix<double> rotmat);
 };
 
 

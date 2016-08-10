@@ -8,7 +8,8 @@ include_directories("../src")
 include_directories("../../pb_shared/src")
 include_directories("../../pb_shared/unittest")
 
-ADD_EXECUTABLE(pbsamtest 
+ADD_EXECUTABLE(pbsamtest
+  ../../pb_shared/src/BaseSys.cpp
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp
   ../src/Electrostatics.cpp

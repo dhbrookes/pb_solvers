@@ -12,11 +12,11 @@
 Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
           vector<Pt> pos, vector<double> vdwr, vector<Pt> cens,
           vector<double> as, double drot, double dtrans)
-:type_(type), typeIdx_(type_idx), moveType_(movetype), qs_(qs), pos_(pos),
-vdwr_(vdwr), centers_(cens), as_(as), drot_(drot), dtrans_(dtrans),
-Nc_((int) qs.size()), Ns_((int) cens.size()), cgCharges_((int) cens.size()),
+:BaseMolecule(type, type_idx, movetype, qs, pos, vdwr, cens, as, drot, dtrans),
+cgCharges_((int) cens.size()),
 cgGridPts_((int) cens.size()),
-cgGdPtExp_((int) cens.size()), cgGdPtBur_((int) cens.size())
+cgGdPtExp_((int) cens.size()),
+cgGdPtBur_((int) cens.size())
 {
   map_repos_charges();
   check_connect();
@@ -30,8 +30,7 @@ Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
                        vector<Pt> msms_np, double tol_sp, int n_trials,
                        int max_trials, double beta, double drot,
                        double dtrans)
-:type_(type), typeIdx_(type_idx), moveType_(movetype), qs_(qs), pos_(pos),
-vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
+:BaseMolecule(type, type_idx, movetype, qs, pos, vdwr, drot, dtrans)
 {
   find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
   check_connect();
@@ -43,10 +42,8 @@ vdwr_(vdwr), drot_(drot), dtrans_(dtrans), Nc_((int) qs.size())
 }
 
 Molecule::Molecule(const Molecule& mol)
-:moveType_(mol.moveType_), type_(mol.type_), typeIdx_(mol.typeIdx_),
-drot_(mol.drot_), dtrans_(mol.dtrans_), Nc_(mol.Nc_), qs_(mol.qs_),
-pos_(mol.pos_), vdwr_(mol.vdwr_), Ns_(mol.Ns_), centers_(mol.centers_),
-as_(mol.as_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_),
+:BaseMolecule(mol.type_, mol.typeIdx_, mol.moveType_, mol.qs_, mol.pos_,
+              mol.vdwr_, mol.centers_, mol.as_, mol.drot_, mol.dtrans_),
 cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 cgNeighs_(mol.cgNeighs_),cgGridPts_(mol.cgGridPts_),
 cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_),
