@@ -25,6 +25,10 @@ Table of Contents
    pbam_input
    pbam_examples
    pbam_program
+   pbsam
+   pbsam_input
+   pbsam_examples
+   pbsam_program
    references
 
 ..

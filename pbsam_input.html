@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PB-AM Inputs &mdash; pb_solvers 0.1 documentation</title>
+  <title>PB-SAM Inputs &mdash; pb_solvers 0.1 documentation</title>
   
 
   
@@ -31,8 +31,8 @@
 
   
     <link rel="top" title="pb_solvers 0.1 documentation" href="index.html"/>
-        <link rel="next" title="PB-AM Examples" href="pbam_examples.html"/>
-        <link rel="prev" title="PB-AM" href="pbam.html"/> 
+        <link rel="next" title="PB-SAM Program details" href="pbsam_program.html"/>
+        <link rel="prev" title="PB-SAM" href="pbsam.html"/> 
 
   
   <script src="static/js/modernizr.min.js"></script>
@@ -85,7 +85,11 @@
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pbam.html">PB-AM</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">PB-AM Inputs</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="pbam_input.html">PB-AM Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_examples.html">PB-AM Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_program.html">PB-AM Program details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbsam.html">PB-SAM</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PB-SAM Inputs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#general-input-file-parameters">General input file parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#physical-calculations">Physical calculations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#electrostatic-potential-visualization">Electrostatic Potential Visualization</a></li>
@@ -95,14 +99,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#xyz-file">XYZ File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#translation-rotation-file">Translation/Rotation File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contact-file">Contact File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vertex-surface-file">Vertex/Surface File</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="pbam_examples.html">PB-AM Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pbam_program.html">PB-AM Program details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pbsam.html">PB-SAM</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pbsam_input.html">PB-SAM Inputs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pbsam_program.html">PB-SAM Program details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
@@ -139,11 +140,11 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>PB-AM Inputs</li>
+    <li>PB-SAM Inputs</li>
     <li class="wy-breadcrumbs-aside">
       
           
-          <a href="sources/pbam_input.txt" rel="nofollow"> View page source</a>
+          <a href="sources/pbsam_input.txt" rel="nofollow"> View page source</a>
         
       
     </li>
@@ -153,10 +154,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pb-am-inputs">
-<h1>PB-AM Inputs<a class="headerlink" href="#pb-am-inputs" title="Permalink to this headline">¶</a></h1>
-<p>Here are the inputs that are used in a PB-AM run, and
-their meanings. The general format of the input is:</p>
+  <div class="section" id="pb-sam-inputs">
+<h1>PB-SAM Inputs<a class="headerlink" href="#pb-sam-inputs" title="Permalink to this headline">¶</a></h1>
+<p>Here are the inputs that are used in a PB-SAM run, and
+their meanings. There is much overlap between PB-AM inputs and PB-SAM, but
+the full PB-SAM list is provided here. The general format of the input is:</p>
 <p><code class="docutils literal"><span class="pre">keyword</span> <span class="pre">value</span></code></p>
 <p>The keyword that is most important is the <cite>runtype</cite> keyword.
 This specifies which type of output you are interested in generating.</p>
@@ -198,6 +200,20 @@ the next section.</p>
 <td><cite>idx</cite>  <cite>fpath</cite></td>
 <td><p class="first">The molecule index for this xyz file.</p>
 <p class="last">Provide input XYZ file at <cite>fpath</cite></p>
+</td>
+</tr>
+<tr class="row-even"><td>surf</td>
+<td><cite>idx</cite>  <cite>fpath</cite></td>
+<td><p class="first">The molecule index for this surface/vertex file.</p>
+<p>Provide input solvent vertex file at <cite>fpath</cite>. See</p>
+<p class="last">details of the vertex file below.</p>
+</td>
+</tr>
+<tr class="row-odd"><td>tolsp</td>
+<td><cite>tolerance</cite></td>
+<td><p class="first">The desired tolerance for coarse-graining, indicates</p>
+<p>how far beyond the surface the CG spheres may extend</p>
+<p class="last">Larger tolsp yields a coarser molecular representation</p>
 </td>
 </tr>
 <tr class="row-even"><td>transrot</td>
@@ -409,13 +425,11 @@ depending on the system and desired results.</p>
 <tr class="row-even"><td><p class="first">term <cite>idx</cite></p>
 <p class="last">contact</p>
 </td>
-<td><cite>confile</cite> <cite>pad</cite></td>
+<td><cite>confile</cite></td>
 <td><p class="first">Set attributes of contact termination condition, where</p>
 <p><cite>idx</cite> is the integer id of this condition, <cite>confile</cite></p>
-<p>is a path to a file containing the contact information,</p>
-<p>and <cite>pad</cite> specifies a correction for the case when the</p>
-<p>contact distance cannot be reached due to the spherical</p>
-<p class="last">assumption of the model. See below for more info.</p>
+<p>is a path to a file containing the contact information.</p>
+<p class="last">See below for more info.</p>
 </td>
 </tr>
 <tr class="row-odd"><td>xyz</td>
@@ -539,12 +553,38 @@ proteins have docked). The contact file contains lines with the format:</p>
 molecular types, <code class="docutils literal"><span class="pre">at1</span></code> is the index of an atom from the first
 molecular type, <code class="docutils literal"><span class="pre">at2</span></code> is the index of an atom from the second
 molecular type and <code class="docutils literal"><span class="pre">dist</span></code> is the maximum distance between
-the two atoms that defines the contact.  Note that sometimes
-these distances cannot be reached due to the assumption in this model that
-the molecule is spherical. To correct for this case, one must
-specify a &#8220;pad&#8221;  distance that is defined as the maximum distance between
-the radial projections of the atoms onto the surface of their
-respective spheres that defines a contact.</p>
+the two atoms that defines the contact.  Note that because of the
+coarse-graining, the program will identify the CG sphere closest
+to the contact atom, and use the surface-to-surface distance of those
+CG spheres to compare against the reported <code class="docutils literal"><span class="pre">dist</span></code>.</p>
+</div>
+<div class="section" id="vertex-surface-file">
+<h3>Vertex/Surface File<a class="headerlink" href="#vertex-surface-file" title="Permalink to this headline">¶</a></h3>
+<p>As part of the coarse-graining process a definition of the molecular
+surface is necessary. For this we have historically used the program
+<a class="reference external" href="http://mgltools.scripps.edu/packages/MSMS">MSMS</a> by M. Sanner, or on the online web <a class="reference external" href="http://mgl.scripps.edu/people/sanner/html/msms_server.html">server</a></p>
+<p>If using the command line tool, after downloading it for the correct platform,
+it can be run as follows on the command line. It requires an xyzr file as input, which
+is the xyz coordinates of each atom of the system followed by the vDW radius. This
+information can all be found in the PQR file.</p>
+<p><code class="docutils literal"><span class="pre">./msms.system</span> <span class="pre">-if</span> <span class="pre">[filename].xyzr</span> <span class="pre">-of</span> <span class="pre">[outfile]</span></code></p>
+<p>This will produce a *.face file and a *.vert file, of which the *.vert is needed.
+The vertex file is given as follows:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span> <span class="m">1669</span>      <span class="m">95</span>  3.00  1.50
+2.965    12.871    -1.084    -0.751    -0.636    -0.175       <span class="m">0</span>      <span class="m">81</span>  2
+3.241    11.952    -0.817    -0.936    -0.024    -0.353       <span class="m">0</span>      <span class="m">69</span>  2
+3.026    11.791    -0.439    -0.792     0.084    -0.604       <span class="m">0</span>      <span class="m">79</span>  2
+4.481    14.391    -3.026    -0.879    -0.246    -0.409       <span class="m">0</span>      <span class="m">73</span>  2
+5.413    15.674    -0.948    -0.337     0.499     0.798       <span class="m">0</span>      <span class="m">73</span>  2
+4.478    15.093    -0.297     0.286     0.886     0.365       <span class="m">0</span>      <span class="m">81</span>  2
+4.930    15.004    -0.240    -0.015     0.945     0.326       <span class="m">0</span>      <span class="m">71</span>  2
+4.072    13.663     0.763    -0.465     0.242     0.852       <span class="m">0</span>      <span class="m">71</span>  2
+</pre></div>
+</div>
+<p>Where the first line is the number of vertex points, followed by information
+on the density of the surface, and the lines that follow indicate the cartesian
+locations of each vertex point, followed by the unit norm of the surface.
+This vertex file is used to coarse-grain the molecule.</p>
 </div>
 </div>
 </div>
@@ -556,10 +596,10 @@ respective spheres that defines a contact.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pbam_examples.html" class="btn btn-neutral float-right" title="PB-AM Examples" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pbsam_program.html" class="btn btn-neutral float-right" title="PB-SAM Program details" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pbam.html" class="btn btn-neutral" title="PB-AM" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pbsam.html" class="btn btn-neutral" title="PB-SAM" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
