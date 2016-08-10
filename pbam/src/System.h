@@ -40,22 +40,22 @@ using namespace std;
 
 
 /*
- Class for storing relevant data about each molecule
+ Class for storing relevant data about each MoleculeAM
  */
-class Molecule : public BaseMolecule
+class MoleculeAM : public BaseMolecule
 {
 protected:
 //  string              moveType_;
-//  int                 type_; // int index of type of molecule, 0 based
+//  int                 type_; // int index of type of MoleculeAM, 0 based
 //  int                 typeIdx_; // int index of mol within given type_, 0 based
 //  double              drot_;  // rotational diffusion coefficient
 //  double              dtrans_; // translational diffusion coefficients
-//  int                 M_;  // number of charges in this molecule
-//  double              a_;  // radius of this molecule
+//  int                 M_;  // number of charges in this MoleculeAM
+//  double              a_;  // radius of this MoleculeAM
 //  Pt                  center_; // wrapped center position
   Pt                  unwrappedCenter_; // unwrapped center to check for term
-//  vector<double>      qs_;  // magnitude of each charge in the molecule
-//  vector<Pt>          pos_;  // position of each charge in the molecule
+//  vector<double>      qs_;  // magnitude of each charge in the MoleculeAM
+//  vector<Pt>          pos_;  // position of each charge in the MoleculeAM
 //  vector<double>      vdwr_; // van der waal radius of each charge
 
   vector<int>         interPol_; // List of other mols that are within 10A
@@ -64,10 +64,10 @@ protected:
 //  // Set coefficients according to the type indicated
 //  void set_Dtr_Drot(string type);
   
-  // calculate the center of the molecule
+  // calculate the center of the MoleculeAM
   Pt calc_center();
   
-  // calculate the radius of the molecule
+  // calculate the radius of the MoleculeAM
   double calc_a();
   
   // reposition charges wrt the center
@@ -75,25 +75,25 @@ protected:
   
 public:
   
-  Molecule() {}
+  MoleculeAM() {}
 
   // user specified radius and center
-  Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
+  MoleculeAM(string movetype, double a, vector<double> qs, vector<Pt> pos,
            vector<double> vdwr, Pt cen, int type, int typeIdx,
            double drot_=0, double dtrans=0);
   
   // user specified radius
-  Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
+  MoleculeAM(string movetype, double a, vector<double> qs, vector<Pt> pos,
            vector<double> vdwr, int type, int typeIdx,
            double drot_=0, double dtrans=0);
   
   // user specified center
-  Molecule(string movetype, vector<double> qs, vector<Pt> pos,
+  MoleculeAM(string movetype, vector<double> qs, vector<Pt> pos,
            vector<double> vdwr, Pt cen, int type, int typeIdx,
            double drot_=0, double dtrans=0);
   
   // neither the center or radius are specified
-  Molecule(string movetype, vector<double> qs, vector<Pt> pos,
+  MoleculeAM(string movetype, vector<double> qs, vector<Pt> pos,
            vector<double> vdwr, int type, int typeIdx,
            double drot_=0, double dtrans=0);
   
@@ -152,17 +152,17 @@ class System
 {
 protected:
     
-  int                          N_; // number of molecules
+  int                          N_; // number of MoleculeAMs
   double                       lambda_; // average molecular radius
-  vector<Molecule>             molecules_;
+  vector<MoleculeAM>             MoleculeAMs_;
   
   double                       boxLength_;
   double                       cutoff_;
   
   double t_;  // time in a BD simulation
   
-  int                          ntype_;  //count of unique molecule types
-  vector<int>                  typect_; //count of molecule of each unique type
+  int                          ntype_;  //count of unique MoleculeAM types
+  vector<int>                  typect_; //count of MoleculeAM of each unique type
   map<vector<int>, int>        typeIdxToIdx_;
   
   const double calc_average_radius() const;
@@ -170,7 +170,7 @@ protected:
 public:
   System() { }
   
-  System(const vector<Molecule>& mols,
+  System(const vector<MoleculeAM>& mols,
          double cutoff=Constants::FORCE_CUTOFF,
          double boxlength=Constants::MAX_DIST);
   
@@ -179,24 +179,24 @@ public:
   const int get_n() const                  {return N_;}
   const int get_ntype()                    {return ntype_;}
   const int get_typect(int i)              {return typect_[i];}
-  const double get_ai(int i) const         {return molecules_[i].get_a();}
-  const double get_Mi(int i) const         {return molecules_[i].get_m();}
-  const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
-  const double get_radij(int i, int j) const {return molecules_[i].get_radj(j);}
-  Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
+  const double get_ai(int i) const         {return MoleculeAMs_[i].get_a();}
+  const double get_Mi(int i) const         {return MoleculeAMs_[i].get_m();}
+  const double get_qij(int i, int j) const {return MoleculeAMs_[i].get_qj(j);}
+  const double get_radij(int i, int j) const {return MoleculeAMs_[i].get_radj(j);}
+  Pt get_posij(int i, int j)               {return MoleculeAMs_[i].get_posj(j);}
   Pt get_posijreal(int i, int j)
-  {return molecules_[i].get_posj_realspace(j);}
-  Molecule get_molecule(int i) const       {return molecules_[i];}
+  {return MoleculeAMs_[i].get_posj_realspace(j);}
+  MoleculeAM get_MoleculeAM(int i) const       {return MoleculeAMs_[i];}
   vector<Pt> get_allcenter() const;
-  Pt get_centeri(int i) const              {return molecules_[i].get_center();}
+  Pt get_centeri(int i) const              {return MoleculeAMs_[i].get_center();}
   Pt get_unwrapped_center(int i) const
-  {return molecules_[i].get_unwrapped_center();}
-  double get_radi(int i) const             {return molecules_[i].get_a();}
+  {return MoleculeAMs_[i].get_unwrapped_center();}
+  double get_radi(int i) const             {return MoleculeAMs_[i].get_a();}
   const double get_lambda() const          {return lambda_;}
   const string get_typei(int i) const
-  {return molecules_[i].get_move_type();}
-  const double get_droti(int i) const      {return molecules_[i].get_drot();}
-  const double get_dtransi(int i) const    {return molecules_[i].get_dtrans();}
+  {return MoleculeAMs_[i].get_move_type();}
+  const double get_droti(int i) const      {return MoleculeAMs_[i].get_drot();}
+  const double get_dtransi(int i) const    {return MoleculeAMs_[i].get_dtrans();}
   const double get_boxlength() const       {return boxLength_;}
   const double get_cutoff() const          {return cutoff_;}
   const double get_time() const            {return t_;}
@@ -213,18 +213,18 @@ public:
   // Set time of simulation as what is input
   void set_time(double val) { t_ = val; }
   
-  // translate every charge in molecule i by the vector dr
-  void translate_mol(int i, Pt dr) { molecules_[i].translate(dr, boxLength_); }
+  // translate every charge in MoleculeAM i by the vector dr
+  void translate_mol(int i, Pt dr) { MoleculeAMs_[i].translate(dr, boxLength_); }
   
-  // rotate every charge in molecule i
-  void rotate_mol(int i, Quat qrot) { molecules_[i].rotate(qrot); }
+  // rotate every charge in MoleculeAM i
+  void rotate_mol(int i, Quat qrot) { MoleculeAMs_[i].rotate(qrot); }
   
-  // Check to determine if any molecules are overlapping
+  // Check to determine if any MoleculeAMs are overlapping
   void check_for_overlap();
   
-  // get the distance vector (Point object) between two molecules, taking into
+  // get the distance vector (Point object) between two MoleculeAMs, taking into
   // account periodic boundary conditions by returning the distance vector
-  // between the closest image of the molecule
+  // between the closest image of the MoleculeAM
   Pt get_pbc_dist_vec(int i, int j);
   
   // get distance vector between any two points taking into account periodic
@@ -232,21 +232,21 @@ public:
   Pt get_pbc_dist_vec_base(Pt p1, Pt p2);
 
   // Interaction and polarization lists
-  void add_J_to_pol_I( int i, int j) { molecules_[i].add_J_to_pol(j);}
-  void add_J_to_interact_I(int i, int j) { molecules_[i].add_J_to_interact(j);}
+  void add_J_to_pol_I( int i, int j) { MoleculeAMs_[i].add_J_to_pol(j);}
+  void add_J_to_interact_I(int i, int j) { MoleculeAMs_[i].add_J_to_interact(j);}
   
-  bool is_J_in_pol_I( int i, int j)  { return molecules_[i].is_J_in_pol(j);}
-  bool is_J_in_act_I( int i, int j)  { return molecules_[i].is_J_in_interact(j);}
+  bool is_J_in_pol_I( int i, int j)  { return MoleculeAMs_[i].is_J_in_pol(j);}
+  bool is_J_in_act_I( int i, int j)  { return MoleculeAMs_[i].is_J_in_interact(j);}
   
-  vector<int> get_pol_I(int i)       { return molecules_[i].get_pol();}
-  vector<int> get_act_I(int i)       { return molecules_[i].get_act();}
+  vector<int> get_pol_I(int i)       { return MoleculeAMs_[i].get_pol();}
+  vector<int> get_act_I(int i)       { return MoleculeAMs_[i].get_act();}
 
   void clear_all_lists()
   {
     for ( int i = 0; i < N_; i++)
     {
-      molecules_[i].clear_inter_pol();
-      molecules_[i].clear_inter_act();
+      MoleculeAMs_[i].clear_inter_pol();
+      MoleculeAMs_[i].clear_inter_act();
     }
   }  
 
@@ -265,16 +265,16 @@ public:
 };
 
 /*
- Exception thrown when two molecules in the system are overlapping
+ Exception thrown when two MoleculeAMs in the system are overlapping
  */
-class OverlappingMoleculeException: public exception
+class OverlappingMoleculeAMException: public exception
 {
 protected:
   int idx1_;
   int idx2_;
   
 public:
-  OverlappingMoleculeException(int idx1, int idx2)
+  OverlappingMoleculeAMException(int idx1, int idx2)
   :idx1_(idx1), idx2_(idx2)
   {
   }
@@ -282,7 +282,7 @@ public:
   virtual const char* what() const throw()
   {
     string ss;
-    ss = "Molecule " + to_string(idx1_)+" & " + to_string(idx2_) + " overlap";
+    ss = "MoleculeAM " + to_string(idx1_)+" & " + to_string(idx2_) + " overlap";
     return ss.c_str();
   }
 };

@@ -58,7 +58,7 @@ public:
 
 /*
  Class for contact based termination. This terminates based on whether
- the specified molecule molecule pair is within a given cutoff of each other
+ the specified MoleculeAM MoleculeAM pair is within a given cutoff of each other
  */
 class ContactTerminate : public BaseTerminate
 {
@@ -108,7 +108,7 @@ protected:
   
   double pad_; // distance between spheres if contact distance cannot be met
   
-  vector<vector<int> > atPairs_;  // vector of size two vectors (atom index from each molecule type)
+  vector<vector<int> > atPairs_;  // vector of size two vectors (atom index from each MoleculeAM type)
   vector<double> dists_;  // min distance between the above pairs
   
   string how_term_;
@@ -182,7 +182,7 @@ public:
             dcon = pad_;
             
             // get position of atoms relative to box
-            // (as opposed to center of molecule)
+            // (as opposed to center of MoleculeAM)
             pos1 = pos1 + cen1;
             pos2 = pos2 + cen2;
             d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
@@ -244,7 +244,7 @@ enum BoundaryType { LEQ, GEQ };
 
 /*
  Class for coordinate based termination. This terminates based on whether
- the specified molecule satisfies the BoundaryType condition on the CoordType
+ the specified MoleculeAM satisfies the BoundaryType condition on the CoordType
  with the given boundary value.
  */
 class CoordTerminate : public BaseTerminate
@@ -270,7 +270,7 @@ public:
     
     if (boundType_ == LEQ)    eq   = "<=";
     
-    sprintf(buff, "Molecule type %d has fulfilled condition: %s %s %5.2f;\t",
+    sprintf(buff, "MoleculeAM type %d has fulfilled condition: %s %s %5.2f;\t",
             molIdx_, cord.c_str(), eq.c_str(), boundaryVal_);
     how_term_ = buff;
   }
@@ -366,17 +366,17 @@ protected:
   shared_ptr<System> _sys_;
   shared_ptr<Constants> _consts_;
   
-  // check if a molecule's new point causes it to collide with any other
+  // check if a MoleculeAM's new point causes it to collide with any other
   bool check_for_collision(int mol, Pt new_pt);
   
-  // updates on individual molecules:
+  // updates on individual MoleculeAMs:
   void indi_trans_update(int i, Pt fi);
   void indi_rot_update(int i, Pt tau_i);
   
   // compute timestep for BD
   double compute_dt( );
   
-  // compute the smallest distance between two molecule centers
+  // compute the smallest distance between two MoleculeAM centers
   void compute_min_dist( );
   
   // return a random vector with each element drawn from a Gaussian
@@ -396,7 +396,7 @@ public:
          bool diff = true, bool force = true);
   
   // update the system with Brownian dynamics given forces and torques on every
-  // molecule
+  // MoleculeAM
   void bd_update(shared_ptr<vector<Pt> > _F,
                  shared_ptr<vector<Pt> > _tau);
   

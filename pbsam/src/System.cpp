@@ -9,7 +9,7 @@
 #include "System.h"
 
 
-Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
+MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
           vector<Pt> pos, vector<double> vdwr, vector<Pt> cens,
           vector<double> as, double drot, double dtrans)
 :BaseMolecule(type, type_idx, movetype, qs, pos, vdwr, cens, as, drot, dtrans),
@@ -25,7 +25,7 @@ cgGdPtBur_((int) cens.size())
   interPol_.resize(Ns_); interAct_.resize(Ns_);
 }
 
-Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
+MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
                        vector<Pt> pos, vector<double> vdwr, vector<Pt> msms_sp,
                        vector<Pt> msms_np, double tol_sp, int n_trials,
                        int max_trials, double beta, double drot,
@@ -41,7 +41,7 @@ Molecule::Molecule(int type, int type_idx, string movetype, vector<double> qs,
   calc_cog();
 }
 
-Molecule::Molecule(const Molecule& mol)
+MoleculeSAM::MoleculeSAM(const MoleculeSAM& mol)
 :BaseMolecule(mol.type_, mol.typeIdx_, mol.moveType_, mol.qs_, mol.pos_,
               mol.vdwr_, mol.centers_, mol.as_, mol.drot_, mol.dtrans_),
 cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
@@ -53,7 +53,7 @@ interPol_(mol.interPol_), interAct_(mol.interAct_)
 }
 
 
-void Molecule::map_repos_charges()
+void MoleculeSAM::map_repos_charges()
 {
   int closest;
   for (int cg = 0; cg < Nc_; cg++)
@@ -64,7 +64,7 @@ void Molecule::map_repos_charges()
     chToCG_[cg] = closest;
   }
   
-  // Assigning all charges to either in or out of molecule
+  // Assigning all charges to either in or out of MoleculeSAM
   cgChargesIn_.resize(Ns_); cgChargesOut_.resize(Ns_);
   for (int i = 0; i < Ns_; i++)
   {
@@ -77,7 +77,7 @@ void Molecule::map_repos_charges()
   }
 }
 
-int Molecule::find_closest_center(Pt pos)
+int MoleculeSAM::find_closest_center(Pt pos)
 {
   int idx = 0;
   double dmin = __DBL_MAX__;
@@ -94,14 +94,14 @@ int Molecule::find_closest_center(Pt pos)
   return idx;
 }
 
-void Molecule::calc_cog()
+void MoleculeSAM::calc_cog()
 {
   cog_ = Pt(0.0, 0.0, 0.0);
   for (int i = 0; i < Nc_; i++)  cog_ = cog_ + get_posj_realspace(i);
   cog_ = cog_ * (1.0/(double) Nc_);
 }
 
-Pt Molecule::random_pt()
+Pt MoleculeSAM::random_pt()
 {
   double phi = drand48(  )*2*M_PI;
   double u = drand48(  )*2 - 1;
@@ -109,7 +109,7 @@ Pt Molecule::random_pt()
   return Pt( sqrt(1 - u*u ) * cos(phi), sqrt(1 - u*u) * sin(phi), u);
 }
 
-double Molecule::random_norm()
+double MoleculeSAM::random_norm()
 {
   double v1, v2, rsq = 0.0;
   do
@@ -123,7 +123,7 @@ double Molecule::random_norm()
   return fac*v2;
 }
 
-void Molecule::translate(Pt dr, double boxlen)
+void MoleculeSAM::translate(Pt dr, double boxlen)
 {
   Pt dv_cen  = cog_ + dr;
   
@@ -142,7 +142,7 @@ void Molecule::translate(Pt dr, double boxlen)
   }
 }
 
-void Molecule::rotate(Quat qrot)
+void MoleculeSAM::rotate(Quat qrot)
 {
   for (int k = 0; k < Ns_; k++)
   {
@@ -156,7 +156,7 @@ void Molecule::rotate(Quat qrot)
   calc_cog();
 }
 
-void Molecule::rotate(MyMatrix<double> rotmat)
+void MoleculeSAM::rotate(MyMatrix<double> rotmat)
 {
   for (int k = 0; k < Ns_; k++)
   {
@@ -169,7 +169,7 @@ void Molecule::rotate(MyMatrix<double> rotmat)
   calc_cog();
 }
 
-void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
+void MoleculeSAM::find_centers(vector<Pt> sp, vector<Pt> np,
                               double tol_sp, int n_trials,
                               int max_trials, double beta)
 {
@@ -227,7 +227,7 @@ void Molecule::find_centers(vector<Pt> sp, vector<Pt> np,
   cout << "End of find_centers" << endl;
 }
 
-CGSphere Molecule::find_best_center(vector<Pt> sp,vector<Pt> np,
+CGSphere MoleculeSAM::find_best_center(vector<Pt> sp,vector<Pt> np,
                                       vector<int> unbound,
                                       double tol_sp, int iter, double beta)
 {
@@ -300,7 +300,7 @@ CGSphere Molecule::find_best_center(vector<Pt> sp,vector<Pt> np,
   return CGSphere(best_cen, sqrt(best_a), ch);
 }
 
-void Molecule::check_connect()
+void MoleculeSAM::check_connect()
 {
   bool all_con = false;
   int maxct = 20;
@@ -328,7 +328,7 @@ void Molecule::check_connect()
 
 }
 
-vector<int> Molecule::find_neighbors( int i )
+vector<int> MoleculeSAM::find_neighbors( int i )
 {
   int j;
   double sum_rad2;
@@ -346,17 +346,17 @@ vector<int> Molecule::find_neighbors( int i )
 }
 
 
-System::System(vector<shared_ptr<Molecule> > mols, double cutoff,
+System::System(vector<shared_ptr<MoleculeSAM> > mols, double cutoff,
                double boxlength)
-:molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
+:MoleculeSAMs_(mols), N_((int) mols.size()), cutoff_(cutoff),
 boxLength_(boxlength), t_(0)
 {
   int i, j, k, maxi = 0;
   vector<int> maxj, keys(2);
   for ( k = 0; k < N_; k++)
   {
-    i = molecules_[k]->get_type();
-    j = molecules_[k]->get_type_idx();
+    i = MoleculeSAMs_[k]->get_type();
+    j = MoleculeSAMs_[k]->get_type_idx();
     keys = {i,j};
     typeIdxToIdx_[keys] = k;
     maxi = ( maxi > i ) ? maxi : i;
@@ -383,23 +383,23 @@ boxLength_(boxlength), t_(0)
 System::System(Setup setup, double cutoff)
 :t_(0), ntype_(setup.getNType()), typect_(setup.get_type_nct())
 {
-  vector<shared_ptr<Molecule> > mols;
+  vector<shared_ptr<MoleculeSAM> > mols;
   int i, j, k=0;
   string pqrpath;
-  shared_ptr<Molecule> mol;
+  shared_ptr<MoleculeSAM> mol;
   vector<int> keys(2);
   for (i = 0; i < setup.getNType(); i++)
   {
     
-    // First a build a representative molecule of this type (which will
+    // First a build a representative MoleculeSAM of this type (which will
     // be repositioned below
     PQRFile pqrI (setup.getTypeNPQR(i));
-    shared_ptr<Molecule> type_mol;
+    shared_ptr<MoleculeSAM> type_mol;
     if (pqrI.get_Ns() == 0)
     {
       clock_t t3 = clock();
       MSMSFile surf_file (setup.getTypeNSurf(i));
-      type_mol = make_shared<Molecule> (i, 0, setup.getTypeNDef(i),
+      type_mol = make_shared<MoleculeSAM> (i, 0, setup.getTypeNDef(i),
                                         pqrI.get_charges(),
                                         pqrI.get_atom_pts(), pqrI.get_radii(),
                                         surf_file.get_sp(), surf_file.get_np(),
@@ -412,7 +412,7 @@ System::System(Setup setup, double cutoff)
     }
     else
     {
-      type_mol = make_shared<Molecule>(i, -1, setup.getTypeNDef(i),
+      type_mol = make_shared<MoleculeSAM>(i, -1, setup.getTypeNDef(i),
                                        pqrI.get_charges(),
                                        pqrI.get_atom_pts(),
                                        pqrI.get_radii(),
@@ -434,10 +434,10 @@ System::System(Setup setup, double cutoff)
     
     for (j = 0; j < setup.getTypeNCount(i); j++)
     {
-      // now copy the representative molecule and reposition it
+      // now copy the representative MoleculeSAM and reposition it
       Pt trans;
       MyMatrix<double> rot;
-      shared_ptr<Molecule> mol (type_mol);
+      shared_ptr<MoleculeSAM> mol (type_mol);
       mol->set_type_idx(j);
       
       Pt com = pqrI.get_center_geo();
@@ -459,15 +459,15 @@ System::System(Setup setup, double cutoff)
       mol->rotate(rot);
       mol->translate(trans, setup.getBLen());
       
-      molecules_.push_back(mol);
+      MoleculeSAMs_.push_back(mol);
       typeIdxToIdx_[keys] = k;
       k++;
     } // end j
     
     if (pqrI.get_Ns() == 0)
-      write_to_pqr(setup.getTypeNPQR(i)+"cg", (int) molecules_.size()-1);
+      write_to_pqr(setup.getTypeNPQR(i)+"cg", (int) MoleculeSAMs_.size()-1);
   } // end i
-  N_ = (int) molecules_.size();
+  N_ = (int) MoleculeSAMs_.size();
   boxLength_ = setup.getBLen();
   cutoff_ = cutoff;
   
@@ -509,25 +509,25 @@ double System::calc_min_dist(int I, int J)
   int k1, k2;
   double dist(__DBL_MAX__), inter_act_d(100.), inter_pol_d(10.), c2c, aik, ajk;
   Pt cen_ik, cen_jk;
-  for (k1 = 0; k1 < molecules_[I]->get_ns(); k1++)
+  for (k1 = 0; k1 < MoleculeSAMs_[I]->get_ns(); k1++)
   {
-    for (k2 = 0; k2 < molecules_[J]->get_ns(); k2++)
+    for (k2 = 0; k2 < MoleculeSAMs_[J]->get_ns(); k2++)
     {
-      cen_ik = molecules_[I]->get_centerk(k1);
-      cen_jk = molecules_[J]->get_centerk(k2);
-      aik = molecules_[I]->get_ak(k1);
-      ajk = molecules_[J]->get_ak(k2);
+      cen_ik = MoleculeSAMs_[I]->get_centerk(k1);
+      cen_jk = MoleculeSAMs_[J]->get_centerk(k2);
+      aik = MoleculeSAMs_[I]->get_ak(k1);
+      ajk = MoleculeSAMs_[J]->get_ak(k2);
       c2c = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
 //      cout << "This is Ik, Jl pair : "  << I << ", "<< k1
 //                << " & "  << J << ", "<< k2 << " dist: " << c2c << endl;
       if ((inter_pol_d+aik+ajk) > c2c)
       {
-        molecules_[I]->add_Jl_to_interk(k1, J, k2);
-        molecules_[J]->add_Jl_to_interk(k2, I, k1);
+        MoleculeSAMs_[I]->add_Jl_to_interk(k1, J, k2);
+        MoleculeSAMs_[J]->add_Jl_to_interk(k2, I, k1);
       } else if ((inter_act_d+aik+ajk) > c2c)
       {
-        molecules_[I]->add_Jl_to_inter_act_k(k1, J, k2);
-        molecules_[J]->add_Jl_to_inter_act_k(k2, I, k1);
+        MoleculeSAMs_[I]->add_Jl_to_inter_act_k(k1, J, k2);
+        MoleculeSAMs_[J]->add_Jl_to_inter_act_k(k2, I, k1);
       }
       if (dist > (c2c-aik-ajk)) dist = c2c-aik-ajk;
     }
@@ -556,17 +556,17 @@ void System::check_for_overlap()
   {
     for (j = i+1; j < N_; j++)
     {
-      for (k1 = 0; k1 < molecules_[i]->get_ns(); k1++)
+      for (k1 = 0; k1 < MoleculeSAMs_[i]->get_ns(); k1++)
       {
-        for (k2 = 0; k2 < molecules_[j]->get_ns(); k2++)
+        for (k2 = 0; k2 < MoleculeSAMs_[j]->get_ns(); k2++)
         {
-          aik = molecules_[i]->get_ak(k1);
-          ajk = molecules_[j]->get_ak(k2);
-          cen_ik = molecules_[i]->get_centerk(k1);
-          cen_jk = molecules_[j]->get_centerk(k2);
+          aik = MoleculeSAMs_[i]->get_ak(k1);
+          ajk = MoleculeSAMs_[j]->get_ak(k2);
+          cen_ik = MoleculeSAMs_[i]->get_centerk(k1);
+          cen_jk = MoleculeSAMs_[j]->get_centerk(k2);
           dist = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
           if (dist < (aik + ajk))
-            throw OverlappingMoleculeException(i, j);
+            throw OverlappingMoleculeSAMException(i, j);
         }
       }
     }

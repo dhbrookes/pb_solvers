@@ -66,7 +66,7 @@ void printPBAMStruct( PBAMInput pbamIn );
 
 #ifdef PBAM_APBS
 PBAMOutput runPBAMWrapAPBS( PBAMInput pbamIn,
-	                          Valist* molecules[], int nmls );
+	                          Valist* MoleculeAMs[], int nmls );
 #endif //PBAM_APBS
 
 PBAMOutput runPBAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],

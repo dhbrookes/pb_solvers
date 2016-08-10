@@ -43,7 +43,7 @@ protected:
   
   string  units_; // the units desired for output
   int     ompThreads_;
-  int     nType_;  		// Number of different molecule types
+  int     nType_;  		// Number of different MoleculeSAMAM types
   int     PBCs_;			// PBC in 0, pseudo-2, or 3 dimensions
   int     maxtime_;
   int     ntraj_;
@@ -52,7 +52,7 @@ protected:
   double  saltConc_;
   double  blen_; 		// boxlength for PBC
   double  idiel_;
-  double  sdiel_;  // dielectric constant win molecule and of solvent
+  double  sdiel_;  // dielectric constant win MoleculeSAMAM and of solvent
   double  iKbT_;
   double  temp_;
   double  kappa_;
@@ -79,7 +79,7 @@ protected:
                                     //conditions
   vector<double>        conpads_;   // pads for contact termination conditions
   vector<double>        termvals_;  // value for each termination condition
-  vector<vector<int> >  termmols_;  // vector of molecule ids
+  vector<vector<int> >  termmols_;  // vector of MoleculeSAMAM ids
   bool                  andCombine_;  //if true, term conds will
                                       //combine w/ 'and', otherwise 'or'
   

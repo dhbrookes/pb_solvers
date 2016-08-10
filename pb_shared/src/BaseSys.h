@@ -15,20 +15,20 @@
 
 using namespace std;
 /*
- Base class for storing relevant data about each molecule
+ Base class for storing relevant data about each MoleculeAM
  */
 class BaseMolecule
 {
 protected:
   string              moveType_;
-  int                 type_; // int index of type of molecule, 0 based
+  int                 type_; // int index of type of MoleculeAM, 0 based
   int                 typeIdx_; // int index of mol within given type_, 0 based
   double              drot_;  // rotational diffusion coefficient
   double              dtrans_; // translational diffusion coefficients
-  int                 Nc_;  // number of charges in this molecule
+  int                 Nc_;  // number of charges in this MoleculeAM
   
-  vector<double>      qs_;  // magnitude of each charge in the molecule
-  vector<Pt>          pos_;  // position of each charge in the molecule
+  vector<double>      qs_;  // magnitude of each charge in the MoleculeAM
+  vector<Pt>          pos_;  // position of each charge in the MoleculeAM
   vector<double>      vdwr_; // van der waal radius of each charge
   
   int                 Ns_;  // number of coarse grained spheres
@@ -40,7 +40,7 @@ protected:
 public:
   
   BaseMolecule()  { }
-//  BaseMolecule(const BaseMolecule& mol);
+//  BaseMoleculeAM(const BaseMoleculeAM& mol);
   
   // no centers or raddi of cg spheres
   BaseMolecule(int type, int type_idx, string movetype, vector<double> qs,

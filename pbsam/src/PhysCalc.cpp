@@ -90,7 +90,7 @@ void ForceCalc::calc_all_f(vector<shared_ptr<HMatrix> > H,
   }
 }
 
-//Ptx ForceCalc::calc_fp(Pt P, shared_ptr<Molecule> mol,
+//Ptx ForceCalc::calc_fp(Pt P, shared_ptr<MoleculeSAM> mol,
 //                       shared_ptr<HMatrix> H,
 //                       shared_ptr<LHNMatrix> LHN,
 //                       shared_ptr<GradHMatrix> dH,
@@ -130,11 +130,11 @@ void TorqueCalc::calc_all_tau(shared_ptr<System> sys,
   for (int i = 0; i < I_; i++)
   {
     //    cout << "This is i " << i << endl;
-    torques_[i] = calc_tauI(i, sys->get_molecule(i), fcalc);
+    torques_[i] = calc_tauI(i, sys->get_MoleculeSAM(i), fcalc);
   }
 }
 
-Pt TorqueCalc::calc_tauI(int i, shared_ptr<Molecule> mol,
+Pt TorqueCalc::calc_tauI(int i, shared_ptr<MoleculeSAM> mol,
                          shared_ptr<ForceCalc> fcalc)
 {
   Pt ck, rpk, fp, tauI, tau1;

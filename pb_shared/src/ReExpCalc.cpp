@@ -137,8 +137,8 @@ prefacSing_(2*p, MyMatrix<double>(p, 2))
   {
     s_prefac_[0] = kappa[1] * kappa[1] * lam_sam_[0] * lam_sam_[1]; //kpio
     s_prefac_[1] = kappa[1] * kappa[1] * lam_sam_[1] * lam_sam_[1]; // kpoo
-    // checking whether we are transforming between molecules or not
-    // if Xform between spheres on same molecule, kap[0] = 0 and kap[1] = whtevr
+    // checking whether we are transforming between MoleculeSAMAMs or not
+    // if Xform between spheres on same MoleculeSAMAM, kap[0] = 0 and kap[1] = whtevr
     if (fabs(kappa[0]) < 1e-10) kappa_extern_ = kappa[1];
   }
   

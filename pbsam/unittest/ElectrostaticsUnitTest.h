@@ -32,9 +32,9 @@ TEST_F(ElectroUTest, one_mol_test)
 {
   int pol(3), nmol(1);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
-  vector<shared_ptr<Molecule> > mols;
+  vector<shared_ptr<MoleculeSAM> > mols;
   for (int i=0; i<nmol; i++)
-    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+    mols.push_back(make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
                                          pqr.get_atom_pts(), pqr.get_radii(),
                                          pqr.get_cg_centers(),
                                          pqr.get_cg_radii()));
@@ -55,7 +55,7 @@ TEST_F(ElectroUTest, one_mol_test)
   
   // Generate surface integrals
   for (int i=0; i<nmol; i++)
-    IEMatrix ieMatTest(0, sys->get_molecule(i),
+    IEMatrix ieMatTest(0, sys->get_MoleculeSAM(i),
                        SHCalcTest, pol, _expcons, true, 0, true);
   
   string istart = test_dir_loc + "imat_test/imat.sp";
@@ -113,9 +113,9 @@ TEST_F(ElectroUTest, three_mol_test)
 {
   int pol(3), nmol(3);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
-  vector<shared_ptr<Molecule> > mols;
+  vector<shared_ptr<MoleculeSAM> > mols;
   for (int i=0; i<nmol; i++)
-    mols.push_back(make_shared<Molecule>(0, 0, "stat", pqr.get_charges(),
+    mols.push_back(make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
                                          pqr.get_atom_pts(), pqr.get_radii(),
                                          pqr.get_cg_centers(),
                                          pqr.get_cg_radii()));
@@ -139,7 +139,7 @@ TEST_F(ElectroUTest, three_mol_test)
   
   // Generate surface integrals
   for (int i=0; i<nmol; i++)
-    IEMatrix ieMatTest(0, sys->get_molecule(i),
+    IEMatrix ieMatTest(0, sys->get_MoleculeSAM(i),
                        SHCalcTest, pol, _expcons, true, 0, true);
   
   string istart = test_dir_loc + "imat_test/imat.sp";

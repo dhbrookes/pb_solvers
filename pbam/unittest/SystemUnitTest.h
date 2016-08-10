@@ -11,7 +11,7 @@
 
 #include "System.h"
 
-class MoleculeUTest : public ::testing::Test
+class MoleculeAMUTest : public ::testing::Test
 {
 public :
   
@@ -21,7 +21,7 @@ protected :
 };
 
 
-TEST_F(MoleculeUTest, checkUserSpecRadCent)
+TEST_F(MoleculeAMUTest, checkUserSpecRadCent)
 {
   Pt pos(0.0,0.0,-5.0);
   int M = 3; vector<double> charges(M); vector<double> vdW(M);
@@ -30,7 +30,7 @@ TEST_F(MoleculeUTest, checkUserSpecRadCent)
   charges[1]=2.0; vdW[1]=0; posCharges[1] = pos + Pt(1.0, 0.0, 0.0);
   charges[2]=2.0; vdW[2]=0; posCharges[2] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos, 0, 0);
+  MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos, 0, 0);
   
   ASSERT_EQ(      3, molNew.get_m());
   ASSERT_EQ(    2.0, molNew.get_a());
@@ -61,7 +61,7 @@ TEST_F(MoleculeUTest, checkUserSpecRadCent)
 }
 
 
-TEST_F(MoleculeUTest, checkUserSpecRad)
+TEST_F(MoleculeAMUTest, checkUserSpecRad)
 {
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
@@ -69,7 +69,7 @@ TEST_F(MoleculeUTest, checkUserSpecRad)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "move", 13.7, charges, posCharges, vdW,  0, 0, 0.04, 0.34);
+  MoleculeAM molNew( "move", 13.7, charges, posCharges, vdW,  0, 0, 0.04, 0.34);
   
   ASSERT_EQ(      2, molNew.get_m());
   ASSERT_EQ(   13.7, molNew.get_a());
@@ -98,7 +98,7 @@ TEST_F(MoleculeUTest, checkUserSpecRad)
   ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
 }
 
-TEST_F(MoleculeUTest, checkUserSpecCent)
+TEST_F(MoleculeAMUTest, checkUserSpecCent)
 {
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
@@ -106,7 +106,7 @@ TEST_F(MoleculeUTest, checkUserSpecCent)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
+  MoleculeAM molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
   
   ASSERT_EQ(    2, molNew.get_m());
   ASSERT_EQ("rot", molNew.get_move_type());
@@ -135,7 +135,7 @@ TEST_F(MoleculeUTest, checkUserSpecCent)
   ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
 }
 
-TEST_F(MoleculeUTest, checkCreateCen)
+TEST_F(MoleculeAMUTest, checkCreateCen)
 {
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
@@ -143,7 +143,7 @@ TEST_F(MoleculeUTest, checkCreateCen)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, 0, 0, 0.24);
+  MoleculeAM molNew( "rot", charges, posCharges, vdW, 0, 0, 0.24);
   
   ASSERT_EQ(    2, molNew.get_m());
   ASSERT_EQ("rot", molNew.get_move_type());
@@ -172,7 +172,7 @@ TEST_F(MoleculeUTest, checkCreateCen)
   ASSERT_EQ( -8.7, molNew.get_posj_realspace(1).z());
 }
 
-TEST_F(MoleculeUTest, translate)
+TEST_F(MoleculeAMUTest, translate)
 {
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
@@ -180,7 +180,7 @@ TEST_F(MoleculeUTest, translate)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, 0, 0, 0.24);
+  MoleculeAM molNew( "rot", charges, posCharges, vdW, 0, 0, 0.24);
   molNew.translate( Pt( 3.0, -4.5, 10.21), 1e48);
   
   EXPECT_NEAR( -6.5, molNew.get_center().x(), preclim);
@@ -204,7 +204,7 @@ TEST_F(MoleculeUTest, translate)
   EXPECT_NEAR( 1.51, molNew.get_posj_realspace(1).z(), preclim);
 }
 
-TEST_F(MoleculeUTest, rotateSimple)
+TEST_F(MoleculeAMUTest, rotateSimple)
 {
   Pt pos( 0.0, 0.0, 0.0);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
@@ -212,7 +212,7 @@ TEST_F(MoleculeUTest, rotateSimple)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
+  MoleculeAM molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
   molNew.rotate( Quat( M_PI/2, Pt(0.0, 0.0, 1.0)));
   
   ASSERT_EQ( 0.0, molNew.get_center().x());
@@ -238,7 +238,7 @@ TEST_F(MoleculeUTest, rotateSimple)
   EXPECT_NEAR(  0.0, molNew.get_posj_realspace(1).z(), preclim);
 }
 
-TEST_F(MoleculeUTest, rotate2)
+TEST_F(MoleculeAMUTest, rotate2)
 {
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
@@ -246,7 +246,7 @@ TEST_F(MoleculeUTest, rotate2)
   charges[0]=2.0; vdW[0]=3.73; posCharges[0] = pos + Pt(1.0, 0.0, 0.0);
   charges[1]=2.0; vdW[1]=6.32; posCharges[1] = pos + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
+  MoleculeAM molNew( "rot", charges, posCharges, vdW, pos, 0, 0, 0.24);
   molNew.rotate( Quat( 1.0, Pt(1.0, 1.0, 1.0)));
   
   ASSERT_EQ(-10.0, molNew.get_center().x());
@@ -284,7 +284,7 @@ protected :
 
 TEST_F(SystemUTest, checkOverlap)
 {
-  vector < Molecule > mol_;
+  vector < MoleculeAM > mol_;
   Pt pos[2] = { Pt( 0.0, 0.0, -5.0), Pt( 0.0, 0.0, 0.0)};
   double rad[2] = { 5.0, 3.7 };
   for (int molInd = 0; molInd < 2; molInd ++ )
@@ -295,7 +295,7 @@ TEST_F(SystemUTest, checkOverlap)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -305,17 +305,17 @@ TEST_F(SystemUTest, checkOverlap)
     System sys( mol_ );
     FAIL();
   }
-  catch( const OverlappingMoleculeException& err )
+  catch( const OverlappingMoleculeAMException& err )
   {
     // check exception
-    string error_exp = "Molecule 0 & 1 overlap";
+    string error_exp = "MoleculeAM 0 & 1 overlap";
     EXPECT_EQ(string(err.what()), error_exp);
   }
 }
 
 TEST_F(SystemUTest, checkPBCOverlap)
 {
-  vector < Molecule > mol_; const int nMol = 3;
+  vector < MoleculeAM > mol_; const int nMol = 3;
   Pt pos[nMol] = { Pt( 0.0, 0.0, -5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
   for (int molInd = 0; molInd < nMol; molInd ++ )
   {
@@ -325,7 +325,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
     chg[1]=2.0; vdW[1]=0.1; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0.1; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", chg, poschg, vdW, pos[molInd], molInd, 0);
+    MoleculeAM molNew( "stat", chg, poschg, vdW, pos[molInd], molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -334,17 +334,17 @@ TEST_F(SystemUTest, checkPBCOverlap)
     System sys( mol_, 20.0, 10.0 );
     FAIL();
   }
-  catch( const OverlappingMoleculeException& err )
+  catch( const OverlappingMoleculeAMException& err )
   {
     // check exception
-    string error_exp = "Molecule 0 & 1 overlap";
+    string error_exp = "MoleculeAM 0 & 1 overlap";
     EXPECT_EQ(string(err.what()), error_exp);
   }
 }
 
 TEST_F(SystemUTest, checkVals)
 {
-  vector < Molecule > mol_;
+  vector < MoleculeAM > mol_;
   double cutoff = 45.876;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
   double rad[3] = { 5.0, 3.7, 8.6 };
@@ -356,7 +356,7 @@ TEST_F(SystemUTest, checkVals)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -400,7 +400,7 @@ TEST_F(SystemUTest, checkVals)
 
 TEST_F(SystemUTest, changeCutoff)
 {
-  vector < Molecule > mol_;
+  vector < MoleculeAM > mol_;
   double cutoff = 45.876;
   double boxl   = 55.876;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,17.8,15.0) };
@@ -413,7 +413,7 @@ TEST_F(SystemUTest, changeCutoff)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -425,7 +425,7 @@ TEST_F(SystemUTest, changeCutoff)
 
 TEST_F(SystemUTest, PBCcheck)
 {
-  vector < Molecule > mol_;
+  vector < MoleculeAM > mol_;
   double cutoff =  5.00;
   double boxl   = 20.00;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,17.8,15.0) };
@@ -438,7 +438,7 @@ TEST_F(SystemUTest, PBCcheck)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "rot", rad[molInd], chg, poschg, vdW, pos[molInd],
+    MoleculeAM molNew( "rot", rad[molInd], chg, poschg, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }

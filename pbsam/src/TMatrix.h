@@ -46,7 +46,7 @@ protected:
   shared_ptr<System>      _system_;
   
   int         Nmol_;
-  vector<int> Nsi_; // number of spheres in each molecule
+  vector<int> Nsi_; // number of spheres in each MoleculeSAM
   
   
   // inner functions for re-expansion

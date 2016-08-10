@@ -9,7 +9,7 @@
 #include "System.h"
 
 // user specified radius and center
-Molecule::Molecule(string movetype, double a, vector<double> qs, vector<Pt> pos,
+MoleculeAM::MoleculeAM(string movetype, double a, vector<double> qs, vector<Pt> pos,
                    vector<double> vdwr, Pt cen, int type, int typeIdx,
                    double drot, double dtrans)
 :BaseMolecule(type, typeIdx, movetype, qs, pos, vdwr, cen, a, drot, dtrans),
@@ -20,7 +20,7 @@ unwrappedCenter_(cen)
 }
 
 // user specified radius
-Molecule::Molecule(string movetype, double a, vector<double> qs,
+MoleculeAM::MoleculeAM(string movetype, double a, vector<double> qs,
                    vector<Pt> pos, vector<double> vdwr, int type, int typeIdx,
                    double drot, double dtrans)
 :BaseMolecule(type, typeIdx, movetype, qs, pos, vdwr, drot, dtrans)
@@ -34,7 +34,7 @@ Molecule::Molecule(string movetype, double a, vector<double> qs,
 }
 
 // user specified center
-Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
+MoleculeAM::MoleculeAM(string movetype, vector<double> qs, vector<Pt> pos,
                    vector<double> vdwr, Pt cen, int type, int typeIdx,
                    double drot, double dtrans)
 :BaseMolecule(type, typeIdx, movetype, qs, pos, vdwr, drot, dtrans)
@@ -48,7 +48,7 @@ Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
 }
 
 // neither the center or radius are specified
-Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
+MoleculeAM::MoleculeAM(string movetype, vector<double> qs, vector<Pt> pos,
                    vector<double> vdwr,  int type, int typeIdx,
                    double drot, double dtrans)
 :BaseMolecule(type, typeIdx, movetype, qs, pos, vdwr, drot, dtrans)
@@ -59,9 +59,9 @@ Molecule::Molecule(string movetype, vector<double> qs, vector<Pt> pos,
   reposition_charges();
 }
 
-Pt Molecule::calc_center()
+Pt MoleculeAM::calc_center()
 {
-  // calculate the center of the molecule (for now using center):
+  // calculate the center of the MoleculeAM (for now using center):
   double xc, yc, zc;
   xc = 0;
   yc = 0;
@@ -81,7 +81,7 @@ Pt Molecule::calc_center()
   return center;
 }
 
-double Molecule::calc_a()
+double MoleculeAM::calc_a()
 {
   double a = 0;
   double dist;
@@ -93,7 +93,7 @@ double Molecule::calc_a()
   return a;
 }
 
-void Molecule::reposition_charges()
+void MoleculeAM::reposition_charges()
 {
   bool recalc_a = false;
   // repositioning the charges WRT center of charge
@@ -108,7 +108,7 @@ void Molecule::reposition_charges()
   if (recalc_a) as_[0] = calc_a();
 }
 
-void Molecule::translate(Pt dr, double boxlen)
+void MoleculeAM::translate(Pt dr, double boxlen)
 {
   Pt dv  = centers_[0] + dr;
   
@@ -118,7 +118,7 @@ void Molecule::translate(Pt dr, double boxlen)
             dv.z() - round(dv.z()/boxlen)*boxlen);
 }
 
-void Molecule::rotate(Quat qrot)
+void MoleculeAM::rotate(Quat qrot)
 {
   for (int i = 0; i < Nc_; i++)
   {
@@ -127,7 +127,7 @@ void Molecule::rotate(Quat qrot)
 }
 
 
-void Molecule::rotate(MyMatrix<double> rotmat)
+void MoleculeAM::rotate(MyMatrix<double> rotmat)
 {
   for (int i = 0; i < Nc_; i++)
   {
@@ -135,17 +135,17 @@ void Molecule::rotate(MyMatrix<double> rotmat)
   }
 }
 
-System::System(const vector<Molecule>& mols, double cutoff,
+System::System(const vector<MoleculeAM>& mols, double cutoff,
                double boxlength)
-:molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
+:MoleculeAMs_(mols), N_((int) mols.size()), cutoff_(cutoff),
 boxLength_(boxlength), t_(0)
 {
   int i, j, k, maxi = 0;
   vector<int> maxj, keys(2);
   for ( k = 0; k < N_; k++)
   {
-    i = molecules_[k].get_type();
-    j = molecules_[k].get_type_idx();
+    i = MoleculeAMs_[k].get_type();
+    j = MoleculeAMs_[k].get_type_idx();
     keys = {i,j};
     typeIdxToIdx_[keys] = k;
     maxi = ( maxi > i ) ? maxi : i;
@@ -168,10 +168,10 @@ boxLength_(boxlength), t_(0)
 System::System(Setup setup, double cutoff)
 :t_(0), ntype_(setup.getNType()), typect_(setup.get_type_nct())
 {
-  vector<Molecule> mols;
+  vector<MoleculeAM> mols;
   int chg, i, j, k=0;
   string pqrpath;
-  Molecule mol;
+  MoleculeAM mol;
   vector<int> keys(2);
   for (i = 0; i < setup.getNType(); i++)
   { 
@@ -218,31 +218,31 @@ System::System(Setup setup, double cutoff)
       
       if (pqrI.get_Ns() != 0)  // coarse graining is in pqr
       {
-        mol  = Molecule(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
+        mol  = MoleculeAM(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
                         pqrI.get_charges(), repos_charges,
                         pqrI.get_radii(), xyzI.get_pts()[j], i, j,
                         setup.getDrot(i), setup.getDtr(i));
       }
       else if (! setup.getTypeIsTransRot(i))
       {
-        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
+        mol = MoleculeAM(setup.getTypeNDef(i), pqrI.get_charges(),
                        repos_charges, pqrI.get_radii(),
                        xyzI.get_pts()[j], i, j,
                        setup.getDrot(i), setup.getDtr(i));
       }
       else
       {
-        mol = Molecule(setup.getTypeNDef(i), pqrI.get_charges(),
+        mol = MoleculeAM(setup.getTypeNDef(i), pqrI.get_charges(),
                        repos_charges, pqrI.get_radii(), i, j,
                        setup.getDrot(i), setup.getDtr(i));
       }
       
-      molecules_.push_back(mol);
+      MoleculeAMs_.push_back(mol);
       typeIdxToIdx_[keys] = k;
       k++;
     } // end j
   } // end i
-  N_ = (int) molecules_.size();
+  N_ = (int) MoleculeAMs_.size();
   boxLength_ = setup.getBLen();
   cutoff_ = cutoff;
   
@@ -277,14 +277,14 @@ void System::check_for_overlap()
   double dist, ai, aj;
   for (i = 0; i < N_; i++)
   {
-    ai = molecules_[i].get_a();
+    ai = MoleculeAMs_[i].get_a();
     for (j = i+1; j < N_; j++)
     {
-      aj = molecules_[j].get_a();
+      aj = MoleculeAMs_[j].get_a();
       dist = get_pbc_dist_vec(i, j).norm();
       if (dist < (ai + aj))
       {
-        throw OverlappingMoleculeException(i, j);
+        throw OverlappingMoleculeAMException(i, j);
       }
     }
   }
@@ -312,7 +312,7 @@ vector<Pt> System::get_allcenter() const
 {
   vector< Pt> mol_cen(N_);
   for ( int i = 0; i < N_; i++)
-    mol_cen[i] = molecules_[i].get_center();
+    mol_cen[i] = MoleculeAMs_[i].get_center();
   
   return mol_cen;
 }
@@ -335,7 +335,7 @@ void System::reset_positions( vector<string> xyzfiles )
       keys = { i, j};
       k = typeIdxToIdx_[keys];
       Pt dist_to_new = get_centeri(k) - xyzI.get_pts()[j];
-      molecules_[k].translate(dist_to_new*-1, boxLength_);
+      MoleculeAMs_[k].translate(dist_to_new*-1, boxLength_);
     }
   }
   

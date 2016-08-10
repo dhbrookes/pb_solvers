@@ -15,7 +15,7 @@
 
 
 /*
- Class for calculating interaction energy of a molecule given H^(I,k)
+ Class for calculating interaction energy of a MoleculeSAM given H^(I,k)
  and LHN^(I,k) matrices
  */
 class EnergyCalc
@@ -37,7 +37,7 @@ protected:
   shared_ptr<BesselCalc> bcalc_;
   
   vector<vector<Pt> > forces_;
-  int I_; // number of molecules in the system
+  int I_; // number of MoleculeSAMs in the system
   vector<int> ks_;
   
   double eps_s_;
@@ -48,7 +48,7 @@ public:
   :shcalc_(shcalc), bcalc_(bcalc), forces_(I), I_(I), ks_(ki), eps_s_(es)  { }
   
   /*
-   Calculate translational force on a molecule given dI_LHN^(I,k), H^(I,k),
+   Calculate translational force on a MoleculeSAM given dI_LHN^(I,k), H^(I,k),
    LHN^(I,k) and dI_H^(I,k)
    */
   void calc_fI(int I, shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
@@ -60,7 +60,7 @@ public:
                   vector<vector<shared_ptr<GradLHNMatrix> > > dLHN);
   
   //calc force at a point
-  Ptx calc_fp(Pt P, shared_ptr<Molecule> mol,
+  Ptx calc_fp(Pt P, shared_ptr<MoleculeSAM> mol,
               shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
               shared_ptr<GradHMatrix> dH, shared_ptr<GradLHNMatrix> dLHN);
   
@@ -82,13 +82,13 @@ class TorqueCalc
 {
 protected:
   vector<Pt> torques_;
-  int I_; // number of molecules in the system
+  int I_; // number of MoleculeSAMs in the system
   
 public:
   TorqueCalc(int I) :  torques_(I), I_(I)  { }
   
   void calc_all_tau(shared_ptr<System> sys, shared_ptr<ForceCalc> fcalc);
-  Pt calc_tauI(int i, shared_ptr<Molecule> mol, shared_ptr<ForceCalc> fcalc);
+  Pt calc_tauI(int i, shared_ptr<MoleculeSAM> mol, shared_ptr<ForceCalc> fcalc);
   
   Pt cross_prod(Pt a, Pt b);
   

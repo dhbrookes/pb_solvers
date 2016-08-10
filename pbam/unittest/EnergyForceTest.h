@@ -18,8 +18,8 @@ class EnForTest
   void RunEnForTest()
   {
     shared_ptr<Constants> const_ = make_shared<Constants>();
-    vector< Molecule > mol_;
-    vector< Molecule > mol_sing_;
+    vector< MoleculeAM > mol_;
+    vector< MoleculeAM > mol_sing_;
     
     mol_.clear( );
     Pt pos[2]     = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
@@ -36,12 +36,12 @@ class EnForTest
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0] = cg[molInd]; posCharges[0] = cgPos[molInd]; vdW[0] = 0.0;
       
-      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
-      Molecule molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      MoleculeAM molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
     

@@ -43,12 +43,12 @@ kappa_(_consts->get_kappa())
                               _bCalc_, _reExConsts_);
   
   _expConsts_ = make_shared<ExpansionConstants>(p_);
-  shared_ptr<Molecule> _mol;
+  shared_ptr<MoleculeSAM> _mol;
   // intialize all matrices
   for (int I = 0; I < _sys_->get_n(); I++)
   {
     Ns_tot_ += _sys_->get_Ns_i(I);
-    _mol = _sys_->get_molecule(I);
+    _mol = _sys_->get_MoleculeSAM(I);
     
     dev_sph_Ik_[I].resize(_mol->get_ns());
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
@@ -159,7 +159,7 @@ void Solver::iter_innerH(int I, int k)
   double dev(1e20), toli(1e-6);
   int ct(0), mxCt(20);
   
-  auto mol = _sys_->get_molecule(I);
+  auto mol = _sys_->get_MoleculeSAM(I);
   while ( dev > toli && ct < mxCt )
   {
     _F_[I]->calc_vals(mol,_F_[I],_XF_[I],_H_[I],_IE_[I],_bCalc_,k,kappa_);
@@ -177,10 +177,10 @@ void Solver::step(int t, int I, int k)
   // Do full step for spol and for mpol at t > 0
   if ((_sys_->get_n() == 1) || (t > 0))
   {
-    _LH_[I]->init(_sys_->get_molecule(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
+    _LH_[I]->init(_sys_->get_MoleculeSAM(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
     _LH_[I]->calc_vals(_T_, _H_[I], k);
     
-    _LF_[I]->init(_sys_->get_molecule(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
+    _LF_[I]->init(_sys_->get_MoleculeSAM(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
     _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
     
     if (_sys_->get_n()>1)
@@ -189,9 +189,9 @@ void Solver::step(int t, int I, int k)
       _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
   }
   
-  _XF_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_,
+  _XF_[I]->calc_vals(_sys_->get_MoleculeSAM(I), _bCalc_,
                      _LH_[I], _LF_[I], _LHN_[I], kappa_, k);
-  _XH_[I]->calc_vals(_sys_->get_molecule(I), _bCalc_, _LH_[I],
+  _XH_[I]->calc_vals(_sys_->get_MoleculeSAM(I), _bCalc_, _LH_[I],
                      _LF_[I], _LHN_[I], kappa_, k);
 }
 
@@ -204,7 +204,7 @@ double Solver::iter(int t)
   if ((_sys_->get_n()>1) && (t==0)) // For 1st step of mpol
     for (int I = 0; I < _sys_->get_n(); I++)
     {
-      auto molI = _sys_->get_molecule(I);
+      auto molI = _sys_->get_MoleculeSAM(I);
       for (int k = 0; k < _sys_->get_Ns_i(I); k++)
       {
         _LH_[I]->init(molI,_H_[I],_shCalc_,_bCalc_,_expConsts_);
@@ -376,7 +376,7 @@ gradT_A_(_sys->get_n(), vector<shared_ptr<GradCmplxMolMat> > (_sys->get_n()))
   dF_.reserve(_sys_->get_n());
   for (int I = 0; I < _sys_->get_n(); I++) // With respect to
   {
-    for (int J = 0; J < _sys_->get_n(); J++) // molecule
+    for (int J = 0; J < _sys_->get_n(); J++) // MoleculeSAM
     {
       dF_[I][J] = make_shared<GradFMatrix> (J, I, _sys_->get_Ns_i(I), p_);
       dWF_[I][J] = make_shared<GradWFMatrix> (J, I, _sys_->get_Ns_i(I), p_,
@@ -464,7 +464,7 @@ double GradSolver::iter(int t, int wrt)
   double inter_pol_d(10.), mu_mpol(0);
   Ns_tot_ = 0;
   
-  shared_ptr<Molecule> molI;
+  shared_ptr<MoleculeSAM> molI;
   vector<double> besseli, besselk;
   vector<int> mol_loop;
   
@@ -477,7 +477,7 @@ double GradSolver::iter(int t, int wrt)
   for (int ind = 0; ind < mol_loop.size(); ind++)
   {
     int I = mol_loop[ind];
-    molI = _sys_->get_molecule(I);
+    molI = _sys_->get_MoleculeSAM(I);
     if ((_sys_->get_min_dist(wrt, I) > inter_pol_d) && (I != wrt)) continue;
     
     dLHN_[wrt][I]->calc_all_vals(_sys_, _T_, gradT_A_[wrt], dH_[wrt]);
@@ -485,7 +485,7 @@ double GradSolver::iter(int t, int wrt)
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
       if (interpol_[I][k] != 0) continue;
-      if (!_sys_->get_molecule(I)->is_J_in_interk(k, wrt) && (I != wrt))
+      if (!_sys_->get_MoleculeSAM(I)->is_J_in_interk(k, wrt) && (I != wrt))
         continue;
       
 //      cout << "This is " << I << " sph " << k << " wrt " << wrt << endl;
@@ -514,7 +514,7 @@ double GradSolver::iter(int t, int wrt)
 void GradSolver::step(int t, int I, int wrt, int k, vector<double> &besseli,
                       vector<double> &besselk)
 {
-  shared_ptr<Molecule> molI = _sys_->get_molecule(I);
+  shared_ptr<MoleculeSAM> molI = _sys_->get_MoleculeSAM(I);
   dLF_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dF_[wrt][I]);
   dLH_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dH_[wrt][I]);
   
@@ -532,7 +532,7 @@ void GradSolver::iter_inner_gradH(int I, int wrt, int k,
   double dev(1e20), toli(1e-6);
   int ct(0), mxCt(20);
   
-  auto mol = _sys_->get_molecule(I);
+  auto mol = _sys_->get_MoleculeSAM(I);
 //  cout << "Mol I " << I << " and sph " << k << endl;
 
   while ( dev > toli && ct < mxCt )
@@ -653,10 +653,10 @@ void GradSolver::update_prev_gradH(int I, int wrt, int k)
   }
 }
 
-// precompute gradT times H(i,j) for all pairs of molecules
+// precompute gradT times H(i,j) for all pairs of MoleculeSAMs
 void GradSolver::pre_compute_gradT_A()
 {
-  shared_ptr<Molecule> molI;
+  shared_ptr<MoleculeSAM> molI;
   double aIk, aJl, dist, cut_act(100.0), cut_er(10.0);
   Pt Ik, Jl, v;
   MyMatrix<Ptx> reex(p_, 2*p_+1);
@@ -728,7 +728,7 @@ void GradSolver::pre_compute_gradT_A()
             
 
           } else if ((interpol_[J][l] != 0) &&
-                     (_sys_->get_molecule(J)->get_inter_act_k(l).size() != 0) &&
+                     (_sys_->get_MoleculeSAM(J)->get_inter_act_k(l).size() != 0) &&
                      (dist < (cut_act+aIk+aJl)))
           {
 //            cout << "Reex 100A for mol (org) " << I << " sph " << k

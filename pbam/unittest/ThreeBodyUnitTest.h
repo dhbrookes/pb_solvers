@@ -18,7 +18,7 @@ class TBDUTest : public ::testing::Test
   protected :
   
   int vals_;
-  vector< Molecule > mol_;
+  vector< MoleculeAM > mol_;
   
   virtual void SetUp()
   {
@@ -36,7 +36,7 @@ class TBDUTest : public ::testing::Test
       charges[1]=cg[molInd]; vdW[1]=0.0; posCharges[1]=pos[molInd]+Pt(1,0,0);
       charges[2]=cg[molInd]; vdW[2]=0.0; posCharges[2]=pos[molInd]+Pt(0,1,0);
       
-      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
     }
@@ -81,7 +81,7 @@ class TBDUTest : public ::testing::Test
 
 TEST_F(TBDUTest, computeGroups)
 {
-  vector<Molecule> mol_sing_;
+  vector<MoleculeAM> mol_sing_;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 ),
     Pt( -5.0, -5.0, 0.0 ),Pt( -5.0, 5.0, 0.0),Pt( 5.0, -5.0, 0.0 ),
     Pt( 5.0, 5.0, 0.0 ),Pt( 0.0, -5.0, 0.0),Pt( 0.0, 5.0, 0.0),};
@@ -93,7 +93,7 @@ TEST_F(TBDUTest, computeGroups)
     charges[1]=-2.0; vdW[1]=0;posCharges[1]=pos[molInd]+Pt(1.0, 0.0, 0.0);
     charges[2]=2.0;  vdW[2]=0;posCharges[2]=pos[molInd]+Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }
@@ -132,7 +132,7 @@ TEST_F(TBDUTest, computeGroups)
 
 TEST_F(TBDUTest, computeGroupsCutoff)
 {
-  vector<Molecule> mol;
+  vector<MoleculeAM> mol;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 ),
     Pt( -5.0, -5.0, 0.0 ),Pt( -5.0, 5.0, 0.0),Pt( 5.0, -5.0, 0.0 ),
     Pt( 5.0, 5.0, 0.0 ),Pt( 0.0, -5.0, 0.0),Pt( 0.0, 5.0, 0.0),};
@@ -144,7 +144,7 @@ TEST_F(TBDUTest, computeGroupsCutoff)
     charges[1]=-2.0; vdW[1]=0;posCharges[1]=pos[molInd]+Pt(1.0, 0.0, 0.0);
     charges[2]=2.0;  vdW[2]=0;posCharges[2]=pos[molInd]+Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -180,7 +180,7 @@ TEST_F(TBDUTest, computeGroupsCutoff)
 
 TEST_F(TBDUTest, twoBD)
 {
-  vector<Molecule> mol;
+  vector<MoleculeAM> mol;
   const int num = 7;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 5.0 ),Pt( -5.0, 0.0, 5.0 ),
     Pt( -5.0, -5.0, 0.0 ),Pt( -5.0, 5.0, 0.0),Pt( 5.0, -5.0, 0.0 ),
@@ -193,7 +193,7 @@ TEST_F(TBDUTest, twoBD)
     charges[1]=-2.0; vdW[1]=0;posCharges[1]=pos[molInd]+Pt(1.0, 0.0, 0.0);
     charges[2]=2.0;  vdW[2]=0;posCharges[2]=pos[molInd]+Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -246,7 +246,7 @@ TEST_F(TBDUTest, twoBD)
 
 TEST_F(TBDUTest, threeBD)
 {
-  vector<Molecule> mol;
+  vector<MoleculeAM> mol;
   const int num = 7;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 5.0 ),Pt( -5.0, 0.0, 5.0 ),
     Pt( -5.0, -5.0, 0.0 ),Pt( -5.0, 5.0, 0.0),Pt( 5.0, -5.0, 0.0 ),
@@ -259,7 +259,7 @@ TEST_F(TBDUTest, threeBD)
     charges[1]=-2.0; vdW[1]=0;posCharges[1]=pos[molInd]+Pt(1.0, 0.0, 0.0);
     charges[2]=2.0;  vdW[2]=0;posCharges[2]=pos[molInd]+Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -323,7 +323,7 @@ TEST_F(TBDUTest, threeBD)
 
 TEST_F(TBDUTest, threeBDfor3)
 {
-  vector<Molecule> mol;
+  vector<MoleculeAM> mol;
   const int num = 3;
   Pt pos[3] = { Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 )};
   for (int molInd = 0; molInd < num; molInd ++ )
@@ -334,7 +334,7 @@ TEST_F(TBDUTest, threeBDfor3)
     charges[1]=-2.0; vdW[1]=0;posCharges[1]=pos[molInd]+Pt(1.0, 0.0, 0.0);
     charges[2]=2.0;  vdW[2]=0;posCharges[2]=pos[molInd]+Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -391,7 +391,7 @@ TEST_F(TBDUTest, threeBDfor3)
 
 TEST_F(TBDUTest, threeBDfor7)
 {
-  vector<Molecule> mol;
+  vector<MoleculeAM> mol;
   const int num = 7;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 ),
     Pt( -5.0, -5.0, 0.0 ),Pt( -5.0, 5.0, 0.0),Pt( 5.0, -5.0, 0.0 ),
@@ -404,7 +404,7 @@ TEST_F(TBDUTest, threeBDfor7)
     charges[1]=-2.0; vdW[1]=0;posCharges[1]=pos[molInd]+Pt(1.0, 0.0, 0.0);
     charges[2]=2.0;  vdW[2]=0;posCharges[2]=pos[molInd]+Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }

@@ -78,15 +78,15 @@ public:
 /*
  Base class for matrices that will be re-expanded
  */
-class ComplexMoleculeMatrix
+class ComplexMoleculeSAMMatrix
 {
 protected:
   vector<MyMatrix<cmplx> > mat_;
   int p_;  // number of poles
-  int I_;  // Index of molecule that this matrix
+  int I_;  // Index of MoleculeSAM that this matrix
   
 public:
-  ComplexMoleculeMatrix(int I, int ns, int p);
+  ComplexMoleculeSAMMatrix(int I, int ns, int p);
   
   cmplx get_mat_knm(int k, int n, int m) { return mat_[k](n, m+p_); }
   void set_mat_knm(int k, int n, int m, cmplx val)
@@ -99,7 +99,7 @@ public:
   
   void reset_mat(int k);
   
-  friend ostream & operator<<(ostream & fout, ComplexMoleculeMatrix & M)
+  friend ostream & operator<<(ostream & fout, ComplexMoleculeSAMMatrix & M)
   {
     fout << "{{";
     for (int k = 0; k < M.get_ns(); k++)
@@ -127,7 +127,7 @@ public:
   
   void print_kmat(int k)
   {
-    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    cout << "MoleculeSAM " << I_ << " For sphere " << k << endl;
     for (int n = 0; n < get_p(); n++)
     {
       for (int m = 0; m <= n; m++)
@@ -194,39 +194,39 @@ class XHMatrix;
 
 /*
  Pre-computed values representing fixed charges within each sphere. Each object
- of this class refers to one molecule. This is then a vector of matrices where
- the vector index, k, loops through each coarse-grained sphere in the molecule.
+ of this class refers to one MoleculeSAM. This is then a vector of matrices where
+ the vector index, k, loops through each coarse-grained sphere in the MoleculeSAM.
  The indices of the inner matrices are then n and m, which loop over the number
  of poles in the system. See eq. 8a in Yap 2010 for more info
  */
-class EMatrix: public ComplexMoleculeMatrix
+class EMatrix: public ComplexMoleculeSAMMatrix
 {
 public:
   EMatrix(int I, int ns, int p);
-  virtual void calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> sh_calc,
+  virtual void calc_vals(shared_ptr<MoleculeSAM> mol, shared_ptr<SHCalc> sh_calc,
                          double eps_in);
   
 };
 
 /*
  Pre-computed values representing fixed charges outside each sphere. Each object
- of this class refers to one molecule. This is then a vector of matrices where
- the vector index, k, loops through each coarse-grained sphere in the molecule.
+ of this class refers to one MoleculeSAM. This is then a vector of matrices where
+ the vector index, k, loops through each coarse-grained sphere in the MoleculeSAM.
  The indices of the inner matrices are then n and m, which loop over the number
  of poles in the system. See eq. 8b in Yap 2010 for more info
  */
-class LEMatrix : public ComplexMoleculeMatrix
+class LEMatrix : public ComplexMoleculeSAMMatrix
 {
 public:
   LEMatrix(int I, int ns, int p);
-  void calc_vals(shared_ptr<Molecule> mol, shared_ptr<SHCalc> sh_calc,
+  void calc_vals(shared_ptr<MoleculeSAM> mol, shared_ptr<SHCalc> sh_calc,
                  double eps_in);
 };
 
 
 /*
  Class for pre-computing values of surface integral matrices I_E. Each object
- of this class refers to one molecule. See equation 21 in Yap 2010 for more
+ of this class refers to one MoleculeSAM. See equation 21 in Yap 2010 for more
  info.
  */
 class IEMatrix
@@ -245,7 +245,7 @@ protected:
   vector<vector<int> > grid_exp_, grid_bur_;
   
 public:
-  IEMatrix(int I, shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc, int p,
+  IEMatrix(int I, shared_ptr<MoleculeSAM> _mol, shared_ptr<SHCalc> sh_calc, int p,
            shared_ptr<ExpansionConstants> _expconst, bool calc_npts = false,
            int npts = Constants::IMAT_GRID, bool set_mol = false );
   
@@ -258,12 +258,12 @@ public:
   
   MyMatrix<double> get_IE_k( int k );
   
-  void compute_grid_pts(shared_ptr<Molecule> _mol);
-  vector<MatOfMats<cmplx>::type >compute_integral(shared_ptr<Molecule> _mol,
+  void compute_grid_pts(shared_ptr<MoleculeSAM> _mol);
+  vector<MatOfMats<cmplx>::type >compute_integral(shared_ptr<MoleculeSAM> _mol,
                                                   shared_ptr<SHCalc> sh_calc,
                                                   int k);
   void populate_mat(vector<MatOfMats<cmplx>::type > Ys, int k);
-  void calc_vals(shared_ptr<Molecule> _mol, shared_ptr<SHCalc> sh_calc);
+  void calc_vals(shared_ptr<MoleculeSAM> _mol, shared_ptr<SHCalc> sh_calc);
   void reset_mat();
   
   void write_all_mat(string imat_prefix)
@@ -289,7 +289,7 @@ protected:
   vector<vector<double> > mat_;
   vector<MyMatrix<cmplx> > mat_cmplx_;
   int p_;  // number of poles
-  int I_;  // Index of molecule that this matrix
+  int I_;  // Index of MoleculeSAM that this matrix
   
 public:
   NumericalMatrix(int I, int ns, int p);
@@ -324,7 +324,7 @@ public:
   
   void print_kmat(int k)
   {
-    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    cout << "MoleculeSAM " << I_ << " For sphere " << k << endl;
     for (int h = 0; h < get_mat_k_len(k); h++)
     {
       double real = get_mat_kh( k, h);
@@ -337,7 +337,7 @@ public:
   
   void print_analytical(int k)
   {
-    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    cout << "MoleculeSAM " << I_ << " For sphere " << k << endl;
     for (int n = 0; n < get_p(); n++)
     {
       for (int m = 0; m <= n; m++)
@@ -364,7 +364,7 @@ class LFMatrix : public NumericalMatrix
 public:
   LFMatrix(int I, int ns, int p);
   
-  void init(shared_ptr<Molecule> mol, shared_ptr<FMatrix> F,
+  void init(shared_ptr<MoleculeSAM> mol, shared_ptr<FMatrix> F,
             shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
             shared_ptr<ExpansionConstants> _expconst);
   
@@ -385,7 +385,7 @@ protected:
 public:
   LHMatrix(int I, int ns, int p, double kappa);
   
-  void init(shared_ptr<Molecule> mol, shared_ptr<HMatrix> H,
+  void init(shared_ptr<MoleculeSAM> mol, shared_ptr<HMatrix> H,
             shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
             shared_ptr<ExpansionConstants> _expconst);
   
@@ -396,7 +396,7 @@ public:
 /*
  Equation 10c [1]
  */
-class LHNMatrix : public ComplexMoleculeMatrix
+class LHNMatrix : public ComplexMoleculeSAMMatrix
 {
 protected:
   vector<int> interPol_;
@@ -414,16 +414,16 @@ public:
 /*
  Equation 14a [1]
  */
-class XHMatrix : public ComplexMoleculeMatrix
+class XHMatrix : public ComplexMoleculeSAMMatrix
 {
 protected:
   vector<MyMatrix<cmplx> > E_LE_mat_;
   
 public:
-  XHMatrix(int I, int ns, int p, shared_ptr<Molecule> mol,
+  XHMatrix(int I, int ns, int p, shared_ptr<MoleculeSAM> mol,
            shared_ptr<EMatrix> E, shared_ptr<LEMatrix> LE);
   
-  void calc_vals(shared_ptr<Molecule> mol, shared_ptr<BesselCalc> bcalc,
+  void calc_vals(shared_ptr<MoleculeSAM> mol, shared_ptr<BesselCalc> bcalc,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                  shared_ptr<LHNMatrix> LHN, double kappa, int k);
 };
@@ -431,7 +431,7 @@ public:
 /*
  Equation 14b [1]
  */
-class XFMatrix : public ComplexMoleculeMatrix
+class XFMatrix : public ComplexMoleculeSAMMatrix
 {
 protected:
   double eps_;
@@ -439,10 +439,10 @@ protected:
   
 public:
   XFMatrix(int I, int ns, int p, double eps_in, double eps_out,
-           shared_ptr<Molecule> mol, shared_ptr<EMatrix> E,
+           shared_ptr<MoleculeSAM> mol, shared_ptr<EMatrix> E,
            shared_ptr<LEMatrix> LE);
   
-  void calc_vals(shared_ptr<Molecule> mol, shared_ptr<BesselCalc> bcalc,
+  void calc_vals(shared_ptr<MoleculeSAM> mol, shared_ptr<BesselCalc> bcalc,
                  shared_ptr<LHMatrix> LH, shared_ptr<LFMatrix> LF,
                  shared_ptr<LHNMatrix> LHN, double kappa, int k);
   
@@ -450,7 +450,7 @@ public:
 };
 
 
-class HMatrix: public ComplexMoleculeMatrix
+class HMatrix: public ComplexMoleculeSAMMatrix
 {
 protected:
   double kappa_;
@@ -461,11 +461,11 @@ public:
   // Read in and initialize from expansion file
   void init_from_exp(string hfilename, int k);
   
-  void init(shared_ptr<Molecule> mol,
+  void init(shared_ptr<MoleculeSAM> mol,
             shared_ptr<SHCalc> _sh_calc,
             double eps_in);
   
-  void calc_vals(shared_ptr<Molecule> mol,
+  void calc_vals(shared_ptr<MoleculeSAM> mol,
                  shared_ptr<HMatrix> prev,
                  shared_ptr<XHMatrix> XH,
                  shared_ptr<FMatrix> F,
@@ -486,7 +486,7 @@ public:
 };
 
 
-class FMatrix: public ComplexMoleculeMatrix
+class FMatrix: public ComplexMoleculeSAMMatrix
 {
 protected:
   double kappa_;
@@ -494,7 +494,7 @@ protected:
 public:
   FMatrix(int I, int ns, int p, double kappa);
   
-  void calc_vals(shared_ptr<Molecule> mol,
+  void calc_vals(shared_ptr<MoleculeSAM> mol,
                  shared_ptr<FMatrix> prev,
                  shared_ptr<XFMatrix> XF,
                  shared_ptr<HMatrix> H,
