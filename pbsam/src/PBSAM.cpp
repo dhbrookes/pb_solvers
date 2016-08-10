@@ -242,14 +242,22 @@ void PBSAM::initialize_pbsam()
       // This is done in Solver!
     }
     
+    clock_t t3 = clock();
+
     // Generate surface integrals
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
       IEMatrix ieMatTest(0, _syst_->get_molecule(idx),
                          _sh_calc_, poles_, _exp_consts_, true, 0, true);
+      if (k==0) //Only write once for each type
+        ieMatTest.write_all_mat(_setp_->getTypeNPQR(i));
     }
-      
+    
+    t3 = clock() - t3;
+    printf ("Imat took me %f seconds.\n",
+            ((float)t3)/CLOCKS_PER_SEC);
+    
     if (_setp_->getTypeNExp(i) != "" )
     {
       string estart = _setp_->getTypeNExp(i);
@@ -267,9 +275,17 @@ void PBSAM::initialize_pbsam()
       auto sub_syst = make_subsystem({_syst_->get_mol_global_idx(i,0)});
       Solver self_pol( sub_syst, _consts_, _sh_calc_, _bessl_calc_, poles_);
       self_pol.solve(solveTol_, 100);
+      
+      //Printing out H and F of selfpol
+      //TODO: This should also get printed if system is only 1 molecule?
+      self_pol.get_all_H()[0]->print_all_to_file(_setp_->getTypeNPQR(i)+".H",
+                                                 _consts_->get_kappa(),
+                                                 _syst_->get_cutoff());
+      
+      self_pol.get_all_F()[0]->print_all_to_file(_setp_->getTypeNPQR(i)+".F",
+                                                 _consts_->get_kappa(),
+                                                 _syst_->get_cutoff());
     }
-    
-    
   }
 }
 
@@ -394,9 +410,13 @@ void PBSAM::run_dynamics()
 void PBSAM::run_electrostatics()
 {
   int i;
-
+  clock_t t3 = clock();
   Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_);
   solv.solve(solveTol_, 100);
+  
+  t3 = clock() - t3;
+  printf ("Solve took me %f seconds.\n",
+          ((float)t3)/CLOCKS_PER_SEC);
   
   Electrostatic estat(solv.get_all_H(), _syst_, _sh_calc_, _bessl_calc_,
                       _consts_, poles_, _setp_->getGridPts());

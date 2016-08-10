@@ -1,19 +1,47 @@
 
 \chapter{Introduction}
 
+The Poisson-Boltzmann Analytical and Semi-Analytical models solve the linearized Poisson-Boltzmann Equation 
+(PBE) for systems hitherto not possible using traditional PBE solvers. This manual describes 
+the methods and their associated suite of programs. We will refer to each method by their acronyms:
+PB-AM and PB-SAM. There is much shared capability between the two softwares, so when an application
+or usage can be applied to both, we will refer to both of them as PB-[S]AM, with the S in square brackets.
+The PBE software suite is licensed as a collection of freely available program under a GPL license. 
 
 
-The Poisson-Boltzmann Analytical Model solves the linearized Poisson-Boltzmann Equation (PBE) for systems hitherto not possible using traditional PBE solvers. This manual describes the method and its associated suite of programs. The PBE software suite is licensed as a collection of freely available program under a GPL license. 
+\section{PB-AM} The first general analytical solution for computing the screened electrostatic 
+interaction between large numbers of macromolecules of arbitrarily complex charge distributions, 
+assuming they are well described by spherical low dielectric cavities in a higher dielectric 
+medium in the presence of a Debye-H{\"u}ckel treatment of salt. The method exploits 
+multipole expansion theory for the screened Coulomb potential such that it can describe direct 
+charge-charge interactions and all higher-order cavity polarization effects between low dielectric 
+spherical cavities containing their charges, while treating these higher order terms correctly 
+at all separation distances. The analytical solution is general to arbitrary numbers of 
+macromolecules, is efficient to compute, provides for the first time the ability to provide new 
+benchmarks for other numerical solutions to the linearized Poisson-Boltzmann equation. A 
+number of utilities are described below that use PB-AM results.
 
+\section{PB-SAM} 
 
-\section{PB-AM} The first general analytical solution for computing the screened electrostatic interaction between large numbers of macromolecules of arbitrarily complex charge distributions, assuming they are well described by spherical low dielectric cavities in a higher dielectric medium in the presence of a Debye-H{\"u}ckel treatment of salt. The method exploits multipole expansion theory for the screened Coulomb potential such that it can describe direct charge-charge interactions and all higher-order cavity polarization effects between low dielectric spherical cavities containing their charges, while treating these higher order terms correctly at all separation distances. The analytical solution is general to arbitrary numbers of macromolecules, is efficient to compute, provides for the first time the ability to provide new benchmarks for other numerical solutions to the linearized Poisson-Boltzmann equation. A number of utilities are described below that use PB-AM results.
+A semi-analytical extension of the PB-AM method. It too is capable of computing the interactions
+of multiple molecules with complex charge distributions, but because of its semi-analytical approach, 
+molecules are now represented as a collection of overlapping spheres. This allows for a more complex
+description of the molecule in comparison to the analytical method. The applications below also apply to the 
+semi-analytical method.
 
-\section{Physical Calculations} The PB-AM results allow for fast calculation of physically important quantities. Specifically this program can calculate the interaction energy of, and the force and torque applied to each molecule. These results may be written into a file or printed to the terminal.
+\section{Physical Calculations} The PB-[S]AM results allow for fast calculation of physically important quantities. 
+Specifically this program can calculate the interaction energy of, and the force and torque 
+applied to each molecule. These results may be written into a file or printed to the terminal.
 
-\section{Brownian Dynamics} This package also implements dynamics simulations using the Brownian protocol developed by Ermak and McCammon\footnote{Ermak, D. L.; McCammon, J. A. \textit{J. Chem. Phys.} 1978, \textit{69}, 1352\---1360.}. At each time step, the translation and rotation due to the applied force and torque, respectively, are calculated and added to random components of motion. The user can specify spatial and temporal termination conditions for the simulation and write the trajectory to specified files.
+\section{Brownian Dynamics} This package also implements dynamics simulations using the 
+Brownian protocol developed by Ermak and McCammon\footnote{Ermak, D. L.; McCammon, J. A. \textit{J. Chem. Phys.} 
+1978, \textit{69}, 1352\---1360.}. At each time step, the translation and rotation due to the applied 
+force and torque, respectively, are calculated and added to random components of motion. The user can specify 
+spatial and temporal termination conditions for the simulation and write the trajectory to specified files.
 
-\section{Electrostatics} Another possible output of PB-AM, the user can specify a configuration of an arbitrary number of molecules and get a 2-dimensional or 3 dimensional potential landscape of the system. We have provided example plotting tools, and the 3-dimensional output may be uploaded in VMD for visualization.
-
-
+\section{Electrostatics} Another possible output of PB-[S]AM, the user can specify a configuration of an 
+arbitrary number of molecules and get a 2-dimensional or 3 dimensional potential landscape of the 
+system. We have provided example plotting tools, and the 3-dimensional output may be 
+uploaded in VMD for visualization.
 
 \clearpage

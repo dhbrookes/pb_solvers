@@ -1,0 +1,30 @@
+\chapter{Common Errors}
+
+\section{Errors while reading input file}
+Our file reader catches some errors, like files not exisiting or
+being unable to open them. Look at the verbose stream of the
+program to make sure all your flags are being caught, and check the
+stream for errors as well.
+
+\section{Segmentation Fault while reading input file}
+Our file reader is not very robust.
+Make sure there is only a single space between keywords and options.
+Make sure that all options are specified for a given keyword.
+
+\section{Initial configuration errors}
+Many issues may arise if your molecules are overlapping, which is not allowed in the PB solvers' models.
+The center of the molecule will be placed at the positions given by each XYZ file.
+Check the printed out PQR file for the initial configuration, which you can load into VMD.
+Try changing the xyz file(s).
+This error may also appear if the box length specified with the pbc keyword is too small.
+Try increasing the box length.
+
+
+
+
+
+
+
+
+
+

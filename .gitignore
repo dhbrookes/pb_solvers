@@ -27,6 +27,7 @@ test_cged_out.pqr
 *.out
 *.bbl
 *.blg
+*.toc
 
 ## Files for work on APBS comparison
 APBS_compare/
