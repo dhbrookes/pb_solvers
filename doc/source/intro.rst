@@ -26,12 +26,12 @@ Running
 
 To run the programs, simply execute the following on the command line::
 
-For PBAM
+For PB-AM
 ^^^^^^^^^
 :code:`$ ./build/bin/pbam <input_file>`
 
-For PBSAM
-^^^^^^^^^
+For PB-SAM
+^^^^^^^^^^
 :code:`$ ./build/bin/pbsam <input_file>`
 
 where :code:`<input_file>` is a PB-[S]AM input file described in detail in the proceeding sections of this documentation
