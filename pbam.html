@@ -31,7 +31,7 @@
 
   
     <link rel="top" title="pb_solvers 0.1 documentation" href="index.html"/>
-        <link rel="next" title="PBAM Inputs" href="pbam_input.html"/>
+        <link rel="next" title="PB-AM Inputs" href="pbam_input.html"/>
         <link rel="prev" title="Getting Started" href="intro.html"/> 
 
   
@@ -92,8 +92,8 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="pbam_input.html">PBAM Inputs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pbam_examples.html">PBAM Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_input.html">PB-AM Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_examples.html">PB-AM Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
@@ -145,22 +145,35 @@
             
   <div class="section" id="pb-am">
 <h1>PB-AM<a class="headerlink" href="#pb-am" title="Permalink to this headline">¶</a></h1>
-<p>PB-AM is an analytical solution to the linearized Poisson-Boltzmann equation for multiple spherical objects of arbitrary charge distribution in an ionic solution. The solution can be reduced to a simple system of equations as follows:</p>
+<p>PB-AM is an analytical solution to the linearized Poisson-Boltzmann
+equation for multiple spherical objects of arbitrary charge distribution
+in an ionic solution. The solution can be reduced to a simple system
+of equations as follows:</p>
 <p>\[ A = \Gamma \cdot (\Delta \cdot T \cdot A + E) \]</p>
-<p>Where \(A^{(i)}\) represents the effective multipole expansion of the charge distributions of molecule \(i\). \(E^{(i)}\) is the free charge distribution of molecule \(i\).  \(\Gamma\) is a dielectric boundary-crossing operator, \(Delta\) is a cavity polarization operator, \(T\) an operator that transforms the multipole expansion to a local coordinate frame.  More details on the method are available in <a class="reference internal" href="references.html#lohe06" id="id1">[LoHe06]</a>. Once \(A^{(i)}\) has been solved, through an iterative SCF method, physical properties of the system can be computed, as detailed in the next section.</p>
+<p>Where \(A^{(i)}\) represents the effective multipole expansion
+of the charge distributions of molecule \(i\). \(E^{(i)}\) is
+the free charge distribution of molecule \(i\).  \(\Gamma\) is
+a dielectric boundary-crossing operator, \(\Delta\) is a cavity
+polarization operator, \(T\) an operator that transforms the
+multipole expansion to a local coordinate frame.  More details on
+the method are available in <a class="reference internal" href="references.html#lohe06" id="id1">[LoHe06]</a>. Once \(A^{(i)}\) has been
+solved, through an iterative SCF method, physical properties of the
+system can be computed, as detailed in the next section.</p>
 <div class="section" id="physical-calculations">
 <h2>Physical calculations<a class="headerlink" href="#physical-calculations" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="interactions-energies">
 <h3>Interactions energies<a class="headerlink" href="#interactions-energies" title="Permalink to this headline">¶</a></h3>
-<p>From the above formulation, computation of the interaction energy (\(\Omega^{(i)}\)) for molecule i, is given as follows:</p>
+<p>From the above formulation, computation of the interaction energy
+(\(\Omega^{(i)}\)) for molecule i, is given as follows:</p>
 <p>\[\Omega^{(i)}=\frac{1}{\epsilon_s} \left \langle \sum_{j \ne i}^N  T \cdot A^{(j)} ,  A^{(i)} \right \rangle \]</p>
-<p>Where \(\langle . , . \rangle\) denotes an inner product.</p>
+<p>Where \(\langle . . . \rangle\) denotes an inner product.</p>
 </div>
 <div class="section" id="forces-and-torques">
 <h3>Forces and Torques<a class="headerlink" href="#forces-and-torques" title="Permalink to this headline">¶</a></h3>
 <p>When energy is computed, forces follow as:</p>
 <p>\[ \textbf{F}^{(i)} = \nabla_i \Omega^{(i)}=\frac{1}{\epsilon_s} [ \langle \nabla_i \,T \cdot A^{(i)} ,  A^{(i)} \rangle +  \langle T \cdot A^{(i)} ,   \nabla_i \, A^{(i)} \rangle ]\]</p>
-<p>The method to calculate the torque \(\boldsymbol{\tau}^{(i)}\) on molecule is outside the scope of this manual, but is discussed extensively in <a class="reference internal" href="references.html#lohe06" id="id2">[LoHe06]</a></p>
+<p>The method to calculate the torque \(\boldsymbol{\tau}^{(i)}\) on
+molecule is outside the scope of this manual, but is discussed extensively in <a class="reference internal" href="references.html#lohe06" id="id2">[LoHe06]</a></p>
 </div>
 </div>
 </div>
@@ -172,7 +185,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pbam_input.html" class="btn btn-neutral float-right" title="PBAM Inputs" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pbam_input.html" class="btn btn-neutral float-right" title="PB-AM Inputs" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="intro.html" class="btn btn-neutral" title="Getting Started" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
