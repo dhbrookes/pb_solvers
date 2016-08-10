@@ -24,7 +24,7 @@ This will make executables for pbam and pbsam. Both executables can then be foun
 Running
 -------
 
-To run the programs, simply execute the following on the command line::
+To run the programs, simply execute the following on the command line:
 
 For PB-AM
 ^^^^^^^^^
