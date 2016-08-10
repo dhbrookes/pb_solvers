@@ -6,7 +6,8 @@
 Welcome!
 ======================================
 
-This is documentation for PBAM and PBSAM, analytic and semi-analytic solvers for the Poisson-Boltzmann equation. The methods and code
+This is documentation for PB-AM and PB-SAM, analytic and semi-analytic 
+solvers for the Poisson-Boltzmann equation. The methods and code
 were developed and are maintained by the THG lab at UC Berkeley.
 
 
@@ -23,6 +24,7 @@ Table of Contents
    pbam
    pbam_input
    pbam_examples
+   pbam_program
    references
 
 ..
