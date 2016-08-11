@@ -130,11 +130,11 @@ void TorqueCalc::calc_all_tau(shared_ptr<System> sys,
   for (int i = 0; i < I_; i++)
   {
     //    cout << "This is i " << i << endl;
-    torques_[i] = calc_tauI(i, sys->get_MoleculeSAM(i), fcalc);
+    torques_[i] = calc_tauI(i, sys->get_moli(i), fcalc);
   }
 }
 
-Pt TorqueCalc::calc_tauI(int i, shared_ptr<MoleculeSAM> mol,
+Pt TorqueCalc::calc_tauI(int i, shared_ptr<BaseMolecule> mol,
                          shared_ptr<ForceCalc> fcalc)
 {
   Pt ck, rpk, fp, tauI, tau1;

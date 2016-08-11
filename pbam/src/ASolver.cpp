@@ -717,7 +717,7 @@ void ASolver::pre_compute_all_sh()
 {
   int i;
   for (i = 0; i < N_; i++)
-    (*_allSh_)[i] = calc_mol_sh(_sys_->get_MoleculeAM(i));
+    (*_allSh_)[i] = calc_mol_sh(_sys_->get_moli(i));
 }
 
 /*

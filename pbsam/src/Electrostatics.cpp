@@ -201,11 +201,11 @@ void Electrostatic::print_3d_heat( string td_name )
   {
     for ( sph = 0; sph < _sys_->get_Ns_i(mol); sph++)
     {
-      vector<int> exp_pts = _sys_->get_MoleculeSAM(mol)->get_gdpt_expj(sph);
+      vector<int> exp_pts = _sys_->get_moli(mol)->get_gdpt_expj(sph);
       center = _sys_->get_centerik(mol, sph);
       for (xct = 0; xct < exp_pts.size(); xct++)
       {
-        pos = _sys_->get_MoleculeSAM(mol)->get_gridjh(sph,exp_pts[xct]) + center;
+        pos = _sys_->get_moli(mol)->get_gridjh(sph,exp_pts[xct]) + center;
         pos = Pt( pos.r()*1.05, pos.theta(), pos.phi(), true);
         ptl = (units_*compute_pot_at(pos))/e_s;
         

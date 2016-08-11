@@ -150,9 +150,8 @@ solveTol_(1e-4)
 
   check_setup();
   
-  vector<shared_ptr<MoleculeSAM> > molP(mls.size());
+  vector<shared_ptr<BaseMolecule> > molP(mls.size());
   for (int i = 0; i < mls.size(); i++) molP[i] = make_shared<MoleculeSAM>(mls[i]);
-  
   _syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
   init_write_system();
@@ -208,10 +207,10 @@ void PBSAM::init_write_system()
 
 shared_ptr<System> PBSAM::make_subsystem(vector<int> mol_idx)
 {
-  vector<shared_ptr<MoleculeSAM> > sub_mols (mol_idx.size());
+  vector<shared_ptr<BaseMolecule> > sub_mols (mol_idx.size());
   for (int i = 0; i < mol_idx.size(); i++)
   {
-    sub_mols[i] = _syst_->get_MoleculeSAM(mol_idx[i]);
+    sub_mols[i] = _syst_->get_moli(mol_idx[i]);
   }
   
   shared_ptr<System> _subsys = make_shared<System>(sub_mols,
@@ -248,7 +247,7 @@ void PBSAM::initialize_pbsam()
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
-      IEMatrix ieMatTest(0, _syst_->get_MoleculeSAM(idx),
+      IEMatrix ieMatTest(0, _syst_->get_moli(idx),
                          _sh_calc_, poles_, _exp_consts_, true, 0, true);
       if (k==0) //Only write once for each type
         ieMatTest.write_all_mat(_setp_->getTypeNPQR(i));

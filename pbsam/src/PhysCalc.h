@@ -60,9 +60,9 @@ public:
                   vector<vector<shared_ptr<GradLHNMatrix> > > dLHN);
   
   //calc force at a point
-  Ptx calc_fp(Pt P, shared_ptr<MoleculeSAM> mol,
-              shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
-              shared_ptr<GradHMatrix> dH, shared_ptr<GradLHNMatrix> dLHN);
+//  Ptx calc_fp(Pt P, shared_ptr<BaseMolecule> mol,
+//              shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN,
+//              shared_ptr<GradHMatrix> dH, shared_ptr<GradLHNMatrix> dLHN);
   
   vector<Pt> get_all_f()
   {
@@ -88,7 +88,7 @@ public:
   TorqueCalc(int I) :  torques_(I), I_(I)  { }
   
   void calc_all_tau(shared_ptr<System> sys, shared_ptr<ForceCalc> fcalc);
-  Pt calc_tauI(int i, shared_ptr<MoleculeSAM> mol, shared_ptr<ForceCalc> fcalc);
+  Pt calc_tauI(int i, shared_ptr<BaseMolecule> mol, shared_ptr<ForceCalc> fcalc);
   
   Pt cross_prod(Pt a, Pt b);
   

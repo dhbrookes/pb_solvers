@@ -152,7 +152,7 @@ TEST_F(MoleculeSAMUTest, checkCreateCen)
   srand(1);
   PQRFile pqr(test_dir_loc + "test.pqr");
   MSMSFile surf_file (test_dir_loc + "test.vert");
-  vector<shared_ptr<MoleculeSAM> > mols;
+  vector<shared_ptr<BaseMolecule> > mols;
   mols.push_back(make_shared<MoleculeSAM>( 0, 0, "stat", pqr.get_charges(),
                       pqr.get_atom_pts(), pqr.get_radii(),
                       surf_file.get_sp(), surf_file.get_np(), 2.5));
@@ -324,7 +324,7 @@ protected :
 TEST_F(SystemUTest, checkOverlap)
 {
   int M = 2;
-  vector<shared_ptr<MoleculeSAM> > mol_;
+  vector<shared_ptr<BaseMolecule> > mol_;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   
   for (int molInd = 0; molInd < M; molInd ++ )
@@ -339,7 +339,7 @@ TEST_F(SystemUTest, checkOverlap)
     System sys( mol_ );
     FAIL();
   }
-  catch( const OverlappingMoleculeSAMException& err )
+  catch( const OverlappingMoleculeException& err )
   {
     // check exception
     string error_exp = "MoleculeSAM 0 & 1 overlap";
@@ -349,7 +349,7 @@ TEST_F(SystemUTest, checkOverlap)
 
 TEST_F(SystemUTest, checkPBCOverlap)
 {
-  vector<shared_ptr<MoleculeSAM> > mol_; const int nMol = 3;
+  vector<shared_ptr<BaseMolecule> > mol_; const int nMol = 3;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   
   for (int molInd = 0; molInd < nMol; molInd ++ )
@@ -368,7 +368,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
     System sys( mol_, 80.0, 40.0 );
     FAIL();
   }
-  catch( const OverlappingMoleculeSAMException& err )
+  catch( const OverlappingMoleculeException& err )
   {
     // check exception
     string error_exp = "MoleculeSAM 0 & 1 overlap";
@@ -379,7 +379,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
 
 TEST_F(SystemUTest, checkVals)
 {
-  vector<shared_ptr<MoleculeSAM> > mol_;
+  vector<shared_ptr<BaseMolecule> > mol_;
   int nMol = 3; int ct = 0;
   double cutoff = 45.876;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(70.0,70.0,70.0), Pt(-70.0,-70.0,-70.0)};
@@ -467,7 +467,7 @@ TEST_F(SystemUTest, changeCutoff)
 {
   double cutoff = 245.876;
   double boxl   = 255.876;
-  vector<shared_ptr<MoleculeSAM> > mol_;
+  vector<shared_ptr<BaseMolecule> > mol_;
   int nMol = 3;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(70.0,70.0,70.0), Pt(-70.0,-70.0,-70.0)};
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
@@ -490,7 +490,7 @@ TEST_F(SystemUTest, PBCcheck)
 {
   double cutoff = 75.0;
   double boxl   = 180.0;
-  vector<shared_ptr<MoleculeSAM> > mol_;
+  vector<shared_ptr<BaseMolecule> > mol_;
   int nMol = 3;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(70.0,70.0,70.0), Pt(-65.3,-68.2,-61.21)};
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");

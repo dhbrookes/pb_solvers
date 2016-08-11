@@ -346,34 +346,34 @@ vector<int> MoleculeSAM::find_neighbors( int i )
 }
 
 
-System::System(vector<shared_ptr<MoleculeSAM> > mols, double cutoff,
+System::System(vector<shared_ptr<BaseMolecule> > mols,
+               double cutoff,
                double boxlength)
-:MoleculeSAMs_(mols), N_((int) mols.size()), cutoff_(cutoff),
-boxLength_(boxlength), t_(0)
+:BaseSystem(mols, cutoff, boxlength)
 {
-  int i, j, k, maxi = 0;
-  vector<int> maxj, keys(2);
-  for ( k = 0; k < N_; k++)
-  {
-    i = MoleculeSAMs_[k]->get_type();
-    j = MoleculeSAMs_[k]->get_type_idx();
-    keys = {i,j};
-    typeIdxToIdx_[keys] = k;
-    maxi = ( maxi > i ) ? maxi : i;
-    
-    if ( i >= maxj.size() ) maxj.push_back(0);
-    maxj[i] = ( maxj[i] > j ) ? maxj[i] : j;
-  }
-  
-  maxi++;
-  for ( j = 0; j < maxj.size(); j++) maxj[j]++;
-  
-  ntype_ = maxi;
-  typect_ = maxj;
-  
-  check_for_overlap();
-  lambda_ = calc_average_radius();
-  if (boxLength_/2. < cutoff_)  compute_cutoff();
+//  int i, j, k, maxi = 0;
+//  vector<int> maxj, keys(2);
+//  for ( k = 0; k < N_; k++)
+//  {
+//    i = molecules_[k]->get_type();
+//    j = molecules_[k]->get_type_idx();
+//    keys = {i,j};
+//    typeIdxToIdx_[keys] = k;
+//    maxi = ( maxi > i ) ? maxi : i;
+//    
+//    if ( i >= maxj.size() ) maxj.push_back(0);
+//    maxj[i] = ( maxj[i] > j ) ? maxj[i] : j;
+//  }
+//  
+//  maxi++;
+//  for ( j = 0; j < maxj.size(); j++) maxj[j]++;
+//  
+//  ntype_ = maxi;
+//  typect_ = maxj;
+//  
+//  check_for_overlap();
+//  lambda_ = calc_average_radius();
+//  if (boxLength_/2. < cutoff_)  compute_cutoff();
   
   min_dist_.resize(N_);
   for (int i=0; i<N_; i++) min_dist_[i].resize(N_);
@@ -381,8 +381,12 @@ boxLength_(boxlength), t_(0)
 }
 
 System::System(Setup setup, double cutoff)
-:t_(0), ntype_(setup.getNType()), typect_(setup.get_type_nct())
+:BaseSystem()
 {
+  t_ = 0;
+  ntype_ = setup.getNType();
+  typect_ = setup.get_type_nct();
+  
   vector<shared_ptr<MoleculeSAM> > mols;
   int i, j, k=0;
   string pqrpath;
@@ -459,15 +463,15 @@ System::System(Setup setup, double cutoff)
       mol->rotate(rot);
       mol->translate(trans, setup.getBLen());
       
-      MoleculeSAMs_.push_back(mol);
+      molecules_.push_back(mol);
       typeIdxToIdx_[keys] = k;
       k++;
     } // end j
     
     if (pqrI.get_Ns() == 0)
-      write_to_pqr(setup.getTypeNPQR(i)+"cg", (int) MoleculeSAMs_.size()-1);
+      write_to_pqr(setup.getTypeNPQR(i)+"cg", (int) molecules_.size()-1);
   } // end i
-  N_ = (int) MoleculeSAMs_.size();
+  N_ = (int) molecules_.size();
   boxLength_ = setup.getBLen();
   cutoff_ = cutoff;
   
@@ -480,54 +484,54 @@ System::System(Setup setup, double cutoff)
   save_min_dist();
 }
 
-const double System::calc_average_radius() const
-{
-  double ave = 0;
-  int total_sphere = 0;
-  for (int i = 0; i < N_; i++)
-  {
-    total_sphere += get_Ns_i(i);
-    for (int k = 0; k < get_Ns_i(i); k++)
-    {
-      ave += get_aik(i, k);
-    }
-  }
-  ave  =  ave / (double) total_sphere;
-  return ave;
-}
+//const double System::calc_average_radius() const
+//{
+//  double ave = 0;
+//  int total_sphere = 0;
+//  for (int i = 0; i < N_; i++)
+//  {
+//    total_sphere += get_Ns_i(i);
+//    for (int k = 0; k < get_Ns_i(i); k++)
+//    {
+//      ave += get_aik(i, k);
+//    }
+//  }
+//  ave  =  ave / (double) total_sphere;
+//  return ave;
+//}
 
 
-void System::compute_cutoff()
-{
-  cutoff_ = boxLength_/2.0;
-  cout << " The desired cutoff is larger than half the box length";
-  cout << ". Resetting cutoff to 1/2 the boxlength: " << cutoff_ << endl;
-}
+//void System::compute_cutoff()
+//{
+//  cutoff_ = boxLength_/2.0;
+//  cout << " The desired cutoff is larger than half the box length";
+//  cout << ". Resetting cutoff to 1/2 the boxlength: " << cutoff_ << endl;
+//}
 
 double System::calc_min_dist(int I, int J)
 {
   int k1, k2;
   double dist(__DBL_MAX__), inter_act_d(100.), inter_pol_d(10.), c2c, aik, ajk;
   Pt cen_ik, cen_jk;
-  for (k1 = 0; k1 < MoleculeSAMs_[I]->get_ns(); k1++)
+  for (k1 = 0; k1 < molecules_[I]->get_ns(); k1++)
   {
-    for (k2 = 0; k2 < MoleculeSAMs_[J]->get_ns(); k2++)
+    for (k2 = 0; k2 < molecules_[J]->get_ns(); k2++)
     {
-      cen_ik = MoleculeSAMs_[I]->get_centerk(k1);
-      cen_jk = MoleculeSAMs_[J]->get_centerk(k2);
-      aik = MoleculeSAMs_[I]->get_ak(k1);
-      ajk = MoleculeSAMs_[J]->get_ak(k2);
+      cen_ik = molecules_[I]->get_centerk(k1);
+      cen_jk = molecules_[J]->get_centerk(k2);
+      aik = molecules_[I]->get_ak(k1);
+      ajk = molecules_[J]->get_ak(k2);
       c2c = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
 //      cout << "This is Ik, Jl pair : "  << I << ", "<< k1
 //                << " & "  << J << ", "<< k2 << " dist: " << c2c << endl;
       if ((inter_pol_d+aik+ajk) > c2c)
       {
-        MoleculeSAMs_[I]->add_Jl_to_interk(k1, J, k2);
-        MoleculeSAMs_[J]->add_Jl_to_interk(k2, I, k1);
+        molecules_[I]->add_Jl_to_interk(k1, J, k2);
+        molecules_[J]->add_Jl_to_interk(k2, I, k1);
       } else if ((inter_act_d+aik+ajk) > c2c)
       {
-        MoleculeSAMs_[I]->add_Jl_to_inter_act_k(k1, J, k2);
-        MoleculeSAMs_[J]->add_Jl_to_inter_act_k(k2, I, k1);
+        molecules_[I]->add_Jl_to_inter_act_k(k1, J, k2);
+        molecules_[J]->add_Jl_to_inter_act_k(k2, I, k1);
       }
       if (dist > (c2c-aik-ajk)) dist = c2c-aik-ajk;
     }
@@ -547,48 +551,48 @@ void System::save_min_dist()
   }
 }
 
-void System::check_for_overlap()
-{
-  int i, j, k1, k2;
-  double dist, aik, ajk;
-  Pt cen_ik, cen_jk;
-  for (i = 0; i < N_; i++)
-  {
-    for (j = i+1; j < N_; j++)
-    {
-      for (k1 = 0; k1 < MoleculeSAMs_[i]->get_ns(); k1++)
-      {
-        for (k2 = 0; k2 < MoleculeSAMs_[j]->get_ns(); k2++)
-        {
-          aik = MoleculeSAMs_[i]->get_ak(k1);
-          ajk = MoleculeSAMs_[j]->get_ak(k2);
-          cen_ik = MoleculeSAMs_[i]->get_centerk(k1);
-          cen_jk = MoleculeSAMs_[j]->get_centerk(k2);
-          dist = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
-          if (dist < (aik + ajk))
-            throw OverlappingMoleculeSAMException(i, j);
-        }
-      }
-    }
-  }
-}
+//void System::check_for_overlap()
+//{
+//  int i, j, k1, k2;
+//  double dist, aik, ajk;
+//  Pt cen_ik, cen_jk;
+//  for (i = 0; i < N_; i++)
+//  {
+//    for (j = i+1; j < N_; j++)
+//    {
+//      for (k1 = 0; k1 < molecules_[i]->get_ns(); k1++)
+//      {
+//        for (k2 = 0; k2 < molecules_[j]->get_ns(); k2++)
+//        {
+//          aik = molecules_[i]->get_ak(k1);
+//          ajk = molecules_[j]->get_ak(k2);
+//          cen_ik = molecules_[i]->get_centerk(k1);
+//          cen_jk = molecules_[j]->get_centerk(k2);
+//          dist = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
+//          if (dist < (aik + ajk))
+//            throw OverlappingMoleculeSAMException(i, j);
+//        }
+//      }
+//    }
+//  }
+//}
 
-Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
-{
-  Pt dv  = p1 - p2;
-  
-  Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
-            dv.y() - round(dv.y()/boxLength_)*boxLength_,
-            dv.z() - round(dv.z()/boxLength_)*boxLength_);
-  
-  return v;
-}
+//Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
+//{
+//  Pt dv  = p1 - p2;
+//  
+//  Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
+//            dv.y() - round(dv.y()/boxLength_)*boxLength_,
+//            dv.z() - round(dv.z()/boxLength_)*boxLength_);
+//  
+//  return v;
+//}
 
-bool System::less_than_cutoff(Pt v)
-{
-  if (v.norm() < cutoff_) return true;
-  else return false;
-}
+//bool System::less_than_cutoff(Pt v)
+//{
+//  if (v.norm() < cutoff_) return true;
+//  else return false;
+//}
 
 void System::write_to_pqr(string outfile, int mid)
 {

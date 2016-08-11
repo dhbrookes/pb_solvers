@@ -305,7 +305,7 @@ TEST_F(SystemUTest, checkOverlap)
     System sys( mol_ );
     FAIL();
   }
-  catch( const OverlappingMoleculeAMException& err )
+  catch( const OverlappingMoleculeException& err )
   {
     // check exception
     string error_exp = "MoleculeAM 0 & 1 overlap";
@@ -334,7 +334,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
     System sys( mol_, 20.0, 10.0 );
     FAIL();
   }
-  catch( const OverlappingMoleculeAMException& err )
+  catch( const OverlappingMoleculeException& err )
   {
     // check exception
     string error_exp = "MoleculeAM 0 & 1 overlap";

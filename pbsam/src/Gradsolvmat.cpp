@@ -45,7 +45,7 @@ GradWFMatrix::GradWFMatrix(int I, int wrt, int ns, int p,
 
 
 
-void GradWFMatrix::calc_all_vals(shared_ptr<MoleculeSAM> mol,
+void GradWFMatrix::calc_all_vals(shared_ptr<BaseMolecule> mol,
                                  shared_ptr<BesselCalc> bcalc,
                                  shared_ptr<GradHMatrix> dH,
                                  shared_ptr<GradFMatrix> dF,
@@ -62,7 +62,7 @@ void GradWFMatrix::calc_all_vals(shared_ptr<MoleculeSAM> mol,
   }
 }
 
-void GradWFMatrix::calc_val_k(int k, shared_ptr<MoleculeSAM> mol,
+void GradWFMatrix::calc_val_k(int k, shared_ptr<BaseMolecule> mol,
                               vector<double> besseli,
                               vector<double> besselk,
                               shared_ptr<GradHMatrix> dH,
@@ -102,7 +102,7 @@ GradWHMatrix::GradWHMatrix(int I, int wrt,
 }
 
 
-void GradWHMatrix::calc_all_vals(shared_ptr<MoleculeSAM> mol,
+void GradWHMatrix::calc_all_vals(shared_ptr<BaseMolecule> mol,
                              shared_ptr<BesselCalc> bcalc,
                              shared_ptr<GradHMatrix> dH,
                              shared_ptr<GradFMatrix> dF,
@@ -120,7 +120,7 @@ void GradWHMatrix::calc_all_vals(shared_ptr<MoleculeSAM> mol,
 }
 
 
-void GradWHMatrix::calc_val_k(int k, shared_ptr<MoleculeSAM> mol,
+void GradWHMatrix::calc_val_k(int k, shared_ptr<BaseMolecule> mol,
                               vector<double> besseli,
                               vector<double> besselk,
                               shared_ptr<GradHMatrix> dH,
@@ -259,7 +259,7 @@ GradHMatrix::GradHMatrix(int I, int wrt, int ns, int p, double kappa)
 {
 }
 
-void GradHMatrix::calc_all_vals(shared_ptr<MoleculeSAM> mol,
+void GradHMatrix::calc_all_vals(shared_ptr<BaseMolecule> mol,
                                 shared_ptr<BesselCalc> bcalc,
                                 shared_ptr<IEMatrix> IE,
                                 shared_ptr<GradWHMatrix> dWH)
@@ -369,7 +369,7 @@ GradLFMatrix::GradLFMatrix(int I, int wrt, int ns, int p)
 {
 }
 
-void GradLFMatrix::init_k(int k, shared_ptr<MoleculeSAM> mol,
+void GradLFMatrix::init_k(int k, shared_ptr<BaseMolecule> mol,
                           shared_ptr<GradFMatrix> dF,
                           shared_ptr<SHCalc> shcalc,
                           shared_ptr<ExpansionConstants> _expconst)
@@ -407,7 +407,7 @@ void GradLFMatrix::init_k(int k, shared_ptr<MoleculeSAM> mol,
   }
 }
 
-void GradLFMatrix::calc_all_vals(shared_ptr<MoleculeSAM> mol, vector<int> interpol,
+void GradLFMatrix::calc_all_vals(shared_ptr<BaseMolecule> mol, vector<int> interpol,
                                  shared_ptr<TMatrix> T,
                                  shared_ptr<GradFMatrix> dF)
 {
@@ -415,7 +415,7 @@ void GradLFMatrix::calc_all_vals(shared_ptr<MoleculeSAM> mol, vector<int> interp
     calc_val_k(k, mol, interpol, T, dF);
 }
 
-void GradLFMatrix::calc_val_k(int k, shared_ptr<MoleculeSAM> mol,
+void GradLFMatrix::calc_val_k(int k, shared_ptr<BaseMolecule> mol,
                               vector<int> interpol,
                               shared_ptr<TMatrix> T,
                               shared_ptr<GradFMatrix> dF)
@@ -474,7 +474,7 @@ GradLHMatrix::GradLHMatrix(int I, int wrt, int ns, int p, double kappa)
 {
 }
 
-void GradLHMatrix::init_k(int k, shared_ptr<MoleculeSAM> mol,
+void GradLHMatrix::init_k(int k, shared_ptr<BaseMolecule> mol,
                           shared_ptr<GradHMatrix> dH,
                           shared_ptr<SHCalc> shcalc,
                           shared_ptr<BesselCalc> bcalc,
@@ -511,7 +511,7 @@ void GradLHMatrix::init_k(int k, shared_ptr<MoleculeSAM> mol,
   }
 }
 
-void GradLHMatrix::calc_all_vals(shared_ptr<MoleculeSAM> mol, vector<int> interpol,
+void GradLHMatrix::calc_all_vals(shared_ptr<BaseMolecule> mol, vector<int> interpol,
                                  shared_ptr<TMatrix> T,
                                  shared_ptr<GradHMatrix> dH)
 {
@@ -519,7 +519,7 @@ void GradLHMatrix::calc_all_vals(shared_ptr<MoleculeSAM> mol, vector<int> interp
     calc_val_k(k, mol, interpol, T, dH);
 }
 
-void GradLHMatrix::calc_val_k(int k, shared_ptr<MoleculeSAM> mol,
+void GradLHMatrix::calc_val_k(int k, shared_ptr<BaseMolecule> mol,
                               vector<int> interpol,
                               shared_ptr<TMatrix> T,
                               shared_ptr<GradHMatrix> dH)

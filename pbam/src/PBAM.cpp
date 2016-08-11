@@ -153,7 +153,7 @@ void PBAM::check_system()
 {
   try {
     syst_ = make_shared<System>(*setp_);
-  } catch(const OverlappingMoleculeAMException& ex1)
+  } catch(const OverlappingMoleculeException& ex1)
   {
     cout << ex1.what() << endl;
     cout << "Provided system has overlapping MoleculeAMs. ";

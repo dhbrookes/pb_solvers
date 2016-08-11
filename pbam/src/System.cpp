@@ -137,15 +137,15 @@ void MoleculeAM::rotate(MyMatrix<double> rotmat)
 
 System::System(const vector<MoleculeAM>& mols, double cutoff,
                double boxlength)
-:MoleculeAMs_(mols), N_((int) mols.size()), cutoff_(cutoff),
+:molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
 boxLength_(boxlength), t_(0)
 {
   int i, j, k, maxi = 0;
   vector<int> maxj, keys(2);
   for ( k = 0; k < N_; k++)
   {
-    i = MoleculeAMs_[k].get_type();
-    j = MoleculeAMs_[k].get_type_idx();
+    i = molecules_[k].get_type();
+    j = molecules_[k].get_type_idx();
     keys = {i,j};
     typeIdxToIdx_[keys] = k;
     maxi = ( maxi > i ) ? maxi : i;
@@ -237,12 +237,12 @@ System::System(Setup setup, double cutoff)
                        setup.getDrot(i), setup.getDtr(i));
       }
       
-      MoleculeAMs_.push_back(mol);
+      molecules_.push_back(mol);
       typeIdxToIdx_[keys] = k;
       k++;
     } // end j
   } // end i
-  N_ = (int) MoleculeAMs_.size();
+  N_ = (int) molecules_.size();
   boxLength_ = setup.getBLen();
   cutoff_ = cutoff;
   
@@ -277,14 +277,14 @@ void System::check_for_overlap()
   double dist, ai, aj;
   for (i = 0; i < N_; i++)
   {
-    ai = MoleculeAMs_[i].get_a();
+    ai = molecules_[i].get_a();
     for (j = i+1; j < N_; j++)
     {
-      aj = MoleculeAMs_[j].get_a();
+      aj = molecules_[j].get_a();
       dist = get_pbc_dist_vec(i, j).norm();
       if (dist < (ai + aj))
       {
-        throw OverlappingMoleculeAMException(i, j);
+        throw OverlappingMoleculeException(i, j);
       }
     }
   }
@@ -312,7 +312,7 @@ vector<Pt> System::get_allcenter() const
 {
   vector< Pt> mol_cen(N_);
   for ( int i = 0; i < N_; i++)
-    mol_cen[i] = MoleculeAMs_[i].get_center();
+    mol_cen[i] = molecules_[i].get_center();
   
   return mol_cen;
 }
@@ -335,7 +335,7 @@ void System::reset_positions( vector<string> xyzfiles )
       keys = { i, j};
       k = typeIdxToIdx_[keys];
       Pt dist_to_new = get_centeri(k) - xyzI.get_pts()[j];
-      MoleculeAMs_[k].translate(dist_to_new*-1, boxLength_);
+      molecules_[k].translate(dist_to_new*-1, boxLength_);
     }
   }
   

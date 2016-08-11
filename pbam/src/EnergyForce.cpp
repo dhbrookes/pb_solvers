@@ -352,7 +352,7 @@ shared_ptr<System> ThreeBody::make_subsystem(vector<int> mol_idx)
   vector<MoleculeAM> sub_mols (mol_idx.size());
   for (int i = 0; i < mol_idx.size(); i++)
   {
-    sub_mols[i] = _sys_->get_MoleculeAM(mol_idx[i]);
+    sub_mols[i] = _sys_->get_moli(mol_idx[i]);
   }
   
   shared_ptr<System> _subsys = make_shared<System>(sub_mols,_sys_->get_cutoff(),

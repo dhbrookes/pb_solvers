@@ -35,7 +35,7 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
   int pol = 5;
   double kap = 0.0;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
-  vector<shared_ptr<MoleculeSAM> > mols;
+  vector<shared_ptr<BaseMolecule> > mols;
   mols.push_back(make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
                                      pqr.get_atom_pts(), pqr.get_radii(),
                                      pqr.get_cg_centers(), pqr.get_cg_radii()));
@@ -50,18 +50,18 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
   auto _expcons = make_shared<ExpansionConstants> (pol);
   
   // Generate surface integrals
-  IEMatrix ieMatTest(0, sys->get_MoleculeSAM(0), SHCalcTest, pol,
+  IEMatrix ieMatTest(0, sys->get_moli(0), SHCalcTest, pol,
                      _expcons, true, 0, true);
 
   auto ReExp = make_shared<ReExpCoeffsConstants>(kap,sys->get_lambda(),pol);
   
   // Analytical H matrix initialized
   auto hmat = make_shared<HMatrix>(0, sys->get_Ns_i(0), pol, kap);
-  hmat->init(sys->get_MoleculeSAM(0), SHCalcTest, 4.0);
+  hmat->init(sys->get_moli(0), SHCalcTest, 4.0);
   
   // Local H, numeric
   LHMatrix lhmt(0, sys->get_Ns_i(0), pol, kap);
-  lhmt.init(sys->get_MoleculeSAM(0), hmat, SHCalcTest, BesselCal, _expcons);
+  lhmt.init(sys->get_moli(0), hmat, SHCalcTest, BesselCal, _expcons);
   
   // Transform class
   TMatrix tmat( pol, sys, SHCalcTest, cst, BesselCal, ReExp);
@@ -97,7 +97,7 @@ TEST_F(TMatrixUTest, xforIntra_analytic_test)
   int pol = 5;
   double kap = 0.21053961;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
-  vector<shared_ptr<MoleculeSAM> > mols;
+  vector<shared_ptr<BaseMolecule> > mols;
   mols.push_back(make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
                                      pqr.get_atom_pts(), pqr.get_radii(),
                                      pqr.get_cg_centers(), pqr.get_cg_radii()));
@@ -111,7 +111,7 @@ TEST_F(TMatrixUTest, xforIntra_analytic_test)
   auto _expcons = make_shared<ExpansionConstants> (pol);
   
   // Generate surface integrals
-  IEMatrix ieMatTest(0, sys->get_MoleculeSAM(0), SHCalcTest, pol,
+  IEMatrix ieMatTest(0, sys->get_moli(0), SHCalcTest, pol,
                      _expcons, true, 0, true);
   
   auto ReExp = make_shared<ReExpCoeffsConstants> (kap, sys->get_lambda(), pol);
