@@ -81,7 +81,7 @@ public:
    Default is 1 x 1 matrix
    */
   MyExpansion(const int poles=1)
-  : poles_(poles), vals_ (poles*poles)
+  : poles_(poles), vals_ (poles*poles, 0.0)
   {
     map_cmplx_to_double();
   }
@@ -293,6 +293,25 @@ public:
     return result;
   }
   
+  /*
+   Vector Expansion multiplication. If this has n poles, then rhs
+   must be a vector of length n.
+   */
+  MyExpansion operator*(double scalar)
+  {
+    MyExpansion result = MyExpansion(poles_);
+    int i, j, ct(0);
+    for (i = 0; i < poles_; i++)
+    {
+      for (j= 0; j < 2*i+1; j++) //Accounting for real+imag
+      {
+        result.set_val(ct, vals_[ct] * scalar);
+        ct++;
+      }
+    }
+    return result;
+  }
+  
   const int get_poles() { return poles_; }
   
 };
@@ -308,13 +327,56 @@ protected:
       
 public:
   
-  MyGradExpansion(int poles) : exps_(3, MyExpansion(poles)), poles_(poles)
+  MyGradExpansion(int poles = 1) : exps_(3, MyExpansion(poles)), poles_(poles)
   {
   }
   
-  MyExpansion get_dim(int dim) { return exps_[dim];} 
+  MyExpansion get_dim(int dim) { return exps_[dim];}
+  
+  complex<double> get_dimij_cmplx(int dim, int i, int j)
+  { return exps_[dim].get_cmplx(i, j);}
+  
+  void set_dim(int dim, MyExpansion exp) { exps_[dim] = exp;}
+  
+  void set_dim_val_cmplx(int dim, int i, int j, complex<double> val)
+  { exps_[dim].set_val_cmplx(i, j, val);}
   
   
+  /*
+   Addition operator returns new matrix
+   */
+  MyGradExpansion operator+(MyGradExpansion rhs)
+  {
+    if (poles_ != rhs.poles_)
+    {
+      throw ExpansionArithmeticException(ADDITION, poles_, rhs.poles_);
+    }
+    
+    MyGradExpansion result = MyGradExpansion(poles_);
+    int i;
+    for (i = 0; i < 3; i++)
+    {
+      result.set_dim(i, exps_[i] + rhs.exps_[i]);
+    }
+    return result;
+  }
+  
+  /*
+   summation operator adds to existing matrix
+   */
+  MyGradExpansion operator+=(MyGradExpansion rhs)
+  {
+    if (poles_ != rhs.poles_)
+    {
+      throw ExpansionArithmeticException(ADDITION, poles_, rhs.poles_);
+    }
+    int i;
+    for (i = 0; i < 3; i++)
+    {
+      set_dim(i, exps_[i] + rhs.exps_[i]);
+    }
+    return *this;
+  }
   
   
 };

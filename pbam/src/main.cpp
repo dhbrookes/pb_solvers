@@ -45,7 +45,7 @@ int main(int argc, const char * argv[])
   
   PBAM pbam_run(input_file);
   pbam_run.run();
-    
+
   return 0;
 }
 

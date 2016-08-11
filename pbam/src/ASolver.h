@@ -51,7 +51,7 @@ protected:
    and dA/dphi, respectively. This can only be calculated once A has been
    solved for
    */
-  shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > _gradT_A_,_gradA_,_prevGradA_;
+  shared_ptr<MyMatrix<MyGradExpansion > > _gradT_A_,_gradA_,_prevGradA_;
   
   /*
    enum for telling the ReExpCoeffs which values to retrieve
@@ -65,13 +65,10 @@ protected:
   double                  a_avg_;  // the average radius of particles in syst
   double            polz_cutoff_; // cutoff between mol surfaces for polarization
 
-  shared_ptr<vector<MyExpansion> >     _E_;
+  shared_ptr<vector<MyExpansion> >     _E_, _L_;
   shared_ptr<VecOfVecs<double>::type > _gamma_, _delta_;
-  shared_ptr<VecOfMats<cmplx>::type>   _L_;
-  
-  //LF edit
-//  shared_ptr<VecOfMats<cmplx>::type>      _gamma_, _delta_, _E_, _L_;
-  shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL_;
+
+  shared_ptr<MyVector<MyGradExpansion > > _gradL_;
   shared_ptr<ReExpCoeffsConstants>        _reExpConsts_;
   shared_ptr<BesselCalc>      _besselCalc_;
   shared_ptr<System>          _sys_;  // system data (radii, charges, etc.)
@@ -89,13 +86,10 @@ protected:
   // calculate the SH for all charges in a molecule
   vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol);
   
-  // calculate one index of inner gamma matrix
-//  cmplx calc_indi_gamma(int i, int n); //LF edit
-  
+  // calculate one index of inner gamma matrix  
   double calc_indi_gamma(int i, int n);
   
   // calculate on index of inner delta matrix
-//  cmplx calc_indi_delta(int i, int n); //LF edit
   double calc_indi_delta(int i, int n);
   
   cmplx calc_indi_e(int i, int n, int m);
@@ -127,41 +121,44 @@ protected:
   
   // re-expand element j of A with element (i, j) of T and return results
   // if prev=True then re-expand prevA
-  MyMatrix<cmplx> re_expandA(int i, int j, bool prev=false);
+  void re_expandA(int i, int j, MyExpansion& z, bool prev=false);
   
   // re-expand element j of grad(A) with element (i, j) of T
-  VecOfMats<cmplx>::type re_expand_gradA(int i,int j,int wrt,bool prev=false);
+  void re_expand_gradA(int i,int j,int wrt,
+                       MyGradExpansion &Z, bool prev=false);
   
   // re-expand element j of A with element (i, j) of grad(T) and return results
   // uses eq 46 to solve eq 47 in Lotan 2006
-  VecOfMats<cmplx>::type re_expandA_gradT(int i, int j, bool prev=false);
+  void re_expandA_gradT(int i, int j, MyGradExpansion &Z, bool prev=false);
   
   // perform first part of T*A and return results (see eq 46 in Lotan 2006)
   // input wrt is only used if whichA is not BASE (then we need to know which
   // molecule the gradient is with respect to). If prev=True then expand
   // prevA (or prevGradA_)
-  MyMatrix<cmplx> expand_RX(int i, int j, WhichReEx whichR,
-                            WhichReEx whichA, bool prev, int wrt=-1);
+  void expand_RX(int i, int j, MyExpansion& x1, WhichReEx whichR,
+                 WhichReEx whichA, bool prev, int wrt=-1);
   
   // perform first part of T*A and return results for singular A wrt THETA
-  MyMatrix<cmplx> expand_dRdtheta_sing(int i, int j, double theta,
-                                       MyExpansion mat, bool ham);
+  void expand_dRdtheta_sing(int i, int j, double theta, MyExpansion mat_in,
+                            MyExpansion& mat_out, bool ham);
   //LF test
-  MyMatrix<cmplx> expand_dRdtheta_sing(int i, int j, double theta, bool ham);
+  void expand_dRdtheta_sing(int i, int j, double theta,
+                            MyExpansion& mat, bool ham);
   
   // perform first part of T*A and return results for singular A wrt PHI
-  MyMatrix<cmplx> expand_dRdphi_sing(int i, int j, double theta,
-                                     MyExpansion mat, bool ham);
+  void expand_dRdphi_sing(int i, int j, double theta,
+                          MyExpansion& mat, bool ham);
   //LF test
-  MyMatrix<cmplx> expand_dRdphi_sing(int i, int j, double theta, bool ham);
+  void expand_dRdphi_sing(int i, int j, double theta, MyExpansion mat_in,
+                          MyExpansion& mout, bool ham);
 
   // perform second part of T*A and return results (see eq 46 in Lotan 2006)
-  MyMatrix<cmplx> expand_SX(int i, int j, MyMatrix<cmplx> x1,
-                            WhichReEx whichS);
+  void expand_SX(int i, int j, MyExpansion x1, MyExpansion & x2,
+                 WhichReEx whichS);
 
   // perform third part of T*A and return results (see eq 46 in Lotan 2006)
-  MyMatrix<cmplx> expand_RHX(int i, int j, MyMatrix<cmplx> x2,
-                             WhichReEx whichRH);
+  void expand_RHX(int i, int j, MyExpansion x2, MyExpansion & z,
+                  WhichReEx whichRH);
   
   // precompute gradT times A(i,j) for all pairs of molecules
   void pre_compute_gradT_A();
@@ -170,8 +167,6 @@ protected:
   // previous values
   cmplx which_aval(WhichReEx whichA, bool prev, int i, int n,
                    int m, int wrt=-1);
-
-  
   
   // perform one iterations of the solution for grad(A) (eq53 in Lotan 2006)
   void grad_iter(int j);
@@ -196,21 +191,14 @@ public:
           const int p=Constants::MAX_NUM_POLES,
           double polz_cutoff = 10.0);
   
-  //LF edit
-//  shared_ptr<VecOfMats<cmplx>::type>  get_gamma() { return _gamma_; }
-//  shared_ptr<VecOfMats<cmplx>::type>  get_delta() { return _delta_; }
-//  shared_ptr<VecOfMats<cmplx>::type>  get_E()     { return _E_; }
-  
   shared_ptr<VecOfVecs<double>::type>  get_gamma() { return _gamma_; }
   shared_ptr<VecOfVecs<double>::type>  get_delta() { return _delta_; }
   shared_ptr<vector<MyExpansion> >     get_E()     { return _E_; }
 
-  //LF test
-  shared_ptr<vector<MyExpansion> >  get_A()     { return _A_; }
-  
-  shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > get_gradA() {return _gradA_ ; }
-  shared_ptr<MyVector<VecOfMats<cmplx>::type > > get_gradL() {return _gradL_ ; }
-  shared_ptr<VecOfMats<cmplx>::type>  get_L() {return  _L_; }
+  shared_ptr<vector<MyExpansion> >        get_A()     {return _A_; }
+  shared_ptr<vector<MyExpansion> >        get_L()     {return  _L_; }
+  shared_ptr<MyMatrix<MyGradExpansion > > get_gradA() {return _gradA_ ; }
+  shared_ptr<MyVector<MyGradExpansion > > get_gradL() {return _gradL_ ; }
   
   int get_p() { return p_; }
   int get_N() { return N_; }
@@ -222,13 +210,6 @@ public:
   
   void calc_L();
   void calc_gradL();
-  
-  //LF edit
-//  cmplx get_gamma_ni( int i, int n)       {return _gamma_->operator[](i)(n,n);}
-//  cmplx get_delta_ni( int i, int n)       {return _delta_->operator[](i)(n,n);}
-//  cmplx get_SH_ij(int i, int j, int n, int m)
-//  {return (*_allSh_)[i][j](n,abs(m));}
-//  cmplx get_E_ni(int i, int n, int m)     {return _E_->operator[](i)(n,m+p_);}
 
   double get_gamma_ni( int i, int n)       {return _gamma_->operator[](i)[n];}
   double get_delta_ni( int i, int n)       {return _delta_->operator[](i)[n];}
@@ -242,50 +223,51 @@ public:
   cmplx get_prevA_ni(int i, int n, int m)
   {return _prevA_->operator[](i).get_cmplx(n,m); }
   
-  VecOfMats<cmplx>::type get_gradT_Aij( int i, int j)
-        {return _gradT_A_->operator()(i,j);}
+  MyGradExpansion get_gradT_Aij( int i, int j)
+  {return _gradT_A_->operator()(i,j);}
   
   // convert derivs in matrix to cartesian
-  VecOfMats<cmplx>::type conv_to_cart(VecOfMats<cmplx>::type dZ, int i, int j);
+//  VecOfMats<cmplx>::type conv_to_cart(VecOfMats<cmplx>::type dZ, int i, int j);
+  MyGradExpansion conv_to_cart(MyGradExpansion& dZ, int i, int j);
   
   // get elements of grad_j(A^(i))
   cmplx get_dAdr_ni(int i, int j, int n, int m)
-  { return _gradA_->operator()(i, j)[0](n, m+p_);}
+  { return _gradA_->operator()(i, j).get_dimij_cmplx(0, n, m);}
   cmplx get_dAdtheta_ni(int i, int j, int n, int m)
-  { return _gradA_->operator()(i, j)[1](n, m+p_);}
+  { return _gradA_->operator()(i, j).get_dimij_cmplx(1, n, m);}
   cmplx get_dAdphi_ni(int i, int j, int n, int m)
-  { return _gradA_->operator()(i, j)[2](n, m+p_);}
+  { return _gradA_->operator()(i, j).get_dimij_cmplx(2, n, m);}
   
   cmplx get_prev_dAdr_ni(int i, int j, int n, int m)
-  { return _prevGradA_->operator()(i, j)[0](n, m+p_);}
+  { return _prevGradA_->operator()(i, j).get_dimij_cmplx(0, n, m);}
   cmplx get_prev_dAdtheta_ni(int i, int j, int n, int m)
-  { return _prevGradA_->operator()(i, j)[1](n, m+p_);}
+  { return _prevGradA_->operator()(i, j).get_dimij_cmplx(1, n, m);}
   cmplx get_prev_dAdphi_ni(int i, int j, int n, int m)
-  { return _prevGradA_->operator()(i, j)[2](n, m+p_);}
+  { return _prevGradA_->operator()(i, j).get_dimij_cmplx(2,n, m);}
   
   void set_prev_dAdr_ni(int i, int j, int n, int m, cmplx val)
-  { _prevGradA_->operator()(i, j)[0].set_val(n, m+p_, val); }
+  { _prevGradA_->operator()(i, j).set_dim_val_cmplx(0, n, m, val); }
   
   void set_prev_dAdtheta_ni(int i, int j, int n, int m, cmplx val)
-  { _prevGradA_->operator()(i, j)[1].set_val(n, m+p_, val); }
+  { _prevGradA_->operator()(i, j).set_dim_val_cmplx(1, n, m, val); }
   
   void set_prev_dAdphi_ni(int i, int j, int n, int m, cmplx val)
-  { _prevGradA_->operator()(i, j)[2].set_val(n, m+p_, val); }
+  { _prevGradA_->operator()(i, j).set_dim_val_cmplx(2, n, m, val); }
   
   // get elements of grad_j(A^(i))
   cmplx get_dAdx_ni(int i, int j, int n, int m)
-  { return _gradA_->operator()(i, j)[0](n, m+p_);}
+  { return _gradA_->operator()(i, j).get_dimij_cmplx(0, n, m);}
   cmplx get_dAdy_ni(int i, int j, int n, int m)
-  { return _gradA_->operator()(i, j)[1](n, m+p_);}
+  { return _gradA_->operator()(i, j).get_dimij_cmplx(1, n, m);}
   cmplx get_dAdz_ni(int i, int j, int n, int m)
-  { return _gradA_->operator()(i, j)[2](n, m+p_);}
+  { return _gradA_->operator()(i, j).get_dimij_cmplx(2, n, m);}
   
   cmplx get_prev_dAdx_ni(int i, int j, int n, int m)
-  { return _prevGradA_->operator()(i, j)[0](n, m+p_);}
+  { return _prevGradA_->operator()(i, j).get_dimij_cmplx(0, n, m);}
   cmplx get_prev_dAdy_ni(int i, int j, int n, int m)
-  { return _prevGradA_->operator()(i, j)[1](n, m+p_);}
+  { return _prevGradA_->operator()(i, j).get_dimij_cmplx(1, n, m);}
   cmplx get_prev_dAdz_ni(int i, int j, int n, int m)
-  { return _prevGradA_->operator()(i, j)[2](n, m+p_);}
+  { return _prevGradA_->operator()(i, j).get_dimij_cmplx(2, n, m);}
   
   void set_A_ni(int i, int n, int m, cmplx val)
   {_A_->operator[](i).set_val_cmplx( n, m, val);}

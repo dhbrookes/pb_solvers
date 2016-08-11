@@ -396,16 +396,16 @@ public:
    */
   MyVector<T> mult(const MyVector<T>& rhs)
   {
-    if (rhs.nrows_ != this->nrows)
+    if (rhs.nrows_ != this->nrows_)
     {
       throw MatrixArithmeticException(INNER_PRODUCT, this->nrows_,
                                       this->ncols_, rhs.nrows_, rhs.ncols_);
     }
-    MyVector<T> out = MyVector<T>(this->nrows);
+    MyVector<T> out = MyVector<T>(this->nrows_);
     int i;
     for(i = 0; i < this->nrows_; i++)
     {
-      out[i] = this[i] * rhs[i];
+      out.set_val(i, this->operator[](i) * rhs.vals_[i][0]);
     }
     return out;
   }

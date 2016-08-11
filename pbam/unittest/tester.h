@@ -36,10 +36,10 @@ public:
     BCalcT.TestBesselCalc();
     cout << "Complete Bessel calculation test" << endl;
     
-    ASolverTest ASolvT;
-    ASolvT.RunASolverTest();
-    ASolvT.RunASolverTest2();
-    cout << "Complete ASolv test" << endl;
+//    ASolverTest ASolvT;
+//    ASolvT.RunASolverTest();
+//    ASolvT.RunASolverTest2();
+//    cout << "Complete ASolv test" << endl;
     
     ConstantsTest ConT;
     ConT.TestConstants();
