@@ -19,8 +19,8 @@ protected :
   
   int vals_;
   shared_ptr<Constants> const_;
-  vector< Molecule > mol_;
-  vector< Molecule > mol_sing_;
+  vector< MoleculeAM > mol_;
+  vector< MoleculeAM > mol_sing_;
   
   virtual void SetUp()
   {
@@ -40,13 +40,13 @@ protected :
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0] = cg[molInd]; posCharges[0] = cgPos[molInd]; vdW[0] = 0.0;
       
-      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
 
-      Molecule molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      MoleculeAM molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -604,7 +604,7 @@ TEST_F(ASolverUTest, checkAMulti)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -656,7 +656,7 @@ TEST_F(ASolverUTest, checkAMultiPBC)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]
                     , molInd, 0);
     mol_.push_back( molNew );
   }
@@ -713,7 +713,7 @@ TEST_F(ASolverUTest, checkAPBC)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd], molInd, 0);
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd], molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -763,7 +763,7 @@ TEST_F(ASolverUTest, checkAPBCoutside)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -847,7 +847,7 @@ TEST_F(ASolverUTest, checkASingMult)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }
@@ -894,7 +894,7 @@ TEST_F(ASolverUTest, checkASingMultFlip)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }
@@ -974,7 +974,7 @@ TEST_F(ASolverUTest, checkgradT_A)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -1108,7 +1108,7 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }
@@ -1229,7 +1229,7 @@ TEST_F(ASolverUTest, checkgradA)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -1343,7 +1343,7 @@ TEST_F(ASolverUTest, checkgradASing)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }
@@ -1493,7 +1493,7 @@ TEST_F(ASolverUTest, checkL)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -1539,7 +1539,7 @@ TEST_F(ASolverUTest, checkLSing)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }
@@ -1594,7 +1594,7 @@ TEST_F(ASolverUTest, checkdL)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -1690,7 +1690,7 @@ TEST_F(ASolverUTest, checkdLSing)
     charges[1]=2.0; vdW[1]=0; posCharges[1]=cgPosSi[molInd] + Pt(1.0,0.0,0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2]=cgPosSi[molInd] + Pt(0.0,1.0,0.0);
     
-    Molecule molSing( "stat", 2.0, charges, posCharges, vdW, cgPosSi[molInd],
+    MoleculeAM molSing( "stat", 2.0, charges, posCharges, vdW, cgPosSi[molInd],
                      molInd, 0);
     mol_sing_.push_back( molSing );
   }

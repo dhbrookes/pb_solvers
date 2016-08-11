@@ -352,10 +352,10 @@ void ThreeBody::generatePairsTrips()
 
 shared_ptr<System> ThreeBody::make_subsystem(vector<int> mol_idx)
 {
-  vector<Molecule> sub_mols (mol_idx.size());
+  vector<MoleculeAM> sub_mols (mol_idx.size());
   for (int i = 0; i < mol_idx.size(); i++)
   {
-    sub_mols[i] = _sys_->get_molecule(mol_idx[i]);
+    sub_mols[i] = _sys_->get_moli(mol_idx[i]);
   }
   
   shared_ptr<System> _subsys = make_shared<System>(sub_mols,_sys_->get_cutoff(),
@@ -504,7 +504,7 @@ void ThreeBody::printTBDEnForTor( string outf, vector<string> outfile )
   
   for ( i = 0; i < N_; i++)
   {
-    out << "MOLECULE #" << i + 1 << " radius: " << _sys_->get_radi(i) << endl;
+    out << "MoleculeAM #" << i + 1 << " radius: " << _sys_->get_radi(i) << endl;
     out << "\tPOSITION: [" << _sys_->get_centeri(i).x() << ", "
         << _sys_->get_centeri(i).y() << ", ";
     out << _sys_->get_centeri(i).z() << "]" << endl;
@@ -660,7 +660,7 @@ void PhysCalc::print_all()
   {
     force_norm = 0;
     torque_norm = 0;
-    out << "MOLECULE #" << i + 1 << " radius: " << _sys_->get_radi(i) << endl;
+    out << "MoleculeAM #" << i + 1 << " radius: " << _sys_->get_radi(i) << endl;
     out << "\tPOSITION: [" << mol_pos[i].x() << ", " << mol_pos[i].y();
     out << ", " << mol_pos[i].z() << "]" << endl;
     out << "\tENERGY: " << unit_conv_ * get_omega()->operator[](i) << endl;

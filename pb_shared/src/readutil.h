@@ -166,7 +166,7 @@ protected:
   int moltype2_;
   
   vector<vector<int> > atPairs_;  // vector of size-two vectors (atom index 
-                                  // from each molecule type)
+                                  // from each MoleculeSAMAM type)
   vector<double> dists_;  // min distance between the above pairs
   
   
@@ -355,7 +355,7 @@ public:
 class XYZFile
 {
 protected:
-  int nmols_;  // number of molecules
+  int nmols_;  // number of MoleculeSAMAMs
   vector<Pt> pts_;
   string path_;
   

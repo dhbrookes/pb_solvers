@@ -11,6 +11,7 @@ include_directories("../../pb_shared/unittest")
 
 ADD_EXECUTABLE(pbamtest 
   ../src/ASolver.cpp
+  ../../pb_shared/src/BaseSys.cpp
   ../src/BD.cpp
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp

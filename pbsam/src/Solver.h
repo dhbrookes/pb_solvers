@@ -36,7 +36,7 @@ protected:
   vector<shared_ptr<XHMatrix> >     _XH_;
   
   vector<shared_ptr<HMatrix> >      _H_;
-  vector<shared_ptr<HMatrix> >      _rotH_; // This is for out of molecule?
+  vector<shared_ptr<HMatrix> >      _rotH_; // This is for out of MoleculeSAM?
   vector<shared_ptr<HMatrix> >      _prevH_;
   vector<shared_ptr<HMatrix> >      _outerH_;
   
@@ -131,7 +131,7 @@ protected:
 
   shared_ptr<TMatrix>               _T_;
   
-  // inner index is molecule number, outer index is index of the molecule
+  // inner index is MoleculeSAM number, outer index is index of the MoleculeSAM
   // that this derivative is with respect to
   vector<vector<shared_ptr<GradFMatrix> > >   dF_;
   vector<vector<shared_ptr<GradHMatrix> > >   dH_;

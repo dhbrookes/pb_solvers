@@ -60,7 +60,7 @@ protected:
   enum WhichReEx { BASE, DDR, DDPHI, DDTHETA };
   
   bool                  solvedA_;  // Boolean of whether or not A is solved
-  int                         N_;  // number of molecules
+  int                         N_;  // number of MoleculeAMs
   int                         p_;  // max value for n (2*numVals_ usually)
   double                  a_avg_;  // the average radius of particles in syst
   double            polz_cutoff_; // cutoff between mol surfaces for polarization
@@ -79,12 +79,12 @@ protected:
   MyMatrix<ReExpCoeffs>  T_;
   
   // pre-computed spherical harmonics matrices for every charge in the system
-  // inner vector is all SH for all the charges in a molecule.
-  // Outer vector is every molecule
+  // inner vector is all SH for all the charges in a MoleculeAM.
+  // Outer vector is every MoleculeAM
   shared_ptr<vector<vector<MyMatrix<cmplx> > > > _allSh_;
   
-  // calculate the SH for all charges in a molecule
-  vector<MyMatrix<cmplx> > calc_mol_sh(Molecule mol);
+  // calculate the SH for all charges in a MoleculeAM
+  vector<MyMatrix<cmplx> > calc_mol_sh(MoleculeAM mol);
   
   // calculate one index of inner gamma matrix  
   double calc_indi_gamma(int i, int n);
@@ -133,7 +133,7 @@ protected:
   
   // perform first part of T*A and return results (see eq 46 in Lotan 2006)
   // input wrt is only used if whichA is not BASE (then we need to know which
-  // molecule the gradient is with respect to). If prev=True then expand
+  // MoleculeAM the gradient is with respect to). If prev=True then expand
   // prevA (or prevGradA_)
   void expand_RX(int i, int j, MyExpansion& x1, WhichReEx whichR,
                  WhichReEx whichA, bool prev, int wrt=-1);
@@ -160,7 +160,7 @@ protected:
   void expand_RHX(int i, int j, MyExpansion x2, MyExpansion & z,
                   WhichReEx whichRH);
   
-  // precompute gradT times A(i,j) for all pairs of molecules
+  // precompute gradT times A(i,j) for all pairs of MoleculeAMs
   void pre_compute_gradT_A();
   
   // convenience method for retrieving values from A and gradA (or their

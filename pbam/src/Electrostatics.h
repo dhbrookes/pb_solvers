@@ -38,7 +38,7 @@
 #include <omp.h>
 #endif
 
-// Exception class to ensure that molecule
+// Exception class to ensure that MoleculeAM
 class ValueOutOfRange: public exception
 {
 protected:
@@ -77,7 +77,7 @@ protected:
   double pot_min_; // A minimum value of the pot
   double pot_max_; // A max value of the potential
   
-  double lam_; // Average radius of molecules in system
+  double lam_; // Average radius of MoleculeAMs in system
   
   vector<double> range_min_;  // Origin of grid in each dim
   vector<double> range_max_;  // Origin of grid in each dim
