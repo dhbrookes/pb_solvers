@@ -553,7 +553,7 @@ TEST_F(ASolverUTest, checkAMulti_iter)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }

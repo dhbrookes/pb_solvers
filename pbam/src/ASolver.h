@@ -227,7 +227,6 @@ public:
   {return _gradT_A_->operator()(i,j);}
   
   // convert derivs in matrix to cartesian
-//  VecOfMats<cmplx>::type conv_to_cart(VecOfMats<cmplx>::type dZ, int i, int j);
   MyGradExpansion conv_to_cart(MyGradExpansion& dZ, int i, int j);
   
   // get elements of grad_j(A^(i))

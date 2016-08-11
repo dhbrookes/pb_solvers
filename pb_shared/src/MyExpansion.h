@@ -336,6 +336,9 @@ public:
   complex<double> get_dimij_cmplx(int dim, int i, int j)
   { return exps_[dim].get_cmplx(i, j);}
   
+  double get_dimi(int dim, int i)
+  { return exps_[dim](i);}
+  
   void set_dim(int dim, MyExpansion exp) { exps_[dim] = exp;}
   
   void set_dim_val_cmplx(int dim, int i, int j, complex<double> val)

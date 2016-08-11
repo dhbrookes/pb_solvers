@@ -61,7 +61,7 @@ public :
   void RunASolverTest2()
   {
     shared_ptr<Constants> const_ = make_shared<Constants>();
-    vector< Molecule > mol_;
+    vector< MoleculeAM > mol_;
     mol_.clear( );
     Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0)};
     for (int molInd = 0; molInd < 3; molInd ++ )
@@ -72,7 +72,7 @@ public :
       charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
       charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
       
-      Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+      MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
     }
