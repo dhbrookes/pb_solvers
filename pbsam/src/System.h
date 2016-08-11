@@ -189,24 +189,7 @@ public:
 class System : public BaseSystem
 {
 protected:
-    
-//  int                          N_; // number of MoleculeSAMs
-//  double                       lambda_; // average molecular radius
-//  vector<shared_ptr<MoleculeSAM> >             molecules_;
-  
-//  double                       boxLength_;
-//  double                       cutoff_;
-  
-//  double t_;  // time in a BD simulation
-  
-//  int                          ntype_;  //count of unique MoleculeSAM types
-//  vector<int>                  typect_; //count of MoleculeSAM of each unique type
   vector<vector<double> >      min_dist_; // minimum dist between mols
-//  map<vector<int>, int>        typeIdxToIdx_;
-  
-//  const double calc_average_radius() const;
-  
-//  MoleculeSAM build_type_mol(int type, Setup setup);
   
 public:
   System() { }
@@ -217,31 +200,15 @@ public:
   
   System(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
   
-//  const int get_n() const                  {return N_;}
-//  const int get_ntype()                    {return ntype_;}
-//  const int get_typect(int i)              {return typect_[i];}
   vector<int> get_all_Ik()
   {
     vector<int> ns_i;
     for ( int i = 0; i< N_; i++) ns_i.push_back(get_Ns_i(i));
     return ns_i;
   }
-//  const double get_aik(int i, int k) const {return molecules_[i]->get_ak(k);}
-//  const int get_Nc_i(int i) const       {return molecules_[i]->get_nc();}
-//  const int get_Ns_i(int i) const       {return molecules_[i]->get_ns();}
-//  const double get_qij(int i, int j) const {return molecules_[i]->get_qj(j);}
-//  const double get_droti(int i) const      {return molecules_[i]->get_drot();}
-//  const double get_dtransi(int i) const    {return molecules_[i]->get_dtrans();}
-//  const double get_boxlength() const       {return boxLength_;}
-//  const double get_cutoff() const          {return cutoff_;}
-//  const double get_time() const            {return t_;}
-//  const double get_lambda() const          {return lambda_;}
-//  shared_ptr<MoleculeSAM> get_moli(int i) const  {return molecules_[i];}
   
   Pt get_cogi(int i) const                {return molecules_[i]->get_cog();}
-//  Pt get_posij(int i, int j)               {return molecules_[i]->get_posj(j);}
-//  Pt get_centerik(int i, int k) const   {return molecules_[i]->get_centerk(k);}
-//  const string get_typei(int i) const   {return molecules_[i]->get_move_type();}
+
   const double get_radij(int i, int j)
                                      const {return molecules_[i]->get_radj(j);}
   Pt get_posijreal(int i, int j) {return molecules_[i]->get_posj_realspace(j);}
@@ -264,28 +231,6 @@ public:
   
   // Save min distances for all MoleculeSAM pairs
   void save_min_dist();
-  
-  // Compute cutoff for force calcs
-//  void compute_cutoff();
-  
-  // Set time of simulation as what is input
-//  void set_time(double val) { t_ = val; }
-  
-  // translate every charge in MoleculeSAM i by the vector dr
-//  void translate_mol(int i, Pt dr) { molecules_[i]->translate(dr, boxLength_); }
-  
-  // rotate every charge in MoleculeSAM i
-//  void rotate_mol(int i, Quat qrot) { molecules_[i]->rotate(qrot); }
-  
-  // Check to determine if any MoleculeSAMs are overlapping
-//  void check_for_overlap();
-  
-  // get distance vector between any two points taking into account periodic
-  // boundary conditions
-//  Pt get_pbc_dist_vec_base(Pt p1, Pt p2);
-  
-  // given a distance vector, determine whether it is in the cutoff
-//  bool less_than_cutoff(Pt v);
   
   // write current system to PQR file, mid=-1 is print all MoleculeSAMs,
   // else only print one
