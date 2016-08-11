@@ -141,14 +141,12 @@ protected:
   // perform first part of T*A and return results for singular A wrt THETA
   void expand_dRdtheta_sing(int i, int j, double theta, MyExpansion mat_in,
                             MyExpansion& mat_out, bool ham);
-  //LF test
   void expand_dRdtheta_sing(int i, int j, double theta,
                             MyExpansion& mat, bool ham);
   
   // perform first part of T*A and return results for singular A wrt PHI
   void expand_dRdphi_sing(int i, int j, double theta,
                           MyExpansion& mat, bool ham);
-  //LF test
   void expand_dRdphi_sing(int i, int j, double theta, MyExpansion mat_in,
                           MyExpansion& mout, bool ham);
 

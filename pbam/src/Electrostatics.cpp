@@ -36,7 +36,6 @@ _bCalc_(_bCalc), _consts_(_consts)
   compute_pot();
 }
 
-//TODO: LF test
 Electrostatic::Electrostatic(shared_ptr<ASolver> _asolv, int npts)
 :p_(_asolv->get_p()), pot_min_(0), pot_max_(0),
 lam_(_asolv->get_sys()->get_lambda()), _A_(_asolv->get_A()),

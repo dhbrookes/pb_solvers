@@ -116,7 +116,7 @@ void ASolver::iter()
 {
   Pt v;
   int i, j;
-  MyExpansion Z, zj(p_), ai; //LF edit
+  MyExpansion Z, zj(p_), ai;
 
   copy_to_prevA();
   bool polz(false), interact(false), prev(true);
@@ -157,15 +157,14 @@ void ASolver::iter()
 }
 
 // one iteration of numerical solution for grad(A) WRT j (eq 53 in Lotan 2006)
+// Solving for grad_j(A^(i)) by iterating through T^(i,k)
+// relevant re-expansions (g prefix means gradient):
 void ASolver::grad_iter(int j)
 {
-  // Solving for grad_j(A^(i)) by iterating through T^(i,k)
-  int i, k;
-
-  // relevant re-expansions (g prefix means gradient):
-  MyGradExpansion add(p_);
-//  MyVector<double> gamma_delta(p_); //LF edit
   Pt v;
+  int i, k;
+  MyGradExpansion add(p_);
+  
   bool prev(true), polz(false), interact(false); //want to re-expand previous
   copy_to_prevGradA(j);
   for (i = 0; i < N_; i++) // MoleculeAM of interest
@@ -530,12 +529,10 @@ void ASolver::expand_RHX(int i, int j, MyExpansion x2, MyExpansion &z,
             z.set_val_cmplx(n, m, x2.get_cmplx(n,m));
         } else if (whichRH == DDTHETA)
         {
-          //LF test
           expand_dRdtheta_sing(lowI, hiJ, vec.theta(), x2, z, true);
         }
         else
         {
-          //LF test
           expand_dRdphi_sing(lowI, hiJ, vec.theta(), x2, z, true);
         }
       } else
@@ -567,7 +564,6 @@ void ASolver::expand_dRdtheta_sing(int i, int j, double theta,
   expand_dRdtheta_sing(lowI, hiJ, theta, _prevA_->operator[](j), mat, ham);
 }
 
-//LF test: Both singular functions
 void ASolver::expand_dRdtheta_sing(int i, int j, double theta,
                                    MyExpansion mat_in,
                                    MyExpansion& mat_out, bool ham)
@@ -579,17 +575,18 @@ void ASolver::expand_dRdtheta_sing(int i, int j, double theta,
   {
     for (int n = 1; n < p_; n++)
     {
-      mat_out.set_val_cmplx( n, 0, rec*cmplx(2.0*T_(i,j).get_prefac_dR_val(n,0,1)*
-                                  mat_in(n, 1, REAL), 0.0)); // m = 0
+      mat_out.set_val_cmplx(n, 0, rec*
+                            cmplx(2.0*T_(i,j).get_prefac_dR_val(n,0,1)*
+                            mat_in(n, 1, REAL), 0.0)); // m = 0
       
       for (int m = 1; m < n; m++)
       {
-        mat_out.set_val_cmplx( n, m, rec*T_(i,j).get_prefac_dR_val(n,m,0)*mat_in.get_cmplx(n,m-1)
-                  + rec*T_(i,j).get_prefac_dR_val(n,m,1)*mat_in.get_cmplx(n,m+1));
+        mat_out.set_val_cmplx( n, m, rec*T_(i,j).get_prefac_dR_val(n,m,0)*
+                              mat_in.get_cmplx(n,m-1) + rec*T_(i,j).get_prefac_dR_val(n,m,1)*mat_in.get_cmplx(n,m+1));
       }
 
-      mat_out.set_val_cmplx(n, n,
-                rec*T_(i,j).get_prefac_dR_val( n, n, 0)*mat_in.get_cmplx(n, n-1));
+      mat_out.set_val_cmplx(n, n, rec*T_(i,j).get_prefac_dR_val( n, n, 0)
+                            *mat_in.get_cmplx(n, n-1));
     }
   }
   else
@@ -606,7 +603,8 @@ void ASolver::expand_dRdtheta_sing(int i, int j, double theta,
                    + T_(i,j).get_prefac_dR_val(n,m,1)*mat_in.get_cmplx(n,-m-1)));
       }
       
-      mat_out.set_val_cmplx(n, n,rec*s*T_(i,j).get_prefac_dR_val(n, n,0)*mat_in.get_cmplx(n,-n+1));
+      mat_out.set_val_cmplx(n, n,rec*s*T_(i,j).get_prefac_dR_val(n, n,0)
+                            *mat_in.get_cmplx(n,-n+1));
     }
   }
 }
@@ -634,13 +632,12 @@ void ASolver::expand_dRdphi_sing(int i, int j, double theta, MyExpansion mat_in,
                                   mat_in(n, 1, IMAG),0.0));
       for (int m = 1; m < n; m++)
       {
-        mat_out.set_val_cmplx(n, m,
-                  rec*(cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m, 0))*mat_in.get_cmplx(n,m-1)
-                       - cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat_in.get_cmplx(n,m+1)));
+        mat_out.set_val_cmplx(n, m, rec*(cmplx(0.0, T_(i,j).get_prefac_dR_val(n,m, 0))*mat_in.get_cmplx(n,m-1) - cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat_in.get_cmplx(n,m+1)));
       }
       
-      mat_out.set_val_cmplx( n, n,
-                rec*cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,n,0))*mat_in.get_cmplx(n,n-1));
+      mat_out.set_val_cmplx( n, n, rec*cmplx( 0.0, T_(i,j).
+                                             get_prefac_dR_val(n,n,0))
+                            *mat_in.get_cmplx(n,n-1));
     }
   }
   else
@@ -652,13 +649,17 @@ void ASolver::expand_dRdphi_sing(int i, int j, double theta, MyExpansion mat_in,
                                  mat_in.get_cmplx(n,1).imag(),0.0));
       for (int m = 1; m < n; m++)
       {
-        mat_out.set_val_cmplx(n, m,
-                  rec*s*(-cmplx(0.0,T_(i,j).get_prefac_dR_val(n,m,0))*mat_in.get_cmplx(n,-m+1)
-                         + cmplx(0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat_in.get_cmplx(n,-m-1)));
+        mat_out.set_val_cmplx(n, m,rec*s*(-cmplx(0.0,T_(i,j).
+                                                 get_prefac_dR_val(n,m,0))
+                                          *mat_in.get_cmplx(n,-m+1)
+                                          + cmplx(0.0, T_(i,j).
+                                                  get_prefac_dR_val(n,m,1))
+                                          *mat_in.get_cmplx(n,-m-1)));
       }
       
-      mat_out.set_val_cmplx( n,  n, rec*cmplx(0.0,
-                                     -s*T_(i,j).get_prefac_dR_val(n,n,0))*mat_in.get_cmplx(n,-n+1));
+      mat_out.set_val_cmplx( n,  n, rec*cmplx(0.0, -s*T_(i,j).
+                                              get_prefac_dR_val(n,n,0))
+                            *mat_in.get_cmplx(n,-n+1));
     }
   }
 }
