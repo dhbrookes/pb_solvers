@@ -569,24 +569,24 @@ void ASolver::expand_dRdtheta_sing(int i, int j, double theta,
                                    MyExpansion& mat_out, bool ham)
 {
   mat_out.set_val_cmplx( 0, 0, cmplx(0.0, 0.0));
-  double rec = (ham ? -1.0 : 1.0);
+  double rPre(0), rPre1(0), rPre2(0), rec = (ham ? -1.0 : 1.0);
   
   if (theta < M_PI/2)
   {
     for (int n = 1; n < p_; n++)
     {
-      mat_out.set_val_cmplx(n, 0, rec*
-                            cmplx(2.0*T_(i,j).get_prefac_dR_val(n,0,1)*
-                            mat_in(n, 1, REAL), 0.0)); // m = 0
+      rPre = T_(i,j).get_prefac_dR_val(n,0,1); // m = 0
+      mat_out.set_val_cmplx(n, 0, rec* cmplx(2.0*rPre*mat_in(n, 1, REAL),0.0));
       
       for (int m = 1; m < n; m++)
       {
-        mat_out.set_val_cmplx( n, m, rec*T_(i,j).get_prefac_dR_val(n,m,0)*
-                              mat_in.get_cmplx(n,m-1) + rec*T_(i,j).get_prefac_dR_val(n,m,1)*mat_in.get_cmplx(n,m+1));
+        rPre1 = T_(i,j).get_prefac_dR_val(n,m,0);
+        rPre2 = T_(i,j).get_prefac_dR_val(n,m,1);
+        mat_out.set_val_cmplx(n, m, rec*rPre1*mat_in.get_cmplx(n,m-1)
+                              + rec*rPre2*mat_in.get_cmplx(n,m+1));
       }
-
-      mat_out.set_val_cmplx(n, n, rec*T_(i,j).get_prefac_dR_val( n, n, 0)
-                            *mat_in.get_cmplx(n, n-1));
+      rPre = T_(i,j).get_prefac_dR_val( n, n, 0);
+      mat_out.set_val_cmplx(n, n, rec*rPre*mat_in.get_cmplx(n, n-1));
     }
   }
   else
@@ -594,17 +594,19 @@ void ASolver::expand_dRdtheta_sing(int i, int j, double theta,
     double s = -1.0;
     for (int n = 1; n < p_; n++, s = -s)
     {
-      mat_out.set_val_cmplx( n, 0, rec*cmplx(2.0*s*T_(i,j).get_prefac_dR_val(n,0,1)*
-                                  mat_in.get_cmplx(n,1).real(), 0.0)); // m = 0
+      rPre = T_(i,j).get_prefac_dR_val(n,0,1);
+      mat_out.set_val_cmplx(n, 0,
+                            rec*cmplx(2.0*s*rPre*mat_in.
+                                      get_cmplx(n,1).real(), 0.0)); // m = 0
       for (int m = 1; m < n; m++)
       {
-        mat_out.set_val_cmplx( n, m, rec*s*
-                  (T_(i,j).get_prefac_dR_val(n,m,0)*mat_in.get_cmplx(n,-m+1)
-                   + T_(i,j).get_prefac_dR_val(n,m,1)*mat_in.get_cmplx(n,-m-1)));
+        rPre1 = T_(i,j).get_prefac_dR_val(n,m,0);
+        rPre2 = T_(i,j).get_prefac_dR_val(n,m,1);
+        mat_out.set_val_cmplx( n, m, rec*s*(rPre1*mat_in.get_cmplx(n,-m+1)
+                                            + rPre2*mat_in.get_cmplx(n,-m-1)));
       }
-      
-      mat_out.set_val_cmplx(n, n,rec*s*T_(i,j).get_prefac_dR_val(n, n,0)
-                            *mat_in.get_cmplx(n,-n+1));
+      rPre = T_(i,j).get_prefac_dR_val(n,n,0);
+      mat_out.set_val_cmplx(n, n,rec*s*rPre*mat_in.get_cmplx(n,-n+1));
     }
   }
 }
@@ -622,22 +624,23 @@ void ASolver::expand_dRdphi_sing(int i, int j, double theta, MyExpansion mat_in,
                                  MyExpansion&mat_out, bool ham)
 {
   mat_out.set_val_cmplx( 0, 0, cmplx(0.0, 0.0));
-  double rec = ((ham && (theta < M_PI/2)) ? -1.0 : 1.0);
+  double rPre(0), rPre1(0), rPre2(0), rec = ((ham&&(theta<M_PI/2)) ? -1.0:1.0);
   
   if (theta < M_PI/2)
   {
     for (int n = 1; n < p_; n++)
     {
-      mat_out.set_val_cmplx( n, 0, rec*cmplx(2.0*T_(i,j).get_prefac_dR_val(n,0,1)*
-                                  mat_in(n, 1, IMAG),0.0));
+      rPre = T_(i,j).get_prefac_dR_val(n,0,1);
+      mat_out.set_val_cmplx(n,0,rec*cmplx(2.0*rPre*mat_in(n, 1, IMAG),0.0));
       for (int m = 1; m < n; m++)
       {
-        mat_out.set_val_cmplx(n, m, rec*(cmplx(0.0, T_(i,j).get_prefac_dR_val(n,m, 0))*mat_in.get_cmplx(n,m-1) - cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat_in.get_cmplx(n,m+1)));
+        rPre1 = T_(i,j).get_prefac_dR_val(n,m,0);
+        rPre2 = T_(i,j).get_prefac_dR_val(n,m,1);
+        mat_out.set_val_cmplx(n,m,rec*(cmplx(0.,rPre1)*mat_in.get_cmplx(n,m-1)-
+                                      cmplx(0.,rPre2)*mat_in.get_cmplx(n,m+1)));
       }
-      
-      mat_out.set_val_cmplx( n, n, rec*cmplx( 0.0, T_(i,j).
-                                             get_prefac_dR_val(n,n,0))
-                            *mat_in.get_cmplx(n,n-1));
+      rPre = T_(i,j).get_prefac_dR_val(n,n,0);
+      mat_out.set_val_cmplx(n,n,rec*cmplx(0.,rPre)*mat_in.get_cmplx(n,n-1));
     }
   }
   else
@@ -645,20 +648,20 @@ void ASolver::expand_dRdphi_sing(int i, int j, double theta, MyExpansion mat_in,
     double s = 1.0;
     for (int n = 1; n < p_; n++, s = -s)
     {
-      mat_out.set_val_cmplx(n, 0, rec*cmplx(2.0*s*T_(i,j).get_prefac_dR_val(n,0,1)*
-                                 mat_in.get_cmplx(n,1).imag(),0.0));
+      rPre = T_(i,j).get_prefac_dR_val(n,0,1);
+      mat_out.set_val_cmplx(n, 0, rec*cmplx(2.0*s*rPre*
+                                            mat_in.get_cmplx(n,1).imag(),0.0));
       for (int m = 1; m < n; m++)
       {
-        mat_out.set_val_cmplx(n, m,rec*s*(-cmplx(0.0,T_(i,j).
-                                                 get_prefac_dR_val(n,m,0))
-                                          *mat_in.get_cmplx(n,-m+1)
-                                          + cmplx(0.0, T_(i,j).
-                                                  get_prefac_dR_val(n,m,1))
-                                          *mat_in.get_cmplx(n,-m-1)));
+        rPre1 = T_(i,j).get_prefac_dR_val(n,m,0);
+        rPre2 = T_(i,j).get_prefac_dR_val(n,m,1);
+        mat_out.set_val_cmplx(n,m,rec*s*(-cmplx(0.,rPre1)
+                                         *mat_in.get_cmplx(n,-m+1)
+                                         +cmplx(0.,rPre2)
+                                         *mat_in.get_cmplx(n,-m-1)));
       }
-      
-      mat_out.set_val_cmplx( n,  n, rec*cmplx(0.0, -s*T_(i,j).
-                                              get_prefac_dR_val(n,n,0))
+      rPre = T_(i,j).get_prefac_dR_val(n,n,0);
+      mat_out.set_val_cmplx(n,n,rec*cmplx(0.0,-s*rPre)
                             *mat_in.get_cmplx(n,-n+1));
     }
   }
