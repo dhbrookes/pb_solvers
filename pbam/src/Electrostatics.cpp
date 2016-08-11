@@ -36,37 +36,38 @@ _bCalc_(_bCalc), _consts_(_consts)
   compute_pot();
 }
 
+//TODO: LF test
 Electrostatic::Electrostatic(shared_ptr<ASolver> _asolv, int npts)
-:p_(_asolv->get_p()), pot_min_(0), pot_max_(0),
-lam_(_asolv->get_sys()->get_lambda()), _A_(_asolv->get_A()),
-_sys_(_asolv->get_sys()), _shCalc_(_asolv->get_sh()),
-_bCalc_(_asolv->get_bessel()), _consts_(_asolv->get_consts())
+//:p_(_asolv->get_p()), pot_min_(0), pot_max_(0),
+//lam_(_asolv->get_sys()->get_lambda()), _A_(_asolv->get_A()),
+//_sys_(_asolv->get_sys()), _shCalc_(_asolv->get_sh()),
+//_bCalc_(_asolv->get_bessel()), _consts_(_asolv->get_consts())
 {
-  range_min_.resize(3);
-  range_max_.resize(3);
-  npts_.resize(3);
-  step_.resize(3);
-  
-  for (int i = 0; i < 3; i++)
-    npts_[i] = npts;
-  
-  grid_.resize(npts);
-  for (int i = 0; i < grid_.size(); i++)
-    grid_[i].resize(npts);
-  
-  find_range();
-  find_bins();
-  
-  compute_units();
-  
-  cout << setprecision(9) <<" This is units " << units_ << " my range " << range_min_[0]
-  <<  ", " <<range_min_[1]
-  <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", "
-  <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", "
-  <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1]
-  <<  ", "<<npts_[2] << endl;
-  
-  compute_pot();
+//  range_min_.resize(3);
+//  range_max_.resize(3);
+//  npts_.resize(3);
+//  step_.resize(3);
+//  
+//  for (int i = 0; i < 3; i++)
+//    npts_[i] = npts;
+//  
+//  grid_.resize(npts);
+//  for (int i = 0; i < grid_.size(); i++)
+//    grid_[i].resize(npts);
+//  
+//  find_range();
+//  find_bins();
+//  
+//  compute_units();
+//  
+//  cout << setprecision(9) <<" This is units " << units_ << " my range " << range_min_[0]
+//  <<  ", " <<range_min_[1]
+//  <<  ", "<<range_min_[2] <<  " and max " << range_max_[0] <<  ", "
+//  <<range_max_[1] <<  ", "<<range_max_[2] << "  bins "  << step_[0] <<  ", "
+//  <<step_[1] <<  ", "<<step_[2] << "  bins "  << npts_[0] <<  ", " <<npts_[1]
+//  <<  ", "<<npts_[2] << endl;
+//  
+//  compute_pot();
 }
 
 

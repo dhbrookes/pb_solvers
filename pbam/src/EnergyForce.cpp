@@ -17,9 +17,10 @@ EnergyCalc::EnergyCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
   calc_energy();
 }
 
+//TODO: LF test
 EnergyCalc::EnergyCalc(shared_ptr<ASolver> _asolv)
-:_A_(_asolv->get_A()), _L_(_asolv->get_L()), _const_(_asolv->get_consts()),
-N_(_asolv->get_N()), p_(_asolv->get_p())
+//:_A_(_asolv->get_A()), _L_(_asolv->get_L()), _const_(_asolv->get_consts()),
+//N_(_asolv->get_N()), p_(_asolv->get_p())
 {
   _omega_ = make_shared<vector<double> > (N_);
 }
@@ -67,10 +68,11 @@ _gradL_(_gradL)
   _F_ = make_shared<vector<Pt> > (N_, Pt());
 }
 
+//TODO: LF test
 ForceCalc::ForceCalc(shared_ptr<ASolver> _asolv)
-:_A_(_asolv->get_A()), _gradA_(_asolv->get_gradA()), _L_(_asolv->get_L()),
-_gradL_(_asolv->get_gradL()), _const_(_asolv->get_consts()),
-N_(_asolv->get_N()), p_(_asolv->get_p())
+//:_A_(_asolv->get_A()), _gradA_(_asolv->get_gradA()), _L_(_asolv->get_L()),
+//_gradL_(_asolv->get_gradL()), _const_(_asolv->get_consts()),
+//N_(_asolv->get_N()), p_(_asolv->get_p())
 {
   _F_ = make_shared<vector<Pt> > (N_);
 }
@@ -147,13 +149,14 @@ _shCalc_(_shCalc), _bCalc_(_bCalc), _gradL_(_gradL), _gamma_(_gamma)
   _tau_ = make_shared<vector<Pt> > (N_);
 }
 
+//TODO: LF edits
 TorqueCalc::TorqueCalc(shared_ptr<ASolver> _asolv)
-:N_(_asolv->get_N()), p_(_asolv->get_p()),
-_consts_(_asolv->get_consts()), _shCalc_(_asolv->get_sh()),
-_bCalc_(_asolv->get_bessel()),
-_gamma_(_asolv->get_gamma()),
-_sys_(_asolv->get_sys()),
-_gradL_(_asolv->get_gradL())
+//:N_(_asolv->get_N()), p_(_asolv->get_p()),
+//_consts_(_asolv->get_consts()), _shCalc_(_asolv->get_sh()),
+//_bCalc_(_asolv->get_bessel()),
+//_gamma_(_asolv->get_gamma()),
+//_sys_(_asolv->get_sys()),
+//_gradL_(_asolv->get_gradL())
 {
   _tau_ = make_shared<vector<Pt> > (N_);
 }

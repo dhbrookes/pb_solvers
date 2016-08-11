@@ -186,17 +186,18 @@ void PBAM::init_write_system()
 
 int PBAM::run()
 {
-  if ( setp_->getRunType() == "dynamics")
-    run_dynamics();
-  else if ( setp_->getRunType() == "electrostatics")
-    run_electrostatics( );
-  else if ( setp_->getRunType() == "energyforce")
-    run_energyforce( );
-  else if ( setp_->getRunType() == "bodyapprox")
-    run_bodyapprox( );
-  else
-    cout << "Runtype not recognized! See manual for options" << endl;
-
+  //TODO: LF test
+//  if ( setp_->getRunType() == "dynamics")
+//    run_dynamics();
+//  else if ( setp_->getRunType() == "electrostatics")
+//    run_electrostatics( );
+//  else if ( setp_->getRunType() == "energyforce")
+//    run_energyforce( );
+//  else if ( setp_->getRunType() == "bodyapprox")
+//    run_bodyapprox( );
+//  else
+//    cout << "Runtype not recognized! See manual for options" << endl;
+//
   return 0;
 }
 

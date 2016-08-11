@@ -40,6 +40,7 @@
 #include <iomanip>
 
 #include "MyMatrix.h"
+#include "MyExpansion.h"
 
 /*
  Right scalar multiplication of a matrix
