@@ -54,6 +54,7 @@ void ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
   {
     iter();
     cng = calc_change();
+//    cout << "This is solve ct " << ct << "and cng " << cng << endl;
     if (ct > MAX_POL_ROUNDS) break;
     ct++;
   }
@@ -78,6 +79,8 @@ void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
       grad_iter(j);
       cng = calc_grad_change(j);
       
+//      if ((ct%5==0))
+//        cout << "Grad dv " << j << " ct " << ct << " and cng " << cng<< endl;
       if (ct > MAX_POL_ROUNDS) break;
       ct++;
     }
@@ -190,11 +193,7 @@ void ASolver::grad_iter(int j)
     {
       MyVector<double> gamma_delta = (_gamma_->operator[](i).
                                       mult(_delta_->operator[](i)));
-      
-      aij.set_dim(0, aij.get_dim(0) * gamma_delta);
-      aij.set_dim(1, aij.get_dim(1) * gamma_delta);
-      aij.set_dim(2, aij.get_dim(2) * gamma_delta);
-      _gradA_->set_val(i, j, aij);
+      _gradA_->set_val(i, j, aij * gamma_delta);
     }
   }
 }
@@ -221,6 +220,7 @@ double ASolver::calc_change(WhichReEx whichA, int wrt)
   cmplx prev, curr, a; // intermediate values
   for (i = 0; i < N_; i++)
   {
+    if( _sys_->get_pol_I(i).size() == 0) continue;
     for(k = 0; k < p_; k++)
     {
       for(m = 0; m <= k; m++)
@@ -293,8 +293,9 @@ void ASolver::pre_compute_gradT_A()
           re_expandA_gradT( i, k, gTA, prev); // grad_i T^(i,k) A^(k)
 
           sign = ( k < i ) ? -1.0 : 1.0;
-          for (dim = 0; dim < 3; dim++)
-            gTA.set_dim(dim, gTA.get_dim(dim)*sign);
+          gTA *= sign;
+//          for (dim = 0; dim < 3; dim++)
+//            gTA.set_dim(dim, gTA.get_dim(dim)*sign);
         
           gjT_Ai += gTA;
         }
@@ -304,8 +305,9 @@ void ASolver::pre_compute_gradT_A()
       else if (_sys_->less_than_cutoff(vij) )
       {
         re_expandA_gradT( j, i, gjT_Ai, prev); // grad_j T^(j,i) A^(i)
-        for (dim = 0; dim < 3; dim++)
-          gjT_Ai.set_dim(dim, gjT_Ai.get_dim(dim)*-1.0);
+        gjT_Ai *= -1.0;
+//        for (dim = 0; dim < 3; dim++)
+//          gjT_Ai.set_dim(dim, gjT_Ai.get_dim(dim)*-1.0);
       }
       _gradT_A_->set_val(i, j, gjT_Ai);
     }
@@ -332,28 +334,28 @@ void ASolver::re_expand_gradA(int i, int j, int wrt,
                               MyGradExpansion & Z, bool prev)
 {
 //  MyMatrix<cmplx> x1, x2, z;
-  MyExpansion x1(p_), x2(p_), z(p_);
+  MyExpansion x1(p_), x2(p_); //, z(p_);
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE, whichA=DDR;
 
   // first dA/dR
   expand_RX(  i, j, x1, whichR, whichA, prev, wrt);
   expand_SX(  i, j, x1, x2, whichS);
-  expand_RHX( i, j, x2, z, whichRH);
-  Z.set_dim(0, z);
+  expand_RHX( i, j, x2, x1, whichRH);
+  Z.set_dim(0, x1);
 
   // dA/dtheta:
   whichA = DDTHETA;
   expand_RX(  i, j, x1, whichR, whichA, prev, wrt);
   expand_SX(  i, j, x1, x2, whichS);
-  expand_RHX( i, j, x2, z, whichRH);
-  Z.set_dim(1, z);
+  expand_RHX( i, j, x2, x1, whichRH);
+  Z.set_dim(1, x1);
   
   // dA/dphiL
   whichA = DDPHI;
   expand_RX(  i, j, x1, whichR, whichA, prev, wrt);
   expand_SX(  i, j, x1, x2, whichS);
-  expand_RHX( i, j, x2, z, whichRH);
-  Z.set_dim(2, z);
+  expand_RHX( i, j, x2, x1, whichRH);
+  Z.set_dim(2, x1);
 
 }
 
@@ -391,7 +393,8 @@ void ASolver::re_expandA_gradT(int i, int j, MyGradExpansion &Z, bool prev)
   expand_RX( i, j, x1, whichR, whichA, prev);
   expand_SX( i, j, x1, x2, whichS);
   expand_RHX( i, j, x2, z2, whichRH);
-  Z.set_dim(1, z1 + z2);
+  z = z1 + z2;
+  Z.set_dim(1, z);
   
   // dT/dphi:
   whichR = BASE;
@@ -405,7 +408,8 @@ void ASolver::re_expandA_gradT(int i, int j, MyGradExpansion &Z, bool prev)
   expand_RX( i, j, x1, whichR, whichA, prev);
   expand_SX( i, j, x1, x2, whichS);
   expand_RHX( i, j, x2, z2, whichRH);
-  Z.set_dim(2, z1 + z2);
+  z = z1 + z2;
+  Z.set_dim(2, z);
 
   Z = conv_to_cart(Z, i, j);
 }

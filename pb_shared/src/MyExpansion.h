@@ -339,7 +339,8 @@ public:
   double get_dimi(int dim, int i)
   { return exps_[dim](i);}
   
-  void set_dim(int dim, MyExpansion exp) { exps_[dim] = exp;}
+  void set_dim(int dim, MyExpansion& exp)
+  { for (int j = 0; j<poles_*poles_; j++)  exps_[dim].set_val(j, exp(j));}
   
   void set_dim_val_cmplx(int dim, int i, int j, complex<double> val)
   { exps_[dim].set_val_cmplx(i, j, val);}
@@ -356,7 +357,7 @@ public:
       throw ExpansionArithmeticException(ADDITION, poles_, rhs.poles_);
     }
     
-    MyGradExpansion result = MyGradExpansion(poles_);
+    MyGradExpansion result(poles_);
     int i,j;
     for (i = 0; i < 3; i++)
     {
@@ -384,6 +385,63 @@ public:
     return *this;
   }
   
+  /*
+   Vector Expansion multiplication. If this has n poles, then rhs
+   must be a vector of length n.
+   */
+  MyGradExpansion operator*(MyVector<double> & rhs)
+  {
+    if (poles_ != rhs.get_nrows())
+      throw ExpansionArithmeticException(MULTIPLICATION, poles_,
+                                         (int)rhs.get_nrows());
+    
+    MyGradExpansion result(poles_);
+    int dim, i, j, ct(0);
+    
+    for (dim = 0; dim < 3; dim++)
+    {
+      ct = 0;
+      for (i = 0; i < poles_; i++)
+      {
+        for (j= 0; j < 2*i+1; j++) //Accounting for real+imag
+        {
+          result.set_dimi(dim, ct, exps_[dim](ct) * rhs[i]);
+          ct++;
+        }
+      }
+    }
+    return result;
+  }
+  
+  MyGradExpansion operator*(double scalar)
+  {
+    MyGradExpansion result(poles_);
+    int dim, i;
+    
+    for (dim = 0; dim < 3; dim++)
+    {
+      for (i = 0; i < poles_*poles_; i++)
+      {
+        result.set_dimi(dim, i, exps_[dim](i) * scalar);
+      }
+    }
+    return result;
+  }
+  
+  MyGradExpansion operator*=(double scalar)
+  {
+    MyGradExpansion result(poles_);
+    int dim, i;
+    
+    for (dim = 0; dim < 3; dim++)
+    {
+      for (i = 0; i < poles_*poles_; i++)
+      {
+        set_dimi(dim, i, exps_[dim](i) * scalar);
+      }
+    }
+    return *this;
+  }
   
 };
 
