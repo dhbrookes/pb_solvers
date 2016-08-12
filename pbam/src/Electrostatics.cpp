@@ -376,8 +376,8 @@ double Electrostatic::compute_pot_at( Pt point )
     center = _sys_->get_centeri(mol);
     rad    = _sys_->get_ai(mol);
     dist   = point - center;
-    MyExpansion localK = get_local_exp(dist);
-    pot += lotan_inner_prod( _A_->operator[](mol), localK, p_);
+//    MyExpansion localK = get_local_exp(dist);
+    pot += lotan_inner_prod( _A_->operator[](mol), get_local_exp(dist), p_);
   }
  
   return pot;

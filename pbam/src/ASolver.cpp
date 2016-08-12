@@ -952,7 +952,7 @@ void ASolver::calc_gradL()
  */
 MyGradExpansion ASolver::conv_to_cart(MyGradExpansion& dZ, int i, int j)
 {
-  int lowI(i), hiJ(j);
+  int n, m, ct(0), lowI(i), hiJ(j);
   double the, r, phi;
   MyGradExpansion Zcart(p_);
   vector<double> con1(3), con2(3), con3(3);
@@ -975,12 +975,17 @@ MyGradExpansion ASolver::conv_to_cart(MyGradExpansion& dZ, int i, int j)
     con3 = {         cos(the),          -sin(the)/r,                  0.0};
   }
   
-  Zcart.set_dim(0, dZ.get_dim(0)*con1[0] + dZ.get_dim(1)*con1[1] +
-                dZ.get_dim(2)*con1[2]);
-  Zcart.set_dim(1, dZ.get_dim(0)*con2[0] + dZ.get_dim(1)*con2[1] +
-                dZ.get_dim(2)*con2[2]);
-  Zcart.set_dim(2, dZ.get_dim(0)*con3[0] + dZ.get_dim(1)*con3[1] +
-                dZ.get_dim(2)*con3[2]);
+  for(n = 0; n<p_; n++)
+    for(m = 0; m<2*n+1; m++)
+    {
+      Zcart.set_dimi(0,ct,dZ.get_dimi(0,ct)*con1[0]+dZ.get_dimi(1,ct)*con1[1]
+                     +dZ.get_dimi(2,ct)*con1[2]);
+      Zcart.set_dimi(1,ct,dZ.get_dimi(0,ct)*con2[0]+dZ.get_dimi(1,ct)*con2[1]+
+                    dZ.get_dimi(2,ct)*con2[2]);
+      Zcart.set_dimi(2,ct,dZ.get_dimi(0,ct)*con3[0]+dZ.get_dimi(1,ct)*con3[1]+
+                    dZ.get_dimi(2,ct)*con3[2]);
+      ct++;
+    }
   return Zcart;
 }
 

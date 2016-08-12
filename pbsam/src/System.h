@@ -239,6 +239,18 @@ public:
   // write current system configuration to XYZ file
   void write_to_xyz(ofstream &xyz_out);
   
+  //Copy surface integral points from molecule i to molecule j. MUST
+  // be the same type!
+  void copy_grid( int i, int j)
+  {
+    for (int k = 0; k < molecules_[i]->get_ns(); k++)
+    {
+      molecules_[j]->set_gridj(k, molecules_[i]->get_gridj(k));
+      molecules_[j]->set_gridburj(k, molecules_[i]->get_gdpt_burj(k));
+      molecules_[j]->set_gridexpj(k, molecules_[i]->get_gdpt_expj(k));
+    }
+    
+  }
 };
 
 /*

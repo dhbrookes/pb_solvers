@@ -17,7 +17,7 @@ PBSAM::PBSAM() : PBSAMInput()
   _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
   _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
   _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
-   _exp_consts_ = make_shared<ExpansionConstants> (poles_);
+  _exp_consts_ = make_shared<ExpansionConstants> (poles_);
 
   vector<string> grid2d = {"tst.2d"};
   vector<string> gridax = {"x"};
@@ -230,9 +230,13 @@ void PBSAM::initialize_pbsam()
   
   for (i = 0; i < _setp_->getNType(); i++)
   {
+    string fil=_setp_->getTypeNPQR(i);
+    cout << "This is fil" << fil.substr(0, fil.size()-4) << endl;
+    
     if (_setp_->getTypeNImat(i) != "" )
     {
       string istart = _setp_->getTypeNImat(i);
+      imat_loc[i].resize(_syst_->get_Ns_i(i));
       for (int k = 0; k < _syst_->get_Ns_i(i); k++)
         imat_loc[i][k] = istart+to_string(k)+".bin";
     } else
@@ -243,14 +247,20 @@ void PBSAM::initialize_pbsam()
     
     clock_t t3 = clock();
 
-    // Generate surface integrals
+    // Generate surface integrals and buried and exposed points
+    // on the molecule surface
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
-      IEMatrix ieMatTest(0, _syst_->get_moli(idx),
-                         _sh_calc_, poles_, _exp_consts_, true, 0, true);
-      if (k==0) //Only write once for each type
-        ieMatTest.write_all_mat(_setp_->getTypeNPQR(i));
+      if (k==0) //Only generate once for each type
+      {
+        IEMatrix ieMatTest(0, _syst_->get_moli(idx),
+                           _sh_calc_, poles_, _exp_consts_, true, 0, true);
+        ieMatTest.write_all_mat(fil.substr(0, fil.size()-4));
+      } else // copy from first one
+      {
+        _syst_->copy_grid(_syst_->get_mol_global_idx(i,0), idx);
+      }
     }
     
     t3 = clock() - t3;
@@ -276,12 +286,13 @@ void PBSAM::initialize_pbsam()
       self_pol.solve(solveTol_, 100);
       
       //Printing out H and F of selfpol
-      //TODO: This should also get printed if system is only 1 MoleculeSAM?
-      self_pol.get_all_H()[0]->print_all_to_file(_setp_->getTypeNPQR(i)+".H",
+      //TODO: This should also get printed if system is only 1 Molecule?
+      
+      self_pol.get_all_H()[0]->print_all_to_file(fil+".H",
                                                  _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
       
-      self_pol.get_all_F()[0]->print_all_to_file(_setp_->getTypeNPQR(i)+".F",
+      self_pol.get_all_F()[0]->print_all_to_file(fil+".F",
                                                  _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
     }

@@ -469,7 +469,12 @@ System::System(Setup setup, double cutoff)
     } // end j
     
     if (pqrI.get_Ns() == 0)
-      write_to_pqr(setup.getTypeNPQR(i)+"cg", (int) molecules_.size()-1);
+    {
+      string pqrf = setup.getTypeNPQR(i);
+      write_to_pqr(pqrf.substr(0,pqrf.size()-4)+"_cg.pqr",
+                   (int)molecules_.size()-1);
+    }
+    
   } // end i
   N_ = (int) molecules_.size();
   boxLength_ = setup.getBLen();

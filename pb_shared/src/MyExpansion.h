@@ -220,7 +220,7 @@ public:
   /*
    Addition operator returns new matrix
    */
-  MyExpansion operator+(MyExpansion rhs)
+  MyExpansion operator+(MyExpansion& rhs)
   {
     if (poles_ != rhs.poles_)
     {
@@ -239,7 +239,7 @@ public:
   /*
    summation operator adds to existing matrix
    */
-  MyExpansion operator+=(MyExpansion rhs)
+  MyExpansion operator+=(MyExpansion& rhs)
   {
     if (poles_ != rhs.poles_)
     {
@@ -344,11 +344,12 @@ public:
   void set_dim_val_cmplx(int dim, int i, int j, complex<double> val)
   { exps_[dim].set_val_cmplx(i, j, val);}
   
+  void set_dimi(int dim, int i, double val) { exps_[dim].set_val(i, val);}
   
   /*
    Addition operator returns new matrix
    */
-  MyGradExpansion operator+(MyGradExpansion rhs)
+  MyGradExpansion operator+(MyGradExpansion &rhs)
   {
     if (poles_ != rhs.poles_)
     {
@@ -356,10 +357,11 @@ public:
     }
     
     MyGradExpansion result = MyGradExpansion(poles_);
-    int i;
+    int i,j;
     for (i = 0; i < 3; i++)
     {
-      result.set_dim(i, exps_[i] + rhs.exps_[i]);
+      for (j = 0; j<poles_*poles_; j++)
+        result.set_dimi(i, j, exps_[i](j) + rhs.exps_[i](j));
     }
     return result;
   }
@@ -367,16 +369,17 @@ public:
   /*
    summation operator adds to existing matrix
    */
-  MyGradExpansion operator+=(MyGradExpansion rhs)
+  MyGradExpansion operator+=(MyGradExpansion & rhs)
   {
     if (poles_ != rhs.poles_)
     {
       throw ExpansionArithmeticException(ADDITION, poles_, rhs.poles_);
     }
-    int i;
+    int i, j;
     for (i = 0; i < 3; i++)
     {
-      set_dim(i, exps_[i] + rhs.exps_[i]);
+      for (j = 0; j<poles_*poles_; j++)
+      exps_[i].set_val(j, exps_[i](j) + rhs.exps_[i](j));
     }
     return *this;
   }
