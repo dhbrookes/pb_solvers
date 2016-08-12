@@ -231,10 +231,10 @@ void PBSAM::initialize_pbsam()
   for (i = 0; i < _setp_->getNType(); i++)
   {
     string fil=_setp_->getTypeNPQR(i);
-    cout << "This is fil" << fil.substr(0, fil.size()-4) << endl;
     
     if (_setp_->getTypeNImat(i) != "" )
     {
+      imat_loc[i].resize(_syst_->get_Ns_i(i));
       string istart = _setp_->getTypeNImat(i);
       imat_loc[i].resize(_syst_->get_Ns_i(i));
       for (int k = 0; k < _syst_->get_Ns_i(i); k++)
@@ -262,6 +262,7 @@ void PBSAM::initialize_pbsam()
         _syst_->copy_grid(_syst_->get_mol_global_idx(i,0), idx);
       }
     }
+
     
     t3 = clock() - t3;
     printf ("Imat took me %f seconds.\n",
@@ -287,8 +288,8 @@ void PBSAM::initialize_pbsam()
       
       //Printing out H and F of selfpol
       //TODO: This should also get printed if system is only 1 Molecule?
-      
-      self_pol.get_all_H()[0]->print_all_to_file(fil+".H",
+      fil = fil.substr(0, fil.size()-4);
+      self_pol.get_all_H()[0]->print_all_to_file(_setp_->getTypeNPQR(i)+".H",
                                                  _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
       

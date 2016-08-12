@@ -220,7 +220,7 @@ void BDRun::run(string xyzfile, string statfile, int nSCF)
       _stepper_->bd_update(fo,to);
    */
 
-    if ( (i % 10) == 0 ) cout << "This is step " << i << " and polz " << polz<< endl;
+    if ( (i % 100) == 0 ) cout << "This is step " << i << " and polz " << polz<< endl;
 
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {

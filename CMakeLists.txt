@@ -100,6 +100,7 @@ add_subdirectory(pbam/unittest)
 add_subdirectory(pbsam/src)
 add_subdirectory(pbsam/unittest)
 
+add_subdirectory(pb_wrap/src)
 
 ################################################
 ##### Make a directory for the executable

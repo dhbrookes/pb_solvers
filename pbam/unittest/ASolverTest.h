@@ -54,38 +54,8 @@ public :
     shared_ptr<System> sys = make_shared<System>(mol_);
     
     ASolver ASolvTest (bCalcu, SHCalcu, sys, const_, vals);
-    ASolvTest.solve_A( 1E-4, 100 );
-    ASolvTest.solve_gradA(1E-12, 100);
-  }
-  
-  void RunASolverTest2()
-  {
-    shared_ptr<Constants> const_ = make_shared<Constants>();
-    vector< MoleculeAM > mol_;
-    mol_.clear( );
-    Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0)};
-    for (int molInd = 0; molInd < 3; molInd ++ )
-    {
-      int M = 3; vector<double> charges(M); vector<double> vdW(M);
-      vector<Pt> posCharges(M);
-      charges[0]=2.0; vdW[0]=0; posCharges[0] = pos[molInd];
-      charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-      charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
-      
-      MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                      molInd, 0);
-      mol_.push_back( molNew );
-    }
-    
-    const int vals = nvals;
-    shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
-    shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
-    shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
-    shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-    shared_ptr<System> sys = make_shared<System>(mol_);
-    
-    ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
-    ASolvTest.iter();
+    ASolvTest.solve_A( 1E-4 );
+    ASolvTest.solve_gradA(1E-12);
   }
 };
 
