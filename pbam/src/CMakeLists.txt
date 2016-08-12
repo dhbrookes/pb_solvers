@@ -45,7 +45,7 @@ if(ENABLE_PBAM_APBS)
               Electrostatics.cpp
               EnergyForce.cpp
               PBAM.cpp
-              PBAMWrap.cpp
+              ../../pb_wrap/src/PBAMWrap.cpp
               ../../pb_shared/src/ReExpCalc.cpp
               ../../pb_shared/src/setup.cpp
               ../../pb_shared/src/SHCalc.cpp
@@ -54,7 +54,7 @@ if(ENABLE_PBAM_APBS)
   
   #  build standalone C example
   add_executable(PBAMWrap
-                 runPBAMWrap.c
+                 ../../pb_wrap/src/runPBAMWrap.c
                  )
 
   target_link_libraries(PBAMWrap PBAMLib)
@@ -74,7 +74,7 @@ if(ENABLE_PBAM_SPHINX)
   
   
   add_library(pbam_sph MODULE
-              pbam_py.c
+              ../../pb_wrap/src/pbam_py.c
               ASolver.cpp
               BD.cpp
               ../../pb_shared/src/BesselCalc.cpp
@@ -82,7 +82,7 @@ if(ENABLE_PBAM_SPHINX)
               Electrostatics.cpp
               EnergyForce.cpp
               PBAM.cpp
-              PBAMWrap.cpp
+              ../../pb_wrap/src/PBAMWrap.cpp
               ReExpCalc.cpp
               ../../pb_shared/src/setup.cpp
               ../../pb_shared/src/SHCalc.cpp

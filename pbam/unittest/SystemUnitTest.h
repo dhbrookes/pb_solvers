@@ -308,7 +308,7 @@ TEST_F(SystemUTest, checkOverlap)
   catch( const OverlappingMoleculeException& err )
   {
     // check exception
-    string error_exp = "MoleculeAM 0 & 1 overlap";
+    string error_exp = "Molecule 0 & 1 overlap";
     EXPECT_EQ(string(err.what()), error_exp);
   }
 }
@@ -337,7 +337,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
   catch( const OverlappingMoleculeException& err )
   {
     // check exception
-    string error_exp = "MoleculeAM 0 & 1 overlap";
+    string error_exp = "Molecule 0 & 1 overlap";
     EXPECT_EQ(string(err.what()), error_exp);
   }
 }
