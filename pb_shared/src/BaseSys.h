@@ -177,6 +177,9 @@ public:
   // Check to determine if any MoleculeSAMs are overlapping
   void check_for_overlap();
   
+//  // attempt dynamics move and return whether there is a collisionv
+//  virtual try_translate(
+  
   // get distance vector between any two points taking into account periodic
   // boundary conditions
   Pt get_pbc_dist_vec_base(Pt p1, Pt p2);

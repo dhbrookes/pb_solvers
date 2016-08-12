@@ -79,13 +79,13 @@ TEST_F(EnergyUTest, two_mol_test)
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
   
-  EnergyCalc ecal;
-  vector<double> ene;
-  ene = ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
-  
+  EnergyCalc ecal (sys->get_n());
+  shared_ptr<vector<double> > ene;
+  ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
+  ene = ecal.get_omega();
   for (int i = 0; i < sys->get_n(); i++)
   {
-    EXPECT_NEAR(ene[i]/-0.00042138573, 1.0, preclim);
+    EXPECT_NEAR((*ene)[i]/-0.00042138573, 1.0, preclim);
   }
 }
 
@@ -146,14 +146,14 @@ TEST_F(EnergyUTest, three_mol_test)
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
   
-  EnergyCalc ecal;
-  vector<double> ene;
-  ene = ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
-  
+  EnergyCalc ecal (sys->get_n());
+  shared_ptr<vector<double> > ene;
+  ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
+  ene = ecal.get_omega();
   for (int i = 0; i < sys->get_n(); i++)
   {
 //    cout << "This is energy "<< setprecision(9) << ene[i] << endl;
-    EXPECT_NEAR(ene[i]/en3[i], 1.0, preclim);
+    EXPECT_NEAR((*ene)[i]/en3[i], 1.0, preclim);
   }
 }
 
@@ -252,11 +252,11 @@ TEST_F(ForceUTest, two_mol_test)
                                        SHCalcTest, BesselCal);
   focal->calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
                     gsolvTest.get_gradH_all(),gsolvTest.get_gradLHN_all());
-  vector<Pt> fo = focal->get_all_f();
+  shared_ptr<vector<Pt> > fo = focal->get_all_f();
   
   TorqueCalc tocal(nmol);
   tocal.calc_all_tau(sys, focal);
-  vector<Pt> to = tocal.get_all_tau();
+  shared_ptr<vector<Pt> > to = tocal.get_all_tau();
   
   for (int i = 0; i < sys->get_n(); i++)
   {
@@ -267,8 +267,8 @@ TEST_F(ForceUTest, two_mol_test)
       {
         if (k==0)
         {
-          EXPECT_NEAR(for2[i][d]/fo[i].get_cart(d), 1.0, preclim);
-          EXPECT_NEAR(tor2[i][d]/to[i].get_cart(d), 1.0, preclim);
+          EXPECT_NEAR(for2[i][d]/(*fo)[i].get_cart(d), 1.0, preclim);
+          EXPECT_NEAR(tor2[i][d]/(*to)[i].get_cart(d), 1.0, preclim);
         }
         if (fabs(forIk3[i][k][d]) > 1e-11)
           EXPECT_NEAR(forIk2[i][k][d]/fI[k].get_cart(d), 1.0, preclim);
@@ -345,11 +345,11 @@ TEST_F(ForceUTest, three_mol_test)
                                        SHCalcTest, BesselCal);
   focal->calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
                    gsolvTest.get_gradH_all(),gsolvTest.get_gradLHN_all());
-  vector<Pt> fo = focal->get_all_f();
+  shared_ptr<vector<Pt> > fo = focal->get_all_f();
   
   TorqueCalc tocal(nmol);
   tocal.calc_all_tau(sys, focal);
-  vector<Pt> to = tocal.get_all_tau();
+  shared_ptr<vector<Pt> > to = tocal.get_all_tau();
 
   for (int i = 0; i < sys->get_n(); i++)
   {
@@ -360,8 +360,8 @@ TEST_F(ForceUTest, three_mol_test)
       {
         if (k==0)
         {
-          EXPECT_NEAR(for3[i][d]/fo[i].get_cart(d), 1.0, preclim);
-          EXPECT_NEAR(tor3[i][d]/to[i].get_cart(d), 1.0, preclim);
+          EXPECT_NEAR(for3[i][d]/(*fo)[i].get_cart(d), 1.0, preclim);
+          EXPECT_NEAR(tor3[i][d]/(*to)[i].get_cart(d), 1.0, preclim);
         }
         if (fabs(forIk3[i][k][d]) > 1e-11)
           EXPECT_NEAR(forIk3[i][k][d]/fI[k].get_cart(d), 1.0, preclim);

@@ -41,9 +41,7 @@ protected:
   vector<shared_ptr<HMatrix> >      _outerH_;
   
   vector<shared_ptr<FMatrix> >      _F_;
-  
   shared_ptr<TMatrix>               _T_;
-  
   shared_ptr<System>                _sys_;
   shared_ptr<SHCalc>                _shCalc_;
   shared_ptr<BesselCalc>            _bCalc_;

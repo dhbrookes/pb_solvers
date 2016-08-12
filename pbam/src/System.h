@@ -195,7 +195,7 @@ public:
   
   // Check to determine if any MoleculeAMs are overlapping
   void check_for_overlap();
-  
+  bool is_collision(); 
   // get the distance vector (Point object) between two MoleculeAMs, taking into
   // account periodic boundary conditions by returning the distance vector
   // between the closest image of the MoleculeAM

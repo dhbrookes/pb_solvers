@@ -26,16 +26,15 @@ double EnergyCalc::calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN)
   return E;
 }
 
-vector<double> EnergyCalc::calc_all_energy(vector<shared_ptr<HMatrix> > H,
+void EnergyCalc::calc_all_energy(vector<shared_ptr<HMatrix> > H,
                                            vector<shared_ptr<LHNMatrix> > LHN)
 {
-  vector<double> E(H.size(), 0.0);
+//  vector<double> E(H.size(), 0.0);
   for (int i = 0; i < H.size(); i++)
   {
 //    cout << "This is i " << i << endl;
-    E[i] = calc_energy(H[i], LHN[i]);
+    (*omega_)[i] = calc_energy(H[i], LHN[i]);
   }
-  return E;
 }
 
 void ForceCalc::calc_fI(int I, shared_ptr<HMatrix> H,
@@ -43,7 +42,7 @@ void ForceCalc::calc_fI(int I, shared_ptr<HMatrix> H,
                         shared_ptr<GradHMatrix> dH,
                         shared_ptr<GradLHNMatrix> dLHN)
 {
-  Pt fIk, inner1, inner2;
+  Pt fIk, tot, inner1, inner2;
   for (int k = 0; k < H->get_ns(); k++)
   {
     forces_[I][k] = 0.0;
@@ -69,12 +68,14 @@ void ForceCalc::calc_fI(int I, shared_ptr<HMatrix> H,
         fIk *= -eps_s_;
         forces_[I][k] += fIk;
       }
+    tot += forces_[I][k];
 //    cout << "For k " << k << " & H*gLHN " << inn1.x() << ", " << inn1.y()
 //    << ", " << inn1.z() << endl;
 //    cout << "For k " << k << " & gH*gLHN " << inn2.x() << ", " << inn2.y()
 //    << ", " << inn2.z() << endl;
 //    cout << "{" <<setprecision(9)<< forces_[I][k].x() << "," << forces_[I][k].y() << "," << forces_[I][k].z() << "},"; //<< endl;
   }
+  (*totForces_)[I] = tot;
 }
 
 void ForceCalc::calc_all_f(vector<shared_ptr<HMatrix> > H,
@@ -130,7 +131,7 @@ void TorqueCalc::calc_all_tau(shared_ptr<System> sys,
   for (int i = 0; i < I_; i++)
   {
     //    cout << "This is i " << i << endl;
-    torques_[i] = calc_tauI(i, sys->get_moli(i), fcalc);
+    (*torques_)[i] = calc_tauI(i, sys->get_moli(i), fcalc);
   }
 }
 
@@ -149,6 +150,21 @@ Pt TorqueCalc::calc_tauI(int i, shared_ptr<BaseMolecule> mol,
   return tauI;
 }
 
+PhysCalc::PhysCalc(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradsolv,
+                   string outfname, Units unit)
+:_solv_(_solv), _gradSolv_(_gradsolv), outfname_(outfname)
+{
+  _sys_ = _solv->get_sys();
+  
+  _eCalc_ = make_shared<EnergyCalc>(_sys_->get_n());
+  _fCalc_ = make_shared<ForceCalc>(_sys_->get_n(), _sys_->get_all_Ik(),
+                                   _solv->get_consts()->get_dielectric_water(),
+                                   _solv->get_sh(), _solv->get_bessel());
+  _torCalc_ = make_shared<TorqueCalc>(_sys_->get_n());
+
+  compute_units(_solv->get_consts(), unit);
+}
+
 Pt TorqueCalc::cross_prod(Pt u, Pt v)
 {
   Pt c;
@@ -157,4 +173,49 @@ Pt TorqueCalc::cross_prod(Pt u, Pt v)
   c.set_z(u[0]*v[1] - u[1]*v[0]);
   return c;
 }
+
+
+
+void PhysCalc::calc_force()
+{
+  _fCalc_->calc_all_f(_solv_->get_all_H(),
+                      _solv_->get_all_LHN(),
+                      _gradSolv_->get_gradH_all(),
+                      _gradSolv_->get_gradLHN_all());
+}
+
+void PhysCalc::calc_energy()
+{
+  _eCalc_->calc_all_energy(_solv_->get_all_H(), _solv_->get_all_LHN());
+}
+
+
+void PhysCalc::calc_torque()
+{
+  _torCalc_->calc_all_tau(_sys_, _fCalc_);
+}
+
+
+void PhysCalc::compute_units( shared_ptr<Constants> cst, Units unit)
+{
+  if (unit==INTERNAL)
+  {
+    unit_ = "Internal";
+    unit_conv_ = 1.0;
+  } else if (unit == KCALMOL)
+  {
+    unit_  = "kCal/Mol";
+    unit_conv_ = cst->convert_int_to_kcal_mol(1.0);
+  } else if (unit == JMOL)
+  {
+    unit_  = "Joules/Mol";
+    unit_conv_ = cst->convert_int_to_jmol(1.0);
+  } else if (unit == kT)
+  {
+    unit_  = "kT";
+    unit_conv_ = cst->convert_int_to_kT(1.0);
+  }
+}
+
+
 

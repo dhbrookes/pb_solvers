@@ -367,7 +367,7 @@ protected:
   shared_ptr<Constants> _consts_;
   
   // check if a MoleculeAM's new point causes it to collide with any other
-  bool check_for_collision(int mol, Pt new_pt);
+//  bool check_for_collision(int mol, Pt new_pt);
   
   // updates on individual MoleculeAMs:
   void indi_trans_update(int i, Pt fi);

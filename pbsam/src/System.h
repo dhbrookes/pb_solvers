@@ -167,19 +167,13 @@ public:
   Pt get_gridjh(int j, int h) const   { return cgGridPts_[j][h]; }
   vector<int> get_gdpt_expj(int j) const { return cgGdPtExp_[j]; }
   vector<int> get_gdpt_burj(int j) const { return cgGdPtBur_[j]; }
-  
   vector<int> get_ch_allin_k(int k)   { return cgChargesIn_[k]; }
   vector<int> get_ch_allout_k(int k)  { return cgChargesOut_[k]; }
-  
   int get_ch_k_alpha(int k, int alpha){ return cgCharges_[k][alpha]; }
-
   Pt get_cen_j(int j)                 { return centers_[chToCG_[j]]; }
-//  Pt get_centerk(int k) const         { return centers_[k]; }
   Pt get_cog() const                  { return cog_;}
-//  const double get_ak(int k) const    { return as_[k]; }
   const int get_cg_of_ch(int j)       { return chToCG_[j]; }
-  
-  vector<vector<int> > get_inter_act_k(int k) {return interAct_[k];}
+  vector<vector<int> > get_inter_act_k(int k) {return interAct_[k]; }
 
 };
 
@@ -242,7 +236,7 @@ public:
 };
 
 /*
- Exception thrown when two MoleculeSAMs in the system are overlapping
+ Exception thrown when two molecules in the system are overlapping
  */
 class OverlappingMoleculeSAMException: public exception
 {
