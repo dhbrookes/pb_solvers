@@ -18,8 +18,8 @@ public :
 protected :
   int vals_;
   Constants const_;
-  vector< Molecule > mol3_; vector< Molecule > mol_;
-  vector< Molecule > mol_sing_;
+  vector< MoleculeAM > mol3_; vector< MoleculeAM > mol_;
+  vector< MoleculeAM > mol_sing_;
   
   virtual void SetUp()
   {
@@ -36,12 +36,12 @@ protected :
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0] = cg[molInd]; posCharges[0] = cgPos[molInd]; vdW[0] = 0.0;
       
-      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
-      Molecule molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      MoleculeAM molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -111,10 +111,7 @@ protected :
   double bdRun30x[2] = {-0.634593964,0.634593964};
   double bdRun30y[2] = {-20.8011211,26.8011211};
 
-  double bdRun30Rot[2][3][3] = {{{0,0,0},{-0.800362355,0.565300727,0.199637645},{0.199637645, 0.565300727, -0.800362355}}, {{0,0,0},
-      {-0.800362773, -0.565300282, 0.199637227},{0.199637227, -0.565300282,
-        -0.800362773}}};
-  
+  double bdRun30Rot[2][3][3] = {{{-0,0,0},{-0.800361952,0.565301155,0.199638048},{0.199638048,0.565301155,-0.800361952}},{{0,0,-0},{-0.800363073,-0.565299964,0.199636927},{0.199636927,-0.565299964,-0.800363073}}};
   virtual void TearDown() {}
 } ; // end BDUTest
 
@@ -129,7 +126,7 @@ TEST_F(BDUTest, dtTest)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -172,7 +169,7 @@ TEST_F(BDUTest, dtLargeTest)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -215,7 +212,7 @@ TEST_F(BDUTest, distPBCTest)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -261,7 +258,7 @@ TEST_F(BDUTest, ForcePos)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -313,7 +310,7 @@ TEST_F(BDUTest, ForcePosZ)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -365,7 +362,7 @@ TEST_F(BDUTest, ForceOpp)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0]=2.0*pow(-1, molInd); posCharges[0]=pos[molInd]; vdW[0]=0.0;
     
-    Molecule molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -418,7 +415,7 @@ TEST_F(BDUTest, TorquePos)
     int M = 1;
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0]=2.0; vdW[0]=0.0; posCharges[0]=pos[molInd]+chgLoc[molInd];
-    Molecule molNew( "rot", 1.4714, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "rot", 1.4714, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -477,7 +474,7 @@ TEST_F(BDUTest, TorqueOpp)
     charges[1] = 2.0*pow(-1, molInd); posCharges[1] = pos[molInd]+Pt(1,0,0);
     charges[2] = 2.0*pow(-1, molInd); posCharges[2] = pos[molInd]+Pt(0,1,0);
     vdW[0]=0.0; vdW[1]=0.0; vdW[2]=0.0;
-    Molecule molNew( "rot", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "rot", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -565,7 +562,7 @@ TEST_F(BDUTest, TorqueOpp)
 
 TEST_F(BDUTest, BDrunTimeTermY)
 {
-  vector<Molecule> mol;
+  vector<MoleculeAM> mol;
   const int ml = 2;
   Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
   for (int mi = 0; mi < ml; mi ++ )
@@ -573,7 +570,7 @@ TEST_F(BDUTest, BDrunTimeTermY)
     int M = 1; vector<double> charges(M);
     vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 7.0; posCharges[0] = pos[mi]; vdW[0]=0.0;
-    Molecule molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi],
+    MoleculeAM molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi],
                     mi, 0, 0, 0.1);
     mol.push_back( molNew );
   }
@@ -602,7 +599,7 @@ TEST_F(BDUTest, BDrunTimeTermY)
 
 TEST_F(BDUTest, BDrunTimeTermXY)
 {
-  vector<Molecule> mol;
+  vector<MoleculeAM> mol;
   const int ml = 2;
   Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
   for (int mi = 0; mi < ml; mi ++ )
@@ -612,7 +609,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
     charges[0] = 7.0; posCharges[0] = pos[mi]; vdW[0]=0.0;
     charges[1] = 7.0; posCharges[1] = pos[mi]+Pt(1,0,0); vdW[1]=0.0;
     charges[2] = 7.0; posCharges[2] = pos[mi]+Pt(0,1,0); vdW[2]=0.0;
-    Molecule molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi],
+    MoleculeAM molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi],
                     mi, 0, 0, 0.1);
     mol.push_back( molNew );
   }
@@ -642,7 +639,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
 
 TEST_F(BDUTest, BDrunTimeTermRot)
 {
-  vector<Molecule> mol;
+  vector<MoleculeAM> mol;
   const int ml = 2;
   Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
   for (int mi = 0; mi < ml; mi ++ )
@@ -652,7 +649,7 @@ TEST_F(BDUTest, BDrunTimeTermRot)
     charges[0] = 7.0; posCharges[0] = pos[mi]; vdW[0]=0.0;
     charges[1] = 7.0; posCharges[1] = pos[mi]+Pt(0,0,1); vdW[1]=0.0;
     charges[2] = 7.0; posCharges[2] = pos[mi]+Pt(1,0,0); vdW[2]=0.0;
-    Molecule molNew( "rot", 2.0, charges, posCharges, vdW, pos[mi], mi, 0,
+    MoleculeAM molNew( "rot", 2.0, charges, posCharges, vdW, pos[mi], mi, 0,
                     0.1, 0.0);
     mol.push_back( molNew );
   }
@@ -679,6 +676,9 @@ TEST_F(BDUTest, BDrunTimeTermRot)
     
     for (int j=0; j < sys->get_Mi(mi); j++)
     {
+      cout << "{"<<setprecision(9) <<sys->get_posij(mi,j).x() << ","
+      <<sys->get_posij(mi,j).y() << ","<<sys->get_posij(mi,j).z() <<"}";
+      
       if (bdRun30Rot[mi][j][0] != 0)
         EXPECT_NEAR(sys->get_posij(mi,j).x()/bdRun30Rot[mi][j][0],1,preclim);
       if (bdRun30Rot[mi][j][1] != 0)

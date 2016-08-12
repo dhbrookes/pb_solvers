@@ -38,7 +38,7 @@
 #include <omp.h>
 #endif
 
-// Exception class to ensure that molecule
+// Exception class to ensure that MoleculeAM
 class ValueOutOfRange: public exception
 {
 protected:
@@ -77,7 +77,7 @@ protected:
   double pot_min_; // A minimum value of the pot
   double pot_max_; // A max value of the potential
   
-  double lam_; // Average radius of molecules in system
+  double lam_; // Average radius of MoleculeAMs in system
   
   vector<double> range_min_;  // Origin of grid in each dim
   vector<double> range_max_;  // Origin of grid in each dim
@@ -87,7 +87,7 @@ protected:
   vector<vector<vector<double > > > esp_; // vector of ESP values
   vector<vector<double > > grid_;  // 2D cross section of ESP
   
-  shared_ptr<VecOfMats<cmplx>::type> _A_;
+  shared_ptr<vector<MyExpansion> > _A_;
   shared_ptr<System> _sys_;
   shared_ptr<SHCalc> _shCalc_;
   shared_ptr<BesselCalc> _bCalc_;
@@ -101,12 +101,12 @@ protected:
   void compute_pot();
   double compute_pot_at( Pt point );
   
-  MyMatrix<cmplx> get_local_exp( Pt dist );
+  MyExpansion get_local_exp( Pt dist );
   
-  double lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p);
+  double lotan_inner_prod(MyExpansion U, MyExpansion V, int p);
   
 public:
-  Electrostatic(shared_ptr<VecOfMats<cmplx>::type> _A, shared_ptr<System> _sys,
+  Electrostatic(shared_ptr<vector<MyExpansion> > _A, shared_ptr<System> _sys,
                 shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                 shared_ptr<Constants> _consts,
                 int p, int npts = 150);

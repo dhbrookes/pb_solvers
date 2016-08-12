@@ -19,7 +19,7 @@ public :
 protected :
   
   int vals_;
-  vector< Molecule > mol_;
+  vector< MoleculeAM > mol_;
   
   virtual void SetUp()
   {
@@ -37,7 +37,7 @@ protected :
       charges[1]=cg[molInd]; vdW[1]=0.0; posCharges[1]=pos[molInd]+Pt(1,0,0);
       charges[2]=cg[molInd]; vdW[2]=0.0; posCharges[2]=pos[molInd]+Pt(0,1,0);
 
-      Molecule molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
     }
@@ -401,7 +401,7 @@ TEST_F(ElecUTest, printPOTZ)
 
 TEST_F(ElecUTest, printPOT)
 {
-  vector<Molecule> mol_sing_;
+  vector<MoleculeAM> mol_sing_;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 ),
             Pt( -5.0, -5.0, 0.0 ),Pt( -5.0, 5.0, 0.0),Pt( 5.0, -5.0, 0.0 ),
             Pt( 5.0, 5.0, 0.0 ),Pt( 0.0, -5.0, 0.0),Pt( 0.0, 5.0, 0.0),};
@@ -413,7 +413,7 @@ TEST_F(ElecUTest, printPOT)
     charges[1]=-2.0; vdW[1]=0;posCharges[1]=pos[molInd]+Pt(1.0, 0.0, 0.0);
     charges[2]=2.0;  vdW[2]=0;posCharges[2]=pos[molInd]+Pt(0.0, 1.0, 0.0);
     
-    Molecule molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }

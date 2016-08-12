@@ -8,7 +8,7 @@
 
 #include "Electrostatics.h"
 
-Electrostatic::Electrostatic(shared_ptr<VecOfMats<cmplx>::type> _A,
+Electrostatic::Electrostatic(shared_ptr<vector<MyExpansion> > _A,
                              shared_ptr<System> _sys,
                              shared_ptr<SHCalc> _shCalc,
                              shared_ptr<BesselCalc> _bCalc,
@@ -370,28 +370,28 @@ double Electrostatic::compute_pot_at( Pt point )
   int mol, Nmol      = _sys_->get_n();
   double rad, pot    = 0.0;
   Pt center, dist;
-  MyMatrix<cmplx> localK;
-  
+
   for ( mol = 0; mol < Nmol; mol++)
   {
     center = _sys_->get_centeri(mol);
     rad    = _sys_->get_ai(mol);
     dist   = point - center;
-    localK = get_local_exp(dist);
-    pot += lotan_inner_prod( _A_->operator[](mol), localK, p_);
+//    MyExpansion localK = get_local_exp(dist);
+    pot += lotan_inner_prod( _A_->operator[](mol), get_local_exp(dist), p_);
   }
  
   return pot;
 }
 
-MyMatrix<cmplx> Electrostatic::get_local_exp( Pt dist )
+MyExpansion Electrostatic::get_local_exp( Pt dist )
 {
   int n, m;
   double lambda = _sys_->get_lambda();
   double kap    = _consts_->get_kappa();
   double expKR;
   vector<double> bessK;
-  MyMatrix<cmplx> localK(p_, 2*p_);
+//  MyMatrix<cmplx> localK(p_, 2*p_);
+  MyExpansion localK(p_, 2*p_);
   
   bessK = _bCalc_->calc_mbfK(p_, kap*dist.r());
   expKR = exp( - kap * dist.r()) / dist.r();
@@ -399,9 +399,9 @@ MyMatrix<cmplx> Electrostatic::get_local_exp( Pt dist )
   
   for ( n = 0; n < p_; n++)
   {
-    for ( m = -n; m <= n; m++)
+    for ( m = 0; m <= n; m++)
     {
-      localK.set_val( n, m+p_, (pow( lambda/dist.r(), n) * expKR *
+      localK.set_val_cmplx( n, m, (pow( lambda/dist.r(), n) * expKR *
                                 _shCalc_->get_result(n, m) * bessK[n]));
     }
   }
@@ -409,20 +409,21 @@ MyMatrix<cmplx> Electrostatic::get_local_exp( Pt dist )
   return localK;
 }
 
-double Electrostatic::lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V,
+double Electrostatic::lotan_inner_prod(MyExpansion U, MyExpansion V,
                                        int p)
 {
-  double ip = 0;
-  int n, m, mT;
+  int n, m;
+  double mult, ct(0), ip(0);
   for (n = 0; n < p; n++)
   {
-    for (m = -n; m <= n; m++)
+    for (m = 0; m < 2*n+1; m++) // Getting double array that is both re & im
     {
-      mT = (m < 0) ? -1*m : m;
-      ip += U(n, mT+p_).real()*V(n, mT+p_).real()
-      + U(n, mT+p_).imag()*V(n, mT+p_).imag();
+      mult = (m > 0) ? 2.0 : 1.0;
+      ip += mult * U(ct) * V(ct);
+      ct++;
     }
   }
+  
   return ip;
 }
 

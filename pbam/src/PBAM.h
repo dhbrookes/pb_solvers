@@ -55,7 +55,7 @@ public:
   PBAM();
   PBAM(string infile);
   // For APBS
-  PBAM(const PBAMInput& pbami, vector<Molecule> mls );
+  PBAM(const PBAMInput& pbami, vector<MoleculeAM> mls );
 
   friend PBAMInput getPBAMParams();
 

@@ -6,6 +6,7 @@ include_directories("./")
 # C++ code for standalone
 add_executable(pbam
   ASolver.cpp
+  ../../pb_shared/src/BaseSys.cpp
   BD.cpp
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp

@@ -184,7 +184,7 @@ orientRand_(randorient) //
   mbdfile_loc_[0] = "";
   mbdfile_loc_[1] = "";
 
-  // Molecule part
+  // MoleculeSAMAM part
   for (int i=0; i<nType_; i++)
   {
     pqr_names_[i] = "";
@@ -528,12 +528,12 @@ void Setup::check_inputs()
   if (typeDiff_.size() < nType_ )
   {
     problems.push_back("Number of molecular input type parameters is less \
-                       than the specified number of molecule types");
+                       than the specified number of MoleculeSAMAM types");
   }
   if (typeDef_.size() < nType_)
   {
     problems.push_back("Number of movement types is less \
-                        than the specified number of molecule types");
+                        than the specified number of MoleculeSAMAM types");
   }
   if (pqr_names_.size() < nType_)
   {

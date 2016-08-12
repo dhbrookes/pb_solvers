@@ -56,7 +56,7 @@ solveTol_(1e-4)
 }
 
 
-PBAM::PBAM(const PBAMInput& pbami, vector<Molecule> mls )
+PBAM::PBAM(const PBAMInput& pbami, vector<MoleculeAM> mls )
 :
 poles_(5),
 solveTol_(1e-4)
@@ -156,7 +156,7 @@ void PBAM::check_system()
   } catch(const OverlappingMoleculeException& ex1)
   {
     cout << ex1.what() << endl;
-    cout << "Provided system has overlapping molecules. ";
+    cout << "Provided system has overlapping MoleculeAMs. ";
     cout << "Please provide a correct system."<< endl;
     exit(0);
   } catch (const NotEnoughCoordsException& ex2)
@@ -164,11 +164,11 @@ void PBAM::check_system()
     cout << ex2.what() << endl;
     exit(0);
   }
-  cout << "Molecule setup okay " << endl;
+  cout << "MoleculeAM setup okay " << endl;
 }
 
 
-// Rotate molecules if needed and then write out config to pqr
+// Rotate MoleculeAMs if needed and then write out config to pqr
 void PBAM::init_write_system()
 {
   if (setp_->get_randOrient())
@@ -247,25 +247,25 @@ void PBAM::run_dynamics()
       j += 1;  // j is index of contact termconditions
     } else if (type.substr(0,1) == "x")
     {
-      cout << type << " termination found for molecule ";
+      cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
       terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
                                              X, btype, val);
     } else if (type.substr(0,1) == "y")
     {
-      cout << type << " termination found for molecule ";
+      cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
       terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
                                              Y, btype, val);
     } else if (type.substr(0,1) == "z")
     {
-      cout << type << " termination found for molecule ";
+      cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
       terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
                                              Z, btype, val);
     } else if (type.substr(0,1) == "r")
     {
-      cout << type << " termination found for molecule ";
+      cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
       terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
                                              R, btype, val);

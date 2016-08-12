@@ -24,8 +24,8 @@ public:
   	 srand(1);
      PQRFile pqr(test_dir_loc + "test.pqr");
      MSMSFile surf_file (test_dir_loc + "test.vert");
-     vector<Molecule> mols;
-     mols.push_back(Molecule( 0, 0, "stat", pqr.get_charges(),
+     vector<MoleculeSAM> mols;
+     mols.push_back(MoleculeSAM( 0, 0, "stat", pqr.get_charges(),
                        pqr.get_atom_pts(), pqr.get_radii(),
                        surf_file.get_sp(), surf_file.get_np(), 2.5));
 

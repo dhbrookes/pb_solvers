@@ -35,8 +35,9 @@ using namespace std;
 
 int main(int argc, const char * argv[])
 {
-  string input_file = argv[1];
+//  string input_file = argv[1];
   //  string input_file = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/energyforce_test/barnase_barstar/run.energyforce.hardrefs.inp";
+  string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/electrostatic_test/fas2/run.fas2.start.hardrefs.inp";
 
   PBSAM pbsam_run(input_file);
   pbsam_run.run();

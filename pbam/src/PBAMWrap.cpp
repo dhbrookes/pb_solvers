@@ -113,10 +113,10 @@ PBAMOutput runPBAMSphinxWrap( double xyzrc[][AT_MAX][XYZRCWIDTH],
                               int natm[1],
                               PBAMInput pbamfin)
 {
-   // convert xyzrc to a vector of Molecules
+   // convert xyzrc to a vector of MoleculeAMs
   printf("Inside pbamrun sphinx\n");
   printPBAMStruct(pbamfin);
-  vector<Molecule> mols;
+  vector<MoleculeAM> mols;
   for (int mol=0; mol < nmol; mol++)
   {
     int natoms = natm[mol];
@@ -149,7 +149,7 @@ PBAMOutput runPBAMSphinxWrap( double xyzrc[][AT_MAX][XYZRCWIDTH],
       vdw.push_back(xyzrc[mol][i][3]);
       chg.push_back(xyzrc[mol][i][4]);
     }
-    mols.push_back(Molecule(difftype, chg, cgpos, vdw, mol, 0, dtr, drot));
+    mols.push_back(MoleculeAM(difftype, chg, cgpos, vdw, mol, 0, dtr, drot));
   }
 
   //  create the PBAM object
@@ -162,15 +162,15 @@ PBAMOutput runPBAMSphinxWrap( double xyzrc[][AT_MAX][XYZRCWIDTH],
 //  to call from APBS
 #ifdef PBAM_APBS
 PBAMOutput runPBAMWrapAPBS( PBAMInput pbamParams,
-                            Valist* molecules[], int nmls )
+                            Valist* MoleculeAMs[], int nmls )
 {
-   // convert Valist to a vector of Molecules
+   // convert Valist to a vector of MoleculeAMs
   printf("Inside pbamrun\n");
-  vector<Molecule> mols;
+  vector<MoleculeAM> mols;
   for (unsigned int mol=0; mol < nmls; mol++)
   {
     Vatom *atom;
-    unsigned int natoms = Valist_getNumberAtoms(molecules[mol]);
+    unsigned int natoms = Valist_getNumberAtoms(MoleculeAMs[mol]);
 
     vector<double> vdw, chg;
     vector<Pt> cgpos;
@@ -195,14 +195,14 @@ PBAMOutput runPBAMWrapAPBS( PBAMInput pbamParams,
 
     for (unsigned int i=0; i < natoms; i++)
     {
-      atom = Valist_getAtom(molecules[mol], i);
+      atom = Valist_getAtom(MoleculeAMs[mol], i);
       cgpos.push_back( Pt(Vatom_getPosition(atom)[0],
                           Vatom_getPosition(atom)[1],
                           Vatom_getPosition(atom)[2]));
       vdw.push_back(Vatom_getRadius(atom));
       chg.push_back(Vatom_getCharge(atom));
     }
-    mols.push_back(Molecule(difftype, chg, cgpos, vdw, mol, 0, dtr, drot));
+    mols.push_back(MoleculeAM(difftype, chg, cgpos, vdw, mol, 0, dtr, drot));
   }
 
   //  create the PBAM object

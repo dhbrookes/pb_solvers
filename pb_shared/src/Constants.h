@@ -49,7 +49,7 @@ protected:
     
   //Independent constants:
   double bDist_;  //!< Initial distance between 2 proteins for BD run
-  double qDist_;  //!< Distance for molecules to be considered escaped
+  double qDist_;  //!< Distance for MoleculeSAMAMs to be considered escaped
   double fDist_;  //!< Cutoff for protein force interactions
   double dielectricWater_;  //!< The dielectric constant of water (solvent, sDiel)
   double dielectricProt_;  //!< Dielectric constant of the protein (internal, iDiel)

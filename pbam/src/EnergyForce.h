@@ -43,15 +43,15 @@
 using namespace std;
 
 /*
- Class for calculating the energy of molecules in the system given
+ Class for calculating the energy of MoleculeAMs in the system given
  an ASolver object
  */
 class EnergyCalc
 {
 protected:
-  shared_ptr<VecOfMats<cmplx>::type> _A_;
-  shared_ptr<VecOfMats<cmplx>::type> _L_;
-  int N_;  // number of molecules
+  shared_ptr<vector<MyExpansion> > _A_;
+  shared_ptr<vector<MyExpansion> > _L_;
+  int N_;  // number of MoleculeAMs
   int p_;  // max number of poles
   shared_ptr<Constants> _const_;
 
@@ -60,21 +60,19 @@ protected:
 public:
   EnergyCalc() { }
   
-  EnergyCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
-             shared_ptr<VecOfMats<cmplx>::type> _L,
+  EnergyCalc(shared_ptr<vector<MyExpansion> > _A,
+             shared_ptr<vector<MyExpansion> > _L,
              shared_ptr<Constants> _const, int N, int p);
   
   EnergyCalc(shared_ptr<ASolver> _asolv);
   
-//  EnergyCalc(ASolver asolv, Constants consts, int p);
-  
   // fill omega_
   void calc_energy();
   
-  // calculate energy of one molecule
+  // calculate energy of one MoleculeAM
   double calc_ei(int i);
   
-  // get the energy for a specific molecule:
+  // get the energy for a specific MoleculeAM:
   double get_omega_i_int(int i)  { return _omega_->operator[](i); }
   // get all energy:
   shared_ptr<vector<double> > get_omega_int() { return _omega_; }
@@ -115,17 +113,17 @@ public:
 };
 
 /*
- Class for calculating the forces on molecules in the system given
+ Class for calculating the forces on MoleculeAMs in the system given
  an ASolver object
  */
 class ForceCalc
 {
 protected:
-  shared_ptr<VecOfMats<cmplx>::type> _A_;
-  shared_ptr<VecOfMats<cmplx>::type> _L_;
+  shared_ptr<vector<MyExpansion> > _A_;
+  shared_ptr<vector<MyExpansion> > _L_;
   
-  shared_ptr< MyMatrix<VecOfMats<cmplx>::type > > _gradA_;
-  shared_ptr< MyVector<VecOfMats<cmplx>::type > > _gradL_;
+  shared_ptr< MyMatrix<MyGradExpansion> > _gradA_;
+  shared_ptr< MyVector<MyGradExpansion> > _gradL_;
   
   double epsS_;
   int N_;
@@ -136,10 +134,10 @@ protected:
 public:
   ForceCalc() { }
   
-  ForceCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
-            shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > _gradA,
-            shared_ptr<VecOfMats<cmplx>::type> _L,
-            shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL,
+  ForceCalc(shared_ptr<vector<MyExpansion> > _A,
+            shared_ptr<MyMatrix<MyGradExpansion> > _gradA,
+            shared_ptr<vector<MyExpansion> > _L,
+            shared_ptr<MyVector<MyGradExpansion> > _gradL,
             shared_ptr<Constants> con, int N, int p);
   
   ForceCalc(shared_ptr<ASolver> _asolv);
@@ -147,7 +145,7 @@ public:
   void calc_force();  // fill F_
   void calc_force_interact( shared_ptr<System> sys);
   
-  // calculate force on one molecule
+  // calculate force on one MoleculeAM
   Pt calc_fi(int i);
   
   Pt get_fi(int i)     { return (*_F_)[i]; }
@@ -156,23 +154,23 @@ public:
 };
 
 /*
- Class for calculating the torque on every molecule in the system
+ Class for calculating the torque on every MoleculeAM in the system
  */
 class TorqueCalc
 {
 protected:
   
-  // outer vector has an entry for every molecule. Inner vector is the torque
-  // on that molecule
+  // outer vector has an entry for every MoleculeAM. Inner vector is the torque
+  // on that MoleculeAM
   shared_ptr<vector<Pt> > _tau_;
   
   shared_ptr<SHCalc> _shCalc_;
   shared_ptr<BesselCalc> _bCalc_;
-  shared_ptr< MyVector<VecOfMats<cmplx>::type > > _gradL_;
+  shared_ptr<MyVector<MyGradExpansion> > _gradL_;
   
   shared_ptr<Constants> _consts_;
   shared_ptr<System> _sys_;
-  shared_ptr<VecOfMats<cmplx>::type> _gamma_;
+  shared_ptr<VecOfVecs<double>::type > _gamma_;
   
   int N_;
   int p_;
@@ -182,8 +180,8 @@ public:
   
   TorqueCalc(shared_ptr<SHCalc> _shCalc,
              shared_ptr<BesselCalc> _bCalc,
-             shared_ptr<MyVector<VecOfMats<cmplx>::type> > _gradL,
-             shared_ptr<VecOfMats<cmplx>::type> _gamma,
+             shared_ptr<MyVector<MyGradExpansion>  > _gradL,
+             shared_ptr<VecOfVecs<double>::type > _gamma,
              shared_ptr<Constants> _consts,
              shared_ptr<System> sys, int p);
   
@@ -191,13 +189,13 @@ public:
   
   void calc_tau();  // fill tau_
   
-  // calculate torque on one molecule
+  // calculate torque on one MoleculeAM
   Pt calc_tau_i(int i);
   
   /*
    Calculate H vector (eq 42 and 43 in Lotan 2006)
    */
-  VecOfMats<cmplx>::type calc_H(int i);
+  MyGradExpansion calc_H(int i);
   
   Pt get_taui(int i)     { return _tau_->operator[](i); }
   shared_ptr<vector<Pt> > get_Tau()    { return _tau_; }
@@ -206,17 +204,18 @@ public:
    Calculate inner product of two matrices as defined in equation 29 of Lotan
    2006
    */
-  double lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p)
+  double lotan_inner_prod(MyExpansion U, MyExpansion V, int p)
   {
-    double ip = 0;
-    int n, m, mT;
+    int n, m, ct(0);
+    double mult, ip(0);
+
     for (n = 0; n < p; n++)
     {
-      for (m = -n; m <= n; m++)
+      for (m = 0; m < 2*n+1; m++) // Getting double array that is both re & im
       {
-        mT = (m < 0) ? -1*m : m;
-        ip += U(n, mT+p_).real()*V(n, mT+p_).real()
-               + U(n, mT+p_).imag()*V(n, mT+p_).imag();
+        mult = (m > 0) ? 2.0 : 1.0;
+        ip += mult * U(ct) * V(ct);
+        ct++;
       }
     }
     return ip;
@@ -228,7 +227,7 @@ public:
 class ThreeBody
 {
 protected:
-  int N_; // number of molecules in the system
+  int N_; // number of MoleculeAMs in the system
   int p_; // number of poles
   
   double cutoffTBD_;  // distance for cutoff of tbd approx
