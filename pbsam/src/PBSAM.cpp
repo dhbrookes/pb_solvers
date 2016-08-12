@@ -70,7 +70,7 @@ solveTol_(1e-4)
 }
 
 
-PBSAM::PBSAM(const PBSAMInput& pbami, vector<Molecule> mls )
+PBSAM::PBSAM(const PBSAMInput& pbami, vector<MoleculeSAM> mls )
 :
 poles_(5),
 solveTol_(1e-4)
@@ -150,9 +150,8 @@ solveTol_(1e-4)
 
   check_setup();
   
-  vector<shared_ptr<Molecule> > molP(mls.size());
-  for (int i = 0; i < mls.size(); i++) molP[i] = make_shared<Molecule>(mls[i]);
-  
+  vector<shared_ptr<BaseMolecule> > molP(mls.size());
+  for (int i = 0; i < mls.size(); i++) molP[i] = make_shared<MoleculeSAM>(mls[i]);
   _syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
   init_write_system();
@@ -177,10 +176,10 @@ void PBSAM::check_system()
 {
   try {
     _syst_ = make_shared<System>(*_setp_);
-  } catch(const OverlappingMoleculeException& ex1)
+  } catch(const OverlappingMoleculeSAMException& ex1)
   {
     cout << ex1.what() << endl;
-    cout << "Provided system has overlapping molecules. ";
+    cout << "Provided system has overlapping MoleculeSAMs. ";
     cout << "Please provide a correct system."<< endl;
     exit(0);
   } catch (const NotEnoughCoordsException& ex2)
@@ -188,11 +187,11 @@ void PBSAM::check_system()
     cout << ex2.what() << endl;
     exit(0);
   }
-  cout << "Molecule setup okay " << endl;
+  cout << "MoleculeSAM setup okay " << endl;
 }
 
 
-// Rotate molecules if needed and then write out config to pqr
+// Rotate MoleculeSAMs if needed and then write out config to pqr
 void PBSAM::init_write_system()
 {
   if (_setp_->get_randOrient())
@@ -208,10 +207,10 @@ void PBSAM::init_write_system()
 
 shared_ptr<System> PBSAM::make_subsystem(vector<int> mol_idx)
 {
-  vector<shared_ptr<Molecule> > sub_mols (mol_idx.size());
+  vector<shared_ptr<BaseMolecule> > sub_mols (mol_idx.size());
   for (int i = 0; i < mol_idx.size(); i++)
   {
-    sub_mols[i] = _syst_->get_molecule(mol_idx[i]);
+    sub_mols[i] = _syst_->get_moli(mol_idx[i]);
   }
   
   shared_ptr<System> _subsys = make_shared<System>(sub_mols,
@@ -248,7 +247,7 @@ void PBSAM::initialize_pbsam()
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
-      IEMatrix ieMatTest(0, _syst_->get_molecule(idx),
+      IEMatrix ieMatTest(0, _syst_->get_moli(idx),
                          _sh_calc_, poles_, _exp_consts_, true, 0, true);
       if (k==0) //Only write once for each type
         ieMatTest.write_all_mat(_setp_->getTypeNPQR(i));
@@ -271,13 +270,13 @@ void PBSAM::initialize_pbsam()
     } else if ( _syst_->get_n() != 1 )
     {
       cout << "Solving for self polarization for mol type " << i << endl;
-      // Make one molecule system for each type to solve for self-polarization
+      // Make one MoleculeSAM system for each type to solve for self-polarization
       auto sub_syst = make_subsystem({_syst_->get_mol_global_idx(i,0)});
       Solver self_pol( sub_syst, _consts_, _sh_calc_, _bessl_calc_, poles_);
       self_pol.solve(solveTol_, 100);
       
       //Printing out H and F of selfpol
-      //TODO: This should also get printed if system is only 1 molecule?
+      //TODO: This should also get printed if system is only 1 MoleculeSAM?
       self_pol.get_all_H()[0]->print_all_to_file(_setp_->getTypeNPQR(i)+".H",
                                                  _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
@@ -353,25 +352,25 @@ void PBSAM::run_dynamics()
 //      j += 1;  // j is index of contact termconditions
 //    } else if (type.substr(0,1) == "x")
 //    {
-//      cout << type << " termination found for molecule ";
+//      cout << type << " termination found for MoleculeSAM ";
 //      cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
 //      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
 //                                             X, btype, val);
 //    } else if (type.substr(0,1) == "y")
 //    {
-//      cout << type << " termination found for molecule ";
+//      cout << type << " termination found for MoleculeSAM ";
 //      cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
 //      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
 //                                             Y, btype, val);
 //    } else if (type.substr(0,1) == "z")
 //    {
-//      cout << type << " termination found for molecule ";
+//      cout << type << " termination found for MoleculeSAM ";
 //      cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
 //      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
 //                                             Z, btype, val);
 //    } else if (type.substr(0,1) == "r")
 //    {
-//      cout << type << " termination found for molecule ";
+//      cout << type << " termination found for MoleculeSAM ";
 //      cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
 //      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
 //                                             R, btype, val);

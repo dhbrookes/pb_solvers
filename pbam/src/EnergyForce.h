@@ -43,7 +43,7 @@
 using namespace std;
 
 /*
- Class for calculating the energy of molecules in the system given
+ Class for calculating the energy of MoleculeAMs in the system given
  an ASolver object
  */
 class EnergyCalc
@@ -51,7 +51,7 @@ class EnergyCalc
 protected:
   shared_ptr<VecOfMats<cmplx>::type> _A_;
   shared_ptr<VecOfMats<cmplx>::type> _L_;
-  int N_;  // number of molecules
+  int N_;  // number of MoleculeAMs
   int p_;  // max number of poles
   shared_ptr<Constants> _const_;
 
@@ -71,10 +71,10 @@ public:
   // fill omega_
   void calc_energy();
   
-  // calculate energy of one molecule
+  // calculate energy of one MoleculeAM
   double calc_ei(int i);
   
-  // get the energy for a specific molecule:
+  // get the energy for a specific MoleculeAM:
   double get_omega_i_int(int i)  { return _omega_->operator[](i); }
   // get all energy:
   shared_ptr<vector<double> > get_omega_int() { return _omega_; }
@@ -115,7 +115,7 @@ public:
 };
 
 /*
- Class for calculating the forces on molecules in the system given
+ Class for calculating the forces on MoleculeAMs in the system given
  an ASolver object
  */
 class ForceCalc
@@ -147,7 +147,7 @@ public:
   void calc_force();  // fill F_
   void calc_force_interact( shared_ptr<System> sys);
   
-  // calculate force on one molecule
+  // calculate force on one MoleculeAM
   Pt calc_fi(int i);
   
   Pt get_fi(int i)     { return (*_F_)[i]; }
@@ -156,14 +156,14 @@ public:
 };
 
 /*
- Class for calculating the torque on every molecule in the system
+ Class for calculating the torque on every MoleculeAM in the system
  */
 class TorqueCalc
 {
 protected:
   
-  // outer vector has an entry for every molecule. Inner vector is the torque
-  // on that molecule
+  // outer vector has an entry for every MoleculeAM. Inner vector is the torque
+  // on that MoleculeAM
   shared_ptr<vector<Pt> > _tau_;
   
   shared_ptr<SHCalc> _shCalc_;
@@ -191,7 +191,7 @@ public:
   
   void calc_tau();  // fill tau_
   
-  // calculate torque on one molecule
+  // calculate torque on one MoleculeAM
   Pt calc_tau_i(int i);
   
   /*
@@ -228,7 +228,7 @@ public:
 class ThreeBody
 {
 protected:
-  int N_; // number of molecules in the system
+  int N_; // number of MoleculeAMs in the system
   int p_; // number of poles
   
   double cutoffTBD_;  // distance for cutoff of tbd approx

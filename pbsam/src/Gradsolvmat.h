@@ -111,7 +111,7 @@ public:
   
   void print_kmat(int k)
   {
-    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    cout << "molecule " << I_ << " For sphere " << k << endl;
     for (int d = 0; d < 3; d++)
     {
       cout << " Dim: " << d <<  endl;
@@ -196,7 +196,7 @@ public:
   
   void print_kmat(int k)
   {
-    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    cout << "molecule " << I_ << " For sphere " << k << endl;
     for (int d = 0; d < 3; d++)
     {
       cout << " Dim: " << d <<  endl;
@@ -216,7 +216,7 @@ public:
   
   void print_analytical(int k)
   {
-    cout << "Molecule " << I_ << " For sphere " << k << endl;
+    cout << "molecule " << I_ << " For sphere " << k << endl;
     for (int d = 0; d < 3; d++)
     {
       cout << " Dim: " << d <<  endl;
@@ -275,7 +275,7 @@ public:
                double kappa);
   
   // calculate values for all spheres in this molecule
-  void calc_all_vals(shared_ptr<Molecule> mol,
+  void calc_all_vals(shared_ptr<BaseMolecule> mol,
                      shared_ptr<BesselCalc> bcalc,
                      shared_ptr<GradHMatrix> dH,
                      shared_ptr<GradFMatrix> dF,
@@ -284,7 +284,7 @@ public:
                      shared_ptr<GradLFMatrix> dLF);
   
   // calcualte values for one sphere in this molecule
-  void calc_val_k(int k, shared_ptr<Molecule> mol,
+  void calc_val_k(int k, shared_ptr<BaseMolecule> mol,
                   vector<double> besseli,
                   vector<double> besselk,
                   shared_ptr<GradHMatrix> dH,
@@ -307,7 +307,7 @@ protected:
 public:
   GradWHMatrix(int I, int wrt, int ns, int p, double kappa);
   
-  void calc_all_vals(shared_ptr<Molecule> mol,
+  void calc_all_vals(shared_ptr<BaseMolecule> mol,
                      shared_ptr<BesselCalc> bcalc,
                      shared_ptr<GradHMatrix> dH,
                      shared_ptr<GradFMatrix> dF,
@@ -315,7 +315,7 @@ public:
                      shared_ptr<GradLHNMatrix> dLHN,
                      shared_ptr<GradLFMatrix> dLF);
   
-  void calc_val_k(int k, shared_ptr<Molecule> mol,
+  void calc_val_k(int k, shared_ptr<BaseMolecule> mol,
                   vector<double> besseli,
                   vector<double> besselk,
                   shared_ptr<GradHMatrix> dH,
@@ -355,7 +355,7 @@ public:
   GradHMatrix(int I, int wrt,
               int ns, int p, double kappa);
   
-  void calc_all_vals(shared_ptr<Molecule> mol,
+  void calc_all_vals(shared_ptr<BaseMolecule> mol,
                      shared_ptr<BesselCalc> bcalc,
                      shared_ptr<IEMatrix> IE,
                      shared_ptr<GradWHMatrix> dWH);
@@ -381,14 +381,14 @@ class GradLFMatrix : public GradNumericalMat
 public:
   GradLFMatrix(int I, int wrt, int ns, int p);
   
-  void init_k(int k, shared_ptr<Molecule> mol, shared_ptr<GradFMatrix> dF,
+  void init_k(int k, shared_ptr<BaseMolecule> mol, shared_ptr<GradFMatrix> dF,
               shared_ptr<SHCalc> shcalc,
               shared_ptr<ExpansionConstants> _expconst);
   
-  void calc_all_vals(shared_ptr<Molecule> mol, vector<int> interpol,
+  void calc_all_vals(shared_ptr<BaseMolecule> mol, vector<int> interpol,
                      shared_ptr<TMatrix> T, shared_ptr<GradFMatrix> dF);
   
-  void calc_val_k(int k, shared_ptr<Molecule> mol, vector<int> interpol,
+  void calc_val_k(int k, shared_ptr<BaseMolecule> mol, vector<int> interpol,
                   shared_ptr<TMatrix> T,
                   shared_ptr<GradFMatrix> dF);
 };
@@ -404,14 +404,14 @@ protected:
 public:
   GradLHMatrix(int I, int wrt, int ns, int p, double kappa);
   
-  void init_k(int k, shared_ptr<Molecule> mol, shared_ptr<GradHMatrix> dH,
+  void init_k(int k, shared_ptr<BaseMolecule> mol, shared_ptr<GradHMatrix> dH,
               shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
               shared_ptr<ExpansionConstants> _expconst);
   
-  void calc_all_vals(shared_ptr<Molecule> mol, vector<int> interpol,
+  void calc_all_vals(shared_ptr<BaseMolecule> mol, vector<int> interpol,
                      shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
   
-  void calc_val_k(int k, shared_ptr<Molecule> mol, vector<int> interpol,
+  void calc_val_k(int k, shared_ptr<BaseMolecule> mol, vector<int> interpol,
                   shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
 };
 

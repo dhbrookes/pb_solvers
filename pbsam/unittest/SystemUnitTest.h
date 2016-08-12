@@ -41,7 +41,7 @@ TEST_F(CGSphereUTest, checkUserSpecRadCent)
 }
 
 
-class MoleculeUTest : public ::testing::Test
+class MoleculeSAMUTest : public ::testing::Test
 {
 public :
   
@@ -101,7 +101,7 @@ protected :
 };
 
 
-TEST_F(MoleculeUTest, checkUserSpecCG)
+TEST_F(MoleculeSAMUTest, checkUserSpecCG)
 {
   vector<Pt> pos(1); vector<double> cgRad(1);
   int M = 3; vector<double> charges(M); vector<double> vdW(M);
@@ -111,7 +111,7 @@ TEST_F(MoleculeUTest, checkUserSpecCG)
   charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[0] + Pt(1.0, 0.0, 0.0);
   charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[0] + Pt(0.0, 1.0, 0.0);
   
-  Molecule molNew( 0, 0, "stat", charges, posCharges, vdW, pos, cgRad, 0, 0);
+  MoleculeSAM molNew( 0, 0, "stat", charges, posCharges, vdW, pos, cgRad, 0, 0);
   
   ASSERT_EQ(      3, molNew.get_nc());
   ASSERT_EQ(      1, molNew.get_ns());
@@ -147,13 +147,13 @@ TEST_F(MoleculeUTest, checkUserSpecCG)
 }
 
 //TODO: Not sure this is actually something we can test...
-TEST_F(MoleculeUTest, checkCreateCen)
+TEST_F(MoleculeSAMUTest, checkCreateCen)
 {
   srand(1);
   PQRFile pqr(test_dir_loc + "test.pqr");
   MSMSFile surf_file (test_dir_loc + "test.vert");
-  vector<shared_ptr<Molecule> > mols;
-  mols.push_back(make_shared<Molecule>( 0, 0, "stat", pqr.get_charges(),
+  vector<shared_ptr<BaseMolecule> > mols;
+  mols.push_back(make_shared<MoleculeSAM>( 0, 0, "stat", pqr.get_charges(),
                       pqr.get_atom_pts(), pqr.get_radii(),
                       surf_file.get_sp(), surf_file.get_np(), 2.5));
   
@@ -161,13 +161,13 @@ TEST_F(MoleculeUTest, checkCreateCen)
   sys.write_to_pqr(test_dir_loc + "test_cged_out.pqr");
 }
 
-TEST_F(MoleculeUTest, check1BRSCGtoAtMap)
+TEST_F(MoleculeSAMUTest, check1BRSCGtoAtMap)
 {
   int ct = 0;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   
-  vector<Molecule> mols(1);
-  mols[0] = Molecule( 0, 0, "stat", pqr.get_charges(),
+  vector<MoleculeSAM> mols(1);
+  mols[0] = MoleculeSAM( 0, 0, "stat", pqr.get_charges(),
                       pqr.get_atom_pts(), pqr.get_radii(),
                       pqr.get_cg_centers(), pqr.get_cg_radii());
   
@@ -179,11 +179,11 @@ TEST_F(MoleculeUTest, check1BRSCGtoAtMap)
 }
 
 
-TEST_F(MoleculeUTest, translate)
+TEST_F(MoleculeSAMUTest, translate)
 {
   int ct = 0;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
-  Molecule molNew( 0, 0, "stat", pqr.get_charges(),
+  MoleculeSAM molNew( 0, 0, "stat", pqr.get_charges(),
                   pqr.get_atom_pts(), pqr.get_radii(),
                   pqr.get_cg_centers(), pqr.get_cg_radii());
   molNew.translate( Pt( 50.0, 50.0, 50.0), 1e48);
@@ -207,11 +207,11 @@ TEST_F(MoleculeUTest, translate)
 }
 
 
-TEST_F(MoleculeUTest, translatePBC)
+TEST_F(MoleculeSAMUTest, translatePBC)
 {
   int ct = 0;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
-  Molecule molNew( 0, 0, "stat", pqr.get_charges(),
+  MoleculeSAM molNew( 0, 0, "stat", pqr.get_charges(),
                   pqr.get_atom_pts(), pqr.get_radii(),
                   pqr.get_cg_centers(), pqr.get_cg_radii());
   molNew.translate( Pt( 100.0, 100.0, 100.0), 90);
@@ -234,12 +234,12 @@ TEST_F(MoleculeUTest, translatePBC)
   }
 }
 
-TEST_F(MoleculeUTest, rotateSimple)
+TEST_F(MoleculeSAMUTest, rotateSimple)
 {
   int ct = 0;
-  vector<Molecule> mols;
+  vector<MoleculeSAM> mols;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
-  Molecule molNew( 0, 0, "stat", pqr.get_charges(),
+  MoleculeSAM molNew( 0, 0, "stat", pqr.get_charges(),
                   pqr.get_atom_pts(), pqr.get_radii(),
                   pqr.get_cg_centers(), pqr.get_cg_radii());
   molNew.rotate( Quat( M_PI/2, Pt(0.0, 0.0, 1.0)));
@@ -262,11 +262,11 @@ TEST_F(MoleculeUTest, rotateSimple)
   }
 }
 
-TEST_F(MoleculeUTest, rotate2)
+TEST_F(MoleculeSAMUTest, rotate2)
 {
   int ct = 0;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
-  Molecule molNew( 0, 0, "stat", pqr.get_charges(),
+  MoleculeSAM molNew( 0, 0, "stat", pqr.get_charges(),
                   pqr.get_atom_pts(), pqr.get_radii(),
                   pqr.get_cg_centers(), pqr.get_cg_radii());
   molNew.rotate( Quat( 1.0, Pt(1.0, 1.0, 1.0)));
@@ -324,11 +324,11 @@ protected :
 TEST_F(SystemUTest, checkOverlap)
 {
   int M = 2;
-  vector<shared_ptr<Molecule> > mol_;
+  vector<shared_ptr<BaseMolecule> > mol_;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   
   for (int molInd = 0; molInd < M; molInd ++ )
-    mol_.push_back( make_shared<Molecule>(molInd, 0, "stat", pqr.get_charges(),
+    mol_.push_back( make_shared<MoleculeSAM>(molInd, 0, "stat", pqr.get_charges(),
                                           pqr.get_atom_pts(), pqr.get_radii(),
                                           pqr.get_cg_centers(),
                                           pqr.get_cg_radii()));
@@ -342,19 +342,19 @@ TEST_F(SystemUTest, checkOverlap)
   catch( const OverlappingMoleculeException& err )
   {
     // check exception
-    string error_exp = "Molecule 0 & 1 overlap";
+    string error_exp = "MoleculeSAM 0 & 1 overlap";
     EXPECT_EQ(string(err.what()), error_exp);
   }
 }
 
 TEST_F(SystemUTest, checkPBCOverlap)
 {
-  vector<shared_ptr<Molecule> > mol_; const int nMol = 3;
+  vector<shared_ptr<BaseMolecule> > mol_; const int nMol = 3;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   
   for (int molInd = 0; molInd < nMol; molInd ++ )
   {
-    mol_.push_back( make_shared<Molecule>(molInd, 0, "stat", pqr.get_charges(),
+    mol_.push_back( make_shared<MoleculeSAM>(molInd, 0, "stat", pqr.get_charges(),
                                           pqr.get_atom_pts(), pqr.get_radii(),
                                           pqr.get_cg_centers(),
                                           pqr.get_cg_radii()));
@@ -371,7 +371,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
   catch( const OverlappingMoleculeException& err )
   {
     // check exception
-    string error_exp = "Molecule 0 & 1 overlap";
+    string error_exp = "MoleculeSAM 0 & 1 overlap";
     EXPECT_EQ(string(err.what()), error_exp);
   }
 }
@@ -379,7 +379,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
 
 TEST_F(SystemUTest, checkVals)
 {
-  vector<shared_ptr<Molecule> > mol_;
+  vector<shared_ptr<BaseMolecule> > mol_;
   int nMol = 3; int ct = 0;
   double cutoff = 45.876;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(70.0,70.0,70.0), Pt(-70.0,-70.0,-70.0)};
@@ -387,7 +387,7 @@ TEST_F(SystemUTest, checkVals)
   
   for (int molInd = 0; molInd < nMol; molInd ++ )
   {
-    mol_.push_back( make_shared<Molecule>(molInd, 0, "stat", pqr.get_charges(),
+    mol_.push_back( make_shared<MoleculeSAM>(molInd, 0, "stat", pqr.get_charges(),
                                           pqr.get_atom_pts(), pqr.get_radii(),
                                           pqr.get_cg_centers(),
                                           pqr.get_cg_radii()));
@@ -467,14 +467,14 @@ TEST_F(SystemUTest, changeCutoff)
 {
   double cutoff = 245.876;
   double boxl   = 255.876;
-  vector<shared_ptr<Molecule> > mol_;
+  vector<shared_ptr<BaseMolecule> > mol_;
   int nMol = 3;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(70.0,70.0,70.0), Pt(-70.0,-70.0,-70.0)};
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   
   for (int molInd = 0; molInd < nMol; molInd ++ )
   {
-    mol_.push_back( make_shared<Molecule>(molInd, 0, "stat", pqr.get_charges(),
+    mol_.push_back( make_shared<MoleculeSAM>(molInd, 0, "stat", pqr.get_charges(),
                                           pqr.get_atom_pts(), pqr.get_radii(),
                                           pqr.get_cg_centers(),
                                           pqr.get_cg_radii()));
@@ -490,17 +490,17 @@ TEST_F(SystemUTest, PBCcheck)
 {
   double cutoff = 75.0;
   double boxl   = 180.0;
-  vector<shared_ptr<Molecule> > mol_;
+  vector<shared_ptr<BaseMolecule> > mol_;
   int nMol = 3;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(70.0,70.0,70.0), Pt(-65.3,-68.2,-61.21)};
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
-  Molecule molNew( 0, 0, "stat", pqr.get_charges(),
+  MoleculeSAM molNew( 0, 0, "stat", pqr.get_charges(),
                   pqr.get_atom_pts(), pqr.get_radii(),
                   pqr.get_cg_centers(), pqr.get_cg_radii());
   
   for (int molInd = 0; molInd < nMol; molInd ++ )
   {
-    mol_.push_back(make_shared<Molecule>(molInd, 0, "stat", pqr.get_charges(),
+    mol_.push_back(make_shared<MoleculeSAM>(molInd, 0, "stat", pqr.get_charges(),
                                          pqr.get_atom_pts(), pqr.get_radii(),
                                          pqr.get_cg_centers(),
                                          pqr.get_cg_radii()));

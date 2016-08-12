@@ -168,14 +168,14 @@ void ASolver::grad_iter(int j)
   Pt v;
   bool prev(true), polz(false), interact(false); //want to re-expand previous
   copy_to_prevGradA(j);
-  for (i = 0; i < N_; i++) // molecule of interest
+  for (i = 0; i < N_; i++) // MoleculeAM of interest
   {
     interact = false;
     polz = false;
     aij = VecOfMats<cmplx>::type (3, MyMatrix<cmplx>(p_,2*p_+1));
     aij = get_gradT_Aij(j, i);
     
-    for (k = 0; k < N_; k++) // other molecules
+    for (k = 0; k < N_; k++) // other MoleculeAMs
     {
       if (k == i) continue;
       v = _sys_->get_pbc_dist_vec(i, k);
@@ -263,7 +263,7 @@ double ASolver::calc_change(WhichReEx whichA, int wrt)
   return change;
 }
 
-// precompute gradT times A(i,j) for all pairs of molecules
+// precompute gradT times A(i,j) for all pairs of MoleculeAMs
 void ASolver::pre_compute_gradT_A()
 {
   // Solving for grad_j(A^(i)) by iterating through T^(i,k)
@@ -274,7 +274,7 @@ void ASolver::pre_compute_gradT_A()
   // relevant re-expansions (g prefix means gradient):
   VecOfMats<cmplx>::type gjT_Ai, gTA;
   bool prev = true; //want to re-expand previous
-  for (i = 0; i < N_; i++) // molecule of interest
+  for (i = 0; i < N_; i++) // MoleculeAM of interest
   {
     for (j = 0; j < N_; j++) // gradient of interest
     {
@@ -717,13 +717,13 @@ void ASolver::pre_compute_all_sh()
 {
   int i;
   for (i = 0; i < N_; i++)
-    (*_allSh_)[i] = calc_mol_sh(_sys_->get_molecule(i));
+    (*_allSh_)[i] = calc_mol_sh(_sys_->get_moli(i));
 }
 
 /*
- Calculate the SH matrix for every charge in a molecule
+ Calculate the SH matrix for every charge in a MoleculeAM
  */
-vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(Molecule mol)
+vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(MoleculeAM mol)
 {
   vector<MyMatrix<cmplx> > vout;
   vout.reserve(mol.get_m());
@@ -844,8 +844,8 @@ void ASolver::compute_delta()
 }
 
 /*
- Constructs the E vector, which contains a matrix for each molecule
- that defines the multipole expansion of that molecule. The values
+ Constructs the E vector, which contains a matrix for each MoleculeAM
+ that defines the multipole expansion of that MoleculeAM. The values
  of the inner matrices are calculated in calc_indi_e()
  */
 void ASolver::compute_E()
@@ -957,10 +957,10 @@ void ASolver::calc_gradL()
   Pt v;
   VecOfMats<cmplx>::type inner1, inner2;
   
-  for (i = 0; i < N_; i++) // molecule of interest
+  for (i = 0; i < N_; i++) // MoleculeAM of interest
   {
     inner1 = get_gradT_Aij( i, i);
-    for (k = 0; k < N_; k++) // other molecules
+    for (k = 0; k < N_; k++) // other MoleculeAMs
     {
       if (k == i) continue;
       v = _sys_->get_pbc_dist_vec(i, k);
@@ -1022,7 +1022,7 @@ VecOfMats<cmplx>::type ASolver::conv_to_cart( VecOfMats<cmplx>::type dZ,
  */
 void ASolver::print_Ei( int i, int p)
 {
-  cout << "This is my E for molecule " << i << " poles " << p <<  endl;
+  cout << "This is my E for MoleculeAM " << i << " poles " << p <<  endl;
   for (int n = 0; n < p; n++)
   {
     for (int m = 0; m <= n; m++)
@@ -1043,7 +1043,7 @@ void ASolver::print_Ei( int i, int p)
  */
 void ASolver::print_Ai( int i, int p)
 {
-  cout << "This is my A for molecule " << i << " poles " << p <<  endl;
+  cout << "This is my A for MoleculeAM " << i << " poles " << p <<  endl;
   for (int n = 0; n < 5; n++)
   {
     for (int m = 0; m <= n; m++)
@@ -1061,7 +1061,7 @@ void ASolver::print_Ai( int i, int p)
 }
 
 /*
- Print function for dA/dx of molecule i wrt j
+ Print function for dA/dx of MoleculeAM i wrt j
  */
 void ASolver::print_dAidx( int i, int j, int p)
 {
@@ -1082,7 +1082,7 @@ void ASolver::print_dAidx( int i, int j, int p)
 }
 
 /*
- Print function for dA/dy of molecule i wrt j
+ Print function for dA/dy of MoleculeAM i wrt j
  */
 void ASolver::print_dAidy( int i, int j, int p)
 {
@@ -1103,7 +1103,7 @@ void ASolver::print_dAidy( int i, int j, int p)
 }
 
 /*
- Print function for dA/dz of molecule i wrt j
+ Print function for dA/dz of MoleculeAM i wrt j
  */
 void ASolver::print_dAidz( int i, int j, int p)
 {
@@ -1125,7 +1125,7 @@ void ASolver::print_dAidz( int i, int j, int p)
 }
 
 /*
- Print function for dA of molecule i wrt j
+ Print function for dA of MoleculeAM i wrt j
  */
 void ASolver::print_dAi( int i, int j, int p)
 {
