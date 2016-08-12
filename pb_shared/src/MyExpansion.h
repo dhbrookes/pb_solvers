@@ -64,7 +64,7 @@ public:
   }
 };
 
-enum CmplxType { REAL, IMAG };
+enum CmplxType { RL, IM};
    
 class MyExpansion
 {
@@ -117,13 +117,15 @@ public:
     for ( i = 0; i < poles_; i++)
       for( j = 0; j <= i; j++)
       {
-        cmplxMp = {i,j,REAL};
+        cmplxMp[0] = i; cmplxMp[1] = j;
+        cmplxMp[2] = (int) RL;
         cmplxToDouble_[cmplxMp] = ct;
         ct++;
         
         if (j > 0)
         {
-          cmplxMp = {i,j,IMAG};
+          cmplxMp[0] = i; cmplxMp[1] = j;
+          cmplxMp[2] = (int)IM;
           cmplxToDouble_[cmplxMp] = ct;
           ct++;
         }
@@ -144,7 +146,7 @@ public:
    */
   void set_val_cmplx(const int i, const int j, complex<double> val)
   {
-    vector<int> cmplxMp = {i,j,REAL};
+    vector<int> cmplxMp = {i,j,RL};
     vals_[cmplxToDouble_[cmplxMp]] = val.real();
     
     if (j > 0) vals_[cmplxToDouble_[cmplxMp]+1] = val.imag();
@@ -164,10 +166,10 @@ public:
     else
     {
       
-      if ((j==0) && (type==IMAG))
+      if ((j==0) && (type==IM))
         return 0.0;
       
-      if ((j < 0) && (type==IMAG))
+      if ((j < 0) && (type==IM))
       {
         vector<int> cmplxMp = {i,-j,type};
         return -vals_[cmplxToDouble_[cmplxMp]];
@@ -205,7 +207,7 @@ public:
     }
     else
     {
-      vector<int> cmplxMp = {i,abs(j),REAL};
+      vector<int> cmplxMp = {i,abs(j),RL};
       int locMap = cmplxToDouble_[cmplxMp];
       if (j==0)
         return complex<double>(vals_[locMap],0.0);
@@ -260,8 +262,8 @@ public:
     {
       for (j = 0; j <= i ; j++)
       {
-        double  r = this->operator()(i, j, REAL);
-        double im = this->operator()(i, j, IMAG);
+        double  r = this->operator()(i, j, RL);
+        double im = this->operator()(i, j, IM);
         r  = fabs( r) > 1e-15 ?  r : 0;
         im = fabs(im) > 1e-15 ? im : 0;
         cout << "("<< setprecision(9) << r << ", " << im <<") ";

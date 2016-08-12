@@ -1,6 +1,7 @@
 project(pbam)
 
 include_directories("../../pb_shared/src")
+include_directories("../../pb_wrap/src")
 include_directories("./")
 
 # C++ code for standalone
@@ -39,6 +40,7 @@ if(ENABLE_PBAM_APBS)
   #  build pbam library
   add_library(PBAMLib 
               ASolver.cpp
+              ../../pb_shared/src/BaseSys.cpp
               BD.cpp
               ../../pb_shared/src/BesselCalc.cpp
               ../../pb_shared/src/Constants.cpp
