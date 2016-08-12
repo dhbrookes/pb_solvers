@@ -1,0 +1,708 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>PB-SAM Inputs &mdash; pb_solvers 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="pb_solvers 0.1 documentation" href="../index.html"/>
+        <link rel="up" title="PB-SAM" href="pbsam.html"/>
+        <link rel="next" title="PB-SAM Program details" href="pbsam_program.html"/>
+        <link rel="prev" title="Method overview" href="pbsam_method.html"/> 
+
+  
+  <script src="../static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pb_solvers
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pbam/pbam.html">PB-AM</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pbsam.html">PB-SAM</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pbsam_method.html">Method overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_method.html#physical-calculations">Physical calculations</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">PB-SAM Inputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-input-file-parameters">General input file parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#physical-calculations">Physical calculations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#electrostatic-potential-visualization">Electrostatic Potential Visualization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#brownian-dynamics-simulations">Brownian Dynamics Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#other-input-files">Other input files</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pqr-file">PQR File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#xyz-file">XYZ File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#translation-rotation-file">Translation/Rotation File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#contact-file">Contact File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertex-surface-file">Vertex/Surface File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imat-surface-integral-file">IMAT: Surface Integral File</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#expansion-files">Expansion files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_program.html">PB-SAM Program details</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">pb_solvers</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+        <li><a href="pbsam.html">PB-SAM</a> &raquo;</li>
+      
+    <li>PB-SAM Inputs</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="../sources/pbsam/pbsam_input.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pb-sam-inputs">
+<h1>PB-SAM Inputs<a class="headerlink" href="#pb-sam-inputs" title="Permalink to this headline">¶</a></h1>
+<p>Here are the inputs that are used in a PB-SAM run, and
+their meanings. There is much overlap between PB-AM inputs and PB-SAM, but
+the full PB-SAM list is provided here. The general format of the input is:</p>
+<p><code class="docutils literal"><span class="pre">keyword</span> <span class="pre">value</span></code></p>
+<p>The keyword that is most important is the <cite>runtype</cite> keyword.
+This specifies which type of output you are interested in generating.</p>
+<p>The current options are: <cite>energyforce</cite>, <cite>electrostatics</cite>
+and <cite>dynamics</cite>. The keywords for each specific run follow
+the next section.</p>
+<div class="section" id="general-input-file-parameters">
+<h2>General input file parameters<a class="headerlink" href="#general-input-file-parameters" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="22%" />
+<col width="63%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>Keyword</em></th>
+<th class="head"><em>Parameters</em></th>
+<th class="head"><em>Description</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>runname</td>
+<td><cite>&lt;name&gt;</cite></td>
+<td><cite>name</cite> is desired internal name of this run.</td>
+</tr>
+<tr class="row-odd"><td>attypes</td>
+<td><cite>&lt;numtypes&gt;</cite></td>
+<td><p class="first">Set the number of different atom</p>
+<p class="last">types to <cite>numtypes</cite></p>
+</td>
+</tr>
+<tr class="row-even"><td>pqr</td>
+<td><cite>&lt;idx&gt;</cite>  <cite>&lt;fpath&gt;</cite></td>
+<td><p class="first">The molecule index, <cite>idx</cite> for this pqr file.</p>
+<p class="last">Provide input PQR file at <cite>fpath</cite></p>
+</td>
+</tr>
+<tr class="row-odd"><td>xyz</td>
+<td><cite>&lt;idx&gt;</cite>  <cite>&lt;fpath&gt;</cite></td>
+<td><p class="first">The molecule index, <cite>idx</cite> for this xyz file.</p>
+<p class="last">Provide input XYZ file at <cite>fpath</cite></p>
+</td>
+</tr>
+<tr class="row-even"><td>surf</td>
+<td><cite>&lt;idx&gt;</cite>  <cite>&lt;fpath&gt;</cite></td>
+<td><p class="first"><cite>idx</cite>, molecule index for this surface/vertex file.</p>
+<p>Provide input solvent vertex file at <cite>fpath</cite>. See</p>
+<p class="last">details of the vertex file below.</p>
+</td>
+</tr>
+<tr class="row-odd"><td>imat</td>
+<td><cite>&lt;idx&gt;</cite>  <cite>&lt;fpath&gt;</cite></td>
+<td><p class="first"><cite>idx</cite>, index for integral matrix file. These are</p>
+<p>precursor files that the program will print if not</p>
+<p>specified with the imat flag. File prefix for type</p>
+<p><cite>idx</cite> is given with <cite>fpath</cite>. For details on the imat</p>
+<p class="last">file, see below.</p>
+</td>
+</tr>
+<tr class="row-even"><td>exp</td>
+<td><cite>&lt;idx&gt;</cite>  <cite>&lt;fpath&gt;</cite></td>
+<td><p class="first"><cite>idx</cite> : the molecule index for this expansion file.</p>
+<p>Provide input solvent vertex file at <cite>fpath</cite>. See</p>
+<p class="last">details of the expansion file below.</p>
+</td>
+</tr>
+<tr class="row-odd"><td>tolsp</td>
+<td><cite>&lt;tolerance&gt;</cite></td>
+<td><p class="first">The desired tolerance for coarse-graining, indicates</p>
+<p>how far beyond the surface the CG spheres may extend</p>
+<p class="last">Larger tolsp yields a coarser molecular representation</p>
+</td>
+</tr>
+<tr class="row-even"><td>transrot</td>
+<td><cite>&lt;idx&gt;</cite>  <cite>&lt;fpath&gt;</cite></td>
+<td><p class="first"><cite>idx</cite>, molecule index for this translation/rotation</p>
+<p>file that can be input instead of a xyz file.</p>
+<p class="last">Provide input file at <cite>fpath</cite></p>
+</td>
+</tr>
+<tr class="row-odd"><td>randorient</td>
+<td>&nbsp;</td>
+<td><p class="first">If you want your molecules to be randomly</p>
+<p class="last">rotated, use this flag</p>
+</td>
+</tr>
+<tr class="row-even"><td>units</td>
+<td><cite>&lt;units&gt;</cite></td>
+<td><p class="first">Set the units of output to <cite>units</cite>.</p>
+<p>The current options are: <cite>jmol</cite> (Joules/mole),</p>
+<p class="last"><cite>kT</cite> (kT/e) and <cite>kcalmol</cite> (kCal/mole).</p>
+</td>
+</tr>
+<tr class="row-odd"><td>salt</td>
+<td><cite>&lt;con&gt;</cite></td>
+<td>Set salt concentration in the system to <cite>con</cite></td>
+</tr>
+<tr class="row-even"><td>temp</td>
+<td><cite>&lt;T&gt;</cite></td>
+<td>Set system temperature to <cite>T</cite></td>
+</tr>
+<tr class="row-odd"><td>idiel</td>
+<td><cite>&lt;ival&gt;</cite></td>
+<td>Set the interior dielectric constant to <cite>ival</cite></td>
+</tr>
+<tr class="row-even"><td>sdiel</td>
+<td><cite>&lt;sval&gt;</cite></td>
+<td>Set the solvent dielectric constant to <cite>sval</cite></td>
+</tr>
+<tr class="row-odd"><td>pbc</td>
+<td><cite>&lt;boxlength&gt;</cite></td>
+<td>Set size of periodic box to <cite>boxlength</cite></td>
+</tr>
+<tr class="row-even"><td>random</td>
+<td><cite>&lt;seed&gt;</cite></td>
+<td>Seed the random number generator with <cite>seed</cite></td>
+</tr>
+<tr class="row-odd"><td>type</td>
+<td><p class="first"><cite>&lt;idx&gt;</cite> <cite>&lt;ct&gt;</cite></p>
+<p><cite>&lt;mvtype&gt;</cite> <cite>&lt;dtr&gt;</cite></p>
+<p class="last"><cite>&lt;drot&gt;</cite></p>
+</td>
+<td><p class="first">Set attributes of an atom type, where <cite>idx</cite> is the</p>
+<p>integer id of this type, which can be 1 to <cite>numtypes</cite></p>
+<p>(above). <cite>ct</cite> is the number of atoms of this type</p>
+<p>in the system and <cite>mvtype</cite> describes the way this</p>
+<p>type is allowed to move in a dynamics run (<cite>move</cite>,</p>
+<p><cite>rot</cite>, or <cite>stat</cite>). If <cite>movetype</cite> is <cite>move</cite> , then a</p>
+<p>translational diffusion coefficient <cite>dtr</cite> and a</p>
+<p>rotational diffusional coefficient <cite>drot</cite> are</p>
+<p>required. If <cite>movetype</cite> is <cite>rot</cite> then just <cite>drot</cite></p>
+<p class="last">is required.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="physical-calculations">
+<h2>Physical calculations<a class="headerlink" href="#physical-calculations" title="Permalink to this headline">¶</a></h2>
+<p>Will calculate the interaction energy, forces and torques
+for all molecules in the system.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="22%" />
+<col width="63%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>Keyword</em></th>
+<th class="head"><em>Parameters</em></th>
+<th class="head"><em>Description</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>runtype</td>
+<td><p class="first"><cite>&lt;energyforce&gt;</cite></p>
+<p class="last"><cite>&lt;outfilename&gt;</cite></p>
+</td>
+<td><p class="first">This will invoke the calculation of energies, forces</p>
+<p class="last">and torques for the input system.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="electrostatic-potential-visualization">
+<h2>Electrostatic Potential Visualization<a class="headerlink" href="#electrostatic-potential-visualization" title="Permalink to this headline">¶</a></h2>
+<p>Will compute the electrostatic potential (ESP)
+and print out 2D and 3D geometries for visualization.
+Post-processing visualization can be performed in VMD
+and with the python scripts provided in the repository.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="22%" />
+<col width="63%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>Keyword</em></th>
+<th class="head"><em>Parameters</em></th>
+<th class="head"><em>Description</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>runtype</td>
+<td><p class="first"><cite>&lt;electrostatics&gt;</cite></p>
+<p class="last"><cite>&lt;gridpts&gt;</cite></p>
+</td>
+<td><p class="first">Will write the results of electrostatics calculations</p>
+<p>for every 3D grid point to <cite>fname</cite>, in the same output</p>
+<p class="last">format as an APBS dx file.</p>
+</td>
+</tr>
+<tr class="row-odd"><td>dx</td>
+<td><p class="first"><cite>&lt;energyforce&gt;</cite></p>
+<p class="last"><cite>&lt;outfilename&gt;</cite></p>
+</td>
+<td><p class="first">Will write the results of electrostatics calculations</p>
+<p>for every 3D grid point to <cite>fname</cite>, in the same output</p>
+<p class="last">format as an APBS dx file.</p>
+</td>
+</tr>
+<tr class="row-even"><td>3dmap</td>
+<td><p class="first"><cite>&lt;energyforce&gt;</cite></p>
+<p class="last"><cite>&lt;outfilename&gt;</cite></p>
+</td>
+<td><p class="first">Will write the results of electrostatics calculations</p>
+<p class="last">for points on the surface of molecules of the system</p>
+</td>
+</tr>
+<tr class="row-odd"><td>gridct</td>
+<td><cite>&lt;ct&gt;</cite></td>
+<td><cite>ct</cite> is the number of 2D grids to output.</td>
+</tr>
+<tr class="row-even"><td>grid2d</td>
+<td><p class="first"><cite>&lt;fname&gt;</cite> <cite>&lt;axis&gt;</cite></p>
+<p class="last"><cite>&lt;val&gt;</cite></p>
+</td>
+<td><p class="first">Set attributes of a grid output where <cite>idx</cite> is the</p>
+<p>integer id of this grid, which can be 1 to <cite>ct</cite> (above)</p>
+<p>Write output of calculations for a cross section</p>
+<p class="last">along <cite>axis</cite> (<em>x</em>, <em>y</em>, or <em>z</em>) at <cite>value</cite></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="brownian-dynamics-simulations">
+<h2>Brownian Dynamics Simulations<a class="headerlink" href="#brownian-dynamics-simulations" title="Permalink to this headline">¶</a></h2>
+<p>Will perform a brownian dynamics simulation
+for the given system. The user may select and
+combine a variety of termination conditions
+depending on the system and desired results.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="22%" />
+<col width="63%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>Keyword</em></th>
+<th class="head"><em>Parameters</em></th>
+<th class="head"><em>Description</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>runtype</td>
+<td><p class="first"><cite>&lt;dynamics&gt;</cite></p>
+<p class="last"><cite>&lt;outnm&gt;</cite> <cite>&lt;ntraj&gt;</cite></p>
+</td>
+<td><p class="first">Will perform a brownian dynamics run. A directory where</p>
+<p>trajectory information will be stored in and the number</p>
+<p class="last">of trajectories is required.</p>
+</td>
+</tr>
+<tr class="row-odd"><td>termct</td>
+<td><cite>&lt;ct&gt;</cite></td>
+<td><cite>ct</cite> is the number of termination conditions.</td>
+</tr>
+<tr class="row-even"><td>termcombine</td>
+<td><cite>&lt;andor&gt;</cite></td>
+<td><p class="first">How termination conditions will be combined. <cite>andor</cite></p>
+<p class="last">should be <em>and</em> or <em>or</em>. Default is <em>or</em>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td>term</td>
+<td><p class="first"><cite>&lt;idx&gt;</cite> <cite>&lt;type&gt;</cite></p>
+<p class="last"><cite>&lt;val&gt;</cite> <cite>&lt;mols&gt;</cite></p>
+</td>
+<td><p class="first">Set attributes of a termination condition where <cite>idx</cite></p>
+<p>is the integer id of this condition, which can be 1 to</p>
+<p><cite>ct</cite> (above). <cite>type</cite> can be <em>time</em>,  <em>x&lt;=</em>, <em>y&lt;=</em>,</p>
+<p><em>z&lt;=</em>, or <em>r&lt;=</em> (or the <em>&gt;=</em> equivalents), <cite>val</cite></p>
+<p>is the value where the simulation terminates. <cite>mols</cite></p>
+<p>is a whitespace-delimited list of molecule indices that</p>
+<p>this condition applies to (<em>time</em> requires 0, and all</p>
+<p class="last">else require 1).</p>
+</td>
+</tr>
+<tr class="row-even"><td><p class="first">term <cite>idx</cite></p>
+<p class="last">contact</p>
+</td>
+<td><cite>&lt;confile&gt;</cite> <cite>&lt;pad&gt;</cite></td>
+<td><p class="first">Set attributes of contact termination condition, where</p>
+<p><cite>idx</cite> is the integer id of this condition, <cite>confile</cite></p>
+<p>is a path to a file containing the contact information,</p>
+<p>and <cite>pad</cite> specifies a correction for the case when the</p>
+<p>contact distance cannot be reached due to the spherical</p>
+<p class="last">assumption of the model. See below for more info.</p>
+</td>
+</tr>
+<tr class="row-odd"><td>xyz</td>
+<td><p class="first"><cite>&lt;idx&gt;</cite> <cite>&lt;trajidx&gt;</cite></p>
+<p class="last"><cite>&lt;fpath&gt;</cite></p>
+</td>
+<td><p class="first"><cite>idx</cite> is the molecule index for this xyz file.</p>
+<p>Provide input XYZ file at <cite>fpath</cite>. For the</p>
+<p>dynamics run, a starting configuration is</p>
+<p>needed for each trajectory for all the molecule</p>
+<p>types, so there should be <cite>ntraj</cite> xyz lines for</p>
+<p>each molecule, the trajectory number denoted by</p>
+<p class="last"><cite>trajidx</cite>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="other-input-files">
+<h2>Other input files<a class="headerlink" href="#other-input-files" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pqr-file">
+<h3>PQR File<a class="headerlink" href="#pqr-file" title="Permalink to this headline">¶</a></h3>
+<p>All the options above require a <em>PQR</em> file name. A PQR file
+can be generated from a PDB file using the PDB2PQR program,
+available as a web server or for download at:</p>
+<div class="line-block">
+<div class="line"><a class="reference external" href="http://nbcr-222.ucsd.edu/pdb2pqr/">http://nbcr-222.ucsd.edu/pdb2pqr/</a></div>
+<div class="line"><a class="reference external" href="http://www.poissonboltzmann.org/docs/pdb2pqr-installation/">http://www.poissonboltzmann.org/docs/pdb2pqr-installation/</a></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>It may also be formatted manually. The general format of a PQR
+file is as follows, and is whitespace-delimited:</p>
+<p><code class="docutils literal"><span class="pre">recName</span>&nbsp; <span class="pre">serial</span>&nbsp; <span class="pre">atName</span>&nbsp; <span class="pre">resName</span>&nbsp; <span class="pre">chainID</span>&nbsp; <span class="pre">resNum</span>&nbsp; <span class="pre">X</span>&nbsp; <span class="pre">Y</span>&nbsp; <span class="pre">Z</span>&nbsp; <span class="pre">charge</span> <span class="pre">rad</span></code></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">recName</span></code></td>
+<td>A string that should either be ATOM or HETATM.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">serial</span></code></td>
+<td>An integer that provides the atom index</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">atName</span></code></td>
+<td>A string that provides the atom name.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">resName</span></code></td>
+<td>A string that provides the residue name.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">chainID</span></code></td>
+<td>An optional string that provides the chain ID of the atom.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">resNumber</span></code></td>
+<td>An integer that provides the residue index.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">X</span> <span class="pre">Y</span> <span class="pre">Z</span></code></td>
+<td>Three floats that provide the atomic coordinates.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">charge</span></code></td>
+<td>A float that provides the atomic charge (in electrons).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">Rad</span></code></td>
+<td>A float that provides the atomic radius (in A).</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="xyz-file">
+<h3>XYZ File<a class="headerlink" href="#xyz-file" title="Permalink to this headline">¶</a></h3>
+<p>The <em>XYZ</em> file simply specifies the desired molecule
+centers for a given molecule type.</p>
+<div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">mol1X</span>&nbsp; <span class="pre">mol1Y</span>&nbsp; <span class="pre">mol1Z</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">mol2X</span>&nbsp; <span class="pre">mol2Y</span>&nbsp; <span class="pre">mol2Z</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">mol3X</span>&nbsp; <span class="pre">mol3Y</span>&nbsp; <span class="pre">mol3Z</span></code></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="translation-rotation-file">
+<h3>Translation/Rotation File<a class="headerlink" href="#translation-rotation-file" title="Permalink to this headline">¶</a></h3>
+<p><em>Translation/Rotation</em> Instead of a XYZ file, one can input a file
+specifying the translations and rotations that should be applied to
+each molecule of a particular type. For these files, we follow
+the PDB standard for rotation matrices and translation vectors,
+which is as follows:</p>
+<div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">mol1</span> <span class="pre">rot_1_11</span> <span class="pre">rot_1_12</span> <span class="pre">rot_1_13</span> <span class="pre">trans_1_1</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">mol1</span> <span class="pre">rot_1_21</span> <span class="pre">rot_1_22</span> <span class="pre">rot_1_23</span> <span class="pre">trans_1_2</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">mol1</span> <span class="pre">rot_1_31</span> <span class="pre">rot_1_32</span> <span class="pre">rot_1_33</span> <span class="pre">trans_1_3</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">mol2</span> <span class="pre">rot_2_11</span> <span class="pre">rot_2_12</span> <span class="pre">rot_2_13</span> <span class="pre">trans_2_1</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">mol2</span> <span class="pre">rot_2_21</span> <span class="pre">rot_2_22</span> <span class="pre">rot_2_23</span> <span class="pre">trans_2_2</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">mol2</span> <span class="pre">rot_2_31</span> <span class="pre">rot_2_32</span> <span class="pre">rot_2_33</span> <span class="pre">trans_2_3</span></code></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">mol1</span></code> and <code class="docutils literal"><span class="pre">mol2</span></code> are indices of the molecule of
+the type this file applies to, <code class="docutils literal"><span class="pre">rot_i_jk</span></code> is the <code class="docutils literal"><span class="pre">j,k</span></code> index
+of the rotation matrix for molecule <code class="docutils literal"><span class="pre">i</span></code> and <code class="docutils literal"><span class="pre">trans_i_j</span></code>
+is the <code class="docutils literal"><span class="pre">j</span></code> th element in the translation vector for molecule <code class="docutils literal"><span class="pre">i</span></code>.</p>
+</div>
+<div class="section" id="contact-file">
+<h3>Contact File<a class="headerlink" href="#contact-file" title="Permalink to this headline">¶</a></h3>
+<p><em>Contact</em> files describe contacts between two molecular types.
+Generally this information is used to determine if a dynamics
+simulation should be terminated (e.g. terminate a simulation after two
+proteins have docked). The contact file contains lines with the format:</p>
+<p><code class="docutils literal"><span class="pre">moltype1</span>&nbsp; <span class="pre">at1</span> <span class="pre">moltype2</span> <span class="pre">at2</span> <span class="pre">dist</span></code></p>
+<p>where <code class="docutils literal"><span class="pre">moltype1</span></code> and <code class="docutils literal"><span class="pre">moltype2</span></code> are indices of the
+molecular types, <code class="docutils literal"><span class="pre">at1</span></code> is the index of an atom from the first
+molecular type, <code class="docutils literal"><span class="pre">at2</span></code> is the index of an atom from the second
+molecular type and <code class="docutils literal"><span class="pre">dist</span></code> is the maximum distance between
+the two atoms that defines the contact.  Note that because of the
+coarse-graining, the program will identify the CG sphere closest
+to the contact atom, and use the surface-to-surface distance of those
+CG spheres to compare against the reported <code class="docutils literal"><span class="pre">dist</span></code>.</p>
+</div>
+<div class="section" id="vertex-surface-file">
+<h3>Vertex/Surface File<a class="headerlink" href="#vertex-surface-file" title="Permalink to this headline">¶</a></h3>
+<p>As part of the coarse-graining process a definition of the molecular
+surface is necessary. For this we have historically used the program
+<a class="reference external" href="http://mgltools.scripps.edu/packages/MSMS">MSMS</a> by M. Sanner, or on the online web <a class="reference external" href="http://mgl.scripps.edu/people/sanner/html/msms_server.html">server</a></p>
+<p>If using the command line tool, after downloading it for the correct platform,
+it can be run as follows on the command line. It requires an xyzr file as input, which
+is the xyz coordinates of each atom of the system followed by the vDW radius. This
+information can all be found in the PQR file.</p>
+<p><code class="docutils literal"><span class="pre">./msms.system</span> <span class="pre">-if</span> <span class="pre">[filename].xyzr</span> <span class="pre">-of</span> <span class="pre">[outfile]</span></code></p>
+<p>This will produce a *.face file and a *.vert file, of which the *.vert is needed.
+The vertex file is given as follows:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span> <span class="m">1669</span>      <span class="m">95</span>  3.00  1.50
+2.965    12.871    -1.084    -0.751    -0.636    -0.175       <span class="m">0</span>      <span class="m">81</span>  2
+3.241    11.952    -0.817    -0.936    -0.024    -0.353       <span class="m">0</span>      <span class="m">69</span>  2
+3.026    11.791    -0.439    -0.792     0.084    -0.604       <span class="m">0</span>      <span class="m">79</span>  2
+4.481    14.391    -3.026    -0.879    -0.246    -0.409       <span class="m">0</span>      <span class="m">73</span>  2
+5.413    15.674    -0.948    -0.337     0.499     0.798       <span class="m">0</span>      <span class="m">73</span>  2
+4.478    15.093    -0.297     0.286     0.886     0.365       <span class="m">0</span>      <span class="m">81</span>  2
+4.930    15.004    -0.240    -0.015     0.945     0.326       <span class="m">0</span>      <span class="m">71</span>  2
+4.072    13.663     0.763    -0.465     0.242     0.852       <span class="m">0</span>      <span class="m">71</span>  2
+</pre></div>
+</div>
+<p>Where the first line is the number of vertex points, followed by information
+on the density of the surface, and the lines that follow indicate the cartesian
+locations of each vertex point, followed by the unit norm of the surface.
+This vertex file is used to coarse-grain the molecule.</p>
+</div>
+<div class="section" id="imat-surface-integral-file">
+<h3>IMAT: Surface Integral File<a class="headerlink" href="#imat-surface-integral-file" title="Permalink to this headline">¶</a></h3>
+<p>The surface integrals are computed for the boundary element part of
+PB-SAM. They can be quite time consuming, so the first time they
+are computed for a system, they are printed to the working directory,
+with the name <code class="docutils literal"><span class="pre">&lt;pqr_prefix&gt;_sph[#].bin</span></code>. Where <code class="docutils literal"><span class="pre">&lt;pqr_prefix&gt;</span></code> is the
+name of the pqr input file, with the last four characters removed (presumed
+<cite>.pqr</cite>. For future computations, the <code class="docutils literal"><span class="pre">imat</span></code> keyword can be used, followed
+by the <code class="docutils literal"><span class="pre">&lt;pqr_prefix&gt;</span></code> and the program will read in the IMAT files instead of
+re-computing them.</p>
+</div>
+<div class="section" id="expansion-files">
+<h3>Expansion files<a class="headerlink" href="#expansion-files" title="Permalink to this headline">¶</a></h3>
+<p>Much like the IMAT files, the expansion files are files generated from
+self-polarization that are useful and time-saving methods for running
+a system of full-mutual polarziation on many molecules. If no expansion
+path is provided, the program will perform self polarization for each
+type of molecule in the system and print out files prepended with the
+<code class="docutils literal"><span class="pre">&lt;pqr_prefix&gt;</span></code> read in with the PQR flag, followed by <code class="docutils literal"><span class="pre">.[sph</span> <span class="pre">#].H.exp</span></code>
+or <code class="docutils literal"><span class="pre">.[sph</span> <span class="pre">#].F.exp</span></code>. Where <code class="docutils literal"><span class="pre">H</span></code> and <code class="docutils literal"><span class="pre">F</span></code> are the two key expansions
+that the PB-SAM code computes during run time. In future program runs, the
+<code class="docutils literal"><span class="pre">exp</span></code> flag can be used, and the <code class="docutils literal"><span class="pre">H</span></code> and <code class="docutils literal"><span class="pre">F</span></code> files will be read in.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pbsam_program.html" class="btn btn-neutral float-right" title="PB-SAM Program details" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pbsam_method.html" class="btn btn-neutral" title="Method overview" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Lisa Felberg and David Brookes.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../static/jquery.js"></script>
+      <script type="text/javascript" src="../static/underscore.js"></script>
+      <script type="text/javascript" src="../static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
