@@ -237,13 +237,15 @@ void Solver::step(int t, int I, int k)
   // Do full step for spol and for mpol at t > 0
   if ((_sys_->get_n() == 1) || (t > 0))
   {
-    _LH_[I]->init(_sys_->get_moli(I),_H_[I],precalcSH_LF_LH_[I]
+    _LH_[I]->init(_sys_->get_moli(I),_H_[I], precalcSH_LF_LH_[I]
                   ,_bCalc_,_expConsts_);
-    _LH_[I]->calc_vals(_T_, _H_[I], k, precalcSH_numeric);
+//    _LH_[I]->calc_vals(_T_, _H_[I], k, precalcSH_numeric);
+    _LH_[I]->calc_vals(_T_, _H_[I], k);
     
     _LF_[I]->init(_sys_->get_moli(I),_F_[I], precalcSH_LF_LH_[I],
                   _bCalc_,_expConsts_);
-    _LF_[I]->calc_vals(_T_, _F_[I], precalcSH_numeric, k);
+//    _LF_[I]->calc_vals(_T_, _F_[I], precalcSH_numeric, k);
+    _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
     
     if (_sys_->get_n()>1)
       _LHN_[I]->calc_vals(_sys_, _T_, _rotH_, k); // use rotated H for mpol
@@ -270,9 +272,11 @@ double Solver::iter(int t)
       for (int k = 0; k < _sys_->get_Ns_i(I); k++)
       {
         _LH_[I]->init(molI,_H_[I],precalcSH_LF_LH_[I], _bCalc_,_expConsts_);
-        _LH_[I]->calc_vals(_T_, _H_[I], k, precalcSH_numeric);
+//        _LH_[I]->calc_vals(_T_, _H_[I], k, precalcSH_numeric);
+        _LH_[I]->calc_vals(_T_, _H_[I], k);
         _LF_[I]->init(molI,_F_[I], precalcSH_LF_LH_[I], _bCalc_,_expConsts_);
-        _LF_[I]->calc_vals(_T_, _F_[I], precalcSH_numeric, k);
+//        _LF_[I]->calc_vals(_T_, _F_[I], precalcSH_numeric, k);
+        _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
         _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
       }
     }
