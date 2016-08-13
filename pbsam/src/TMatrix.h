@@ -46,7 +46,7 @@ protected:
   shared_ptr<System>      _system_;
   
   int         Nmol_;
-  vector<int> Nsi_; // number of spheres in each MoleculeSAM
+  vector<int> Nsi_; // number of spheres in each Molecule
   
   
   // inner functions for re-expansion
@@ -116,6 +116,12 @@ public:
    */
   MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
                                    int J, int l, double kappa);
+  
+  // Perform local expansion from J, l onto I, k with pre-calculated
+  // spherical harmonics
+  MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
+                                     int J, int l, double kappa,
+                                     shared_ptr<MyMatrix<cmplx> > pre_sh);
   
   /*
    re-expand element j of grad(X) with element (I,k,J l) of T. REquires

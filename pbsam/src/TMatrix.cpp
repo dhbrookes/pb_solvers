@@ -126,6 +126,44 @@ MyMatrix<cmplx> TMatrix::re_expandX_numeric(vector<vector<double> > X,
 }
 
 
+MyMatrix<cmplx> TMatrix::re_expandX_numeric(vector<vector<double> > X,
+                                            int I, int k,
+                                            int J, int l, double kappa,
+                                            shared_ptr<MyMatrix<cmplx> > pre_sh)
+{
+  int h, n, m;
+  cmplx val, sh;
+  double chgscl, rscl, ekr;
+  MyMatrix<cmplx> Z(p_, 2*p_+1);
+  vector<int> exp_pts = _system_->get_gdpt_expij(J, l);
+  for (h = 0; h < X[l].size(); h++)
+  {
+    Pt sph_dist = _system_->get_centerik(I, k) - _system_->get_centerik(J, l);
+    Pt loc = _system_->get_gridijh(J, l, exp_pts[h]) - sph_dist;
+//    _shCalc_->calc_sh(loc.theta(), loc.phi());
+    vector<double> bessI = _besselCalc_->calc_mbfK(p_+1, kappa*loc.r());
+    rscl = _system_->get_aik(I, k) / loc.r();
+    chgscl = X[l][h] / loc.r();
+    ekr = exp(-kappa*loc.r());
+    for (n = 0; n < p_; n++)
+    {
+      for (m = -n; m <= n; m++)
+      {
+        
+        if (m < 0) sh = conj((*pre_sh)(n, -m));
+        else sh = (*pre_sh)(n, m);
+        
+        val = bessI[n] * ekr * chgscl * sh + Z(n, m+p_);
+        Z.set_val(n, m+p_, val);
+      }
+      chgscl *= rscl;
+    }
+  }
+  return Z;
+}
+
+
+
 MyMatrix<cmplx> TMatrix::re_expandX(MyMatrix<cmplx> X,
                                     int I, int k,
                                    int J, int l, bool isF)

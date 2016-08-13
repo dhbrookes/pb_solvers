@@ -169,7 +169,8 @@ EMatrix::EMatrix(int I, int ns, int p)
 {
 }
 
-void EMatrix::calc_vals(shared_ptr<BaseMolecule> mol, shared_ptr<SHCalc> _shcalc,
+void EMatrix::calc_vals(shared_ptr<BaseMolecule> mol,
+                        shared_ptr<SHCalc> _shcalc,
                         double eps_in)
 {
   cmplx val;
@@ -201,12 +202,50 @@ void EMatrix::calc_vals(shared_ptr<BaseMolecule> mol, shared_ptr<SHCalc> _shcalc
   }
 }
 
+
+//void EMatrix::calc_vals(shared_ptr<BaseMolecule> mol,
+//                       shared_ptr<vector<vector<MyMatrix<cmplx> > > > pre_sh_in,
+//                       double eps_in)
+//{
+//  cmplx val;
+//  Pt cen;
+//  double r_alpha, a_k, q_alpha;
+//  for (int k=0; k< mol->get_ns(); k++)
+//  {
+//    vector<int> allin = mol->get_ch_allin_k(k);
+//    for (int alpha=0; alpha < allin.size(); alpha++)
+//    {
+//      cen = (mol->get_posj_realspace(allin[alpha]) - mol->get_centerk(k));
+////      _shcalc->calc_sh(cen.theta(), cen.phi());
+//      for (int n = 0; n < p_; n++)
+//      {
+//        for (int m = -n; m < n+1; m++)
+//        {
+//          q_alpha = mol->get_qj(allin[alpha]);
+//          r_alpha = cen.r();
+//          a_k = mol->get_ak(k);
+//          
+//          if (m < 0) val = conj((*pre_sh_in)[k][alpha](n, -m));
+//          else val = (*pre_sh_in)[k][alpha](n, m);
+//          
+//          val *= q_alpha / eps_in;
+//          val *= pow(r_alpha / a_k, n);
+//          val += get_mat_knm(k, n, m);
+//          set_mat_knm(k, n, m, val);
+//        }
+//      }
+//    }
+//  }
+//}
+
+
 LEMatrix::LEMatrix(int I, int ns, int p)
 :ComplexMoleculeMatrix(I, ns, p)
 {
 }
 
-void LEMatrix::calc_vals(shared_ptr<BaseMolecule> mol, shared_ptr<SHCalc> _shcalc,
+void LEMatrix::calc_vals(shared_ptr<BaseMolecule> mol,
+                         shared_ptr<SHCalc> _shcalc,
                          double eps_in)
 {
   cmplx val;
@@ -239,6 +278,42 @@ void LEMatrix::calc_vals(shared_ptr<BaseMolecule> mol, shared_ptr<SHCalc> _shcal
     }
   }
 }
+
+//void LEMatrix::calc_vals(shared_ptr<BaseMolecule> mol,
+//                         shared_ptr<vector<vector<MyMatrix<cmplx> > > > pre_sh_out,
+//                         double eps_in)
+//{
+//  cmplx val;
+//  Pt cen;
+//  
+//  double r_alpha, a_k, q_alpha;
+//  for (int k=0; k< mol->get_ns(); k++)
+//  {
+//    vector<int> allout = mol->get_ch_allout_k(k);
+//    for (int alpha=0; alpha < allout.size(); alpha++)
+//    {
+//      cen = mol->get_posj_realspace(allout[alpha]) - mol->get_centerk(k);
+//      for (int n = 0; n < p_; n++)
+//      {
+//        for (int m = -n; m < n+1; m++)
+//        {
+//          q_alpha = mol->get_qj(allout[alpha]);
+//          r_alpha = cen.r();
+//          a_k = mol->get_ak(k);
+//          
+//          if (m < 0) val = conj((*pre_sh_out)[k][alpha](n, -m));
+//          else val = (*pre_sh_out)[k][alpha](n, m);
+//          
+//          val *= q_alpha / eps_in;
+//          val *= 1 / r_alpha;
+//          val *= pow(a_k / r_alpha, n);
+//          val += get_mat_knm(k, n, m);
+//          set_mat_knm(k, n, m, val);
+//        }
+//      }
+//    }
+//  }
+//}
 
 
 IEMatrix::IEMatrix(int I, shared_ptr<BaseMolecule> _mol,
@@ -534,7 +609,8 @@ void IEMatrix::populate_mat(vector<MatOfMats<cmplx>::type >  Ys, int k)
   }//l
 }
 
-void IEMatrix::calc_vals(shared_ptr<BaseMolecule> _mol, shared_ptr<SHCalc> _shcalc)
+void IEMatrix::calc_vals(shared_ptr<BaseMolecule> _mol,
+                         shared_ptr<SHCalc> _shcalc)
 {
   for (int k = 0; k < _mol->get_ns(); k++)
   {
@@ -589,6 +665,45 @@ void LFMatrix::init(shared_ptr<BaseMolecule> mol, shared_ptr<FMatrix> F,
   }
 }
 
+void LFMatrix::init(shared_ptr<BaseMolecule> mol, shared_ptr<FMatrix> F,
+                    shared_ptr<vector<vector<MyMatrix<cmplx> > > > pre_sh,
+                    shared_ptr<BesselCalc> bcalc,
+                    shared_ptr<ExpansionConstants> _expconst)
+{
+  double rl, im;
+  cmplx sh;
+  for (int k=0; k< mol->get_ns(); k++)
+  {
+    vector <int> exp_pts = mol->get_gdpt_expj(k);
+    mat_[k].resize( (int) exp_pts.size() );
+    double dA = 4 * M_PI / (double) mol->get_gridj(k).size();
+    
+    for (int h = 0; h < exp_pts.size(); h++)
+    {
+      double val = 0.0;
+//      Pt q = mol->get_gridjh(k, exp_pts[h]);
+//      shcalc->calc_sh(q.theta(), q.phi());
+      
+      for (int n=0; n<p_; n++)
+      {
+        for (int m = -n; m <= n; m++)
+        {
+          
+          if (m < 0) sh = conj((*pre_sh)[k][h](n, -m));
+          else sh = (*pre_sh)[k][h](n, m);
+          
+          rl = sh.real()*F->get_mat_knm(k,n,m).real();
+          im = sh.imag()*F->get_mat_knm(k,n,m).imag();
+          val += dA*_expconst->get_const1_l(n) * ( rl + im );
+        }
+      }
+      set_mat_kh(k, h, val);
+    }
+  }
+}
+
+
+
 void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
                          shared_ptr<SHCalc> shcalc,
                          shared_ptr<System> sys, int k)
@@ -608,6 +723,31 @@ void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
     else
     {
       reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j, 0.0 );
+    }
+    
+    mat_cmplx_[k] += reex;
+  }
+}
+
+void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
+                         map<vector<int>, shared_ptr<MyMatrix<cmplx> > > pre_sh, int k)
+{
+  reset_mat(k);
+  MyMatrix<cmplx> reex;
+  for (int j = 0; j < T->get_nsi(I_); j++)
+  {
+    if (j==k) continue;
+    //    print_kmat(j);
+    
+    if (T->is_analytic(I_, k, I_, j))
+    {
+      bool isF = true;
+      reex = T->re_expandX(F->get_mat_k(j), I_, k, I_, j, isF );
+    }
+    else
+    {
+      reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j, 0.0 ,
+                                   pre_sh[{I_, k, I_, j}]);
     }
     
     mat_cmplx_[k] += reex;
@@ -652,6 +792,44 @@ void LHMatrix::init(shared_ptr<BaseMolecule> mol, shared_ptr<HMatrix> H,
   }
 }
 
+void LHMatrix::init(shared_ptr<BaseMolecule> mol, shared_ptr<HMatrix> H,
+                    shared_ptr<vector<vector<MyMatrix<cmplx> > > > pre_sh,
+                    shared_ptr<BesselCalc> bcalc,
+                    shared_ptr<ExpansionConstants> _expconst)
+{
+  double rl, im;
+  cmplx sh;
+  
+  for (int k=0; k< mol->get_ns(); k++)
+  {
+    vector <int> exp_pts = mol->get_gdpt_expj(k);
+    mat_[k].resize( (int) exp_pts.size() );
+    double dA = 4 * M_PI / (double) mol->get_gridj(k).size();
+    
+    for (int h = 0; h < exp_pts.size(); h++)
+    {
+      double val = 0.0;
+      Pt q = mol->get_gridjh(k, exp_pts[h]);
+//      shcalc->calc_sh(q.theta(), q.phi());
+      vector<double> bessI = bcalc->calc_mbfI(p_+1, kappa_*q.r());
+      
+      for (int n=0; n<p_; n++)
+      {
+        for (int m = -n; m <= n; m++)
+        {
+          if (m < 0) sh = conj((*pre_sh)[k][h](n, -m));
+          else sh = (*pre_sh)[k][h](n, m);
+          
+          rl = sh.real()*H->get_mat_knm(k,n,m).real();
+          im = sh.imag()*H->get_mat_knm(k,n,m).imag();
+          val += dA*_expconst->get_const1_l(n)*( rl + im )/bessI[n];
+        }
+      }
+      set_mat_kh(k, h, val);
+    }
+  }
+}
+
 void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
 {
   reset_mat(k);
@@ -665,6 +843,26 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k)
       reex = T->re_expandX(H->get_mat_k(j), I_, k, I_, j );
     else
       reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j, kappa_ );
+    
+    mat_cmplx_[k] += reex;
+  }
+}
+
+void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k,
+                         map<vector<int>, shared_ptr<MyMatrix<cmplx> > > pre_sh)
+{
+  reset_mat(k);
+  MyMatrix<cmplx> reex;
+  
+  for (int j = 0; j < T->get_nsi(I_); j++)
+  {
+    if (j==k) continue;
+    
+    if (T->is_analytic(I_, k, I_, j))
+      reex = T->re_expandX(H->get_mat_k(j), I_, k, I_, j );
+    else
+      reex = T->re_expandX_numeric(get_mat(), I_, k, I_, j, kappa_ ,
+                                   pre_sh[{I_, k, I_, j}]);
     
     mat_cmplx_[k] += reex;
   }
@@ -840,7 +1038,8 @@ void HMatrix::init_from_exp(string hfilename, int k)
 
 
 // Initialize H matrix to E with charges mapped to cg (mol.cgCharges_)
-void HMatrix::init(shared_ptr<BaseMolecule> mol, shared_ptr<SHCalc> _sh_calc, double eps_in)
+void HMatrix::init(shared_ptr<BaseMolecule> mol,
+                   shared_ptr<SHCalc> _sh_calc, double eps_in)
 {
   cmplx val;
   Pt cen;

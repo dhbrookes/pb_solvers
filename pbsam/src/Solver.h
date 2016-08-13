@@ -50,6 +50,12 @@ protected:
   shared_ptr<ExpansionConstants>    _expConsts_;
   
   vector<vector<double> >           dev_sph_Ik_;
+
+  
+  // precalculated SH values for LF and LH matrices
+  vector<shared_ptr<vector<vector<MyMatrix<cmplx> > > > > precalcSH_LF_LH_;
+  // precalculated SH values for numeric re-expansion
+  map<vector<int>, shared_ptr<MyMatrix<cmplx> > > precalcSH_numeric;
   
   double                            mu_; // SCF deviation max
   
@@ -60,6 +66,11 @@ protected:
   void update_prev_all();
   
   void iter_innerH(int I, int k);
+  
+  // pre-calculate spherical harmonics for LH and LF
+  void precalc_sh_lf_lh();
+  // pre-calculate spherical harmonics for numeric re-expansion
+  void precalc_sh_numeric();
   
 public:
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
