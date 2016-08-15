@@ -15,12 +15,12 @@ void applyMMat(const double * A, const double * X, double * Y,
                const double alpha, const double beta, int ma, int nc, int na)
 
 {
-//  const int M = ma;
-//  const int N = nc;
-//  const int K = na;
-//  const int lda = M;
-//  const int ldb = K;
-//  const int ldc = M;
+  const int M = ma;
+  const int N = nc;
+  const int K = na;
+  const int lda = M;
+  const int ldb = K;
+  const int ldc = M;
   
 #ifdef __ACML
   char transA = 'N';
@@ -897,7 +897,7 @@ void HMatrix::calc_vals(shared_ptr<BaseMolecule> mol,
   int ct = 0;
   cmplx inner;
   double ak = mol->get_ak(k);
-  double h_in[p_*p_];
+  double h_in[p_*p_], h_out[p_*p_];
   vector<double> bessel_i = bcalc->calc_mbfI(p_+1, kappa_*ak);
   vector<double> bessel_k = bcalc->calc_mbfK(p_+1, kappa_*ak);
   
@@ -1010,7 +1010,7 @@ void FMatrix::calc_vals(shared_ptr<BaseMolecule> mol,
   double ak = mol->get_ak(k), fRe, fIm, scl;
   vector<double> bessel_i = bcalc->calc_mbfI(p_+1, kappa*ak);
   vector<double> bessel_k = bcalc->calc_mbfK(p_+1, kappa*ak);
-  double f_in[p_*p_];
+  double f_in[p_*p_], f_out[p_*p_];;
   
   for (int l = 0; l < p_; l++)
   {
