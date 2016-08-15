@@ -82,7 +82,7 @@ public:
 
   int run();
   // for running the APBS version
-  PBSAMOutput run_apbs( );
+  PBAMOutput run_apbs( );
 
   void run_bodyapprox();
   void run_dynamics();

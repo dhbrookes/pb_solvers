@@ -47,6 +47,7 @@ if(ENABLE_PBSAM_APBS)
               Gradsolvmat.cpp  
               PBSAM.cpp 
               PhysCalc.cpp
+              ../../pb_wrap/src/PBSAMWrap.cpp
               ../../pb_shared/src/ReExpCalc.cpp
               ../../pb_shared/src/setup.cpp
               ../../pb_shared/src/SHCalc.cpp
@@ -55,6 +56,11 @@ if(ENABLE_PBSAM_APBS)
               System.cpp
               TMatrix.cpp
               )
+
+  MESSAGE( STATUS "linkers: " ${APBS_LIBS})
+  list(APPEND APBS_LIBS ${PBSAM_LINKER_LIBS})
+  MESSAGE( STATUS "linkers: " ${APBS_LIBS})
+
 endif()
 
 ################################################

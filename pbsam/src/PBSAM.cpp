@@ -318,7 +318,7 @@ int PBSAM::run()
   return 0;
 }
 
-PBSAMOutput PBSAM::run_apbs()
+PBAMOutput PBSAM::run_apbs()
 {
   if ( _setp_->getRunType() == "dynamics")
     run_dynamics();
@@ -331,7 +331,7 @@ PBSAMOutput PBSAM::run_apbs()
   else
     cout << "Runtype not recognized! See manual for options" << endl;
 
-  PBSAMOutput pbsamO;
+  PBAMOutput pbsamO;
   return pbsamO;
 }
 

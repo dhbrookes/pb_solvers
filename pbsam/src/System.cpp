@@ -41,6 +41,25 @@ MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double>
   calc_cog();
 }
 
+MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
+                       vector<Pt> pos, vector<double> vdwr, string msms_f,
+                       double tol_sp, double drot, double dtrans, int n_trials,
+                       int max_trials, double beta)
+                       
+:BaseMolecule(type, type_idx, movetype, qs, pos, vdwr, drot, dtrans)
+{
+
+  MSMSFile surf_file (msms_f);
+  find_centers(surf_file.get_sp(), surf_file.get_np(), tol_sp, n_trials, 
+               max_trials, beta);
+  check_connect();
+  for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
+  interPol_.resize(Ns_);  interAct_.resize(Ns_);
+  
+  map_repos_charges();
+  calc_cog();
+}
+
 MoleculeSAM::MoleculeSAM(const MoleculeSAM& mol)
 :BaseMolecule(mol.type_, mol.typeIdx_, mol.moveType_, mol.qs_, mol.pos_,
               mol.vdwr_, mol.centers_, mol.as_, mol.drot_, mol.dtrans_),

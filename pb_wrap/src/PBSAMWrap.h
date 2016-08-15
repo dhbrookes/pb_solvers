@@ -65,6 +65,9 @@ extern "C"{
 void printPBSAMStruct( PBAMInput pbamIn, PBSAMInput pbsamIn );
 
 #ifdef PBSAM_APBS
+
+#define RESLEN 64
+
 PBAMOutput runPBSAMWrapAPBS( PBAMInput pbamIn, PBSAMInput pbsamIn,
 	                          Valist* MoleculeAMs[], int nmls );
 #endif //PBSAM_APBS

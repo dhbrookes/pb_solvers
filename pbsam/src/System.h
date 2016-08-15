@@ -135,6 +135,11 @@ public:
              int max_trials=40, double beta=2.0, double drot=0,
              double dtrans=0);
   
+  MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
+             vector<Pt> pos, vector<double> vdwr, string msms_fil,
+             double tol_sp, double drot=0, double dtrans = 0, int n_trials=10,
+             int max_trials=40, double beta=2.0);
+  
   void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
 
   
