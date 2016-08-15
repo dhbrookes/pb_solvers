@@ -114,14 +114,13 @@ public:
   /*
    Re-expand a numerical surface with respect to T(I,k)(J,l) (Equation 27b [1])
    */
-  MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
-                                   int J, int l, double kappa);
+//  MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
+//                                   int J, int l, double kappa);
   
-  // Perform local expansion from J, l onto I, k with pre-calculated
-  // spherical harmonics
   MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
                                      int J, int l, double kappa,
-                                     shared_ptr<MyMatrix<cmplx> > pre_sh);
+                                     shared_ptr<PreCalcSH> pre_sh,
+                                     bool no_pre_sh=false);
   
   /*
    re-expand element j of grad(X) with element (I,k,J l) of T. REquires

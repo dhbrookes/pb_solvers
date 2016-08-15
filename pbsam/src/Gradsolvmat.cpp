@@ -168,7 +168,7 @@ void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
 {
   int ct(0), dim(3), p2(p_*p_);
   double dfRe, dfIm;
-  double df_in[p_*p_*dim], df_out[p_*p_*dim];
+  double df_in[p_*p_*dim];
   
   for (int d = 0; d < dim; d++)  // 3 dimensions
   {
@@ -278,7 +278,7 @@ void GradHMatrix::calc_val_k(int k, vector<double> besseli,
 {
   int ct(0), d, l, s, n, m, dim(3), p2(p_*p_);
   double dhR, dhI;
-  double dh_in[p_*p_*dim], dh_out[p_*p_*dim];
+  double dh_in[p_*p_*dim];
   
   for (d = 0; d < dim; d++)  // 3 dimensions
   {

@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <memory>
 #include "BesselCalc.h"
+#include <unordered_map>
 
 
 using namespace std;
@@ -112,5 +113,29 @@ public:
   double get_legendre_result( int n, int m );
   int get_num_vals()  { return numVals_; }
 };
+
+
+// class for pre-calculated spherical harmonics. Map
+class PreCalcSH
+{
+protected:
+  
+  unordered_map<Pt, MyMatrix<cmplx> > map_;
+  
+public:
+  
+  PreCalcSH() { }
+  
+  // calculates spherical harmonics at this point and add to hashmap
+  void calc_and_add(Pt p, shared_ptr<SHCalc> sh);
+  
+  cmplx get_sh(Pt p, int n, int m);
+  
+  bool is_calculated(Pt p) { return map_.find(p) != map_.end(); }
+  
+  
+  
+};
+
 
 #endif /* SHCalc_hpp */

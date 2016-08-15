@@ -585,12 +585,12 @@ TEST_F(SolverUTest, LHinit_test)
   auto _expcons = make_shared<ExpansionConstants> (pol);
   
   IEMatrix ieMatTest(0, mol, SHCalcTest, pol, _expcons, true);
-  
+  shared_ptr<PreCalcSH> precalc_sh = make_shared<PreCalcSH>();
   auto hmat = make_shared<HMatrix>(0, mol->get_ns(), pol, 0.21053961);
   hmat->init(mol, SHCalcTest, 4.0);
   
   LHMatrix lhmt(0, mol->get_ns(), pol, 0.21053961);
-  lhmt.init(mol, hmat, SHCalcTest, BesselCal, _expcons);
+  lhmt.init(mol, hmat, SHCalcTest, BesselCal, precalc_sh,  _expcons);
   
   for (int i = 0; i < mol->get_ns(); i++)
   {

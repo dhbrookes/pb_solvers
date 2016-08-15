@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <memory>
 #include "Solver.h"
+#include <map>
 
 
 /*

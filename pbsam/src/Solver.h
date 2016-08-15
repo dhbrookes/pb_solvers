@@ -13,6 +13,11 @@
 #include <iostream>
 #include <memory>
 #include "Gradsolvmat.h"
+#include <unordered_map>
+#include <map>
+#include <vector>
+
+
 
 
 /*
@@ -50,13 +55,9 @@ protected:
   shared_ptr<ExpansionConstants>    _expConsts_;
   
   vector<vector<double> >           dev_sph_Ik_;
+  
+  shared_ptr<PreCalcSH>             _precalcSH_;
 
-  
-  // precalculated SH values for LF and LH matrices
-  vector<shared_ptr<vector<vector<MyMatrix<cmplx> > > > > precalcSH_LF_LH_;
-  // precalculated SH values for numeric re-expansion
-  map<vector<int>, shared_ptr<MyMatrix<cmplx> > > precalcSH_numeric;
-  
   double                            mu_; // SCF deviation max
   
   // update prevH and outerH and rotH

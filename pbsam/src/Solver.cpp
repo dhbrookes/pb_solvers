@@ -36,13 +36,14 @@ _consts_(_consts),
 _sys_(_sys),
 dev_sph_Ik_(_sys->get_n()),
 p_(p),
-kappa_(_consts->get_kappa()),
-precalcSH_LF_LH_(_sys_->get_n())
-//precalcSH_LE_(_sys_->get_n())
+kappa_(_consts->get_kappa())
 {
   _reExConsts_ = make_shared<ReExpCoeffsConstants> (kappa_,
                                                     _sys_->get_lambda(), p_,
                                                     true);
+  
+  _precalcSH_ = make_shared<PreCalcSH>();
+  
   _T_ = make_shared<TMatrix> (p_, _sys_, _shCalc_, _consts_,
                               _bCalc_, _reExConsts_);
   precalc_sh_lf_lh();
@@ -118,18 +119,13 @@ void Solver::precalc_sh_lf_lh()
   for (int i = 0; i < _sys_->get_n(); i++)
   {
     mol = _sys_->get_moli(i);
-    precalcSH_LF_LH_[i] = make_shared<vector<vector<MyMatrix<cmplx> > > >
-                    (mol->get_ns());
     for (int k = 0; k < mol->get_ns(); k++)
     {
       exp_pts = mol->get_gdpt_expj(k);
-      (*precalcSH_LF_LH_[i])[k] = vector<MyMatrix<cmplx> > (exp_pts.size());
-      
       for (int h=0; h < exp_pts.size(); h++)
       {
         q = mol->get_gridjh(k, exp_pts[h]);
-        _shCalc_->calc_sh(q.theta(), q.phi());
-        (*precalcSH_LF_LH_[i])[k][h] = _shCalc_->get_full_result();
+        _precalcSH_->calc_and_add(q, _shCalc_);
       }
     }
   }
@@ -149,14 +145,13 @@ void Solver::precalc_sh_numeric()
           else if (_T_->is_analytic(I, k, I, l)) continue;
           else
           {
+
             exp_pts = _sys_->get_gdpt_expij(I, l);
             for (int h = 0; h < exp_pts.size(); h++)
             {
               sph_dist = _sys_->get_centerik(I, k) - _sys_->get_centerik(I, l);
               loc = _sys_->get_gridijh(I, l, exp_pts[h]) - sph_dist;
-              _shCalc_->calc_sh(loc.theta(), loc.phi());
-              precalcSH_numeric[{I, k, I, l}] = make_shared<MyMatrix<cmplx> >
-                      (_shCalc_->get_full_result());
+              _precalcSH_->calc_and_add(loc, _shCalc_);
             }
           }
         }
@@ -237,15 +232,13 @@ void Solver::step(int t, int I, int k)
   // Do full step for spol and for mpol at t > 0
   if ((_sys_->get_n() == 1) || (t > 0))
   {
-    _LH_[I]->init(_sys_->get_moli(I),_H_[I], precalcSH_LF_LH_[I]
-                  ,_bCalc_,_expConsts_);
-//    _LH_[I]->calc_vals(_T_, _H_[I], k, precalcSH_numeric);
-    _LH_[I]->calc_vals(_T_, _H_[I], k);
+    _LH_[I]->init(_sys_->get_moli(I),_H_[I], _shCalc_, _bCalc_,
+                  _precalcSH_, _expConsts_);
+    _LH_[I]->calc_vals(_T_, _H_[I], _precalcSH_, k);
     
-    _LF_[I]->init(_sys_->get_moli(I),_F_[I], precalcSH_LF_LH_[I],
-                  _bCalc_,_expConsts_);
-//    _LF_[I]->calc_vals(_T_, _F_[I], precalcSH_numeric, k);
-    _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+    _LF_[I]->init(_sys_->get_moli(I), _F_[I],_shCalc_, _bCalc_,
+                  _precalcSH_, _expConsts_);
+    _LF_[I]->calc_vals(_T_, _F_[I], _sys_, _precalcSH_, k);
     
     if (_sys_->get_n()>1)
       _LHN_[I]->calc_vals(_sys_, _T_, _rotH_, k); // use rotated H for mpol
@@ -271,12 +264,12 @@ double Solver::iter(int t)
       auto molI = _sys_->get_moli(I);
       for (int k = 0; k < _sys_->get_Ns_i(I); k++)
       {
-        _LH_[I]->init(molI,_H_[I],precalcSH_LF_LH_[I], _bCalc_,_expConsts_);
-//        _LH_[I]->calc_vals(_T_, _H_[I], k, precalcSH_numeric);
-        _LH_[I]->calc_vals(_T_, _H_[I], k);
-        _LF_[I]->init(molI,_F_[I], precalcSH_LF_LH_[I], _bCalc_,_expConsts_);
-//        _LF_[I]->calc_vals(_T_, _F_[I], precalcSH_numeric, k);
-        _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+        _LH_[I]->init(molI,_H_[I], _shCalc_, _bCalc_, _precalcSH_, _expConsts_);
+        _LH_[I]->calc_vals(_T_, _H_[I], _precalcSH_, k);
+
+        _LF_[I]->init(molI,_F_[I], _shCalc_, _bCalc_, _precalcSH_, _expConsts_);
+        _LF_[I]->calc_vals(_T_, _F_[I], _sys_, _precalcSH_, k);
+
         _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
       }
     }

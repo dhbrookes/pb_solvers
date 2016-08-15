@@ -38,7 +38,7 @@
 #include <complex>
 #include <iostream>
 #include <iomanip>
-
+#include <unordered_map>
 #include "MyMatrix.h"
 
 /*
@@ -172,6 +172,11 @@ public:
     else return T();
   }
   
+  bool operator==(const Point<T> &other) const
+  {
+    return (p1_ == other.p1_ && p2_ == other.p2_ && p3_ == other.p3_);
+  }
+  
   void set_x(T val) { convert_to_euclidean(); p1_ = val; }
   void set_y(T val) { convert_to_euclidean(); p2_ = val; }
   void set_z(T val) { convert_to_euclidean(); p3_ = val; }
@@ -282,6 +287,11 @@ public:
     return p3_;
   }
   
+  const T& get_p1() const { return p1_; }
+  const T& get_p2() const { return p2_; }
+  const T& get_p3() const { return p3_; }
+  
+  
   // Getter methods perform necessary conversions:
   const T& x()
   {
@@ -317,7 +327,11 @@ public:
   T norm2() { return p1_*p1_ + p2_*p2_ + p3_*p3_; }
   
   T norm() { return sqrt(norm2()); }
+  
+  
 };
+
+
 
 /*
  Class for storing quaternions, which are defined as a real part and a vector
@@ -449,6 +463,18 @@ typedef Quaternion Quat;
 
 
 
+//hash for Point classes:
+template <>
+struct hash<Pt>
+{
+  size_t operator()(const Pt& k) const
+  {
+    size_t h1 = std::hash<double>()(k.get_p1());
+    size_t h2 = std::hash<double>()(k.get_p2());
+    size_t h3 = std::hash<double>()(k.get_p3());
+    return (h1 ^ (h2 << 1)) ^ h3;
+  }
+};
 
 
 #endif /* util_h */
