@@ -70,7 +70,8 @@ solveTol_(1e-4)
 }
 
 
-PBSAM::PBSAM(const PBSAMInput& pbami, vector<MoleculeSAM> mls )
+PBSAM::PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
+             vector<MoleculeSAM> mls )
 :
 poles_(5),
 solveTol_(1e-4)

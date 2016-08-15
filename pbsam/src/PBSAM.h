@@ -33,6 +33,7 @@
 
 #include <memory>
 #include <time.h>
+#include "PBAMStruct.h"
 #include "PBSAMStruct.h"
 #include "Electrostatics.h"
 
@@ -63,9 +64,11 @@ public:
   PBSAM();
   PBSAM(string infile);
   // For APBS
-  PBSAM(const PBSAMInput& pbsami, vector<MoleculeSAM> mls );
+  PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
+        vector<MoleculeSAM> mls );
 
   friend PBSAMInput getPBSAMParams();
+  friend PBAMInput getPBAMParams();
 
   // Copy constructors
   PBSAM( const PBSAM& pbam ) ;

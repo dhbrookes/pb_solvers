@@ -1,7 +1,7 @@
-///  @file runPBAMWrap.cpp
+///  @file PBSAMWrap.h
 ///  @author  Lisa Felberg
-///  @brief standalone _c_ program to interface the PBAM class
-///  @ingroup PBAM
+///  @brief c interface for the C++ PBSAM class
+///  @ingroup PBSAM
 ///  @version $Id$
 ///  @attention
 ///  @verbatim
@@ -52,22 +52,34 @@
 ///
 /// @endverbatim
 
-#include "PBAMWrap.h"
+#include "PBSAMStruct.h"
 
-int main( int argc, char *argv[] )
-{
-   PBAMInput pbamIn = 
-      getPBAMParams();
+#ifdef PBSAM_APBS
+  #include "generic/valist.h"
+#endif
 
-   // change any of the parameters you want...
-   pbamIn.temp_ =  298.15;
-   
-   //
-   // TODO: need to create an AtomList - the c version of this code for
-   // APBS uses the APBS data structures (Valist.h)
-   //
+#ifdef __cplusplus
+extern "C"{
+#endif
 
-   PBAMOutput pbamOut = 
-      runPBAMWrap( pbamIn );
+void printPBSAMStruct( PBAMInput pbamIn, PBSAMInput pbsamIn );
 
+#ifdef PBSAM_APBS
+PBAMOutput runPBSAMWrapAPBS( PBAMInput pbamIn, PBSAMInput pbsamIn,
+	                          Valist* MoleculeAMs[], int nmls );
+#endif //PBSAM_APBS
+
+PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
+                              int nmol,
+                              int natm[],
+                              PBAMInput pbamfin,
+                              PBSAMInput pbsamfin);
+
+  PBSAMInput getPBSAMParams();
+  
+  PBAMInput getPBAMParams();
+
+#ifdef __cplusplus
 }
+#endif
+
