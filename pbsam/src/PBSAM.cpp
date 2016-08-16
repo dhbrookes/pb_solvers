@@ -480,11 +480,11 @@ void PBSAM::run_energyforce()
                                        _sh_calc_, _bessl_calc_);
   focal->calc_all_f(solv.get_all_H(), solv.get_all_LHN(),
                     gsolv.get_gradH_all(), gsolv.get_gradLHN_all());
-  vector<Pt> fo = focal->get_all_f();
+  shared_ptr<vector<Pt> > fo = focal->get_all_f();
   
   TorqueCalc tocal(_syst_->get_n());
   tocal.calc_all_tau(_syst_, focal);
-  vector<Pt> to = tocal.get_all_tau();
+  shared_ptr<vector<Pt> > to = tocal.get_all_tau();
   
   t3 = clock() - t3;
   printf ("energyforce calc took me %f seconds.\n",

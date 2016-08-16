@@ -657,7 +657,7 @@ void PhysCalc::print_all()
   {
     force_norm = 0;
     torque_norm = 0;
-    out << "MoleculeAM #" << i + 1 << " radius: " << _sys_->get_radi(i) << endl;
+    out << "Molecule #" << i + 1 << " radius: " << _sys_->get_radi(i) << endl;
     out << "\tPOSITION: [" << mol_pos[i].x() << ", " << mol_pos[i].y();
     out << ", " << mol_pos[i].z() << "]" << endl;
     out << "\tENERGY: " << unit_conv_ * get_omega()->operator[](i) << endl;
