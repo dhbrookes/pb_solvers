@@ -113,7 +113,7 @@ void printPBSAMStruct( PBAMInput pbamIn, PBSAMInput pbsamIn )
   }
   
   printf("Now printing for PBSAM");
-  printf("This is tolsp: %.1f", pbsamIn.tolsp_);
+  printf("This is tolsp: %.1f\n", pbsamIn.tolsp_);
   for (int i=0; i<pbamIn.nmol_; i++)
   {
     printf("This is mol %d imat: %s, surf: %s, exp: %s\n",

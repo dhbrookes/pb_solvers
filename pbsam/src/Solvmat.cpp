@@ -847,6 +847,7 @@ void HMatrix::init(shared_ptr<BaseMolecule> mol, shared_ptr<SHCalc> _sh_calc, do
   double r_alpha, a_k, q_alpha;
   for (int k=0; k< mol->get_ns(); k++)
   {
+    cout << "This is k " << k << " and ns " << mol->get_ns() << endl;
     for (int alpha=0; alpha < mol->get_nc_k(k); alpha++)
     {
       cen = mol->get_posj(mol->get_ch_k_alpha(k, alpha));

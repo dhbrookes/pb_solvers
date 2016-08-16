@@ -73,8 +73,10 @@ kappa_(_consts->get_kappa())
         _F_[I]->init_from_exp(expHF[I][k][1], k);
       }
     } else
+    {
+      cout << "Before H init" << endl;
       _H_[I]->init(_mol, _shCalc_, _consts_->get_dielectric_prot());
-
+    }
     _outerH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _rotH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
@@ -88,6 +90,7 @@ kappa_(_consts->get_kappa())
     } else
       _IE_[I]->calc_vals(_mol, _shCalc_);
     
+    cout << "Okay 12" << endl;
     _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa);
     _LHN_[I] = make_shared<LHNMatrix> (I, _sys_->get_Ns_i(I), p_, _sys_);
@@ -99,7 +102,9 @@ kappa_(_consts->get_kappa())
     _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_,
                                      _mol, _E_[I], _LE_[I]);
   }
+  cout << "Okay 2 " << endl;
   update_prev_all();
+  cout << "Okay 3 " << endl;
 }
 
 

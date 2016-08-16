@@ -76,14 +76,21 @@ PBSAM::PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
 poles_(5),
 solveTol_(1e-4)
 {
+  int i, j;
   _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
   _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
   _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
   _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
   _exp_consts_ = make_shared<ExpansionConstants> (poles_);
+
+  // PBSAM part
+  vector<string> surffil(pbsami.surfct_),imatfil(pbsami.imatct_);
+  vector<string> expfil(pbsami.expct_);
+  for (i=0; i<pbsami.surfct_; i++) surffil[i] = string(pbsami.surffil_[i]);
+  for (i=0; i<pbsami.imatct_; i++) imatfil[i] = string(pbsami.imatfil_[i]);
+  for (i=0; i<pbsami.expct_; i++)   expfil[i] = string(pbsami.expfil_[i]);
   
   // Electrostatics
-  int i, j;
   vector<string> grid2Dname(pbami.grid2Dct_);
   vector<string> grid2Dax(pbami.grid2Dct_);
   vector<double> grid2Dloc(pbami.grid2Dct_);
@@ -107,6 +114,8 @@ solveTol_(1e-4)
   vector<double> conpad;
   vector<string> confil(pbami.contct_);
   vector<vector <string > > xyzf(pbami.nmol_);
+
+
 
   if (string(pbami.runType_) == "dynamics")
   {
@@ -148,7 +157,7 @@ solveTol_(1e-4)
                              string(pbami.dxname_), pbami.ntraj_, termcomb,
                              difftype, diffcon, termcond, termval, termnu,
                              confil, conpad, xyzf);
-
+  _setp_->apbs_pbsam_set(surffil, imatfil, expfil);
   check_setup();
   
   vector<shared_ptr<BaseMolecule> > molP(mls.size());
@@ -156,6 +165,9 @@ solveTol_(1e-4)
   _syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
   init_write_system();
+
+  initialize_pbsam();
+
 }
 
 // Function to check inputs from setup file
@@ -228,6 +240,8 @@ void PBSAM::initialize_pbsam()
   int i, k, idx;
   vector<vector<vector<string > > > exp_loc(_syst_->get_n());
   vector<vector<string> > imat_loc(_syst_->get_n());
+
+  cout << "Inside initialize_pbsam" << endl;
   
   for (i = 0; i < _setp_->getNType(); i++)
   {
@@ -423,7 +437,9 @@ void PBSAM::run_electrostatics()
 {
   int i;
   clock_t t3 = clock();
+  cout << "Before solv constructor" << endl;
   Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_);
+  cout << "Before solve" << endl;
   solv.solve(solveTol_, 100);
   
   t3 = clock() - t3;
