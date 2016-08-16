@@ -158,7 +158,7 @@ cmplx SHCalc::get_result(const int n, const int m)
 void PreCalcSH::calc_and_add(Pt p, shared_ptr<SHCalc> sh)
 {
     sh->calc_sh(p.theta(), p.phi());
-  map_[p] =  sh->get_full_result();
+    map_[p] =  sh->get_full_result();
 }
 
 cmplx PreCalcSH::get_sh(Pt p, int n, int m)

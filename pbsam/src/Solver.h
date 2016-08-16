@@ -68,10 +68,7 @@ protected:
   
   void iter_innerH(int I, int k);
   
-  // pre-calculate spherical harmonics for LH and LF
-  void precalc_sh_lf_lh();
-  // pre-calculate spherical harmonics for numeric re-expansion
-  void precalc_sh_numeric();
+  
   
 public:
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
@@ -93,6 +90,11 @@ public:
   void solve_inner();
   
   void reset_all();
+  
+  // pre-calculate spherical harmonics for LH and LF
+  void precalc_sh_lf_lh();
+  // pre-calculate spherical harmonics for numeric re-expansion
+  void precalc_sh_numeric();
   
   void update_LHN_all();
   
@@ -118,12 +120,13 @@ public:
     return ipol;
   }
   
-  shared_ptr<TMatrix> get_T()              {return _T_;}
-  int get_p()                              {return p_;}
-  shared_ptr<System> get_sys()             {return _sys_; }
-  shared_ptr<Constants> get_consts()       {return _consts_; }
-  shared_ptr<SHCalc> get_sh()              {return _shCalc_;}
-  shared_ptr<BesselCalc> get_bessel()      {return _bCalc_;}
+  shared_ptr<TMatrix> get_T()              { return _T_;}
+  int get_p()                              { return p_;}
+  shared_ptr<System> get_sys()             { return _sys_; }
+  shared_ptr<Constants> get_consts()       { return _consts_; }
+  shared_ptr<SHCalc> get_sh()              { return _shCalc_;}
+  shared_ptr<BesselCalc> get_bessel()      { return _bCalc_;}
+  shared_ptr<PreCalcSH> get_precalc_sh()   { return _precalcSH_; }
 };
 
 
@@ -133,6 +136,9 @@ protected:
   int p_;
   double kappa_;
   int Ns_tot_; // measure of number of spheres in the system
+  
+  shared_ptr<PreCalcSH> precalcSH_;
+  bool noPreSH_; // if sh values have not been pre-calculated
   
   vector<shared_ptr<FMatrix> >      _F_;  // converged solutions for these
   vector<shared_ptr<HMatrix> >      _H_;
@@ -180,8 +186,9 @@ public:
              shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
              shared_ptr<TMatrix> _T, vector<shared_ptr<FMatrix> > _F,
              vector<shared_ptr<HMatrix> > _H, vector<shared_ptr<IEMatrix> > _IE,
-             vector<vector<int> > interpol,
-             shared_ptr<ExpansionConstants> _expConst,int p);
+             vector<vector<int> > interpol,shared_ptr<PreCalcSH> precalc_sh,
+             shared_ptr<ExpansionConstants> _expConst, int p,
+             bool no_pre_sh=false);
   
   void solve(double tol, int maxiter);
   

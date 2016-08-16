@@ -414,8 +414,9 @@ GradSolver::GradSolver(shared_ptr<System> _sys,
                        vector<shared_ptr<HMatrix> > _H,
                        vector<shared_ptr<IEMatrix> > _IE,
                        vector<vector<int > > interpol,
+                       shared_ptr<PreCalcSH> precalc_sh,
                        shared_ptr<ExpansionConstants> _expConst,
-                       int p)
+                       int p, bool no_pre_sh)
 :p_(p), _F_(_F), _H_(_H), _T_(_T),
 _bCalc_(_bCalc), _shCalc_(_shCalc),
 _sys_(_sys), _consts_(_consts), kappa_(_consts->get_kappa()),
@@ -430,7 +431,8 @@ dWH_(_sys->get_n(), vector<shared_ptr<GradWHMatrix> > (_sys->get_n())),
 dLF_(_sys->get_n(), vector<shared_ptr<GradLFMatrix> > (_sys->get_n())),
 dLH_(_sys->get_n(), vector<shared_ptr<GradLHMatrix> > (_sys->get_n())),
 dLHN_(_sys->get_n(), vector<shared_ptr<GradLHNMatrix> > (_sys->get_n())),
-gradT_A_(_sys->get_n(), vector<shared_ptr<GradCmplxMolMat> > (_sys->get_n()))
+gradT_A_(_sys->get_n(), vector<shared_ptr<GradCmplxMolMat> > (_sys->get_n())),
+precalcSH_(precalc_sh), noPreSH_(no_pre_sh)
 {
   dF_.reserve(_sys_->get_n());
   for (int I = 0; I < _sys_->get_n(); I++) // With respect to
@@ -463,8 +465,6 @@ gradT_A_(_sys->get_n(), vector<shared_ptr<GradCmplxMolMat> > (_sys->get_n()))
   
   for (int i = 0; i < _T_->get_T_ct(); i++)  _T_->compute_derivatives_i(i);
 }
-
-
 
 void GradSolver::solve(double tol, int maxiter)
 {
@@ -558,8 +558,8 @@ double GradSolver::iter(int t, int wrt)
       step( t, I, wrt, k, besseli, besselk);
       iter_inner_gradH(I, wrt, k, besseli, besselk);
       
-      dLF_[wrt][I]->init_k(k,molI,dF_[wrt][I],_shCalc_,_expConsts_);
-      dLH_[wrt][I]->init_k(k,molI,dH_[wrt][I],_shCalc_,_bCalc_,_expConsts_);
+      dLF_[wrt][I]->init_k(k,molI,dF_[wrt][I],_shCalc_, precalcSH_ , _expConsts_, noPreSH_);
+      dLH_[wrt][I]->init_k(k,molI,dH_[wrt][I],_shCalc_,_bCalc_, precalcSH_, _expConsts_, noPreSH_);
       
       dev_sph_Ik_[I][k] = calc_converge_gradH(I, wrt, k, false);
       mu_mpol += dev_sph_Ik_[I][k];
@@ -574,8 +574,8 @@ void GradSolver::step(int t, int I, int wrt, int k, vector<double> &besseli,
                       vector<double> &besselk)
 {
   shared_ptr<BaseMolecule> molI = _sys_->get_moli(I);
-  dLF_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dF_[wrt][I]);
-  dLH_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dH_[wrt][I]);
+  dLF_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dF_[wrt][I], precalcSH_, noPreSH_);
+  dLH_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dH_[wrt][I], precalcSH_, noPreSH_);
   
 //  cout << "This is computed dLH " << k << " ";
 //  dLH_[wrt][I]->print_analytical(k);

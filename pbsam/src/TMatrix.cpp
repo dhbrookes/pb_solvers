@@ -154,6 +154,7 @@ MyMatrix<cmplx> TMatrix::re_expandX_numeric(vector<vector<double> > X,
     rscl = _system_->get_aik(I, k) / loc.r();
     chgscl = X[l][h] / loc.r();
     ekr = exp(-kappa*loc.r());
+    
     for (n = 0; n < p_; n++)
     {
       for (m = -n; m <= n; m++)
@@ -284,11 +285,13 @@ MyMatrix<Ptx> TMatrix::re_expandX_gradT(MyMatrix<cmplx> X,
 
 // Perform local expansion from J, l onto I, k
 MyMatrix<Ptx> TMatrix::re_expandgradX_numeric(vector<vector<Pt> > X,
-                                                int I, int k,
-                                                int J, int l, double kappa)
+                                              int I, int k,
+                                              int J, int l, double kappa,
+                                              shared_ptr<PreCalcSH> pre_sh,
+                                              bool no_pre_sh)
 {
   int h, n, m;
-  cmplx val;
+  cmplx val, sh;
   double chgscl, rscl, ekr, xval;
   VecOfMats<cmplx>::type Z (3, MyMatrix<cmplx> (p_, 2*p_+1));
   vector<int> exp_pts = _system_->get_gdpt_expij(J, l);
@@ -302,7 +305,9 @@ MyMatrix<Ptx> TMatrix::re_expandgradX_numeric(vector<vector<Pt> > X,
       
       Pt sph_dist = _system_->get_centerik(I, k) - _system_->get_centerik(J, l);
       Pt loc = _system_->get_gridijh(J, l, exp_pts[h]) - sph_dist;
-      _shCalc_->calc_sh(loc.theta(), loc.phi());
+//      _shCalc_->calc_sh(loc.theta(), loc.phi());
+      if (no_pre_sh) pre_sh->calc_and_add(loc, _shCalc_);
+      
       vector<double> bessI = _besselCalc_->calc_mbfK(p_+1, kappa*loc.r());
       rscl = _system_->get_aik(I, k) / loc.r();
       chgscl = xval / loc.r();
@@ -311,7 +316,8 @@ MyMatrix<Ptx> TMatrix::re_expandgradX_numeric(vector<vector<Pt> > X,
       {
         for (m = -n; m <= n; m++)
         {
-          val = bessI[n]*ekr*chgscl*_shCalc_->get_result(n, m) + Z[d](n, m+p_);
+          sh = pre_sh->get_sh(loc, n, m);
+          val = bessI[n]*ekr*chgscl*sh + Z[d](n, m+p_);
           Z[d](n, m+p_) = val;
         }
         chgscl *= rscl;

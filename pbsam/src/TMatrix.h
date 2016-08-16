@@ -145,7 +145,9 @@ public:
    */
   MyMatrix<Ptx> re_expandgradX_numeric(vector<vector<Pt> > X,
                                        int I, int k,
-                                       int J, int l, double kappa);
+                                       int J, int l, double kappa,
+                                       shared_ptr<PreCalcSH> pre_sh,
+                                       bool no_pre_sh=false);
   
 
   int get_nmol() const { return Nmol_; }
