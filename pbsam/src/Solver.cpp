@@ -8,7 +8,6 @@
 
 #include "Solver.h"
 
-
 Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                int p, bool readImat, bool readHF,
@@ -39,8 +38,13 @@ kappa_(_consts->get_kappa())
   _reExConsts_ = make_shared<ReExpCoeffsConstants> (kappa_,
                                                     _sys_->get_lambda(), p_,
                                                     true);
+  
+  _precalcSH_ = make_shared<PreCalcSH>();
+  
   _T_ = make_shared<TMatrix> (p_, _sys_, _shCalc_, _consts_,
                               _bCalc_, _reExConsts_);
+  precalc_sh_lf_lh();
+  precalc_sh_numeric();
   
   _expConsts_ = make_shared<ExpansionConstants>(p_);
   shared_ptr<BaseMolecule> _mol;
@@ -74,7 +78,6 @@ kappa_(_consts->get_kappa())
       }
     } else
     {
-      cout << "Before H init" << endl;
       _H_[I]->init(_mol, _shCalc_, _consts_->get_dielectric_prot());
     }
     _outerH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
@@ -90,7 +93,6 @@ kappa_(_consts->get_kappa())
     } else
       _IE_[I]->calc_vals(_mol, _shCalc_);
     
-    cout << "Okay 12" << endl;
     _LF_[I] = make_shared<LFMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LH_[I] = make_shared<LHMatrix> (I, _sys_->get_Ns_i(I), p_, kappa);
     _LHN_[I] = make_shared<LHNMatrix> (I, _sys_->get_Ns_i(I), p_, _sys_);
@@ -102,12 +104,58 @@ kappa_(_consts->get_kappa())
     _XH_[I] = make_shared<XHMatrix> (I, _sys_->get_Ns_i(I), p_,
                                      _mol, _E_[I], _LE_[I]);
   }
-  cout << "Okay 2 " << endl;
   update_prev_all();
-  cout << "Okay 3 " << endl;
 }
 
 
+
+void Solver::precalc_sh_lf_lh()
+{
+  Pt q;
+  vector<int> exp_pts;
+  shared_ptr<BaseMolecule> mol;
+  for (int i = 0; i < _sys_->get_n(); i++)
+  {
+    mol = _sys_->get_moli(i);
+    for (int k = 0; k < mol->get_ns(); k++)
+    {
+      exp_pts = mol->get_gdpt_expj(k);
+      for (int h=0; h < exp_pts.size(); h++)
+      {
+        q = mol->get_gridjh(k, exp_pts[h]);
+        _precalcSH_->calc_and_add(q, _shCalc_);
+      }
+    }
+  }
+}
+
+void Solver::precalc_sh_numeric()
+{
+  vector<int> exp_pts;
+  Pt loc, sph_dist;
+  for (int I = 0; I < _sys_->get_n(); I++)
+  {
+    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+    {
+        for (int l = 0; l < _sys_->get_Ns_i(I); l++)
+        {
+          if (k == l) continue;
+          else if (_T_->is_analytic(I, k, I, l)) continue;
+          else
+          {
+
+            exp_pts = _sys_->get_gdpt_expij(I, l);
+            for (int h = 0; h < exp_pts.size(); h++)
+            {
+              sph_dist = _sys_->get_centerik(I, k) - _sys_->get_centerik(I, l);
+              loc = _sys_->get_gridijh(I, l, exp_pts[h]) - sph_dist;
+              _precalcSH_->calc_and_add(loc, _shCalc_);
+            }
+          }
+        }
+    }
+  }
+}
 
 double Solver::calc_converge_H(int I, int k, bool inner)
 {
@@ -182,11 +230,13 @@ void Solver::step(int t, int I, int k)
   // Do full step for spol and for mpol at t > 0
   if ((_sys_->get_n() == 1) || (t > 0))
   {
-    _LH_[I]->init(_sys_->get_moli(I),_H_[I],_shCalc_,_bCalc_,_expConsts_);
-    _LH_[I]->calc_vals(_T_, _H_[I], k);
+    _LH_[I]->init(_sys_->get_moli(I),_H_[I], _shCalc_, _bCalc_,
+                  _precalcSH_, _expConsts_);
+    _LH_[I]->calc_vals(_T_, _H_[I], _precalcSH_, k);
     
-    _LF_[I]->init(_sys_->get_moli(I),_F_[I],_shCalc_,_bCalc_,_expConsts_);
-    _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+    _LF_[I]->init(_sys_->get_moli(I), _F_[I],_shCalc_, _bCalc_,
+                  _precalcSH_, _expConsts_);
+    _LF_[I]->calc_vals(_T_, _F_[I], _sys_, _precalcSH_, k);
     
     if (_sys_->get_n()>1)
       _LHN_[I]->calc_vals(_sys_, _T_, _rotH_, k); // use rotated H for mpol
@@ -212,10 +262,12 @@ double Solver::iter(int t)
       auto molI = _sys_->get_moli(I);
       for (int k = 0; k < _sys_->get_Ns_i(I); k++)
       {
-        _LH_[I]->init(molI,_H_[I],_shCalc_,_bCalc_,_expConsts_);
-        _LH_[I]->calc_vals(_T_, _H_[I], k);
-        _LF_[I]->init(molI,_F_[I],_shCalc_,_bCalc_,_expConsts_);
-        _LF_[I]->calc_vals(_T_, _F_[I], _shCalc_, _sys_, k);
+        _LH_[I]->init(molI,_H_[I], _shCalc_, _bCalc_, _precalcSH_, _expConsts_);
+        _LH_[I]->calc_vals(_T_, _H_[I], _precalcSH_, k);
+
+        _LF_[I]->init(molI,_F_[I], _shCalc_, _bCalc_, _precalcSH_, _expConsts_);
+        _LF_[I]->calc_vals(_T_, _F_[I], _sys_, _precalcSH_, k);
+
         _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
       }
     }
@@ -360,8 +412,9 @@ GradSolver::GradSolver(shared_ptr<System> _sys,
                        vector<shared_ptr<HMatrix> > _H,
                        vector<shared_ptr<IEMatrix> > _IE,
                        vector<vector<int > > interpol,
+                       shared_ptr<PreCalcSH> precalc_sh,
                        shared_ptr<ExpansionConstants> _expConst,
-                       int p)
+                       int p, bool no_pre_sh)
 :p_(p), _F_(_F), _H_(_H), _T_(_T),
 _bCalc_(_bCalc), _shCalc_(_shCalc),
 _sys_(_sys), _consts_(_consts), kappa_(_consts->get_kappa()),
@@ -376,12 +429,13 @@ dWH_(_sys->get_n(), vector<shared_ptr<GradWHMatrix> > (_sys->get_n())),
 dLF_(_sys->get_n(), vector<shared_ptr<GradLFMatrix> > (_sys->get_n())),
 dLH_(_sys->get_n(), vector<shared_ptr<GradLHMatrix> > (_sys->get_n())),
 dLHN_(_sys->get_n(), vector<shared_ptr<GradLHNMatrix> > (_sys->get_n())),
-gradT_A_(_sys->get_n(), vector<shared_ptr<GradCmplxMolMat> > (_sys->get_n()))
+gradT_A_(_sys->get_n(), vector<shared_ptr<GradCmplxMolMat> > (_sys->get_n())),
+precalcSH_(precalc_sh), noPreSH_(no_pre_sh)
 {
   dF_.reserve(_sys_->get_n());
   for (int I = 0; I < _sys_->get_n(); I++) // With respect to
   {
-    for (int J = 0; J < _sys_->get_n(); J++) // MoleculeSAM
+    for (int J = 0; J < _sys_->get_n(); J++) // molecule
     {
       dF_[I][J] = make_shared<GradFMatrix> (J, I, _sys_->get_Ns_i(I), p_);
       dWF_[I][J] = make_shared<GradWFMatrix> (J, I, _sys_->get_Ns_i(I), p_,
@@ -409,8 +463,6 @@ gradT_A_(_sys->get_n(), vector<shared_ptr<GradCmplxMolMat> > (_sys->get_n()))
   
   for (int i = 0; i < _T_->get_T_ct(); i++)  _T_->compute_derivatives_i(i);
 }
-
-
 
 void GradSolver::solve(double tol, int maxiter)
 {
@@ -504,8 +556,8 @@ double GradSolver::iter(int t, int wrt)
       step( t, I, wrt, k, besseli, besselk);
       iter_inner_gradH(I, wrt, k, besseli, besselk);
       
-      dLF_[wrt][I]->init_k(k,molI,dF_[wrt][I],_shCalc_,_expConsts_);
-      dLH_[wrt][I]->init_k(k,molI,dH_[wrt][I],_shCalc_,_bCalc_,_expConsts_);
+      dLF_[wrt][I]->init_k(k,molI,dF_[wrt][I],_shCalc_, precalcSH_ , _expConsts_, noPreSH_);
+      dLH_[wrt][I]->init_k(k,molI,dH_[wrt][I],_shCalc_,_bCalc_, precalcSH_, _expConsts_, noPreSH_);
       
       dev_sph_Ik_[I][k] = calc_converge_gradH(I, wrt, k, false);
       mu_mpol += dev_sph_Ik_[I][k];
@@ -520,8 +572,8 @@ void GradSolver::step(int t, int I, int wrt, int k, vector<double> &besseli,
                       vector<double> &besselk)
 {
   shared_ptr<BaseMolecule> molI = _sys_->get_moli(I);
-  dLF_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dF_[wrt][I]);
-  dLH_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dH_[wrt][I]);
+  dLF_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dF_[wrt][I], precalcSH_, noPreSH_);
+  dLH_[wrt][I]->calc_val_k(k, molI, interpol_[I], _T_, dH_[wrt][I], precalcSH_, noPreSH_);
   
 //  cout << "This is computed dLH " << k << " ";
 //  dLH_[wrt][I]->print_analytical(k);

@@ -63,9 +63,10 @@ MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double>
 MoleculeSAM::MoleculeSAM(const MoleculeSAM& mol)
 :BaseMolecule(mol.type_, mol.typeIdx_, mol.moveType_, mol.qs_, mol.pos_,
               mol.vdwr_, mol.centers_, mol.as_, mol.drot_, mol.dtrans_),
-cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 cgNeighs_(mol.cgNeighs_),cgGridPts_(mol.cgGridPts_),
 cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_),
+cog_(mol.cog_), cgCharges_(mol.cgCharges_), 
+cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 interPol_(mol.interPol_), interAct_(mol.interAct_)
 {
   calc_cog();

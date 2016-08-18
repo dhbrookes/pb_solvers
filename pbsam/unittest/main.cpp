@@ -46,7 +46,7 @@ string test_dir_loc = "/Users/davidbrookes/Projects/pb_solvers/pbsam/pbsam_test_
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
 #include "ElectrostaticsUnitTest.h"
-#include "EnergyForceUnitTest.h"
+//#include "EnergyForceUnitTest.h"
 #include "MyMatrixUnitTest.h"
 #include "readutilUnitTest.h"
 #include "ReExpCalcUnitTest.h"

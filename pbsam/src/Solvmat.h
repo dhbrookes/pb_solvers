@@ -203,9 +203,13 @@ class EMatrix: public ComplexMoleculeMatrix
 {
 public:
   EMatrix(int I, int ns, int p);
-  virtual void calc_vals(shared_ptr<BaseMolecule> mol, shared_ptr<SHCalc> sh_calc,
+  void calc_vals(shared_ptr<BaseMolecule> mol, shared_ptr<SHCalc> sh_calc,
                          double eps_in);
   
+//  void calc_vals(shared_ptr<BaseMolecule> mol,
+//                         shared_ptr<vector<vector<MyMatrix<cmplx> > > > pre_sh,
+//                         double eps_in);
+//  
 };
 
 /*
@@ -221,6 +225,9 @@ public:
   LEMatrix(int I, int ns, int p);
   void calc_vals(shared_ptr<BaseMolecule> mol, shared_ptr<SHCalc> sh_calc,
                  double eps_in);
+//  void calc_vals(shared_ptr<BaseMolecule> mol,
+//                 shared_ptr<vector<vector<MyMatrix<cmplx> > > > pre_sh,
+//                 double eps_in);
 };
 
 
@@ -354,8 +361,6 @@ public:
   
 };
 
-
-
 /*
  Equation 8c
  */
@@ -366,12 +371,14 @@ public:
   
   void init(shared_ptr<BaseMolecule> mol, shared_ptr<FMatrix> F,
             shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
-            shared_ptr<ExpansionConstants> _expconst);
-  
-  void calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
-                 shared_ptr<SHCalc> shcalc, shared_ptr<System> sys, int k);
-  
+            shared_ptr<PreCalcSH> pre_sh,
+            shared_ptr<ExpansionConstants> _expconst, bool no_pre_sh=false);
 
+  // if no_pre_sh is true, then SH values have not been pre-calculated
+  // this is mostly for unit tests
+  void calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
+                 shared_ptr<System> sys, shared_ptr<PreCalcSH> pre_sh, int k,
+                 bool no_pre_sh=false);
 };
 
 /*
@@ -387,9 +394,13 @@ public:
   
   void init(shared_ptr<BaseMolecule> mol, shared_ptr<HMatrix> H,
             shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
-            shared_ptr<ExpansionConstants> _expconst);
+            shared_ptr<PreCalcSH> pre_sh,
+            shared_ptr<ExpansionConstants> _expconst,
+            bool no_pre_sh=false);
   
-  void calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H, int k);
+  void calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H,
+                 shared_ptr<PreCalcSH> pre_sh, int k,
+                 bool no_pre_sh=false);
   
 };
 

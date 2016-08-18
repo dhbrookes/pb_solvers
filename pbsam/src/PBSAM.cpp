@@ -437,7 +437,6 @@ void PBSAM::run_electrostatics()
 {
   int i;
   clock_t t3 = clock();
-  cout << "Before solv constructor" << endl;
   Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_);
   cout << "Before solve" << endl;
   solv.solve(solveTol_, 100);
@@ -472,7 +471,8 @@ void PBSAM::run_energyforce()
   GradSolver gsolv(_syst_, _consts_, _sh_calc_, _bessl_calc_, solv.get_T(),
                    solv.get_all_F(), solv.get_all_H(),
                    solv.get_IE(),
-                   solv.get_interpol_list(), _exp_consts_, poles_);
+                   solv.get_interpol_list(), solv.get_precalc_sh(),
+                   _exp_consts_, poles_);
   gsolv.solve(1e-16, 85);
   
   auto focal = make_shared<ForceCalc> (_syst_->get_n(), _syst_->get_all_Ik(),
