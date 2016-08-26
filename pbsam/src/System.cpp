@@ -209,6 +209,9 @@ void MoleculeSAM::find_centers(vector<Pt> sp, vector<Pt> np,
     {
       m++;
       CGSphere best = find_best_center(sp, np, unbound, tol_sp, beta);
+      cout<<"trial "<<m<<": center = "<< best.get_center().x() << ", " << best.get_center().y() 
+      << ", " << best.get_center().z() 
+      <<" bound points :"<<best.get_n()<<" max: "<<n_max<<endl;
       if (best.get_n() > n_max)
       {
         centers_[j] = best.get_center();
@@ -249,12 +252,12 @@ void MoleculeSAM::find_centers(vector<Pt> sp, vector<Pt> np,
 
 CGSphere MoleculeSAM::find_best_center(vector<Pt> sp,vector<Pt> np,
                                       vector<int> unbound,
-                                      double tol_sp, int iter, double beta)
+                                      double tol_sp, double beta)
 {
   int sz = (int) unbound.size();
   Pt best_cen;
   double best_a = 0;
-  int best_N = 0;
+  int iter(1200), best_N(0);
   vector<int> ch;  // encompassed charges of best sphere
   
   best_cen = pos_[unbound[(int) floor(drand48()*sz)]];  

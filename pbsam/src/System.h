@@ -102,7 +102,7 @@ protected:
    */
   CGSphere find_best_center(vector<Pt> sp,vector<Pt> np,
                             vector<int> unbounded,
-                            double tol_sp, int iter=1200, double beta=2.0);
+                            double tol_sp, double beta=2.0);
 
   /* Ensure that all the CG spheres are touching */
   void check_connect();
