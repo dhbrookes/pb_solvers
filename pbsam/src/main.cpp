@@ -35,14 +35,14 @@ using namespace std;
 
 int main(int argc, const char * argv[])
 {
-//  string input_file = argv[1];
-//  //  string input_file = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/energyforce_test/barnase_barstar/run.energyforce.hardrefs.inp";
-//
-//  PBSAM pbsam_run(input_file);
-//  pbsam_run.run();
-//  
-//  return 0;
-  string test_dir_loc = "/Users/davidbrookes/Projects/pb_solvers/pbsam/pbsam_test_files/gtest/";
+  string input_file = argv[1];
+//string test_dir_loc = "/Users/davidbrookes/Projects/pb_solvers/pbsam/pbsam_test_files/gtest/";
+//  string input_file = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/energyforce_test/barnase_barstar/run.energyforce.hardrefs.inp";
+//string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/electrostatic_test/fas2/run.fas2.start.hardrefs.inp";
+
+  PBSAM pbsam_run(input_file);
+  pbsam_run.run();
+  return 0;
 //
 //  int pol(3), nmol(2);
 //  PQRFile pqr(test_dir_loc + "test_cged.pqr");
@@ -96,7 +96,7 @@ int main(int argc, const char * argv[])
 //                  true, true, imat_loc, exp_loc);
 //  solvTest.solve(1e-15, 150);
   
-  int pol(3), nmol(2);
+/*int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
   for (int i=0; i<nmol; i++)
@@ -114,20 +114,6 @@ int main(int argc, const char * argv[])
   cst->set_salt_concentration(0.01);
   cst->set_temp(298.15);
   cst->set_kappa(0.0325628352);
-  
-  //  cout << "This is cog of i " << sys->get_cogi(0).x() << ", " << sys->get_cogi(0).y() << ", " << sys->get_cogi(0).z() << endl;
-  //  cout << "This is cog of i " << sys->get_cogi(1).x() << ", " << sys->get_cogi(1).y() << ", " << sys->get_cogi(1).z() << endl;
-  //
-  //  for (int j = 0; j < sys->get_n(); j++)
-  //  {
-  //    cout << "For MoleculeSAM  " << j << endl;
-  //    for (int k = 0; k < sys->get_Ns_i(j); k++)
-  //    {
-  //      for (int d = 0; d < 3; d++)
-  //        cout << sys->get_centerik(j,k).get_cart(d) << ",";
-  //      cout << endl;
-  //    }
-  //  }
   
   auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);
   auto SHCalcTest = make_shared<SHCalc> (2*pol, _SHConstTest);
@@ -168,5 +154,5 @@ int main(int argc, const char * argv[])
                        solvTest.get_IE(), solvTest.get_interpol_list(),
                        solvTest.get_precalc_sh(), _expcons, pol);
   gsolvTest.solve(1e-16, 75);
-
+*/
 }

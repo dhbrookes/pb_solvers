@@ -8,9 +8,6 @@
 
 #include "Solver.h"
 
-
-
-
 Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                int p, bool readImat, bool readHF,
@@ -80,8 +77,9 @@ kappa_(_consts->get_kappa())
         _F_[I]->init_from_exp(expHF[I][k][1], k);
       }
     } else
+    {
       _H_[I]->init(_mol, _shCalc_, _consts_->get_dielectric_prot());
-
+    }
     _outerH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _rotH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);

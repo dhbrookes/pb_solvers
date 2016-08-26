@@ -17,7 +17,7 @@ PBSAM::PBSAM() : PBSAMInput()
   _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
   _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
   _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
-   _exp_consts_ = make_shared<ExpansionConstants> (poles_);
+  _exp_consts_ = make_shared<ExpansionConstants> (poles_);
 
   vector<string> grid2d = {"tst.2d"};
   vector<string> gridax = {"x"};
@@ -70,19 +70,27 @@ solveTol_(1e-4)
 }
 
 
-PBSAM::PBSAM(const PBSAMInput& pbami, vector<MoleculeSAM> mls )
+PBSAM::PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
+             vector<MoleculeSAM> mls )
 :
 poles_(5),
 solveTol_(1e-4)
 {
+  int i, j;
   _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
   _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
   _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
   _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
   _exp_consts_ = make_shared<ExpansionConstants> (poles_);
+
+  // PBSAM part
+  vector<string> surffil(pbsami.surfct_),imatfil(pbsami.imatct_);
+  vector<string> expfil(pbsami.expct_);
+  for (i=0; i<pbsami.surfct_; i++) surffil[i] = string(pbsami.surffil_[i]);
+  for (i=0; i<pbsami.imatct_; i++) imatfil[i] = string(pbsami.imatfil_[i]);
+  for (i=0; i<pbsami.expct_; i++)   expfil[i] = string(pbsami.expfil_[i]);
   
   // Electrostatics
-  int i, j;
   vector<string> grid2Dname(pbami.grid2Dct_);
   vector<string> grid2Dax(pbami.grid2Dct_);
   vector<double> grid2Dloc(pbami.grid2Dct_);
@@ -106,6 +114,8 @@ solveTol_(1e-4)
   vector<double> conpad;
   vector<string> confil(pbami.contct_);
   vector<vector <string > > xyzf(pbami.nmol_);
+
+
 
   if (string(pbami.runType_) == "dynamics")
   {
@@ -147,7 +157,7 @@ solveTol_(1e-4)
                              string(pbami.dxname_), pbami.ntraj_, termcomb,
                              difftype, diffcon, termcond, termval, termnu,
                              confil, conpad, xyzf);
-
+  _setp_->apbs_pbsam_set(surffil, imatfil, expfil);
   check_setup();
   
   vector<shared_ptr<BaseMolecule> > molP(mls.size());
@@ -155,6 +165,9 @@ solveTol_(1e-4)
   _syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
   init_write_system();
+
+  initialize_pbsam();
+
 }
 
 // Function to check inputs from setup file
@@ -227,12 +240,18 @@ void PBSAM::initialize_pbsam()
   int i, k, idx;
   vector<vector<vector<string > > > exp_loc(_syst_->get_n());
   vector<vector<string> > imat_loc(_syst_->get_n());
+
+  cout << "Inside initialize_pbsam" << endl;
   
   for (i = 0; i < _setp_->getNType(); i++)
   {
+    string fil=_setp_->getTypeNPQR(i);
+    
     if (_setp_->getTypeNImat(i) != "" )
     {
+      imat_loc[i].resize(_syst_->get_Ns_i(i));
       string istart = _setp_->getTypeNImat(i);
+      imat_loc[i].resize(_syst_->get_Ns_i(i));
       for (int k = 0; k < _syst_->get_Ns_i(i); k++)
         imat_loc[i][k] = istart+to_string(k)+".bin";
     } else
@@ -243,15 +262,22 @@ void PBSAM::initialize_pbsam()
     
     clock_t t3 = clock();
 
-    // Generate surface integrals
+    // Generate surface integrals and buried and exposed points
+    // on the molecule surface
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
-      IEMatrix ieMatTest(0, _syst_->get_moli(idx),
-                         _sh_calc_, poles_, _exp_consts_, true, 0, true);
-      if (k==0) //Only write once for each type
-        ieMatTest.write_all_mat(_setp_->getTypeNPQR(i));
+      if (k==0) //Only generate once for each type
+      {
+        IEMatrix ieMatTest(0, _syst_->get_moli(idx),
+                           _sh_calc_, poles_, _exp_consts_, true, 0, true);
+        ieMatTest.write_all_mat(fil.substr(0, fil.size()-4));
+      } else // copy from first one
+      {
+        _syst_->copy_grid(_syst_->get_mol_global_idx(i,0), idx);
+      }
     }
+
     
     t3 = clock() - t3;
     printf ("Imat took me %f seconds.\n",
@@ -276,12 +302,13 @@ void PBSAM::initialize_pbsam()
       self_pol.solve(solveTol_, 100);
       
       //Printing out H and F of selfpol
-      //TODO: This should also get printed if system is only 1 MoleculeSAM?
+      //TODO: This should also get printed if system is only 1 Molecule?
+      fil = fil.substr(0, fil.size()-4);
       self_pol.get_all_H()[0]->print_all_to_file(_setp_->getTypeNPQR(i)+".H",
                                                  _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
       
-      self_pol.get_all_F()[0]->print_all_to_file(_setp_->getTypeNPQR(i)+".F",
+      self_pol.get_all_F()[0]->print_all_to_file(fil+".F",
                                                  _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
     }
@@ -305,7 +332,7 @@ int PBSAM::run()
   return 0;
 }
 
-PBSAMOutput PBSAM::run_apbs()
+PBAMOutput PBSAM::run_apbs()
 {
   if ( _setp_->getRunType() == "dynamics")
     run_dynamics();
@@ -318,7 +345,7 @@ PBSAMOutput PBSAM::run_apbs()
   else
     cout << "Runtype not recognized! See manual for options" << endl;
 
-  PBSAMOutput pbsamO;
+  PBAMOutput pbsamO;
   return pbsamO;
 }
 
@@ -411,6 +438,7 @@ void PBSAM::run_electrostatics()
   int i;
   clock_t t3 = clock();
   Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_);
+  cout << "Before solve" << endl;
   solv.solve(solveTol_, 100);
   
   t3 = clock() - t3;

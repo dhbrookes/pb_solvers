@@ -5,6 +5,10 @@ Most of the code between PB-AM and PB-SAM is shared so they are hosted in the sa
 See our [manual](https://github.com/davas301/pb_solvers/blob/master/manual/doc_main.pdf) or our
 [website](https://davas301.github.io/pb_solvers/) for more information.  We outline each code base below:
 
+## Installation
+
+Please see the file `INSTALL.md` for directions on installation.
+
 ## PB-AM
 The PB-AM code is located [here](https://github.com/davas301/pb_solvers/tree/master/pbam), 
 based on the papers by Lotan and Head-Gordon (2006).

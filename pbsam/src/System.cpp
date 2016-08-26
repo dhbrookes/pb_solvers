@@ -41,12 +41,32 @@ MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double>
   calc_cog();
 }
 
+MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
+                       vector<Pt> pos, vector<double> vdwr, string msms_f,
+                       double tol_sp, double drot, double dtrans, int n_trials,
+                       int max_trials, double beta)
+                       
+:BaseMolecule(type, type_idx, movetype, qs, pos, vdwr, drot, dtrans)
+{
+
+  MSMSFile surf_file (msms_f);
+  find_centers(surf_file.get_sp(), surf_file.get_np(), tol_sp, n_trials, 
+               max_trials, beta);
+  check_connect();
+  for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
+  interPol_.resize(Ns_);  interAct_.resize(Ns_);
+  
+  map_repos_charges();
+  calc_cog();
+}
+
 MoleculeSAM::MoleculeSAM(const MoleculeSAM& mol)
 :BaseMolecule(mol.type_, mol.typeIdx_, mol.moveType_, mol.qs_, mol.pos_,
               mol.vdwr_, mol.centers_, mol.as_, mol.drot_, mol.dtrans_),
-cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 cgNeighs_(mol.cgNeighs_),cgGridPts_(mol.cgGridPts_),
 cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_),
+cog_(mol.cog_), cgCharges_(mol.cgCharges_), 
+cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 interPol_(mol.interPol_), interAct_(mol.interAct_)
 {
   calc_cog();
@@ -445,7 +465,11 @@ System::System(Setup setup, double cutoff)
     } // end j
     
     if (pqrI.get_Ns() == 0)
-      write_to_pqr(setup.getTypeNPQR(i)+"cg", (int) molecules_.size()-1);
+    {
+      string pqrf = setup.getTypeNPQR(i);
+      write_to_pqr(pqrf.substr(0,pqrf.size()-4)+"_cg.pqr",
+                   (int)molecules_.size()-1);
+    }
   } // end i
   N_ = (int) molecules_.size();
   boxLength_ = setup.getBLen();

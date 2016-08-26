@@ -1,18 +1,24 @@
-import numpy as np
 import math
+import sys
+import numpy as np
 import matplotlib.pyplot as plt
 
 '''
 Program to convert DX to a 2D version of the ESP
 '''
-dirName= '/Users/felb315'
-dirName += '/Desktop/APBS_compare/'
-fileName= dirName + '1BRS.dx'
-outFile=dirName + 'barn_apbs_x_0.png'
-ind = 0 # chose 0 = x, 1 = y and 2 = z
+fileName = sys.argv[1]
+outFile  = sys.argv[2]
 
-barnCOM = [0, 0, 0]
-barnRad2 = pow(25.6102,2)
+if sys.argv[3] == "x":
+    ind = 0
+elif sys.argv[3] == "y":
+    ind = 1 
+else sys.argv[3] == "z":
+    ind = 2 
+
+cx = float(sys.argv[4])
+barnCOM = [float(sys.argv[5]), float(sys.argv[6]), float(sys.argv[7])]
+barnRad2 = pow(float(sys.argv[8]),2)
 
 #-----------------------------------------------------------------------
 def FileOpen(fileName):
@@ -62,7 +68,6 @@ def FileOpen(fileName):
                     if yct == grid[1]:
                         yct = 0
                         xct += 1
-
     return(pot, org, dl, mx, mn)
 
 def dispPlot( org, bn, count, potential,
@@ -106,7 +111,7 @@ def dispPlot( org, bn, count, potential,
 
 esp3D, org, dl, mx, mn  = FileOpen(fileName)
 
-pos = -0.0 #barnCOM[ind]
+pos = cx
 idx = round((pos-org[ind]) / dl[ind])
 
 ax = 'x'
@@ -128,7 +133,7 @@ elif ind == 2:
 
 titl = "Cross section at {0} = {1:.2f}".format( ax,
                         org[ind] + dl[ind] * idx - barnCOM[ind])
-titl += ' in kT'
+titl += ' in kT/e'
 
 org2d, dl2d = [], []
 for i in range(3):

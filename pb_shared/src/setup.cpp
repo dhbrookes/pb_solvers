@@ -124,6 +124,9 @@ typeDef_(nmol),
 typeDiff_(nmol),
 pqr_names_(nmol),
 xyz_names_(nmol),
+imatNames_(nmol),
+surfNames_(nmol),
+expNames_(nmol),
 isTransRot_(nmol),
 runSpecs_(2),  // 
 mbdfile_loc_(2),
@@ -184,16 +187,39 @@ orientRand_(randorient) //
   mbdfile_loc_[0] = "";
   mbdfile_loc_[1] = "";
 
-  // MoleculeSAMAM part
+  // Molecule part
   for (int i=0; i<nType_; i++)
   {
     pqr_names_[i] = "";
+    surfNames_[i] = "";
+    imatNames_[i] = "";
+    expNames_[i]  = "";
     xyz_names_[i].resize(ntraj);
     isTransRot_[i].resize(1);
     isTransRot_[i][0] = false;
 
     for (int j=0; j<ntraj; j++) xyz_names_[i][j] = xyzfil[i][j];
   }  
+}
+
+void Setup::apbs_pbsam_set(vector<string> surffil, vector<string> imatfil,
+                           vector<string> expfil)
+{
+  int i;
+//if ( nType_ > surffil.size() ) 
+//  cout << "Missing surf file, assuming its the end ones" << endl;
+  for (i=0; i<surffil.size(); i++)
+    surfNames_[i] = surffil[i];
+
+//if ( nType_ > imatfil.size() ) 
+//  cout << "Missing imat file, assuming its the end ones" << endl;
+  for (i=0; i<imatfil.size(); i++)
+    imatNames_[i] = imatfil[i];
+
+//if ( nType_ > expfil.size() ) 
+//  cout << "Missing exp file, assuming its the end ones" << endl;
+  for (i=0; i<expfil.size(); i++)
+    expNames_[i] = expfil[i];
 }
 
 void Setup::read_infile(string fname)

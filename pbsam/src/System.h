@@ -135,6 +135,11 @@ public:
              int max_trials=40, double beta=2.0, double drot=0,
              double dtrans=0);
   
+  MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
+             vector<Pt> pos, vector<double> vdwr, string msms_fil,
+             double tol_sp, double drot=0, double dtrans = 0, int n_trials=10,
+             int max_trials=40, double beta=2.0);
+  
   void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
 
   
@@ -225,6 +230,18 @@ public:
   
   // Save min distances for all MoleculeSAM pairs
   void save_min_dist();
+  
+  //Copy surface integral points from molecule i to molecule j. MUST
+  // be the same type!
+  void copy_grid( int i, int j)
+  {
+    for (int k = 0; k < molecules_[i]->get_ns(); k++)
+    {
+      molecules_[j]->set_gridj(k, molecules_[i]->get_gridj(k));
+      molecules_[j]->set_gridburj(k, molecules_[i]->get_gdpt_burj(k));
+      molecules_[j]->set_gridexpj(k, molecules_[i]->get_gdpt_expj(k));
+    }
+  }
   
   // write current system to PQR file, mid=-1 is print all MoleculeSAMs,
   // else only print one
