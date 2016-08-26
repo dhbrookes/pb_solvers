@@ -300,7 +300,7 @@ CGSphere MoleculeSAM::find_best_center(vector<Pt> sp,vector<Pt> np,
     }
     
     //apply MC criteria
-    if (exp(beta*(tri_N - best_N) > drand48()))
+    if (exp(beta*(tri_N - best_N)) > drand48())
     {
       best_cen = tri_cen;
       best_N = tri_N;
@@ -393,7 +393,6 @@ System::System(Setup setup, double cutoff)
   vector<int> keys(2);
   for (i = 0; i < setup.getNType(); i++)
   {
-    
     // First a build a representative MoleculeSAM of this type (which will
     // be repositioned below
     PQRFile pqrI (setup.getTypeNPQR(i));

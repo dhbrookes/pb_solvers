@@ -43,7 +43,7 @@ andCombine_(false),
 sphBeta_(2.0),
 tolSP_(1.0),
 maxTrials_(40),
-nTrials_(1200)
+nTrials_(9)
 {
   nTypenCount_[0] = 1;
   nTypenCount_[1] = 1;
