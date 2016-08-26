@@ -112,7 +112,7 @@ void printPBSAMStruct( PBAMInput pbamIn, PBSAMInput pbsamIn )
               pbamIn.termnam_[i], pbamIn.termval_[i]);
   }
   
-  printf("Now printing for PBSAM");
+  printf("Now printing for PBSAM\n");
   printf("This is tolsp: %.1f\n", pbsamIn.tolsp_);
   for (int i=0; i<pbamIn.nmol_; i++)
   {
@@ -258,7 +258,8 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
 
     if (ncg == 0)
       mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, 
-                     string(pbsamParams.surffil_[mol]), pbsamParams.tolsp_));
+                     string(pbsamParams.surffil_[mol]), pbsamParams.tolsp_,
+                     drot, dtr));
     else
       mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, sPos, 
                                  vdwS, dtr, drot));
