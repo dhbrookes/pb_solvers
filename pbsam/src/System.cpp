@@ -32,7 +32,7 @@ MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double>
                        double dtrans)
 :BaseMolecule(type, type_idx, movetype, qs, pos, vdwr, drot, dtrans)
 {
-  find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
+  find_centers(msms_sp, msms_np, tol_sp, n_trials, max_trials, beta);
   check_connect();
   for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
   interPol_.resize(Ns_);  interAct_.resize(Ns_);
