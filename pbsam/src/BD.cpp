@@ -42,12 +42,6 @@ double BDStep::compute_dt( )
     return 2.0 + ( min_dist_ - DISTCUTOFF_TIME )/15.0;
   else
     return 2.0;
-/*
-  double DISTCUTOFF_TIME = 3.5;
-  if ( min_dist_ - DISTCUTOFF_TIME > 0 )
-    return ( min_dist_*min_dist_ )/(240.0*368.0);
-  else
-    return 0.001;*/
 }
 
 void BDStep::compute_min_dist( )
@@ -211,8 +205,6 @@ void BDRun::run(string xyzfile, string statfile, int nSCF)
     _solver_->reset_all();
     if (nSCF != 0) scf = nSCF;
 
-//    _asolver_->solve_A(prec_, scf);
-//    _asolver_->solve_gradA(prec_, scf);
     _solver_->solve(prec_);
     _gradSolv_->solve(prec_, 5);
     _physCalc_->calc_force();
