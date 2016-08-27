@@ -182,12 +182,17 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
 
 
     if (ncg == 0)
-      mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw,
-                     string(pbsamfin.surffil_[mol]), pbsamfin.tolsp_));
+    {   
+      mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, 
+                     string(pbsamfin.surffil_[mol]), pbsamfin.tolsp_,
+                     drot, dtr));
+      mols[mol].write_pqr("cg_mol"+to_string(mol)+".pqr");
+    }   
     else
-      mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, sPos,
+      mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, sPos, 
                                  vdwS, dtr, drot));
   }
+
 
   //  create the PBAM object
   PBSAM pbsam( pbamfin, pbsamfin, mols );
@@ -257,9 +262,12 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
 
 
     if (ncg == 0)
+    {
       mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, 
                      string(pbsamParams.surffil_[mol]), pbsamParams.tolsp_,
                      drot, dtr));
+      mols[mol].write_pqr("cg_mol"+to_string(mol)+".pqr");
+    }
     else
       mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, sPos, 
                                  vdwS, dtr, drot));
