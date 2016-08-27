@@ -210,9 +210,9 @@ void MoleculeSAM::find_centers(vector<Pt> sp, vector<Pt> np,
     {
       m++;
       CGSphere best = find_best_center(sp, np, unbound, tol_sp, beta);
-      cout<<"trial "<<m<<": center = "<< best.get_center().x() << ", " << best.get_center().y() 
-      << ", " << best.get_center().z() 
-      <<" bound points :"<<best.get_n()<<" max: "<<n_max<<endl;
+    //cout<<"trial "<<m<<": center = "<< best.get_center().x() << ", " << best.get_center().y() 
+    //<< ", " << best.get_center().z() 
+    //<<" bound points :"<<best.get_n()<<" max: "<<n_max<<endl;
       if (best.get_n() > n_max)
       {
         centers_[j] = best.get_center();
