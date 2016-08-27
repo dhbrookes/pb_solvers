@@ -65,7 +65,7 @@ MoleculeSAM::MoleculeSAM(const MoleculeSAM& mol)
               mol.vdwr_, mol.centers_, mol.as_, mol.drot_, mol.dtrans_),
 cgNeighs_(mol.cgNeighs_),cgGridPts_(mol.cgGridPts_),
 cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_),
-cog_(mol.cog_), cgCharges_(mol.cgCharges_), 
+cog_(mol.cog_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_),
 cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 interPol_(mol.interPol_), interAct_(mol.interAct_)
 {
@@ -81,6 +81,7 @@ void MoleculeSAM::map_repos_charges()
     closest = find_closest_center(pos_[cg]);
     cgCharges_[closest].push_back(cg);
     pos_[cg] = pos_[cg] - centers_[closest];  // reposition charge
+
     chToCG_[cg] = closest;
   }
   
@@ -366,6 +367,35 @@ vector<int> MoleculeSAM::find_neighbors( int i )
     }
   }
   return neighs;
+}
+
+void MoleculeSAM::write_pqr(string outfile)
+{
+  int j, k, ct(0);
+  ofstream pqr_out;
+  char pqrlin[400];
+  
+  pqr_out.open( outfile );
+  
+  for ( j = 0; j < get_nc(); j++)
+  {   
+    sprintf(pqrlin,"%6d  C   CHG A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,0,
+            get_posj_realspace(j).x(),
+            get_posj_realspace(j).y(),
+            get_posj_realspace(j).z(),
+            get_qj(j), get_radj(j));
+    pqr_out << "ATOM " << pqrlin << endl;
+    ct++;
+  }   
+  for (k = 0; k < get_ns(); k++)
+  {   
+    sprintf(pqrlin,"%6d  X   CEN A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,0,
+            get_centerk(k).x(), get_centerk(k).y(),
+            get_centerk(k).z(), 0.0, get_ak(k));
+    pqr_out << "ATOM " << pqrlin << endl;
+    ct++;
+  }   
+  pqr_out.close();
 }
 
 

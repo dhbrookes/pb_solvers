@@ -165,6 +165,7 @@ public:
   void rotate(MyMatrix<double> rotmat);
   
   void calc_cog();
+  void write_pqr(string outfile);
 
   int get_nc_k(int k) const           { return (int) cgCharges_[k].size(); }
   vector<int> get_neighj(int j) const { return cgNeighs_[j]; }
