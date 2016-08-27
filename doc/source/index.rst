@@ -29,6 +29,7 @@ Table of Contents
    pbsam_input
    pbsam_examples
    pbsam_program
+   analysis_tools
    references
 
 ..
