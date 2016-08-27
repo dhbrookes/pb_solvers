@@ -104,7 +104,7 @@ Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel,
              vector<string> difftype, vector<vector<double> > diffcon,
              vector<string> termcond, vector<double> termval, 
              vector<vector <int > > termnu, vector<string> confil,
-             vector<double> conpad, vector<vector <string> > xyzfil)
+             vector<double> conpad, vector<vector <string> > xyzfil, string unt)
 :
 ompThreads_( 1 ),
 saltConc_( salt_conc ), //
@@ -141,7 +141,7 @@ orientRand_(randorient) //
 {
   runSpecs_[0] = runtype; //
   runSpecs_[1] = runname; //
-  units_ = "kT";
+  units_ = unt;
 
   for (int i = 0; i<nType_; i++) nTypenCount_[i] = 1; //
 

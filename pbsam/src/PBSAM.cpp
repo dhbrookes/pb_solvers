@@ -40,7 +40,7 @@ PBSAM::PBSAM() : PBSAMInput()
                              false, 100, 0, 15, "tst.map", 1, grid2d,
                              gridax, gridloc, "tst.dx", 1, false, difftype,
                              diffcon, termtype, termval, termnu, confil,
-                             conpad, xyzf);
+                             conpad, xyzf, "kT");
   _syst_ = make_shared<System> ();
   _consts_ = make_shared<Constants> ();
 }
@@ -84,6 +84,7 @@ solveTol_(1e-4)
   _exp_consts_ = make_shared<ExpansionConstants> (poles_);
 
   // PBSAM part
+  string unt = (pbami.setunits_ == 0) ? "kT" : string(pbami.units_);
   vector<string> surffil(pbsami.surfct_),imatfil(pbsami.imatct_);
   vector<string> expfil(pbsami.expct_);
   for (i=0; i<pbsami.surfct_; i++) surffil[i] = string(pbsami.surffil_[i]);
@@ -114,8 +115,6 @@ solveTol_(1e-4)
   vector<double> conpad;
   vector<string> confil(pbami.contct_);
   vector<vector <string > > xyzf(pbami.nmol_);
-
-
 
   if (string(pbami.runType_) == "dynamics")
   {
@@ -156,7 +155,7 @@ solveTol_(1e-4)
                              grid2Dname, grid2Dax, grid2Dloc,
                              string(pbami.dxname_), pbami.ntraj_, termcomb,
                              difftype, diffcon, termcond, termval, termnu,
-                             confil, conpad, xyzf);
+                             confil, conpad, xyzf, unt);
   _setp_->apbs_pbsam_set(surffil, imatfil, expfil);
   check_setup();
   

@@ -19,6 +19,9 @@ typedef struct _PBAMInput {
   int nmol_;
   char runType_[CHR_MAX];
   char runName_[CHR_MAX];
+
+  int setunits_;
+  char units_[CHR_MAX];
   int randOrient_;
   double boxLen_;
   int pbcType_;
@@ -63,6 +66,7 @@ typedef struct _PBAMInput {
    sdiel_(80.0),
    nmol_(1),
    randOrient_(0),
+   setunits_(0),
    boxLen_(1.4e18),
    pbcType_(0),
    gridPts_(15),

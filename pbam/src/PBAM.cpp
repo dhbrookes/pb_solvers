@@ -61,6 +61,7 @@ PBAM::PBAM(const PBAMInput& pbami, vector<MoleculeAM> mls )
 poles_(5),
 solveTol_(1e-4)
 {
+  string unt = (pbami.setunits_ == 0) ? "kT" : string(pbami.units_);
   // Electrostatics
   int i, j;
   vector<string> grid2Dname(pbami.grid2Dct_);
@@ -126,7 +127,7 @@ solveTol_(1e-4)
                              grid2Dname, grid2Dax, grid2Dloc,
                              string(pbami.dxname_), pbami.ntraj_, termcomb,
                              difftype, diffcon, termcond, termval, termnu,
-                             confil, conpad, xyzf);
+                             confil, conpad, xyzf, unt);
 
   check_setup();
   syst_ = make_shared<System> (mls, Constants::FORCE_CUTOFF, pbami.boxLen_);

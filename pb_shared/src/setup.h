@@ -209,7 +209,7 @@ public:
         vector<string> difftype, vector<vector<double> > diffcon,
         vector<string> termcond, vector<double> termval, 
         vector<vector <int > > termnu, vector<string> confil,
-        vector<double> conpad, vector<vector <string> > xyzfil);
+        vector<double> conpad, vector<vector <string> > xyzfil, string unt);
   // APBS PBSAM  
   void apbs_pbsam_set(vector<string> surffil, vector<string> imatfil,
                       vector<string> expfil);
