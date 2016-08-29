@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Analysis Tools &mdash; pb_solvers 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="pb_solvers 0.1 documentation" href="index.html"/>
+        <link rel="next" title="References" href="references.html"/>
+        <link rel="prev" title="PB-SAM Program details" href="pbsam_program.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> pb_solvers</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#running">Running</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pbam.html">PB-AM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pbam.html#physical-calculations">Physical calculations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_input.html">PB-AM Inputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pbam_input.html#general-input-file-parameters">General input file parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbam_input.html#physical-calculations">Physical calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbam_input.html#electrostatic-potential-visualization">Electrostatic Potential Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbam_input.html#brownian-dynamics-simulations">Brownian Dynamics Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbam_input.html#other-input-files">Other input files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_examples.html">PB-AM Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pbam_examples.html#physical-calculation-run">Physical Calculation run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbam_examples.html#electrostatics-run">Electrostatics run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbam_examples.html#dynamics-run">Dynamics run</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pbam_program.html">PB-AM Program details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pbsam.html">PB-SAM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pbsam.html#physical-calculations">Physical calculations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pbsam_input.html">PB-SAM Inputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_input.html#general-input-file-parameters">General input file parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_input.html#physical-calculations">Physical calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_input.html#electrostatic-potential-visualization">Electrostatic Potential Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_input.html#brownian-dynamics-simulations">Brownian Dynamics Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_input.html#other-input-files">Other input files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pbsam_program.html">PB-SAM Program details</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Analysis Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#viewing-pqr-in-vmd">Viewing PQR in VMD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#viewing-electrostatics-in-vmd">Viewing Electrostatics in VMD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#d-esp-plots">2D ESP Plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">3D ESP plots</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pb_solvers</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Analysis Tools</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="sources/analysis_tools.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="analysis-tools">
+<h1>Analysis Tools<a class="headerlink" href="#analysis-tools" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="viewing-pqr-in-vmd">
+<h2>Viewing PQR in VMD<a class="headerlink" href="#viewing-pqr-in-vmd" title="Permalink to this headline">¶</a></h2>
+<p>First, open VMD and load the PQR file by selecting File &gt; New Molecule on the toolbar and entering the path to the PQR file in the Filename section. Then select Graphics &gt; Representations on the toolbar.  In the Selected Atoms selection of the pop-up, type:</p>
+<div class="highlight-python"><div class="highlight"><pre>not name X
+</pre></div>
+</div>
+<p>This tells VMD to remove the coarse grained spheres from the current representation.  Change the Coloring Method to Charge and the Drawing Method
+to VDW. Now, to add the coarse grained spheres back into the image, select the Create Rep button and in the Selected Atoms section type:</p>
+<div class="highlight-python"><div class="highlight"><pre>name X
+</pre></div>
+</div>
+<p>Change the Drawing Method of the new representation to VDW and the Material to Transparent. You should now see a collection of charges inside
+transparent coarse grained spheres. The final view of the Graphical Representations screen and the ouput image after this process are shown below.</p>
+<a class="reference internal image-reference" href="images/vmd_graph_rep_pqr.png"><img alt="images/vmd_graph_rep_pqr.png" src="images/vmd_graph_rep_pqr.png" style="width: 30%;" /></a>
+<a class="reference internal image-reference" href="images/vmd_4sp.png"><img alt="images/vmd_4sp.png" src="images/vmd_4sp.png" style="width: 66%;" /></a>
+</div>
+<div class="section" id="viewing-electrostatics-in-vmd">
+<h2>Viewing Electrostatics in VMD<a class="headerlink" href="#viewing-electrostatics-in-vmd" title="Permalink to this headline">¶</a></h2>
+<p>To view the electrostatic results, first follow the steps above to load the PQR file. Then load the .dx file by selecting File &gt; New Molecule on the toolbar, using the Load Files For toggle to select the previously loaded PQR and then entering the path to the .dx file in the Filename section. We will now use the .dx file to draw isosurfaces representing the surface in which the system has a selected charge. First, open the Graphical Representation screen again and select the Create Rep button. Now change the Drawing Method to Isosurface. Now in the new Draw toggle, select Solid Surface. Move the Value bar to change the charge that the isosurface represents. Change the Coloring Method to ColorID and then select the color by entering a ColorID number
+in the box that appears next to the Coloring Method toggle. You may also toggle through the options by expanding this box. You may add an arbritary number
+of isosurfaces by again pressing Create Rep and choosing a new Value and ColorID. The final view of the Graphical Representations screen and the ouput image after this process are shown below.</p>
+<a class="reference internal image-reference" href="images/vmd_graph_rep_dx.png"><img alt="images/vmd_graph_rep_dx.png" src="images/vmd_graph_rep_dx.png" style="width: 30%;" /></a>
+<a class="reference internal image-reference" href="images/vmd_4sp_dx.png"><img alt="images/vmd_4sp_dx.png" src="images/vmd_4sp_dx.png" style="width: 66%;" /></a>
+</div>
+<div class="section" id="d-esp-plots">
+<h2>2D ESP Plots<a class="headerlink" href="#d-esp-plots" title="Permalink to this headline">¶</a></h2>
+<p>If one chooses the &#8216;electrostatic&#8217; run type in PB-[S]AM, then a file for each specified
+cross section will be output with the following format:</p>
+<div class="highlight-python"><div class="highlight"><pre># Data from PBAM Electrostat run
+# My runname is barnase.x.0.dat
+units kT
+grid 200 200
+axis x 0
+origin -51.2204 -51.2204
+delta 0.512204  0.512204
+maxmin  1.35396 0
+        0.2352107       0.2360552       0.2368904       0.2377159
+</pre></div>
+</div>
+<p>In our <code class="code docutils literal"><span class="pre">scripts</span></code> directory we have provided a python script for plotting these potential
+files. Simply call:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ python plot_2D_potential.py   &lt;file_name&gt;     &lt;out_name&gt;
+</pre></div>
+</div>
+<p>where <code class="code docutils literal"><span class="pre">&lt;file_name&gt;</span></code> is an output file with format detailed above and <code class="code docutils literal"><span class="pre">&lt;out_name&gt;</span></code>
+is the desired prefix of the output file. This script creates a JPG file of the cross sectioned
+potential. An example of this output is shown below.</p>
+<a class="reference internal image-reference" href="images/pot_x_0.jpg"><img alt="images/pot_x_0.jpg" class="align-center" src="images/pot_x_0.jpg" style="width: 70%;" /></a>
+</div>
+<div class="section" id="id1">
+<h2>3D ESP plots<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Additionally, if one chooses the &#8216;electrostatic&#8217; run type in PB-[S]AM, then a .dx file will
+be created that maps the electrostatic potential to a specified number of grid points. This
+.dx file has the following format:</p>
+<div class="highlight-python"><div class="highlight"><pre># Data from PBAM Electrostat run
+# My runname is electro.map.out and units kT
+grid 10 10 10
+origin -4 -9 -9
+delta 0.8 1.8 1.8
+        0.00000 0.00000 -2.90000        -5.899581
+</pre></div>
+</div>
+<p>In our <code class="code docutils literal"><span class="pre">scripts</span></code> directory we have provided a python script for plotting these potential
+files. Simply call:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ python plot_3d_surf.py &lt;dx_file&gt; &lt;out_name&gt;
+</pre></div>
+</div>
+<p>which will create a number of 3D potential JPG images from various viewing angles.  An example
+output image is shown below.</p>
+<a class="reference internal image-reference" href="images/4sp_surf.jpg"><img alt="images/4sp_surf.jpg" class="align-center" src="images/4sp_surf.jpg" style="width: 70%;" /></a>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="references.html" class="btn btn-neutral float-right" title="References">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pbsam_program.html" class="btn btn-neutral" title="PB-SAM Program details"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Lisa Felberg and David Brookes.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="static/jquery.js"></script>
+      <script type="text/javascript" src="static/underscore.js"></script>
+      <script type="text/javascript" src="static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
