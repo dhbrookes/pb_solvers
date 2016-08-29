@@ -66,6 +66,9 @@ solveTol_(1e-4)
   _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
   _exp_consts_ = make_shared<ExpansionConstants> (poles_);
   
+   h_spol_.resize(_setp_->getNType());
+   f_spol_.resize(_setp_->getNType());
+  
   initialize_pbsam();
 }
 
@@ -74,7 +77,8 @@ PBSAM::PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
              vector<MoleculeSAM> mls )
 :
 poles_(5),
-solveTol_(1e-4)
+solveTol_(1e-4),
+h_spol_(mls.size()), f_spol_(mls.size())
 {
   int i, j;
   _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
@@ -255,7 +259,7 @@ void PBSAM::initialize_pbsam()
         imat_loc[i][k] = istart+to_string(k)+".bin";
     } else
     {
-      cout << "Generating IMatrices" << endl;
+      cout << "Generating IMatrices " << fil << endl;
       // This is done in Solver!
     }
     
@@ -300,14 +304,15 @@ void PBSAM::initialize_pbsam()
       Solver self_pol( sub_syst, _consts_, _sh_calc_, _bessl_calc_, poles_);
       self_pol.solve(solveTol_, 100);
       
+      h_spol_[i] = self_pol.get_all_H()[0];
+      f_spol_[i] = self_pol.get_all_F()[0];
       //Printing out H and F of selfpol
       //TODO: This should also get printed if system is only 1 Molecule?
-      fil = fil.substr(0, fil.size()-4);
-      self_pol.get_all_H()[0]->print_all_to_file(_setp_->getTypeNPQR(i)+".H",
+      self_pol.get_all_H()[0]->print_all_to_file(fil.substr(0, fil.size()-5)+".H",
                                                  _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
       
-      self_pol.get_all_F()[0]->print_all_to_file(fil+".F",
+      self_pol.get_all_F()[0]->print_all_to_file(fil.substr(0, fil.size()-5)+".F",
                                                  _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
     }
@@ -436,7 +441,13 @@ void PBSAM::run_electrostatics()
 {
   int i;
   clock_t t3 = clock();
-  Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_);
+  if (_setp_->getTypeNExp(i) != "" )
+    Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_,
+                 false, true, vector<vector<string> > imat_loc, 
+  else
+  {
+    Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_);
+  }
   cout << "Before solve" << endl;
   solv.solve(solveTol_, 100);
   

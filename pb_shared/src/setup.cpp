@@ -190,7 +190,7 @@ orientRand_(randorient) //
   // Molecule part
   for (int i=0; i<nType_; i++)
   {
-    pqr_names_[i] = "";
+    pqr_names_[i] = "mol" + to_string(i) + "_.pqr";
     surfNames_[i] = "";
     imatNames_[i] = "";
     expNames_[i]  = "";

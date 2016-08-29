@@ -47,7 +47,6 @@ protected:
   shared_ptr<System> _syst_;
   shared_ptr<Constants> _consts_;
   
-  
   shared_ptr<BesselConstants> _bessl_consts_;
   shared_ptr<BesselCalc> _bessl_calc_;
   shared_ptr<SHCalcConstants> _sh_consts_;
@@ -55,6 +54,9 @@ protected:
   shared_ptr<ExpansionConstants> _exp_consts_;
   
   shared_ptr<Solver> solvr_;
+
+  vector<shared_ptr<HMatrix > > h_spol_;
+  vector<shared_ptr<FMatrix > > f_spol_;
 
   int poles_;
   double solveTol_;

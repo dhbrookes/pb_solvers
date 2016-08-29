@@ -172,9 +172,8 @@ public:
         else
           fout << setprecision(9) << real << " ";
       }
-      cout << endl;
+      fout << endl;
     }
-    cout << endl;
   }
   
 };
