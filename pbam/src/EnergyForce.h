@@ -328,6 +328,7 @@ public:
   virtual Pt get_taui(int i) { return Pt(); }
   virtual Pt get_forcei(int i) { return Pt (); }
   virtual double get_omegai(int i) {return 0; }
+  virtual double calc_ei(int i) {return 0; }
   
   virtual Pt get_moli_pos(int i) { return Pt(); }
   

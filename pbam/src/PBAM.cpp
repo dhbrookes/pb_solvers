@@ -34,7 +34,7 @@ PBAM::PBAM() : PBAMInput()
                              false, 100, 0, 15, "tst.map", 1, grid2d,
                              gridax, gridloc, "tst.dx", 1, false, difftype,
                              diffcon, termtype, termval, termnu, confil,
-                             conpad, xyzf);
+                             conpad, xyzf, "kT");
   syst_ = make_shared<System> ();
   consts_ = make_shared<Constants> ();
   initialize_coeff_consts();
@@ -187,7 +187,7 @@ void PBAM::init_write_system()
   cout << "Written config" << endl;
 }
 
-int PBAM::initialize_coeff_consts()
+void PBAM::initialize_coeff_consts()
 {
   _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
   _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
@@ -341,6 +341,7 @@ void PBAM::run_electrostatics()
 
 void PBAM::run_energyforce()
 {
+  int i;
   clock_t t3 = clock();
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (_bessl_calc_, _sh_calc_,
                                                     syst_, consts_, poles_);
@@ -363,6 +364,7 @@ void PBAM::run_energyforce()
 
 void PBAM::run_bodyapprox()
 {
+  int i;
   clock_t t3 = clock();  
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (_bessl_calc_, _sh_calc_,
                                                     syst_, consts_, poles_);
@@ -376,9 +378,9 @@ void PBAM::run_bodyapprox()
   threeBodTest.printTBDEnForTor(setp_->getRunName(), setp_->getMBDLoc());
   for (i=0; i<syst_->get_n(); i++)
   {
-    force_[i]   = threeBodTest.get_forcei(i);
-    torque_[i]  = threeBodTest.get_taui(i);
-    nrg_intera_[i]  = threeBodTest.get_omegai(i);
+    force_[i]   = threeBodTest.get_forcei_approx(i);
+    torque_[i]  = threeBodTest.get_torquei_approx(i);
+    nrg_intera_[i]  = threeBodTest.get_energyi_approx(i);
   }
 
   t3 = clock() - t3;
