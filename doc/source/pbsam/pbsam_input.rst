@@ -1,9 +1,10 @@
 
-PB-AM Inputs
-============
+PB-SAM Inputs
+=============
 
-Here are the inputs that are used in a PB-AM run, and
-their meanings. The general format of the input is:
+Here are the inputs that are used in a PB-SAM run, and
+their meanings. There is much overlap between PB-AM inputs and PB-SAM, but 
+the full PB-SAM list is provided here. The general format of the input is:
 
 ``keyword value``
 
@@ -21,55 +22,83 @@ General input file parameters
 | *Keyword*   |  *Parameters*      |  *Description*                                         |
 |             |                    |                                                        |
 +=============+====================+========================================================+
-| runname     | `name`             | `name` is desired internal name of this run.           |
+| runname     | `<name>`           | `name` is desired internal name of this run.           |
 +-------------+--------------------+--------------------------------------------------------+
-| attypes     | `numtypes`         | Set the number of different atom                       |
+| attypes     | `<numtypes>`       | Set the number of different atom                       |
 |             |                    |                                                        |
 |             |                    | types to `numtypes`                                    |
 +-------------+--------------------+--------------------------------------------------------+
-| pqr         | `idx`  `fpath`     | The molecule index for this xyz file.                  |
+| pqr         | `<idx>`  `<fpath>` | The molecule index, `idx` for this pqr file.           |
 |             |                    |                                                        |
 |             |                    | Provide input PQR file at `fpath`                      |
 +-------------+--------------------+--------------------------------------------------------+
-| xyz         | `idx`  `fpath`     | The molecule index for this xyz file.                  |
+| xyz         | `<idx>`  `<fpath>` | The molecule index, `idx` for this xyz file.           |   
+|             |                    |                                                        |   
+|             |                    | Provide input XYZ file at `fpath`                      |   
++-------------+--------------------+--------------------------------------------------------+
+| surf        | `<idx>`  `<fpath>` | `idx`, molecule index for this surface/vertex file.    |
 |             |                    |                                                        |
-|             |                    | Provide input XYZ file at `fpath`                      |
-+-------------+--------------------+--------------------------------------------------------+
-|  transrot   | `idx`  `fpath`     | The molecule type index for this translation/rotation  | 
+|             |                    | Provide input solvent vertex file at `fpath`. See      |
 |             |                    |                                                        |
-|             |                    | file that can be input instead of a xyz file.          |
+|             |                    | details of the vertex file below.                      |
++-------------+--------------------+--------------------------------------------------------+
+| imat        | `<idx>`  `<fpath>` | `idx`, index for integral matrix file. These are       |
 |             |                    |                                                        |
-|             |                    | Provide input file at `fpath`                          |
-+-------------+--------------------+--------------------------------------------------------+
-|  randorient |                    | If you want your molecules to be randomly              |
+|             |                    | precursor files that the program will print if not     |
 |             |                    |                                                        |
-|             |                    | rotated, use this flag                                 |
-+-------------+--------------------+--------------------------------------------------------+
-|  units      | `units`            | Set the units of output to `units`.                    |
+|             |                    | specified with the imat flag. File prefix for type     |
 |             |                    |                                                        |
-|             |                    | The current options are: `jmol` (Joules/mole),         |
+|             |                    | `idx` is given with `fpath`. For details on the imat   |
 |             |                    |                                                        |
-|             |                    | `kT` (kT/e) and `kcalmol` (kCal/mole).                 |
+|             |                    | file, see below.                                       |
 +-------------+--------------------+--------------------------------------------------------+
-|  salt       | `con`              | Set salt concentration in the system to `con`          |
-+-------------+--------------------+--------------------------------------------------------+
-|  temp       | `T`                | Set system temperature to `T`                          |
-+-------------+--------------------+--------------------------------------------------------+
-|  idiel      | `ival`             | Set the interior dielectric constant to `ival`         |
-+-------------+--------------------+--------------------------------------------------------+
-|  sdiel      | `sval`             | Set the solvent dielectric constant to `sval`          |
-+-------------+--------------------+--------------------------------------------------------+
-|  pbc        | `boxlength`        | Set size of periodic box to `boxlength`                |
-+-------------+--------------------+--------------------------------------------------------+
-|  random     | `seed`             | Seed the random number generator with `seed`           |
-+-------------+--------------------+--------------------------------------------------------+
-|  type       |   `idx` `ct`       | Set attributes of an atom type, where `idx` is the     | 
+| exp         | `<idx>`  `<fpath>` | `idx` : the molecule index for this expansion file.    |
 |             |                    |                                                        |
-|             |   `movetype` `dtr` | integer id of this type, which can be 1 to `numtypes`  |
+|             |                    | Provide input solvent vertex file at `fpath`. See      |
 |             |                    |                                                        |
-|             |   `drot`           | (above). `ct` is the number of atoms of this type      |
+|             |                    | details of the expansion file below.                   |
++-------------+--------------------+--------------------------------------------------------+
+| tolsp       | `<tolerance>`      | The desired tolerance for coarse-graining, indicates   |
 |             |                    |                                                        |
-|             |                    | in the system and `movetype` describes the way this    |
+|             |                    | how far beyond the surface the CG spheres may extend   |
+|             |                    |                                                        |
+|             |                    | Larger tolsp yields a coarser molecular representation |
++-------------+--------------------+--------------------------------------------------------+
+|  transrot   | `<idx>`  `<fpath>` | `idx`, molecule index for this translation/rotation    |   
+|             |                    |                                                        |   
+|             |                    | file that can be input instead of a xyz file.          |   
+|             |                    |                                                        |   
+|             |                    | Provide input file at `fpath`                          |   
++-------------+--------------------+--------------------------------------------------------+
+|  randorient |                    | If you want your molecules to be randomly              |   
+|             |                    |                                                        |   
+|             |                    | rotated, use this flag                                 |   
++-------------+--------------------+--------------------------------------------------------+
+|  units      | `<units>`          | Set the units of output to `units`.                    |   
+|             |                    |                                                        |   
+|             |                    | The current options are: `jmol` (Joules/mole),         |   
+|             |                    |                                                        |   
+|             |                    | `kT` (kT/e) and `kcalmol` (kCal/mole).                 |   
++-------------+--------------------+--------------------------------------------------------+
+|  salt       | `<con>`            | Set salt concentration in the system to `con`          |   
++-------------+--------------------+--------------------------------------------------------+
+|  temp       | `<T>`              | Set system temperature to `T`                          |   
++-------------+--------------------+--------------------------------------------------------+
+|  idiel      | `<ival>`           | Set the interior dielectric constant to `ival`         |   
++-------------+--------------------+--------------------------------------------------------+
+|  sdiel      | `<sval>`           | Set the solvent dielectric constant to `sval`          |   
++-------------+--------------------+--------------------------------------------------------+
+|  pbc        | `<boxlength>`      | Set size of periodic box to `boxlength`                |   
++-------------+--------------------+--------------------------------------------------------+
+|  random     | `<seed>`           | Seed the random number generator with `seed`           |
++-------------+--------------------+--------------------------------------------------------+
+|  type       | `<idx>` `<ct>`     | Set attributes of an atom type, where `idx` is the     |
+|             |                    |                                                        |
+|             | `<mvtype>` `<dtr>` | integer id of this type, which can be 1 to `numtypes`  |
+|             |                    |                                                        |
+|             | `<drot>`           | (above). `ct` is the number of atoms of this type      |
+|             |                    |                                                        |
+|             |                    | in the system and `mvtype` describes the way this      |
 |             |                    |                                                        |
 |             |                    | type is allowed to move in a dynamics run (`move`,     |
 |             |                    |                                                        |
@@ -85,8 +114,6 @@ General input file parameters
 +-------------+--------------------+--------------------------------------------------------+
 
 
-
-
 Physical calculations
 ---------------------
 
@@ -97,9 +124,9 @@ for all molecules in the system.
 | *Keyword*   |  *Parameters*      |  *Description*                                         |
 |             |                    |                                                        |
 +=============+====================+========================================================+
-| runtype     | `energyforce`      | This will invoke the calculation of energies, forces   |
+| runtype     | `<energyforce>`    | This will invoke the calculation of energies, forces   |
 |             |                    |                                                        |
-|             | `outfilename`      | and torques for the input system.                      |
+|             | `<outfilename>`    | and torques for the input system.                      |
 +-------------+--------------------+--------------------------------------------------------+
 
 Electrostatic Potential Visualization
@@ -114,34 +141,32 @@ and with the python scripts provided in the repository.
 | *Keyword*   |  *Parameters*      |  *Description*                                         |
 |             |                    |                                                        |
 +=============+====================+========================================================+
-| runtype     | `electrostatics`   | Will write the results of electrostatics calculations  |
+| runtype     | `<electrostatics>` | Will write the results of electrostatics calculations  |
 |             |                    |                                                        |
-|             | `gridpts`          | for every 3D grid point to `fname`, in the same output |
-|             |                    |                                                        |
-|             |                    | format as an APBS dx file.                             |
-+-------------+--------------------+--------------------------------------------------------+
-| dx          | `energyforce`      | Will write the results of electrostatics calculations  |
-|             |                    |                                                        |
-|             | `outfilename`      | for every 3D grid point to `fname`, in the same output |
+|             | `<gridpts>`        | for every 3D grid point to `fname`, in the same output |
 |             |                    |                                                        |
 |             |                    | format as an APBS dx file.                             |
 +-------------+--------------------+--------------------------------------------------------+
-| 3dmap       | `energyforce`      | Will write the results of electrostatics calculations  |
+| dx          | `<energyforce>`    | Will write the results of electrostatics calculations  |
 |             |                    |                                                        |
-|             | `outfilename`      | for points on the surface of molecules of the system   |
-+-------------+--------------------+--------------------------------------------------------+
-| gridct      | `ct`               | `ct` is the number of 2D grids to output.              |
-+-------------+--------------------+--------------------------------------------------------+
-| grid2d      | `fname` `axis`     | Set attributes of a grid output where `idx` is the     |
+|             | `<outfilename>`    | for every 3D grid point to `fname`, in the same output |
 |             |                    |                                                        |
-|             | `val`              | integer id of this grid, which can be 1 to `ct` (above)|
+|             |                    | format as an APBS dx file.                             |
++-------------+--------------------+--------------------------------------------------------+
+| 3dmap       | `<energyforce>`    | Will write the results of electrostatics calculations  |
+|             |                    |                                                        |
+|             | `<outfilename>`    | for points on the surface of molecules of the system   |
++-------------+--------------------+--------------------------------------------------------+
+| gridct      | `<ct>`             | `ct` is the number of 2D grids to output.              |
++-------------+--------------------+--------------------------------------------------------+
+| grid2d      | `<fname>` `<axis>` | Set attributes of a grid output where `idx` is the     |
+|             |                    |                                                        |
+|             | `<val>`            | integer id of this grid, which can be 1 to `ct` (above)|
 |             |                    |                                                        |
 |             |                    | Write output of calculations for a cross section       |
 |             |                    |                                                        |
 |             |                    | along `axis` (*x*, *y*, or *z*) at `value`             |
 +-------------+--------------------+--------------------------------------------------------+
-
-
 
 
 Brownian Dynamics Simulations
@@ -156,21 +181,21 @@ depending on the system and desired results.
 | *Keyword*   |  *Parameters*      |  *Description*                                         |
 |             |                    |                                                        |
 +=============+====================+========================================================+
-| runtype     | `dynamics`         | Will perform a brownian dynamics run. A directory where|
+| runtype     | `<dynamics>`       | Will perform a brownian dynamics run. A directory where|
 |             |                    |                                                        |
-|             | `outname` `ntraj`  | trajectory information will be stored in and the number|
+|             | `<outnm>` `<ntraj>`| trajectory information will be stored in and the number|
 |             |                    |                                                        |
 |             |                    | of trajectories is required.                           |
 +-------------+--------------------+--------------------------------------------------------+
-|  termct     | `ct`               | `ct` is the number of termination conditions.          |
+|  termct     | `<ct>`             | `ct` is the number of termination conditions.          |
 +-------------+--------------------+--------------------------------------------------------+
-|  termcombine| `andor`            | How termination conditions will be combined. `andor`   |
+|  termcombine| `<andor>`          | How termination conditions will be combined. `andor`   |
 |             |                    |                                                        |
 |             |                    | should be *and* or *or*. Default is *or*.              |
 +-------------+--------------------+--------------------------------------------------------+
-|  term       | `idx` `type` `val` | Set attributes of a termination condition where `idx`  |
+|  term       | `<idx>` `<type>`   | Set attributes of a termination condition where `idx`  |
 |             |                    |                                                        |
-|             | `mols`             | is the integer id of this condition, which can be 1 to |
+|             | `<val>` `<mols>`   | is the integer id of this condition, which can be 1 to |
 |             |                    |                                                        |
 |             |                    | `ct` (above). `type` can be *time*,  *x<=*, *y<=*,     |
 |             |                    |                                                        |
@@ -184,7 +209,7 @@ depending on the system and desired results.
 |             |                    |                                                        |
 |             |                    | else require 1).                                       |
 +-------------+--------------------+--------------------------------------------------------+
-|  term `idx` | `confile` `pad`    | Set attributes of contact termination condition, where |
+|  term `idx` | `<confile>` `<pad>`| Set attributes of contact termination condition, where |
 |             |                    |                                                        |
 |  contact    |                    | `idx` is the integer id of this condition, `confile`   |
 |             |                    |                                                        |
@@ -196,9 +221,9 @@ depending on the system and desired results.
 |             |                    |                                                        |
 |             |                    | assumption of the model. See below for more info.      |
 +-------------+--------------------+--------------------------------------------------------+
-|  xyz        | `idx` `trajidx`    | `idx` is the molecule index for this xyz file.         |
+|  xyz        | `<idx>` `<trajidx>`| `idx` is the molecule index for this xyz file.         |
 |             |                    |                                                        |
-|             | `fpath`            | Provide input XYZ file at `fpath`. For the             |
+|             | `<fpath>`          | Provide input XYZ file at `fpath`. For the             |
 |             |                    |                                                        |
 |             |                    | dynamics run, a starting configuration is              |
 |             |                    |                                                        |
@@ -212,15 +237,12 @@ depending on the system and desired results.
 +-------------+--------------------+--------------------------------------------------------+
 
 
-
 Other input files
 -----------------
 
 
 PQR File
 ^^^^^^^^
-
-
 All the options above require a *PQR* file name. A PQR file 
 can be generated from a PDB file using the PDB2PQR program, 
 available as a web server or for download at: 
@@ -309,9 +331,74 @@ where ``moltype1`` and ``moltype2`` are indices of the
 molecular types, ``at1`` is the index of an atom from the first
 molecular type, ``at2`` is the index of an atom from the second 
 molecular type and ``dist`` is the maximum distance between
-the two atoms that defines the contact.  Note that sometimes 
-these distances cannot be reached due to the assumption in this model that
-the molecule is spherical. To correct for this case, one must 
-specify a "pad"  distance that is defined as the maximum distance between
-the radial projections of the atoms onto the surface of their 
-respective spheres that defines a contact.
+the two atoms that defines the contact.  Note that because of the
+coarse-graining, the program will identify the CG sphere closest
+to the contact atom, and use the surface-to-surface distance of those 
+CG spheres to compare against the reported ``dist``.
+
+
+Vertex/Surface File
+^^^^^^^^^^^^^^^^^^^^^^
+
+As part of the coarse-graining process a definition of the molecular
+surface is necessary. For this we have historically used the program
+MSMS_ by M. Sanner, or on the online web server_
+
+.. _MSMS: http://mgltools.scripps.edu/packages/MSMS
+
+.. _server: http://mgl.scripps.edu/people/sanner/html/msms_server.html
+
+If using the command line tool, after downloading it for the correct platform, 
+it can be run as follows on the command line. It requires an xyzr file as input, which
+is the xyz coordinates of each atom of the system followed by the vDW radius. This
+information can all be found in the PQR file.
+
+``./msms.system -if [filename].xyzr -of [outfile]``
+
+This will produce a \*.face file and a \*.vert file, of which the \*.vert is needed. 
+The vertex file is given as follows: 
+
+.. code-block:: bash
+
+    1669      95  3.00  1.50
+   2.965    12.871    -1.084    -0.751    -0.636    -0.175       0      81  2
+   3.241    11.952    -0.817    -0.936    -0.024    -0.353       0      69  2
+   3.026    11.791    -0.439    -0.792     0.084    -0.604       0      79  2
+   4.481    14.391    -3.026    -0.879    -0.246    -0.409       0      73  2
+   5.413    15.674    -0.948    -0.337     0.499     0.798       0      73  2
+   4.478    15.093    -0.297     0.286     0.886     0.365       0      81  2
+   4.930    15.004    -0.240    -0.015     0.945     0.326       0      71  2
+   4.072    13.663     0.763    -0.465     0.242     0.852       0      71  2
+
+Where the first line is the number of vertex points, followed by information 
+on the density of the surface, and the lines that follow indicate the cartesian 
+locations of each vertex point, followed by the unit norm of the surface. 
+This vertex file is used to coarse-grain the molecule.
+
+
+IMAT: Surface Integral File
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The surface integrals are computed for the boundary element part of
+PB-SAM. They can be quite time consuming, so the first time they 
+are computed for a system, they are printed to the working directory,
+with the name ``<pqr_prefix>_sph[#].bin``. Where ``<pqr_prefix>`` is the
+name of the pqr input file, with the last four characters removed (presumed
+`.pqr`. For future computations, the ``imat`` keyword can be used, followed
+by the ``<pqr_prefix>`` and the program will read in the IMAT files instead of
+re-computing them.
+
+
+Expansion files
+^^^^^^^^^^^^^^^^
+
+Much like the IMAT files, the expansion files are files generated from
+self-polarization that are useful and time-saving methods for running 
+a system of full-mutual polarziation on many molecules. If no expansion
+path is provided, the program will perform self polarization for each
+type of molecule in the system and print out files prepended with the 
+``<pqr_prefix>`` read in with the PQR flag, followed by ``.[sph #].H.exp``
+or ``.[sph #].F.exp``. Where ``H`` and ``F`` are the two key expansions
+that the PB-SAM code computes during run time. In future program runs, the
+``exp`` flag can be used, and the ``H`` and ``F`` files will be read in.
+

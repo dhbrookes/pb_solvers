@@ -7,6 +7,6 @@ has some linear algebra utilities and OMP parallelism implemented.
 
 Below is a flow diagram of the program from call to finish.
 
-.. image:: images/pbam_flow.png
+.. image:: ../images/pbam_flow.png
    :width: 95%
 
