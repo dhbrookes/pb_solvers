@@ -263,6 +263,12 @@ void IEMatrix::init_from_file(string imatfile, int k )
   set_IE_k(k, imat.get_mat());
 }
 
+void IEMatrix::init_from_other(shared_ptr<IEMatrix> other)
+{
+  for (int k=0; k < IE_orig_.size(); k++)
+    set_IE_k(k, other->get_IE_k_org(k));
+}
+
 
 MyMatrix<double> IEMatrix::get_IE_k(int k)
 {

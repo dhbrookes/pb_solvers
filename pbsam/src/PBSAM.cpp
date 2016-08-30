@@ -265,41 +265,44 @@ void PBSAM::initialize_pbsam()
   for (i = 0; i < _setp_->getNType(); i++)
   {
     string fil=_setp_->getTypeNPQR(i);
-    
-    if (_setp_->getTypeNImat(i) != "" )
-    {
-      imat_loc[i].resize(_syst_->get_Ns_i(i));
-      string istart = _setp_->getTypeNImat(i);
-      imat_loc[i].resize(_syst_->get_Ns_i(i));
-      for (int k = 0; k < _syst_->get_Ns_i(i); k++)
-        imat_loc[i][k] = istart+to_string(k)+".bin";
-    } else
-    {
-      cout << "Generating IMatrices " << fil << endl;
-      // This is done in Solver!
-    }
-    
-    clock_t t3 = clock();
     // Generate surface integrals and buried and exposed points
     // on the molecule surface
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
-      if (k==0) //Only generate once for each type
+      if (k==0) // Only generate sp points if this is the first mol of type i
+        imats_[idx] = make_shared<IEMatrix>(idx, _syst_->get_moli(idx),
+                                             _sh_calc_, poles_, _exp_consts_,
+                                             true, 0, true);
+      if (_setp_->getTypeNImat(i) != "" )
       {
-        IEMatrix ieMatTest(0, _syst_->get_moli(idx),
-                           _sh_calc_, poles_, _exp_consts_, true, 0, true);
-        ieMatTest.write_all_mat(fil.substr(0, fil.size()-4));
-      } else // copy from first one
+        string istart = _setp_->getTypeNImat(i);
+        for (int k = 0; k < _syst_->get_Ns_i(i); k++)
+          imats_[idx]->init_from_file(istart+to_string(k)+".bin", k);
+        
+      } else
       {
-        _syst_->copy_grid(_syst_->get_mol_global_idx(i,0), idx);
+        cout << "Generating IMatrices " << fil << endl;
+        clock_t t3 = clock();
+        
+        if (k==0) //Only generate once for each type
+        {
+          imats_[idx]->calc_vals(_syst_->get_moli(idx), _sh_calc_);
+          imats_[idx]->write_all_mat(fil.substr(0, fil.size()-4));
+        } else
+        {
+          imats_[idx]->init_from_other(imats_[_syst_->get_mol_global_idx(i,0)]);
+          _syst_->copy_grid(_syst_->get_mol_global_idx(i,0), idx);
+        }
+        
+        t3 = clock() - t3;
+        printf ("Imat took me %f seconds.\n",
+                ((float)t3)/CLOCKS_PER_SEC);
       }
+      
     }
-
-    t3 = clock() - t3;
-    printf ("Imat took me %f seconds.\n",
-            ((float)t3)/CLOCKS_PER_SEC);
     
+    // Performing similar operations for expansions
     if (_setp_->getTypeNExp(i) != "" )
     {
       string estart = _setp_->getTypeNExp(i);

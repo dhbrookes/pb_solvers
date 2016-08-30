@@ -571,7 +571,7 @@ void GradLHNMatrix::calc_val_k(int k, shared_ptr<System> sys,
       
       if ( sys->get_pbc_dist_vec_base(Ik, Mm).norm() < (interPolcut+aIk+aMm))
       {
-        inner = T->re_expand_gradX(dH[M]->get_mat_k(m), I_, k, M, m);        
+        inner = T->re_expand_gradX(dH[M]->get_mat_k(m), I_, k, M, m);
         lhn_k += inner;
       }
     }

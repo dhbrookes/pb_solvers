@@ -255,6 +255,7 @@ public:
            int npts = Constants::IMAT_GRID, bool set_mol = false );
   
   void init_from_file(string imatfile, int k );
+  void init_from_other(shared_ptr<IEMatrix> other);
   
   void set_IE_k(int k, vector<double> ie) { IE_orig_[k] = ie;}
   
