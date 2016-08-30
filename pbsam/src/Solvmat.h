@@ -280,6 +280,7 @@ public:
     }
   }
   void write_mat_k(string imat_prefix, int k);
+  void write_mat_k_reg(string imat_prefix, int k);
 };
 
 

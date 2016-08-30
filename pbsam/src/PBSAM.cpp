@@ -291,9 +291,15 @@ void PBSAM::initialize_pbsam()
         printf ("Imat took me %f seconds.\n",
                 ((float)t3)/CLOCKS_PER_SEC);
       }
-      
     }
-    
+    for (k=0; k<_setp_->getTypeNCount(i); k++)
+    {
+      idx = _syst_->get_mol_global_idx(i,k);
+      h_spol_[expct] = make_shared<HMatrix>(idx, _syst_->get_Ns_i(idx),
+                                            poles_, _consts_->get_kappa());
+      f_spol_[expct] = make_shared<FMatrix>(idx, _syst_->get_Ns_i(idx),
+                                            poles_, 0.0);
+    }
     // Performing similar operations for expansions
     if (_setp_->getTypeNExp(i) != "" )
     {
@@ -302,8 +308,8 @@ void PBSAM::initialize_pbsam()
       {
         for (k = 0; k < _syst_->get_Ns_i(i); k++)
         {
-          h_spol_[expct]->init_from_exp(estart+to_string(k) + ".H.exp", k);
-          f_spol_[expct]->init_from_exp(estart+to_string(k) + ".F.exp", k);
+          h_spol_[expct]->init_from_exp(estart+".H."+to_string(k)+".exp",k);
+          f_spol_[expct]->init_from_exp(estart+".F."+to_string(k)+".exp",k);
         }
         expct++;
       }

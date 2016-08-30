@@ -287,6 +287,24 @@ MyMatrix<double> IEMatrix::get_IE_k(int k)
   return IMat;
 }
 
+void IEMatrix::write_mat_k_reg(string imatFname, int k)
+{
+  ofstream fout;
+  fout.open(imatFname, ofstream::binary); //for writing
+  if (!fout)
+  {
+    cout << "file "<< imatFname << " could not be opened."<< endl;
+    exit(1);
+  }
+  fout << p_ << endl; // pole order
+  for (int i = 0; i< p_*p_*p_*p_; i++)
+  {
+    fout << IE_orig_[k][i] << " "; //mat
+    if ( (i%(p_*p_)) == 0 && (i > 0)) fout << endl;
+  }
+  
+  fout.close();
+}
 
 void IEMatrix::write_mat_k(string imatFname, int k)
 {
