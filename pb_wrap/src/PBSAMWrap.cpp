@@ -209,6 +209,7 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
    // convert Valist to a vector of MoleculeSAMs
   printf("Inside pbsamrun\n");
   vector<MoleculeSAM> mols;
+
   for (unsigned int mol=0; mol < nmls; mol++)
   {
     Vatom *atom;

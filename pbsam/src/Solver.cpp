@@ -116,7 +116,7 @@ Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
 : Ns_tot_(0),
 _E_(_sys->get_n()),
 _LE_(_sys->get_n()),
-_IE_(imats),
+_IE_(_sys->get_n()),
 _LF_(_sys->get_n()),
 _LH_(_sys->get_n()),
 _LHN_(_sys->get_n()),
@@ -167,6 +167,9 @@ kappa_(_consts->get_kappa())
     _LE_[I] = make_shared<LEMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LE_[I]->calc_vals(_mol, _shCalc_, _consts_->get_dielectric_prot());
     
+    _IE_[I] = make_shared<IEMatrix>(I, _mol, _shCalc, p_, _expConsts_, false);
+    _IE_[I]->init_from_other(imats[I]);
+
     _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, 0.0);
     if (h_spol.size() == 0)
@@ -464,6 +467,7 @@ void Solver::solve(double tol, int maxiter)
     if (mu < tol) break;
   }
 
+  cout << "This is solved H " << (*_H_[0]) << endl;
 }
 
 

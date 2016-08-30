@@ -66,10 +66,6 @@ PBSAM::PBSAM(string infile) : poles_(5)
   _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
   _exp_consts_ = make_shared<ExpansionConstants> (poles_);
   
-  h_spol_.resize(_syst_->get_n());
-  f_spol_.resize(_syst_->get_n());
-  imats_.resize(_syst_->get_n());
-  
   initialize_pbsam();
 }
 
@@ -77,7 +73,7 @@ PBSAM::PBSAM(string infile) : poles_(5)
 PBSAM::PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
              vector<MoleculeSAM> mls )
 :
-poles_(5), h_spol_(mls.size()), f_spol_(mls.size())
+poles_(5), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
 {
   int i, j;
   
@@ -96,6 +92,7 @@ poles_(5), h_spol_(mls.size()), f_spol_(mls.size())
   string unt = (pbami.setunits_ == 0) ? "kT" : string(pbami.units_);
   vector<string> surffil(pbsami.surfct_),imatfil(pbsami.imatct_);
   vector<string> expfil(pbsami.expct_);
+
   for (i=0; i<pbsami.surfct_; i++) surffil[i] = string(pbsami.surffil_[i]);
   for (i=0; i<pbsami.imatct_; i++) imatfil[i] = string(pbsami.imatfil_[i]);
   for (i=0; i<pbsami.expct_; i++)   expfil[i] = string(pbsami.expfil_[i]);
@@ -166,6 +163,7 @@ poles_(5), h_spol_(mls.size()), f_spol_(mls.size())
                              difftype, diffcon, termcond, termval, termnu,
                              confil, conpad, xyzf, unt);
   _setp_->apbs_pbsam_set(surffil, imatfil, expfil);
+
   check_setup();
   
   vector<shared_ptr<BaseMolecule> > molP(mls.size());
@@ -173,9 +171,12 @@ poles_(5), h_spol_(mls.size()), f_spol_(mls.size())
   _syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
   
+  h_spol_.resize(_syst_->get_n());
+  f_spol_.resize(_syst_->get_n());
+  imats_.resize(_syst_->get_n());
+
   init_write_system();
   initialize_pbsam();
-
 }
 
 // Function to check inputs from setup file
@@ -292,6 +293,7 @@ void PBSAM::initialize_pbsam()
                 ((float)t3)/CLOCKS_PER_SEC);
       }
     }
+    cout << " 4" << endl;
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
@@ -320,13 +322,14 @@ void PBSAM::initialize_pbsam()
       auto sub_syst = make_subsystem({_syst_->get_mol_global_idx(i,0)});
       vector<shared_ptr<IEMatrix> > sub_i;
       sub_i.push_back(imats_[_syst_->get_mol_global_idx(i,0)]);
+      sub_i[0]->write_all_mat("");
       
       vector<shared_ptr<HMatrix> > sub_h(0);
       vector<shared_ptr<FMatrix> > sub_f(0);
       
       Solver self_pol(sub_syst, _consts_, _sh_calc_, _bessl_calc_, poles_,
                       sub_i, sub_h, sub_f);
-      self_pol.solve(solveTol_, 100);
+      self_pol.solve(solveTol_, 500);
       
       for (int k = 0; k < _syst_->get_typect(i); k++)
       {
