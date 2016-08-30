@@ -43,7 +43,7 @@ andCombine_(false),
 sphBeta_(2.0),
 tolSP_(1.0),
 maxTrials_(40),
-nTrials_(1200)
+nTrials_(9)
 {
   nTypenCount_[0] = 1;
   nTypenCount_[1] = 1;
@@ -104,7 +104,7 @@ Setup::Setup(double temp, double salt_conc, double int_diel, double solv_diel,
              vector<string> difftype, vector<vector<double> > diffcon,
              vector<string> termcond, vector<double> termval, 
              vector<vector <int > > termnu, vector<string> confil,
-             vector<double> conpad, vector<vector <string> > xyzfil)
+             vector<double> conpad, vector<vector <string> > xyzfil, string unt)
 :
 ompThreads_( 1 ),
 saltConc_( salt_conc ), //
@@ -124,6 +124,9 @@ typeDef_(nmol),
 typeDiff_(nmol),
 pqr_names_(nmol),
 xyz_names_(nmol),
+imatNames_(nmol),
+surfNames_(nmol),
+expNames_(nmol),
 isTransRot_(nmol),
 runSpecs_(2),  // 
 mbdfile_loc_(2),
@@ -138,7 +141,7 @@ orientRand_(randorient) //
 {
   runSpecs_[0] = runtype; //
   runSpecs_[1] = runname; //
-  units_ = "kT";
+  units_ = unt;
 
   for (int i = 0; i<nType_; i++) nTypenCount_[i] = 1; //
 
@@ -184,16 +187,39 @@ orientRand_(randorient) //
   mbdfile_loc_[0] = "";
   mbdfile_loc_[1] = "";
 
-  // MoleculeSAMAM part
+  // Molecule part
   for (int i=0; i<nType_; i++)
   {
-    pqr_names_[i] = "";
+    pqr_names_[i] = "mol" + to_string(i) + ".pqr";
+    surfNames_[i] = "";
+    imatNames_[i] = "";
+    expNames_[i]  = "";
     xyz_names_[i].resize(ntraj);
     isTransRot_[i].resize(1);
     isTransRot_[i][0] = false;
 
     for (int j=0; j<ntraj; j++) xyz_names_[i][j] = xyzfil[i][j];
   }  
+}
+
+void Setup::apbs_pbsam_set(vector<string> surffil, vector<string> imatfil,
+                           vector<string> expfil)
+{
+  int i;
+//if ( nType_ > surffil.size() ) 
+//  cout << "Missing surf file, assuming its the end ones" << endl;
+  for (i=0; i<surffil.size(); i++)
+    surfNames_[i] = surffil[i];
+
+//if ( nType_ > imatfil.size() ) 
+//  cout << "Missing imat file, assuming its the end ones" << endl;
+  for (i=0; i<imatfil.size(); i++)
+    imatNames_[i] = imatfil[i];
+
+//if ( nType_ > expfil.size() ) 
+//  cout << "Missing exp file, assuming its the end ones" << endl;
+  for (i=0; i<expfil.size(); i++)
+    expNames_[i] = expfil[i];
 }
 
 void Setup::read_infile(string fname)

@@ -8,7 +8,6 @@ if(NOT APPLE)
 
   if(BLAS STREQUAL "Atlas" OR BLAS STREQUAL "atlas")
     find_package(Atlas REQUIRED)
-   #include_directories(SYSTEM ${Atlas_INCLUDE_DIR})
     include_directories(${Atlas_INCLUDE_DIR})
     list(APPEND PBSAM_LINKER_LIBS ${Atlas_LIBRARIES})
   elseif(BLAS STREQUAL "Open" OR BLAS STREQUAL "open")

@@ -32,7 +32,26 @@ MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double>
                        double dtrans)
 :BaseMolecule(type, type_idx, movetype, qs, pos, vdwr, drot, dtrans)
 {
-  find_centers(msms_sp, msms_sp, tol_sp, n_trials, max_trials, beta);
+  find_centers(msms_sp, msms_np, tol_sp, n_trials, max_trials, beta);
+  check_connect();
+  for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
+  interPol_.resize(Ns_);  interAct_.resize(Ns_);
+  
+  map_repos_charges();
+  calc_cog();
+}
+
+MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
+                       vector<Pt> pos, vector<double> vdwr, string msms_f,
+                       double tol_sp, double drot, double dtrans, int n_trials,
+                       int max_trials, double beta)
+                       
+:BaseMolecule(type, type_idx, movetype, qs, pos, vdwr, drot, dtrans)
+{
+
+  MSMSFile surf_file (msms_f);
+  find_centers(surf_file.get_sp(), surf_file.get_np(), tol_sp, n_trials, 
+               max_trials, beta);
   check_connect();
   for ( int i = 0; i < Ns_; i++ ) cgNeighs_.push_back(find_neighbors( i ));
   interPol_.resize(Ns_);  interAct_.resize(Ns_);
@@ -44,9 +63,10 @@ MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double>
 MoleculeSAM::MoleculeSAM(const MoleculeSAM& mol)
 :BaseMolecule(mol.type_, mol.typeIdx_, mol.moveType_, mol.qs_, mol.pos_,
               mol.vdwr_, mol.centers_, mol.as_, mol.drot_, mol.dtrans_),
-cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 cgNeighs_(mol.cgNeighs_),cgGridPts_(mol.cgGridPts_),
 cgGdPtExp_(mol.cgGdPtExp_), cgGdPtBur_(mol.cgGdPtBur_),
+cog_(mol.cog_), cgCharges_(mol.cgCharges_), chToCG_(mol.chToCG_),
+cgChargesIn_(mol.cgChargesIn_), cgChargesOut_(mol.cgChargesOut_),
 interPol_(mol.interPol_), interAct_(mol.interAct_)
 {
   calc_cog();
@@ -61,6 +81,7 @@ void MoleculeSAM::map_repos_charges()
     closest = find_closest_center(pos_[cg]);
     cgCharges_[closest].push_back(cg);
     pos_[cg] = pos_[cg] - centers_[closest];  // reposition charge
+
     chToCG_[cg] = closest;
   }
   
@@ -229,12 +250,12 @@ void MoleculeSAM::find_centers(vector<Pt> sp, vector<Pt> np,
 
 CGSphere MoleculeSAM::find_best_center(vector<Pt> sp,vector<Pt> np,
                                       vector<int> unbound,
-                                      double tol_sp, int iter, double beta)
+                                      double tol_sp, double beta)
 {
   int sz = (int) unbound.size();
   Pt best_cen;
   double best_a = 0;
-  int best_N = 0;
+  int iter(1200), best_N(0);
   vector<int> ch;  // encompassed charges of best sphere
   
   best_cen = pos_[unbound[(int) floor(drand48()*sz)]];  
@@ -277,7 +298,7 @@ CGSphere MoleculeSAM::find_best_center(vector<Pt> sp,vector<Pt> np,
     }
     
     //apply MC criteria
-    if (exp(beta*(tri_N - best_N) > drand48()))
+    if (exp(beta*(tri_N - best_N)) > drand48())
     {
       best_cen = tri_cen;
       best_N = tri_N;
@@ -345,36 +366,41 @@ vector<int> MoleculeSAM::find_neighbors( int i )
   return neighs;
 }
 
+void MoleculeSAM::write_pqr(string outfile)
+{
+  int j, k, ct(0);
+  ofstream pqr_out;
+  char pqrlin[400];
+  
+  pqr_out.open( outfile );
+  
+  for ( j = 0; j < get_nc(); j++)
+  {   
+    sprintf(pqrlin,"%6d  C   CHG A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,0,
+            get_posj_realspace(j).x(),
+            get_posj_realspace(j).y(),
+            get_posj_realspace(j).z(),
+            get_qj(j), get_radj(j));
+    pqr_out << "ATOM " << pqrlin << endl;
+    ct++;
+  }   
+  for (k = 0; k < get_ns(); k++)
+  {   
+    sprintf(pqrlin,"%6d  X   CEN A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,0,
+            get_centerk(k).x(), get_centerk(k).y(),
+            get_centerk(k).z(), 0.0, get_ak(k));
+    pqr_out << "ATOM " << pqrlin << endl;
+    ct++;
+  }   
+  pqr_out.close();
+}
+
 
 System::System(vector<shared_ptr<BaseMolecule> > mols,
                double cutoff,
                double boxlength)
 :BaseSystem(mols, cutoff, boxlength)
 {
-//  int i, j, k, maxi = 0;
-//  vector<int> maxj, keys(2);
-//  for ( k = 0; k < N_; k++)
-//  {
-//    i = molecules_[k]->get_type();
-//    j = molecules_[k]->get_type_idx();
-//    keys = {i,j};
-//    typeIdxToIdx_[keys] = k;
-//    maxi = ( maxi > i ) ? maxi : i;
-//    
-//    if ( i >= maxj.size() ) maxj.push_back(0);
-//    maxj[i] = ( maxj[i] > j ) ? maxj[i] : j;
-//  }
-//  
-//  maxi++;
-//  for ( j = 0; j < maxj.size(); j++) maxj[j]++;
-//  
-//  ntype_ = maxi;
-//  typect_ = maxj;
-//  
-//  check_for_overlap();
-//  lambda_ = calc_average_radius();
-//  if (boxLength_/2. < cutoff_)  compute_cutoff();
-  
   min_dist_.resize(N_);
   for (int i=0; i<N_; i++) min_dist_[i].resize(N_);
   save_min_dist();
@@ -394,7 +420,6 @@ System::System(Setup setup, double cutoff)
   vector<int> keys(2);
   for (i = 0; i < setup.getNType(); i++)
   {
-    
     // First a build a representative MoleculeSAM of this type (which will
     // be repositioned below
     PQRFile pqrI (setup.getTypeNPQR(i));
@@ -488,30 +513,6 @@ System::System(Setup setup, double cutoff)
   save_min_dist();
 }
 
-//const double System::calc_average_radius() const
-//{
-//  double ave = 0;
-//  int total_sphere = 0;
-//  for (int i = 0; i < N_; i++)
-//  {
-//    total_sphere += get_Ns_i(i);
-//    for (int k = 0; k < get_Ns_i(i); k++)
-//    {
-//      ave += get_aik(i, k);
-//    }
-//  }
-//  ave  =  ave / (double) total_sphere;
-//  return ave;
-//}
-
-
-//void System::compute_cutoff()
-//{
-//  cutoff_ = boxLength_/2.0;
-//  cout << " The desired cutoff is larger than half the box length";
-//  cout << ". Resetting cutoff to 1/2 the boxlength: " << cutoff_ << endl;
-//}
-
 double System::calc_min_dist(int I, int J)
 {
   int k1, k2;
@@ -555,48 +556,23 @@ void System::save_min_dist()
   }
 }
 
-//void System::check_for_overlap()
-//{
-//  int i, j, k1, k2;
-//  double dist, aik, ajk;
-//  Pt cen_ik, cen_jk;
-//  for (i = 0; i < N_; i++)
-//  {
-//    for (j = i+1; j < N_; j++)
-//    {
-//      for (k1 = 0; k1 < molecules_[i]->get_ns(); k1++)
-//      {
-//        for (k2 = 0; k2 < molecules_[j]->get_ns(); k2++)
-//        {
-//          aik = molecules_[i]->get_ak(k1);
-//          ajk = molecules_[j]->get_ak(k2);
-//          cen_ik = molecules_[i]->get_centerk(k1);
-//          cen_jk = molecules_[j]->get_centerk(k2);
-//          dist = get_pbc_dist_vec_base(cen_ik, cen_jk).norm();
-//          if (dist < (aik + ajk))
-//            throw OverlappingMoleculeSAMException(i, j);
-//        }
-//      }
-//    }
-//  }
-//}
-
-//Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
-//{
-//  Pt dv  = p1 - p2;
-//  
-//  Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
-//            dv.y() - round(dv.y()/boxLength_)*boxLength_,
-//            dv.z() - round(dv.z()/boxLength_)*boxLength_);
-//  
-//  return v;
-//}
-
-//bool System::less_than_cutoff(Pt v)
-//{
-//  if (v.norm() < cutoff_) return true;
-//  else return false;
-//}
+void System::reset_positions( vector<string> xyzfiles )
+{
+  int i, j, k;
+  vector<int> keys(2);
+  for (i = 0; i < ntype_; i++)
+  {
+    XYZFile xyzI (xyzfiles[i], typect_[i]);
+    for (j = 0; j < typect_[i]; j++)
+    {
+      keys = { i, j};
+      k = typeIdxToIdx_[keys];
+      Pt dist_to_new = get_cogi(k) - xyzI.get_pts()[j];
+      molecules_[k]->translate(dist_to_new*-1, boxLength_);
+    }
+  }
+  
+}
 
 void System::write_to_pqr(string outfile, int mid)
 {

@@ -58,10 +58,10 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
   // Analytical H matrix initialized
   auto hmat = make_shared<HMatrix>(0, sys->get_Ns_i(0), pol, kap);
   hmat->init(sys->get_moli(0), SHCalcTest, 4.0);
-  
+  shared_ptr<PreCalcSH> precalc_sh = make_shared<PreCalcSH>();
   // Local H, numeric
   LHMatrix lhmt(0, sys->get_Ns_i(0), pol, kap);
-  lhmt.init(sys->get_moli(0), hmat, SHCalcTest, BesselCal, _expcons);
+  lhmt.init(sys->get_moli(0), hmat, SHCalcTest, BesselCal, precalc_sh, _expcons, true);
   
   // Transform class
   TMatrix tmat( pol, sys, SHCalcTest, cst, BesselCal, ReExp);
@@ -77,7 +77,8 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
       if ( localXSphre[i][sphct].size() == 0 ) continue;
       int expct = 0;
       MyMatrix<cmplx> out = tmat.re_expandX_numeric(lhmt.get_mat(), 0,
-                                                    mySphs[i], 0, j, kap);
+                                                    mySphs[i], 0, j, kap,
+                                                    precalc_sh, true);
       for (int n = 0; n < pol; n++)
       {
         for (int m = 0; m <= n; m++)

@@ -13,6 +13,11 @@
 #include <iostream>
 #include <memory>
 #include "Gradsolvmat.h"
+#include <unordered_map>
+#include <map>
+#include <vector>
+
+
 
 
 /*
@@ -41,9 +46,7 @@ protected:
   vector<shared_ptr<HMatrix> >      _outerH_;
   
   vector<shared_ptr<FMatrix> >      _F_;
-  
   shared_ptr<TMatrix>               _T_;
-  
   shared_ptr<System>                _sys_;
   shared_ptr<SHCalc>                _shCalc_;
   shared_ptr<BesselCalc>            _bCalc_;
@@ -53,6 +56,8 @@ protected:
   
   vector<vector<double> >           dev_sph_Ik_;
   
+  shared_ptr<PreCalcSH>             _precalcSH_;
+
   double                            mu_; // SCF deviation max
   
   // update prevH and outerH and rotH
@@ -63,12 +68,22 @@ protected:
   
   void iter_innerH(int I, int k);
   
+  
+  
 public:
+  //Used primarily for testing
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
          shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
          int p, bool readImat=false, bool readHF=false,
          vector<vector<string> > imats = {{}},
          vector<vector<vector<string> > > expHF = {{{}}});
+  
+  // Used for main/runs
+  Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+         shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
+         int p, vector<shared_ptr<IEMatrix> > imats,
+         vector<shared_ptr<HMatrix > > h_spol,
+         vector<shared_ptr<FMatrix > > f_spol);
   
   // run an iteration and return convergence value
   double iter(int t);
@@ -83,6 +98,11 @@ public:
   void solve_inner();
   
   void reset_all();
+  
+  // pre-calculate spherical harmonics for LH and LF
+  void precalc_sh_lf_lh();
+  // pre-calculate spherical harmonics for numeric re-expansion
+  void precalc_sh_numeric();
   
   void update_LHN_all();
   
@@ -108,12 +128,13 @@ public:
     return ipol;
   }
   
-  shared_ptr<TMatrix> get_T()              {return _T_;}
-  int get_p()                              {return p_;}
-  shared_ptr<System> get_sys()             {return _sys_; }
-  shared_ptr<Constants> get_consts()       {return _consts_; }
-  shared_ptr<SHCalc> get_sh()              {return _shCalc_;}
-  shared_ptr<BesselCalc> get_bessel()      {return _bCalc_;}
+  shared_ptr<TMatrix> get_T()              { return _T_;}
+  int get_p()                              { return p_;}
+  shared_ptr<System> get_sys()             { return _sys_; }
+  shared_ptr<Constants> get_consts()       { return _consts_; }
+  shared_ptr<SHCalc> get_sh()              { return _shCalc_;}
+  shared_ptr<BesselCalc> get_bessel()      { return _bCalc_;}
+  shared_ptr<PreCalcSH> get_precalc_sh()   { return _precalcSH_; }
 };
 
 
@@ -123,6 +144,9 @@ protected:
   int p_;
   double kappa_;
   int Ns_tot_; // measure of number of spheres in the system
+  
+  shared_ptr<PreCalcSH> precalcSH_;
+  bool noPreSH_; // if sh values have not been pre-calculated
   
   vector<shared_ptr<FMatrix> >      _F_;  // converged solutions for these
   vector<shared_ptr<HMatrix> >      _H_;
@@ -170,12 +194,23 @@ public:
              shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
              shared_ptr<TMatrix> _T, vector<shared_ptr<FMatrix> > _F,
              vector<shared_ptr<HMatrix> > _H, vector<shared_ptr<IEMatrix> > _IE,
-             vector<vector<int> > interpol,
-             shared_ptr<ExpansionConstants> _expConst,int p);
+             vector<vector<int> > interpol,shared_ptr<PreCalcSH> precalc_sh,
+             shared_ptr<ExpansionConstants> _expConst, int p,
+             bool no_pre_sh=false);
   
   void solve(double tol, int maxiter);
   
   void pre_compute_gradT_A();
+  
+  void update_HF(vector<shared_ptr<FMatrix> > F,
+                 vector<shared_ptr<HMatrix> > H)
+  {
+    for (int i=0; i<Ns_tot_; i++)
+    {
+      _F_[i] = F[i];
+      _H_[i] = H[i];
+    }
+  }
   
   shared_ptr<GradHMatrix> get_gradH(int I, int wrt) { return dH_[wrt][I];}
   shared_ptr<GradFMatrix> get_gradF(int I, int wrt) { return dF_[wrt][I];}

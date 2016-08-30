@@ -46,7 +46,7 @@ protected:
   shared_ptr<System>      _system_;
   
   int         Nmol_;
-  vector<int> Nsi_; // number of spheres in each MoleculeSAM
+  vector<int> Nsi_; // number of spheres in each Molecule
   
   
   // inner functions for re-expansion
@@ -114,8 +114,13 @@ public:
   /*
    Re-expand a numerical surface with respect to T(I,k)(J,l) (Equation 27b [1])
    */
+//  MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
+//                                   int J, int l, double kappa);
+  
   MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
-                                   int J, int l, double kappa);
+                                     int J, int l, double kappa,
+                                     shared_ptr<PreCalcSH> pre_sh,
+                                     bool no_pre_sh=false);
   
   /*
    re-expand element j of grad(X) with element (I,k,J l) of T. REquires
@@ -140,7 +145,9 @@ public:
    */
   MyMatrix<Ptx> re_expandgradX_numeric(vector<vector<Pt> > X,
                                        int I, int k,
-                                       int J, int l, double kappa);
+                                       int J, int l, double kappa,
+                                       shared_ptr<PreCalcSH> pre_sh,
+                                       bool no_pre_sh=false);
   
 
   int get_nmol() const { return Nmol_; }

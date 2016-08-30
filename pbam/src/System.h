@@ -195,7 +195,7 @@ public:
   
   // Check to determine if any MoleculeAMs are overlapping
   void check_for_overlap();
-  
+  bool is_collision(); 
   // get the distance vector (Point object) between two MoleculeAMs, taking into
   // account periodic boundary conditions by returning the distance vector
   // between the closest image of the MoleculeAM
@@ -237,28 +237,5 @@ public:
   void write_to_xyz(ofstream &xyz_out);
   
 };
-
-///*
-// Exception thrown when two MoleculeAMs in the system are overlapping
-// */
-//class OverlappingMoleculeException: public exception
-//{
-//protected:
-//  int idx1_;
-//  int idx2_;
-//  
-//public:
-//  OverlappingMoleculeException(int idx1, int idx2)
-//  :idx1_(idx1), idx2_(idx2)
-//  {
-//  }
-//  
-//  virtual const char* what() const throw()
-//  {
-//    string ss;
-//    ss = "Molecule " + to_string(idx1_)+" & " + to_string(idx2_) + " overlap";
-//    return ss.c_str();
-//  }
-//};
 
 #endif /* Setup_hpp */

@@ -585,12 +585,12 @@ TEST_F(SolverUTest, LHinit_test)
   auto _expcons = make_shared<ExpansionConstants> (pol);
   
   IEMatrix ieMatTest(0, mol, SHCalcTest, pol, _expcons, true);
-  
+  shared_ptr<PreCalcSH> precalc_sh = make_shared<PreCalcSH>();
   auto hmat = make_shared<HMatrix>(0, mol->get_ns(), pol, 0.21053961);
   hmat->init(mol, SHCalcTest, 4.0);
   
   LHMatrix lhmt(0, mol->get_ns(), pol, 0.21053961);
-  lhmt.init(mol, hmat, SHCalcTest, BesselCal, _expcons);
+  lhmt.init(mol, hmat, SHCalcTest, BesselCal, precalc_sh,  _expcons);
   
   for (int i = 0; i < mol->get_ns(); i++)
   {
@@ -866,10 +866,12 @@ TEST_F(SolverUTest, grad_pre_test)
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
                   true, true, imat_loc, exp_loc);
+  solvTest.precalc_sh_lf_lh();
+  solvTest.precalc_sh_numeric();
   GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
                        solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
+                       solvTest.get_IE(), solvTest.get_interpol_list(),
+                       solvTest.get_precalc_sh(), _expcons, pol);
   gsolvTest.pre_compute_gradT_A();
   
   for (int i = 0; i < sys->get_n(); i++)
@@ -977,11 +979,12 @@ TEST_F(SolverUTest, grad_test)
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
                   true, true, imat_loc, exp_loc);
+  solvTest.precalc_sh_lf_lh();
+  solvTest.precalc_sh_numeric();
   GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
                        solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
-
+                       solvTest.get_IE(), solvTest.get_interpol_list(),
+                       solvTest.get_precalc_sh(), _expcons, pol);
   gsolvTest.solve(1e-16, 75);
   
   for (int i = 0; i < sys->get_n(); i++) // MoleculeSAM
@@ -1082,10 +1085,12 @@ TEST_F(SolverUTest, grad3_test)
   
   Solver solvTest( sys, cst, SHCalcTest, BesselCal, pol,
                   true, true, imat_loc, exp_loc);
+  solvTest.precalc_sh_lf_lh();
+  solvTest.precalc_sh_numeric();
   GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
                        solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
+                       solvTest.get_IE(), solvTest.get_interpol_list(),
+                       solvTest.get_precalc_sh(), _expcons, pol);
   
   gsolvTest.solve(1e-16, 75);
   for (int i = 0; i < sys->get_n(); i++) // MoleculeSAM

@@ -63,6 +63,7 @@ class MoleculeSAM : public BaseMolecule
 {
 protected:
   Pt                  cog_; // MoleculeSAM center of geometry
+  Pt                  cog_unwrapped_; // MoleculeSAM center of geometry unwrapp
   
   vector<vector<int> > cgNeighs_; // list of indices of CG centers that neighbor
                                    // each coarse grained sphere
@@ -102,7 +103,7 @@ protected:
    */
   CGSphere find_best_center(vector<Pt> sp,vector<Pt> np,
                             vector<int> unbounded,
-                            double tol_sp, int iter=1200, double beta=2.0);
+                            double tol_sp, double beta=2.0);
 
   /* Ensure that all the CG spheres are touching */
   void check_connect();
@@ -135,6 +136,11 @@ public:
              int max_trials=40, double beta=2.0, double drot=0,
              double dtrans=0);
   
+  MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
+             vector<Pt> pos, vector<double> vdwr, string msms_fil,
+             double tol_sp, double drot=0, double dtrans = 0, int n_trials=10,
+             int max_trials=40, double beta=2.0);
+  
   void set_type_idx(int typeidx) { typeIdx_ = typeidx; }
 
   
@@ -160,6 +166,7 @@ public:
   void rotate(MyMatrix<double> rotmat);
   
   void calc_cog();
+  void write_pqr(string outfile);
 
   int get_nc_k(int k) const           { return (int) cgCharges_[k].size(); }
   vector<int> get_neighj(int j) const { return cgNeighs_[j]; }
@@ -167,19 +174,14 @@ public:
   Pt get_gridjh(int j, int h) const   { return cgGridPts_[j][h]; }
   vector<int> get_gdpt_expj(int j) const { return cgGdPtExp_[j]; }
   vector<int> get_gdpt_burj(int j) const { return cgGdPtBur_[j]; }
-  
   vector<int> get_ch_allin_k(int k)   { return cgChargesIn_[k]; }
   vector<int> get_ch_allout_k(int k)  { return cgChargesOut_[k]; }
-  
   int get_ch_k_alpha(int k, int alpha){ return cgCharges_[k][alpha]; }
-
   Pt get_cen_j(int j)                 { return centers_[chToCG_[j]]; }
-//  Pt get_centerk(int k) const         { return centers_[k]; }
   Pt get_cog() const                  { return cog_;}
-//  const double get_ak(int k) const    { return as_[k]; }
+  Pt get_unwrapped_center() const     { return cog_unwrapped_; }
   const int get_cg_of_ch(int j)       { return chToCG_[j]; }
-  
-  vector<vector<int> > get_inter_act_k(int k) {return interAct_[k];}
+  vector<vector<int> > get_inter_act_k(int k) {return interAct_[k]; }
 
 };
 
@@ -213,6 +215,9 @@ public:
                                      const {return molecules_[i]->get_radj(j);}
   Pt get_posijreal(int i, int j) {return molecules_[i]->get_posj_realspace(j);}
   
+  Pt get_unwrapped_center(int i) const
+  {return molecules_[i]->get_unwrapped_center();}
+  
   Pt get_gridijh(int i, int j, int h) const
         { return molecules_[i]->get_gridjh(j, h); }
   vector<int> get_gdpt_expij(int i, int j) const
@@ -244,6 +249,9 @@ public:
     }
   }
   
+  // Reset positions for new BD trajectory
+  void reset_positions(vector<string> xyzfiles);
+  
   // write current system to PQR file, mid=-1 is print all MoleculeSAMs,
   // else only print one
   void write_to_pqr(string outfile, int mid = -1 );
@@ -251,22 +259,10 @@ public:
   // write current system configuration to XYZ file
   void write_to_xyz(ofstream &xyz_out);
   
-  //Copy surface integral points from molecule i to molecule j. MUST
-  // be the same type!
-  void copy_grid( int i, int j)
-  {
-    for (int k = 0; k < molecules_[i]->get_ns(); k++)
-    {
-      molecules_[j]->set_gridj(k, molecules_[i]->get_gridj(k));
-      molecules_[j]->set_gridburj(k, molecules_[i]->get_gdpt_burj(k));
-      molecules_[j]->set_gridexpj(k, molecules_[i]->get_gdpt_expj(k));
-    }
-    
-  }
 };
 
 /*
- Exception thrown when two MoleculeSAMs in the system are overlapping
+ Exception thrown when two molecules in the system are overlapping
  */
 class OverlappingMoleculeSAMException: public exception
 {

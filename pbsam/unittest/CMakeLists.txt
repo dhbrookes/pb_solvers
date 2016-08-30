@@ -7,6 +7,7 @@ file(GLOB SRCS *.cpp)
 include_directories("../src")
 include_directories("../../pb_shared/src")
 include_directories("../../pb_shared/unittest")
+include_directories("../../pb_wrap/src")
 
 ADD_EXECUTABLE(pbsamtest
   ../../pb_shared/src/BaseSys.cpp
