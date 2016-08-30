@@ -46,6 +46,15 @@ protected:
   shared_ptr<System> syst_;
   shared_ptr<Constants> consts_;
 
+  shared_ptr<BesselConstants> _bessl_consts_;
+  shared_ptr<BesselCalc> _bessl_calc_;
+  shared_ptr<SHCalcConstants> _sh_consts_;
+  shared_ptr<SHCalc> _sh_calc_;
+
+  vector<Pt> force_;
+  vector<Pt> torque_;
+  vector<double> nrg_intera_;
+
   int poles_;
   double solveTol_;
 
@@ -67,6 +76,7 @@ public:
   void check_system();
 
   void init_write_system();
+  void initialize_coeff_consts();
 
   int run();
   // for running the APBS version

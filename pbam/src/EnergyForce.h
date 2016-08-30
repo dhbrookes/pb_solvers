@@ -359,7 +359,7 @@ public:
   
   Pt calc_force_i(int i)  { return _fCalc_->calc_fi(i); }
   Pt calc_tau_i(int i)    { return _torCalc_->calc_tau_i(i); }
-  MyVector<double> calc_ei(int i)       { return _eCalc_->calc_ei(i); }
+  double calc_ei(int i)    { return _eCalc_->calc_ei(i); }
   
   void calc_force_interact()   { _fCalc_->calc_force_interact(_sys_); }
   void calc_force()   { _fCalc_->calc_force(); }

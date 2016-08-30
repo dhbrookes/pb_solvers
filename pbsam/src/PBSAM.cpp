@@ -320,7 +320,6 @@ void PBSAM::initialize_pbsam()
       auto sub_syst = make_subsystem({_syst_->get_mol_global_idx(i,0)});
       vector<shared_ptr<IEMatrix> > sub_i;
       sub_i.push_back(imats_[_syst_->get_mol_global_idx(i,0)]);
-      sub_i[0]->write_all_mat("");
       
       vector<shared_ptr<HMatrix> > sub_h(0);
       vector<shared_ptr<FMatrix> > sub_f(0);
