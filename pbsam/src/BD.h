@@ -56,159 +56,89 @@ public:
   }
 };
 
-///*
-// Class for contact based termination. This terminates based on whether
-// the specified MoleculeAM MoleculeAM pair is within a given cutoff of each other
-// */
-//class ContactTerminate : public BaseTerminate
-//{
-//protected:
-//  double dist_contact_; //termination time
-//  int mol1_;
-//  int mol2_;
-//  string how_term_;
-//  
-//public:
-//  ContactTerminate(vector<int> mol, double distance)
-//  :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), dist_contact_(distance)
-//  {
-//    char buff[400];
-//    sprintf(buff, "Type %d and Type %d are within %5.2f;\t",
-//            mol1_, mol2_, dist_contact_);
-//    how_term_ = "System has fulfilled condition: " + string(buff);
-//  }
-//  
-//  const bool is_terminated(shared_ptr<System> _sys) const
-//  {
-//    int i, j, idx1, idx2;
-//    for ( i = 0; i < _sys->get_typect(mol1_); i++)
-//    {
-//      for ( j = 0; j < _sys->get_typect(mol2_); j++)
-//      {
-//        idx1 = _sys->get_mol_global_idx( mol1_, i);
-//        idx2 = _sys->get_mol_global_idx( mol2_, j);
-//
-//        double mol_c2c = _sys->get_pbc_dist_vec(idx1, idx2).norm();
-//        double a1 = _sys->get_ai(idx1);
-//        double a2 = _sys->get_ai(idx2);
-//        if (mol_c2c <= (dist_contact_+a1+a2)) return true;
-//      }
-//    }
-//    return false;
-//  }
-//  
-//  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
-//};
-//
-//class ContactTerminate2 : public BaseTerminate
-//{
-//protected:
-//  int mol1_;
-//  int mol2_;
-//  
-//  double pad_; // distance between spheres if contact distance cannot be met
-//  
-//  vector<vector<int> > atPairs_;  // vector of size two vectors (atom index from each MoleculeAM type)
-//  vector<double> dists_;  // min distance between the above pairs
-//  
-//  string how_term_;
-//  
-//public:
-//  ContactTerminate2(vector<int> mol, vector<vector<int> > atpairs,
-//                    vector<double> dists, double pad)
-//  :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
-//  dists_(dists), pad_(pad)
-//  {
-//    string_create();
-//  }
-//  
-//  ContactTerminate2(ContactFile confile, double pad)
-//  :pad_(pad), mol1_(confile.get_moltype1()), mol2_(confile.get_moltype2()),
-//  atPairs_(confile.get_at_pairs()), dists_(confile.get_dists())
-//  {
-//    string_create();
-//  }
-//  
-//  void string_create()
-//  {
-//    char buff[400];
-//    sprintf(buff, "Type %d and Type %d are within %5.2f;\t",
-//            mol1_, mol2_, pad_);
-//    how_term_ = "System has fulfilled condition: " + string(buff);
-//  }
-//  
-//  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
-//  
-//  const bool is_terminated(shared_ptr<System> _sys) const
-//  {
-//    bool contacted = false;
-//    int i, j, k, idx1, idx2;
-//    Pt cen1, cen2, pos1, pos2, vc1, vc2;
-//    double a1, a2, d, dcon;
-//    double sphdist1, sphdist2;  // distance of atom to edge of sphere
-//    
-//    for ( i = 0; i < _sys->get_typect(mol1_); i++)
-//    {
-//      for ( j = 0; j < _sys->get_typect(mol2_); j++)
-//      {
-//        idx1 = _sys->get_mol_global_idx( mol1_, i);
-//        idx2 = _sys->get_mol_global_idx( mol2_, j);
-//        
-//        cen1 = _sys->get_centeri(idx1);
-//        cen2 = _sys->get_centeri(idx2);
-//        
-//        a1 = _sys->get_ai(idx1);
-//        a2 = _sys->get_ai(idx2);
-//        
-//        for (k = 0; k < atPairs_.size(); k++)
-//        {
-//          dcon = dists_[k];
-//          pos1 = _sys->get_posijreal(idx1, atPairs_[k][0]);
-//          pos2 = _sys->get_posijreal(idx2, atPairs_[k][1]);
-//          
-//          vc1 = pos1 - cen1;
-//          vc2 = pos2 - cen2;
-//          
-//          sphdist1 = a1 - vc1.norm();
-//          sphdist2 = a2 - vc2.norm();
-//          
-//          // if sum of distances to edge of the spheres is > contact distance,
-//          // then contact can never happen and the new position is closest
-//          // point on edge of sphere and new contact distance is pad
-//          if ( (sphdist1 + sphdist2) > dcon)
-//          {
-//            pos1 = vc1 * (a1/vc1.norm()); // project onto sphere surface
-//            pos2 = vc2 * (a2/vc2.norm());
-//            dcon = pad_;
-//            
-//            // get position of atoms relative to box
-//            // (as opposed to center of MoleculeAM)
-//            pos1 = pos1 + cen1;
-//            pos2 = pos2 + cen2;
-//            d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
-// 
-//            if (d < dcon){ contacted = true; break;}
-//          }else
-//          {
-//            d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
-//            if (d < dcon)
-//            {
-//              contacted = true;
-//              cout << "This is dcon " << dcon << " and d " << d << endl;
-//              cout << "This is pos1 " << pos1.x() << " " <<
-//              pos1.y() << " " << pos1.z() << " " << endl;
-//              cout << "This is pos2 " << pos2.x() << " " <<
-//              pos2.y() << " " << pos2.z() << " " << endl;
-//              
-//              break;
-//            }
-//          }
-//        }
-//      }
-//    }
-//    return contacted;
-//  }
-//};
+class ContactTerminate2 : public BaseTerminate
+{
+protected:
+  int mol1_;
+  int mol2_;
+  
+  double pad_; // distance between spheres if contact distance cannot be met
+  
+  vector<vector<int> > atPairs_;  // vector of size two vectors (atom index from each MoleculeAM type)
+  vector<double> dists_;  // min distance between the above pairs
+  
+  string how_term_;
+  
+public:
+  ContactTerminate2(vector<int> mol, vector<vector<int> > atpairs,
+                    vector<double> dists, double pad)
+  :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
+  dists_(dists), pad_(pad)
+  {
+    string_create();
+  }
+  
+  ContactTerminate2(ContactFile confile, double pad)
+  :pad_(pad), mol1_(confile.get_moltype1()), mol2_(confile.get_moltype2()),
+  atPairs_(confile.get_at_pairs()), dists_(confile.get_dists())
+  {
+    string_create();
+  }
+  
+  void string_create()
+  {
+    char buff[400];
+    sprintf(buff, "Type %d and Type %d are in contact;\t",
+            mol1_, mol2_);
+    how_term_ = "System has fulfilled condition: " + string(buff);
+  }
+  
+  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
+  
+  const bool is_terminated(shared_ptr<System> _sys) const
+  {
+    bool contacted = false;
+    int i, j, ctct, k, idx1, idx2, sph1, sph2;
+    Pt cen1, cen2, vc1, vc2;
+    double a1, a2, dcon;
+
+    for ( i = 0; i < _sys->get_typect(mol1_); i++)
+    {
+      for ( j = 0; j < _sys->get_typect(mol2_); j++)
+      {
+        ctct = 0;
+        idx1 = _sys->get_mol_global_idx( mol1_, i);
+        idx2 = _sys->get_mol_global_idx( mol2_, j);
+        
+        for (k = 0; k < atPairs_.size(); k++)
+        {
+          dcon = dists_[k];
+          
+          sph1 = _sys->get_moli(idx1)->get_cg_of_ch(atPairs_[k][0]);
+          sph2 = _sys->get_moli(idx1)->get_cg_of_ch(atPairs_[k][0]);
+          
+          cen1 = _sys->get_centerik(idx1, sph1);
+          cen2 = _sys->get_centerik(idx2, sph2);
+          
+          a1 = _sys->get_aik(idx1, sph1);
+          a2 = _sys->get_aik(idx2, sph2);
+
+          // if the distance between the 2 CG spheres is less than the cutoff
+          // The points are in contact
+          if ( _sys->get_pbc_dist_vec_base( cen1, cen2).norm() < a1+a2+dcon)
+          {
+            cout << "This is dcon " << dcon << " sph1 " << cen1.x() << " " <<
+            cen1.y() << " " << cen1.z() << " " << " & sph2 " << cen2.x()
+            << " " << cen2.y() << " " << cen2.z() << " " << endl;
+            ctct++;
+            if (ctct == 2){contacted = true; break;}
+          }
+        }
+      }
+    }
+    return contacted;
+  }
+};
 
 
 /*
@@ -242,61 +172,61 @@ public:
 enum CoordType { X, Y, Z, R };
 enum BoundaryType { LEQ, GEQ };
 
-///*
-// Class for coordinate based termination. This terminates based on whether
-// the specified MoleculeAM satisfies the BoundaryType condition on the CoordType
-// with the given boundary value.
-// */
-//class CoordTerminate : public BaseTerminate
-//{
-//protected:
-//  double boundaryVal_;
-//  int molIdx_;
-//  CoordType coordType_;
-//  BoundaryType boundType_;
-//  string how_term_;
-//  
-//public:
-//  CoordTerminate(int mol_idx, CoordType coord_type,
-//                 BoundaryType bound_type, double bound_val)
-//  :BaseTerminate(), molIdx_(mol_idx), coordType_(coord_type),
-//  boundType_(bound_type), boundaryVal_(bound_val)
-//  {
-//    char buff[400];
-//    string cord = "r", eq = ">=";
-//    if (coordType_ == X)      cord = "x";
-//    else if (coordType_ == Y) cord = "y";
-//    else if (coordType_ == Z) cord = "z";
-//    
-//    if (boundType_ == LEQ)    eq   = "<=";
-//    
-//    sprintf(buff, "MoleculeAM type %d has fulfilled condition: %s %s %5.2f;\t",
-//            molIdx_, cord.c_str(), eq.c_str(), boundaryVal_);
-//    how_term_ = buff;
-//  }
-//  
-//  const bool is_terminated(shared_ptr<System> _sys) const
-//  {
-//    bool done = false;
-//    int i, idx;
-//    for ( i = 0; i < _sys->get_typect(molIdx_); i++)
-//    {
-//      idx = _sys->get_mol_global_idx( molIdx_, i);
-//      Pt mol_coord = _sys->get_unwrapped_center(idx);
-//      double test_val;
-//      if (coordType_ == X)      test_val = mol_coord.x();
-//      else if (coordType_ == Y) test_val = mol_coord.y();
-//      else if (coordType_ == Z) test_val = mol_coord.z();
-//      else                      test_val = mol_coord.norm();
-//      
-//      if ((boundType_ == LEQ) && (test_val <= boundaryVal_))      return true;
-//      else if ((boundType_ == GEQ) && (test_val >= boundaryVal_)) return true;
-//    }
-//    return done;
-//  }
-//  
-//  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
-//};
+/*
+ Class for coordinate based termination. This terminates based on whether
+ the specified MoleculeAM satisfies the BoundaryType condition on the CoordType
+ with the given boundary value.
+ */
+class CoordTerminate : public BaseTerminate
+{
+protected:
+  double boundaryVal_;
+  int molIdx_;
+  CoordType coordType_;
+  BoundaryType boundType_;
+  string how_term_;
+  
+public:
+  CoordTerminate(int mol_idx, CoordType coord_type,
+                 BoundaryType bound_type, double bound_val)
+  :BaseTerminate(), molIdx_(mol_idx), coordType_(coord_type),
+  boundType_(bound_type), boundaryVal_(bound_val)
+  {
+    char buff[400];
+    string cord = "r", eq = ">=";
+    if (coordType_ == X)      cord = "x";
+    else if (coordType_ == Y) cord = "y";
+    else if (coordType_ == Z) cord = "z";
+    
+    if (boundType_ == LEQ)    eq   = "<=";
+    
+    sprintf(buff, "MoleculeAM type %d has fulfilled condition: %s %s %5.2f;\t",
+            molIdx_, cord.c_str(), eq.c_str(), boundaryVal_);
+    how_term_ = buff;
+  }
+  
+  const bool is_terminated(shared_ptr<System> _sys) const
+  {
+    bool done = false;
+    int i, idx;
+    for ( i = 0; i < _sys->get_typect(molIdx_); i++)
+    {
+      idx = _sys->get_mol_global_idx( molIdx_, i);
+      Pt mol_coord = _sys->get_unwrapped_center(idx);
+      double test_val;
+      if (coordType_ == X)      test_val = mol_coord.x();
+      else if (coordType_ == Y) test_val = mol_coord.y();
+      else if (coordType_ == Z) test_val = mol_coord.z();
+      else                      test_val = mol_coord.norm();
+      
+      if ((boundType_ == LEQ) && (test_val <= boundaryVal_))      return true;
+      else if ((boundType_ == GEQ) && (test_val >= boundaryVal_)) return true;
+    }
+    return done;
+  }
+  
+  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
+};
 
 
 /*
@@ -428,8 +358,9 @@ public:
   // num is the number of bodies to perform calculations on (2, 3 or all).
   // If num=0, then the equations will be solved exactly
   BDRun(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradSolv,
-             shared_ptr<BaseTerminate> _terminator, string outfname, int num,
-             bool diff, bool force, int maxiter, double prec);
+        shared_ptr<BaseTerminate> _terminator, string outfname, int num = 0,
+        bool diff = true, bool force = true,
+        int maxiter = 2, double prec = 1e-4);
   
   void run(string xyzfile = "test.xyz", string statfile = "stats.dat", 
            int nSCF = 0);

@@ -238,27 +238,4 @@ public:
   
 };
 
-///*
-// Exception thrown when two MoleculeAMs in the system are overlapping
-// */
-//class OverlappingMoleculeException: public exception
-//{
-//protected:
-//  int idx1_;
-//  int idx2_;
-//  
-//public:
-//  OverlappingMoleculeException(int idx1, int idx2)
-//  :idx1_(idx1), idx2_(idx2)
-//  {
-//  }
-//  
-//  virtual const char* what() const throw()
-//  {
-//    string ss;
-//    ss = "Molecule " + to_string(idx1_)+" & " + to_string(idx2_) + " overlap";
-//    return ss.c_str();
-//  }
-//};
-
 #endif /* Setup_hpp */

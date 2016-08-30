@@ -68,31 +68,6 @@ Pt BDStep::rand_vec(double mean, double var)
   return pout;
 }
 
-
-//bool BDStep::check_for_collision(int mol, Pt new_pt)
-//{
-//  bool collision = false;
-//  int j;
-//  double dist, aj;
-//  Pt pj;
-//  double ai = _sys_->get_ai(mol);
-//  
-//  for (j = 0; j < _sys_->get_n(); j++)
-//  {
-//    if (j == mol) continue;
-//    pj = _sys_->get_centeri(j);
-//    aj = _sys_->get_ai(j);
-//    
-//    dist = new_pt.dist(pj);
-//    if (dist < (ai + aj))
-//    {
-//      collision = true;
-//      break;
-//    }
-//  }
-//  return collision;
-//}
-
 void BDStep::indi_trans_update(int i, Pt fi)
 {
   double kT = _consts_->get_kbt();
@@ -178,7 +153,6 @@ BDRun::BDRun(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradSolv,
 :maxIter_(maxiter), _solver_(_solv), prec_(prec), _terminator_(_terminator)
 {
   if (num == 0) _physCalc_ = make_shared<PhysCalc>(_solv, _gradSolv, outfname);
-//  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolver_, num, outfname);
   
   _stepper_ = make_shared<BDStep> (_solver_->get_sys(),
                                    _solver_->get_consts(), diff, force);
@@ -186,9 +160,8 @@ BDRun::BDRun(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradSolv,
 
 void BDRun::run(string xyzfile, string statfile, int nSCF)
 {
-  int i(0), scf(2);
-  int WRITEFREQ = 200;
-  bool term(false), polz(true);
+  int i(0), scf(2), WRITEFREQ(200);
+  bool term(false);
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
   stats.open(statfile, fstream::in | fstream::out | fstream::app);
@@ -205,8 +178,9 @@ void BDRun::run(string xyzfile, string statfile, int nSCF)
     _solver_->reset_all();
     if (nSCF != 0) scf = nSCF;
 
-    _solver_->solve(prec_);
-    _gradSolv_->solve(prec_, 5);
+    _solver_->solve(prec_, scf);
+    _gradSolv_->update_HF(_solver_->get_all_F(), _solver_->get_all_H());
+    _gradSolv_->solve(prec_, scf);
     _physCalc_->calc_force();
     _physCalc_->calc_torque();
     _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
@@ -216,9 +190,7 @@ void BDRun::run(string xyzfile, string statfile, int nSCF)
       auto to = make_shared<vector<Pt> > (N, Pt(0.0,0.0,0.0));
       _stepper_->bd_update(fo,to);
    */
-
-    if ( (i % 100) == 0 ) cout << "This is step " << i << " and polz " << polz<< endl;
-
+    
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {
       term = true;

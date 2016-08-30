@@ -356,7 +356,7 @@ MyMatrix<cmplx> TMatrix::expand_RX(MyMatrix<cmplx> X,
         Pt vec = T_[map_idx]->get_TVec();
         if (whichR == BASE)
         {
-          aval = X(n, -m+p_); //TODO: check if this is right
+          aval = X(n, -m+p_);
           if (vec.theta() > M_PI/2.0)
             x1.set_val(n, m+p_, (n%2 == 0 ? aval : -aval));
           else x1.set_val(n, m+p_, X(n, m+p_));
@@ -639,8 +639,6 @@ VecOfMats<cmplx>::type TMatrix::convert_from_ptx(MyMatrix<Ptx> X)
 {
   VecOfMats<cmplx>::type result (3, MyMatrix<cmplx> (X.get_nrows(),
                                                      X.get_ncols()));
-  
-  //TODO: fix this!
   for (int i = 0 ; i < 3; i++)
     for (int j = 0; j < X.get_nrows(); j++)
       for (int k = 0; k < X.get_ncols(); k++)

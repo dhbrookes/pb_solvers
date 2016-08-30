@@ -210,9 +210,6 @@ void MoleculeSAM::find_centers(vector<Pt> sp, vector<Pt> np,
     {
       m++;
       CGSphere best = find_best_center(sp, np, unbound, tol_sp, beta);
-    //cout<<"trial "<<m<<": center = "<< best.get_center().x() << ", " << best.get_center().y() 
-    //<< ", " << best.get_center().z() 
-    //<<" bound points :"<<best.get_n()<<" max: "<<n_max<<endl;
       if (best.get_n() > n_max)
       {
         centers_[j] = best.get_center();
@@ -557,6 +554,24 @@ void System::save_min_dist()
       min_dist_[i][j] = calc_min_dist(i, j);
     }
   }
+}
+
+void System::reset_positions( vector<string> xyzfiles )
+{
+  int i, j, k;
+  vector<int> keys(2);
+  for (i = 0; i < ntype_; i++)
+  {
+    XYZFile xyzI (xyzfiles[i], typect_[i]);
+    for (j = 0; j < typect_[i]; j++)
+    {
+      keys = { i, j};
+      k = typeIdxToIdx_[keys];
+      Pt dist_to_new = get_cogi(k) - xyzI.get_pts()[j];
+      molecules_[k]->translate(dist_to_new*-1, boxLength_);
+    }
+  }
+  
 }
 
 void System::write_to_pqr(string outfile, int mid)

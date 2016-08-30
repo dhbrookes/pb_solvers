@@ -19,7 +19,6 @@
  [2] Yap, E., Head-Gordon, T. 2013. JCTC
  */
 
-//TODO: Figure out MATMul
 #ifdef __ACML
 #include "acml.h"
 #include "clapack.h"
@@ -489,9 +488,11 @@ public:
                    shared_ptr<SHCalc> shcalc,
                    vector<double> besseli);
   
-  // calculate convergence criteria (Equation 23)
-//  static double calc_converge(shared_ptr<HMatrix> curr,
-//                              shared_ptr<HMatrix> prev);
+  void set_all_mats( shared_ptr<HMatrix> hin)
+  {
+    for (int k=0; k<get_ns(); k++)
+      set_mat_k(k, hin->get_mat_k(k));
+  }
   
 };
 
@@ -519,6 +520,12 @@ public:
    */
   cmplx make_fb_Ij(int I, int j, Pt rb,
                    shared_ptr<SHCalc> shcalc);
+  
+  void set_all_mats( shared_ptr<FMatrix> fin)
+  {
+    for (int k=0; k<get_ns(); k++)
+      set_mat_k(k, fin->get_mat_k(k));
+  }
   
 };
 

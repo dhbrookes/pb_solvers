@@ -164,6 +164,7 @@ void NumericalMatrix::reset_mat(int k)
   
 }
 
+
 EMatrix::EMatrix(int I, int ns, int p)
 :ComplexMoleculeMatrix(I, ns, p)
 {
