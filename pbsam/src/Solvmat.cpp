@@ -317,7 +317,7 @@ void IEMatrix::compute_grid_pts(shared_ptr<BaseMolecule> _mol)
     grid_loc = make_uniform_sph_grid(gridPts_, _mol->get_ak(k));
     if (set_mol_)    _mol->set_gridj(k, grid_loc);
     else gridPtLocs_[k] = grid_loc;
-    
+
     // Loop through points to find the exposed ones
     for (int g = 0; g < gridPts_; g++)
     {

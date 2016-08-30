@@ -43,7 +43,7 @@ PBSAM::PBSAM() : PBSAMInput(), poles_(5), solveTol_(1e-4)
 }
 
 
-PBSAM::PBSAM(string infile)
+PBSAM::PBSAM(string infile) : poles_(5)
 {
   _setp_ = make_shared<Setup>(infile);
   check_setup();
@@ -56,15 +56,9 @@ PBSAM::PBSAM(string infile)
   
   if ((_setp_->getRunType() == "electrostatics")
       || ( _setp_->getRunType() == "energyforce"))
-  {
-    poles_ = 20;
     solveTol_ = 1e-10;
-  }
   else
-  {
-    poles_ = 7;
     solveTol_ = 1e-4;
-  }
   
   _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
   _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
@@ -74,6 +68,7 @@ PBSAM::PBSAM(string infile)
   
   h_spol_.resize(_syst_->get_n());
   f_spol_.resize(_syst_->get_n());
+  imats_.resize(_syst_->get_n());
   
   initialize_pbsam();
 }
@@ -82,21 +77,15 @@ PBSAM::PBSAM(string infile)
 PBSAM::PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
              vector<MoleculeSAM> mls )
 :
-h_spol_(mls.size()), f_spol_(mls.size())
+poles_(5), h_spol_(mls.size()), f_spol_(mls.size())
 {
   int i, j;
   
   if ((string(pbami.runType_) == "electrostatics")
-      || (string(pbami.runType_) == "energyforce"))
-  {
-    poles_ = 20;
-    solveTol_ = 1e-10;
-  }
+      || (string(pbami.runType_) == "energyforce")) solveTol_ = 1e-10;
   else
-  {
-    poles_ = 7;
     solveTol_ = 1e-4;
-  }
+  
   _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
   _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
   _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
@@ -258,9 +247,6 @@ shared_ptr<System> PBSAM::make_subsystem(vector<int> mol_idx)
 void PBSAM::initialize_pbsam()
 {
   int i, k, j, expct(0), idx;
-  vector<vector<vector<string > > > exp_loc(_syst_->get_n());
-  vector<vector<string> > imat_loc(_syst_->get_n());
-
   cout << "Inside initialize_pbsam" << endl;
   for (i = 0; i < _setp_->getNType(); i++)
   {
@@ -271,9 +257,15 @@ void PBSAM::initialize_pbsam()
     {
       idx = _syst_->get_mol_global_idx(i,k);
       if (k==0) // Only generate sp points if this is the first mol of type i
+      {
+        auto imt = make_shared<IEMatrix>(idx, _syst_->get_moli(idx),
+                                         _sh_calc_, poles_, _exp_consts_,
+                                         true, 0, true);
         imats_[idx] = make_shared<IEMatrix>(idx, _syst_->get_moli(idx),
                                              _sh_calc_, poles_, _exp_consts_,
-                                             true, 0, true);
+                                            false);
+        
+      }
       if (_setp_->getTypeNImat(i) != "" )
       {
         string istart = _setp_->getTypeNImat(i);
@@ -320,7 +312,14 @@ void PBSAM::initialize_pbsam()
       cout << "Solving for self-pol + writing out for mol type " << i << endl;
       // Make one mol system for each type to solve for self-polarization
       auto sub_syst = make_subsystem({_syst_->get_mol_global_idx(i,0)});
-      Solver self_pol( sub_syst, _consts_, _sh_calc_, _bessl_calc_, poles_);
+      vector<shared_ptr<IEMatrix> > sub_i;
+      sub_i.push_back(imats_[_syst_->get_mol_global_idx(i,0)]);
+      
+      vector<shared_ptr<HMatrix> > sub_h(0);
+      vector<shared_ptr<FMatrix> > sub_f(0);
+      
+      Solver self_pol(sub_syst, _consts_, _sh_calc_, _bessl_calc_, poles_,
+                      sub_i, sub_h, sub_f);
       self_pol.solve(solveTol_, 100);
       
       for (int k = 0; k < _syst_->get_typect(i); k++)
@@ -330,11 +329,11 @@ void PBSAM::initialize_pbsam()
         expct++;
       }
       //Printing out H and F of selfpol
-      self_pol.get_all_H()[0]->print_all_to_file(fil.substr(0, fil.size()-5)
+      self_pol.get_all_H()[0]->print_all_to_file(fil.substr(0, fil.size()-4)
                                                  +".H", _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
       
-      self_pol.get_all_F()[0]->print_all_to_file(fil.substr(0, fil.size()-5)
+      self_pol.get_all_F()[0]->print_all_to_file(fil.substr(0, fil.size()-4)
                                                  +".F", _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
     }
@@ -467,7 +466,7 @@ void PBSAM::run_electrostatics()
   clock_t t3 = clock();
   Solver solv(_syst_, _consts_, _sh_calc_, _bessl_calc_, poles_,
               imats_, h_spol_, f_spol_);
-  solv.solve(solveTol_, 100);
+  if (_syst_->get_n() > 1) solv.solve(solveTol_, 100);
   
   t3 = clock() - t3;
   printf ("Solve took me %f seconds.\n",
@@ -495,14 +494,14 @@ void PBSAM::run_energyforce()
   clock_t t3 = clock();
   Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_,
               imats_, h_spol_, f_spol_);
-  solv.solve(solveTol_, 100);
+  if (_syst_->get_n() > 1) solv.solve(solveTol_, 100);
   
   GradSolver gsolv(_syst_, _consts_, _sh_calc_, _bessl_calc_, solv.get_T(),
                    solv.get_all_F(), solv.get_all_H(),
                    solv.get_IE(),
                    solv.get_interpol_list(), solv.get_precalc_sh(),
                    _exp_consts_, poles_);
-  gsolv.solve(solveTol_, 100);
+  if (_syst_->get_n() > 1) gsolv.solve(solveTol_, 100);
   
   auto focal = make_shared<ForceCalc> (_syst_->get_n(), _syst_->get_all_Ik(),
                                        _consts_->get_dielectric_water(),

@@ -122,8 +122,8 @@ _LH_(_sys->get_n()),
 _LHN_(_sys->get_n()),
 _XF_(_sys->get_n()),
 _XH_(_sys->get_n()),
-_H_(h_spol),
-_F_(f_spol),
+_H_(_sys->get_n()),
+_F_(_sys->get_n()),
 _outerH_(_sys->get_n()),
 _rotH_(_sys->get_n()),
 _prevH_(_sys->get_n()),
@@ -167,8 +167,16 @@ kappa_(_consts->get_kappa())
     _LE_[I] = make_shared<LEMatrix> (I, _sys_->get_Ns_i(I), p_);
     _LE_[I]->calc_vals(_mol, _shCalc_, _consts_->get_dielectric_prot());
     
-    _H_[I]->set_all_mats(h_spol[molt]);
-    _F_[I]->set_all_mats(f_spol[molt]);
+    _H_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
+    _F_[I] = make_shared<FMatrix>(I, _sys_->get_Ns_i(I), p_, 0.0);
+    if (h_spol.size() == 0)
+    {
+      _H_[I]->init(_mol, _shCalc_, _consts_->get_dielectric_prot());
+    } else
+    {
+      _H_[I]->set_all_mats(h_spol[molt]);
+      _F_[I]->set_all_mats(f_spol[molt]);
+    }
     
     _outerH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
     _prevH_[I] = make_shared<HMatrix>(I, _sys_->get_Ns_i(I), p_, kappa);
