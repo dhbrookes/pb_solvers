@@ -276,10 +276,10 @@ public:
   {
     for (int k = 0; k < IE_orig_.size(); k++)
     {
-      write_mat_k_reg(imat_prefix+"sph"+to_string(k)+".bin", k);
       write_mat_k(imat_prefix+"sph"+to_string(k)+".bin", k);
     }
   }
+
   void write_mat_k(string imat_prefix, int k);
   void write_mat_k_reg(string imat_prefix, int k);
 };

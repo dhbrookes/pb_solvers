@@ -248,7 +248,6 @@ shared_ptr<System> PBSAM::make_subsystem(vector<int> mol_idx)
 void PBSAM::initialize_pbsam()
 {
   int i, k, j, expct(0), idx;
-  cout << "Inside initialize_pbsam" << endl;
   for (i = 0; i < _setp_->getNType(); i++)
   {
     string fil=_setp_->getTypeNPQR(i);
@@ -293,7 +292,6 @@ void PBSAM::initialize_pbsam()
                 ((float)t3)/CLOCKS_PER_SEC);
       }
     }
-    cout << " 4" << endl;
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
@@ -368,6 +366,7 @@ int PBSAM::run()
 
 PBAMOutput PBSAM::run_apbs()
 {
+  cout << "Now running program" << endl;
   if ( _setp_->getRunType() == "dynamics")
     run_dynamics();
   else if ( _setp_->getRunType() == "electrostatics")

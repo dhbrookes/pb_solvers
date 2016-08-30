@@ -360,6 +360,7 @@ double Solver::iter(int t)
         _LF_[I]->calc_vals(_T_, _F_[I], _sys_, _precalcSH_, k);
 
         _LHN_[I]->calc_vals(_sys_, _T_, _H_, k);
+        cout << "this is dev " << dev_sph_Ik_[I][k] << endl;
       }
     }
 
@@ -382,6 +383,7 @@ double Solver::iter(int t)
           update_rotH(I, k);
         
         dev_sph_Ik_[I][k] = calc_converge_H(I,k,false);
+        cout << "this is dev " << dev_sph_Ik_[I][k] << endl;
         mu_mpol += dev_sph_Ik_[I][k];
         Ns_tot_++;
         if ( dev_sph_Ik_[I][k] > mu_int )
@@ -466,8 +468,7 @@ void Solver::solve(double tol, int maxiter)
     mu = iter(t);
     if (mu < tol) break;
   }
-
-  cout << "This is solved H " << (*_H_[0]) << endl;
+  cout << "This is mu " << mu << " tol " << tol << endl;
 }
 
 
