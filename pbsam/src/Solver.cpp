@@ -464,11 +464,10 @@ void Solver::solve(double tol, int maxiter)
   double mu;
   for (int t = 0; t < maxiter; t++)
   {
-    if ((t%10) == 0) cout << "this is t " << t << endl;
+    if ((t%50) == 0) cout << "this is t " << t << endl;
     mu = iter(t);
     if (mu < tol) break;
   }
-  cout << "This is mu " << mu << " tol " << tol << endl;
 }
 
 
