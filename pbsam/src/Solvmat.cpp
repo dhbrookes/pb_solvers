@@ -265,7 +265,7 @@ void IEMatrix::init_from_file(string imatfile, int k )
 
 void IEMatrix::init_from_other(shared_ptr<IEMatrix> other)
 {
-  for (int k=0; k < IE_orig_.size(); k++)
+  for (int k=0; k < other->get_k(); k++)
     set_IE_k(k, other->get_IE_k_org(k));
 }
 

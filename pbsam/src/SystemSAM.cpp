@@ -466,7 +466,7 @@ SystemSAM::SystemSAM(Setup setup, double cutoff)
       // now copy the representative MoleculeSAM and reposition it
       Pt trans;
       MyMatrix<double> rot;
-      shared_ptr<MoleculeSAM> mol (type_mol);
+      auto mol = make_shared<MoleculeSAM>((*type_mol));
       mol->set_type_idx(j);
       
       Pt com = pqrI.get_center_geo();
@@ -483,10 +483,15 @@ SystemSAM::SystemSAM(Setup setup, double cutoff)
         rot.set_val(0, 0, 1.0);
         rot.set_val(1, 1, 1.0);
         rot.set_val(2, 2, 1.0);
+        
       }
       
+      cout << "This is old cog " << mol->get_cog().x() << ", "
+      << mol->get_cog().y() << ", " << mol->get_cog().z() << endl;
       mol->rotate(rot);
       mol->translate(trans, setup.getBLen());
+      cout << "This is new cog " << mol->get_cog().x() << ", "
+      << mol->get_cog().y() << ", " << mol->get_cog().z() << endl;
       
       molecules_.push_back(mol);
       typeIdxToIdx_[keys] = k;

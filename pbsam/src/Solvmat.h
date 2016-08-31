@@ -14,6 +14,8 @@
 #include "TMatrix.h"
 #include "SystemSAM.h"
 
+
+
 /*
  References:
  [1] Yap, E., Head-Gordon, T. 2010. JCTC
@@ -260,6 +262,7 @@ public:
   
   void set_IE_k(int k, vector<double> ie) { IE_orig_[k] = ie;}
   
+  int get_k()                         { return (int)IE_orig_.size(); }
   double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
   vector<double> get_IE_k_org(int k)  { return IE_orig_[k]; }
   
