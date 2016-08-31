@@ -34,6 +34,7 @@
 
 #include "ReExpCalc.h"
 #include <memory>
+#include "SystemAM.h"
 
 /*
  This class is designed to compute the vector A defined in Equation 22 
@@ -69,7 +70,7 @@ protected:
   shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL_;
   shared_ptr<ReExpCoeffsConstants>        _reExpConsts_;
   shared_ptr<BesselCalc>      _besselCalc_;
-  shared_ptr<System>          _sys_;  // system data (radii, charges, etc.)
+  shared_ptr<SystemAM>          _sys_;  // system data (radii, charges, etc.)
   shared_ptr<SHCalc>          _shCalc_;
   shared_ptr<Constants>       _consts_;
   
@@ -178,7 +179,7 @@ public:
   
   ASolver(shared_ptr<BesselCalc> _bcalc,
           shared_ptr<SHCalc> shCalc,
-          shared_ptr<System> _sys,
+          shared_ptr<SystemAM> _sys,
           shared_ptr<Constants> _consts,
           const int p=Constants::MAX_NUM_POLES,
           double polz_cutoff = 10.0);
@@ -195,7 +196,7 @@ public:
   int get_N() { return N_; }
   
   shared_ptr<BesselCalc> get_bessel() { return _besselCalc_; }
-  shared_ptr<System> get_sys()        { return _sys_; }
+  shared_ptr<SystemAM> get_sys()        { return _sys_; }
   shared_ptr<SHCalc> get_sh()         { return _shCalc_; }
   shared_ptr<Constants> get_consts()  { return _consts_; }
   
@@ -276,7 +277,7 @@ public:
   /*
    Reset all relevant members given a new system
    */
-  void reset_all(shared_ptr<System> _sys);
+  void reset_all(shared_ptr<SystemAM> _sys);
   
 }; // End ASolver
 

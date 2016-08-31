@@ -6,9 +6,9 @@
 //  Copyright © 2016 David Brookes. All rights reserved.
 //
 
-#include "BD.h"
+#include "BDAM.h"
 
-BDStep::BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+BDStepAM::BDStepAM(shared_ptr<SystemAM> _sys, shared_ptr<Constants> _consts,
        vector<double> trans_diff_consts,
        vector<double> rot_diff_consts,
        bool diff, bool force)
@@ -19,7 +19,7 @@ diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
   randGen_ = mt19937(rd());
 }
 
-BDStep::BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+BDStepAM::BDStepAM(shared_ptr<SystemAM> _sys, shared_ptr<Constants> _consts,
                bool diff, bool force)
 :transDiffConsts_(_sys->get_n()), rotDiffConsts_(_sys->get_n()),
 diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
@@ -35,7 +35,7 @@ diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
 }
 
 
-double BDStep::compute_dt( )
+double BDStepAM::compute_dt( )
 {
   double DISTCUTOFF_TIME = 20.0;
   if ( min_dist_ - DISTCUTOFF_TIME > 0 )
@@ -44,7 +44,7 @@ double BDStep::compute_dt( )
     return 2.0;
 }
 
-void BDStep::compute_min_dist( )
+void BDStepAM::compute_min_dist( )
 {
   int i, j;
   Pt pt1, pt2;
@@ -61,14 +61,14 @@ void BDStep::compute_min_dist( )
   min_dist_ = minDist;
 }
 
-Pt BDStep::rand_vec(double mean, double var)
+Pt BDStepAM::rand_vec(double mean, double var)
 {
   normal_distribution<double> dist (mean, sqrt(var));
   Pt pout = Pt(dist(randGen_), dist(randGen_), dist(randGen_));
   return pout;
 }
 
-void BDStep::indi_trans_update(int i, Pt fi)
+void BDStepAM::indi_trans_update(int i, Pt fi)
 {
   double kT = _consts_->get_kbt();
   double ikT_int = 1 / Constants::convert_j_to_int(kT);
@@ -94,7 +94,7 @@ void BDStep::indi_trans_update(int i, Pt fi)
 }
 
 
-void BDStep::indi_rot_update(int i, Pt tau_i)
+void BDStepAM::indi_rot_update(int i, Pt tau_i)
 {
   Pt rand, new_pt;
   Quat qrot;
@@ -132,7 +132,7 @@ void BDStep::indi_rot_update(int i, Pt tau_i)
   }
 }
 
-void BDStep::bd_update(shared_ptr<vector<Pt> > _F,
+void BDStepAM::bd_update(shared_ptr<vector<Pt> > _F,
                    shared_ptr<vector<Pt> > _tau)
 {
   int i;
@@ -152,19 +152,19 @@ void BDStep::bd_update(shared_ptr<vector<Pt> > _F,
 }
 
 
-BDRun::BDRun(shared_ptr<ASolver> _asolv,
-             shared_ptr<BaseTerminate> _terminator, string outfname, int num,
+BDRunAM::BDRunAM(shared_ptr<ASolver> _asolv,
+             shared_ptr<BaseTerminateAM> _terminator, string outfname, int num,
              bool diff, bool force, int maxiter, double prec)
 :maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
 {
-  if (num == 0) _physCalc_ = make_shared<PhysCalc>(_asolver_, outfname);
-  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolver_, num, outfname);
+  if (num == 0) _physCalc_ = make_shared<PhysCalcAM>(_asolver_, outfname);
+  else _physCalc_ = make_shared<ThreeBodyPhysCalcAM>(_asolver_, num, outfname);
   
-  _stepper_ = make_shared<BDStep> (_asolver_->get_sys(),
+  _stepper_ = make_shared<BDStepAM> (_asolver_->get_sys(),
                                    _asolver_->get_consts(), diff, force);
 }
 
-void BDRun::run(string xyzfile, string statfile, int nSCF)
+void BDRunAM::run(string xyzfile, string statfile, int nSCF)
 {
   int i(0), scf(2);
   int WRITEFREQ = 200;

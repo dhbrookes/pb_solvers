@@ -28,11 +28,12 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef Electrostatics_h
-#define Electrostatics_h
+#ifndef ElectrostaticsAM_h
+#define ElectrostaticsAM_h
 
-#include "EnergyForce.h"
+#include "PhysCalcAM.h"
 #include <time.h> 
+#include "SystemAM.h"
 
 #ifdef __OMP
 #include <omp.h>
@@ -68,7 +69,7 @@ public:
 /*
  Class for printing out electrostatics of system
  */
-class Electrostatic
+class ElectrostaticAM
 {
 protected:
   int p_; // Npoles
@@ -88,7 +89,7 @@ protected:
   vector<vector<double > > grid_;  // 2D cross section of ESP
   
   shared_ptr<VecOfMats<cmplx>::type> _A_;
-  shared_ptr<System> _sys_;
+  shared_ptr<SystemAM> _sys_;
   shared_ptr<SHCalc> _shCalc_;
   shared_ptr<BesselCalc> _bCalc_;
   shared_ptr<Constants> _consts_;
@@ -106,12 +107,12 @@ protected:
   double lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p);
   
 public:
-  Electrostatic(shared_ptr<VecOfMats<cmplx>::type> _A, shared_ptr<System> _sys,
+  ElectrostaticAM(shared_ptr<VecOfMats<cmplx>::type> _A, shared_ptr<SystemAM> _sys,
                 shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                 shared_ptr<Constants> _consts,
                 int p, int npts = 150);
   
-  Electrostatic(shared_ptr<ASolver> _asolv, int npts=150);
+  ElectrostaticAM(shared_ptr<ASolver> _asolv, int npts=150);
   
   // print APBS file
   void print_dx(string ifname);

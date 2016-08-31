@@ -51,7 +51,7 @@ public :
     shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
     shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
     shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-    shared_ptr<System> sys = make_shared<System>(mol_);
+    shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
     
     ASolver ASolvTest (bCalcu, SHCalcu, sys, const_, vals);
     ASolvTest.solve_A( 1E-4 );

@@ -35,7 +35,7 @@ PBAM::PBAM() : PBAMInput()
                              gridax, gridloc, "tst.dx", 1, false, difftype,
                              diffcon, termtype, termval, termnu, confil,
                              conpad, xyzf, "kT");
-  syst_ = make_shared<System> ();
+  syst_ = make_shared<SystemAM> ();
   consts_ = make_shared<Constants> ();
   initialize_coeff_consts();
 }
@@ -49,7 +49,7 @@ solveTol_(1e-4)
   setp_ = make_shared<Setup>(infile);
   check_setup();
 
-  syst_ = make_shared<System> ();
+  syst_ = make_shared<SystemAM> ();
   consts_ = make_shared<Constants> (*setp_);
 
   check_system();
@@ -132,7 +132,7 @@ solveTol_(1e-4)
                              confil, conpad, xyzf, unt);
 
   check_setup();
-  syst_ = make_shared<System> (mls, Constants::FORCE_CUTOFF, pbami.boxLen_);
+  syst_ = make_shared<SystemAM> (mls, Constants::FORCE_CUTOFF, pbami.boxLen_);
   consts_ = make_shared<Constants> (*setp_);
   init_write_system();
 
@@ -157,7 +157,7 @@ void PBAM::check_setup()
 void PBAM::check_system()
 {
   try {
-    syst_ = make_shared<System>(*setp_);
+    syst_ = make_shared<SystemAM>(*setp_);
   } catch(const OverlappingMoleculeException& ex1)
   {
     cout << ex1.what() << endl;
@@ -226,7 +226,7 @@ void PBAM::run_dynamics()
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (_bessl_calc_, _sh_calc_, 
 												    syst_, consts_, poles_);
 
-  vector<shared_ptr<BaseTerminate > >  terms(setp_->get_numterms());
+  vector<shared_ptr<BaseTerminateAM > >  terms(setp_->get_numterms());
   for (i = 0; i < setp_->get_numterms(); i++)
   {
     string type = setp_->get_termtype(i);
@@ -239,44 +239,44 @@ void PBAM::run_dynamics()
       cout << "Contact termination found" << endl;
       double pad = setp_->get_conpad(j);
       ContactFile confile (setp_->get_confile(j));
-      auto conterm = make_shared<ContactTerminate2>(confile, pad);
+      auto conterm = make_shared<ContactTerminateAM2>(confile, pad);
 
-      terms[i] = make_shared<ContactTerminate2>(confile, pad);
+      terms[i] = make_shared<ContactTerminateAM2>(confile, pad);
       j += 1;  // j is index of contact termconditions
     } else if (type.substr(0,1) == "x")
     {
       cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminateAM>( setp_->get_termMolIDX(i)[0],
                                              X, btype, val);
     } else if (type.substr(0,1) == "y")
     {
       cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminateAM>( setp_->get_termMolIDX(i)[0],
                                              Y, btype, val);
     } else if (type.substr(0,1) == "z")
     {
       cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminateAM>( setp_->get_termMolIDX(i)[0],
                                              Z, btype, val);
     } else if (type.substr(0,1) == "r")
     {
       cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminateAM>( setp_->get_termMolIDX(i)[0],
                                              R, btype, val);
     } else if (type == "time")
     {
-      cout << "Time termination found, at time (ps) " << val << endl;
-      terms[i] = make_shared<TimeTerminate>( val);
+      cout << "Time termination found, at AMtime (ps) " << val << endl;
+      terms[i] = make_shared<TimeTerminateAM>( val);
     } else cout << "Termination type not recognized!" << endl;
   }
 
   cout << "Done making termination conds " << endl;
   HowTermCombine com = (setp_->get_andCombine() ? ALL : ONE);
-  auto term_conds = make_shared<CombineTerminate> (terms, com);
+  auto term_conds = make_shared<CombineTerminateAM> (terms, com);
 
   char buff[100], outb[100];
   sprintf( outb, "%s.stat", setp_->getRunName().c_str());
@@ -292,7 +292,7 @@ void PBAM::run_dynamics()
     string stats = setp_->getRunName();
     syst_->reset_positions( setp_->get_trajn_xyz(traj));
     syst_->set_time(0.0);
-    BDRun dynamic_run( ASolv, term_conds, outfile);
+    BDRunAM dynamic_run( ASolv, term_conds, outfile);
     dynamic_run.run(xyztraj, statfile);
     cout << "Done with trajectory " << traj << endl;
     if (traj==0)
@@ -313,7 +313,7 @@ void PBAM::run_electrostatics()
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (_bessl_calc_, _sh_calc_,
                                                     syst_, consts_, poles_);
   ASolv->solve_A(solveTol_); ASolv->solve_gradA(solveTol_);
-  Electrostatic Estat( ASolv, setp_->getGridPts());
+  ElectrostaticAM Estat( ASolv, setp_->getGridPts());
 
   if ( setp_->getDXoutName() != "" )
     Estat.print_dx( setp_->getDXoutName());
@@ -336,7 +336,7 @@ void PBAM::run_energyforce()
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (_bessl_calc_, _sh_calc_,
                                                     syst_, consts_, poles_);
   ASolv->solve_A(solveTol_); ASolv->solve_gradA(solveTol_);
-  PhysCalc calcEnFoTo( ASolv, setp_->getRunName(), consts_->get_unitsEnum());
+  PhysCalcAM calcEnFoTo( ASolv, setp_->getRunName(), consts_->get_unitsEnum());
   calcEnFoTo.calc_all();
   calcEnFoTo.print_all();
   
@@ -360,7 +360,7 @@ void PBAM::run_bodyapprox()
   clock_t t3 = clock();  
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (_bessl_calc_, _sh_calc_,
                                                     syst_, consts_, poles_);
-  ThreeBody threeBodTest( ASolv, consts_->get_unitsEnum(), 
+  ThreeBodyAM threeBodTest( ASolv, consts_->get_unitsEnum(), 
                          setp_->getRunName(), 100.0);
   threeBodTest.solveNmer(2);
   threeBodTest.solveNmer(3);

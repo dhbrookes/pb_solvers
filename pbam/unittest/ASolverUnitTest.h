@@ -450,7 +450,7 @@ TEST_F(ASolverUTest, checkGamma)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
 
@@ -468,7 +468,7 @@ TEST_F(ASolverUTest, checkDelta)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   
@@ -487,7 +487,7 @@ TEST_F(ASolverUTest, checkE)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   
@@ -517,7 +517,7 @@ TEST_F(ASolverUTest, checkSH)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
 
@@ -562,7 +562,7 @@ TEST_F(ASolverUTest, checkAMulti)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -614,7 +614,7 @@ TEST_F(ASolverUTest, checkAMultiPBC)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_, 85, 175);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_, 85, 175);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -670,7 +670,7 @@ TEST_F(ASolverUTest, checkAPBC)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_, 40, 175);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_, 40, 175);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -721,7 +721,7 @@ TEST_F(ASolverUTest, checkAPBCoutside)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_, 25, 150);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_, 25, 150);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -762,7 +762,7 @@ TEST_F(ASolverUTest, checkA)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-20, 1000);
@@ -805,7 +805,7 @@ TEST_F(ASolverUTest, checkASingMult)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -852,7 +852,7 @@ TEST_F(ASolverUTest, checkASingMultFlip)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -890,7 +890,7 @@ TEST_F(ASolverUTest, checkASing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-30, 1000);
@@ -932,7 +932,7 @@ TEST_F(ASolverUTest, checkgradT_A)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
@@ -1054,7 +1054,7 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
@@ -1176,7 +1176,7 @@ TEST_F(ASolverUTest, checkgradA)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-25, 1000); ASolvTest.solve_gradA(1E-50, 1000);
@@ -1289,7 +1289,7 @@ TEST_F(ASolverUTest, checkgradASing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
@@ -1439,7 +1439,7 @@ TEST_F(ASolverUTest, checkL)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -1481,7 +1481,7 @@ TEST_F(ASolverUTest, checkLSing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -1533,7 +1533,7 @@ TEST_F(ASolverUTest, checkdL)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-20, 1000); ASolvTest.solve_gradA(1E-30, 1000);
@@ -1628,7 +1628,7 @@ TEST_F(ASolverUTest, checkdLSing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-40, 1000);

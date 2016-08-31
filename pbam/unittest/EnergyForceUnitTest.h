@@ -9,7 +9,7 @@
 #ifndef EnergyForceUnitTest_h
 #define EnergyForceUnitTest_h
 
-#include "EnergyForce.h"
+#include "PhysCalcAM.h"
 
 class EnergyForceUTest : public ::testing::Test
 {
@@ -82,14 +82,14 @@ TEST_F(EnergyForceUTest, checkEnergy)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000);
   
-  EnergyCalc EnTest(ASolvTest);
+  EnergyCalcAM EnTest(ASolvTest);
   EnTest.calc_energy();
 
   EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.00117849131, preclim);
@@ -105,14 +105,14 @@ TEST_F(EnergyForceUTest, checkEnergySing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000);
   
-  EnergyCalc EnTest(ASolvTest);
+  EnergyCalcAM EnTest(ASolvTest);
   EnTest.calc_energy();
   for (int n=0; n<mol_sing_.size(); n++)
     EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.000573165, preclim);
@@ -140,14 +140,14 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000);
   
-  EnergyCalc EnTest(ASolvTest);
+  EnergyCalcAM EnTest(ASolvTest);
   EnTest.calc_energy();
   for (int n=0; n<mol_.size(); n++)
     EXPECT_NEAR( EnTest.get_omega_i_int(n)/MolTripSing[n], 1, preclim);
@@ -175,13 +175,13 @@ TEST_F(EnergyForceUTest, checkForce)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-40, 1000); ASolvTest->solve_gradA(1E-40, 1000);
-  ForceCalc FoTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
   FoTest.calc_force();
   for (int n=0; n<mol_.size(); n++)
   {
@@ -199,14 +199,14 @@ TEST_F(EnergyForceUTest, checkForceSing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-40, 1000); ASolvTest->solve_gradA(1E-40, 1000);
   
-  ForceCalc FoTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
   FoTest.calc_force();
   for (int n=0; n<2; n++)
   {
@@ -238,15 +238,15 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-30, 1000); ASolvTest->solve_gradA(1E-30, 1000);
 
-  EnergyCalc EnTest(ASolvTest);
-  ForceCalc FoTest(ASolvTest);
+  EnergyCalcAM EnTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
   EnTest.calc_energy();
   FoTest.calc_force();
   EXPECT_NEAR( EnTest.get_omega_i_int(0)/0.0845178625, 1, preclim);
@@ -282,15 +282,15 @@ TEST_F(EnergyForceUTest, checkTorque)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals, 
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000); ASolvTest->solve_gradA(1E-20, 1000);
   
-  ForceCalc FoTest(ASolvTest);
-  TorqueCalc TorTest( ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
+  TorqueCalcAM TorTest( ASolvTest);
   FoTest.calc_force();
   TorTest.calc_tau();
   for (int n=0; n<3; n++)
@@ -309,15 +309,15 @@ TEST_F(EnergyForceUTest, checkTorqueSing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000); ASolvTest->solve_gradA(1E-20, 1000);
   
-  ForceCalc FoTest(ASolvTest);
-  TorqueCalc TorTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
+  TorqueCalcAM TorTest(ASolvTest);
   FoTest.calc_force();
   TorTest.calc_tau();
   for (int n=0; n<mol_.size(); n++)
@@ -348,15 +348,15 @@ TEST_F(EnergyForceUTest, checkTorqueSing3)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000); ASolvTest->solve_gradA(1E-20, 1000);
   
-  ForceCalc FoTest(ASolvTest);
-  TorqueCalc TorTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
+  TorqueCalcAM TorTest(ASolvTest);
   FoTest.calc_force();
   TorTest.calc_tau();
   EXPECT_NEAR( TorTest.get_taui(0)[0], 0.0, 1e-14);
