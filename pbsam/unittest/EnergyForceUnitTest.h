@@ -9,7 +9,7 @@
 #ifndef EnergyForceUnitTest_h
 #define EnergyForceUnitTest_h
 
-#include "PhysCalc.h"
+#include "PhysCalcSAM.h"
 #include "Solver.h"
 
 /*
@@ -37,7 +37,7 @@ TEST_F(EnergyUTest, two_mol_test)
                                          pqr.get_cg_radii()));
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -79,7 +79,7 @@ TEST_F(EnergyUTest, two_mol_test)
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
   
-  EnergyCalc ecal (sys->get_n());
+  EnergyCalcSAM ecal (sys->get_n());
   shared_ptr<vector<double> > ene;
   ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
   ene = ecal.get_omega();
@@ -104,7 +104,7 @@ TEST_F(EnergyUTest, three_mol_test)
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
   mols[2]->translate(Pt(-22.28786458,-14.35779167,-15.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -146,7 +146,7 @@ TEST_F(EnergyUTest, three_mol_test)
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
   
-  EnergyCalc ecal (sys->get_n());
+  EnergyCalcSAM ecal (sys->get_n());
   shared_ptr<vector<double> > ene;
   ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
   ene = ecal.get_omega();
@@ -196,7 +196,7 @@ TEST_F(ForceUTest, two_mol_test)
                                          pqr.get_cg_radii()));
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -247,14 +247,14 @@ TEST_F(ForceUTest, two_mol_test)
                        solvTest.get_precalc_sh(), _expcons, pol);
   gsolvTest.solve(1e-16, 100);
   
-  auto focal = make_shared<ForceCalc> (nmol, sys->get_all_Ik(),
+  auto focal = make_shared<ForceCalcSAM> (nmol, sys->get_all_Ik(),
                                        cst->get_dielectric_water(),
                                        SHCalcTest, BesselCal);
   focal->calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
                     gsolvTest.get_gradH_all(),gsolvTest.get_gradLHN_all());
   shared_ptr<vector<Pt> > fo = focal->get_all_f();
   
-  TorqueCalc tocal(nmol);
+  TorqueCalcSAM tocal(nmol);
   tocal.calc_all_tau(sys, focal);
   shared_ptr<vector<Pt> > to = tocal.get_all_tau();
   
@@ -292,7 +292,7 @@ TEST_F(ForceUTest, three_mol_test)
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
   mols[2]->translate(Pt(-22.28786458,-14.35779167,-15.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -340,14 +340,14 @@ TEST_F(ForceUTest, three_mol_test)
                        solvTest.get_precalc_sh(), _expcons, pol);
   gsolvTest.solve(1e-16, 85);
 
-  auto focal = make_shared<ForceCalc> (nmol, sys->get_all_Ik(),
+  auto focal = make_shared<ForceCalcSAM> (nmol, sys->get_all_Ik(),
                                        cst->get_dielectric_water(),
                                        SHCalcTest, BesselCal);
   focal->calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
                    gsolvTest.get_gradH_all(),gsolvTest.get_gradLHN_all());
   shared_ptr<vector<Pt> > fo = focal->get_all_f();
   
-  TorqueCalc tocal(nmol);
+  TorqueCalcSAM tocal(nmol);
   tocal.calc_all_tau(sys, focal);
   shared_ptr<vector<Pt> > to = tocal.get_all_tau();
 

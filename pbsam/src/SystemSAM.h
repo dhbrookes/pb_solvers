@@ -188,19 +188,19 @@ public:
 /*
  Class containing all of the relevant information for a particular system
  */
-class System : public BaseSystem
+class SystemSAM : public BaseSystem
 {
 protected:
   vector<vector<double> >      min_dist_; // minimum dist between mols
   
 public:
-  System() { }
+  SystemSAM() { }
   
-  System(vector<shared_ptr<BaseMolecule> > mols,
+  SystemSAM(vector<shared_ptr<BaseMolecule> > mols,
          double cutoff=Constants::FORCE_CUTOFF,
          double boxlength=Constants::MAX_DIST);
   
-  System(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
+  SystemSAM(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
   
   vector<int> get_all_Ik()
   {

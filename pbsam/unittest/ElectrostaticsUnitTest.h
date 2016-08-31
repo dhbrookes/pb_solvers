@@ -9,7 +9,7 @@
 #ifndef ElectrostaticsUnitTest_h
 #define ElectrostaticsUnitTest_h
 
-#include "Electrostatics.h"
+#include "ElectrostaticsSAM.h"
 
 /*
  Class for unit testing energy calculations
@@ -39,7 +39,7 @@ TEST_F(ElectroUTest, one_mol_test)
                                          pqr.get_cg_centers(),
                                          pqr.get_cg_radii()));
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> (kT);
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -78,7 +78,7 @@ TEST_F(ElectroUTest, one_mol_test)
   }
 
   string dxmap = "one_mol.dx";
-  Electrostatic estat(Hmat, sys, SHCalcTest, BesselCal, cst, pol, 10);
+  ElectrostaticSAM estat(Hmat, sys, SHCalcTest, BesselCal, cst, pol, 10);
   estat.print_dx(test_dir_loc + "one_mol.dx");
   
   string inputLine;
@@ -123,7 +123,7 @@ TEST_F(ElectroUTest, three_mol_test)
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
   mols[2]->translate(Pt(-22.28786458,-14.35779167,-15.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -163,7 +163,7 @@ TEST_F(ElectroUTest, three_mol_test)
   }
   
   string map3d = "threemol_map.out";
-  Electrostatic estat(Hmat, sys, SHCalcTest, BesselCal, cst, pol, 2);
+  ElectrostaticSAM estat(Hmat, sys, SHCalcTest, BesselCal, cst, pol, 2);
   estat.print_3d_heat(test_dir_loc + map3d);
   
   string inputLine;

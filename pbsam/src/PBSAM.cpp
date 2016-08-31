@@ -32,7 +32,7 @@ PBSAM::PBSAM() : PBSAMInput(), poles_(5), solveTol_(1e-4)
                              gridax, gridloc, "tst.dx", 1, false, difftype,
                              diffcon, termtype, termval, termnu, confil,
                              conpad, xyzf, "kT");
-  _syst_ = make_shared<System> ();
+  _syst_ = make_shared<SystemSAM> ();
   _consts_ = make_shared<Constants> ();
 }
 
@@ -42,7 +42,7 @@ PBSAM::PBSAM(string infile) : poles_(5)
   _setp_ = make_shared<Setup>(infile);
   check_setup();
 
-  _syst_ = make_shared<System> ();
+  _syst_ = make_shared<SystemSAM> ();
   _consts_ = make_shared<Constants> (*_setp_);
 
   check_system();
@@ -150,7 +150,7 @@ poles_(5), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
   
   vector<shared_ptr<BaseMolecule> > molP(mls.size());
   for (int i = 0; i < mls.size(); i++) molP[i] = make_shared<MoleculeSAM>(mls[i]);
-  _syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
+  _syst_ = make_shared<SystemSAM> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
   
   init_consts_calcs();
@@ -176,7 +176,7 @@ void PBSAM::check_setup()
 void PBSAM::check_system()
 {
   try {
-    _syst_ = make_shared<System>(*_setp_);
+    _syst_ = make_shared<SystemSAM>(*_setp_);
   } catch(const OverlappingMoleculeSAMException& ex1)
   {
     cout << ex1.what() << endl;
@@ -221,7 +221,7 @@ void PBSAM::init_consts_calcs()
 
 }
 
-shared_ptr<System> PBSAM::make_subsystem(vector<int> mol_idx)
+shared_ptr<SystemSAM> PBSAM::make_subsystem(vector<int> mol_idx)
 {
   vector<shared_ptr<BaseMolecule> > sub_mols (mol_idx.size());
   for (int i = 0; i < mol_idx.size(); i++)
@@ -229,7 +229,7 @@ shared_ptr<System> PBSAM::make_subsystem(vector<int> mol_idx)
     sub_mols[i] = _syst_->get_moli(mol_idx[i]);
   }
   
-  shared_ptr<System> _subsys = make_shared<System>(sub_mols,
+  shared_ptr<SystemSAM> _subsys = make_shared<SystemSAM>(sub_mols,
                                                    _syst_->get_cutoff(),
                                                    _syst_->get_boxlength());
   _subsys -> set_time(_syst_->get_time());
@@ -378,7 +378,7 @@ void PBSAM::run_dynamics()
                                        solv->get_interpol_list(),
                                        solv->get_precalc_sh(),
                                        _exp_consts_, poles_);
-  vector<shared_ptr<BaseTerminate > >  terms(_setp_->get_numterms());
+  vector<shared_ptr<BaseTerminateSAM > >  terms(_setp_->get_numterms());
   for (i = 0; i < _setp_->get_numterms(); i++)
   {
     string type = _setp_->get_termtype(i);
@@ -391,44 +391,44 @@ void PBSAM::run_dynamics()
       cout << "Contact termination found" << endl;
       double pad = _setp_->get_conpad(j);
       ContactFile confile (_setp_->get_confile(j));
-      auto conterm = make_shared<ContactTerminate2>(confile, pad);
+      auto conterm = make_shared<ContactTerminateSAM2>(confile, pad);
 
-      terms[i] = make_shared<ContactTerminate2>(confile, pad);
+      terms[i] = make_shared<ContactTerminateSAM2>(confile, pad);
       j += 1;  // j is index of contact termconditions
     } else if (type.substr(0,1) == "x")
     {
       cout << type << " termination found for MoleculeSAM ";
       cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminateSAM>( _setp_->get_termMolIDX(i)[0],
                                              X, btype, val);
     } else if (type.substr(0,1) == "y")
     {
       cout << type << " termination found for MoleculeSAM ";
       cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminateSAM>( _setp_->get_termMolIDX(i)[0],
                                              Y, btype, val);
     } else if (type.substr(0,1) == "z")
     {
       cout << type << " termination found for MoleculeSAM ";
       cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminateSAM>( _setp_->get_termMolIDX(i)[0],
                                              Z, btype, val);
     } else if (type.substr(0,1) == "r")
     {
       cout << type << " termination found for MoleculeSAM ";
       cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminateSAM>( _setp_->get_termMolIDX(i)[0],
                                              R, btype, val);
     } else if (type == "time")
     {
       cout << "Time termination found, at time (ps) " << val << endl;
-      terms[i] = make_shared<TimeTerminate>( val);
+      terms[i] = make_shared<TimeTerminateSAM>( val);
     } else cout << "Termination type not recognized!" << endl;
   }
 
   cout << "Done making termination conds " << endl;
-  HowTermCombine com = (_setp_->get_andCombine() ? ALL : ONE);
-  auto term_conds = make_shared<CombineTerminate> (terms, com);
+  HowTermCombineSAM com = (_setp_->get_andCombine() ? ALL : ONE);
+  auto term_conds = make_shared<CombineTerminateSAM> (terms, com);
 
   char buff[100], outb[100];
   sprintf( outb, "%s.stat", _setp_->getRunName().c_str());
@@ -444,7 +444,7 @@ void PBSAM::run_dynamics()
     string stats = _setp_->getRunName();
     _syst_->reset_positions( _setp_->get_trajn_xyz(traj));
     _syst_->set_time(0.0);
-    BDRun dynamic_run( solv, gsolv, term_conds, outfile);
+    BDRunSAM dynamic_run( solv, gsolv, term_conds, outfile);
     dynamic_run.run(xyztraj, statfile);
     cout << "Done with trajectory " << traj << endl;
   }
@@ -463,7 +463,7 @@ void PBSAM::run_electrostatics()
   printf ("Solve took me %f seconds.\n",
           ((float)t3)/CLOCKS_PER_SEC);
   
-  Electrostatic estat(solv.get_all_H(), _syst_, _sh_calc_, _bessl_calc_,
+  ElectrostaticSAM estat(solv.get_all_H(), _syst_, _sh_calc_, _bessl_calc_,
                       _consts_, poles_, _setp_->getGridPts());
 
   if ( _setp_->getDXoutName() != "" )
@@ -494,14 +494,14 @@ void PBSAM::run_energyforce()
                    _exp_consts_, poles_);
   if (_syst_->get_n() > 1) gsolv.solve(solveTol_, 100);
   
-  auto focal = make_shared<ForceCalc> (_syst_->get_n(), _syst_->get_all_Ik(),
+  auto focal = make_shared<ForceCalcSAM> (_syst_->get_n(), _syst_->get_all_Ik(),
                                        _consts_->get_dielectric_water(),
                                        _sh_calc_, _bessl_calc_);
   focal->calc_all_f(solv.get_all_H(), solv.get_all_LHN(),
                     gsolv.get_gradH_all(), gsolv.get_gradLHN_all());
   shared_ptr<vector<Pt> > fo = focal->get_all_f();
   
-  TorqueCalc tocal(_syst_->get_n());
+  TorqueCalcSAM tocal(_syst_->get_n());
   tocal.calc_all_tau(_syst_, focal);
   shared_ptr<vector<Pt> > to = tocal.get_all_tau();
   

@@ -8,7 +8,7 @@
 
 #include "Solver.h"
 
-Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+Solver::Solver(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                int p, bool readImat, bool readHF,
                vector<vector<string> > imats,
@@ -108,7 +108,7 @@ kappa_(_consts->get_kappa())
 }
 
 
-Solver::Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+Solver::Solver(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                int p, vector<shared_ptr<IEMatrix> > imats,
                vector<shared_ptr<HMatrix > > h_spol,
@@ -496,7 +496,7 @@ void Solver::reset_all()
 }
 
 
-GradSolver::GradSolver(shared_ptr<System> _sys,
+GradSolver::GradSolver(shared_ptr<SystemSAM> _sys,
                        shared_ptr<Constants> _consts,
                        shared_ptr<SHCalc> _shCalc,
                        shared_ptr<BesselCalc> _bCalc,

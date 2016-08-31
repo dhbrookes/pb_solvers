@@ -19,12 +19,12 @@
  Class for calculating interaction energy of a MoleculeSAM given H^(I,k)
  and LHN^(I,k) matrices
  */
-class EnergyCalc
+class EnergyCalcSAM
 {
   shared_ptr<vector<double> > omega_;
   
 public:
-  EnergyCalc(int I) { omega_ = make_shared<vector<double> > (I); }
+  EnergyCalcSAM(int I) { omega_ = make_shared<vector<double> > (I); }
   
   double calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN);
   void calc_all_energy(vector<shared_ptr<HMatrix> > H,
@@ -35,7 +35,7 @@ public:
 
 
 
-class ForceCalc
+class ForceCalcSAM
 {
 protected:
   shared_ptr<SHCalc> shcalc_;
@@ -51,7 +51,7 @@ protected:
 public:
   
   // number of molecules, Ik of all molecules, solvent dielectric:
-  ForceCalc(int I, vector<int> ki, double es, shared_ptr<SHCalc> shcalc,
+  ForceCalcSAM(int I, vector<int> ki, double es, shared_ptr<SHCalc> shcalc,
             shared_ptr<BesselCalc> bcalc)
   :shcalc_(shcalc), bcalc_(bcalc), forces_(I), I_(I), ks_(ki), eps_s_(es)
   {
@@ -84,17 +84,17 @@ public:
 };
 
 
-class TorqueCalc
+class TorqueCalcSAM
 {
 protected:
   shared_ptr<vector<Pt> > torques_;
   int I_; // number of MoleculeSAMs in the system
   
 public:
-  TorqueCalc(int I) : I_(I)  { torques_ = make_shared<vector<Pt> >(I_); }
+  TorqueCalcSAM(int I) : I_(I)  { torques_ = make_shared<vector<Pt> >(I_); }
   
-  void calc_all_tau(shared_ptr<System> sys, shared_ptr<ForceCalc> fcalc);
-  Pt calc_tauI(int i, shared_ptr<BaseMolecule> mol, shared_ptr<ForceCalc> fcalc);
+  void calc_all_tau(shared_ptr<SystemSAM> sys, shared_ptr<ForceCalcSAM> fcalc);
+  Pt calc_tauI(int i, shared_ptr<BaseMolecule> mol, shared_ptr<ForceCalcSAM> fcalc);
   
   Pt cross_prod(Pt a, Pt b);
   
@@ -105,10 +105,10 @@ public:
 /*
  Base class for calculations of physical quantities
  */
-class BasePhysCalc
+class BasePhysCalcSAM
 {
 public:
-  BasePhysCalc() { }
+  BasePhysCalcSAM() { }
   
   virtual void calc_force() {}
   virtual void calc_energy() {}
@@ -128,17 +128,17 @@ public:
 /*
  Class for calculating energy force and torque in one place
  */
-class PhysCalc : public BasePhysCalc
+class PhysCalcSAM : public BasePhysCalcSAM
 {
 protected:
   int N_; // number of particles
   double unit_conv_; // Conversion factor for units
   string unit_; // String of the type of units
-  shared_ptr<System> _sys_; // System
+  shared_ptr<SystemSAM> _sys_; // System
   
-  shared_ptr<EnergyCalc> _eCalc_;
-  shared_ptr<ForceCalc> _fCalc_;
-  shared_ptr<TorqueCalc> _torCalc_;
+  shared_ptr<EnergyCalcSAM> _eCalc_;
+  shared_ptr<ForceCalcSAM> _fCalc_;
+  shared_ptr<TorqueCalcSAM> _torCalc_;
   
   shared_ptr<Solver> _solv_;
   shared_ptr<GradSolver> _gradSolv_;
@@ -150,7 +150,7 @@ protected:
 public:
   
   // constructor just requires an asolver
-  PhysCalc(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradsolv,
+  PhysCalcSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradsolv,
            string outfname, Units unit = INTERNAL);
   
 //  void calc_force_interact()   { _fCalc_->calc_force_interact(_sys_); }

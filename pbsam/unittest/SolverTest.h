@@ -10,7 +10,7 @@
 #define SolverTest_h
 
 #include "Solver.h"
-#include "Electrostatics.h"
+#include "ElectrostaticsSAM.h"
 
 class SolverTest
 {
@@ -84,7 +84,7 @@ public:
                                            pqr.get_cg_centers(),
                                            pqr.get_cg_radii()));
     mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
-    auto sys = make_shared<System>(mols);
+    auto sys = make_shared<SystemSAM>(mols);
     auto cst = make_shared<Constants> (kT);
     cst->set_dielectric_water(80);
     cst->set_dielectric_prot(4);
@@ -125,7 +125,7 @@ public:
     
     sys->write_to_pqr(test_dir_loc+"barnase_out.pqr");
     
-    Electrostatic estat(Hmat, sys, SHCalcTest, BesselCal, cst, pol, 50);
+    ElectrostaticSAM estat(Hmat, sys, SHCalcTest, BesselCal, cst, pol, 50);
     estat.print_3d_heat(test_dir_loc + "barnase_map.out");
     estat.print_dx(test_dir_loc + "barnase_mol.dx");
   
