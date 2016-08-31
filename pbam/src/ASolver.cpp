@@ -10,7 +10,7 @@
 
 ASolver::ASolver(shared_ptr<BesselCalc> _bcalc,
                   shared_ptr<SHCalc> _shCalc,
-                  shared_ptr<System> _sys,
+                  shared_ptr<SystemAM> _sys,
                   shared_ptr<Constants> _consts,
                   const int p,
                   double polz_cutoff)
@@ -1135,7 +1135,7 @@ void ASolver::print_dAi( int i, int j, int p)
 }
 
 
-void ASolver::reset_all(shared_ptr<System> _sys)
+void ASolver::reset_all(shared_ptr<SystemAM> _sys)
 {
   _sys_ = _sys;
   T_  = MyMatrix<ReExpCoeffs>(_sys->get_n(), _sys->get_n());

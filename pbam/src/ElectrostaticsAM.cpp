@@ -6,10 +6,10 @@
 //  Copyright © 2016 Lisa Felberg. All rights reserved.
 //
 
-#include "Electrostatics.h"
+#include "ElectrostaticsAM.h"
 
-Electrostatic::Electrostatic(shared_ptr<VecOfMats<cmplx>::type> _A,
-                             shared_ptr<System> _sys,
+ElectrostaticAM::ElectrostaticAM(shared_ptr<VecOfMats<cmplx>::type> _A,
+                             shared_ptr<SystemAM> _sys,
                              shared_ptr<SHCalc> _shCalc,
                              shared_ptr<BesselCalc> _bCalc,
                              shared_ptr<Constants> _consts,
@@ -36,7 +36,7 @@ _bCalc_(_bCalc), _consts_(_consts)
   compute_pot();
 }
 
-Electrostatic::Electrostatic(shared_ptr<ASolver> _asolv, int npts)
+ElectrostaticAM::ElectrostaticAM(shared_ptr<ASolver> _asolv, int npts)
 :p_(_asolv->get_p()), pot_min_(0), pot_max_(0),
 lam_(_asolv->get_sys()->get_lambda()), _A_(_asolv->get_A()),
 _sys_(_asolv->get_sys()), _shCalc_(_asolv->get_sh()),
@@ -70,7 +70,7 @@ _bCalc_(_asolv->get_bessel()), _consts_(_asolv->get_consts())
 }
 
 
-void Electrostatic::find_range()
+void ElectrostaticAM::find_range()
 {
   int mol, atom, dim;
   Pt center, curAt;
@@ -109,7 +109,7 @@ void Electrostatic::find_range()
 }
 
 
-void Electrostatic::find_bins()
+void ElectrostaticAM::find_bins()
 {
   int dim, x, y;
   
@@ -125,12 +125,12 @@ void Electrostatic::find_bins()
   }
 }
 
-void Electrostatic::compute_units()
+void ElectrostaticAM::compute_units()
 {
   units_ = _consts_->get_conv_factor();
 }
 
-void Electrostatic::print_dx( string dxname )
+void ElectrostaticAM::print_dx( string dxname )
 {
   ofstream dx;
   char pot[20];
@@ -185,7 +185,7 @@ void Electrostatic::print_dx( string dxname )
   cout << "This is max " << pot_max_ << endl;
 }
 
-void Electrostatic::print_3d_heat( string td_name )
+void ElectrostaticAM::print_3d_heat( string td_name )
 {
   ofstream ht;
   char pot[500];
@@ -227,7 +227,7 @@ void Electrostatic::print_3d_heat( string td_name )
   ht.close();
 }
 
-void Electrostatic::print_grid(string axis, double value, string fname)
+void ElectrostaticAM::print_grid(string axis, double value, string fname)
 {
   int i, j, idx = 0;
   double v_act;
@@ -310,7 +310,7 @@ void Electrostatic::print_grid(string axis, double value, string fname)
   f.close();
 }
 
-void Electrostatic::compute_pot()
+void ElectrostaticAM::compute_pot()
 {
   int Nmol = _sys_->get_n();
   double e_s = _consts_->get_dielectric_water();
@@ -364,7 +364,7 @@ void Electrostatic::compute_pot()
   
 }
 
-double Electrostatic::compute_pot_at( Pt point )
+double ElectrostaticAM::compute_pot_at( Pt point )
 {
 
   int mol, Nmol      = _sys_->get_n();
@@ -384,7 +384,7 @@ double Electrostatic::compute_pot_at( Pt point )
   return pot;
 }
 
-MyMatrix<cmplx> Electrostatic::get_local_exp( Pt dist )
+MyMatrix<cmplx> ElectrostaticAM::get_local_exp( Pt dist )
 {
   int n, m;
   double lambda = _sys_->get_lambda();
@@ -409,7 +409,7 @@ MyMatrix<cmplx> Electrostatic::get_local_exp( Pt dist )
   return localK;
 }
 
-double Electrostatic::lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V,
+double ElectrostaticAM::lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V,
                                        int p)
 {
   double ip = 0;

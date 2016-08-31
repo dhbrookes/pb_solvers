@@ -31,14 +31,14 @@
 #ifndef Electrostatics_h
 #define Electrostatics_h
 
-#include "EnergyForce.h"
+#include "PhysCalcSAM.h"
 #include <time.h> 
 
 #ifdef __OMP
 #include <omp.h>
 #endif
 
-// Exception class to ensure that MoleculeAM
+// Exception class to ensure that MoleculeSAM
 class ValueOutOfRange: public exception
 {
 protected:
@@ -68,7 +68,7 @@ public:
 /*
  Class for printing out electrostatics of system
  */
-class Electrostatic
+class ElectrostaticSAM
 {
 protected:
   int p_; // Npoles
@@ -77,7 +77,7 @@ protected:
   double pot_min_; // A minimum value of the pot
   double pot_max_; // A max value of the potential
   
-  double lam_; // Average radius of MoleculeAMs in system
+  double lam_; // Average radius of MoleculeSAMs in system
   
   vector<double> range_min_;  // Origin of grid in each dim
   vector<double> range_max_;  // Origin of grid in each dim
@@ -87,8 +87,8 @@ protected:
   vector<vector<vector<double > > > esp_; // vector of ESP values
   vector<vector<double > > grid_;  // 2D cross section of ESP
   
-  shared_ptr<VecOfMats<cmplx>::type> _A_;
-  shared_ptr<System> _sys_;
+  vector<shared_ptr<HMatrix> > _H_;
+  shared_ptr<SystemSAM> _sys_;
   shared_ptr<SHCalc> _shCalc_;
   shared_ptr<BesselCalc> _bCalc_;
   shared_ptr<Constants> _consts_;
@@ -101,17 +101,17 @@ protected:
   void compute_pot();
   double compute_pot_at( Pt point );
   
-  MyMatrix<cmplx> get_local_exp( Pt dist );
+  MyMatrix<cmplx> get_local_exp( Pt dist, double lambda );
   
   double lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p);
   
 public:
-  Electrostatic(shared_ptr<VecOfMats<cmplx>::type> _A, shared_ptr<System> _sys,
+  ElectrostaticSAM(vector<shared_ptr<HMatrix> > H, shared_ptr<SystemSAM> _sys,
                 shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                 shared_ptr<Constants> _consts,
                 int p, int npts = 150);
   
-  Electrostatic(shared_ptr<ASolver> _asolv, int npts=150);
+  ElectrostaticSAM(shared_ptr<Solver> solve, int npts=150);
   
   // print APBS file
   void print_dx(string ifname);

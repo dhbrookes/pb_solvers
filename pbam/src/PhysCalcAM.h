@@ -29,12 +29,13 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EnergyForce_h
-#define EnergyForce_h
+#ifndef PhysCalcAM_h
+#define PhysCalcAM_h
 
 #include <stdio.h>
 #include <memory>
 #include "ASolver.h"
+#include "SystemAM.h"
 
 #ifdef __OMP
 #include <omp.h>
@@ -43,10 +44,10 @@
 using namespace std;
 
 /*
- Class for calculating the energy of MoleculeAMs in the system given
+ Class for calculating the energy of molecules in the system given
  an ASolver object
  */
-class EnergyCalc
+class EnergyCalcAM
 {
 protected:
   shared_ptr<VecOfMats<cmplx>::type> _A_;
@@ -58,13 +59,13 @@ protected:
   // result of energy calculation, internal units
   shared_ptr<vector<double > > _omega_;
 public:
-  EnergyCalc() { }
+  EnergyCalcAM() { }
   
-  EnergyCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
+  EnergyCalcAM(shared_ptr<VecOfMats<cmplx>::type> _A,
              shared_ptr<VecOfMats<cmplx>::type> _L,
              shared_ptr<Constants> _const, int N, int p);
   
-  EnergyCalc(shared_ptr<ASolver> _asolv);
+  EnergyCalcAM(shared_ptr<ASolver> _asolv);
   
 //  EnergyCalc(ASolver asolv, Constants consts, int p);
   
@@ -118,7 +119,7 @@ public:
  Class for calculating the forces on MoleculeAMs in the system given
  an ASolver object
  */
-class ForceCalc
+class ForceCalcAM
 {
 protected:
   shared_ptr<VecOfMats<cmplx>::type> _A_;
@@ -134,18 +135,18 @@ protected:
   shared_ptr<vector<Pt> > _F_;
   
 public:
-  ForceCalc() { }
+  ForceCalcAM() { }
   
-  ForceCalc(shared_ptr<VecOfMats<cmplx>::type> _A,
+  ForceCalcAM(shared_ptr<VecOfMats<cmplx>::type> _A,
             shared_ptr<MyMatrix<VecOfMats<cmplx>::type > > _gradA,
             shared_ptr<VecOfMats<cmplx>::type> _L,
             shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL,
             shared_ptr<Constants> con, int N, int p);
   
-  ForceCalc(shared_ptr<ASolver> _asolv);
+  ForceCalcAM(shared_ptr<ASolver> _asolv);
   
   void calc_force();  // fill F_
-  void calc_force_interact( shared_ptr<System> sys);
+  void calc_force_interact( shared_ptr<SystemAM> sys);
   
   // calculate force on one MoleculeAM
   Pt calc_fi(int i);
@@ -158,7 +159,7 @@ public:
 /*
  Class for calculating the torque on every MoleculeAM in the system
  */
-class TorqueCalc
+class TorqueCalcAM
 {
 protected:
   
@@ -171,23 +172,23 @@ protected:
   shared_ptr< MyVector<VecOfMats<cmplx>::type > > _gradL_;
   
   shared_ptr<Constants> _consts_;
-  shared_ptr<System> _sys_;
+  shared_ptr<SystemAM> _sys_;
   shared_ptr<VecOfMats<cmplx>::type> _gamma_;
   
   int N_;
   int p_;
 
 public:
-  TorqueCalc() { }
+  TorqueCalcAM() { }
   
-  TorqueCalc(shared_ptr<SHCalc> _shCalc,
+  TorqueCalcAM(shared_ptr<SHCalc> _shCalc,
              shared_ptr<BesselCalc> _bCalc,
              shared_ptr<MyVector<VecOfMats<cmplx>::type> > _gradL,
              shared_ptr<VecOfMats<cmplx>::type> _gamma,
              shared_ptr<Constants> _consts,
-             shared_ptr<System> sys, int p);
+             shared_ptr<SystemAM> sys, int p);
   
-  TorqueCalc(shared_ptr<ASolver> _asolv);
+  TorqueCalcAM(shared_ptr<ASolver> _asolv);
   
   void calc_tau();  // fill tau_
   
@@ -225,7 +226,7 @@ public:
 };
 
 
-class ThreeBody
+class ThreeBodyAM
 {
 protected:
   int N_; // number of MoleculeAMs in the system
@@ -254,7 +255,7 @@ protected:
   shared_ptr<vector< Pt > >  torque_approx_;
   
   shared_ptr<BesselCalc>      _besselCalc_;
-  shared_ptr<System>          _sys_;  // system data (radii, charges, etc.)
+  shared_ptr<SystemAM>          _sys_;  // system data (radii, charges, etc.)
   shared_ptr<SHCalc>          _shCalc_;
   shared_ptr<Constants>       _consts_;
   
@@ -262,13 +263,13 @@ protected:
   
   void compute_units(Units unt);
   
-  shared_ptr<System> make_subsystem(vector<int> mol_idx);
+  shared_ptr<SystemAM> make_subsystem(vector<int> mol_idx);
   
   int find_di( int i, int j);
   void generatePairsTrips();
   
 public:
-  ThreeBody(shared_ptr<ASolver> _asolver, Units unt = INTERNAL,
+  ThreeBodyAM(shared_ptr<ASolver> _asolver, Units unt = INTERNAL,
             string outfname="", double cutoff = 1e48);
   
   // Solve the N body problem, only 2 or 3 right now
@@ -307,10 +308,10 @@ public:
 /*
  Base class for calculations of physical quantities
  */
-class BasePhysCalc
+class BasePhysCalcAM
 {
 public:
-  BasePhysCalc() { }
+  BasePhysCalcAM() { }
   
   virtual void calc_force() {}
   virtual void calc_energy() {}
@@ -337,17 +338,17 @@ public:
 /*
  Class for calculating energy force and torque in one place
  */
-class PhysCalc : public BasePhysCalc
+class PhysCalcAM : public BasePhysCalcAM
 {
 protected:
   int N_; // number of particles
   double unit_conv_; // Conversion factor for units
   string unit_; // String of the type of units
-  shared_ptr<System> _sys_; // System
+  shared_ptr<SystemAM> _sys_; // System
   
-  shared_ptr<EnergyCalc> _eCalc_;
-  shared_ptr<ForceCalc> _fCalc_;
-  shared_ptr<TorqueCalc> _torCalc_;
+  shared_ptr<EnergyCalcAM> _eCalc_;
+  shared_ptr<ForceCalcAM> _fCalc_;
+  shared_ptr<TorqueCalcAM> _torCalc_;
   
   string outfname_; // where you want the info printed to
   
@@ -356,7 +357,7 @@ protected:
 public:
   
   // constructor just requires an asolver
-  PhysCalc(shared_ptr<ASolver> _asolv, string outfname, Units unit = INTERNAL);
+  PhysCalcAM(shared_ptr<ASolver> _asolv, string outfname, Units unit = INTERNAL);
   
   Pt calc_force_i(int i)  { return _fCalc_->calc_fi(i); }
   Pt calc_tau_i(int i)    { return _torCalc_->calc_tau_i(i); }
@@ -390,7 +391,7 @@ public:
 };
 
 
-class ThreeBodyPhysCalc : public BasePhysCalc, ThreeBody
+class ThreeBodyPhysCalcAM : public BasePhysCalcAM, ThreeBodyAM
 {
 protected:
 //  shared_ptr<ThreeBody> _threeBody_;
@@ -399,7 +400,7 @@ protected:
   string outfname_;
   
 public:
-  ThreeBodyPhysCalc(shared_ptr<ASolver> _asolv, int num=3, string outfname = "", 
+  ThreeBodyPhysCalcAM(shared_ptr<ASolver> _asolv, int num=3, string outfname = "", 
                     Units unit = INTERNAL, double cutoff=1e48);
   
   void calc_force() { if (!solved_) solveNmer(num_); solved_ = true; }
@@ -421,4 +422,4 @@ public:
   
 };
 
-#endif /* EnergyForce_h */
+#endif /* PhysCalcAM_h */

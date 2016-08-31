@@ -29,8 +29,8 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef System_hpp
-#define System_hpp
+#ifndef SystemAM_h
+#define SystemAM_h
 
 #include <map>
 #include "Constants.h"
@@ -122,7 +122,7 @@ public:
 /*
  Class containing all of the relevant information for a particular system
  */
-class System
+class SystemAM
 {
 protected:
     
@@ -142,13 +142,13 @@ protected:
   const double calc_average_radius() const;
   
 public:
-  System() { }
+  SystemAM() { }
   
-  System(const vector<MoleculeAM>& mols,
+  SystemAM(const vector<MoleculeAM>& mols,
          double cutoff=Constants::FORCE_CUTOFF,
          double boxlength=Constants::MAX_DIST);
    
-  System(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
+  SystemAM(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
   
   const int get_n() const                  {return N_;}
   const int get_ntype()                    {return ntype_;}

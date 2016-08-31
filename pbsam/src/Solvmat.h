@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include "BesselCalc.h"
 #include "TMatrix.h"
+#include "SystemSAM.h"
+
+
 
 /*
  References:
@@ -259,6 +262,7 @@ public:
   
   void set_IE_k(int k, vector<double> ie) { IE_orig_[k] = ie;}
   
+  int get_k()                         { return (int)IE_orig_.size(); }
   double get_IE_k_ind(int k, int ind) { return IE_orig_[k][ind]; }
   vector<double> get_IE_k_org(int k)  { return IE_orig_[k]; }
   
@@ -378,7 +382,7 @@ public:
   // if no_pre_sh is true, then SH values have not been pre-calculated
   // this is mostly for unit tests
   void calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
-                 shared_ptr<System> sys, shared_ptr<PreCalcSH> pre_sh, int k,
+                 shared_ptr<SystemSAM> sys, shared_ptr<PreCalcSH> pre_sh, int k,
                  bool no_pre_sh=false);
 };
 
@@ -413,12 +417,12 @@ class LHNMatrix : public ComplexMoleculeMatrix
 protected:
   vector<int> interPol_;
 public:
-  LHNMatrix(int I, int ns, int p, shared_ptr<System> sys);
+  LHNMatrix(int I, int ns, int p, shared_ptr<SystemSAM> sys);
   
   int get_interPol_k(int k)    { return interPol_[k]; }
   vector<int> get_interPol() { return interPol_; }
   
-  void calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
+  void calc_vals(shared_ptr<SystemSAM> sys, shared_ptr<TMatrix> T,
                  vector<shared_ptr<HMatrix> > H, int k);
   
 };

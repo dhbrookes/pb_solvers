@@ -9,7 +9,7 @@
 #ifndef SystemTest_h
 #define SystemTest_h
 
-#include "System.h"
+#include "SystemSAM.h"
 
 using namespace std;
 

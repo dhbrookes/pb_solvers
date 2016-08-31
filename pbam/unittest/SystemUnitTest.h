@@ -9,7 +9,7 @@
 #ifndef SystemUnitTest_h
 #define SystemUnitTest_h
 
-#include "System.h"
+#include "SystemAM.h"
 
 class MoleculeAMUTest : public ::testing::Test
 {
@@ -302,7 +302,7 @@ TEST_F(SystemUTest, checkOverlap)
   
   try
   {
-    System sys( mol_ );
+    SystemAM sys( mol_ );
     FAIL();
   }
   catch( const OverlappingMoleculeException& err )
@@ -331,7 +331,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
   
   try
   {
-    System sys( mol_, 20.0, 10.0 );
+    SystemAM sys( mol_, 20.0, 10.0 );
     FAIL();
   }
   catch( const OverlappingMoleculeException& err )
@@ -361,7 +361,7 @@ TEST_F(SystemUTest, checkVals)
     mol_.push_back( molNew );
   }
   
-  System sys( mol_, cutoff );
+  SystemAM sys( mol_, cutoff );
   EXPECT_NEAR( 5.7666666667, sys.get_lambda(), preclim);
   EXPECT_NEAR( cutoff/sys.get_cutoff(), 1.0, preclim);
   
@@ -418,7 +418,7 @@ TEST_F(SystemUTest, changeCutoff)
     mol_.push_back( molNew );
   }
   
-  System sys( mol_, cutoff, boxl );
+  SystemAM sys( mol_, cutoff, boxl );
   EXPECT_NEAR( (boxl/2.0)/sys.get_cutoff(), 1.0, preclim);
 }
 
@@ -443,7 +443,7 @@ TEST_F(SystemUTest, PBCcheck)
     mol_.push_back( molNew );
   }
 
-  System sys( mol_, cutoff, boxl );
+  SystemAM sys( mol_, cutoff, boxl );
   Pt dis01 = sys.get_pbc_dist_vec(0, 1);
   EXPECT_NEAR(  10/dis01.x(), 1.0, preclim);
   EXPECT_NEAR(-7.8/dis01.y(), 1.0, preclim);

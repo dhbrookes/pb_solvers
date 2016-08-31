@@ -6,7 +6,7 @@
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
-#include "System.h"
+#include "SystemSAM.h"
 
 
 MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
@@ -396,7 +396,7 @@ void MoleculeSAM::write_pqr(string outfile)
 }
 
 
-System::System(vector<shared_ptr<BaseMolecule> > mols,
+SystemSAM::SystemSAM(vector<shared_ptr<BaseMolecule> > mols,
                double cutoff,
                double boxlength)
 :BaseSystem(mols, cutoff, boxlength)
@@ -406,7 +406,7 @@ System::System(vector<shared_ptr<BaseMolecule> > mols,
   save_min_dist();
 }
 
-System::System(Setup setup, double cutoff)
+SystemSAM::SystemSAM(Setup setup, double cutoff)
 :BaseSystem()
 {
   t_ = 0;
@@ -466,7 +466,7 @@ System::System(Setup setup, double cutoff)
       // now copy the representative MoleculeSAM and reposition it
       Pt trans;
       MyMatrix<double> rot;
-      shared_ptr<MoleculeSAM> mol (type_mol);
+      auto mol = make_shared<MoleculeSAM>((*type_mol));
       mol->set_type_idx(j);
       
       Pt com = pqrI.get_center_geo();
@@ -483,10 +483,15 @@ System::System(Setup setup, double cutoff)
         rot.set_val(0, 0, 1.0);
         rot.set_val(1, 1, 1.0);
         rot.set_val(2, 2, 1.0);
+        
       }
       
+      cout << "This is old cog " << mol->get_cog().x() << ", "
+      << mol->get_cog().y() << ", " << mol->get_cog().z() << endl;
       mol->rotate(rot);
       mol->translate(trans, setup.getBLen());
+      cout << "This is new cog " << mol->get_cog().x() << ", "
+      << mol->get_cog().y() << ", " << mol->get_cog().z() << endl;
       
       molecules_.push_back(mol);
       typeIdxToIdx_[keys] = k;
@@ -513,7 +518,7 @@ System::System(Setup setup, double cutoff)
   save_min_dist();
 }
 
-double System::calc_min_dist(int I, int J)
+double SystemSAM::calc_min_dist(int I, int J)
 {
   int k1, k2;
   double dist(__DBL_MAX__), inter_act_d(100.), inter_pol_d(10.), c2c, aik, ajk;
@@ -544,7 +549,7 @@ double System::calc_min_dist(int I, int J)
   return dist;
 }
 
-void System::save_min_dist()
+void SystemSAM::save_min_dist()
 {
   int i, j;
   for (i = 0; i < N_; i++)
@@ -556,7 +561,7 @@ void System::save_min_dist()
   }
 }
 
-void System::reset_positions( vector<string> xyzfiles )
+void SystemSAM::reset_positions( vector<string> xyzfiles )
 {
   int i, j, k;
   vector<int> keys(2);
@@ -574,7 +579,7 @@ void System::reset_positions( vector<string> xyzfiles )
   
 }
 
-void System::write_to_pqr(string outfile, int mid)
+void SystemSAM::write_to_pqr(string outfile, int mid)
 {
   int i, j, k, upper, lower, ct(0);
   ofstream pqr_out;
@@ -615,7 +620,7 @@ void System::write_to_pqr(string outfile, int mid)
   }
 }
 
-void System::write_to_xyz(ofstream & xyz_out)
+void SystemSAM::write_to_xyz(ofstream & xyz_out)
 {
   int i, j, k, at_tot = 0;
   char xyzlin[400];

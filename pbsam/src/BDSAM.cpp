@@ -6,9 +6,9 @@
 //  Copyright © 2016 David Brookes. All rights reserved.
 //
 
-#include "BD.h"
+#include "BDSAM.h"
 
-BDStep::BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+BDStepSAM::BDStepSAM(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
        vector<double> trans_diff_consts,
        vector<double> rot_diff_consts,
        bool diff, bool force)
@@ -19,7 +19,7 @@ diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
   randGen_ = mt19937(rd());
 }
 
-BDStep::BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+BDStepSAM::BDStepSAM(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
                bool diff, bool force)
 :transDiffConsts_(_sys->get_n()), rotDiffConsts_(_sys->get_n()),
 diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
@@ -35,7 +35,7 @@ diff_(diff), force_(force), _sys_(_sys), _consts_(_consts)
 }
 
 
-double BDStep::compute_dt( )
+double BDStepSAM::compute_dt( )
 {
   double DISTCUTOFF_TIME = 20.0;
   if ( min_dist_ - DISTCUTOFF_TIME > 0 )
@@ -44,8 +44,9 @@ double BDStep::compute_dt( )
     return 2.0;
 }
 
-void BDStep::compute_min_dist( )
+void BDStepSAM::compute_min_dist( )
 {
+  
   int i, j;
   Pt pt1, pt2;
   double newD, minDist = 1e100;
@@ -53,27 +54,27 @@ void BDStep::compute_min_dist( )
   {
     for (j = i+1; j < _sys_->get_n(); j++)
     {
-      newD = _sys_->get_pbc_dist_vec(i, j).norm();
+      newD = _sys_->calc_min_dist(i, j);
       if (newD < minDist) minDist = newD;
     }
   }
-  
   min_dist_ = minDist;
 }
 
-Pt BDStep::rand_vec(double mean, double var)
+Pt BDStepSAM::rand_vec(double mean, double var)
 {
   normal_distribution<double> dist (mean, sqrt(var));
   Pt pout = Pt(dist(randGen_), dist(randGen_), dist(randGen_));
   return pout;
 }
 
-void BDStep::indi_trans_update(int i, Pt fi)
+void BDStepSAM::indi_trans_update(int i, Pt fi)
 {
   double kT = _consts_->get_kbt();
   double ikT_int = 1 / Constants::convert_j_to_int(kT);
   double coeff = transDiffConsts_[i] * dt_ * ikT_int;
   Pt dr = Pt(fi * coeff);
+  //  Pt center = _sys_->get_centeri(i);
   Pt rand, new_pt;
   bool accept = false;
   
@@ -94,7 +95,7 @@ void BDStep::indi_trans_update(int i, Pt fi)
 }
 
 
-void BDStep::indi_rot_update(int i, Pt tau_i)
+void BDStepSAM::indi_rot_update(int i, Pt tau_i)
 {
   Pt rand, new_pt;
   Quat qrot;
@@ -105,7 +106,6 @@ void BDStep::indi_rot_update(int i, Pt tau_i)
   double coeff = rotDiffConsts_[i] * dt_ * ikT_int;
   
   Pt dtheta = (tau_i * coeff);
-  Pt center = _sys_->get_centeri(i);
   
   while (! accept)
   {
@@ -115,7 +115,7 @@ void BDStep::indi_rot_update(int i, Pt tau_i)
     // creating zero quaternion if there is no rot
     if (dtheta.norm() < 1e-15) qrot = Quat();
     else qrot = Quat(dtheta.norm(), dtheta);
-//    new_pt = qrot.rotate_point(center);
+    //    new_pt = qrot.rotate_point(center);
     _sys_->rotate_mol(i, qrot);
     accept = true;
     try {
@@ -124,15 +124,10 @@ void BDStep::indi_rot_update(int i, Pt tau_i)
       _sys_->rotate_mol(i, qrot.conj());
       accept = false;
     }
-//    if (!check_for_collision(i, new_pt))
-//    {
-//      _sys_->rotate_mol(i, qrot);
-//      accept = true;
-//    }
   }
 }
 
-void BDStep::bd_update(shared_ptr<vector<Pt> > _F,
+void BDStepSAM::bd_update(shared_ptr<vector<Pt> > _F,
                    shared_ptr<vector<Pt> > _tau)
 {
   int i;
@@ -152,23 +147,21 @@ void BDStep::bd_update(shared_ptr<vector<Pt> > _F,
 }
 
 
-BDRun::BDRun(shared_ptr<ASolver> _asolv,
-             shared_ptr<BaseTerminate> _terminator, string outfname, int num,
+BDRunSAM::BDRunSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradSolv,
+             shared_ptr<BaseTerminateSAM> _terminator, string outfname, int num,
              bool diff, bool force, int maxiter, double prec)
-:maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
+:maxIter_(maxiter), _solver_(_solv), prec_(prec), _terminator_(_terminator)
 {
-  if (num == 0) _physCalc_ = make_shared<PhysCalc>(_asolver_, outfname);
-  else _physCalc_ = make_shared<ThreeBodyPhysCalc>(_asolver_, num, outfname);
+  if (num == 0) _physCalc_ = make_shared<PhysCalcSAM>(_solv, _gradSolv, outfname);
   
-  _stepper_ = make_shared<BDStep> (_asolver_->get_sys(),
-                                   _asolver_->get_consts(), diff, force);
+  _stepper_ = make_shared<BDStepSAM> (_solver_->get_sys(),
+                                   _solver_->get_consts(), diff, force);
 }
 
-void BDRun::run(string xyzfile, string statfile, int nSCF)
+void BDRunSAM::run(string xyzfile, string statfile, int nSCF)
 {
-  int i(0), scf(2);
-  int WRITEFREQ = 200;
-  bool term(false), polz(true);
+  int i(0), scf(2), WRITEFREQ(200);
+  bool term(false);
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
   stats.open(statfile, fstream::in | fstream::out | fstream::app);
@@ -181,12 +174,13 @@ void BDRun::run(string xyzfile, string statfile, int nSCF)
       if (i != 0)  _physCalc_->print_all();
     }
     
-    _stepper_->get_system()->clear_all_lists();
-    _asolver_->reset_all(_stepper_->get_system());
+//    _stepper_->get_system()->clear_all_lists();
+    _solver_->reset_all();
     if (nSCF != 0) scf = nSCF;
 
-    _asolver_->solve_A(prec_, scf);
-    _asolver_->solve_gradA(prec_, scf);
+    _solver_->solve(prec_, scf);
+    _gradSolv_->update_HF(_solver_->get_all_F(), _solver_->get_all_H());
+    _gradSolv_->solve(prec_, scf);
     _physCalc_->calc_force();
     _physCalc_->calc_torque();
     _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
@@ -196,9 +190,7 @@ void BDRun::run(string xyzfile, string statfile, int nSCF)
       auto to = make_shared<vector<Pt> > (N, Pt(0.0,0.0,0.0));
       _stepper_->bd_update(fo,to);
    */
-
-    if ( (i % 100) == 0 ) cout << "This is step " << i << " and polz " << polz<< endl;
-
+    
     if (_terminator_->is_terminated(_stepper_->get_system()))
     {
       term = true;

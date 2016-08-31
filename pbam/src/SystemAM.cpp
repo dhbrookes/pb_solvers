@@ -1,12 +1,12 @@
 //
-//  System.cpp
+//  SystemAM.cpp
 //  pb_solvers_code
 //
 //  Created by David Brookes on 9/28/15.
 //  Copyright © 2015 David Brookes. All rights reserved.
 //
 
-#include "System.h"
+#include "SystemAM.h"
 
 // user specified radius and center
 MoleculeAM::MoleculeAM(string movetype, double a, vector<double> qs, vector<Pt> pos,
@@ -135,7 +135,7 @@ void MoleculeAM::rotate(MyMatrix<double> rotmat)
   }
 }
 
-System::System(const vector<MoleculeAM>& mols, double cutoff,
+SystemAM::SystemAM(const vector<MoleculeAM>& mols, double cutoff,
                double boxlength)
 :molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
 boxLength_(boxlength), t_(0)
@@ -165,7 +165,7 @@ boxLength_(boxlength), t_(0)
   if (boxLength_/2. < cutoff_)  compute_cutoff();
 }
 
-System::System(Setup setup, double cutoff)
+SystemAM::SystemAM(Setup setup, double cutoff)
 :t_(0), ntype_(setup.getNType()), typect_(setup.get_type_nct())
 {
   vector<MoleculeAM> mols;
@@ -251,7 +251,7 @@ System::System(Setup setup, double cutoff)
   lambda_ = calc_average_radius();
 }
 
-const double System::calc_average_radius() const
+const double SystemAM::calc_average_radius() const
 {
   double ave = 0;
   for (int i = 0; i < N_; i++)
@@ -263,7 +263,7 @@ const double System::calc_average_radius() const
 }
 
 
-void System::compute_cutoff()
+void SystemAM::compute_cutoff()
 {
   cutoff_ = boxLength_/2.0;
   cout << " The desired cutoff is larger than half the box length";
@@ -271,7 +271,7 @@ void System::compute_cutoff()
 }
 
 
-void System::check_for_overlap()
+void SystemAM::check_for_overlap()
 {
   int i, j;
   double dist, ai, aj;
@@ -290,14 +290,14 @@ void System::check_for_overlap()
   }
 }
 
-Pt System::get_pbc_dist_vec(int i, int j)
+Pt SystemAM::get_pbc_dist_vec(int i, int j)
 {
   Pt ci = get_centeri(i);
   Pt cj = get_centeri(j);
   return get_pbc_dist_vec_base(ci, cj);
 }
 
-Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
+Pt SystemAM::get_pbc_dist_vec_base(Pt p1, Pt p2)
 {
   Pt dv  = p1 - p2;
   
@@ -308,7 +308,7 @@ Pt System::get_pbc_dist_vec_base(Pt p1, Pt p2)
   return v;
 }
 
-vector<Pt> System::get_allcenter() const
+vector<Pt> SystemAM::get_allcenter() const
 {
   vector< Pt> mol_cen(N_);
   for ( int i = 0; i < N_; i++)
@@ -317,13 +317,13 @@ vector<Pt> System::get_allcenter() const
   return mol_cen;
 }
 
-bool System::less_than_cutoff(Pt v)
+bool SystemAM::less_than_cutoff(Pt v)
 {
   if (v.norm() < cutoff_) return true;
   else return false;
 }
 
-void System::reset_positions( vector<string> xyzfiles )
+void SystemAM::reset_positions( vector<string> xyzfiles )
 {
   int i, j, k;
   vector<int> keys(2);
@@ -341,7 +341,7 @@ void System::reset_positions( vector<string> xyzfiles )
   
 }
 
-void System::write_to_pqr(string outfile)
+void SystemAM::write_to_pqr(string outfile)
 {
   int i, j, ct = 0;
   ofstream pqr_out;
@@ -369,7 +369,7 @@ void System::write_to_pqr(string outfile)
   }
 }
 
-void System::write_to_xyz(ofstream & xyz_out)
+void SystemAM::write_to_xyz(ofstream & xyz_out)
 {
   int i, j, at_tot = 0;
   char xyzlin[400];

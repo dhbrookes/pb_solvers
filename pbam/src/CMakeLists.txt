@@ -8,17 +8,17 @@ include_directories("./")
 add_executable(pbam
   ASolver.cpp
   ../../pb_shared/src/BaseSys.cpp
-  BD.cpp
+  BDAM.cpp
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp
-  Electrostatics.cpp
-  EnergyForce.cpp
+  ElectrostaticsAM.cpp
+  PhysCalcAM.cpp
   main.cpp
   PBAM.cpp
   ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/setup.cpp
   ../../pb_shared/src/SHCalc.cpp
-  System.cpp
+  SystemAM.cpp
   )
 
 
@@ -41,17 +41,17 @@ if(ENABLE_PBAM_APBS)
   add_library(PBAMLib 
               ASolver.cpp
               ../../pb_shared/src/BaseSys.cpp
-              BD.cpp
+              BDAM.cpp
               ../../pb_shared/src/BesselCalc.cpp
               ../../pb_shared/src/Constants.cpp
-              Electrostatics.cpp
-              EnergyForce.cpp
+              ElectrostaticsAM.cpp
+              PhysCalcAM.cpp
               PBAM.cpp
               ../../pb_wrap/src/PBAMWrap.cpp
               ../../pb_shared/src/ReExpCalc.cpp
               ../../pb_shared/src/setup.cpp
               ../../pb_shared/src/SHCalc.cpp
-              System.cpp
+              SystemAM.cpp
               )
   
 endif()
@@ -65,17 +65,17 @@ if(ENABLE_PBAM_SPHINX)
   add_library(pbam_sph MODULE
               ../../pb_wrap/src/pbam_py.c
               ASolver.cpp
-              BD.cpp
+              BDAM.cpp
               ../../pb_shared/src/BesselCalc.cpp
               ../../pb_shared/src/Constants.cpp
-              Electrostatics.cpp
-              EnergyForce.cpp
+              ElectrostaticsAM.cpp
+              PhysCalcAM.cpp
               PBAM.cpp
               ../../pb_wrap/src/PBAMWrap.cpp
               ReExpCalc.cpp
               ../../pb_shared/src/setup.cpp
               ../../pb_shared/src/SHCalc.cpp
-              System.cpp)
+              SystemAM.cpp)
   
   set_target_properties(pbam_sph PROPERTIES PREFIX "")
 endif()

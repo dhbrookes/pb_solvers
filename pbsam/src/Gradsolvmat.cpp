@@ -537,7 +537,7 @@ GradLHNMatrix::GradLHNMatrix(int I, int wrt, int ns, int p)
 {
 }
 
-void GradLHNMatrix::calc_all_vals(shared_ptr<System> sys,
+void GradLHNMatrix::calc_all_vals(shared_ptr<SystemSAM> sys,
                                   shared_ptr<TMatrix> T,
                                   vector<shared_ptr<GradCmplxMolMat> > gradT_A,
                                   vector<shared_ptr<GradHMatrix> > dH)
@@ -547,7 +547,7 @@ void GradLHNMatrix::calc_all_vals(shared_ptr<System> sys,
     calc_val_k(k, sys, T, gradT_A, dH);
 }
 
-void GradLHNMatrix::calc_val_k(int k, shared_ptr<System> sys,
+void GradLHNMatrix::calc_val_k(int k, shared_ptr<SystemSAM> sys,
                                shared_ptr<TMatrix> T,
                                vector<shared_ptr<GradCmplxMolMat> > gradT_A,
                                vector<shared_ptr<GradHMatrix> > dH,

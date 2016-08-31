@@ -6,10 +6,10 @@
 //  Copyright © 2016 David Brookes. All rights reserved.
 //
 
-#include "PhysCalc.h"
+#include "PhysCalcSAM.h"
 
 
-double EnergyCalc::calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN)
+double EnergyCalcSAM::calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN)
 {
   double E = 0;
   for (int k = 0; k < H->get_ns(); k++)
@@ -26,7 +26,7 @@ double EnergyCalc::calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> LHN)
   return E;
 }
 
-void EnergyCalc::calc_all_energy(vector<shared_ptr<HMatrix> > H,
+void EnergyCalcSAM::calc_all_energy(vector<shared_ptr<HMatrix> > H,
                                            vector<shared_ptr<LHNMatrix> > LHN)
 {
 //  vector<double> E(H.size(), 0.0);
@@ -37,7 +37,7 @@ void EnergyCalc::calc_all_energy(vector<shared_ptr<HMatrix> > H,
   }
 }
 
-void ForceCalc::calc_fI(int I, shared_ptr<HMatrix> H,
+void ForceCalcSAM::calc_fI(int I, shared_ptr<HMatrix> H,
                         shared_ptr<LHNMatrix> LHN,
                         shared_ptr<GradHMatrix> dH,
                         shared_ptr<GradLHNMatrix> dLHN)
@@ -78,7 +78,7 @@ void ForceCalc::calc_fI(int I, shared_ptr<HMatrix> H,
   (*totForces_)[I] = tot;
 }
 
-void ForceCalc::calc_all_f(vector<shared_ptr<HMatrix> > H,
+void ForceCalcSAM::calc_all_f(vector<shared_ptr<HMatrix> > H,
                            vector<shared_ptr<LHNMatrix> > LHN,
                            vector<vector<shared_ptr<GradHMatrix> > > dH,
                            vector<vector<shared_ptr<GradLHNMatrix> > > dLHN)
@@ -125,8 +125,8 @@ void ForceCalc::calc_all_f(vector<shared_ptr<HMatrix> > H,
 //}
 
 
-void TorqueCalc::calc_all_tau(shared_ptr<System> sys,
-                              shared_ptr<ForceCalc> fcalc)
+void TorqueCalcSAM::calc_all_tau(shared_ptr<SystemSAM> sys,
+                              shared_ptr<ForceCalcSAM> fcalc)
 {
   for (int i = 0; i < I_; i++)
   {
@@ -135,8 +135,8 @@ void TorqueCalc::calc_all_tau(shared_ptr<System> sys,
   }
 }
 
-Pt TorqueCalc::calc_tauI(int i, shared_ptr<BaseMolecule> mol,
-                         shared_ptr<ForceCalc> fcalc)
+Pt TorqueCalcSAM::calc_tauI(int i, shared_ptr<BaseMolecule> mol,
+                         shared_ptr<ForceCalcSAM> fcalc)
 {
   Pt ck, rpk, fp, tauI, tau1;
   vector<int> ch_in_k; // charges in sphere k
@@ -150,22 +150,22 @@ Pt TorqueCalc::calc_tauI(int i, shared_ptr<BaseMolecule> mol,
   return tauI;
 }
 
-PhysCalc::PhysCalc(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradsolv,
+PhysCalcSAM::PhysCalcSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradsolv,
                    string outfname, Units unit)
 :_solv_(_solv), _gradSolv_(_gradsolv), outfname_(outfname)
 {
   _sys_ = _solv->get_sys();
   
-  _eCalc_ = make_shared<EnergyCalc>(_sys_->get_n());
-  _fCalc_ = make_shared<ForceCalc>(_sys_->get_n(), _sys_->get_all_Ik(),
+  _eCalc_ = make_shared<EnergyCalcSAM>(_sys_->get_n());
+  _fCalc_ = make_shared<ForceCalcSAM>(_sys_->get_n(), _sys_->get_all_Ik(),
                                    _solv->get_consts()->get_dielectric_water(),
                                    _solv->get_sh(), _solv->get_bessel());
-  _torCalc_ = make_shared<TorqueCalc>(_sys_->get_n());
+  _torCalc_ = make_shared<TorqueCalcSAM>(_sys_->get_n());
 
   compute_units(_solv->get_consts(), unit);
 }
 
-Pt TorqueCalc::cross_prod(Pt u, Pt v)
+Pt TorqueCalcSAM::cross_prod(Pt u, Pt v)
 {
   Pt c;
   c.set_x(u[1]*v[2] - u[2]*v[1]);
@@ -176,7 +176,7 @@ Pt TorqueCalc::cross_prod(Pt u, Pt v)
 
 
 
-void PhysCalc::calc_force()
+void PhysCalcSAM::calc_force()
 {
   _fCalc_->calc_all_f(_solv_->get_all_H(),
                       _solv_->get_all_LHN(),
@@ -184,19 +184,19 @@ void PhysCalc::calc_force()
                       _gradSolv_->get_gradLHN_all());
 }
 
-void PhysCalc::calc_energy()
+void PhysCalcSAM::calc_energy()
 {
   _eCalc_->calc_all_energy(_solv_->get_all_H(), _solv_->get_all_LHN());
 }
 
 
-void PhysCalc::calc_torque()
+void PhysCalcSAM::calc_torque()
 {
   _torCalc_->calc_all_tau(_sys_, _fCalc_);
 }
 
 
-void PhysCalc::compute_units( shared_ptr<Constants> cst, Units unit)
+void PhysCalcSAM::compute_units( shared_ptr<Constants> cst, Units unit)
 {
   if (unit==INTERNAL)
   {

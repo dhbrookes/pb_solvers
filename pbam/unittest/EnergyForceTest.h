@@ -9,7 +9,7 @@
 #ifndef EnergyForceTest_h
 #define EnergyForceTest_h
 
-#include "EnergyForce.h"
+#include "PhysCalcAM.h"
 
 class EnForTest
 {
@@ -50,15 +50,15 @@ class EnForTest
     shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
     shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
     shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-    shared_ptr<System> sys = make_shared<System>(mol_sing_);
+    shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
     
     shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                           const_, vals);
     ASolvTest->solve_A( 1E-12 );
     ASolvTest->solve_gradA(1E-12);
 
-    ForceCalc FoTest(ASolvTest);
-    TorqueCalc TorTest(ASolvTest);
+    ForceCalcAM FoTest(ASolvTest);
+    TorqueCalcAM TorTest(ASolvTest);
     
     FoTest.calc_force();
     TorTest.calc_tau();

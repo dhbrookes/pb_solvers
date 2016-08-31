@@ -8,7 +8,7 @@
 
 #include "TMatrix.h"
 
-TMatrix::TMatrix(int p, shared_ptr<System> _sys,
+TMatrix::TMatrix(int p, shared_ptr<SystemSAM> _sys,
                  shared_ptr<SHCalc> _shcalc,
                  shared_ptr<Constants> _consts,
                  shared_ptr<BesselCalc> _besselcalc,
@@ -29,7 +29,7 @@ _besselCalc_(_besselcalc), _shCalc_(_shcalc)
 }
 
 
-void TMatrix::update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
+void TMatrix::update_vals(shared_ptr<SystemSAM> _sys, shared_ptr<SHCalc> _shcalc,
                           shared_ptr<BesselCalc> _besselcalc,
                           shared_ptr<ReExpCoeffsConstants> _reexpconsts)
 {

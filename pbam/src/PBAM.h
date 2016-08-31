@@ -34,7 +34,7 @@
 #include <memory>
 #include <time.h>
 #include "PBAMStruct.h"
-#include "BD.h"
+#include "BDAM.h"
 
 
 using namespace std;
@@ -43,7 +43,7 @@ class PBAM : protected PBAMInput
 {
 protected:
   shared_ptr<Setup> setp_;
-  shared_ptr<System> syst_;
+  shared_ptr<SystemAM> syst_;
   shared_ptr<Constants> consts_;
 
   shared_ptr<BesselConstants> _bessl_consts_;

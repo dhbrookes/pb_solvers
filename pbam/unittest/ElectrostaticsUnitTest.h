@@ -10,7 +10,7 @@
 #define ElectrostaticsUnitTest_h
 
 #include <stdio.h>
-#include "Electrostatics.h"
+#include "ElectrostaticsAM.h"
 
 class ElecUTest : public ::testing::Test
 {
@@ -88,13 +88,13 @@ TEST_F(ElecUTest, detailsCheck)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   
   vector<double>  mins = EstatTest.get_mins();
   vector<double>  maxs = EstatTest.get_maxs();
@@ -118,13 +118,13 @@ TEST_F(ElecUTest, detailsCheck2)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 20);
+  ElectrostaticAM EstatTest( ASolvTest, 20);
   vector<double>  mins = EstatTest.get_mins();
   vector<double>  maxs = EstatTest.get_maxs();
   vector<int>     npts = EstatTest.get_npts();
@@ -147,13 +147,13 @@ TEST_F(ElecUTest, checkPot)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   vector<vector<vector<double > > > esp = EstatTest.get_potential();
   
   int ct = 0;
@@ -175,13 +175,13 @@ TEST_F(ElecUTest, printDX)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   EstatTest.print_dx(test_dir_loc+"test.dx");
   
   string inputLine;
@@ -205,13 +205,13 @@ TEST_F(ElecUTest, checkPOTZ)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   
   double val = -5.4;
   char pot[50];
@@ -241,13 +241,13 @@ TEST_F(ElecUTest, checkGridOutRange)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-4, 1000); ASolvTest->solve_gradA(1E-4, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   
   double val = 100.8;
   char pot[50];
@@ -273,13 +273,13 @@ TEST_F(ElecUTest, checkGridOutRange2)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-4, 1000); ASolvTest->solve_gradA(1E-4, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   
   double val = -50.4;
   char pot[50];
@@ -305,13 +305,13 @@ TEST_F(ElecUTest, printPOTX)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   
   double val = 1;
   char pot[50];
@@ -339,13 +339,13 @@ TEST_F(ElecUTest, printPOTY)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   
   double val = 4;
   char pot[50];
@@ -373,13 +373,13 @@ TEST_F(ElecUTest, printPOTZ)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-12, 1000); ASolvTest->solve_gradA(1E-12, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   
   double val = -1;
   char pot[50];
@@ -424,13 +424,13 @@ TEST_F(ElecUTest, printPOT)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         make_shared<Constants>
                                                         (const_), vals);
   ASolvTest->solve_A(1E-3, 1000); ASolvTest->solve_gradA(1E-3, 1000);
   
-  Electrostatic EstatTest( ASolvTest, 11);
+  ElectrostaticAM EstatTest( ASolvTest, 11);
   double val = 0; char pot[50];
   sprintf(pot, "pot_z_%.2f.dat", val);
   EstatTest.print_grid("z", val, test_dir_loc+string(pot));

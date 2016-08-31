@@ -13,16 +13,16 @@ ADD_EXECUTABLE(pbsamtest
   ../../pb_shared/src/BaseSys.cpp
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp
-  ../src/Electrostatics.cpp
+  ../src/ElectrostaticsSAM.cpp
   ../src/Gradsolvmat.cpp
   ../src/PBSAM.cpp
-  ../src/PhysCalc.cpp
+  ../src/PhysCalcSAM.cpp
   ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/SHCalc.cpp
   ../../pb_shared/src/setup.cpp
   ../src/Solver.cpp
   ../src/Solvmat.cpp
-  ../src/System.cpp
+  ../src/SystemSAM.cpp
   ../src/TMatrix.cpp
   main.cpp
   )
