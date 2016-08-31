@@ -436,6 +436,10 @@ public:
   Pt get_force_i(int i)      {return _physCalc_->get_forcei(i);}
   Pt get_torque_i(int i)     {return _physCalc_->get_taui(i);}
   double get_energy_i(int i) {return _physCalc_->calc_ei(i);}
+
+  Pt get_forcei_conv(int i)      {return _physCalc_->get_forcei(i);}
+  Pt get_torquei_conv(int i)     {return _physCalc_->get_taui(i);}
+  double get_energyi_conv(int i) {return _physCalc_->calc_ei(i);}
 };
 
 

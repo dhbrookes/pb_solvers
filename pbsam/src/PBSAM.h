@@ -59,6 +59,10 @@ protected:
   vector<shared_ptr<HMatrix > > h_spol_;
   vector<shared_ptr<FMatrix > > f_spol_;
 
+  double force_[MOL_MAX][3];
+  double torque_[MOL_MAX][3];
+  double nrg_intera_[MOL_MAX];
+
   int poles_;
   double solveTol_;
 
@@ -82,6 +86,7 @@ public:
   void check_system();
 
   void init_write_system();
+  void init_consts_calcs();
   void initialize_pbsam();
 
   int run();

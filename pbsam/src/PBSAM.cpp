@@ -10,12 +10,6 @@
 
 PBSAM::PBSAM() : PBSAMInput(), poles_(5), solveTol_(1e-4)
 {
-  _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
-  _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
-  _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
-  _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
-  _exp_consts_ = make_shared<ExpansionConstants> (poles_);
-
   vector<string> grid2d = {"tst.2d"};
   vector<string> gridax = {"x"};
   vector<double> gridloc = {0.0};
@@ -60,12 +54,7 @@ PBSAM::PBSAM(string infile) : poles_(5)
   else
     solveTol_ = 1e-4;
   
-  _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
-  _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
-  _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
-  _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
-  _exp_consts_ = make_shared<ExpansionConstants> (poles_);
-  
+  init_consts_calcs(); 
   initialize_pbsam();
 }
 
@@ -76,18 +65,11 @@ PBSAM::PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
 poles_(5), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
 {
   int i, j;
-  
   if ((string(pbami.runType_) == "electrostatics")
       || (string(pbami.runType_) == "energyforce")) solveTol_ = 1e-10;
   else
     solveTol_ = 1e-4;
   
-  _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
-  _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
-  _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
-  _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
-  _exp_consts_ = make_shared<ExpansionConstants> (poles_);
-
   // PBSAM part
   string unt = (pbami.setunits_ == 0) ? "kT" : string(pbami.units_);
   vector<string> surffil(pbsami.surfct_),imatfil(pbsami.imatct_);
@@ -171,10 +153,7 @@ poles_(5), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
   _syst_ = make_shared<System> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
   
-  h_spol_.resize(_syst_->get_n());
-  f_spol_.resize(_syst_->get_n());
-  imats_.resize(_syst_->get_n());
-
+  init_consts_calcs();
   init_write_system();
   initialize_pbsam();
 }
@@ -225,6 +204,21 @@ void PBSAM::init_write_system()
   // writing initial configuration out
   _syst_->write_to_pqr( _setp_->getRunName() + ".pqr");
   cout << "Written config" << endl;
+}
+
+
+void PBSAM::init_consts_calcs()
+{
+  _bessl_consts_ = make_shared<BesselConstants>(2*poles_);
+  _bessl_calc_ = make_shared<BesselCalc>(2*poles_, _bessl_consts_);
+  _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
+  _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
+  _exp_consts_ = make_shared<ExpansionConstants> (poles_);
+
+  h_spol_.resize(_syst_->get_n());
+  f_spol_.resize(_syst_->get_n());
+  imats_.resize(_syst_->get_n());
+
 }
 
 shared_ptr<System> PBSAM::make_subsystem(vector<int> mol_idx)
@@ -349,6 +343,7 @@ void PBSAM::initialize_pbsam()
 
 int PBSAM::run()
 {
+  cout << "Now running program" << endl;
   if ( _setp_->getRunType() == "dynamics")
     run_dynamics();
   else if ( _setp_->getRunType() == "electrostatics")
@@ -365,19 +360,8 @@ int PBSAM::run()
 
 PBAMOutput PBSAM::run_apbs()
 {
-  cout << "Now running program" << endl;
-  if ( _setp_->getRunType() == "dynamics")
-    run_dynamics();
-  else if ( _setp_->getRunType() == "electrostatics")
-    run_electrostatics( );
-  else if ( _setp_->getRunType() == "energyforce")
-    run_energyforce( );
-  else if ( _setp_->getRunType() == "bodyapprox")
-    run_bodyapprox( );
-  else
-    cout << "Runtype not recognized! See manual for options" << endl;
-
-  PBAMOutput pbsamO;
+  run();
+  PBAMOutput pbsamO(_syst_->get_n(), force_, nrg_intera_);
   return pbsamO;
 }
 

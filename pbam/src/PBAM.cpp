@@ -298,11 +298,11 @@ void PBAM::run_dynamics()
     if (traj==0)
       for (i=0; i<syst_->get_n(); i++)
       {
-        Pt tmp = dynamic_run.get_force_i(i);
+        Pt tmp = dynamic_run.get_force_i(i) * consts_->get_conv_factor();
         force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
-        tmp = dynamic_run.get_torque_i(i);
+        tmp = dynamic_run.get_torque_i(i) * consts_->get_conv_factor();
         torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
-        nrg_intera_[i]  = dynamic_run.get_energy_i(i);
+        nrg_intera_[i]=dynamic_run.get_energy_i(i)*consts_->get_conv_factor();
       }
   }
 }
@@ -342,11 +342,11 @@ void PBAM::run_energyforce()
   
   for (i=0; i<syst_->get_n(); i++)
   {
-    Pt tmp = calcEnFoTo.get_forcei(i);
+    Pt tmp = calcEnFoTo.get_forcei_conv(i);
     force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
-    tmp = calcEnFoTo.get_taui(i);
+    tmp = calcEnFoTo.get_taui_conv(i);
     torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
-    nrg_intera_[i]  = calcEnFoTo.get_omegai(i);
+    nrg_intera_[i]  = calcEnFoTo.get_omegai_conv(i);
   }
   
   t3 = clock() - t3;
