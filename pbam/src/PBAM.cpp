@@ -194,9 +194,6 @@ void PBAM::initialize_coeff_consts()
   _sh_consts_ = make_shared<SHCalcConstants>(2*poles_);
   _sh_calc_ = make_shared<SHCalc>(2*poles_, _sh_consts_);
 
-  force_      = vector<Pt> (syst_->get_n(), Pt());
-  torque_     = vector<Pt> (syst_->get_n(), Pt());
-  nrg_intera_ = vector<double> (syst_->get_n(), 0.0);
 }
 
 
@@ -218,18 +215,8 @@ int PBAM::run()
 
 PBAMOutput PBAM::run_apbs()
 {
-  if ( setp_->getRunType() == "dynamics")
-    run_dynamics();
-  else if ( setp_->getRunType() == "electrostatics")
-    run_electrostatics( );
-  else if ( setp_->getRunType() == "energyforce")
-    run_energyforce( );
-  else if ( setp_->getRunType() == "bodyapprox")
-    run_bodyapprox( );
-  else
-    cout << "Runtype not recognized! See manual for options" << endl;
-
-  PBAMOutput pbamO;
+  run();
+  PBAMOutput pbamO(syst_->get_n(), force_, nrg_intera_);
   return pbamO;
 }
 
@@ -308,12 +295,15 @@ void PBAM::run_dynamics()
     BDRun dynamic_run( ASolv, term_conds, outfile);
     dynamic_run.run(xyztraj, statfile);
     cout << "Done with trajectory " << traj << endl;
-    for (i=0; i<syst_->get_n(); i++)
-    {
-      force_[i]   = dynamic_run.get_force_i(i);
-      torque_[i]  = dynamic_run.get_torque_i(i);
-      nrg_intera_[i]  = dynamic_run.get_energy_i(i);
-    }
+    if (traj==0)
+      for (i=0; i<syst_->get_n(); i++)
+      {
+        Pt tmp = dynamic_run.get_force_i(i);
+        force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
+        tmp = dynamic_run.get_torque_i(i);
+        torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
+        nrg_intera_[i]  = dynamic_run.get_energy_i(i);
+      }
   }
 }
 
@@ -352,8 +342,10 @@ void PBAM::run_energyforce()
   
   for (i=0; i<syst_->get_n(); i++)
   {
-    force_[i]   = calcEnFoTo.get_forcei(i);
-    torque_[i]  = calcEnFoTo.get_taui(i);
+    Pt tmp = calcEnFoTo.get_forcei(i);
+    force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
+    tmp = calcEnFoTo.get_taui(i);
+    torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
     nrg_intera_[i]  = calcEnFoTo.get_omegai(i);
   }
   
@@ -378,8 +370,10 @@ void PBAM::run_bodyapprox()
   threeBodTest.printTBDEnForTor(setp_->getRunName(), setp_->getMBDLoc());
   for (i=0; i<syst_->get_n(); i++)
   {
-    force_[i]   = threeBodTest.get_forcei_approx(i);
-    torque_[i]  = threeBodTest.get_torquei_approx(i);
+    Pt tmp = threeBodTest.get_forcei_approx(i);
+    force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
+    tmp = threeBodTest.get_torquei_approx(i);
+    torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
     nrg_intera_[i]  = threeBodTest.get_energyi_approx(i);
   }
 

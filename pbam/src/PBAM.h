@@ -51,9 +51,9 @@ protected:
   shared_ptr<SHCalcConstants> _sh_consts_;
   shared_ptr<SHCalc> _sh_calc_;
 
-  vector<Pt> force_;
-  vector<Pt> torque_;
-  vector<double> nrg_intera_;
+  double force_[MOL_MAX][3];
+  double torque_[MOL_MAX][3];
+  double nrg_intera_[MOL_MAX];
 
   int poles_;
   double solveTol_;
