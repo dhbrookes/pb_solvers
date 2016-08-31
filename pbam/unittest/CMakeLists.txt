@@ -12,14 +12,14 @@ include_directories("../../pb_shared/unittest")
 ADD_EXECUTABLE(pbamtest 
   ../src/ASolver.cpp
   ../../pb_shared/src/BaseSys.cpp
-  ../src/BD.cpp
+  ../src/BDAM.cpp
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp
-  ../src/Electrostatics.cpp
-  ../src/EnergyForce.cpp
+  ../src/ElectrostaticsAM.cpp
+  ../src/PhysCalcAM.cpp
   ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/SHCalc.cpp
-  ../src/System.cpp
+  ../src/SystemAM.cpp
   ../../pb_shared/src/setup.cpp
   main.cpp
   )

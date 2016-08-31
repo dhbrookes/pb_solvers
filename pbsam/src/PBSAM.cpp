@@ -277,6 +277,9 @@ void PBSAM::initialize_pbsam()
           imats_[idx]->write_all_mat(fil.substr(0, fil.size()-4));
         } else
         {
+          imats_[idx] = make_shared<IEMatrix>(idx, _syst_->get_moli(idx),
+                                              _sh_calc_, poles_, _exp_consts_,
+                                              false);
           imats_[idx]->init_from_other(imats_[_syst_->get_mol_global_idx(i,0)]);
           _syst_->copy_grid(_syst_->get_mol_global_idx(i,0), idx);
         }

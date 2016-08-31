@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include "SHCalc.h"
 #include "ReExpCalc.h"
+#include "BaseSys.h"
+#include "System.h"
 
 using namespace std;
 
