@@ -7,8 +7,8 @@ has some linear algebra utilities and OMP parallelism implemented.
 
 Below is a flow diagram of the program from call to finish.
 
-.. image:: images/pbam_flow.png
-   :width: 95%
+.. image:: ../images/pbsam_flow.png
+   :width: 85%
 
 Additionally, some of the pre-run components are quite time-consuming
 to compute, so if they are not included as inputs, they will be printed to 

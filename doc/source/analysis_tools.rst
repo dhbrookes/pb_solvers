@@ -36,3 +36,60 @@ of isosurfaces by again pressing Create Rep and choosing a new Value and ColorID
 .. image:: images/vmd_4sp_dx.png
    :width: 66%
 
+
+2D ESP Plots
+------------
+
+If one chooses the 'electrostatic' run type in PB-[S]AM, then a file for each specified 
+cross section will be output with the following format::
+
+	# Data from PBAM Electrostat run
+	# My runname is barnase.x.0.dat
+	units kT
+	grid 200 200
+	axis x 0
+	origin -51.2204	-51.2204
+	delta 0.512204	0.512204
+	maxmin	1.35396	0
+		0.2352107	0.2360552	0.2368904	0.2377159
+
+In our :code:`scripts` directory we have provided a python script for plotting these potential
+files. Simply call::
+
+	$ python plot_2D_potential.py	<file_name>	<out_name>
+
+where :code:`<file_name>` is an output file with format detailed above and :code:`<out_name>` 
+is the desired prefix of the output file. This script creates a JPG file of the cross sectioned 
+potential. An example of this output is shown below.
+
+
+.. image:: images/pot_x_0.jpg
+   :width: 70%
+   :align: center
+
+3D ESP plots
+------------
+
+Additionally, if one chooses the 'electrostatic' run type in PB-[S]AM, then a .dx file will 
+be created that maps the electrostatic potential to a specified number of grid points. This 
+.dx file has the following format::
+
+	# Data from PBAM Electrostat run
+	# My runname is electro.map.out and units kT
+	grid 10 10 10
+	origin -4 -9 -9
+	delta 0.8 1.8 1.8
+		0.00000	0.00000	-2.90000	-5.899581
+
+In our :code:`scripts` directory we have provided a python script for plotting these potential
+files. Simply call::
+
+	$ python plot_3d_surf.py <dx_file> <out_name> 
+
+which will create a number of 3D potential JPG images from various viewing angles.  An example
+output image is shown below. 
+
+.. image:: images/4sp_surf.jpg
+   :width: 70%
+   :align: center
+

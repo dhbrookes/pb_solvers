@@ -42,12 +42,6 @@ double BDStep::compute_dt( )
     return 2.0 + ( min_dist_ - DISTCUTOFF_TIME )/15.0;
   else
     return 2.0;
-/*
-  double DISTCUTOFF_TIME = 3.5;
-  if ( min_dist_ - DISTCUTOFF_TIME > 0 )
-    return ( min_dist_*min_dist_ )/(240.0*368.0);
-  else
-    return 0.001;*/
 }
 
 void BDStep::compute_min_dist( )
@@ -74,38 +68,12 @@ Pt BDStep::rand_vec(double mean, double var)
   return pout;
 }
 
-
-//bool BDStep::check_for_collision(int mol, Pt new_pt)
-//{
-//  bool collision = false;
-//  int j;
-//  double dist, aj;
-//  Pt pj;
-//  double ai = _sys_->get_ai(mol);
-//  
-//  for (j = 0; j < _sys_->get_n(); j++)
-//  {
-//    if (j == mol) continue;
-//    pj = _sys_->get_centeri(j);
-//    aj = _sys_->get_ai(j);
-//    
-//    dist = new_pt.dist(pj);
-//    if (dist < (ai + aj))
-//    {
-//      collision = true;
-//      break;
-//    }
-//  }
-//  return collision;
-//}
-
 void BDStep::indi_trans_update(int i, Pt fi)
 {
   double kT = _consts_->get_kbt();
   double ikT_int = 1 / Constants::convert_j_to_int(kT);
   double coeff = transDiffConsts_[i] * dt_ * ikT_int;
   Pt dr = Pt(fi * coeff);
-//  Pt center = _sys_->get_centeri(i);
   Pt rand, new_pt;
   bool accept = false;
   
@@ -122,13 +90,6 @@ void BDStep::indi_trans_update(int i, Pt fi)
       _sys_->translate_mol(i, (dr+rand) * -1);
       accept = false;
     }
-//    if (_sys_->is_collision())
-//    new_pt = center + (dr + rand);
-//    if (!check_for_collision(i, new_pt))
-//    {
-//      _sys_->translate_mol(i, dr+rand);
-//      accept = true;
-//    }
   }
 }
 

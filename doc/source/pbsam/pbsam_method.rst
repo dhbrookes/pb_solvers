@@ -1,6 +1,5 @@
-
-PB-SAM
-===========
+Method overview
+----------------
 
 PB-SAM is a semi-analytical solution to the linearized Poisson-Boltzmann 
 equation for multiple molecules of arbitrary charge distribution 

@@ -300,7 +300,7 @@ void IEMatrix::write_mat_k_reg(string imatFname, int k)
   for (int i = 0; i< p_*p_*p_*p_; i++)
   {
     fout << IE_orig_[k][i] << " "; //mat
-    if ( (i%(p_*p_)) == 0 && (i > 0)) fout << endl;
+    if ( (i%(p_*p_-1)) == 0 && (i > 0)) fout << endl;
   }
   
   fout.close();

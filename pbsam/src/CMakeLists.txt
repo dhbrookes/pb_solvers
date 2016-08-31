@@ -6,6 +6,7 @@ include_directories("./")
 
 add_executable(pbsam
   ../../pb_shared/src/BaseSys.cpp
+  BD.cpp
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp
   Electrostatics.cpp
@@ -41,6 +42,7 @@ if(ENABLE_PBSAM_APBS)
   #  build pbsam library
   add_library(PBSAMLib 
               ../../pb_shared/src/BaseSys.cpp
+			  BD.cpp
               ../../pb_shared/src/BesselCalc.cpp
               ../../pb_shared/src/Constants.cpp
               Electrostatics.cpp
