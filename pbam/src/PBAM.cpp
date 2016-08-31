@@ -34,7 +34,7 @@ PBAM::PBAM() : PBAMInput()
                              false, 100, 0, 15, "tst.map", 1, grid2d,
                              gridax, gridloc, "tst.dx", 1, false, difftype,
                              diffcon, termtype, termval, termnu, confil,
-                             conpad, xyzf);
+                             conpad, xyzf, "kT");
   syst_ = make_shared<System> ();
   consts_ = make_shared<Constants> ();
 }
