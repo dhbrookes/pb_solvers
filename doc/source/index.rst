@@ -23,6 +23,7 @@ Table of Contents
    intro
    pbam/pbam
    pbsam/pbsam
+   analysis_tools.rst
    references
 ..   pbam/pbam_input
    pbam/pbam_examples
