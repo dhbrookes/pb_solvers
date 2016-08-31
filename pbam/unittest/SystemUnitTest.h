@@ -284,9 +284,11 @@ protected :
 
 TEST_F(SystemUTest, checkOverlap)
 {
-  vector < MoleculeAM > mol_;
+  vector < shared_ptr<BaseMolecule > > mol_;
+  shared_ptr<BaseMolecule> molNew;
   Pt pos[2] = { Pt( 0.0, 0.0, -5.0), Pt( 0.0, 0.0, 0.0)};
   double rad[2] = { 5.0, 3.7 };
+
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
     int M = 3; vector<double> chg(M); vector<double> vdW(M);
@@ -295,7 +297,7 @@ TEST_F(SystemUTest, checkOverlap)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+    molNew = make_shared<MoleculeAM> ( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -315,7 +317,9 @@ TEST_F(SystemUTest, checkOverlap)
 
 TEST_F(SystemUTest, checkPBCOverlap)
 {
-  vector < MoleculeAM > mol_; const int nMol = 3;
+  vector < shared_ptr<BaseMolecule > > mol_;
+  shared_ptr<BaseMolecule> molNew;
+  const int nMol = 3;
   Pt pos[nMol] = { Pt( 0.0, 0.0, -5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
   for (int molInd = 0; molInd < nMol; molInd ++ )
   {
@@ -325,7 +329,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
     chg[1]=2.0; vdW[1]=0.1; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0.1; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", chg, poschg, vdW, pos[molInd], molInd, 0);
+    molNew = make_shared<MoleculeAM>( "stat", chg, poschg, vdW, pos[molInd], molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -344,7 +348,8 @@ TEST_F(SystemUTest, checkPBCOverlap)
 
 TEST_F(SystemUTest, checkVals)
 {
-  vector < MoleculeAM > mol_;
+  vector < shared_ptr<BaseMolecule > > mol_;
+  shared_ptr<BaseMolecule> molNew;
   double cutoff = 45.876;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
   double rad[3] = { 5.0, 3.7, 8.6 };
@@ -356,8 +361,8 @@ TEST_F(SystemUTest, checkVals)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -400,7 +405,8 @@ TEST_F(SystemUTest, checkVals)
 
 TEST_F(SystemUTest, changeCutoff)
 {
-  vector < MoleculeAM > mol_;
+  vector < shared_ptr<BaseMolecule > > mol_;
+  shared_ptr<BaseMolecule> molNew;
   double cutoff = 45.876;
   double boxl   = 55.876;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,17.8,15.0) };
@@ -413,8 +419,8 @@ TEST_F(SystemUTest, changeCutoff)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -425,7 +431,8 @@ TEST_F(SystemUTest, changeCutoff)
 
 TEST_F(SystemUTest, PBCcheck)
 {
-  vector < MoleculeAM > mol_;
+  vector < shared_ptr<BaseMolecule > > mol_;
+  shared_ptr<BaseMolecule> molNew;
   double cutoff =  5.00;
   double boxl   = 20.00;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,17.8,15.0) };
@@ -438,8 +445,8 @@ TEST_F(SystemUTest, PBCcheck)
     chg[1]=2.0; vdW[1]=0; poschg[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     chg[2]=2.0; vdW[2]=0; poschg[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "rot", rad[molInd], chg, poschg, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", rad[molInd], chg, poschg, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
 

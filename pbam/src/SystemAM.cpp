@@ -135,17 +135,16 @@ void MoleculeAM::rotate(MyMatrix<double> rotmat)
   }
 }
 
-SystemAM::SystemAM(const vector<MoleculeAM>& mols, double cutoff,
+SystemAM::SystemAM(vector<shared_ptr<BaseMolecule> > mols, double cutoff,
                double boxlength)
-:molecules_(mols), N_((int) mols.size()), cutoff_(cutoff),
-boxLength_(boxlength), t_(0)
+:BaseSystem(mols, cutoff, boxlength)
 {
   int i, j, k, maxi = 0;
   vector<int> maxj, keys(2);
   for ( k = 0; k < N_; k++)
   {
-    i = molecules_[k].get_type();
-    j = molecules_[k].get_type_idx();
+    i = molecules_[k]->get_type();
+    j = molecules_[k]->get_type_idx();
     keys = {i,j};
     typeIdxToIdx_[keys] = k;
     maxi = ( maxi > i ) ? maxi : i;
@@ -166,12 +165,16 @@ boxLength_(boxlength), t_(0)
 }
 
 SystemAM::SystemAM(Setup setup, double cutoff)
-:t_(0), ntype_(setup.getNType()), typect_(setup.get_type_nct())
+:BaseSystem()
 {
+  t_ = 0;
+  ntype_ = setup.getNType();
+  typect_ = setup.get_type_nct();
+  
   vector<MoleculeAM> mols;
   int chg, i, j, k=0;
   string pqrpath;
-  MoleculeAM mol;
+  shared_ptr<MoleculeAM> mol;
   vector<int> keys(2);
   for (i = 0; i < setup.getNType(); i++)
   { 
@@ -218,21 +221,21 @@ SystemAM::SystemAM(Setup setup, double cutoff)
       
       if (pqrI.get_Ns() != 0)  // coarse graining is in pqr
       {
-        mol  = MoleculeAM(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
+        mol  = make_shared<MoleculeAM>(setup.getTypeNDef(i), pqrI.get_cg_radii()[0],
                         pqrI.get_charges(), repos_charges,
                         pqrI.get_radii(), xyzI.get_pts()[j], i, j,
                         setup.getDrot(i), setup.getDtr(i));
       }
       else if (! setup.getTypeIsTransRot(i))
       {
-        mol = MoleculeAM(setup.getTypeNDef(i), pqrI.get_charges(),
+        mol = make_shared<MoleculeAM> (setup.getTypeNDef(i), pqrI.get_charges(),
                        repos_charges, pqrI.get_radii(),
                        xyzI.get_pts()[j], i, j,
                        setup.getDrot(i), setup.getDtr(i));
       }
       else
       {
-        mol = MoleculeAM(setup.getTypeNDef(i), pqrI.get_charges(),
+        mol = make_shared<MoleculeAM > (setup.getTypeNDef(i), pqrI.get_charges(),
                        repos_charges, pqrI.get_radii(), i, j,
                        setup.getDrot(i), setup.getDtr(i));
       }
@@ -251,44 +254,44 @@ SystemAM::SystemAM(Setup setup, double cutoff)
   lambda_ = calc_average_radius();
 }
 
-const double SystemAM::calc_average_radius() const
-{
-  double ave = 0;
-  for (int i = 0; i < N_; i++)
-  {
-    ave += get_ai(i);
-  }
-  ave  =  ave / N_;
-  return ave;
-}
-
-
-void SystemAM::compute_cutoff()
-{
-  cutoff_ = boxLength_/2.0;
-  cout << " The desired cutoff is larger than half the box length";
-  cout << ". Resetting cutoff to 1/2 the boxlength: " << cutoff_ << endl;
-}
-
-
-void SystemAM::check_for_overlap()
-{
-  int i, j;
-  double dist, ai, aj;
-  for (i = 0; i < N_; i++)
-  {
-    ai = molecules_[i].get_a();
-    for (j = i+1; j < N_; j++)
-    {
-      aj = molecules_[j].get_a();
-      dist = get_pbc_dist_vec(i, j).norm();
-      if (dist < (ai + aj))
-      {
-        throw OverlappingMoleculeException(i, j);
-      }
-    }
-  }
-}
+//const double SystemAM::calc_average_radius() const
+//{
+//  double ave = 0;
+//  for (int i = 0; i < N_; i++)
+//  {
+//    ave += get_ai(i);
+//  }
+//  ave  =  ave / N_;
+//  return ave;
+//}
+//
+//
+//void SystemAM::compute_cutoff()
+//{
+//  cutoff_ = boxLength_/2.0;
+//  cout << " The desired cutoff is larger than half the box length";
+//  cout << ". Resetting cutoff to 1/2 the boxlength: " << cutoff_ << endl;
+//}
+//
+//
+//void SystemAM::check_for_overlap()
+//{
+//  int i, j;
+//  double dist, ai, aj;
+//  for (i = 0; i < N_; i++)
+//  {
+//    ai = molecules_[i].get_a();
+//    for (j = i+1; j < N_; j++)
+//    {
+//      aj = molecules_[j].get_a();
+//      dist = get_pbc_dist_vec(i, j).norm();
+//      if (dist < (ai + aj))
+//      {
+//        throw OverlappingMoleculeException(i, j);
+//      }
+//    }
+//  }
+//}
 
 Pt SystemAM::get_pbc_dist_vec(int i, int j)
 {
@@ -297,31 +300,31 @@ Pt SystemAM::get_pbc_dist_vec(int i, int j)
   return get_pbc_dist_vec_base(ci, cj);
 }
 
-Pt SystemAM::get_pbc_dist_vec_base(Pt p1, Pt p2)
-{
-  Pt dv  = p1 - p2;
-  
-  Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
-            dv.y() - round(dv.y()/boxLength_)*boxLength_,
-            dv.z() - round(dv.z()/boxLength_)*boxLength_);
-  
-  return v;
-}
+//Pt SystemAM::get_pbc_dist_vec_base(Pt p1, Pt p2)
+//{
+//  Pt dv  = p1 - p2;
+//  
+//  Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
+//            dv.y() - round(dv.y()/boxLength_)*boxLength_,
+//            dv.z() - round(dv.z()/boxLength_)*boxLength_);
+//  
+//  return v;
+//}
 
 vector<Pt> SystemAM::get_allcenter() const
 {
   vector< Pt> mol_cen(N_);
   for ( int i = 0; i < N_; i++)
-    mol_cen[i] = molecules_[i].get_center();
+    mol_cen[i] = molecules_[i]->get_centerk(0);
   
   return mol_cen;
 }
 
-bool SystemAM::less_than_cutoff(Pt v)
-{
-  if (v.norm() < cutoff_) return true;
-  else return false;
-}
+//bool SystemAM::less_than_cutoff(Pt v)
+//{
+//  if (v.norm() < cutoff_) return true;
+//  else return false;
+//}
 
 void SystemAM::reset_positions( vector<string> xyzfiles )
 {
@@ -335,13 +338,13 @@ void SystemAM::reset_positions( vector<string> xyzfiles )
       keys = { i, j};
       k = typeIdxToIdx_[keys];
       Pt dist_to_new = get_centeri(k) - xyzI.get_pts()[j];
-      molecules_[k].translate(dist_to_new*-1, boxLength_);
+      molecules_[k]->translate(dist_to_new*-1, boxLength_);
     }
   }
   
 }
 
-void SystemAM::write_to_pqr(string outfile)
+void SystemAM::write_to_pqr(string outfile, int mid)
 {
   int i, j, ct = 0;
   ofstream pqr_out;

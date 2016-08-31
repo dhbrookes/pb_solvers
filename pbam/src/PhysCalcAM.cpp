@@ -349,7 +349,7 @@ void ThreeBodyAM::generatePairsTrips()
 
 shared_ptr<SystemAM> ThreeBodyAM::make_subsystem(vector<int> mol_idx)
 {
-  vector<MoleculeAM> sub_mols (mol_idx.size());
+  vector<shared_ptr<BaseMolecule> > sub_mols (mol_idx.size());
   for (int i = 0; i < mol_idx.size(); i++)
   {
     sub_mols[i] = _sys_->get_moli(mol_idx[i]);

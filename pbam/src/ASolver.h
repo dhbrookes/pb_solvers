@@ -83,7 +83,7 @@ protected:
   shared_ptr<vector<vector<MyMatrix<cmplx> > > > _allSh_;
   
   // calculate the SH for all charges in a MoleculeAM
-  vector<MyMatrix<cmplx> > calc_mol_sh(MoleculeAM mol);
+  vector<MyMatrix<cmplx> > calc_mol_sh(shared_ptr<BaseMolecule> mol);
   
   // calculate one index of inner gamma matrix
   cmplx calc_indi_gamma(int i, int n);

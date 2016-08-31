@@ -28,7 +28,7 @@ protected :
 TEST_F(TermUTest, timeTerm)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
@@ -36,7 +36,7 @@ TEST_F(TermUTest, timeTerm)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -54,7 +54,7 @@ TEST_F(TermUTest, timeTerm)
 TEST_F(TermUTest, xLETerm)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
@@ -62,7 +62,7 @@ TEST_F(TermUTest, xLETerm)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -81,7 +81,7 @@ TEST_F(TermUTest, xLETerm)
 TEST_F(TermUTest, xGETerm)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
@@ -89,7 +89,7 @@ TEST_F(TermUTest, xGETerm)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -108,7 +108,7 @@ TEST_F(TermUTest, xGETerm)
 TEST_F(TermUTest, yLETerm)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
@@ -116,7 +116,7 @@ TEST_F(TermUTest, yLETerm)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -135,7 +135,7 @@ TEST_F(TermUTest, yLETerm)
 TEST_F(TermUTest, yGETerm)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
@@ -143,7 +143,7 @@ TEST_F(TermUTest, yGETerm)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -162,7 +162,7 @@ TEST_F(TermUTest, yGETerm)
 TEST_F(TermUTest, zLETerm)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
@@ -170,7 +170,7 @@ TEST_F(TermUTest, zLETerm)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -189,7 +189,7 @@ TEST_F(TermUTest, zLETerm)
 TEST_F(TermUTest, zGETerm)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
@@ -197,7 +197,7 @@ TEST_F(TermUTest, zGETerm)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -216,7 +216,7 @@ TEST_F(TermUTest, zGETerm)
 TEST_F(TermUTest, zLETermManyType)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   vector<int> typ = { 0, 0, 1}; vector<int> typind = { 0, 1, 0};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -225,7 +225,7 @@ TEST_F(TermUTest, zLETermManyType)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -244,7 +244,7 @@ TEST_F(TermUTest, zLETermManyType)
 TEST_F(TermUTest, xGETermManyType)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -253,7 +253,7 @@ TEST_F(TermUTest, xGETermManyType)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -276,7 +276,7 @@ TEST_F(TermUTest, xGETermManyType)
 TEST_F(TermUTest, xLETermManyTypePBC)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -285,7 +285,7 @@ TEST_F(TermUTest, xLETermManyTypePBC)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -308,7 +308,7 @@ TEST_F(TermUTest, xLETermManyTypePBC)
 TEST_F(TermUTest, yGETermManyTypePBC)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -317,7 +317,7 @@ TEST_F(TermUTest, yGETermManyTypePBC)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -343,7 +343,7 @@ TEST_F(TermUTest, yGETermManyTypePBC)
 TEST_F(TermUTest, rTermType)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
@@ -351,7 +351,7 @@ TEST_F(TermUTest, rTermType)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -374,7 +374,7 @@ TEST_F(TermUTest, rTermType)
 TEST_F(TermUTest, rTermManyType)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -383,7 +383,7 @@ TEST_F(TermUTest, rTermManyType)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -406,7 +406,7 @@ TEST_F(TermUTest, rTermManyType)
 TEST_F(TermUTest, rTermManyTypePBC)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -415,7 +415,7 @@ TEST_F(TermUTest, rTermManyTypePBC)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -444,7 +444,7 @@ TEST_F(TermUTest, rTermManyTypePBC)
 TEST_F(TermUTest, contTermType)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
   {
@@ -452,7 +452,7 @@ TEST_F(TermUTest, contTermType)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol.push_back( molNew );
   }
@@ -476,7 +476,7 @@ TEST_F(TermUTest, contTermType)
 TEST_F(TermUTest, contTermManyType)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -485,7 +485,7 @@ TEST_F(TermUTest, contTermManyType)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -509,7 +509,7 @@ TEST_F(TermUTest, contTermManyType)
 TEST_F(TermUTest, contTermManyTypePBC)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -518,7 +518,7 @@ TEST_F(TermUTest, contTermManyTypePBC)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -544,7 +544,7 @@ TEST_F(TermUTest, contTermManyTypePBC)
 TEST_F(TermUTest, combineTermORPBC)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -553,7 +553,7 @@ TEST_F(TermUTest, combineTermORPBC)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -591,7 +591,7 @@ TEST_F(TermUTest, combineTermORPBC)
 TEST_F(TermUTest, combineTermANDPBC)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -600,7 +600,7 @@ TEST_F(TermUTest, combineTermANDPBC)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -640,7 +640,7 @@ TEST_F(TermUTest, combineTermANDPBC)
 TEST_F(TermUTest, combineTerm3ORPBC)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -649,7 +649,7 @@ TEST_F(TermUTest, combineTerm3ORPBC)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }
@@ -691,7 +691,7 @@ TEST_F(TermUTest, combineTerm3ORPBC)
 TEST_F(TermUTest, combineTerm3ANDPBC)
 {
   const int nmol = 3;
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
   for (int molInd = 0; molInd < nmol; molInd ++ )
@@ -700,7 +700,7 @@ TEST_F(TermUTest, combineTerm3ANDPBC)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     typ[molInd], typind[molInd]);
     mol.push_back( molNew );
   }

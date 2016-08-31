@@ -723,16 +723,16 @@ void ASolver::pre_compute_all_sh()
 /*
  Calculate the SH matrix for every charge in a MoleculeAM
  */
-vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(MoleculeAM mol)
+vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(shared_ptr<BaseMolecule> mol)
 {
   vector<MyMatrix<cmplx> > vout;
-  vout.reserve(mol.get_m());
+  vout.reserve(mol->get_m());
   int j;
   double theta, phi;
   Pt pt;
-  for (j = 0; j < mol.get_m(); j++)
+  for (j = 0; j < mol->get_m(); j++)
   {
-    pt = mol.get_posj(j);
+    pt = mol->get_posj(j);
     theta = pt.theta();
     phi = pt.phi();
     _shCalc_->calc_sh(theta, phi);
