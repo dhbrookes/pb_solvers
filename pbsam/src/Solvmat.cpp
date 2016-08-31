@@ -622,7 +622,7 @@ void LFMatrix::init(shared_ptr<BaseMolecule> mol, shared_ptr<FMatrix> F,
 }
 
 void LFMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<FMatrix> F,
-                         shared_ptr<System> sys, shared_ptr<PreCalcSH> pre_sh,
+                         shared_ptr<SystemSAM> sys, shared_ptr<PreCalcSH> pre_sh,
                          int k, bool no_pre_sh)
 {
   reset_mat(k);
@@ -711,7 +711,7 @@ void LHMatrix::calc_vals(shared_ptr<TMatrix> T, shared_ptr<HMatrix> H,
 }
 
 
-LHNMatrix::LHNMatrix(int I, int ns, int p, shared_ptr<System> sys)
+LHNMatrix::LHNMatrix(int I, int ns, int p, shared_ptr<SystemSAM> sys)
 :interPol_(ns, 1), ComplexMoleculeMatrix(I, ns, p)
 {
   Pt Ik, Jl;
@@ -737,7 +737,7 @@ LHNMatrix::LHNMatrix(int I, int ns, int p, shared_ptr<System> sys)
   }
 }
 
-void LHNMatrix::calc_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
+void LHNMatrix::calc_vals(shared_ptr<SystemSAM> sys, shared_ptr<TMatrix> T,
                           vector<shared_ptr<HMatrix> > H, int k)
 {
   reset_mat(k);

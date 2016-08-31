@@ -435,11 +435,11 @@ class GradLHNMatrix : public GradCmplxMolMat
 public:
   GradLHNMatrix(int I, int wrt, int ns, int p);
   
-  void calc_all_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
+  void calc_all_vals(shared_ptr<SystemSAM> sys, shared_ptr<TMatrix> T,
                      vector<shared_ptr<GradCmplxMolMat> > gradT_A,
                      vector<shared_ptr<GradHMatrix> > dH);
   
-  void calc_val_k(int k, shared_ptr<System> sys,
+  void calc_val_k(int k, shared_ptr<SystemSAM> sys,
                   shared_ptr<TMatrix> T,
                   vector<shared_ptr<GradCmplxMolMat> > gradT_A,
                   vector<shared_ptr<GradHMatrix> > dH,

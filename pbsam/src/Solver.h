@@ -47,7 +47,7 @@ protected:
   
   vector<shared_ptr<FMatrix> >      _F_;
   shared_ptr<TMatrix>               _T_;
-  shared_ptr<System>                _sys_;
+  shared_ptr<SystemSAM>                _sys_;
   shared_ptr<SHCalc>                _shCalc_;
   shared_ptr<BesselCalc>            _bCalc_;
   shared_ptr<Constants>             _consts_;
@@ -72,14 +72,14 @@ protected:
   
 public:
   //Used primarily for testing
-  Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+  Solver(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
          shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
          int p, bool readImat=false, bool readHF=false,
          vector<vector<string> > imats = {{}},
          vector<vector<vector<string> > > expHF = {{{}}});
   
   // Used for main/runs
-  Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+  Solver(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
          shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
          int p, vector<shared_ptr<IEMatrix> > imats,
          vector<shared_ptr<HMatrix > > h_spol,
@@ -130,7 +130,7 @@ public:
   
   shared_ptr<TMatrix> get_T()              { return _T_;}
   int get_p()                              { return p_;}
-  shared_ptr<System> get_sys()             { return _sys_; }
+  shared_ptr<SystemSAM> get_sys()             { return _sys_; }
   shared_ptr<Constants> get_consts()       { return _consts_; }
   shared_ptr<SHCalc> get_sh()              { return _shCalc_;}
   shared_ptr<BesselCalc> get_bessel()      { return _bCalc_;}
@@ -169,7 +169,7 @@ protected:
   
   vector<vector<shared_ptr<GradCmplxMolMat> > > gradT_A_; // pre-computed part
   
-  shared_ptr<System>                _sys_;
+  shared_ptr<SystemSAM>                _sys_;
   shared_ptr<SHCalc>                _shCalc_;
   shared_ptr<BesselCalc>            _bCalc_;
   shared_ptr<ExpansionConstants>    _expConsts_;
@@ -190,7 +190,7 @@ protected:
   void update_outer_gradH(int I, int wrt, int k);
   
 public:
-  GradSolver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+  GradSolver(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
              shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
              shared_ptr<TMatrix> _T, vector<shared_ptr<FMatrix> > _F,
              vector<shared_ptr<HMatrix> > _H, vector<shared_ptr<IEMatrix> > _IE,

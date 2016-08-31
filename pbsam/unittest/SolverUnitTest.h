@@ -616,7 +616,7 @@ TEST_F(SolverUTest, LHN_test)
                                          pqr.get_cg_radii()));
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -697,7 +697,7 @@ TEST_F(SolverUTest, spol_test)
                                        pqr.get_atom_pts(), pqr.get_radii(),
                                        pqr.get_cg_centers(),
                                        pqr.get_cg_radii()));
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -747,7 +747,7 @@ TEST_F(SolverUTest, mutual_pol_test)
                                          pqr.get_cg_radii()));
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -826,7 +826,7 @@ TEST_F(SolverUTest, grad_pre_test)
                                          pqr.get_cg_radii()));
     mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
     mols[1]->translate(Pt(10.71213542,-7.35779167,-0.15628125), 1e14);
-    auto sys = make_shared<System>(mols);
+    auto sys = make_shared<SystemSAM>(mols);
     auto cst = make_shared<Constants> ();
     cst->set_dielectric_water(80);
     cst->set_dielectric_prot(4);
@@ -925,7 +925,7 @@ TEST_F(SolverUTest, grad_test)
   
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -1045,7 +1045,7 @@ TEST_F(SolverUTest, grad3_test)
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
   mols[2]->translate(Pt(-22.28786458,-14.35779167,-15.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);

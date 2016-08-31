@@ -39,7 +39,7 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
   mols.push_back(make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
                                      pqr.get_atom_pts(), pqr.get_radii(),
                                      pqr.get_cg_centers(), pqr.get_cg_radii()));
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   
   auto cst = make_shared<Constants> ();
   cst->set_salt_concentration(0.0);
@@ -102,7 +102,7 @@ TEST_F(TMatrixUTest, xforIntra_analytic_test)
   mols.push_back(make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
                                      pqr.get_atom_pts(), pqr.get_radii(),
                                      pqr.get_cg_centers(), pqr.get_cg_radii()));
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   
   auto _SHConstTest = make_shared<SHCalcConstants> (2*pol);

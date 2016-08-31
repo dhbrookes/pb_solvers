@@ -35,28 +35,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <random>
 #include <memory>
-#include "Electrostatics.h"
+#include "ElectrostaticsSAM.h"
 
 /*
  Base class for implementing termination conditions in BD
  */
-class BaseTerminate
+class BaseTerminateSAM
 {
 public:
-  BaseTerminate() { }
+  BaseTerminateSAM() { }
   
-  virtual const bool is_terminated(shared_ptr<System> _sys) const
+  virtual const bool is_terminated(shared_ptr<SystemSAM> _sys) const
   {
     return false;
   }
   
-  virtual string get_how_term(shared_ptr<System> _sys)
+  virtual string get_how_term(shared_ptr<SystemSAM> _sys)
   {
     return "";
   }
 };
 
-class ContactTerminate2 : public BaseTerminate
+class ContactTerminateSAM2 : public BaseTerminateSAM
 {
 protected:
   int mol1_;
@@ -70,15 +70,15 @@ protected:
   string how_term_;
   
 public:
-  ContactTerminate2(vector<int> mol, vector<vector<int> > atpairs,
+  ContactTerminateSAM2(vector<int> mol, vector<vector<int> > atpairs,
                     vector<double> dists, double pad)
-  :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
+  :BaseTerminateSAM(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
   dists_(dists), pad_(pad)
   {
     string_create();
   }
   
-  ContactTerminate2(ContactFile confile, double pad)
+  ContactTerminateSAM2(ContactFile confile, double pad)
   :pad_(pad), mol1_(confile.get_moltype1()), mol2_(confile.get_moltype2()),
   atPairs_(confile.get_at_pairs()), dists_(confile.get_dists())
   {
@@ -93,9 +93,9 @@ public:
     how_term_ = "System has fulfilled condition: " + string(buff);
   }
   
-  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
+  string get_how_term(shared_ptr<SystemSAM> _sys)   { return how_term_; }
   
-  const bool is_terminated(shared_ptr<System> _sys) const
+  const bool is_terminated(shared_ptr<SystemSAM> _sys) const
   {
     bool contacted = false;
     int i, j, ctct, k, idx1, idx2, sph1, sph2;
@@ -144,29 +144,29 @@ public:
 /*
  Class for time based termination
  */
-class TimeTerminate : public BaseTerminate
+class TimeTerminateSAM : public BaseTerminateSAM
 {
 protected:
   double endTime_; //termination time
   string how_term_;
   
 public:
-  TimeTerminate(double end_time)
-  :BaseTerminate(), endTime_(end_time)
+  TimeTerminateSAM(double end_time)
+  :BaseTerminateSAM(), endTime_(end_time)
   {
     char buff[400];
     sprintf(buff, "System has fulfilled condition: time >= %7.1f;\t", endTime_);
     how_term_ = buff;
   }
   
-  const bool is_terminated(shared_ptr<System> _sys) const
+  const bool is_terminated(shared_ptr<SystemSAM> _sys) const
   {
     bool done = false;
     if (_sys->get_time() >= endTime_) done = true;
     return done;
   }
   
-  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
+  string get_how_term(shared_ptr<SystemSAM> _sys)   { return how_term_; }
 };
 
 enum CoordType { X, Y, Z, R };
@@ -177,7 +177,7 @@ enum BoundaryType { LEQ, GEQ };
  the specified MoleculeAM satisfies the BoundaryType condition on the CoordType
  with the given boundary value.
  */
-class CoordTerminate : public BaseTerminate
+class CoordTerminateSAM : public BaseTerminateSAM
 {
 protected:
   double boundaryVal_;
@@ -187,9 +187,9 @@ protected:
   string how_term_;
   
 public:
-  CoordTerminate(int mol_idx, CoordType coord_type,
+  CoordTerminateSAM(int mol_idx, CoordType coord_type,
                  BoundaryType bound_type, double bound_val)
-  :BaseTerminate(), molIdx_(mol_idx), coordType_(coord_type),
+  :BaseTerminateSAM(), molIdx_(mol_idx), coordType_(coord_type),
   boundType_(bound_type), boundaryVal_(bound_val)
   {
     char buff[400];
@@ -205,7 +205,7 @@ public:
     how_term_ = buff;
   }
   
-  const bool is_terminated(shared_ptr<System> _sys) const
+  const bool is_terminated(shared_ptr<SystemSAM> _sys) const
   {
     bool done = false;
     int i, idx;
@@ -225,28 +225,29 @@ public:
     return done;
   }
   
-  string get_how_term(shared_ptr<System> _sys)   { return how_term_; }
+  string get_how_term(shared_ptr<SystemSAM> _sys)   { return how_term_; }
 };
 
 
 /*
  Combine termination conditions
  */
-enum HowTermCombine { ALL, ONE };
+enum HowTermCombineSAM { ALL, ONE };
 
-class CombineTerminate: public BaseTerminate
+class CombineTerminateSAM: public BaseTerminateSAM
 {
 protected:
-  vector<shared_ptr<BaseTerminate> > terms_;
-  HowTermCombine howCombine_;
+  vector<shared_ptr<BaseTerminateSAM> > terms_;
+  HowTermCombineSAM howCombine_;
   
 public:
-  CombineTerminate(vector<shared_ptr<BaseTerminate> > terms, HowTermCombine how_combine)
-  :BaseTerminate(), terms_(terms), howCombine_(how_combine)
+  CombineTerminateSAM(vector<shared_ptr<BaseTerminateSAM> > terms,
+                      HowTermCombineSAM how_combine)
+  :BaseTerminateSAM(), terms_(terms), howCombine_(how_combine)
   {
   }
   
-  const bool is_terminated(shared_ptr<System> _sys) const
+  const bool is_terminated(shared_ptr<SystemSAM> _sys) const
   {
     bool done;
     howCombine_== ALL ? done=true : done=false;
@@ -261,7 +262,7 @@ public:
     return done;
   }
   
-  string get_how_term(shared_ptr<System> _sys)
+  string get_how_term(shared_ptr<SystemSAM> _sys)
   {
     string how_term = "";
     bool done;
@@ -280,7 +281,7 @@ public:
 /*
  Class for performing a brownian dynamics step
  */
-class BDStep
+class BDStepSAM
 {
 protected:
   vector<double> transDiffConsts_;  // translational diffusion constants
@@ -293,7 +294,7 @@ protected:
   
   // random number generator object:
   mt19937 randGen_;
-  shared_ptr<System> _sys_;
+  shared_ptr<SystemSAM> _sys_;
   shared_ptr<Constants> _consts_;
   
   // check if a MoleculeAM's new point causes it to collide with any other
@@ -316,13 +317,13 @@ protected:
   void update_sys_time(double dt) { _sys_->set_time(_sys_->get_time() + dt); }
   
 public:
-  BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+  BDStepSAM(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
      vector<double> trans_diff_consts,
      vector<double> rot_diff_consts,
      bool diff = true, bool force = true);
   
   // Constructor where diffusion constants are read from system:
-  BDStep(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+  BDStepSAM(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
          bool diff = true, bool force = true);
   
   // update the system with Brownian dynamics given forces and torques on every
@@ -330,7 +331,7 @@ public:
   void bd_update(shared_ptr<vector<Pt> > _F,
                  shared_ptr<vector<Pt> > _tau);
   
-  shared_ptr<System> get_system() { return _sys_; }
+  shared_ptr<SystemSAM> get_system() { return _sys_; }
   double get_dt()                 { return dt_; }
   double get_min_dist()           { return min_dist_; }
   
@@ -340,14 +341,14 @@ public:
 /*
  Class for running a full BD simulation
  */
-class BDRun
+class BDRunSAM
 {
 protected:
-  shared_ptr<BDStep> _stepper_;
+  shared_ptr<BDStepSAM> _stepper_;
   shared_ptr<Solver> _solver_;
   shared_ptr<GradSolver> _gradSolv_;
-  shared_ptr<BasePhysCalc> _physCalc_;
-  shared_ptr<BaseTerminate> _terminator_;
+  shared_ptr<BasePhysCalcSAM> _physCalc_;
+  shared_ptr<BaseTerminateSAM> _terminator_;
   
   string outfname_; //outputfile
   
@@ -357,8 +358,8 @@ protected:
 public:
   // num is the number of bodies to perform calculations on (2, 3 or all).
   // If num=0, then the equations will be solved exactly
-  BDRun(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradSolv,
-        shared_ptr<BaseTerminate> _terminator, string outfname, int num = 0,
+  BDRunSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradSolv,
+        shared_ptr<BaseTerminateSAM> _terminator, string outfname, int num = 0,
         bool diff = true, bool force = true,
         int maxiter = 2, double prec = 1e-4);
   

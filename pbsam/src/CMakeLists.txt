@@ -6,20 +6,20 @@ include_directories("./")
 
 add_executable(pbsam
   ../../pb_shared/src/BaseSys.cpp
-  BD.cpp
+  BDSAM.cpp
   ../../pb_shared/src/BesselCalc.cpp
   ../../pb_shared/src/Constants.cpp
-  Electrostatics.cpp
+  ElectrostaticsSAM.cpp
   Gradsolvmat.cpp  
   main.cpp
   PBSAM.cpp 
-  PhysCalc.cpp
+  PhysCalcSAM.cpp
   ../../pb_shared/src/ReExpCalc.cpp
   ../../pb_shared/src/setup.cpp
   ../../pb_shared/src/SHCalc.cpp
   Solver.cpp
   Solvmat.cpp
-  System.cpp
+  SystemSAM.cpp
   TMatrix.cpp
   )
 
@@ -42,20 +42,20 @@ if(ENABLE_PBSAM_APBS)
   #  build pbsam library
   add_library(PBSAMLib 
               ../../pb_shared/src/BaseSys.cpp
-			  BD.cpp
+			  BDSAM.cpp
               ../../pb_shared/src/BesselCalc.cpp
               ../../pb_shared/src/Constants.cpp
-              Electrostatics.cpp
+              ElectrostaticsSAM.cpp
               Gradsolvmat.cpp  
               PBSAM.cpp 
-              PhysCalc.cpp
+              PhysCalcSAM.cpp
               ../../pb_wrap/src/PBSAMWrap.cpp
               ../../pb_shared/src/ReExpCalc.cpp
               ../../pb_shared/src/setup.cpp
               ../../pb_shared/src/SHCalc.cpp
               Solver.cpp
               Solvmat.cpp
-              System.cpp
+              SystemSAM.cpp
               TMatrix.cpp
               )
 

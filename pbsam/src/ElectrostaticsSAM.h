@@ -31,7 +31,7 @@
 #ifndef Electrostatics_h
 #define Electrostatics_h
 
-#include "PhysCalc.h"
+#include "PhysCalcSAM.h"
 #include <time.h> 
 
 #ifdef __OMP
@@ -68,7 +68,7 @@ public:
 /*
  Class for printing out electrostatics of system
  */
-class Electrostatic
+class ElectrostaticSAM
 {
 protected:
   int p_; // Npoles
@@ -88,7 +88,7 @@ protected:
   vector<vector<double > > grid_;  // 2D cross section of ESP
   
   vector<shared_ptr<HMatrix> > _H_;
-  shared_ptr<System> _sys_;
+  shared_ptr<SystemSAM> _sys_;
   shared_ptr<SHCalc> _shCalc_;
   shared_ptr<BesselCalc> _bCalc_;
   shared_ptr<Constants> _consts_;
@@ -106,12 +106,12 @@ protected:
   double lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V, int p);
   
 public:
-  Electrostatic(vector<shared_ptr<HMatrix> > H, shared_ptr<System> _sys,
+  ElectrostaticSAM(vector<shared_ptr<HMatrix> > H, shared_ptr<SystemSAM> _sys,
                 shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                 shared_ptr<Constants> _consts,
                 int p, int npts = 150);
   
-  Electrostatic(shared_ptr<Solver> solve, int npts=150);
+  ElectrostaticSAM(shared_ptr<Solver> solve, int npts=150);
   
   // print APBS file
   void print_dx(string ifname);

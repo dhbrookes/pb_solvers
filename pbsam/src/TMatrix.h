@@ -15,8 +15,7 @@
 #include <stdio.h>
 #include "SHCalc.h"
 #include "ReExpCalc.h"
-#include "BaseSys.h"
-#include "System.h"
+#include "SystemSAM.h"
 
 using namespace std;
 
@@ -45,7 +44,7 @@ protected:
   map<vector<int>, int>   idxMap_;
   shared_ptr<SHCalc>      _shCalc_;
   shared_ptr<BesselCalc>  _besselCalc_;
-  shared_ptr<System>      _system_;
+  shared_ptr<SystemSAM>      _system_;
   
   int         Nmol_;
   vector<int> Nsi_; // number of spheres in each Molecule
@@ -86,7 +85,7 @@ public:
   
   TMatrix() { }
   
-  TMatrix(int p, shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
+  TMatrix(int p, shared_ptr<SystemSAM> _sys, shared_ptr<SHCalc> _shcalc,
           shared_ptr<Constants> _consts, shared_ptr<BesselCalc> _besselcalc,
           shared_ptr<ReExpCoeffsConstants> _reexpconsts);
   
@@ -103,7 +102,7 @@ public:
     return T_[idxMap_[{I, k, J, l}]];
   }
   
-  void update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
+  void update_vals(shared_ptr<SystemSAM> _sys, shared_ptr<SHCalc> _shcalc,
                    shared_ptr<BesselCalc> _besselcalc,
                    shared_ptr<ReExpCoeffsConstants> _reexpconsts);
   

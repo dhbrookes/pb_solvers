@@ -33,10 +33,10 @@
 
 #include <memory>
 #include <time.h>
-#include "PBAMStruct.h"
+//#include "PBAMStruct.h"
 #include "PBSAMStruct.h"
-#include "Electrostatics.h"
-#include "BD.h"
+#include "ElectrostaticsSAM.h"
+#include "BDSAM.h"
 
 using namespace std;
 
@@ -44,7 +44,7 @@ class PBSAM : protected PBSAMInput
 {
 protected:
   shared_ptr<Setup> _setp_;
-  shared_ptr<System> _syst_;
+  shared_ptr<SystemSAM> _syst_;
   shared_ptr<Constants> _consts_;
   
   shared_ptr<BesselConstants> _bessl_consts_;
@@ -98,7 +98,7 @@ public:
   void run_electrostatics();
   void run_energyforce();
   
-  shared_ptr<System> make_subsystem(vector<int> mol_idx);
+  shared_ptr<SystemSAM> make_subsystem(vector<int> mol_idx);
 };
 
 
