@@ -1,6 +1,5 @@
-
-PB-AM
-=====
+Method overview
+---------------------
 
 PB-AM is an analytical solution to the linearized Poisson-Boltzmann 
 equation for multiple spherical objects of arbitrary charge distribution 
@@ -41,3 +40,5 @@ When energy is computed, forces follow as:
 
 The method to calculate the torque \\(\\boldsymbol{\\tau}^{(i)}\\) on 
 molecule is outside the scope of this manual, but is discussed extensively in [LoHe06]_
+
+

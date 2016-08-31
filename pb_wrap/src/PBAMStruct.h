@@ -87,9 +87,19 @@ typedef struct _PBAMOutput {
   double energies_[MOL_MAX];
   double forces_[MOL_MAX][3];
 
- #ifdef __cplusplus
-   _PBAMOutput() {}
- #endif
+#ifdef __cplusplus
+   _PBAMOutput( int len, double forces[][3], double * energy) 
+  {
+    int i;
+    for (i=0; i<len; i++) 
+    {
+      forces_[i][0] = forces[i][0];
+      forces_[i][1] = forces[i][1];
+      forces_[i][2] = forces[i][2];
+      energies_[i] = energy[i];
+    }
+  }
+#endif
 
 } PBAMOutput;
 

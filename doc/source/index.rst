@@ -21,16 +21,15 @@ Table of Contents
    :maxdepth: 2
 
    intro
-   pbam
-   pbam_input
-   pbam_examples
-   pbam_program
-   pbsam
-   pbsam_input
-   pbsam_examples
-   pbsam_program
-   analysis_tools
+   pbam/pbam
+   pbsam/pbsam
    references
+..   pbam/pbam_input
+   pbam/pbam_examples
+   pbam/pbam_program
+   pbsam/pbsam_input
+   pbsam/pbsam_examples
+   pbsam/pbsam_program
 
 ..
    Indices and tables

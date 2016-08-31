@@ -243,8 +243,8 @@ TEST_F(ForceUTest, two_mol_test)
   
   GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
                        solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
+                       solvTest.get_IE(), solvTest.get_interpol_list(),
+                       solvTest.get_precalc_sh(), _expcons, pol);
   gsolvTest.solve(1e-16, 100);
   
   auto focal = make_shared<ForceCalc> (nmol, sys->get_all_Ik(),
@@ -336,8 +336,8 @@ TEST_F(ForceUTest, three_mol_test)
 
   GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
                        solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
+                       solvTest.get_IE(), solvTest.get_interpol_list(),
+                       solvTest.get_precalc_sh(), _expcons, pol);
   gsolvTest.solve(1e-16, 85);
 
   auto focal = make_shared<ForceCalc> (nmol, sys->get_all_Ik(),

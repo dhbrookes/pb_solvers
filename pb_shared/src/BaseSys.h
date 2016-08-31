@@ -43,7 +43,6 @@ protected:
 public:
   
   BaseMolecule()  { }
-//  BaseMoleculeAM(const BaseMoleculeAM& mol);
   
   // no centers or raddi of cg spheres
   BaseMolecule(int type, int type_idx, string movetype, vector<double> qs,
@@ -82,7 +81,6 @@ public:
   virtual void rotate(Quat qrot) = 0;
   virtual void rotate(MyMatrix<double> rotmat) = 0;
   
-  
   //below are methods only for PBSAM that should be overridden
   virtual void set_gridj(int j, vector<Pt> grid) { }
   virtual void set_gridexpj(int j, vector<int> grid_exp) { }
@@ -91,7 +89,9 @@ public:
   virtual void add_Jl_to_inter_act_k( int k, int J, int l) { }
   virtual Pt get_gridjh(int j, int h) const   { return Pt(); }
   virtual Pt get_cog() const                  { return Pt(); }
+  virtual Pt get_unwrapped_center() const     { return Pt(); }
   virtual vector<int> get_gdpt_expj(int j) const { return vector<int>(); }
+  virtual int get_cg_of_ch(int k) const       { return 0; }
   virtual int get_nc_k(int k) const           { return 0; }
   virtual vector<int> get_neighj(int j) const { return vector<int> (); }
   virtual vector<Pt> get_gridj(int j) const   { return vector<Pt> (); }
@@ -99,7 +99,6 @@ public:
   virtual vector<int> get_ch_allin_k(int k)   { return vector<int> (); }
   virtual vector<int> get_ch_allout_k(int k)  { return vector<int> (); }
   virtual int get_ch_k_alpha(int k, int alpha){ return 0; }
-//  virtual const int get_cg_of_ch(int j)       { return 0; }
   virtual vector<vector<int> > get_inter_act_k(int k) {return vector<vector<int> >(); }
   virtual bool is_J_in_interk( int k, int J ) { return true; }
 };

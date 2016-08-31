@@ -164,6 +164,7 @@ void NumericalMatrix::reset_mat(int k)
   
 }
 
+
 EMatrix::EMatrix(int I, int ns, int p)
 :ComplexMoleculeMatrix(I, ns, p)
 {
@@ -262,6 +263,12 @@ void IEMatrix::init_from_file(string imatfile, int k )
   set_IE_k(k, imat.get_mat());
 }
 
+void IEMatrix::init_from_other(shared_ptr<IEMatrix> other)
+{
+  for (int k=0; k < IE_orig_.size(); k++)
+    set_IE_k(k, other->get_IE_k_org(k));
+}
+
 
 MyMatrix<double> IEMatrix::get_IE_k(int k)
 {
@@ -280,6 +287,24 @@ MyMatrix<double> IEMatrix::get_IE_k(int k)
   return IMat;
 }
 
+void IEMatrix::write_mat_k_reg(string imatFname, int k)
+{
+  ofstream fout;
+  fout.open(imatFname, ofstream::binary); //for writing
+  if (!fout)
+  {
+    cout << "file "<< imatFname << " could not be opened."<< endl;
+    exit(1);
+  }
+  fout << p_ << endl; // pole order
+  for (int i = 0; i< p_*p_*p_*p_; i++)
+  {
+    fout << IE_orig_[k][i] << " "; //mat
+    if ( (i%(p_*p_-1)) == 0 && (i > 0)) fout << endl;
+  }
+  
+  fout.close();
+}
 
 void IEMatrix::write_mat_k(string imatFname, int k)
 {
@@ -310,7 +335,7 @@ void IEMatrix::compute_grid_pts(shared_ptr<BaseMolecule> _mol)
     grid_loc = make_uniform_sph_grid(gridPts_, _mol->get_ak(k));
     if (set_mol_)    _mol->set_gridj(k, grid_loc);
     else gridPtLocs_[k] = grid_loc;
-    
+
     // Loop through points to find the exposed ones
     for (int g = 0; g < gridPts_; g++)
     {

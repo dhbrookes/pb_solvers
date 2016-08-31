@@ -35,8 +35,8 @@
 #include <time.h>
 #include "PBAMStruct.h"
 #include "PBSAMStruct.h"
-//#include "PBAMStruct.h"
 #include "Electrostatics.h"
+#include "BD.h"
 
 using namespace std;
 
@@ -54,7 +54,8 @@ protected:
   shared_ptr<ExpansionConstants> _exp_consts_;
   
   shared_ptr<Solver> solvr_;
-
+  
+  vector<shared_ptr<IEMatrix > > imats_;
   vector<shared_ptr<HMatrix > > h_spol_;
   vector<shared_ptr<FMatrix > > f_spol_;
 
@@ -74,8 +75,8 @@ public:
   friend PBAMInput getPBAMParams();
 
   // Copy constructors
-  PBSAM( const PBSAM& pbam ) ;
-  PBSAM( const PBSAM* pbam ) ;
+  PBSAM( const PBSAM& pbsam ) ;
+  PBSAM( const PBSAM* pbsam ) ;
 
   void check_setup();
   void check_system();

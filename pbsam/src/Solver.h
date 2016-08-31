@@ -71,11 +71,19 @@ protected:
   
   
 public:
+  //Used primarily for testing
   Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
          shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
          int p, bool readImat=false, bool readHF=false,
          vector<vector<string> > imats = {{}},
          vector<vector<vector<string> > > expHF = {{{}}});
+  
+  // Used for main/runs
+  Solver(shared_ptr<System> _sys, shared_ptr<Constants> _consts,
+         shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
+         int p, vector<shared_ptr<IEMatrix> > imats,
+         vector<shared_ptr<HMatrix > > h_spol,
+         vector<shared_ptr<FMatrix > > f_spol);
   
   // run an iteration and return convergence value
   double iter(int t);
@@ -193,6 +201,16 @@ public:
   void solve(double tol, int maxiter);
   
   void pre_compute_gradT_A();
+  
+  void update_HF(vector<shared_ptr<FMatrix> > F,
+                 vector<shared_ptr<HMatrix> > H)
+  {
+    for (int i=0; i<Ns_tot_; i++)
+    {
+      _F_[i] = F[i];
+      _H_[i] = H[i];
+    }
+  }
   
   shared_ptr<GradHMatrix> get_gradH(int I, int wrt) { return dH_[wrt][I];}
   shared_ptr<GradFMatrix> get_gradF(int I, int wrt) { return dF_[wrt][I];}
