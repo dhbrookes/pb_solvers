@@ -595,7 +595,7 @@ TEST_F(BDUTest, BDrunTimeTermY)
                                         make_shared<Constants> (const_), vals,
                                         sys->get_cutoff());
 
-  shared_ptr<TimeTerminateAM> term = make_shared<TimeTerminateAM>(10);
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
   BDRunAM BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
   BDTest.run( "", "", 500);
   
@@ -634,7 +634,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
                                         make_shared<Constants> (const_), vals,
                                         sys->get_cutoff());
   
-  shared_ptr<TimeTerminateAM> term = make_shared<TimeTerminateAM>(30);
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRunAM BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
   BDTest.run( "", "", 500);
   
@@ -674,7 +674,7 @@ TEST_F(BDUTest, BDrunTimeTermRot)
                                         make_shared<Constants> (const_), vals,
                                         sys->get_cutoff());
   
-  shared_ptr<TimeTerminateAM> term = make_shared<TimeTerminateAM>(30);
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRunAM BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-30);
   BDTest.run( "", "", 500);
   

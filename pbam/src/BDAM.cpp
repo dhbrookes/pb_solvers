@@ -8,6 +8,132 @@
 
 #include "BDAM.h"
 
+ContactTerminateAM::ContactTerminateAM(vector<int> mol, double distance)
+:BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), dist_contact_(distance)
+{
+  char buff[400];
+  sprintf(buff, "Type %d and Type %d are within %5.2f;\t",
+          mol1_, mol2_, dist_contact_);
+  how_term_ = "System has fulfilled condition: " + string(buff);
+}
+
+const bool ContactTerminateAM::is_terminated(shared_ptr<BaseSystem> _sys) const
+{
+  int i, j, idx1, idx2;
+  for ( i = 0; i < _sys->get_typect(mol1_); i++)
+  {
+    for ( j = 0; j < _sys->get_typect(mol2_); j++)
+    {
+      idx1 = _sys->get_mol_global_idx( mol1_, i);
+      idx2 = _sys->get_mol_global_idx( mol2_, j);
+      
+//      double mol_c2c = _sys->get_pbc_dist_vec(idx1, idx2).norm();
+      double mol_c2c = _sys->get_pbc_dist_vec_base(_sys->get_centerik(idx1, 0),
+                                                   _sys->get_centerik(idx2, 0)).norm();
+      double a1 = _sys->get_aik(idx1, 0);
+      double a2 = _sys->get_aik(idx2, 0);
+      if (mol_c2c <= (dist_contact_+a1+a2)) return true;
+    }
+  }
+  return false;
+}
+
+
+ContactTerminateAM2::ContactTerminateAM2(vector<int> mol,
+                                         vector<vector<int> > atpairs,
+                                         vector<double> dists, double pad)
+:BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
+dists_(dists), pad_(pad)
+{
+  string_create();
+}
+
+ContactTerminateAM2::ContactTerminateAM2(ContactFile confile, double pad)
+:pad_(pad), mol1_(confile.get_moltype1()), mol2_(confile.get_moltype2()),
+atPairs_(confile.get_at_pairs()), dists_(confile.get_dists())
+{
+  string_create();
+}
+
+void ContactTerminateAM2::string_create()
+{
+  char buff[400];
+  sprintf(buff, "Type %d and Type %d are within %5.2f;\t",
+          mol1_, mol2_, pad_);
+  how_term_ = "System has fulfilled condition: " + string(buff);
+}
+
+const bool ContactTerminateAM2::is_terminated(shared_ptr<BaseSystem> _sys) const
+{
+  bool contacted = false;
+  int i, j, k, idx1, idx2;
+  Pt cen1, cen2, pos1, pos2, vc1, vc2;
+  double a1, a2, d, dcon;
+  double sphdist1, sphdist2;  // distance of atom to edge of sphere
+  
+  for ( i = 0; i < _sys->get_typect(mol1_); i++)
+  {
+    for ( j = 0; j < _sys->get_typect(mol2_); j++)
+    {
+      idx1 = _sys->get_mol_global_idx( mol1_, i);
+      idx2 = _sys->get_mol_global_idx( mol2_, j);
+      
+      cen1 = _sys->get_centerik(idx1, 0);
+      cen2 = _sys->get_centerik(idx2, 0);
+      
+      a1 = _sys->get_aik(idx1, 0);
+      a2 = _sys->get_aik(idx2, 0);
+      
+      for (k = 0; k < atPairs_.size(); k++)
+      {
+        dcon = dists_[k];
+        pos1 = _sys->get_posijreal(idx1, atPairs_[k][0]);
+        pos2 = _sys->get_posijreal(idx2, atPairs_[k][1]);
+        
+        vc1 = pos1 - cen1;
+        vc2 = pos2 - cen2;
+        
+        sphdist1 = a1 - vc1.norm();
+        sphdist2 = a2 - vc2.norm();
+        
+        // if sum of distances to edge of the spheres is > contact distance,
+        // then contact can never happen and the new position is closest
+        // point on edge of sphere and new contact distance is pad
+        if ( (sphdist1 + sphdist2) > dcon)
+        {
+          pos1 = vc1 * (a1/vc1.norm()); // project onto sphere surface
+          pos2 = vc2 * (a2/vc2.norm());
+          dcon = pad_;
+          
+          // get position of atoms relative to box
+          // (as opposed to center of MoleculeAM)
+          pos1 = pos1 + cen1;
+          pos2 = pos2 + cen2;
+          d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
+          
+          if (d < dcon){ contacted = true; break;}
+        }else
+        {
+          d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
+          if (d < dcon)
+          {
+            contacted = true;
+            cout << "This is dcon " << dcon << " and d " << d << endl;
+            cout << "This is pos1 " << pos1.x() << " " <<
+            pos1.y() << " " << pos1.z() << " " << endl;
+            cout << "This is pos2 " << pos2.x() << " " <<
+            pos2.y() << " " << pos2.z() << " " << endl;
+            
+            break;
+          }
+        }
+      }
+    }
+  }
+  return contacted;
+}
+
+
 BDStepAM::BDStepAM(shared_ptr<SystemAM> _sys, shared_ptr<Constants> _consts,
        vector<double> trans_diff_consts,
        vector<double> rot_diff_consts,
@@ -153,7 +279,7 @@ void BDStepAM::bd_update(shared_ptr<vector<Pt> > _F,
 
 
 BDRunAM::BDRunAM(shared_ptr<ASolver> _asolv,
-             shared_ptr<BaseTerminateAM> _terminator, string outfname, int num,
+             shared_ptr<BaseTerminate> _terminator, string outfname, int num,
              bool diff, bool force, int maxiter, double prec)
 :maxIter_(maxiter), _asolver_(_asolv), prec_(prec), _terminator_(_terminator)
 {
