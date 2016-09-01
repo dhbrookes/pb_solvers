@@ -147,8 +147,6 @@ poles_(5), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
   _setp_->apbs_pbsam_set(surffil, imatfil, expfil);
   check_setup();
   
-//vector<shared_ptr<BaseMolecule> > molP(mls.size());
-//for (int i = 0; i < mls.size(); i++) molP[i] = make_shared<MoleculeSAM>(mls[i]);
   _syst_ = make_shared<SystemSAM> (mls, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
   
@@ -449,9 +447,17 @@ void PBSAM::run_dynamics()
     BDRunSAM dynamic_run( solv, gsolv, term_conds, outfile);
     dynamic_run.run(xyztraj, statfile);
     cout << "Done with trajectory " << traj << endl;
+    if (traj==0)
+      for (i=0; i<_syst_->get_n(); i++)
+      {   
+      //Pt tmp = dynamic_run.get_force_i(i) * _consts_->get_conv_factor();
+      //force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
+      //tmp = dynamic_run.get_torque_i(i) * _consts_->get_conv_factor();
+      //torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
+      //nrg_intera_[i]=dynamic_run.get_energy_i(i)*_consts_->get_conv_factor();
+      }   
   }
-
-}
+} // end run_dynamics()
 
 void PBSAM::run_electrostatics()
 {
@@ -484,28 +490,34 @@ void PBSAM::run_electrostatics()
 
 void PBSAM::run_energyforce()
 {
+  int i;
   clock_t t3 = clock();
-  Solver solv( _syst_, _consts_, _sh_calc_, _bessl_calc_, poles_,
-              imats_, h_spol_, f_spol_);
-  if (_syst_->get_n() > 1) solv.solve(solveTol_, 100);
+  auto solv = make_shared<Solver>(_syst_, _consts_, _sh_calc_, _bessl_calc_,
+                                  poles_, imats_, h_spol_, f_spol_);
+  if (_syst_->get_n() > 1) solv->solve(solveTol_, 100);
   
-  GradSolver gsolv(_syst_, _consts_, _sh_calc_, _bessl_calc_, solv.get_T(),
-                   solv.get_all_F(), solv.get_all_H(),
-                   solv.get_IE(),
-                   solv.get_interpol_list(), solv.get_precalc_sh(),
-                   _exp_consts_, poles_);
-  if (_syst_->get_n() > 1) gsolv.solve(solveTol_, 100);
+  auto gsolv = make_shared<GradSolver>(_syst_, _consts_, _sh_calc_, 
+                                       _bessl_calc_, solv->get_T(),
+                                       solv->get_all_F(), solv->get_all_H(),
+                                       solv->get_IE(),solv->get_interpol_list(),
+                                        solv->get_precalc_sh(),
+                                       _exp_consts_, poles_);
+  if (_syst_->get_n() > 1) gsolv->solve(solveTol_, 100);
   
-  auto focal = make_shared<ForceCalcSAM> (_syst_->get_n(), _syst_->get_all_Ik(),
-                                       _consts_->get_dielectric_water(),
-                                       _sh_calc_, _bessl_calc_);
-  focal->calc_all_f(solv.get_all_H(), solv.get_all_LHN(),
-                    gsolv.get_gradH_all(), gsolv.get_gradLHN_all());
-  shared_ptr<vector<Pt> > fo = focal->get_all_f();
-  
-  TorqueCalcSAM tocal(_syst_->get_n());
-  tocal.calc_all_tau(_syst_, focal);
-  shared_ptr<vector<Pt> > to = tocal.get_all_tau();
+  PhysCalcSAM calcEnFoTo(solv, gsolv, _setp_->getRunName(), 
+                         _consts_->get_unitsEnum());
+
+  calcEnFoTo.calc_all();
+
+  for (i = 0; i < _syst_->get_n(); i++)
+  {
+  //Pt tmp = calcEnFoTo.get_forcei_conv(i);
+  //force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
+  //tmp = calcEnFoTo.get_taui_conv(i);
+  //torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
+  //nrg_intera_[i]  = calcEnFoTo.get_omegai_conv(i);
+  }
+
   
   t3 = clock() - t3;
   printf ("energyforce calc took me %f seconds.\n",

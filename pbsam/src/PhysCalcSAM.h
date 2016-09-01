@@ -14,7 +14,6 @@
 #include "Solver.h"
 #include <map>
 
-
 /*
  Class for calculating interaction energy of a MoleculeSAM given H^(I,k)
  and LHN^(I,k) matrices
@@ -31,9 +30,8 @@ public:
                        vector<shared_ptr<LHNMatrix> > LHN);
   
   shared_ptr<vector<double> > get_omega() { return omega_; }
+  double get_omega_i(int i)               { return omega_->operator[](i);}
 };
-
-
 
 class ForceCalcSAM
 {
@@ -155,8 +153,6 @@ public:
   
 //  void calc_force_interact()   { _fCalc_->calc_force_interact(_sys_); }
   void calc_force();
-  
-  
   void calc_energy();
   void calc_torque();
   void calc_all()     { calc_energy(); calc_force(); calc_torque(); }
@@ -166,13 +162,16 @@ public:
   shared_ptr<vector<Pt> > get_Tau() { return _torCalc_->get_all_tau(); }
   shared_ptr<vector<Pt> > get_F() { return _fCalc_->get_all_f(); }
   shared_ptr<vector<double> > get_omega() { return _eCalc_->get_omega(); }
+
+  Pt get_taui(int i) { return _torCalc_->get_taui(i); }
+  Pt get_forcei(int i) { return _fCalc_->get_fi(i); }
+  double get_omegai(int i) {return _eCalc_->get_omega_i_int(i);}
   
   Pt get_moli_pos( int i) { return _sys_->get_cogi(i); }
   
 };
 
 #endif /* PhysCalcCalc_h */
-
 
 
 
