@@ -206,23 +206,23 @@ public:
 //  Pt get_pbc_dist_vec_base(Pt p1, Pt p2);
 
   // Interaction and polarization lists
-  void add_J_to_pol_I( int i, int j) { molecules_[i]->add_J_to_pol(j);}
-  void add_J_to_interact_I(int i, int j) { molecules_[i]->add_J_to_interact(j);}
+  void add_J_to_pol_I( int i, int j) { } //molecules_[i]->add_J_to_pol(j);}
+  void add_J_to_interact_I(int i, int j) {}// molecules_[i]->add_J_to_interact(j);}
   
-  bool is_J_in_pol_I( int i, int j)  { return molecules_[i]->is_J_in_pol(j);}
-  bool is_J_in_act_I( int i, int j)  { return molecules_[i]->is_J_in_interact(j);}
+  bool is_J_in_pol_I( int i, int j)  { return false;} //molecules_[i]->is_J_in_pol(j);}
+  bool is_J_in_act_I( int i, int j)  { return false;} //molecules_[i]->is_J_in_interact(j);}
   
-  vector<int> get_pol_I(int i)       { return molecules_[i]->get_pol();}
-  vector<int> get_act_I(int i)       { return molecules_[i]->get_act();}
+  vector<int> get_pol_I(int i)       { return vector<int> (1,0);} //molecules_[i]->get_pol();}
+  vector<int> get_act_I(int i)       { return vector<int> (1,0);}//molecules_[i]->get_act();}
 
   void clear_all_lists()
   {
-    for ( int i = 0; i < N_; i++)
-    {
-      molecules_[i]->clear_inter_pol();
-      molecules_[i]->clear_inter_act();
-    }
-  }  
+//    for ( int i = 0; i < N_; i++)
+//    {
+//      molecules_[i]->clear_inter_pol();
+//      molecules_[i]->clear_inter_act();
+//    }
+  }
 
   // given a distance vector, determine whether it is in the cutoff
 //  bool less_than_cutoff(Pt v);

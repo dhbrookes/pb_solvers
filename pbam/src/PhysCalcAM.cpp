@@ -511,8 +511,6 @@ void ThreeBodyAM::printTBDEnForTor( string outf, vector<string> outfile )
     out << get_forcei_approx(i).x() << " "
         << get_forcei_approx(i).y() << " "
         << get_forcei_approx(i).z()<< "]"<<endl;
-//    out << "\tTORQUE: " << sqrt(torque_norm) << ", [";
-//    out << torque_i.x() << " " << torque_i.y()<<" "<<torque_i.z()<< "]"<<endl;
   }
   
   if ( outfile[0] != "") printNmer( 2, outfile[0]);

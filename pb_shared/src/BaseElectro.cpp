@@ -98,7 +98,7 @@ void BaseElectro::print_dx( string dxname )
   double pot_min_ = 0;
   
   dx.open(dxname);
-  dx << "# Data from PBSAM Electrostat run" << endl;
+  dx << "# Data from PB[S]AM Electrostat run" << endl;
   dx << "# My runname is " << dxname << " and units " ;
   dx << _consts_->get_units() <<  endl;
   dx << "object 1 class gridpositions counts " << npts_[0]
@@ -247,7 +247,7 @@ void BaseElectro::print_grid(string axis, double value, string fname)
   
   f.open(fname);
   v_act = (abs(v_act) < 1e-12) ? 0 : v_act;
-  f << "# Data from PBSAM Electrostat run\n# My runname is " << fname << endl;
+  f << "# Data from PB[S]AM Electrostat run\n# My runname is " << fname << endl;
   f << "units " << _consts_->get_units() <<  endl;
   f << "grid " << grid_.size() << " " << grid_[0].size() << endl;
   f << "axis " << axis << " " << v_act << endl;
