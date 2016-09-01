@@ -14,25 +14,19 @@ double EnergyCalcSAM::calc_energy(shared_ptr<HMatrix> H, shared_ptr<LHNMatrix> L
   double E = 0;
   for (int k = 0; k < H->get_ns(); k++)
   {
-//    cout << "This is H " << endl; H->print_kmat(k);
-//    cout << "This is LHN " << endl; LHN->print_kmat(k);
     for (int n = 0; n < H->get_p(); n++)
       for (int m = -n; m < n+1; m++)
         E += (LHN->get_mat_knm(k, n, m).real()*H->get_mat_knm(k, n, m).real()
               +LHN->get_mat_knm(k, n, m).imag()*H->get_mat_knm(k, n, m).imag());
-//    cout << "This is E " << E << endl;
-    
   }
   return E;
 }
 
 void EnergyCalcSAM::calc_all_energy(vector<shared_ptr<HMatrix> > H,
-                                           vector<shared_ptr<LHNMatrix> > LHN)
+                                    vector<shared_ptr<LHNMatrix> > LHN)
 {
-//  vector<double> E(H.size(), 0.0);
   for (int i = 0; i < H.size(); i++)
   {
-//    cout << "This is i " << i << endl;
     (*omega_)[i] = calc_energy(H[i], LHN[i]);
   }
 }
@@ -46,10 +40,6 @@ void ForceCalcSAM::calc_fI(int I, shared_ptr<HMatrix> H,
   for (int k = 0; k < H->get_ns(); k++)
   {
     forces_[I][k] = 0.0;
-//    cout << "This is H" << endl; H->print_kmat(k);
-//    cout << "This is dLHN" << endl; dLHN->print_kmat(k);
-//    cout << "This is dH" << endl; dH->print_kmat(k);
-//    cout << "This is LHN" << endl; LHN->print_kmat(k);
     for (int n = 0; n < H->get_p(); n++)
       for (int m = -n; m < n+1; m++)
       {
@@ -69,13 +59,8 @@ void ForceCalcSAM::calc_fI(int I, shared_ptr<HMatrix> H,
         forces_[I][k] += fIk;
       }
     tot += forces_[I][k];
-//    cout << "For k " << k << " & H*gLHN " << inn1.x() << ", " << inn1.y()
-//    << ", " << inn1.z() << endl;
-//    cout << "For k " << k << " & gH*gLHN " << inn2.x() << ", " << inn2.y()
-//    << ", " << inn2.z() << endl;
-//    cout << "{" <<setprecision(9)<< forces_[I][k].x() << "," << forces_[I][k].y() << "," << forces_[I][k].z() << "},"; //<< endl;
   }
-  (*totForces_)[I] = tot;
+  (*_F_)[I] = tot;
 }
 
 void ForceCalcSAM::calc_all_f(vector<shared_ptr<HMatrix> > H,
@@ -85,44 +70,10 @@ void ForceCalcSAM::calc_all_f(vector<shared_ptr<HMatrix> > H,
 {
   for (int i = 0; i < H.size(); i++)
   {
-//    cout << "This is i " << i << endl;
     forces_[i].resize(ks_[i]);
     calc_fI(i, H[i], LHN[i], dH[i][i], dLHN[i][i]);
   }
 }
-
-//Ptx ForceCalc::calc_fp(Pt P, shared_ptr<MoleculeSAM> mol,
-//                       shared_ptr<HMatrix> H,
-//                       shared_ptr<LHNMatrix> LHN,
-//                       shared_ptr<GradHMatrix> dH,
-//                       shared_ptr<GradLHNMatrix> dLHN)
-//{
-//  cmplx Hp;
-//  Ptx f, fpk, inner1, inner2, dHp;
-//  vector<double> besseli;
-//
-//  shcalc_->calc_sh(P.theta(), P.phi());
-//  
-//  for (int k = 0; k < H->get_ns(); k++)
-//  {
-//    besseli = bcalc_->calc_mbfI(H->get_p(), dH->get_kappa()*mol->get_ak(k));
-//    for (int n = 0; n < H->get_p(); n++)
-//    {
-//      for (int m = - n; m < n+1; m++)
-//      {
-//        Hp = H->make_hb_Ik(k, P, shcalc_, besseli) * shcalc_->get_result(n, m);
-//        dHp = dH->calc_dh_P(P, k, besseli, shcalc_);
-//        
-//        inner1 = dLHN->get_mat_knm(k, n, m) * Hp;
-//        inner2 = dHp * LHN->get_mat_knm(k, n, m);
-//        fpk = inner1 * (-1) + inner2;
-//        fpk *= -1;
-//        f += fpk;
-//      }
-//    }
-//  }
-//  return f;
-//}
 
 
 void TorqueCalcSAM::calc_all_tau(shared_ptr<SystemSAM> sys,
@@ -131,7 +82,7 @@ void TorqueCalcSAM::calc_all_tau(shared_ptr<SystemSAM> sys,
   for (int i = 0; i < I_; i++)
   {
     //    cout << "This is i " << i << endl;
-    (*torques_)[i] = calc_tauI(i, sys->get_moli(i), fcalc);
+    (*_tau_)[i] = calc_tauI(i, sys->get_moli(i), fcalc);
   }
 }
 
@@ -152,7 +103,8 @@ Pt TorqueCalcSAM::calc_tauI(int i, shared_ptr<BaseMolecule> mol,
 
 PhysCalcSAM::PhysCalcSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradsolv,
                    string outfname, Units unit)
-:_solv_(_solv), _gradSolv_(_gradsolv), outfname_(outfname)
+:BasePhysCalc(_solv_->get_sys()->get_n(), _solv_->get_consts(), outfname, unit),
+_solv_(_solv), _gradSolv_(_gradsolv), _sys_(_solv->get_sys())
 {
   _sys_ = _solv->get_sys();
   
@@ -162,7 +114,7 @@ PhysCalcSAM::PhysCalcSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _grads
                                    _solv->get_sh(), _solv->get_bessel());
   _torCalc_ = make_shared<TorqueCalcSAM>(_sys_->get_n());
 
-  compute_units(_solv->get_consts(), unit);
+//  compute_units(_solv->get_consts(), unit);
 }
 
 Pt TorqueCalcSAM::cross_prod(Pt u, Pt v)
@@ -173,8 +125,6 @@ Pt TorqueCalcSAM::cross_prod(Pt u, Pt v)
   c.set_z(u[0]*v[1] - u[1]*v[0]);
   return c;
 }
-
-
 
 void PhysCalcSAM::calc_force()
 {
@@ -195,27 +145,6 @@ void PhysCalcSAM::calc_torque()
   _torCalc_->calc_all_tau(_sys_, _fCalc_);
 }
 
-
-void PhysCalcSAM::compute_units( shared_ptr<Constants> cst, Units unit)
-{
-  if (unit==INTERNAL)
-  {
-    unit_ = "Internal";
-    unit_conv_ = 1.0;
-  } else if (unit == KCALMOL)
-  {
-    unit_  = "kCal/Mol";
-    unit_conv_ = cst->convert_int_to_kcal_mol(1.0);
-  } else if (unit == JMOL)
-  {
-    unit_  = "Joules/Mol";
-    unit_conv_ = cst->convert_int_to_jmol(1.0);
-  } else if (unit == kT)
-  {
-    unit_  = "kT";
-    unit_conv_ = cst->convert_int_to_kT(1.0);
-  }
-}
 
 
 

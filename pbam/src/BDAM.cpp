@@ -1,5 +1,5 @@
 //
-//  BD.cpp
+//  BDAM.cpp
 //  pb_solvers_code
 //
 //  Created by David Brookes on 1/20/16.

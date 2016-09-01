@@ -1,5 +1,5 @@
 //
-//  System_hpp
+//  SystemAM_h
 //  pb_solvers_code
 //
 /*
@@ -125,21 +125,6 @@ public:
 class SystemAM : public BaseSystem
 {
 protected:
-    
-//  int                          N_; // number of molecules
-//  double                       lambda_; // average molecular radius
-//  vector<MoleculeAM>           molecules_;
-//  
-//  double                       boxLength_;
-//  double                       cutoff_;
-//  
-//  double t_;  // time in a BD simulation
-//  
-//  int                          ntype_;  //count of unique molecules
-//  vector<int>                  typect_; //count of molecules of each unique type
-//  map<vector<int>, int>        typeIdxToIdx_;
-//  
-//  const double calc_average_radius() const;
   
 public:
   SystemAM() { }
@@ -154,45 +139,12 @@ public:
   const int get_ntype()                    { return ntype_;}
   const int get_typect(int i)              { return typect_[i];}
   const double get_ai(int i) const         { return get_aik(i, 0); }
-//  const double get_Mi(int i) const         {return molecules_[i].get_m();}
-//  const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
-//  const double get_radij(int i, int j) const {return molecules_[i].get_radj(j);}
-//  Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
-//  Pt get_posijreal(int i, int j)
-//  {return molecules_[i].get_posj_realspace(j);}
-//  MoleculeAM get_moli(int i) const       {return molecules_[i];}
   vector<Pt> get_allcenter() const;
   Pt get_centeri(int i) const              { return get_centerik(i, 0); }
   Pt get_unwrapped_center(int i) const
   {return molecules_[i]->get_unwrapped_center();}
   double get_radi(int i) const             { return get_aik(i, 0); }
-  const double get_lambda() const          { return lambda_;}
-//  const string get_typei(int i) const
-//  {return molecules_[i].get_move_type();}
-//  const double get_droti(int i) const      {return molecules_[i].get_drot();}
-//  const double get_dtransi(int i) const    {return molecules_[i].get_dtrans();}
-//  const double get_boxlength() const       {return boxLength_;}
-//  const double get_cutoff() const          {return cutoff_;}
-//  const double get_time() const            {return t_;}
-  
-//  const int get_mol_global_idx(int type, int ty_idx)
-//  {
-//    vector<int> keys = {type, ty_idx};
-//    return typeIdxToIdx_[keys];
-//  }
 
-//  // translate every charge in MoleculeAM i by the vector dr
-//  void translate_mol(int i, Pt dr) { molecules_[i].translate(dr, boxLength_); }
-//  
-//  // rotate every charge in MoleculeAM i
-//  void rotate_mol(int i, Quat qrot) { molecules_[i].rotate(qrot); }
-  
-  // Check to determine if any MoleculeAMs are overlapping
-//  void check_for_overlap();
-//  bool is_collision(); 
-  // get the distance vector (Point object) between two MoleculeAMs, taking into
-  // account periodic boundary conditions by returning the distance vector
-  // between the closest image of the MoleculeAM
   Pt get_pbc_dist_vec(int i, int j);
 
   // Interaction and polarization lists
@@ -216,4 +168,4 @@ public:
   
 };
 
-#endif /* Setup_hpp */
+#endif /* SystemAM_h */

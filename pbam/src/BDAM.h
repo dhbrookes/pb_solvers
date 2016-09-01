@@ -1,5 +1,5 @@
 //
-//  BD.h
+//  BDAM.h
 //  pb_solvers_code
 //
 /*
@@ -416,7 +416,7 @@ class BDRunAM
 protected:
   shared_ptr<BDStepAM> _stepper_;
   shared_ptr<ASolver> _asolver_;
-  shared_ptr<BasePhysCalcAM> _physCalc_;
+  shared_ptr<BasePhysCalc> _physCalc_;
   shared_ptr<BaseTerminateAM> _terminator_;
   
   string outfname_; //outputfile
@@ -446,4 +446,4 @@ public:
 
 
 
-#endif /* BD_h */
+#endif /* BDAM_h */

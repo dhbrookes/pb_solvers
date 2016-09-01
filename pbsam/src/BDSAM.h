@@ -1,5 +1,5 @@
 //
-//  BD.h
+//  BDSAM.h
 //  pb_solvers_code
 //
 /*
@@ -29,8 +29,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef BD_h
-#define BD_h
+#ifndef BDSAM_h
+#define BDSAM_h
 
 #include <stdio.h>
 #include <random>
@@ -347,7 +347,7 @@ protected:
   shared_ptr<BDStepSAM> _stepper_;
   shared_ptr<Solver> _solver_;
   shared_ptr<GradSolver> _gradSolv_;
-  shared_ptr<BasePhysCalcSAM> _physCalc_;
+  shared_ptr<BasePhysCalc> _physCalc_;
   shared_ptr<BaseTerminateSAM> _terminator_;
   
   string outfname_; //outputfile

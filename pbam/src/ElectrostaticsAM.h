@@ -1,5 +1,5 @@
 //
-//  Electrostatics.h
+//  ElectrostaticsAM.h
 //  pb_solvers_code
 //
 /*

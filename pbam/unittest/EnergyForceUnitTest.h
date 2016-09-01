@@ -93,9 +93,9 @@ TEST_F(EnergyForceUTest, checkEnergy)
   EnergyCalcAM EnTest(ASolvTest);
   EnTest.calc_energy();
 
-  EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.00117849131, preclim);
-  EXPECT_NEAR( EnTest.get_omega_i_int(1), 0.00199508625, preclim);
-  EXPECT_NEAR( EnTest.get_omega_i_int(2), 0.00199508625, preclim);
+  EXPECT_NEAR( EnTest.get_ei(0), 0.00117849131, preclim);
+  EXPECT_NEAR( EnTest.get_ei(1), 0.00199508625, preclim);
+  EXPECT_NEAR( EnTest.get_ei(2), 0.00199508625, preclim);
 }
 
 TEST_F(EnergyForceUTest, checkEnergySing)
@@ -116,7 +116,7 @@ TEST_F(EnergyForceUTest, checkEnergySing)
   EnergyCalcAM EnTest(ASolvTest);
   EnTest.calc_energy();
   for (int n=0; n<mol_sing_.size(); n++)
-    EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.000573165, preclim);
+    EXPECT_NEAR( EnTest.get_ei(0), 0.000573165, preclim);
 }
 
 TEST_F(EnergyForceUTest, checkEnergySingMulti)
@@ -151,7 +151,7 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
   EnergyCalcAM EnTest(ASolvTest);
   EnTest.calc_energy();
   for (int n=0; n<mol_.size(); n++)
-    EXPECT_NEAR( EnTest.get_omega_i_int(n)/MolTripSing[n], 1, preclim);
+    EXPECT_NEAR( EnTest.get_ei(n)/MolTripSing[n], 1, preclim);
 }
 
 TEST_F(EnergyForceUTest, checkForce)
@@ -186,9 +186,9 @@ TEST_F(EnergyForceUTest, checkForce)
   FoTest.calc_force();
   for (int n=0; n<mol_.size(); n++)
   {
-    EXPECT_NEAR( FoTest.get_fi(0)[n]/Mol1F[n], 1.0, preclim);
-    EXPECT_NEAR( FoTest.get_fi(1)[n]/Mol2F[n], 1.0, preclim);
-    EXPECT_NEAR( FoTest.get_fi(2)[n]/Mol3F[n], 1.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(0)[n]/Mol1F[n], 1.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(1)[n]/Mol2F[n], 1.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(2)[n]/Mol3F[n], 1.0, preclim);
   }
 }
 
@@ -211,9 +211,9 @@ TEST_F(EnergyForceUTest, checkForceSing)
   FoTest.calc_force();
   for (int n=0; n<2; n++)
   {
-    EXPECT_NEAR( FoTest.get_fi(n)[0], 0.0, preclim);
-    EXPECT_NEAR( FoTest.get_fi(n)[1], 0.0, preclim);
-    EXPECT_NEAR( FoTest.get_fi(n)[2]/(-3.61229952e-05*pow(-1.0,n)), 1, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(n)[0], 0.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(n)[1], 0.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(n)[2]/(-3.61229952e-05*pow(-1.0,n)), 1, preclim);
   }
 }
 
@@ -250,14 +250,14 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
   ForceCalcAM FoTest(ASolvTest);
   EnTest.calc_energy();
   FoTest.calc_force();
-  EXPECT_NEAR( EnTest.get_omega_i_int(0)/0.0845178625, 1, preclim);
-  EXPECT_NEAR( FoTest.get_fi(0)[0], 0, 1e-12);
-  EXPECT_NEAR( FoTest.get_fi(0)[1], 0, 1e-12);
-  EXPECT_NEAR( FoTest.get_fi(0)[2]/0.0239714121, 1.0, preclim);
-  EXPECT_NEAR( EnTest.get_omega_i_int(1)/0.0845178625, 1, preclim);
-  EXPECT_NEAR( FoTest.get_fi(1)[0], 0, 1e-12);
-  EXPECT_NEAR( FoTest.get_fi(1)[1], 0, 1e-12);
-  EXPECT_NEAR( FoTest.get_fi(1)[2]/-0.0239714121, 1.0, preclim);
+  EXPECT_NEAR( EnTest.get_ei(0)/0.0845178625, 1, preclim);
+  EXPECT_NEAR( FoTest.get_forcei(0)[0], 0, 1e-12);
+  EXPECT_NEAR( FoTest.get_forcei(0)[1], 0, 1e-12);
+  EXPECT_NEAR( FoTest.get_forcei(0)[2]/0.0239714121, 1.0, preclim);
+  EXPECT_NEAR( EnTest.get_ei(1)/0.0845178625, 1, preclim);
+  EXPECT_NEAR( FoTest.get_forcei(1)[0], 0, 1e-12);
+  EXPECT_NEAR( FoTest.get_forcei(1)[1], 0, 1e-12);
+  EXPECT_NEAR( FoTest.get_forcei(1)[2]/-0.0239714121, 1.0, preclim);
 
 }
 

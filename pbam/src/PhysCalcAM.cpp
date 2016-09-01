@@ -11,17 +11,17 @@
 EnergyCalcAM::EnergyCalcAM(shared_ptr<VecOfMats<cmplx>::type> _A,
                        shared_ptr<VecOfMats<cmplx>::type> _L,
                        shared_ptr<Constants> _const, int N, int p)
-:N_(N), _const_(_const), p_(p), _A_(_A), _L_(_L)
+:BaseEnergyCalc(N), N_(N), _const_(_const), p_(p), _A_(_A), _L_(_L)
 {
-  _omega_ = make_shared<vector<double> > (N_);
+//  _omega_ = make_shared<vector<double> > (N_);
   calc_energy();
 }
 
 EnergyCalcAM::EnergyCalcAM(shared_ptr<ASolver> _asolv)
 :_A_(_asolv->get_A()), _L_(_asolv->get_L()), _const_(_asolv->get_consts()),
-N_(_asolv->get_N()), p_(_asolv->get_p())
+N_(_asolv->get_N()), p_(_asolv->get_p()), BaseEnergyCalc(_asolv->get_N())
 {
-  _omega_ = make_shared<vector<double> > (N_);
+//  _omega_ = make_shared<vector<double> > (N_);
 }
 
 double EnergyCalcAM::calc_ei(int i)
@@ -52,7 +52,7 @@ void EnergyCalcAM::calc_energy()
 {
   for (int i = 0; i < N_; i++)
   {
-    (*_omega_)[i] = calc_ei(i);
+    (*omega_)[i] = calc_ei(i);
   }
 }
 
@@ -62,17 +62,15 @@ ForceCalcAM::ForceCalcAM(shared_ptr<VecOfMats<cmplx>::type> _A,
                      shared_ptr<MyVector<VecOfMats<cmplx>::type > > _gradL,
                      shared_ptr<Constants> _con, int N, int p)
 :N_(N), _const_(_con), p_(p), _gradA_(_gradA), _A_(_A), _L_(_L),
-_gradL_(_gradL)
+_gradL_(_gradL), BaseForceCalc(N)
 {
-  _F_ = make_shared<vector<Pt> > (N_, Pt());
 }
 
 ForceCalcAM::ForceCalcAM(shared_ptr<ASolver> _asolv)
 :_A_(_asolv->get_A()), _gradA_(_asolv->get_gradA()), _L_(_asolv->get_L()),
 _gradL_(_asolv->get_gradL()), _const_(_asolv->get_consts()),
-N_(_asolv->get_N()), p_(_asolv->get_p())
+N_(_asolv->get_N()), p_(_asolv->get_p()), BaseForceCalc(_asolv->get_N())
 {
-  _F_ = make_shared<vector<Pt> > (N_);
 }
 
 Pt ForceCalcAM::calc_fi(int i)
@@ -142,9 +140,9 @@ TorqueCalcAM::TorqueCalcAM(shared_ptr<SHCalc> _shCalc,
                        shared_ptr<Constants> _consts,
                        shared_ptr<SystemAM> _sys, int p)
 : N_(_sys->get_n()), p_(p), _consts_(_consts),
-_shCalc_(_shCalc), _bCalc_(_bCalc), _gradL_(_gradL), _gamma_(_gamma)
+_shCalc_(_shCalc), _bCalc_(_bCalc), _gradL_(_gradL), _gamma_(_gamma),
+BaseTorqueCalc(_sys->get_n())
 {
-  _tau_ = make_shared<vector<Pt> > (N_);
 }
 
 TorqueCalcAM::TorqueCalcAM(shared_ptr<ASolver> _asolv)
@@ -153,9 +151,9 @@ _consts_(_asolv->get_consts()), _shCalc_(_asolv->get_sh()),
 _bCalc_(_asolv->get_bessel()),
 _gamma_(_asolv->get_gamma()),
 _sys_(_asolv->get_sys()),
-_gradL_(_asolv->get_gradL())
+_gradL_(_asolv->get_gradL()),
+BaseTorqueCalc(_asolv->get_N())
 {
-  _tau_ = make_shared<vector<Pt> > (N_);
 }
 
 
@@ -599,7 +597,7 @@ void ThreeBodyAM::calcTwoBDEnForTor( )
 
 
 PhysCalcAM::PhysCalcAM(shared_ptr<ASolver> _asolv, string outfname, Units unit)
-: N_(_asolv->get_N()), outfname_(outfname), BasePhysCalcAM()
+: N_(_asolv->get_N()), outfname_(outfname), BasePhysCalc()
 {
   _eCalc_ = make_shared<EnergyCalcAM>(_asolv);
   _fCalc_ = make_shared<ForceCalcAM>(_asolv);
@@ -673,7 +671,7 @@ void PhysCalcAM::print_all()
 
 ThreeBodyPhysCalcAM::ThreeBodyPhysCalcAM(shared_ptr<ASolver> _asolv, int num,
                                      string outfname, Units unit, double cutoff)
-:BasePhysCalcAM(), ThreeBodyAM(_asolv, unit, "", cutoff), solved_(false), num_(num),
+:BasePhysCalc(), ThreeBodyAM(_asolv, unit, "", cutoff), solved_(false), num_(num),
 outfname_(outfname)
 {
 }
