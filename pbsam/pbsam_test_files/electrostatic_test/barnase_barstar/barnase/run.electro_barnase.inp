@@ -1,4 +1,4 @@
-runtype electrostatics 100
+runtype electrostatics 150
 runname barnase.out
 
 units kT

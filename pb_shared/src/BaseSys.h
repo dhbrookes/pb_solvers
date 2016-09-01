@@ -81,6 +81,18 @@ public:
   virtual void rotate(Quat qrot) = 0;
   virtual void rotate(MyMatrix<double> rotmat) = 0;
   
+  
+  //below are methods only for PBAM that should be overridden:
+  virtual vector<int> get_pol()                 { return vector<int> (); }
+  virtual vector<int> get_act()                 { return vector<int> (); }
+  virtual void clear_inter_pol()                { }
+  virtual void clear_inter_act()                { }
+  virtual void add_J_to_pol(int J)              { }
+  virtual void add_J_to_interact(int J)         { }
+  virtual bool is_J_in_pol( int J )             { return true; }
+  virtual bool is_J_in_interact( int J )        { return true; }
+  
+  
   //below are methods only for PBSAM that should be overridden
   virtual void set_gridj(int j, vector<Pt> grid) { }
   virtual void set_gridexpj(int j, vector<int> grid_exp) { }
@@ -144,6 +156,7 @@ public:
   Pt get_centerik(int i, int k) const      { return molecules_[i]->get_centerk(k); }
   const double get_Mi(int i) const         {return molecules_[i]->get_m();}
   const double get_qij(int i, int j) const {return molecules_[i]->get_qj(j);}
+  const double get_radij(int i, int j) const { return molecules_[i]->get_radj(j); }
   Pt get_posij(int i, int j)               {return molecules_[i]->get_posj(j);}
   Pt get_posijreal(int i, int j)
   {return molecules_[i]->get_posj_realspace(j);}

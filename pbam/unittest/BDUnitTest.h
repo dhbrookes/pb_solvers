@@ -18,8 +18,9 @@ public :
 protected :
   int vals_;
   Constants const_;
-  vector< MoleculeAM > mol3_; vector< MoleculeAM > mol_;
-  vector< MoleculeAM > mol_sing_;
+  vector<shared_ptr<BaseMolecule> > mol3_;
+  vector<shared_ptr<BaseMolecule> > mol_;
+  vector< shared_ptr<BaseMolecule> > mol_sing_;
   
   virtual void SetUp()
   {
@@ -28,7 +29,7 @@ protected :
     Pt cgPos[2]   = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
     double cg[2]  = { 5.0, -0.4}; double rd[2] = { 5.6, 10.4};
     Pt cgPosSi[2] = { Pt( 0.0, 0.0, -35.0 ), Pt( 0.0, 0.0, 0.0 ) };
-    
+    shared_ptr<MoleculeAM> molNew, molSing;
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
       int M = 1;
@@ -36,12 +37,12 @@ protected :
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0] = cg[molInd]; posCharges[0] = cgPos[molInd]; vdW[0] = 0.0;
       
-      MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      molNew = make_shared<MoleculeAM>("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
-      MoleculeAM molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      molSing = make_shared<MoleculeAM>( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -122,6 +123,7 @@ protected :
 TEST_F(BDUTest, dtTest)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
@@ -129,7 +131,7 @@ TEST_F(BDUTest, dtTest)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+    molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -165,6 +167,7 @@ TEST_F(BDUTest, dtTest)
 TEST_F(BDUTest, dtLargeTest)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
@@ -172,8 +175,8 @@ TEST_F(BDUTest, dtLargeTest)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                                     molInd, 0);
     mol_.push_back( molNew );
   }
   const int vals           = 5;
@@ -208,6 +211,7 @@ TEST_F(BDUTest, dtLargeTest)
 TEST_F(BDUTest, distPBCTest)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[2] = {Pt(0.0, 0.0, 0.0), Pt(-25.0, 55.8, 21.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
@@ -215,8 +219,8 @@ TEST_F(BDUTest, distPBCTest)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                                     molInd, 0);
     mol_.push_back( molNew );
   }
   double cutoff  = 10.00;
@@ -254,6 +258,7 @@ TEST_F(BDUTest, distPBCTest)
 TEST_F(BDUTest, ForcePos)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
@@ -261,8 +266,8 @@ TEST_F(BDUTest, ForcePos)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                                     molInd, 0);
     mol_.push_back( molNew );
   }
   const int vals           = 5;
@@ -306,6 +311,7 @@ TEST_F(BDUTest, ForcePos)
 TEST_F(BDUTest, ForcePosZ)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 0.0, 5.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
@@ -313,8 +319,8 @@ TEST_F(BDUTest, ForcePosZ)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; posCharges[0] = pos[molInd]; vdW[0] = 0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                                     molInd, 0);
     mol_.push_back( molNew );
   }
   const int vals           = 5;
@@ -358,6 +364,7 @@ TEST_F(BDUTest, ForcePosZ)
 TEST_F(BDUTest, ForceOpp)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
@@ -365,8 +372,8 @@ TEST_F(BDUTest, ForceOpp)
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0]=2.0*pow(-1, molInd); posCharges[0]=pos[molInd]; vdW[0]=0.0;
     
-    MoleculeAM molNew( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM>( "stat", 1.0, charges, posCharges, vdW, pos[molInd],
+                                     molInd, 0);
     mol_.push_back( molNew );
   }
   const int vals           = 5;
@@ -418,8 +425,8 @@ TEST_F(BDUTest, TorquePos)
     int M = 1;
     vector<double> charges(M); vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0]=2.0; vdW[0]=0.0; posCharges[0]=pos[molInd]+chgLoc[molInd];
-    MoleculeAM molNew( "rot", 1.4714, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "rot", 1.4714, charges, posCharges, vdW, pos[molInd],
+                                                            molInd, 0);
     mol_.push_back( molNew );
   }
   const int vals           = 5;
@@ -468,6 +475,7 @@ TEST_F(BDUTest, TorquePos)
 TEST_F(BDUTest, TorqueOpp)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0), Pt(-10.0, 7.8, 25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -477,8 +485,8 @@ TEST_F(BDUTest, TorqueOpp)
     charges[1] = 2.0*pow(-1, molInd); posCharges[1] = pos[molInd]+Pt(1,0,0);
     charges[2] = 2.0*pow(-1, molInd); posCharges[2] = pos[molInd]+Pt(0,1,0);
     vdW[0]=0.0; vdW[1]=0.0; vdW[2]=0.0;
-    MoleculeAM molNew( "rot", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM>( "rot", 2.0, charges, posCharges, vdW, pos[molInd],
+                                     molInd, 0);
     mol_.push_back( molNew );
   }
   const int vals = 5;
@@ -565,7 +573,7 @@ TEST_F(BDUTest, TorqueOpp)
 
 TEST_F(BDUTest, BDrunTimeTermY)
 {
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   const int ml = 2;
   Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
   for (int mi = 0; mi < ml; mi ++ )
@@ -573,7 +581,7 @@ TEST_F(BDUTest, BDrunTimeTermY)
     int M = 1; vector<double> charges(M);
     vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 7.0; posCharges[0] = pos[mi]; vdW[0]=0.0;
-    MoleculeAM molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "trans", 2.0, charges, posCharges, vdW, pos[mi],
                     mi, 0, 0, 0.1);
     mol.push_back( molNew );
   }
@@ -602,7 +610,7 @@ TEST_F(BDUTest, BDrunTimeTermY)
 
 TEST_F(BDUTest, BDrunTimeTermXY)
 {
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   const int ml = 2;
   Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
   for (int mi = 0; mi < ml; mi ++ )
@@ -612,7 +620,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
     charges[0] = 7.0; posCharges[0] = pos[mi]; vdW[0]=0.0;
     charges[1] = 7.0; posCharges[1] = pos[mi]+Pt(1,0,0); vdW[1]=0.0;
     charges[2] = 7.0; posCharges[2] = pos[mi]+Pt(0,1,0); vdW[2]=0.0;
-    MoleculeAM molNew( "trans", 2.0, charges, posCharges, vdW, pos[mi],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "trans", 2.0, charges, posCharges, vdW, pos[mi],
                     mi, 0, 0, 0.1);
     mol.push_back( molNew );
   }
@@ -642,7 +650,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
 
 TEST_F(BDUTest, BDrunTimeTermRot)
 {
-  vector<MoleculeAM> mol;
+  vector<shared_ptr<BaseMolecule> > mol;
   const int ml = 2;
   Pt pos[ml] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 6.0, 0.0)};
   for (int mi = 0; mi < ml; mi ++ )
@@ -652,7 +660,7 @@ TEST_F(BDUTest, BDrunTimeTermRot)
     charges[0] = 7.0; posCharges[0] = pos[mi]; vdW[0]=0.0;
     charges[1] = 7.0; posCharges[1] = pos[mi]+Pt(0,0,1); vdW[1]=0.0;
     charges[2] = 7.0; posCharges[2] = pos[mi]+Pt(1,0,0); vdW[2]=0.0;
-    MoleculeAM molNew( "rot", 2.0, charges, posCharges, vdW, pos[mi], mi, 0,
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "rot", 2.0, charges, posCharges, vdW, pos[mi], mi, 0,
                     0.1, 0.0);
     mol.push_back( molNew );
   }

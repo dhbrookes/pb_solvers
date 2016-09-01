@@ -19,8 +19,9 @@ protected :
   
   int vals_;
   shared_ptr<Constants> const_;
-  vector< MoleculeAM > mol3_; vector< MoleculeAM > mol_;
-  vector< MoleculeAM > mol_sing_;
+//  vector< MoleculeAM > mol3_;
+  vector< shared_ptr<BaseMolecule> > mol_, mol3_, mol_sing_;
+//  vector< MoleculeAM > mol_sing_;
   
   virtual void SetUp()
   {
@@ -37,12 +38,12 @@ protected :
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0]=cg[molInd]; vdW[0]=0.0; posCharges[0]=cgPos[molInd];
       
-      MoleculeAM molNew( "stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]=2.0; vdW[0] = 0.0; posCharges[0] = cgPosSi[molInd];
-      MoleculeAM molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      shared_ptr<MoleculeAM> molSing = make_shared<MoleculeAM>( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -73,7 +74,7 @@ TEST_F(EnergyForceUTest, checkEnergy)
     vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; vdW[0] = 0.0; posCharges[0] = pos[molInd];
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -131,7 +132,7 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }
@@ -166,7 +167,7 @@ TEST_F(EnergyForceUTest, checkForce)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -229,7 +230,7 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -273,7 +274,7 @@ TEST_F(EnergyForceUTest, checkTorque)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -338,7 +339,7 @@ TEST_F(EnergyForceUTest, checkTorqueSing3)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }

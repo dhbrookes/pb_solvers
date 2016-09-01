@@ -58,7 +58,7 @@ solveTol_(1e-4)
   initialize_coeff_consts();
 }
 
-PBAM::PBAM(const PBAMInput& pbami, vector<MoleculeAM> mls )
+PBAM::PBAM(const PBAMInput& pbami, vector<shared_ptr<BaseMolecule> > mls )
 :
 poles_(5),
 solveTol_(1e-4)

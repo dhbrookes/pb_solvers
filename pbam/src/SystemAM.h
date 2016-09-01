@@ -122,116 +122,94 @@ public:
 /*
  Class containing all of the relevant information for a particular system
  */
-class SystemAM
+class SystemAM : public BaseSystem
 {
 protected:
     
-  int                          N_; // number of molecules
-  double                       lambda_; // average molecular radius
-  vector<MoleculeAM>           molecules_;
-  
-  double                       boxLength_;
-  double                       cutoff_;
-  
-  double t_;  // time in a BD simulation
-  
-  int                          ntype_;  //count of unique molecules
-  vector<int>                  typect_; //count of molecules of each unique type
-  map<vector<int>, int>        typeIdxToIdx_;
-  
-  const double calc_average_radius() const;
+//  int                          N_; // number of molecules
+//  double                       lambda_; // average molecular radius
+//  vector<MoleculeAM>           molecules_;
+//  
+//  double                       boxLength_;
+//  double                       cutoff_;
+//  
+//  double t_;  // time in a BD simulation
+//  
+//  int                          ntype_;  //count of unique molecules
+//  vector<int>                  typect_; //count of molecules of each unique type
+//  map<vector<int>, int>        typeIdxToIdx_;
+//  
+//  const double calc_average_radius() const;
   
 public:
   SystemAM() { }
   
-  SystemAM(const vector<MoleculeAM>& mols,
+  SystemAM(vector<shared_ptr<BaseMolecule> > mols,
          double cutoff=Constants::FORCE_CUTOFF,
          double boxlength=Constants::MAX_DIST);
    
   SystemAM(Setup setup, double cutoff=Constants::FORCE_CUTOFF);
   
-  const int get_n() const                  {return N_;}
-  const int get_ntype()                    {return ntype_;}
-  const int get_typect(int i)              {return typect_[i];}
-  const double get_ai(int i) const         {return molecules_[i].get_a();}
-  const double get_Mi(int i) const         {return molecules_[i].get_m();}
-  const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
-  const double get_radij(int i, int j) const {return molecules_[i].get_radj(j);}
-  Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
-  Pt get_posijreal(int i, int j)
-  {return molecules_[i].get_posj_realspace(j);}
-  MoleculeAM get_moli(int i) const       {return molecules_[i];}
+  const int get_n() const                  { return N_;}
+  const int get_ntype()                    { return ntype_;}
+  const int get_typect(int i)              { return typect_[i];}
+  const double get_ai(int i) const         { return get_aik(i, 0); }
+//  const double get_Mi(int i) const         {return molecules_[i].get_m();}
+//  const double get_qij(int i, int j) const {return molecules_[i].get_qj(j);}
+//  const double get_radij(int i, int j) const {return molecules_[i].get_radj(j);}
+//  Pt get_posij(int i, int j)               {return molecules_[i].get_posj(j);}
+//  Pt get_posijreal(int i, int j)
+//  {return molecules_[i].get_posj_realspace(j);}
+//  MoleculeAM get_moli(int i) const       {return molecules_[i];}
   vector<Pt> get_allcenter() const;
-  Pt get_centeri(int i) const              {return molecules_[i].get_center();}
+  Pt get_centeri(int i) const              { return get_centerik(i, 0); }
   Pt get_unwrapped_center(int i) const
-  {return molecules_[i].get_unwrapped_center();}
-  double get_radi(int i) const             {return molecules_[i].get_a();}
-  const double get_lambda() const          {return lambda_;}
-  const string get_typei(int i) const
-  {return molecules_[i].get_move_type();}
-  const double get_droti(int i) const      {return molecules_[i].get_drot();}
-  const double get_dtransi(int i) const    {return molecules_[i].get_dtrans();}
-  const double get_boxlength() const       {return boxLength_;}
-  const double get_cutoff() const          {return cutoff_;}
-  const double get_time() const            {return t_;}
+  {return molecules_[i]->get_unwrapped_center();}
+  double get_radi(int i) const             { return get_aik(i, 0); }
+  const double get_lambda() const          { return lambda_;}
+//  const string get_typei(int i) const
+//  {return molecules_[i].get_move_type();}
+//  const double get_droti(int i) const      {return molecules_[i].get_drot();}
+//  const double get_dtransi(int i) const    {return molecules_[i].get_dtrans();}
+//  const double get_boxlength() const       {return boxLength_;}
+//  const double get_cutoff() const          {return cutoff_;}
+//  const double get_time() const            {return t_;}
   
-  const int get_mol_global_idx(int type, int ty_idx)
-  {
-    vector<int> keys = {type, ty_idx};
-    return typeIdxToIdx_[keys];
-  }
-  
-  // Compute cutoff for force calcs
-  void compute_cutoff();
-  
-  // Set time of simulation as what is input
-  void set_time(double val) { t_ = val; }
-  
-  // translate every charge in MoleculeAM i by the vector dr
-  void translate_mol(int i, Pt dr) { molecules_[i].translate(dr, boxLength_); }
-  
-  // rotate every charge in MoleculeAM i
-  void rotate_mol(int i, Quat qrot) { molecules_[i].rotate(qrot); }
+//  const int get_mol_global_idx(int type, int ty_idx)
+//  {
+//    vector<int> keys = {type, ty_idx};
+//    return typeIdxToIdx_[keys];
+//  }
+
+//  // translate every charge in MoleculeAM i by the vector dr
+//  void translate_mol(int i, Pt dr) { molecules_[i].translate(dr, boxLength_); }
+//  
+//  // rotate every charge in MoleculeAM i
+//  void rotate_mol(int i, Quat qrot) { molecules_[i].rotate(qrot); }
   
   // Check to determine if any MoleculeAMs are overlapping
-  void check_for_overlap();
-  bool is_collision(); 
+//  void check_for_overlap();
+//  bool is_collision(); 
   // get the distance vector (Point object) between two MoleculeAMs, taking into
   // account periodic boundary conditions by returning the distance vector
   // between the closest image of the MoleculeAM
   Pt get_pbc_dist_vec(int i, int j);
-  
-  // get distance vector between any two points taking into account periodic
-  // boundary conditions
-  Pt get_pbc_dist_vec_base(Pt p1, Pt p2);
 
   // Interaction and polarization lists
-  void add_J_to_pol_I( int i, int j) { molecules_[i].add_J_to_pol(j);}
-  void add_J_to_interact_I(int i, int j) { molecules_[i].add_J_to_interact(j);}
-  
-  bool is_J_in_pol_I( int i, int j)  { return molecules_[i].is_J_in_pol(j);}
-  bool is_J_in_act_I( int i, int j)  { return molecules_[i].is_J_in_interact(j);}
-  
-  vector<int> get_pol_I(int i)       { return molecules_[i].get_pol();}
-  vector<int> get_act_I(int i)       { return molecules_[i].get_act();}
+  void add_J_to_pol_I( int i, int j) { }
+  void add_J_to_interact_I(int i, int j) {}
+  bool is_J_in_pol_I( int i, int j)  { return false;}
+  bool is_J_in_act_I( int i, int j)  { return false;}
+  vector<int> get_pol_I(int i)       { return vector<int> (1,0);}
+  vector<int> get_act_I(int i)       { return vector<int> (1,0);}
 
-  void clear_all_lists()
-  {
-    for ( int i = 0; i < N_; i++)
-    {
-      molecules_[i].clear_inter_pol();
-      molecules_[i].clear_inter_act();
-    }
-  }  
-
-  // given a distance vector, determine whether it is in the cutoff
-  bool less_than_cutoff(Pt v);
+  void clear_all_lists()  {  }
   
   // reset positions with input xyz file
   void reset_positions( vector<string> xyzfiles );
   
   // write current system to PQR file
-  void write_to_pqr( string outfile );
+  void write_to_pqr( string outfile, int mid = -1);
   
   // write current system configuration to XYZ file
   void write_to_xyz(ofstream &xyz_out);

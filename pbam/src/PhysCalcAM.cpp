@@ -349,7 +349,7 @@ void ThreeBodyAM::generatePairsTrips()
 
 shared_ptr<SystemAM> ThreeBodyAM::make_subsystem(vector<int> mol_idx)
 {
-  vector<MoleculeAM> sub_mols (mol_idx.size());
+  vector<shared_ptr<BaseMolecule> > sub_mols (mol_idx.size());
   for (int i = 0; i < mol_idx.size(); i++)
   {
     sub_mols[i] = _sys_->get_moli(mol_idx[i]);
@@ -511,8 +511,6 @@ void ThreeBodyAM::printTBDEnForTor( string outf, vector<string> outfile )
     out << get_forcei_approx(i).x() << " "
         << get_forcei_approx(i).y() << " "
         << get_forcei_approx(i).z()<< "]"<<endl;
-//    out << "\tTORQUE: " << sqrt(torque_norm) << ", [";
-//    out << torque_i.x() << " " << torque_i.y()<<" "<<torque_i.z()<< "]"<<endl;
   }
   
   if ( outfile[0] != "") printNmer( 2, outfile[0]);

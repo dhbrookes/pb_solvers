@@ -14,8 +14,6 @@
 #include "TMatrix.h"
 #include "SystemSAM.h"
 
-
-
 /*
  References:
  [1] Yap, E., Head-Gordon, T. 2010. JCTC

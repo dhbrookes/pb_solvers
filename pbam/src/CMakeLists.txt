@@ -7,6 +7,7 @@ include_directories("./")
 # C++ code for standalone
 add_executable(pbam
   ASolver.cpp
+  ../../pb_shared/src/BaseElectro.cpp
   ../../pb_shared/src/BaseSys.cpp
   BDAM.cpp
   ../../pb_shared/src/BesselCalc.cpp
@@ -40,6 +41,7 @@ if(ENABLE_PBAM_APBS)
   #  build pbam library
   add_library(PBAMLib 
               ASolver.cpp
+              ../../pb_shared/src/BaseElectro.cpp
               ../../pb_shared/src/BaseSys.cpp
               BDAM.cpp
               ../../pb_shared/src/BesselCalc.cpp
@@ -65,6 +67,8 @@ if(ENABLE_PBAM_SPHINX)
   add_library(pbam_sph MODULE
               ../../pb_wrap/src/pbam_py.c
               ASolver.cpp
+              ../../pb_shared/src/BaseElectro.cpp
+              ../../pb_shared/src/BaseSys.cpp
               BDAM.cpp
               ../../pb_shared/src/BesselCalc.cpp
               ../../pb_shared/src/Constants.cpp
