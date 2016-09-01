@@ -67,12 +67,13 @@ PBSAMInput getPBSAMParams()
   return pbsamI;
 }
 
+/*
 PBAMInput getPBAMParams()
 {
   // get the struct for use in the c code
   PBAMInput pbamI;
   return pbamI;
-}
+} */
 
 
 //  print the PBAM flow structure for debugging
