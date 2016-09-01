@@ -156,17 +156,30 @@ to VDW. Now, to add the coarse grained spheres back into the image, select the C
 </pre></div>
 </div>
 <p>Change the Drawing Method of the new representation to VDW and the Material to Transparent. You should now see a collection of charges inside
-transparent coarse grained spheres. The final view of the Graphical Representations screen and the ouput image after this process are shown below.</p>
+transparent coarse grained spheres. The final view of the Graphical Representations screen and the ouput image after this process are shown below, for both PB-AM and PB-SAM.</p>
 <a class="reference internal image-reference" href="images/vmd_graph_rep_pqr.png"><img alt="images/vmd_graph_rep_pqr.png" src="images/vmd_graph_rep_pqr.png" style="width: 30%;" /></a>
 <a class="reference internal image-reference" href="images/vmd_4sp.png"><img alt="images/vmd_4sp.png" src="images/vmd_4sp.png" style="width: 66%;" /></a>
+<p>PB-SAM DX:</p>
+<a class="reference internal image-reference" href="images/vmd_barn_bars_rep.png"><img alt="images/vmd_barn_bars_rep.png" src="images/vmd_barn_bars_rep.png" style="width: 35%;" /></a>
+<a class="reference internal image-reference" href="images/vmd_barn_bars.png"><img alt="images/vmd_barn_bars.png" src="images/vmd_barn_bars.png" style="width: 56%;" /></a>
 </div>
 <div class="section" id="viewing-electrostatics-in-vmd">
 <h2>Viewing Electrostatics in VMD<a class="headerlink" href="#viewing-electrostatics-in-vmd" title="Permalink to this headline">¶</a></h2>
 <p>To view the electrostatic results, first follow the steps above to load the PQR file. Then load the .dx file by selecting File &gt; New Molecule on the toolbar, using the Load Files For toggle to select the previously loaded PQR and then entering the path to the .dx file in the Filename section. We will now use the .dx file to draw isosurfaces representing the surface in which the system has a selected charge. First, open the Graphical Representation screen again and select the Create Rep button. Now change the Drawing Method to Isosurface. Now in the new Draw toggle, select Solid Surface. Move the Value bar to change the charge that the isosurface represents. Change the Coloring Method to ColorID and then select the color by entering a ColorID number
 in the box that appears next to the Coloring Method toggle. You may also toggle through the options by expanding this box. You may add an arbritary number
-of isosurfaces by again pressing Create Rep and choosing a new Value and ColorID. The final view of the Graphical Representations screen and the ouput image after this process are shown below.</p>
+of isosurfaces by again pressing Create Rep and choosing a new Value and ColorID. The final view of the Graphical Representations screen and the ouput image after this process are shown below, for both PB-AM and PB-SAM</p>
+<p>PB-AM DX:</p>
 <a class="reference internal image-reference" href="images/vmd_graph_rep_dx.png"><img alt="images/vmd_graph_rep_dx.png" src="images/vmd_graph_rep_dx.png" style="width: 30%;" /></a>
 <a class="reference internal image-reference" href="images/vmd_4sp_dx.png"><img alt="images/vmd_4sp_dx.png" src="images/vmd_4sp_dx.png" style="width: 66%;" /></a>
+<p>PB-SAM DX:</p>
+<a class="reference internal image-reference" href="images/vmd_barn_bars_rep_dx.png"><img alt="images/vmd_barn_bars_rep_dx.png" src="images/vmd_barn_bars_rep_dx.png" style="width: 35%;" /></a>
+<a class="reference internal image-reference" href="images/vmd_barn_bars_dx.png"><img alt="images/vmd_barn_bars_dx.png" src="images/vmd_barn_bars_dx.png" style="width: 56%;" /></a>
+<p>For PB-SAM, in addition to using dx files for viewing ESP isosurfaces, they can also be used to
+visualize the potential on the molecule surfaces. An excellent tutorial for this
+procedure is given <a class="reference external" href="http://www.poissonboltzmann.org/examples/comp_tut/#VMD">here</a>, starting at step 15.</p>
+<a class="reference internal image-reference" href="images/vmd_barn_bars_rep_surf.png"><img alt="images/vmd_barn_bars_rep_surf.png" src="images/vmd_barn_bars_rep_surf.png" style="width: 25%;" /></a>
+<a class="reference internal image-reference" href="images/vmd_barn_bars_surf1.png"><img alt="images/vmd_barn_bars_surf1.png" src="images/vmd_barn_bars_surf1.png" style="width: 36%;" /></a>
+<a class="reference internal image-reference" href="images/vmd_barn_bars_surf2.png"><img alt="images/vmd_barn_bars_surf2.png" src="images/vmd_barn_bars_surf2.png" style="width: 36%;" /></a>
 </div>
 <div class="section" id="d-esp-plots">
 <h2>2D ESP Plots<a class="headerlink" href="#d-esp-plots" title="Permalink to this headline">¶</a></h2>
@@ -191,7 +204,10 @@ files. Simply call:</p>
 <p>where <code class="code docutils literal"><span class="pre">&lt;file_name&gt;</span></code> is an output file with format detailed above and <code class="code docutils literal"><span class="pre">&lt;out_name&gt;</span></code>
 is the desired prefix of the output file. This script creates a JPG file of the cross sectioned
 potential. An example of this output is shown below.</p>
+<p>PB-AM 2D plot:</p>
 <a class="reference internal image-reference" href="images/pot_x_0.jpg"><img alt="images/pot_x_0.jpg" class="align-center" src="images/pot_x_0.jpg" style="width: 70%;" /></a>
+<p>PB-SAM 2D plot:</p>
+<a class="reference internal image-reference" href="images/pbsam_barstar.png"><img alt="images/pbsam_barstar.png" class="align-center" src="images/pbsam_barstar.png" style="width: 70%;" /></a>
 </div>
 <div class="section" id="id1">
 <h2>3D ESP plots<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
@@ -213,7 +229,10 @@ files. Simply call:</p>
 </div>
 <p>which will create a number of 3D potential JPG images from various viewing angles.  An example
 output image is shown below.</p>
+<p>PB-AM 3D plot:</p>
 <a class="reference internal image-reference" href="images/4sp_surf.jpg"><img alt="images/4sp_surf.jpg" class="align-center" src="images/4sp_surf.jpg" style="width: 70%;" /></a>
+<p>PB-SAM 3D plot:</p>
+<a class="reference internal image-reference" href="images/barstar_180.png"><img alt="images/barstar_180.png" class="align-center" src="images/barstar_180.png" style="width: 70%;" /></a>
 </div>
 </div>
 
