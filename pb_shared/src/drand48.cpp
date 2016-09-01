@@ -1,3 +1,14 @@
+/*
+ * The lion's share of this file and included functions courtesy of:
+ * https://gist.github.com/mortennobel/8665258
+ *
+ * Description: "drand48() and srand48(long) on Windows"
+ *      based on Freebsd: 
+ *      <http://fxr.watson.org/fxr/ident?v=FREEBSD-LIBC;im=bigexcerpts;i=_dorand48>
+ */
+
+
+
 #include "util.h"
 
 #define RAND48_SEED_0   (0x330e)
