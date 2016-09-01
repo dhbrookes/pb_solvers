@@ -31,8 +31,9 @@
 #ifndef ElectrostaticsAM_h
 #define ElectrostaticsAM_h
 
-#include "PhysCalcAM.h"
 #include <time.h> 
+
+#include "PhysCalcAM.h"
 #include "SystemAM.h"
 #include "BaseElectro.h"
 
@@ -52,10 +53,10 @@ protected:
   double compute_pot_at( Pt point );
   
 public:
-  ElectrostaticAM(shared_ptr<VecOfMats<cmplx>::type> _A, shared_ptr<SystemAM> _sys,
-                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
-                shared_ptr<Constants> _consts,
-                int p, int npts = 150);
+  ElectrostaticAM(shared_ptr<VecOfMats<cmplx>::type> _A,
+                  shared_ptr<SystemAM> _sys,
+                  shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
+                  shared_ptr<Constants> _consts, int p, int npts = 150);
   
   ElectrostaticAM(shared_ptr<ASolver> _asolv, int npts=150);
 };

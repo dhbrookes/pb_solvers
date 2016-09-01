@@ -264,16 +264,7 @@ SystemAM::SystemAM(Setup setup, double cutoff)
 //  ave  =  ave / N_;
 //  return ave;
 //}
-//
-//
-//void SystemAM::compute_cutoff()
-//{
-//  cutoff_ = boxLength_/2.0;
-//  cout << " The desired cutoff is larger than half the box length";
-//  cout << ". Resetting cutoff to 1/2 the boxlength: " << cutoff_ << endl;
-//}
-//
-//
+
 //void SystemAM::check_for_overlap()
 //{
 //  int i, j;
@@ -300,17 +291,6 @@ Pt SystemAM::get_pbc_dist_vec(int i, int j)
   return get_pbc_dist_vec_base(ci, cj);
 }
 
-//Pt SystemAM::get_pbc_dist_vec_base(Pt p1, Pt p2)
-//{
-//  Pt dv  = p1 - p2;
-//  
-//  Pt v = Pt(dv.x() - round(dv.x()/boxLength_)*boxLength_,
-//            dv.y() - round(dv.y()/boxLength_)*boxLength_,
-//            dv.z() - round(dv.z()/boxLength_)*boxLength_);
-//  
-//  return v;
-//}
-
 vector<Pt> SystemAM::get_allcenter() const
 {
   vector< Pt> mol_cen(N_);
@@ -319,12 +299,6 @@ vector<Pt> SystemAM::get_allcenter() const
   
   return mol_cen;
 }
-
-//bool SystemAM::less_than_cutoff(Pt v)
-//{
-//  if (v.norm() < cutoff_) return true;
-//  else return false;
-//}
 
 void SystemAM::reset_positions( vector<string> xyzfiles )
 {
