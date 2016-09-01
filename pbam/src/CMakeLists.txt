@@ -5,21 +5,40 @@ include_directories("../../pb_wrap/src")
 include_directories("./")
 
 # C++ code for standalone
-add_executable(pbam
-  ASolver.cpp
-  ../../pb_shared/src/BaseSys.cpp
-  BDAM.cpp
-  ../../pb_shared/src/BesselCalc.cpp
-  ../../pb_shared/src/Constants.cpp
-  ElectrostaticsAM.cpp
-  PhysCalcAM.cpp
-  main.cpp
-  PBAM.cpp
-  ../../pb_shared/src/ReExpCalc.cpp
-  ../../pb_shared/src/setup.cpp
-  ../../pb_shared/src/SHCalc.cpp
-  SystemAM.cpp
-  )
+if(NOT WIN32)
+  add_executable(pbam
+                 ASolver.cpp
+                 ../../pb_shared/src/BaseSys.cpp
+                 BDAM.cpp
+                 ../../pb_shared/src/BesselCalc.cpp
+                 ../../pb_shared/src/Constants.cpp
+                 ElectrostaticsAM.cpp
+                 PhysCalcAM.cpp
+                 main.cpp
+                 PBAM.cpp
+                 ../../pb_shared/src/ReExpCalc.cpp
+                 ../../pb_shared/src/setup.cpp
+                 ../../pb_shared/src/SHCalc.cpp
+                 SystemAM.cpp
+                 )
+else()
+  add_executable(pbam
+                 ASolver.cpp
+                 ../../pb_shared/src/BaseSys.cpp
+                 BDAM.cpp
+                 ../../pb_shared/src/BesselCalc.cpp
+                 ../../pb_shared/src/Constants.cpp
+                 ElectrostaticsAM.cpp
+                 PhysCalcAM.cpp
+                 main.cpp
+                 PBAM.cpp
+                 ../../pb_shared/src/ReExpCalc.cpp
+                 ../../pb_shared/src/setup.cpp
+                 ../../pb_shared/src/SHCalc.cpp
+                 SystemAM.cpp
+                 ../../pb_shared/src/drand48.cpp
+                 )
+endif()
 
 
 ################################################
@@ -38,22 +57,40 @@ if(ENABLE_PBAM_APBS)
                       )
 
   #  build pbam library
-  add_library(PBAMLib 
-              ASolver.cpp
-              ../../pb_shared/src/BaseSys.cpp
-              BDAM.cpp
-              ../../pb_shared/src/BesselCalc.cpp
-              ../../pb_shared/src/Constants.cpp
-              ElectrostaticsAM.cpp
-              PhysCalcAM.cpp
-              PBAM.cpp
-              ../../pb_wrap/src/PBAMWrap.cpp
-              ../../pb_shared/src/ReExpCalc.cpp
-              ../../pb_shared/src/setup.cpp
-              ../../pb_shared/src/SHCalc.cpp
-              SystemAM.cpp
-              )
-  
+  if(NOT WIN32)
+    add_library(PBAMLib 
+                ASolver.cpp
+                ../../pb_shared/src/BaseSys.cpp
+                BDAM.cpp
+                ../../pb_shared/src/BesselCalc.cpp
+                ../../pb_shared/src/Constants.cpp
+                ElectrostaticsAM.cpp
+                PhysCalcAM.cpp
+                PBAM.cpp
+                ../../pb_wrap/src/PBAMWrap.cpp
+                ../../pb_shared/src/ReExpCalc.cpp
+                ../../pb_shared/src/setup.cpp
+                ../../pb_shared/src/SHCalc.cpp
+                SystemAM.cpp
+                )
+    else()
+    add_library(PBAMLib 
+                ASolver.cpp
+                ../../pb_shared/src/BaseSys.cpp
+                BDAM.cpp
+                ../../pb_shared/src/BesselCalc.cpp
+                ../../pb_shared/src/Constants.cpp
+                ElectrostaticsAM.cpp
+                PhysCalcAM.cpp
+                PBAM.cpp
+                ../../pb_wrap/src/PBAMWrap.cpp
+                ../../pb_shared/src/ReExpCalc.cpp
+                ../../pb_shared/src/setup.cpp
+                ../../pb_shared/src/SHCalc.cpp
+                SystemAM.cpp
+                ../../pb_shared/src/drand48.cpp
+                )
+    endif()
 endif()
 
 ################################################

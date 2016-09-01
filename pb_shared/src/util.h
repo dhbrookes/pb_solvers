@@ -32,8 +32,13 @@
 #ifndef util_hpp
 #define util_hpp
 
-#include <stdio.h>
+#ifdef _WIN32
+  #include <iso646.h>
+  #define _USE_MATH_DEFINES
+#endif
+
 #include <math.h>
+#include <stdio.h>
 #include <algorithm>
 #include <complex>
 #include <iostream>
@@ -41,6 +46,10 @@
 #include <unordered_map>
 #include "MyMatrix.h"
 #include "MyExpansion.h"
+
+#ifdef _WIN32
+  extern double drand48();
+#endif
 
 /*
  Right scalar multiplication of a matrix
