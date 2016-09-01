@@ -15,7 +15,7 @@ to VDW. Now, to add the coarse grained spheres back into the image, select the C
  name X
 
 Change the Drawing Method of the new representation to VDW and the Material to Transparent. You should now see a collection of charges inside
-transparent coarse grained spheres. The final view of the Graphical Representations screen and the ouput image after this process are shown below.
+transparent coarse grained spheres. The final view of the Graphical Representations screen and the ouput image after this process are shown below, for both PB-AM and PB-SAM.
 
 .. image:: images/vmd_graph_rep_pqr.png
    :width: 30%
@@ -23,18 +23,52 @@ transparent coarse grained spheres. The final view of the Graphical Representati
 .. image:: images/vmd_4sp.png
    :width: 66%
 
+PB-SAM DX:
+
+.. image:: images/vmd_barn_bars_rep.png
+   :width: 35%
+
+.. image:: images/vmd_barn_bars.png
+   :width: 56%
+
+
 Viewing Electrostatics in VMD
 -----------------------------
 
 To view the electrostatic results, first follow the steps above to load the PQR file. Then load the .dx file by selecting File > New Molecule on the toolbar, using the Load Files For toggle to select the previously loaded PQR and then entering the path to the .dx file in the Filename section. We will now use the .dx file to draw isosurfaces representing the surface in which the system has a selected charge. First, open the Graphical Representation screen again and select the Create Rep button. Now change the Drawing Method to Isosurface. Now in the new Draw toggle, select Solid Surface. Move the Value bar to change the charge that the isosurface represents. Change the Coloring Method to ColorID and then select the color by entering a ColorID number
 in the box that appears next to the Coloring Method toggle. You may also toggle through the options by expanding this box. You may add an arbritary number
-of isosurfaces by again pressing Create Rep and choosing a new Value and ColorID. The final view of the Graphical Representations screen and the ouput image after this process are shown below.
+of isosurfaces by again pressing Create Rep and choosing a new Value and ColorID. The final view of the Graphical Representations screen and the ouput image after this process are shown below, for both PB-AM and PB-SAM
+
+PB-AM DX: 
 
 .. image:: images/vmd_graph_rep_dx.png
    :width: 30%
 
 .. image:: images/vmd_4sp_dx.png
    :width: 66%
+
+PB-SAM DX:
+
+.. image:: images/vmd_barn_bars_rep_dx.png
+   :width: 35%
+
+.. image:: images/vmd_barn_bars_dx.png
+   :width: 56%
+
+For PB-SAM, in addition to using dx files for viewing ESP isosurfaces, they can also be used to 
+visualize the potential on the molecule surfaces. An excellent tutorial for this 
+procedure is given here_, starting at step 15.
+
+.. _here: http://www.poissonboltzmann.org/examples/comp_tut/#VMD
+
+.. image:: images/vmd_barn_bars_rep_surf.png
+   :width: 25%
+
+.. image:: images/vmd_barn_bars_surf1.png
+   :width: 36%
+
+.. image:: images/vmd_barn_bars_surf2.png
+   :width: 36%
 
 
 2D ESP Plots
@@ -62,8 +96,15 @@ where :code:`<file_name>` is an output file with format detailed above and :code
 is the desired prefix of the output file. This script creates a JPG file of the cross sectioned 
 potential. An example of this output is shown below.
 
+PB-AM 2D plot:
 
 .. image:: images/pot_x_0.jpg
+   :width: 70%
+   :align: center
+
+PB-SAM 2D plot:
+
+.. image:: images/pbsam_barstar.png
    :width: 70%
    :align: center
 
@@ -89,7 +130,15 @@ files. Simply call::
 which will create a number of 3D potential JPG images from various viewing angles.  An example
 output image is shown below. 
 
+PB-AM 3D plot:
+
 .. image:: images/4sp_surf.jpg
+   :width: 70%
+   :align: center
+
+PB-SAM 3D plot:
+
+.. image:: images/barstar_180.png
    :width: 70%
    :align: center
 
