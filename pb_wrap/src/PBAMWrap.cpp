@@ -117,7 +117,7 @@ PBAMOutput runPBAMSphinxWrap( double xyzrc[][AT_MAX][XYZRCWIDTH],
    // convert xyzrc to a vector of MoleculeAMs
   printf("Inside pbamrun sphinx\n");
   printPBAMStruct(pbamfin);
-  vector<MoleculeAM> mols;
+  vector<shared_ptr<BaseMolecule> > mols;
   for (int mol=0; mol < nmol; mol++)
   {
     int natoms = natm[mol];
@@ -150,7 +150,8 @@ PBAMOutput runPBAMSphinxWrap( double xyzrc[][AT_MAX][XYZRCWIDTH],
       vdw.push_back(xyzrc[mol][i][3]);
       chg.push_back(xyzrc[mol][i][4]);
     }
-    mols.push_back(MoleculeAM(difftype, chg, cgpos, vdw, mol, 0, dtr, drot));
+    mols.push_back(make_shared<MoleculeAM>(difftype, chg, cgpos, vdw, 
+                                           mol, 0, dtr, drot));
   }
 
   //  create the PBAM object
@@ -167,7 +168,7 @@ PBAMOutput runPBAMWrapAPBS( PBAMInput pbamParams,
 {
    // convert Valist to a vector of MoleculeAMs
   printf("Inside pbamrun\n");
-  vector<MoleculeAM> mols;
+  vector<shared_ptr< BaseMolecule > > mols;
   for (unsigned int mol=0; mol < nmls; mol++)
   {
     Vatom *atom;
@@ -203,7 +204,8 @@ PBAMOutput runPBAMWrapAPBS( PBAMInput pbamParams,
       vdw.push_back(Vatom_getRadius(atom));
       chg.push_back(Vatom_getCharge(atom));
     }
-    mols.push_back(MoleculeAM(difftype, chg, cgpos, vdw, mol, 0, dtr, drot));
+    mols.push_back(make_shared<MoleculeAM> (difftype, chg, cgpos, vdw, 
+                                            mol, 0, dtr, drot));
   }
 
   //  create the PBAM object

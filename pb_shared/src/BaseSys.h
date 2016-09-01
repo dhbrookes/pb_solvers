@@ -74,6 +74,8 @@ public:
   Pt get_posj_realspace(int j)          { return pos_[j] + get_cen_j(j); }
   const int get_ns() const              { return Ns_; }
   
+  void write_pqr(string outfile);
+
   // get center for charge j
   virtual Pt get_cen_j(int j) = 0;
   
@@ -81,8 +83,7 @@ public:
   virtual void rotate(Quat qrot) = 0;
   virtual void rotate(MyMatrix<double> rotmat) = 0;
   
-  
-  //below are methods only for PBAM that should be overridden:
+  //below are methods only for PBSAM that should be overridden
   virtual vector<int> get_pol()                 { return vector<int> (); }
   virtual vector<int> get_act()                 { return vector<int> (); }
   virtual void clear_inter_pol()                { }
@@ -92,8 +93,6 @@ public:
   virtual bool is_J_in_pol( int J )             { return true; }
   virtual bool is_J_in_interact( int J )        { return true; }
   
-  
-  //below are methods only for PBSAM that should be overridden
   virtual void set_gridj(int j, vector<Pt> grid) { }
   virtual void set_gridexpj(int j, vector<int> grid_exp) { }
   virtual void set_gridburj(int j, vector<int> grid_bur) { }

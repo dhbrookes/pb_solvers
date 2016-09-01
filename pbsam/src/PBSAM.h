@@ -73,7 +73,7 @@ public:
   PBSAM(string infile);
   // For APBS
   PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
-        vector<MoleculeSAM> mls );
+        vector<shared_ptr<BaseMolecule> > mls );
 
   friend PBSAMInput getPBSAMParams();
   friend PBAMInput getPBAMParams();

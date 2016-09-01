@@ -60,7 +60,7 @@ PBSAM::PBSAM(string infile) : poles_(5)
 
 
 PBSAM::PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
-             vector<MoleculeSAM> mls )
+             vector<shared_ptr<BaseMolecule> > mls )
 :
 poles_(5), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
 {
@@ -145,12 +145,11 @@ poles_(5), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
                              difftype, diffcon, termcond, termval, termnu,
                              confil, conpad, xyzf, unt);
   _setp_->apbs_pbsam_set(surffil, imatfil, expfil);
-
   check_setup();
   
-  vector<shared_ptr<BaseMolecule> > molP(mls.size());
-  for (int i = 0; i < mls.size(); i++) molP[i] = make_shared<MoleculeSAM>(mls[i]);
-  _syst_ = make_shared<SystemSAM> (molP, Constants::FORCE_CUTOFF, pbami.boxLen_);
+//vector<shared_ptr<BaseMolecule> > molP(mls.size());
+//for (int i = 0; i < mls.size(); i++) molP[i] = make_shared<MoleculeSAM>(mls[i]);
+  _syst_ = make_shared<SystemSAM> (mls, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
   
   init_consts_calcs();
