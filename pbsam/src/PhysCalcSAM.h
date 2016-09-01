@@ -163,9 +163,9 @@ public:
   shared_ptr<vector<Pt> > get_F() { return _fCalc_->get_all_f(); }
   shared_ptr<vector<double> > get_omega() { return _eCalc_->get_omega(); }
 
-  Pt get_taui(int i) { return _torCalc_->get_taui(i); }
-  Pt get_forcei(int i) { return _fCalc_->get_fi(i); }
-  double get_omegai(int i) {return _eCalc_->get_omega_i_int(i);}
+//Pt get_taui(int i) { return _torCalc_->get_taui(i); }
+//Pt get_forcei(int i) { return _fCalc_->get_fi(i); }
+//double get_omegai(int i) {return _eCalc_->get_omega_i_int(i);}
   
   Pt get_moli_pos( int i) { return _sys_->get_cogi(i); }
   
