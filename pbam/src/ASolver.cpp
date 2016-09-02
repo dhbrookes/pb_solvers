@@ -37,8 +37,9 @@ _consts_(_consts)
   
   _allSh_ = make_shared<vector<vector<MyMatrix<cmplx> > > > (N_,
                                       vector<MyMatrix<cmplx>> (N_));
+  _sys_ = _sys;
   
-  reset_all(_sys);
+  reset_all();
 }
 
 // perform many iterations of the solution for A
@@ -1135,10 +1136,9 @@ void ASolver::print_dAi( int i, int j, int p)
 }
 
 
-void ASolver::reset_all(shared_ptr<SystemAM> _sys)
+void ASolver::reset_all()
 {
-  _sys_ = _sys;
-  T_  = MyMatrix<ReExpCoeffs>(_sys->get_n(), _sys->get_n());
+  T_  = MyMatrix<ReExpCoeffs>(_sys_->get_n(), _sys_->get_n());
   _reExpConsts_ = make_shared<ReExpCoeffsConstants>(_consts_->get_kappa(),
                                                     _sys_->get_lambda(), p_);
   int n, n1;

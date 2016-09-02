@@ -277,7 +277,7 @@ public:
   /*
    Reset all relevant members given a new system
    */
-  void reset_all(shared_ptr<SystemAM> _sys);
+  void reset_all();
   
 }; // End ASolver
 

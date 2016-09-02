@@ -201,8 +201,7 @@ void BDRunAM::run(string xyzfile, string statfile, int nSCF)
     }
     
     _stepper_->get_system()->clear_all_lists();
-    shared_ptr<SystemAM> sysam = dynamic_pointer_cast<SystemAM>(_stepper_->get_system());
-    _asolver_->reset_all( sysam);
+    _asolver_->reset_all();
     if (nSCF != 0) scf = nSCF;
 
     _asolver_->solve_A(prec_, scf);
