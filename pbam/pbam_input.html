@@ -42,7 +42,6 @@
 
 <body class="wy-body-for-nav" role="document">
 
-   
   <div class="wy-grid-for-nav">
 
     
@@ -88,7 +87,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="pbam.html">PB-AM</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="pbam_method.html">Method overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pbam_method.html#physical-calculations">Physical calculations</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">PB-AM Inputs</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="">PB-AM Inputs</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#general-input-file-parameters">General input file parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#physical-calculations">Physical calculations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#electrostatic-potential-visualization">Electrostatic Potential Visualization</a></li>
@@ -131,10 +130,6 @@
         <div class="rst-content">
           
 
- 
-
-
-
 
 
 
@@ -143,16 +138,16 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-        <li><a href="pbam.html">PB-AM</a> &raquo;</li>
+          <li><a href="pbam.html">PB-AM</a> &raquo;</li>
       
     <li>PB-AM Inputs</li>
-    <li class="wy-breadcrumbs-aside">
-      
-          
-          <a href="../sources/pbam/pbam_input.txt" rel="nofollow"> View page source</a>
+      <li class="wy-breadcrumbs-aside">
         
-      
-    </li>
+          
+            <a href="../sources/pbam/pbam_input.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
   </ul>
   <hr/>
 </div>
@@ -502,7 +497,7 @@ file is as follows, and is whitespace-delimited:</p>
 <h3>XYZ File<a class="headerlink" href="#xyz-file" title="Permalink to this headline">¶</a></h3>
 <p>The <em>XYZ</em> file simply specifies the desired molecule
 centers for a given molecule type.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>mol1X  mol1Y  mol1Z
+<div class="highlight-bash"><div class="highlight"><pre>mol1X  mol1Y  mol1Z
 mol2X  mol2Y  mol2Z
 mol3X  mol3Y  mol3Z
 </pre></div>
@@ -518,7 +513,7 @@ specifying the translations and rotations that should be applied to
 each molecule of a particular type. For these files, we follow
 the PDB standard for rotation matrices and translation vectors,
 which is as follows:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>mol1 rot_1_11 rot_1_12 rot_1_13 trans_1_1
+<div class="highlight-bash"><div class="highlight"><pre>mol1 rot_1_11 rot_1_12 rot_1_13 trans_1_1
 mol1 rot_1_21 rot_1_22 rot_1_23 trans_1_2
 mol1 rot_1_31 rot_1_32 rot_1_33 trans_1_3
 mol2 rot_2_11 rot_2_12 rot_2_13 trans_2_1

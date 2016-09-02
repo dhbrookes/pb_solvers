@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PB-AM Examples &mdash; pb_solvers 0.1 documentation</title>
+  <title>PB-SAM Examples &mdash; pb_solvers 0.1 documentation</title>
   
 
   
@@ -31,9 +31,9 @@
 
   
     <link rel="top" title="pb_solvers 0.1 documentation" href="../index.html"/>
-        <link rel="up" title="PB-AM" href="pbam.html"/>
-        <link rel="next" title="PB-AM Program details" href="pbam_program.html"/>
-        <link rel="prev" title="PB-AM Inputs" href="pbam_input.html"/> 
+        <link rel="up" title="PB-SAM" href="pbsam.html"/>
+        <link rel="next" title="PB-SAM Program details" href="pbsam_program.html"/>
+        <link rel="prev" title="PB-SAM Inputs" href="pbsam_input.html"/> 
 
   
   <script src="../static/js/modernizr.min.js"></script>
@@ -84,11 +84,18 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Getting Started</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="pbam.html">PB-AM</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="pbam_method.html">Method overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pbam_method.html#physical-calculations">Physical calculations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pbam_input.html">PB-AM Inputs</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">PB-AM Examples</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../pbam/pbam.html">PB-AM</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pbsam.html">PB-SAM</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pbsam_method.html">Method overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_method.html#physical-calculations">Physical calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_input.html">PB-SAM Inputs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">PB-SAM Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pb-sam-intermediates">PB-SAM intermediates</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#coarse-grain-pqr-files">Coarse-Grain PQR files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imat-surface-integral-files">Imat: Surface integral files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exp-expansion-files">Exp: Expansion files</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#physical-calculation-run">Physical Calculation run</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#input-files">Input Files</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#output-files">Output Files</a></li>
@@ -96,7 +103,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#electrostatics-run">Electrostatics run</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id1">Input Files</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id2">Output Files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pbsam-dyn">Output Files</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#dynamics-run">Dynamics run</a><ul>
@@ -106,10 +113,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pbam_program.html">PB-AM Program details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pbsam_program.html">PB-SAM Program details</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../pbsam/pbsam.html">PB-SAM</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analysis_tools.html">Analysis Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
@@ -142,13 +148,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-          <li><a href="pbam.html">PB-AM</a> &raquo;</li>
+          <li><a href="pbsam.html">PB-SAM</a> &raquo;</li>
       
-    <li>PB-AM Examples</li>
+    <li>PB-SAM Examples</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../sources/pbam/pbam_examples.txt" rel="nofollow"> View page source</a>
+            <a href="../sources/pbsam/pbsam_examples.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -158,34 +164,103 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pb-am-examples">
-<h1>PB-AM Examples<a class="headerlink" href="#pb-am-examples" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pb-sam-examples">
+<h1>PB-SAM Examples<a class="headerlink" href="#pb-sam-examples" title="Permalink to this headline">¶</a></h1>
 <p>This is a few examples of input files
-and their expected outputs for each type of PB-AM run.</p>
+and their expected outputs for each type of PB-SAM run. Like PB-AM
+runs can be one of three options:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#pbsam-enfo"><span>Physical Calculation run</span></a></li>
+<li><a class="reference internal" href="#pbsam-elec"><span>Electrostatics run</span></a></li>
+<li><a class="reference internal" href="#pbsam-dyn"><span>Output Files</span></a></li>
+</ul>
+<p>Because PB-SAM is a bit more theoretically involved than PB-AM, it is
+time saving to save some files with program intermediates that
+can be later used as program inputs. They are described in the following section.</p>
+<div class="section" id="pb-sam-intermediates">
+<h2>PB-SAM intermediates<a class="headerlink" href="#pb-sam-intermediates" title="Permalink to this headline">¶</a></h2>
+<p>When running PB-SAM, a few intermediate quantities are generated
+and saved to files. These include</p>
+<ul class="simple">
+<li><a class="reference internal" href="#pqrlab"><span>Coarse-Grain PQR files</span></a></li>
+<li><a class="reference internal" href="#imatlab"><span>Imat: Surface integral files</span></a></li>
+<li><a class="reference internal" href="#explab"><span>Exp: Expansion files</span></a></li>
+</ul>
+<div class="section" id="coarse-grain-pqr-files">
+<span id="pqrlab"></span><h3>Coarse-Grain PQR files<a class="headerlink" href="#coarse-grain-pqr-files" title="Permalink to this headline">¶</a></h3>
+<p>The program uses the vertex file output from MSMS
+to coarse-grain the system. If the input file does not
+contain any CG centers (indicated by <code class="docutils literal"><span class="pre">CEN</span></code> keyword in
+the PQR file, then the MC CG process is run, and the output
+is stored to a file called <code class="docutils literal"><span class="pre">[pqr</span> <span class="pre">input]_cg.pqr</span></code>, where
+<code class="docutils literal"><span class="pre">[pqr</span> <span class="pre">input]</span></code> is the input file name with the last four characters
+removed (presumably &#8216;.pqr&#8217;).</p>
+<div class="highlight-bash"><div class="highlight"><pre>pqr <span class="m">1</span> barnase.pqr
+surf <span class="m">1</span> barnase.vert
+</pre></div>
+</div>
+<p><strong>Later use:</strong> If you wish to run the system again, you can
+change the filename of the PQR file from the original to
+the new <code class="docutils literal"><span class="pre">[pqr]_cg.pqr</span></code>, and the CG process will be skipped.</p>
+<div class="highlight-bash"><div class="highlight"><pre>pqr <span class="m">1</span> barnase_cg.pqr <span class="c1"># _cg file has replaced pqr</span>
+<span class="c1">#surf 1 barnase.vert # commented out, no longer needed</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="imat-surface-integral-files">
+<span id="imatlab"></span><h3>Imat: Surface integral files<a class="headerlink" href="#imat-surface-integral-files" title="Permalink to this headline">¶</a></h3>
+<p>After the system has been coarse-grained, surface integral
+matrices are generated for each CG sphere. These are binary
+files, and will be named as follows: <code class="docutils literal"><span class="pre">[pqr</span> <span class="pre">input]sph[#].bin</span></code>,
+where like the CG output file, the pqr input has removed the last
+four characters, and the <code class="docutils literal"><span class="pre">#</span></code> indicating the number of the sphere
+within the molecule (zero-based).</p>
+<p><strong>Later use:</strong> If you wish to run the system again, you
+can add the flag <code class="docutils literal"><span class="pre">imat</span></code> into the input file, with the prefix
+<code class="docutils literal"><span class="pre">[pqr</span> <span class="pre">input]sph</span></code> for the molecule. The program will append the sphere
+numbers after the <code class="docutils literal"><span class="pre">sph</span></code>. Input file invocation is given below.
+Please note that if system conditions (dielectric
+constants, temperature, salt concentration) are changed, the <code class="docutils literal"><span class="pre">imat</span></code>
+files do not need to be regenerated.</p>
+<div class="highlight-bash"><div class="highlight"><pre>pqr <span class="m">1</span> barnase.pqr
+imat <span class="m">1</span> barnasesph
+</pre></div>
+</div>
+</div>
+<div class="section" id="exp-expansion-files">
+<span id="explab"></span><h3>Exp: Expansion files<a class="headerlink" href="#exp-expansion-files" title="Permalink to this headline">¶</a></h3>
+<p>After the system has been coarse-grained and surface integral
+generated, the program will then perform a self-polarization for
+each molecule type designated in the input. Once the self-polarization
+has completed, the multipole expansions <strong>H</strong> and <strong>F</strong> representing
+the effective charge distribution on the molecular surface are printed
+to files, called: <code class="docutils literal"><span class="pre">[pqr</span> <span class="pre">input].H.[#].exp</span></code> and <code class="docutils literal"><span class="pre">[pqr</span> <span class="pre">input].F.[#].exp</span></code>.
+where like the CG output file, the pqr input has removed the last
+four characters, and the <code class="docutils literal"><span class="pre">#</span></code> indicating the number of the sphere
+within the molecule (zero-based).</p>
+<p><strong>Later use:</strong> If you wish to run the system again, you
+can add the flag <code class="docutils literal"><span class="pre">exp</span></code> into the input file, with the prefix
+<code class="docutils literal"><span class="pre">[pqr</span> <span class="pre">input]</span></code> for the molecule. The program will append letter H or F
+and the sphere numbers. Please note that if system conditions (dielectric
+constants, temperature, salt concentration) are changed, the <code class="docutils literal"><span class="pre">exp</span></code>
+files should be regenerated.</p>
+<div class="highlight-bash"><div class="highlight"><pre>pqr <span class="m">1</span> barnase.pqr
+exp <span class="m">1</span> barnase
+</pre></div>
+</div>
+</div>
+</div>
 <div class="section" id="physical-calculation-run">
-<h2>Physical Calculation run<a class="headerlink" href="#physical-calculation-run" title="Permalink to this headline">¶</a></h2>
+<span id="pbsam-enfo"></span><h2>Physical Calculation run<a class="headerlink" href="#physical-calculation-run" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="input-files">
 <h3>Input Files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h3>
 <p>name:  <code class="docutils literal"><span class="pre">run.energyforce.inp</span></code></p>
 <div class="highlight-bash"><div class="highlight"><pre>runtype energyforce
-runname energyforce.2sp.jmol.out
-
-units jmol
-salt 0.01
-temp 353
-idiel 4
-sdiel 78
-
-attypes 1
-<span class="nb">type</span> <span class="m">1</span> 2
-pqr <span class="m">1</span> single_charge.pqr
-xyz <span class="m">1</span> positions_2.xyz
 </pre></div>
 </div>
 <p>The files for PQR and XYZ are:</p>
 <p>name:  <code class="docutils literal"><span class="pre">single_charge.pqr</span></code></p>
 <div class="highlight-bash"><div class="highlight"><pre>ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       1.000   0.000   0.000 -1.0000 3.7300
-ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   1.000   0.000 -1.0000 6.3200
 </pre></div>
 </div>
 <p>name:  <code class="docutils literal"><span class="pre">positions_2.xyz</span></code></p>
@@ -203,126 +278,80 @@ ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0
 <p>And the resulting file:</p>
 <p>name: <code class="docutils literal"><span class="pre">energyforce.2sp.jmol.out</span></code></p>
 <div class="highlight-bash"><div class="highlight"><pre>My units are Joules/Mol
-MOLECULE <span class="c1">#1</span>
-        POSITION: <span class="o">[</span>-10, 23.4, -8.7<span class="o">]</span>
-        ENERGY: 1328.86
-        FORCE: 1.19858e+08, <span class="o">[</span>-36.6012 1.19858e+08 -1.65408e-05<span class="o">]</span>
-        TORQUE: 1.78426e+06, <span class="o">[</span>1.28425 1.78426e+06 1.9978e-06<span class="o">]</span>
-MOLECULE <span class="c1">#2</span>
-        POSITION: <span class="o">[</span>0, 0, -2.5<span class="o">]</span>
-        ENERGY: 1328.86
-        FORCE: 1.19858e+08, <span class="o">[</span>36.6012 -1.19858e+08 1.65408e-05<span class="o">]</span>
-        TORQUE: 1.78354e+06, <span class="o">[</span>1.28372 1.78354e+06 1.99699e-06<span class="o">]</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="electrostatics-run">
-<h2>Electrostatics run<a class="headerlink" href="#electrostatics-run" title="Permalink to this headline">¶</a></h2>
+<span id="pbsam-elec"></span><h2>Electrostatics run<a class="headerlink" href="#electrostatics-run" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id1">
 <h3>Input Files<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>name:  <code class="docutils literal"><span class="pre">run.electrostatic.inp</span></code></p>
-<div class="highlight-bash"><div class="highlight"><pre>runtype electrostatics 140
-runname electrostatic
+<div class="highlight-bash"><div class="highlight"><pre>runtype electrostatics 150
+runname barnase.out
 
 units kT
 salt 0.01
 temp 298
-idiel 4
+idiel 2
 sdiel 78
 
-dx out.dx
+dx barnase.dx
 
-3dmap electro_map.out
+3dmap barnase_map.out
 
 gridct 2
-grid2D <span class="m">1</span> out.x.0.dat x 0
-grid2D <span class="m">2</span> out.x.-1.dat x -1
+grid2D <span class="m">1</span> barnase.y.0.dat y 0
+grid2D <span class="m">2</span> barnase.z.0.dat z 0
 
-attypes 2
-<span class="nb">type</span> <span class="m">1</span> 2
-pqr <span class="m">1</span> single_charge.pqr
-xyz <span class="m">1</span> positions_2.xyz
-
-<span class="nb">type</span> <span class="m">2</span> 2
-pqr <span class="m">2</span> pos_charge.pqr
-xyz <span class="m">2</span> positions_pos.xyz
+attypes 1
+<span class="nb">type</span> <span class="m">1</span> 1
+pqr <span class="m">1</span> barnase.pqr
+<span class="c1">#pqr 1 barnase_cg.pqr #For when CG process is done</span>
+<span class="c1">#imat 1 barnasesph    #For when imat calculation is done</span>
+<span class="c1">#exp 1 barnase        #For when self-polarization is done</span>
+xyz <span class="m">1</span> zero.xyz
 </pre></div>
 </div>
 <p>The files for PQR and XYZ files are:</p>
-<p>name:  <code class="docutils literal"><span class="pre">single_charge.pqr</span></code></p>
-<div class="highlight-bash"><div class="highlight"><pre>ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   1.000   0.000  4.0000 0.3200
-ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   0.000  -1.000  4.0000 0.3200
-ATOM      <span class="m">1</span>  X   CEN     <span class="m">0</span>       0.000   0.000   0.000  0.0000 2.0000
+<p>name:  <code class="docutils literal"><span class="pre">barnase.pqr</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre>ATOM   <span class="m">1700</span>  N    ALA B   <span class="m">1</span>      20.757 52.394 30.692     0.1414  1.8240
+ATOM   <span class="m">1702</span>  CA   ALA B   <span class="m">1</span>      20.602 52.680 29.268     0.0962  1.9080
+ATOM   <span class="m">1703</span>  C    ALA B   <span class="m">1</span>      19.286 52.138 28.675     0.6163  1.9080
+ATOM   <span class="m">1704</span>  O    ALA B   <span class="m">1</span>      18.578 51.351 29.318    -0.5722  1.6612
+ATOM   <span class="m">1705</span>  CB   ALA B   <span class="m">1</span>      21.739 52.033 28.476    -0.0597  1.9080
 </pre></div>
 </div>
-<p>name:  <code class="docutils literal"><span class="pre">positions_2.xyz</span></code></p>
-<div class="highlight-bash"><div class="highlight"><pre>0.0   0.0  -5.0
-0.0   0.0   5.0
+<p>name:  <code class="docutils literal"><span class="pre">zero.xyz</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre>0.0   0.0   0.0
 </pre></div>
 </div>
-<p>name:  <code class="docutils literal"><span class="pre">pos_charge.pqr</span></code></p>
-<div class="highlight-bash"><div class="highlight"><pre>ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   1.000   0.000 -4.0000 0.3200
-ATOM      <span class="m">1</span>  N   NTR     <span class="m">0</span>       0.000   0.000  -1.000 -4.0000 0.3200
-ATOM      <span class="m">1</span>  X   CEN     <span class="m">0</span>       0.000   0.000   0.000  0.0000 2.0000
-</pre></div>
-</div>
-<p>name:  <code class="docutils literal"><span class="pre">positions_pos.xyz</span></code></p>
-<div class="highlight-bash"><div class="highlight"><pre>0.0   5.0   0.0
-0.0  -5.0   0.0
+<p>name: <code class="docutils literal"><span class="pre">barnase.vert</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre>ATOM      <span class="m">1</span>  O    CEN     <span class="m">1</span>      15.773   43.159   13.061  0.00  12.5813
+ATOM      <span class="m">2</span>  O    CEN     <span class="m">2</span>      29.519   49.345   20.442  0.00  10.3065
+ATOM      <span class="m">3</span>  O    CEN     <span class="m">3</span>      13.647   40.795    6.493  0.00  11.5453
+ATOM      <span class="m">4</span>  O    CEN     <span class="m">4</span>      10.614   49.582   13.541  0.00  10.4199
 </pre></div>
 </div>
 <p>To run:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$$</span> ../../bin/pbam run.electrostatic.inp
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$$</span> ../../bin/pbsam run.electrostatic.inp
 </pre></div>
 </div>
 </div>
-<div class="section" id="id2">
-<h3>Output Files<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="pbsam-dyn">
+<span id="id2"></span><h3>Output Files<a class="headerlink" href="#pbsam-dyn" title="Permalink to this headline">¶</a></h3>
 <p>And the resulting files:</p>
-<p>name: <code class="docutils literal"><span class="pre">out.dx</span></code></p>
+<p>name: <code class="docutils literal"><span class="pre">barnase.dx</span></code></p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="c1"># Data from PBAM Electrostat run</span>
 <span class="c1"># My runname is out.dx and units kT/e</span>
-object <span class="m">1</span> class gridpositions counts <span class="m">140</span> <span class="m">140</span> 140
-origin -4 -9 -9
-delta 0.0571429 0.0e+00 0.0e+00
-delta 0.0e00 0.128571 0.0e+00
-delta 0.0e00 0.0e+00 0.128571
-object <span class="m">2</span> class gridconnections counts <span class="m">140</span> <span class="m">140</span> 140
-object <span class="m">3</span> class array <span class="nb">type</span> double rank <span class="m">0</span> items <span class="m">2744000</span> data follows
-2.7203115e-01  3.0271755e-01  3.3459723e-01
-3.6769040e-01  4.0201595e-01  4.3759129e-01
-.....
--1.3185519e-01  -1.5849252e-01  -1.8359631e-01
--2.0722087e-01  -2.2942006e-01  -2.5024714e-01
--2.6975467e-01  -2.8799442e-01
-attribute <span class="s2">&quot;dep&quot;</span> string <span class="s2">&quot;positions&quot;</span>
-object <span class="s2">&quot;regular positions regular connections&quot;</span> class field
-component <span class="s2">&quot;positions&quot;</span> value 1
-component <span class="s2">&quot;connections&quot;</span> value 2
-component <span class="s2">&quot;data&quot;</span> value 3
 </pre></div>
 </div>
-<p>name: <code class="docutils literal"><span class="pre">electro_map.out</span></code></p>
+<p>name: <code class="docutils literal"><span class="pre">barnase_map.out</span></code></p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="c1"># Data from PBAM Electrostat run</span>
-<span class="c1"># My runname is electro_map.out and units kT/e</span>
-grid <span class="m">10</span> <span class="m">10</span> 10
-origin -4 -9 -9
-delta 0.8 1.8 1.8
-  0.00825   0.00006  -2.90002 -5.899956
-  0.00822   0.00071  -2.90002 -5.902602
 </pre></div>
 </div>
-<p>name: <code class="docutils literal"><span class="pre">out.x.0.dat</span></code></p>
+<p>name: <code class="docutils literal"><span class="pre">barnase.y.0.dat</span></code></p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="c1"># Data from PBAM Electrostat run</span>
-<span class="c1"># My runname is out.x.0.dat</span>
-units kT
-grid <span class="m">140</span> 140
-axis x 0
-origin -9 -9
-delta 0.128571 0.128571
-maxmin 39.23 -39.23
-   0.3605004     0.4030045     0.4474874     0.4940082     0.5426260     0.5933995
 </pre></div>
 </div>
 </div>
@@ -342,16 +371,18 @@ sdiel 78
 
 termct 1
 termcombine or
-term <span class="m">1</span> contact 2.5 <span class="m">1</span> 2
+term <span class="m">1</span> contact contact.dat
 
 attypes 2
 <span class="nb">type</span> <span class="m">1</span> <span class="m">2</span> move 0.015 0.000045
 pqr <span class="m">1</span> 1BRS_chainA.pqr
+surf <span class="m">1</span> 1BRS_chainA.vert
 xyz <span class="m">1</span> <span class="m">1</span> pos_1_1.xyz
 xyz <span class="m">1</span> <span class="m">2</span> pos_1_2.xyz
 
 <span class="nb">type</span> <span class="m">2</span> <span class="m">2</span> move 0.015 0.000045
 pqr <span class="m">2</span> 1BRS_chainD.pqr
+surf <span class="m">2</span> 1BRS_chainD.vert
 xyz <span class="m">2</span> <span class="m">1</span> pos_2_1.xyz
 xyz <span class="m">2</span> <span class="m">2</span> pos_2_2.xyz
 </pre></div>
@@ -444,10 +475,10 @@ System has fulfilled condition: Type <span class="m">0</span> and Type <span cla
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pbam_program.html" class="btn btn-neutral float-right" title="PB-AM Program details" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pbsam_program.html" class="btn btn-neutral float-right" title="PB-SAM Program details" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pbam_input.html" class="btn btn-neutral" title="PB-AM Inputs" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pbsam_input.html" class="btn btn-neutral" title="PB-SAM Inputs" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
