@@ -5,6 +5,7 @@ include_directories("../../pb_wrap/src")
 include_directories("./")
 
 add_executable(pbsam
+  ../../pb_shared/src/BaseBD.cpp
   ../../pb_shared/src/BaseElectro.cpp
   ../../pb_shared/src/BaseSys.cpp
   BDSAM.cpp
@@ -42,6 +43,7 @@ if(ENABLE_PBSAM_APBS)
 
   #  build pbsam library
   add_library(PBSAMLib 
+              ../../pb_shared/src/BaseBD.cpp
               ../../pb_shared/src/BaseElectro.cpp
               ../../pb_shared/src/BaseSys.cpp
 			  BDSAM.cpp
