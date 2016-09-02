@@ -648,12 +648,10 @@ void PhysCalcAM::print_all()
   out << "My units are " << unit_ << ". Time: " << _sys_->get_time() << endl;
   for ( i = 0; i < N_; i++)
   {
-    force_norm = 0;
-    torque_norm = 0;
     out << "Molecule #" << i + 1 << " radius: " << _sys_->get_radi(i) << endl;
     out << "\tPOSITION: [" << mol_pos[i].x() << ", " << mol_pos[i].y();
     out << ", " << mol_pos[i].z() << "]" << endl;
-    out << "\tENERGY: " << unit_conv_ * get_omega(i) << endl;
+    out << "\tENERGY: " << unit_conv_ * get_omegai(i) << endl;
 
     out << "\tFORCE: " << get_forcei(i).norm() * unit_conv_ << ", [";
     out << get_forcei(i).x() * unit_conv_ << " "

@@ -149,7 +149,6 @@ void PhysCalcSAM::print_all()
   int i;
   streambuf * buf;
   ofstream of; 
-  vector<Pt> mol_pos = _sys_->get_cog();
   
   if(outfname_ != "") 
   {
@@ -163,9 +162,10 @@ void PhysCalcSAM::print_all()
   out << "My units are " << unit_ << ". Time: " << _sys_->get_time() << endl;
   for ( i = 0; i < N_; i++)
   {
+    Pt mol_pos = _sys_->get_cogi(i);
     out << "Molecule #" << i + 1 << endl;
-    out << "\tPOSITION: [" << mol_pos[i].x() << ", " << mol_pos[i].y();
-    out << ", " << mol_pos[i].z() << "]" << endl;
+    out << "\tPOSITION: [" << mol_pos.x() << ", " << mol_pos.y();
+    out << ", " << mol_pos.z() << "]" << endl;
     out << "\tENERGY: " << unit_conv_ * get_omegai(i) << endl;
 
     out << "\tFORCE: " << get_forcei(i).norm() * unit_conv_ << ", [";
