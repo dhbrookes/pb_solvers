@@ -10,6 +10,7 @@ include_directories("../../pb_shared/unittest")
 include_directories("../../pb_wrap/src")
 
 ADD_EXECUTABLE(pbsamtest
+  ../../pb_shared/src/BaseBD.cpp
   ../../pb_shared/src/BaseElectro.cpp
   ../../pb_shared/src/BaseSys.cpp
   ../src/BDSAM.cpp

@@ -5,41 +5,25 @@ include_directories("../../pb_wrap/src")
 include_directories("./")
 
 # C++ code for standalone
-if(NOT WIN32)
-  add_executable(pbam
-                 ASolver.cpp
-                 ../../pb_shared/src/BaseElectro.cpp
-                 ../../pb_shared/src/BaseSys.cpp
-                 BDAM.cpp
-                 ../../pb_shared/src/BesselCalc.cpp
-                 ../../pb_shared/src/Constants.cpp
-                 ElectrostaticsAM.cpp
-                 PhysCalcAM.cpp
-                 main.cpp
-                 PBAM.cpp
-                 ../../pb_shared/src/ReExpCalc.cpp
-                 ../../pb_shared/src/setup.cpp
-                 ../../pb_shared/src/SHCalc.cpp
-                 SystemAM.cpp
-                 )
-else()
-  add_executable(pbam
-                 ASolver.cpp
-                 ../../pb_shared/src/BaseElectro.cpp
-                 ../../pb_shared/src/BaseSys.cpp
-                 BDAM.cpp
-                 ../../pb_shared/src/BesselCalc.cpp
-                 ../../pb_shared/src/Constants.cpp
-                 ElectrostaticsAM.cpp
-                 PhysCalcAM.cpp
-                 main.cpp
-                 PBAM.cpp
-                 ../../pb_shared/src/ReExpCalc.cpp
-                 ../../pb_shared/src/setup.cpp
-                 ../../pb_shared/src/SHCalc.cpp
-                 SystemAM.cpp
-                 ../../pb_shared/src/drand48.cpp
-                 )
+add_executable(pbam
+               ASolver.cpp
+               ../../pb_shared/src/BaseBD.cpp
+               ../../pb_shared/src/BaseElectro.cpp
+               ../../pb_shared/src/BaseSys.cpp
+               BDAM.cpp
+               ../../pb_shared/src/BesselCalc.cpp
+               ../../pb_shared/src/Constants.cpp
+               ElectrostaticsAM.cpp
+               PhysCalcAM.cpp
+               main.cpp
+               PBAM.cpp
+               ../../pb_shared/src/ReExpCalc.cpp
+               ../../pb_shared/src/setup.cpp
+               ../../pb_shared/src/SHCalc.cpp
+               SystemAM.cpp
+               )
+if(WIN32)
+  target_sources(pbam PUBLIC ../../pb_shared/src/drand48.cpp)
 endif()
 
 ################################################
@@ -58,42 +42,26 @@ if(ENABLE_PBAM_APBS)
                       )
 
   #  build pbam library
-  if(NOT WIN32)
-    add_library(PBAMLib 
-                ASolver.cpp
-                ../../pb_shared/src/BaseElectro.cpp
-                ../../pb_shared/src/BaseSys.cpp
-                BDAM.cpp
-                ../../pb_shared/src/BesselCalc.cpp
-                ../../pb_shared/src/Constants.cpp
-                ElectrostaticsAM.cpp
-                PhysCalcAM.cpp
-                PBAM.cpp
-                ../../pb_wrap/src/PBAMWrap.cpp
-                ../../pb_shared/src/ReExpCalc.cpp
-                ../../pb_shared/src/setup.cpp
-                ../../pb_shared/src/SHCalc.cpp
-                SystemAM.cpp
-                )
-    else()
-    add_library(PBAMLib 
-                ASolver.cpp
-                ../../pb_shared/src/BaseElectro.cpp
-                ../../pb_shared/src/BaseSys.cpp
-                BDAM.cpp
-                ../../pb_shared/src/BesselCalc.cpp
-                ../../pb_shared/src/Constants.cpp
-                ElectrostaticsAM.cpp
-                PhysCalcAM.cpp
-                PBAM.cpp
-                ../../pb_wrap/src/PBAMWrap.cpp
-                ../../pb_shared/src/ReExpCalc.cpp
-                ../../pb_shared/src/setup.cpp
-                ../../pb_shared/src/SHCalc.cpp
-                SystemAM.cpp
-                ../../pb_shared/src/drand48.cpp
-                )
-    endif()
+  add_library(PBAMLib 
+              ASolver.cpp
+              ../../pb_shared/src/BaseBD.cpp
+              ../../pb_shared/src/BaseElectro.cpp
+              ../../pb_shared/src/BaseSys.cpp
+              BDAM.cpp
+              ../../pb_shared/src/BesselCalc.cpp
+              ../../pb_shared/src/Constants.cpp
+              ElectrostaticsAM.cpp
+              PhysCalcAM.cpp
+              PBAM.cpp
+              ../../pb_wrap/src/PBAMWrap.cpp
+              ../../pb_shared/src/ReExpCalc.cpp
+              ../../pb_shared/src/setup.cpp
+              ../../pb_shared/src/SHCalc.cpp
+              SystemAM.cpp
+              )
+  if(WIN32)
+    target_sources(PBAMLib PUBLIC ../../pb_shared/src/drand48.cpp)
+  endif()
 endif()
 
 ################################################
@@ -105,6 +73,7 @@ if(ENABLE_PBAM_SPHINX)
   add_library(pbam_sph MODULE
               ../../pb_wrap/src/pbam_py.c
               ASolver.cpp
+              ../../pb_shared/src/BaseBD.cpp
               ../../pb_shared/src/BaseElectro.cpp
               ../../pb_shared/src/BaseSys.cpp
               BDAM.cpp

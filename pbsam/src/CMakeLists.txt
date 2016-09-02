@@ -4,49 +4,29 @@ include_directories("../../pb_wrap/src")
 
 include_directories("./")
 
-if(NOT WIN32)
-  add_executable(pbsam
-                 ../../pb_shared/src/BaseBD.cpp
-                 ../../pb_shared/src/BaseElectro.cpp
-                 ../../pb_shared/src/BaseSys.cpp
-                 BDSAM.cpp
-                 ../../pb_shared/src/BesselCalc.cpp
-                 ../../pb_shared/src/Constants.cpp
-                 ElectrostaticsSAM.cpp
-                 Gradsolvmat.cpp  
-                 main.cpp
-                 PBSAM.cpp 
-                 PhysCalcSAM.cpp
-                 ../../pb_shared/src/ReExpCalc.cpp
-                 ../../pb_shared/src/setup.cpp
-                 ../../pb_shared/src/SHCalc.cpp
-                 Solver.cpp
-                 Solvmat.cpp
-                 SystemSAM.cpp
-                 TMatrix.cpp
-                 )
-else()
-  add_executable(pbsam
-                 ../../pb_shared/src/BaseBD.cpp
-                 ../../pb_shared/src/BaseElectro.cpp
-                 ../../pb_shared/src/BaseSys.cpp
-                 BDSAM.cpp
-                 ../../pb_shared/src/BesselCalc.cpp
-                 ../../pb_shared/src/Constants.cpp
-                 ElectrostaticsSAM.cpp
-                 Gradsolvmat.cpp  
-                 main.cpp
-                 PBSAM.cpp 
-                 PhysCalcSAM.cpp
-                 ../../pb_shared/src/ReExpCalc.cpp
-                 ../../pb_shared/src/setup.cpp
-                 ../../pb_shared/src/SHCalc.cpp
-                 Solver.cpp
-                 Solvmat.cpp
-                 SystemSAM.cpp
-                 TMatrix.cpp
-                 ../../pb_shared/src/drand48.cpp
-                 )
+add_executable(pbsam
+               ../../pb_shared/src/BaseBD.cpp
+               ../../pb_shared/src/BaseElectro.cpp
+               ../../pb_shared/src/BaseSys.cpp
+               BDSAM.cpp
+               ../../pb_shared/src/BesselCalc.cpp
+               ../../pb_shared/src/Constants.cpp
+               ElectrostaticsSAM.cpp
+               Gradsolvmat.cpp  
+               main.cpp
+               PBSAM.cpp 
+               PhysCalcSAM.cpp
+               ../../pb_shared/src/ReExpCalc.cpp
+               ../../pb_shared/src/setup.cpp
+               ../../pb_shared/src/SHCalc.cpp
+               Solver.cpp
+               Solvmat.cpp
+               SystemSAM.cpp
+               TMatrix.cpp
+               )
+
+if(WIN32)
+  target_sources(pbsam PUBLIC ../../pb_shared/src/drand48.cpp)
 endif()
 
 ################################################
@@ -66,49 +46,29 @@ if(ENABLE_PBSAM_APBS)
                       )
 
   #  build pbsam library
-  if(NOT WIN32)
-    add_library(PBSAMLib 
-                ../../pb_shared/src/BaseBD.cpp
-                ../../pb_shared/src/BaseElectro.cpp
-                ../../pb_shared/src/BaseSys.cpp
-                BDSAM.cpp
-                ../../pb_shared/src/BesselCalc.cpp
-                ../../pb_shared/src/Constants.cpp
-                ElectrostaticsSAM.cpp
-                Gradsolvmat.cpp  
-                PBSAM.cpp 
-                PhysCalcSAM.cpp
-                ../../pb_wrap/src/PBSAMWrap.cpp
-                ../../pb_shared/src/ReExpCalc.cpp
-                ../../pb_shared/src/setup.cpp
-                ../../pb_shared/src/SHCalc.cpp
-                Solver.cpp
-                Solvmat.cpp
-                SystemSAM.cpp
-                TMatrix.cpp
-                )
-  else()
-    add_library(PBSAMLib 
-                ../../pb_shared/src/BaseBD.cpp
-                ../../pb_shared/src/BaseElectro.cpp
-                ../../pb_shared/src/BaseSys.cpp
-                BDSAM.cpp
-                ../../pb_shared/src/BesselCalc.cpp
-                ../../pb_shared/src/Constants.cpp
-                ElectrostaticsSAM.cpp
-                Gradsolvmat.cpp  
-                PBSAM.cpp 
-                PhysCalcSAM.cpp
-                ../../pb_wrap/src/PBSAMWrap.cpp
-                ../../pb_shared/src/ReExpCalc.cpp
-                ../../pb_shared/src/setup.cpp
-                ../../pb_shared/src/SHCalc.cpp
-                Solver.cpp
-                Solvmat.cpp
-                SystemSAM.cpp
-                TMatrix.cpp
-                ../../pb_shared/src/drand48.cpp
-                )
+  add_library(PBSAMLib 
+              ../../pb_shared/src/BaseBD.cpp
+              ../../pb_shared/src/BaseElectro.cpp
+              ../../pb_shared/src/BaseSys.cpp
+              BDSAM.cpp
+              ../../pb_shared/src/BesselCalc.cpp
+              ../../pb_shared/src/Constants.cpp
+              ElectrostaticsSAM.cpp
+              Gradsolvmat.cpp  
+              PBSAM.cpp 
+              PhysCalcSAM.cpp
+              ../../pb_wrap/src/PBSAMWrap.cpp
+              ../../pb_shared/src/ReExpCalc.cpp
+              ../../pb_shared/src/setup.cpp
+              ../../pb_shared/src/SHCalc.cpp
+              Solver.cpp
+              Solvmat.cpp
+              SystemSAM.cpp
+              TMatrix.cpp
+              )
+
+  if(WIN32)
+    target_sources(PBSAMLib PUBLIC ../../pb_shared/src/drand48.cpp)
   endif()
 
   MESSAGE( STATUS "linkers: " ${APBS_LIBS})
