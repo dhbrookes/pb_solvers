@@ -208,6 +208,14 @@ public:
   
   // write current system configuration to XYZ file
   virtual void write_to_xyz(ofstream &xyz_out) = 0;
+  
+  //overridden by SAM:
+  virtual double calc_min_dist(int i, int j) { return 0.0; }
+  
+  //overriden by AM:
+  virtual void clear_all_lists() { }
+  virtual void add_J_to_interact_I(int i, int j) { }
+  virtual void add_J_to_pol_I(int i, int j)      { }
 };
 
 /*
