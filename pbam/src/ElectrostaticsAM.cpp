@@ -1,5 +1,5 @@
 //
-//  Electrostatics.cpp
+//  ElectrostaticsAM.cpp
 //  pb_solvers_code
 //
 //  Created by Lisa Felberg on 3/3/16.

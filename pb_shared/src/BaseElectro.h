@@ -1,13 +1,13 @@
 //
-//  BaseElectro.hpp
+//  BaseElectro.h
 //  pbsam_xcode
 //
 //  Created by David Brookes on 8/31/16.
 //  Copyright © 2016 David Brookes. All rights reserved.
 //
 
-#ifndef BaseElectro_hpp
-#define BaseElectro_hpp
+#ifndef BaseElectro_h
+#define BaseElectro_h
 
 #include <stdio.h>
 
@@ -122,4 +122,4 @@ public:
 };
 
 
-#endif /* BaseElectro_hpp */
+#endif /* BaseElectro_h*/

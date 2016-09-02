@@ -1,5 +1,5 @@
 //
-//  BD.h
+//  BDAM.h
 //  pb_solvers_code
 //
 /*
@@ -36,31 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <random>
 #include <memory>
 #include "ElectrostaticsAM.h"
+#include "BaseBD.h"
 
-/*
- Base class for implementing termination conditions in BD
- */
-class BaseTerminateAM
-{
-public:
-  BaseTerminateAM() { }
-  
-  virtual const bool is_terminated(shared_ptr<SystemAM> _sys) const
-  {
-    return false;
-  }
-  
-  virtual string get_how_term(shared_ptr<SystemAM> _sys)
-  {
-    return "";
-  }
-};
 
 /*
  Class for contact based termination. This terminates based on whether
- the specified MoleculeAM MoleculeAM pair is within a given cutoff of each other
+ the specified molecule-molecule pair is within a given cutoff of each other
  */
-class ContactTerminateAM : public BaseTerminateAM
+class ContactTerminateAM : public BaseTerminate
 {
 protected:
   double dist_contact_; //termination time
@@ -69,38 +52,15 @@ protected:
   string how_term_;
   
 public:
-  ContactTerminateAM(vector<int> mol, double distance)
-  :BaseTerminateAM(), mol1_(mol[0]), mol2_(mol[1]), dist_contact_(distance)
-  {
-    char buff[400];
-    sprintf(buff, "Type %d and Type %d are within %5.2f;\t",
-            mol1_, mol2_, dist_contact_);
-    how_term_ = "System has fulfilled condition: " + string(buff);
-  }
+  ContactTerminateAM(vector<int> mol, double distance);
   
-  const bool is_terminated(shared_ptr<SystemAM> _sys) const
-  {
-    int i, j, idx1, idx2;
-    for ( i = 0; i < _sys->get_typect(mol1_); i++)
-    {
-      for ( j = 0; j < _sys->get_typect(mol2_); j++)
-      {
-        idx1 = _sys->get_mol_global_idx( mol1_, i);
-        idx2 = _sys->get_mol_global_idx( mol2_, j);
-
-        double mol_c2c = _sys->get_pbc_dist_vec(idx1, idx2).norm();
-        double a1 = _sys->get_ai(idx1);
-        double a2 = _sys->get_ai(idx2);
-        if (mol_c2c <= (dist_contact_+a1+a2)) return true;
-      }
-    }
-    return false;
-  }
-  
-  string get_how_term(shared_ptr<SystemAM> _sys)   { return how_term_; }
+  const bool is_terminated(shared_ptr<BaseSystem> _sys) const;
+  string get_how_term(shared_ptr<BaseSystem> _sys)   { return how_term_; }
 };
 
-class ContactTerminateAM2 : public BaseTerminateAM
+// a more complicated contact scheme based on distance between projections of
+// atom positions on outer sphere
+class ContactTerminateAM2 : public BaseTerminate
 {
 protected:
   int mol1_;
@@ -115,237 +75,15 @@ protected:
   
 public:
   ContactTerminateAM2(vector<int> mol, vector<vector<int> > atpairs,
-                    vector<double> dists, double pad)
-  :BaseTerminateAM(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
-  dists_(dists), pad_(pad)
-  {
-    string_create();
-  }
+                      vector<double> dists, double pad);
   
-  ContactTerminateAM2(ContactFile confile, double pad)
-  :pad_(pad), mol1_(confile.get_moltype1()), mol2_(confile.get_moltype2()),
-  atPairs_(confile.get_at_pairs()), dists_(confile.get_dists())
-  {
-    string_create();
-  }
+  ContactTerminateAM2(ContactFile confile, double pad);
   
-  void string_create()
-  {
-    char buff[400];
-    sprintf(buff, "Type %d and Type %d are within %5.2f;\t",
-            mol1_, mol2_, pad_);
-    how_term_ = "System has fulfilled condition: " + string(buff);
-  }
+  void string_create();
   
-  string get_how_term(shared_ptr<SystemAM> _sys)   { return how_term_; }
+  string get_how_term(shared_ptr<BaseSystem> _sys)   { return how_term_; }
   
-  const bool is_terminated(shared_ptr<SystemAM> _sys) const
-  {
-    bool contacted = false;
-    int i, j, k, idx1, idx2;
-    Pt cen1, cen2, pos1, pos2, vc1, vc2;
-    double a1, a2, d, dcon;
-    double sphdist1, sphdist2;  // distance of atom to edge of sphere
-    
-    for ( i = 0; i < _sys->get_typect(mol1_); i++)
-    {
-      for ( j = 0; j < _sys->get_typect(mol2_); j++)
-      {
-        idx1 = _sys->get_mol_global_idx( mol1_, i);
-        idx2 = _sys->get_mol_global_idx( mol2_, j);
-        
-        cen1 = _sys->get_centeri(idx1);
-        cen2 = _sys->get_centeri(idx2);
-        
-        a1 = _sys->get_ai(idx1);
-        a2 = _sys->get_ai(idx2);
-        
-        for (k = 0; k < atPairs_.size(); k++)
-        {
-          dcon = dists_[k];
-          pos1 = _sys->get_posijreal(idx1, atPairs_[k][0]);
-          pos2 = _sys->get_posijreal(idx2, atPairs_[k][1]);
-          
-          vc1 = pos1 - cen1;
-          vc2 = pos2 - cen2;
-          
-          sphdist1 = a1 - vc1.norm();
-          sphdist2 = a2 - vc2.norm();
-          
-          // if sum of distances to edge of the spheres is > contact distance,
-          // then contact can never happen and the new position is closest
-          // point on edge of sphere and new contact distance is pad
-          if ( (sphdist1 + sphdist2) > dcon)
-          {
-            pos1 = vc1 * (a1/vc1.norm()); // project onto sphere surface
-            pos2 = vc2 * (a2/vc2.norm());
-            dcon = pad_;
-            
-            // get position of atoms relative to box
-            // (as opposed to center of MoleculeAM)
-            pos1 = pos1 + cen1;
-            pos2 = pos2 + cen2;
-            d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
- 
-            if (d < dcon){ contacted = true; break;}
-          }else
-          {
-            d = _sys->get_pbc_dist_vec_base(pos1, pos2).norm();
-            if (d < dcon)
-            {
-              contacted = true;
-              cout << "This is dcon " << dcon << " and d " << d << endl;
-              cout << "This is pos1 " << pos1.x() << " " <<
-              pos1.y() << " " << pos1.z() << " " << endl;
-              cout << "This is pos2 " << pos2.x() << " " <<
-              pos2.y() << " " << pos2.z() << " " << endl;
-              
-              break;
-            }
-          }
-        }
-      }
-    }
-    return contacted;
-  }
-};
-
-
-/*
- Class for time based termination
- */
-class TimeTerminateAM : public BaseTerminateAM
-{
-protected:
-  double endTime_; //termination time
-  string how_term_;
-  
-public:
-  TimeTerminateAM(double end_time)
-  :BaseTerminateAM(), endTime_(end_time)
-  {
-    char buff[400];
-    sprintf(buff, "System has fulfilled condition: time >= %7.1f;\t", endTime_);
-    how_term_ = buff;
-  }
-  
-  const bool is_terminated(shared_ptr<SystemAM> _sys) const
-  {
-    bool done = false;
-    if (_sys->get_time() >= endTime_) done = true;
-    return done;
-  }
-  
-  string get_how_term(shared_ptr<SystemAM> _sys)   { return how_term_; }
-};
-
-enum CoordType { X, Y, Z, R };
-enum BoundaryType { LEQ, GEQ };
-
-/*
- Class for coordinate based termination. This terminates based on whether
- the specified MoleculeAM satisfies the BoundaryType condition on the CoordType
- with the given boundary value.
- */
-class CoordTerminateAM : public BaseTerminateAM
-{
-protected:
-  double boundaryVal_;
-  int molIdx_;
-  CoordType coordType_;
-  BoundaryType boundType_;
-  string how_term_;
-  
-public:
-  CoordTerminateAM(int mol_idx, CoordType coord_type,
-                 BoundaryType bound_type, double bound_val)
-  :BaseTerminateAM(), molIdx_(mol_idx), coordType_(coord_type),
-  boundType_(bound_type), boundaryVal_(bound_val)
-  {
-    char buff[400];
-    string cord = "r", eq = ">=";
-    if (coordType_ == X)      cord = "x";
-    else if (coordType_ == Y) cord = "y";
-    else if (coordType_ == Z) cord = "z";
-    
-    if (boundType_ == LEQ)    eq   = "<=";
-    
-    sprintf(buff, "MoleculeAM type %d has fulfilled condition: %s %s %5.2f;\t",
-            molIdx_, cord.c_str(), eq.c_str(), boundaryVal_);
-    how_term_ = buff;
-  }
-  
-  const bool is_terminated(shared_ptr<SystemAM> _sys) const
-  {
-    bool done = false;
-    int i, idx;
-    for ( i = 0; i < _sys->get_typect(molIdx_); i++)
-    {
-      idx = _sys->get_mol_global_idx( molIdx_, i);
-      Pt mol_coord = _sys->get_unwrapped_center(idx);
-      double test_val;
-      if (coordType_ == X)      test_val = mol_coord.x();
-      else if (coordType_ == Y) test_val = mol_coord.y();
-      else if (coordType_ == Z) test_val = mol_coord.z();
-      else                      test_val = mol_coord.norm();
-      
-      if ((boundType_ == LEQ) && (test_val <= boundaryVal_))      return true;
-      else if ((boundType_ == GEQ) && (test_val >= boundaryVal_)) return true;
-    }
-    return done;
-  }
-  
-  string get_how_term(shared_ptr<SystemAM> _sys)   { return how_term_; }
-};
-
-
-/*
- Combine termination conditions
- */
-enum HowTermCombine { ALL, ONE };
-
-class CombineTerminateAM: public BaseTerminateAM
-{
-protected:
-  vector<shared_ptr<BaseTerminateAM> > terms_;
-  HowTermCombine howCombine_;
-  
-public:
-  CombineTerminateAM(vector<shared_ptr<BaseTerminateAM> > terms,
-                     HowTermCombine how_combine)
-  :BaseTerminateAM(), terms_(terms), howCombine_(how_combine)
-  {
-  }
-  
-  const bool is_terminated(shared_ptr<SystemAM> _sys) const
-  {
-    bool done;
-    howCombine_== ALL ? done=true : done=false;
-    for (int i = 0; i < terms_.size(); i++)
-    {
-      if (terms_[i]->is_terminated(_sys) == ! done)
-      {
-        done=!done;
-        break;
-      }
-    }
-    return done;
-  }
-  
-  string get_how_term(shared_ptr<SystemAM> _sys)
-  {
-    string how_term = "";
-    bool done;
-    howCombine_== ALL ? done=true : done=false;
-    for (int i = 0; i < terms_.size(); i++)
-    {
-      if (terms_[i]->is_terminated(_sys) == true)
-      {
-        how_term += terms_[i]->get_how_term(_sys);
-      }
-    }
-    return how_term;
-  }
+  const bool is_terminated(shared_ptr<BaseSystem> _sys) const;
 };
 
 /*
@@ -416,8 +154,8 @@ class BDRunAM
 protected:
   shared_ptr<BDStepAM> _stepper_;
   shared_ptr<ASolver> _asolver_;
-  shared_ptr<BasePhysCalcAM> _physCalc_;
-  shared_ptr<BaseTerminateAM> _terminator_;
+  shared_ptr<BasePhysCalc> _physCalc_;
+  shared_ptr<BaseTerminate> _terminator_;
   
   string outfname_; //outputfile
   
@@ -427,7 +165,7 @@ protected:
 public:
   // num is the number of bodies to perform calculations on (2, 3 or all).
   // If num=0, then the equations will be solved exactly
-  BDRunAM(shared_ptr<ASolver> _asolv, shared_ptr<BaseTerminateAM> _terminator,
+  BDRunAM(shared_ptr<ASolver> _asolv, shared_ptr<BaseTerminate> _terminator,
         string outfname, int num=0, bool diff = true, bool force = true,
         int maxiter=1e8, double prec=1e-4);
   
@@ -446,4 +184,4 @@ public:
 
 
 
-#endif /* BD_h */
+#endif /* BDAM_h */

@@ -254,36 +254,6 @@ SystemAM::SystemAM(Setup setup, double cutoff)
   lambda_ = calc_average_radius();
 }
 
-//const double SystemAM::calc_average_radius() const
-//{
-//  double ave = 0;
-//  for (int i = 0; i < N_; i++)
-//  {
-//    ave += get_ai(i);
-//  }
-//  ave  =  ave / N_;
-//  return ave;
-//}
-
-//void SystemAM::check_for_overlap()
-//{
-//  int i, j;
-//  double dist, ai, aj;
-//  for (i = 0; i < N_; i++)
-//  {
-//    ai = molecules_[i].get_a();
-//    for (j = i+1; j < N_; j++)
-//    {
-//      aj = molecules_[j].get_a();
-//      dist = get_pbc_dist_vec(i, j).norm();
-//      if (dist < (ai + aj))
-//      {
-//        throw OverlappingMoleculeException(i, j);
-//      }
-//    }
-//  }
-//}
-
 Pt SystemAM::get_pbc_dist_vec(int i, int j)
 {
   Pt ci = get_centeri(i);

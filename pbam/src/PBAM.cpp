@@ -226,7 +226,7 @@ void PBAM::run_dynamics()
   shared_ptr<ASolver> ASolv = make_shared<ASolver> (_bessl_calc_, _sh_calc_, 
 												    syst_, consts_, poles_);
 
-  vector<shared_ptr<BaseTerminateAM > >  terms(setp_->get_numterms());
+  vector<shared_ptr<BaseTerminate > >  terms(setp_->get_numterms());
   for (i = 0; i < setp_->get_numterms(); i++)
   {
     string type = setp_->get_termtype(i);
@@ -247,36 +247,36 @@ void PBAM::run_dynamics()
     {
       cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminateAM>( setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
                                              X, btype, val);
     } else if (type.substr(0,1) == "y")
     {
       cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminateAM>( setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
                                              Y, btype, val);
     } else if (type.substr(0,1) == "z")
     {
       cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminateAM>( setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
                                              Z, btype, val);
     } else if (type.substr(0,1) == "r")
     {
       cout << type << " termination found for MoleculeAM ";
       cout << setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminateAM>( setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminate>( setp_->get_termMolIDX(i)[0],
                                              R, btype, val);
     } else if (type == "time")
     {
       cout << "Time termination found, at AMtime (ps) " << val << endl;
-      terms[i] = make_shared<TimeTerminateAM>( val);
+      terms[i] = make_shared<TimeTerminate>( val);
     } else cout << "Termination type not recognized!" << endl;
   }
 
   cout << "Done making termination conds " << endl;
   HowTermCombine com = (setp_->get_andCombine() ? ALL : ONE);
-  auto term_conds = make_shared<CombineTerminateAM> (terms, com);
+  auto term_conds = make_shared<CombineTerminate> (terms, com);
 
   char buff[100], outb[100];
   sprintf( outb, "%s.stat", setp_->getRunName().c_str());

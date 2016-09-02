@@ -1,5 +1,5 @@
 //
-//  EnergyForce.h
+//  PhysCalcAM.h
 //  pb_solvers_code
 //
 /*
@@ -36,6 +36,7 @@
 #include <memory>
 #include "ASolver.h"
 #include "SystemAM.h"
+#include "BasePhysCalc.h"
 
 #ifdef __OMP
 #include <omp.h>
@@ -47,7 +48,7 @@ using namespace std;
  Class for calculating the energy of molecules in the system given
  an ASolver object
  */
-class EnergyCalcAM
+class EnergyCalcAM: public BaseEnergyCalc
 {
 protected:
   shared_ptr<VecOfMats<cmplx>::type> _A_;
@@ -55,11 +56,8 @@ protected:
   int N_;  // number of MoleculeAMs
   int p_;  // max number of poles
   shared_ptr<Constants> _const_;
-
-  // result of energy calculation, internal units
-  shared_ptr<vector<double > > _omega_;
 public:
-  EnergyCalcAM() { }
+  EnergyCalcAM(): BaseEnergyCalc() { }
   
   EnergyCalcAM(shared_ptr<VecOfMats<cmplx>::type> _A,
              shared_ptr<VecOfMats<cmplx>::type> _L,
@@ -74,43 +72,38 @@ public:
   
   // calculate energy of one MoleculeAM
   double calc_ei(int i);
-  
-  // get the energy for a specific MoleculeAM:
-  double get_omega_i_int(int i)  { return _omega_->operator[](i); }
-  // get all energy:
-  shared_ptr<vector<double> > get_omega_int() { return _omega_; }
-  
+
   // energy in kCal/mol:
   double get_omega_i_kcal(int i)
-  { return _const_->convert_int_to_kcal_mol(_omega_->operator[](i)); }
+  { return _const_->convert_int_to_kcal_mol(omega_->operator[](i)); }
   
   MyVector<double> get_omega_kcal()
   {
     MyVector<double> omeg(N_);
     for (int n = 0; n < N_; n++)
-      omeg[n] = _const_->convert_int_to_kcal_mol(_omega_->operator[](n));
+      omeg[n] = _const_->convert_int_to_kcal_mol(omega_->operator[](n));
     return omeg;
   }
   
   // energy in kT:
   double get_omega_i_kT(int i)
-  { return _const_->convert_int_to_kT(_omega_->operator[](i)); }
+  { return _const_->convert_int_to_kT(omega_->operator[](i)); }
   MyVector<double> get_omega_kT()
   {
     MyVector<double> omeg(N_);
     for (int n = 0; n < N_; n++)
-      omeg[n] = _const_->convert_int_to_kT(_omega_->operator[](n));
+      omeg[n] = _const_->convert_int_to_kT(omega_->operator[](n));
     return omeg;
   }
   
   // energy in joules/mol:
   double get_omega_i_jmol(int i)
-  { return _const_->convert_int_to_jmol(_omega_->operator[](i)); }
+  { return _const_->convert_int_to_jmol(omega_->operator[](i)); }
   MyVector<double> get_omega_jmol()
   {
     MyVector<double> omeg(N_);
     for (int n = 0; n < N_; n++)
-      omeg[n] = _const_->convert_int_to_jmol(_omega_->operator[](n));
+      omeg[n] = _const_->convert_int_to_jmol(omega_->operator[](n));
     return omeg;
   }
 };
@@ -119,7 +112,7 @@ public:
  Class for calculating the forces on MoleculeAMs in the system given
  an ASolver object
  */
-class ForceCalcAM
+class ForceCalcAM: public BaseForceCalc
 {
 protected:
   shared_ptr<VecOfMats<cmplx>::type> _A_;
@@ -132,7 +125,6 @@ protected:
   int N_;
   int p_;
   shared_ptr<Constants> _const_;
-  shared_ptr<vector<Pt> > _F_;
   
 public:
   ForceCalcAM() { }
@@ -151,21 +143,14 @@ public:
   // calculate force on one MoleculeAM
   Pt calc_fi(int i);
   
-  Pt get_fi(int i)     { return (*_F_)[i]; }
-  shared_ptr<vector<Pt> > get_F()    { return _F_; }
-  
 };
 
 /*
  Class for calculating the torque on every MoleculeAM in the system
  */
-class TorqueCalcAM
+class TorqueCalcAM : public BaseTorqueCalc
 {
 protected:
-  
-  // outer vector has an entry for every MoleculeAM. Inner vector is the torque
-  // on that MoleculeAM
-  shared_ptr<vector<Pt> > _tau_;
   
   shared_ptr<SHCalc> _shCalc_;
   shared_ptr<BesselCalc> _bCalc_;
@@ -199,9 +184,6 @@ public:
    Calculate H vector (eq 42 and 43 in Lotan 2006)
    */
   VecOfMats<cmplx>::type calc_H(int i);
-  
-  Pt get_taui(int i)     { return _tau_->operator[](i); }
-  shared_ptr<vector<Pt> > get_Tau()    { return _tau_; }
   
   /*
    Calculate inner product of two matrices as defined in equation 29 of Lotan
@@ -306,39 +288,9 @@ public:
 };
 
 /*
- Base class for calculations of physical quantities
- */
-class BasePhysCalcAM
-{
-public:
-  BasePhysCalcAM() { }
-  
-  virtual void calc_force() {}
-  virtual void calc_energy() {}
-  virtual void calc_torque() {}
-  
-  virtual void print_all() { }
-  
-  virtual shared_ptr<vector<Pt> > get_Tau()
-    { return make_shared<vector<Pt> > ();  }
-  virtual shared_ptr<vector<Pt> > get_F()
-    { return make_shared<vector<Pt> > ();   }
-  virtual shared_ptr<vector<double> > get_omega()
-    { return make_shared<vector<double> > (); }
-  
-  virtual Pt get_taui(int i) { return Pt(); }
-  virtual Pt get_forcei(int i) { return Pt (); }
-  virtual double get_omegai(int i) {return 0; }
-  virtual double calc_ei(int i) {return 0; }
-  
-  virtual Pt get_moli_pos(int i) { return Pt(); }
-  
-};
-
-/*
  Class for calculating energy force and torque in one place
  */
-class PhysCalcAM : public BasePhysCalcAM
+class PhysCalcAM : public BasePhysCalc
 {
 protected:
   int N_; // number of particles
@@ -371,27 +323,27 @@ public:
   
   void print_all();
   
-  shared_ptr<vector<Pt> > get_Tau() { return _torCalc_->get_Tau();}
+  shared_ptr<vector<Pt> > get_Tau() { return _torCalc_->get_tau();}
   shared_ptr<vector<Pt> > get_F()    { return _fCalc_->get_F();}
-  shared_ptr<vector<double> > get_omega() {return _eCalc_->get_omega_int();}
+  shared_ptr<vector<double> > get_omega() {return _eCalc_->get_omega();}
   
   Pt get_taui(int i) { return _torCalc_->get_taui(i); }
-  Pt get_forcei(int i) { return _fCalc_->get_fi(i); }
-  double get_omegai(int i) {return _eCalc_->get_omega_i_int(i);}
+  Pt get_forcei(int i) { return _fCalc_->get_forcei(i); }
+  double get_omegai(int i) {return _eCalc_->get_ei(i);}
   
   Pt get_taui_conv(int i)
   { return _torCalc_->get_taui(i)*unit_conv_; }
   Pt get_forcei_conv(int i)
-  { return _fCalc_->get_fi(i)*unit_conv_; }
+  { return _fCalc_->get_forcei(i)*unit_conv_; }
   double get_omegai_conv(int i)
-  {return _eCalc_->get_omega_i_int(i)*unit_conv_;}
+  {return _eCalc_->get_ei(i)*unit_conv_;}
   
   Pt get_moli_pos( int i) { return _sys_->get_centeri(i); }
 
 };
 
 
-class ThreeBodyPhysCalcAM : public BasePhysCalcAM, ThreeBodyAM
+class ThreeBodyPhysCalcAM : public BasePhysCalc, ThreeBodyAM
 {
 protected:
 //  shared_ptr<ThreeBody> _threeBody_;

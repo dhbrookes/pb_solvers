@@ -42,7 +42,7 @@ TEST_F(TermUTest, timeTerm)
   }
 
   auto sys = make_shared<SystemAM> ( mol );
-  shared_ptr<TimeTerminateAM> term = make_shared<TimeTerminateAM>(30);
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   
   EXPECT_NEAR(sys->get_time(), 0, preclim);
   EXPECT_EQ( term->is_terminated( sys), false);
@@ -68,7 +68,7 @@ TEST_F(TermUTest, xLETerm)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(1, X, LEQ, -10);
+  auto term = make_shared<CoordTerminate>(1, X, LEQ, -10);
 
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(1, Pt(-5, 0, 0));
@@ -95,7 +95,7 @@ TEST_F(TermUTest, xGETerm)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(2, X, GEQ, 12.54);
+  auto term = make_shared<CoordTerminate>(2, X, GEQ, 12.54);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(5, 0, 0));
@@ -122,7 +122,7 @@ TEST_F(TermUTest, yLETerm)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(0, Y, LEQ, -10);
+  auto term = make_shared<CoordTerminate>(0, Y, LEQ, -10);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(0, Pt(-5, 0, 0));
@@ -149,7 +149,7 @@ TEST_F(TermUTest, yGETerm)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(1, Y, GEQ, 10);
+  auto term = make_shared<CoordTerminate>(1, Y, GEQ, 10);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(1, Pt(.5, -2, 0));
@@ -176,7 +176,7 @@ TEST_F(TermUTest, zLETerm)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(0, Z, LEQ, -50);
+  auto term = make_shared<CoordTerminate>(0, Z, LEQ, -50);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(0, Pt(100, 0, -5));
@@ -203,7 +203,7 @@ TEST_F(TermUTest, zGETerm)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(2, Z, GEQ, 29.4);
+  auto term = make_shared<CoordTerminate>(2, Z, GEQ, 29.4);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(-5, 10.4, 20));
@@ -231,7 +231,7 @@ TEST_F(TermUTest, zLETermManyType)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(0, Z, LEQ, -50);
+  auto term = make_shared<CoordTerminate>(0, Z, LEQ, -50);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(100, 0, -500));
@@ -259,7 +259,7 @@ TEST_F(TermUTest, xGETermManyType)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(1, X, GEQ, 29.4);
+  auto term = make_shared<CoordTerminate>(1, X, GEQ, 29.4);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(-5, 10.4, 20));
@@ -291,7 +291,7 @@ TEST_F(TermUTest, xLETermManyTypePBC)
   }
   
   auto sys = make_shared<SystemAM> ( mol, 20, 40 );
-  auto term = make_shared<CoordTerminateAM>(0, X, LEQ, -29.4);
+  auto term = make_shared<CoordTerminate>(0, X, LEQ, -29.4);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(-4.5, 9.5, 0));
@@ -323,7 +323,7 @@ TEST_F(TermUTest, yGETermManyTypePBC)
   }
   
   auto sys = make_shared<SystemAM> ( mol, 20, 40 );
-  auto term = make_shared<CoordTerminateAM>(1, Y, GEQ, 39.4);
+  auto term = make_shared<CoordTerminate>(1, Y, GEQ, 39.4);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(-4.5, 9.5, 0));
@@ -357,7 +357,7 @@ TEST_F(TermUTest, rTermType)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(1, R, GEQ, 29.4);
+  auto term = make_shared<CoordTerminate>(1, R, GEQ, 29.4);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(-5, 10.4, 20));
@@ -389,7 +389,7 @@ TEST_F(TermUTest, rTermManyType)
   }
   
   auto sys = make_shared<SystemAM> ( mol );
-  auto term = make_shared<CoordTerminateAM>(1, R, GEQ, 29.4);
+  auto term = make_shared<CoordTerminate>(1, R, GEQ, 29.4);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(-5, 1.4, 5));
@@ -421,7 +421,7 @@ TEST_F(TermUTest, rTermManyTypePBC)
   }
   
   auto sys = make_shared<SystemAM> ( mol, 20, 40 );
-  auto term = make_shared<CoordTerminateAM>(1, R, GEQ, 29.4);
+  auto term = make_shared<CoordTerminate>(1, R, GEQ, 29.4);
   
   EXPECT_EQ( term->is_terminated( sys), false);
   sys->translate_mol(2, Pt(-4.5, 9.5, 0));
@@ -560,11 +560,11 @@ TEST_F(TermUTest, combineTermORPBC)
   
   auto sys = make_shared<SystemAM> ( mol, 20, 40 );
   vector<int> cont_pair = { 0, 1};
-  vector<shared_ptr<BaseTerminateAM > > all_term;
+  vector<shared_ptr<BaseTerminate > > all_term;
   all_term.push_back(make_shared<ContactTerminateAM>(cont_pair, 1.0));
-  all_term.push_back(make_shared<TimeTerminateAM>(100.0));
+  all_term.push_back(make_shared<TimeTerminate>(100.0));
   
-  CombineTerminateAM combine(all_term, ONE);
+  CombineTerminate combine(all_term, ONE);
   
   EXPECT_EQ( combine.is_terminated( sys), false);
   sys->translate_mol(2, Pt(-24.5, 19.5, 0));
@@ -607,11 +607,11 @@ TEST_F(TermUTest, combineTermANDPBC)
   
   auto sys = make_shared<SystemAM> ( mol, 20, 40 );
   vector<int> cont_pair = { 0, 1};
-  vector<shared_ptr<BaseTerminateAM > > all_term;
+  vector<shared_ptr<BaseTerminate > > all_term;
   all_term.push_back(make_shared<ContactTerminateAM>(cont_pair, 1.0));
-  all_term.push_back(make_shared<TimeTerminateAM>(100.0));
+  all_term.push_back(make_shared<TimeTerminate>(100.0));
   
-  CombineTerminateAM combine(all_term, ALL);
+  CombineTerminate combine(all_term, ALL);
   
   EXPECT_EQ( combine.is_terminated( sys), false);
   sys->translate_mol(2, Pt(-24.5, 19.5, 0));
@@ -656,12 +656,12 @@ TEST_F(TermUTest, combineTerm3ORPBC)
   
   auto sys = make_shared<SystemAM> ( mol, 20, 40 );
   vector<int> cont_pair = { 0, 1};
-  vector<shared_ptr<BaseTerminateAM > > all_term;
+  vector<shared_ptr<BaseTerminate > > all_term;
   all_term.push_back(make_shared<ContactTerminateAM>(cont_pair, 1.0));
-  all_term.push_back(make_shared<CoordTerminateAM>(1, X, LEQ, -20.4));
-  all_term.push_back(make_shared<TimeTerminateAM>(100.0));
+  all_term.push_back(make_shared<CoordTerminate>(1, X, LEQ, -20.4));
+  all_term.push_back(make_shared<TimeTerminate>(100.0));
   
-  CombineTerminateAM combine(all_term, ONE);
+  CombineTerminate combine(all_term, ONE);
   EXPECT_EQ( combine.is_terminated( sys), false);
   
   sys->translate_mol(0, Pt(-24.5, 19.5, 0));
@@ -707,12 +707,12 @@ TEST_F(TermUTest, combineTerm3ANDPBC)
   
   auto sys = make_shared<SystemAM> ( mol, 20, 40 );
   vector<int> cont_pair = { 0, 1};
-  vector<shared_ptr<BaseTerminateAM > > all_term;
+  vector<shared_ptr<BaseTerminate > > all_term;
   all_term.push_back(make_shared<ContactTerminateAM>(cont_pair, 1.0));
-  all_term.push_back(make_shared<CoordTerminateAM>(1, X, LEQ, -20.4));
-  all_term.push_back(make_shared<TimeTerminateAM>(100.0));
+  all_term.push_back(make_shared<CoordTerminate>(1, X, LEQ, -20.4));
+  all_term.push_back(make_shared<TimeTerminate>(100.0));
   
-  CombineTerminateAM combine(all_term, ALL);
+  CombineTerminate combine(all_term, ALL);
   
   EXPECT_EQ( combine.is_terminated( sys), false);
   sys->translate_mol(0, Pt(-24.5, 19.5, 0));

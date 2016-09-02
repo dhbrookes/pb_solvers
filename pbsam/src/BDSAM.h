@@ -1,5 +1,5 @@
 //
-//  BD.h
+//  BDSAM.h
 //  pb_solvers_code
 //
 /*
@@ -29,34 +29,17 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef BD_h
-#define BD_h
+#ifndef BDSAM_h
+#define BDSAM_h
 
 #include <stdio.h>
 #include <random>
 #include <memory>
+#include "BaseBD.h"
 #include "ElectrostaticsSAM.h"
 
-/*
- Base class for implementing termination conditions in BD
- */
-class BaseTerminateSAM
-{
-public:
-  BaseTerminateSAM() { }
-  
-  virtual const bool is_terminated(shared_ptr<SystemSAM> _sys) const
-  {
-    return false;
-  }
-  
-  virtual string get_how_term(shared_ptr<SystemSAM> _sys)
-  {
-    return "";
-  }
-};
 
-class ContactTerminateSAM2 : public BaseTerminateSAM
+class ContactTerminateSAM : public BaseTerminate
 {
 protected:
   int mol1_;
@@ -70,212 +53,14 @@ protected:
   string how_term_;
   
 public:
-  ContactTerminateSAM2(vector<int> mol, vector<vector<int> > atpairs,
-                    vector<double> dists, double pad)
-  :BaseTerminateSAM(), mol1_(mol[0]), mol2_(mol[1]), atPairs_(atpairs),
-  dists_(dists), pad_(pad)
-  {
-    string_create();
-  }
+  ContactTerminateSAM(vector<int> mol, vector<vector<int> > atpairs,
+                      vector<double> dists, double pad);
   
-  ContactTerminateSAM2(ContactFile confile, double pad)
-  :pad_(pad), mol1_(confile.get_moltype1()), mol2_(confile.get_moltype2()),
-  atPairs_(confile.get_at_pairs()), dists_(confile.get_dists())
-  {
-    string_create();
-  }
+  ContactTerminateSAM(ContactFile confile, double pad);
   
-  void string_create()
-  {
-    char buff[400];
-    sprintf(buff, "Type %d and Type %d are in contact;\t",
-            mol1_, mol2_);
-    how_term_ = "System has fulfilled condition: " + string(buff);
-  }
-  
-  string get_how_term(shared_ptr<SystemSAM> _sys)   { return how_term_; }
-  
-  const bool is_terminated(shared_ptr<SystemSAM> _sys) const
-  {
-    bool contacted = false;
-    int i, j, ctct, k, idx1, idx2, sph1, sph2;
-    Pt cen1, cen2, vc1, vc2;
-    double a1, a2, dcon;
-
-    for ( i = 0; i < _sys->get_typect(mol1_); i++)
-    {
-      for ( j = 0; j < _sys->get_typect(mol2_); j++)
-      {
-        ctct = 0;
-        idx1 = _sys->get_mol_global_idx( mol1_, i);
-        idx2 = _sys->get_mol_global_idx( mol2_, j);
-        
-        for (k = 0; k < atPairs_.size(); k++)
-        {
-          dcon = dists_[k];
-          
-          sph1 = _sys->get_moli(idx1)->get_cg_of_ch(atPairs_[k][0]);
-          sph2 = _sys->get_moli(idx1)->get_cg_of_ch(atPairs_[k][0]);
-          
-          cen1 = _sys->get_centerik(idx1, sph1);
-          cen2 = _sys->get_centerik(idx2, sph2);
-          
-          a1 = _sys->get_aik(idx1, sph1);
-          a2 = _sys->get_aik(idx2, sph2);
-
-          // if the distance between the 2 CG spheres is less than the cutoff
-          // The points are in contact
-          if ( _sys->get_pbc_dist_vec_base( cen1, cen2).norm() < a1+a2+dcon)
-          {
-            cout << "This is dcon " << dcon << " sph1 " << cen1.x() << " " <<
-            cen1.y() << " " << cen1.z() << " " << " & sph2 " << cen2.x()
-            << " " << cen2.y() << " " << cen2.z() << " " << endl;
-            ctct++;
-            if (ctct == 2){contacted = true; break;}
-          }
-        }
-      }
-    }
-    return contacted;
-  }
-};
-
-
-/*
- Class for time based termination
- */
-class TimeTerminateSAM : public BaseTerminateSAM
-{
-protected:
-  double endTime_; //termination time
-  string how_term_;
-  
-public:
-  TimeTerminateSAM(double end_time)
-  :BaseTerminateSAM(), endTime_(end_time)
-  {
-    char buff[400];
-    sprintf(buff, "System has fulfilled condition: time >= %7.1f;\t", endTime_);
-    how_term_ = buff;
-  }
-  
-  const bool is_terminated(shared_ptr<SystemSAM> _sys) const
-  {
-    bool done = false;
-    if (_sys->get_time() >= endTime_) done = true;
-    return done;
-  }
-  
-  string get_how_term(shared_ptr<SystemSAM> _sys)   { return how_term_; }
-};
-
-enum CoordType { X, Y, Z, R };
-enum BoundaryType { LEQ, GEQ };
-
-/*
- Class for coordinate based termination. This terminates based on whether
- the specified MoleculeAM satisfies the BoundaryType condition on the CoordType
- with the given boundary value.
- */
-class CoordTerminateSAM : public BaseTerminateSAM
-{
-protected:
-  double boundaryVal_;
-  int molIdx_;
-  CoordType coordType_;
-  BoundaryType boundType_;
-  string how_term_;
-  
-public:
-  CoordTerminateSAM(int mol_idx, CoordType coord_type,
-                 BoundaryType bound_type, double bound_val)
-  :BaseTerminateSAM(), molIdx_(mol_idx), coordType_(coord_type),
-  boundType_(bound_type), boundaryVal_(bound_val)
-  {
-    char buff[400];
-    string cord = "r", eq = ">=";
-    if (coordType_ == X)      cord = "x";
-    else if (coordType_ == Y) cord = "y";
-    else if (coordType_ == Z) cord = "z";
-    
-    if (boundType_ == LEQ)    eq   = "<=";
-    
-    sprintf(buff, "MoleculeAM type %d has fulfilled condition: %s %s %5.2f;\t",
-            molIdx_, cord.c_str(), eq.c_str(), boundaryVal_);
-    how_term_ = buff;
-  }
-  
-  const bool is_terminated(shared_ptr<SystemSAM> _sys) const
-  {
-    bool done = false;
-    int i, idx;
-    for ( i = 0; i < _sys->get_typect(molIdx_); i++)
-    {
-      idx = _sys->get_mol_global_idx( molIdx_, i);
-      Pt mol_coord = _sys->get_unwrapped_center(idx);
-      double test_val;
-      if (coordType_ == X)      test_val = mol_coord.x();
-      else if (coordType_ == Y) test_val = mol_coord.y();
-      else if (coordType_ == Z) test_val = mol_coord.z();
-      else                      test_val = mol_coord.norm();
-      
-      if ((boundType_ == LEQ) && (test_val <= boundaryVal_))      return true;
-      else if ((boundType_ == GEQ) && (test_val >= boundaryVal_)) return true;
-    }
-    return done;
-  }
-  
-  string get_how_term(shared_ptr<SystemSAM> _sys)   { return how_term_; }
-};
-
-
-/*
- Combine termination conditions
- */
-enum HowTermCombineSAM { ALL, ONE };
-
-class CombineTerminateSAM: public BaseTerminateSAM
-{
-protected:
-  vector<shared_ptr<BaseTerminateSAM> > terms_;
-  HowTermCombineSAM howCombine_;
-  
-public:
-  CombineTerminateSAM(vector<shared_ptr<BaseTerminateSAM> > terms,
-                      HowTermCombineSAM how_combine)
-  :BaseTerminateSAM(), terms_(terms), howCombine_(how_combine)
-  {
-  }
-  
-  const bool is_terminated(shared_ptr<SystemSAM> _sys) const
-  {
-    bool done;
-    howCombine_== ALL ? done=true : done=false;
-    for (int i = 0; i < terms_.size(); i++)
-    {
-      if (terms_[i]->is_terminated(_sys) == ! done)
-      {
-        done=!done;
-        break;
-      }
-    }
-    return done;
-  }
-  
-  string get_how_term(shared_ptr<SystemSAM> _sys)
-  {
-    string how_term = "";
-    bool done;
-    howCombine_== ALL ? done=true : done=false;
-    for (int i = 0; i < terms_.size(); i++)
-    {
-      if (terms_[i]->is_terminated(_sys) == true)
-      {
-        how_term += terms_[i]->get_how_term(_sys);
-      }
-    }
-    return how_term;
-  }
+  void string_create();
+  string get_how_term(shared_ptr<BaseSystem> _sys)   { return how_term_; }
+  const bool is_terminated(shared_ptr<SystemSAM> _sys) const;
 };
 
 /*
@@ -347,8 +132,8 @@ protected:
   shared_ptr<BDStepSAM> _stepper_;
   shared_ptr<Solver> _solver_;
   shared_ptr<GradSolver> _gradSolv_;
-  shared_ptr<BasePhysCalcSAM> _physCalc_;
-  shared_ptr<BaseTerminateSAM> _terminator_;
+  shared_ptr<BasePhysCalc> _physCalc_;
+  shared_ptr<BaseTerminate> _terminator_;
   
   string outfname_; //outputfile
   
@@ -359,7 +144,7 @@ public:
   // num is the number of bodies to perform calculations on (2, 3 or all).
   // If num=0, then the equations will be solved exactly
   BDRunSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradSolv,
-        shared_ptr<BaseTerminateSAM> _terminator, string outfname, int num = 0,
+        shared_ptr<BaseTerminate> _terminator, string outfname, int num = 0,
         bool diff = true, bool force = true,
         int maxiter = 2, double prec = 1e-4);
   

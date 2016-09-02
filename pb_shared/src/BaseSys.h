@@ -180,6 +180,9 @@ public:
   // translate every charge in molecule i by the vector dr
   void translate_mol(int i, Pt dr) { molecules_[i]->translate(dr, boxLength_); }
   
+  Pt get_unwrapped_center(int i) const
+      { return molecules_[i]->get_unwrapped_center(); }
+  
   // rotate every charge in Molecule i
   void rotate_mol(int i, Quat qrot) { molecules_[i]->rotate(qrot); }
   void rotate_mol(int i, MyMatrix<double> rotmat)

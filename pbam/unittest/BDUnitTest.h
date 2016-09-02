@@ -159,7 +159,7 @@ TEST_F(BDUTest, dtTest)
   TorqueCalcAM TorTest( make_shared<ASolver> (ASolvTest));
   FoTest.calc_force(); TorTest.calc_tau();
   
-  BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+  BDTest.bd_update(FoTest.get_F(), TorTest.get_tau());
   
   EXPECT_NEAR(BDTest.get_dt()/2.0, 1.0, preclim);
 }
@@ -203,7 +203,7 @@ TEST_F(BDUTest, dtLargeTest)
   TorqueCalcAM TorTest( make_shared<ASolver> (ASolvTest));
   FoTest.calc_force(); TorTest.calc_tau();
   
-  BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+  BDTest.bd_update(FoTest.get_F(), TorTest.get_tau());
   
   EXPECT_NEAR(BDTest.get_dt()/2.535522526, 1.0, preclim);
 }
@@ -249,7 +249,7 @@ TEST_F(BDUTest, distPBCTest)
   TorqueCalcAM TorTest( make_shared<ASolver> (ASolvTest));
   FoTest.calc_force(); TorTest.calc_tau();
   
-  BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+  BDTest.bd_update(FoTest.get_F(), TorTest.get_tau());
   
   EXPECT_NEAR(BDTest.get_dt()/2.0, 1.0, preclim);
 }
@@ -296,7 +296,7 @@ TEST_F(BDUTest, ForcePos)
     TorqueCalcAM TorTest( make_shared<ASolver> (ASolvTest));
     FoTest.calc_force(); TorTest.calc_tau();
     
-    BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+    BDTest.bd_update(FoTest.get_F(), TorTest.get_tau());
     
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).x(), 0, preclim);
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
@@ -349,7 +349,7 @@ TEST_F(BDUTest, ForcePosZ)
     TorqueCalcAM TorTest( make_shared<ASolver> (ASolvTest));
     FoTest.calc_force(); TorTest.calc_tau();
     
-    BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+    BDTest.bd_update(FoTest.get_F(), TorTest.get_tau());
     
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).x(), 0, preclim);
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
@@ -403,7 +403,7 @@ TEST_F(BDUTest, ForceOpp)
 
     FoTest.calc_force();  TorTest.calc_tau();
     
-    BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+    BDTest.bd_update(FoTest.get_F(), TorTest.get_tau());
     
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).x(), 0, preclim);
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
@@ -455,7 +455,7 @@ TEST_F(BDUTest, TorquePos)
     TorqueCalcAM TorTest( make_shared<ASolver> (ASolvTest));
     FoTest.calc_force(); TorTest.calc_tau();
 
-    BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+    BDTest.bd_update(FoTest.get_F(), TorTest.get_tau());
   
     EXPECT_NEAR(BDTest.get_system()->get_posij(0, 0).x()/BDTor0x[step],
                 1.0, preclim);
@@ -515,7 +515,7 @@ TEST_F(BDUTest, TorqueOpp)
     TorqueCalcAM TorTest( make_shared<ASolver> (ASolvTest));
     FoTest.calc_force(); TorTest.calc_tau();
     
-    BDTest.bd_update(FoTest.get_F(), TorTest.get_Tau());
+    BDTest.bd_update(FoTest.get_F(), TorTest.get_tau());
 
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).x(), 0, preclim);
     EXPECT_NEAR(BDTest.get_system()->get_centeri(0).y(), 0, preclim);
@@ -595,7 +595,7 @@ TEST_F(BDUTest, BDrunTimeTermY)
                                         make_shared<Constants> (const_), vals,
                                         sys->get_cutoff());
 
-  shared_ptr<TimeTerminateAM> term = make_shared<TimeTerminateAM>(10);
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(10);
   BDRunAM BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
   BDTest.run( "", "", 500);
   
@@ -634,7 +634,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
                                         make_shared<Constants> (const_), vals,
                                         sys->get_cutoff());
   
-  shared_ptr<TimeTerminateAM> term = make_shared<TimeTerminateAM>(30);
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRunAM BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-20);
   BDTest.run( "", "", 500);
   
@@ -674,7 +674,7 @@ TEST_F(BDUTest, BDrunTimeTermRot)
                                         make_shared<Constants> (const_), vals,
                                         sys->get_cutoff());
   
-  shared_ptr<TimeTerminateAM> term = make_shared<TimeTerminateAM>(30);
+  shared_ptr<TimeTerminate> term = make_shared<TimeTerminate>(30);
   BDRunAM BDTest( ASolvTest, term, "", 0, false, true, 1e7, 1e-30);
   BDTest.run( "", "", 500);
   

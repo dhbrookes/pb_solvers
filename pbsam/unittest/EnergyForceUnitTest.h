@@ -252,11 +252,11 @@ TEST_F(ForceUTest, two_mol_test)
                                        SHCalcTest, BesselCal);
   focal->calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
                     gsolvTest.get_gradH_all(),gsolvTest.get_gradLHN_all());
-  shared_ptr<vector<Pt> > fo = focal->get_all_f();
+  shared_ptr<vector<Pt> > fo = focal->get_F();
   
   TorqueCalcSAM tocal(nmol);
   tocal.calc_all_tau(sys, focal);
-  shared_ptr<vector<Pt> > to = tocal.get_all_tau();
+  shared_ptr<vector<Pt> > to = tocal.get_tau();
   
   for (int i = 0; i < sys->get_n(); i++)
   {
@@ -345,11 +345,11 @@ TEST_F(ForceUTest, three_mol_test)
                                        SHCalcTest, BesselCal);
   focal->calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
                    gsolvTest.get_gradH_all(),gsolvTest.get_gradLHN_all());
-  shared_ptr<vector<Pt> > fo = focal->get_all_f();
+  shared_ptr<vector<Pt> > fo = focal->get_F();
   
   TorqueCalcSAM tocal(nmol);
   tocal.calc_all_tau(sys, focal);
-  shared_ptr<vector<Pt> > to = tocal.get_all_tau();
+  shared_ptr<vector<Pt> > to = tocal.get_tau();
 
   for (int i = 0; i < sys->get_n(); i++)
   {

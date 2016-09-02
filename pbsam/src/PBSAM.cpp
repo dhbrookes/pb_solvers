@@ -378,7 +378,7 @@ void PBSAM::run_dynamics()
                                        solv->get_interpol_list(),
                                        solv->get_precalc_sh(),
                                        _exp_consts_, poles_);
-  vector<shared_ptr<BaseTerminateSAM > >  terms(_setp_->get_numterms());
+  vector<shared_ptr<BaseTerminate > >  terms(_setp_->get_numterms());
   for (i = 0; i < _setp_->get_numterms(); i++)
   {
     string type = _setp_->get_termtype(i);
@@ -391,44 +391,44 @@ void PBSAM::run_dynamics()
       cout << "Contact termination found" << endl;
       double pad = _setp_->get_conpad(j);
       ContactFile confile (_setp_->get_confile(j));
-      auto conterm = make_shared<ContactTerminateSAM2>(confile, pad);
+      auto conterm = make_shared<ContactTerminateSAM>(confile, pad);
 
-      terms[i] = make_shared<ContactTerminateSAM2>(confile, pad);
+      terms[i] = make_shared<ContactTerminateSAM>(confile, pad);
       j += 1;  // j is index of contact termconditions
     } else if (type.substr(0,1) == "x")
     {
       cout << type << " termination found for MoleculeSAM ";
       cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminateSAM>( _setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
                                              X, btype, val);
     } else if (type.substr(0,1) == "y")
     {
       cout << type << " termination found for MoleculeSAM ";
       cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminateSAM>( _setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
                                              Y, btype, val);
     } else if (type.substr(0,1) == "z")
     {
       cout << type << " termination found for MoleculeSAM ";
       cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminateSAM>( _setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
                                              Z, btype, val);
     } else if (type.substr(0,1) == "r")
     {
       cout << type << " termination found for MoleculeSAM ";
       cout << _setp_->get_termMolIDX(i)[0] << " at a distance " << val << endl;
-      terms[i] = make_shared<CoordTerminateSAM>( _setp_->get_termMolIDX(i)[0],
+      terms[i] = make_shared<CoordTerminate>( _setp_->get_termMolIDX(i)[0],
                                              R, btype, val);
     } else if (type == "time")
     {
       cout << "Time termination found, at time (ps) " << val << endl;
-      terms[i] = make_shared<TimeTerminateSAM>( val);
+      terms[i] = make_shared<TimeTerminate>( val);
     } else cout << "Termination type not recognized!" << endl;
   }
 
   cout << "Done making termination conds " << endl;
-  HowTermCombineSAM com = (_setp_->get_andCombine() ? ALL : ONE);
-  auto term_conds = make_shared<CombineTerminateSAM> (terms, com);
+  HowTermCombine com = (_setp_->get_andCombine() ? ALL : ONE);
+  auto term_conds = make_shared<CombineTerminate> (terms, com);
 
   char buff[100], outb[100];
   sprintf( outb, "%s.stat", _setp_->getRunName().c_str());
@@ -506,19 +506,18 @@ void PBSAM::run_energyforce()
   
   PhysCalcSAM calcEnFoTo(solv, gsolv, _setp_->getRunName(), 
                          _consts_->get_unitsEnum());
-
   calcEnFoTo.calc_all();
+  calcEnFoTo.print_all();
 
   for (i = 0; i < _syst_->get_n(); i++)
   {
-  //Pt tmp = calcEnFoTo.get_forcei_conv(i);
-  //force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
-  //tmp = calcEnFoTo.get_taui_conv(i);
-  //torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
-  //nrg_intera_[i]  = calcEnFoTo.get_omegai_conv(i);
+    Pt tmp = calcEnFoTo.get_forcei_conv(i);
+    force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
+    tmp = calcEnFoTo.get_taui_conv(i);
+    torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
+    nrg_intera_[i]  = calcEnFoTo.get_omegai_conv(i);
   }
 
-  
   t3 = clock() - t3;
   printf ("energyforce calc took me %f seconds.\n",
           ((float)t3)/CLOCKS_PER_SEC);
@@ -527,12 +526,6 @@ void PBSAM::run_energyforce()
 void PBSAM::run_bodyapprox()
 {
 //  clock_t t3 = clock();  
-//  
-//  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*poles_);
-//  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*poles_, bConsta);
-//  auto SHConsta = make_shared<SHCalcConstants>(2*poles_);
-//  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*poles_, SHConsta);
-//
 //  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, _syst_,
 //                                                    _consts_, poles_);
 //  
