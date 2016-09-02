@@ -67,12 +67,13 @@ PBSAMInput getPBSAMParams()
   return pbsamI;
 }
 
+/*
 PBAMInput getPBAMParams()
 {
   // get the struct for use in the c code
   PBAMInput pbamI;
   return pbamI;
-}
+} */
 
 
 //  print the PBAM flow structure for debugging
@@ -132,7 +133,7 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
    // convert xyzrc to a vector of Molecules
   printf("Inside pbamrun sphinx\n");
   printPBSAMStruct(pbamfin, pbsamfin);
-  vector<MoleculeSAM> mols;
+  vector<shared_ptr <BaseMolecule> > mols;
   for (int mol=0; mol < nmol; mol++)
   {
     int ncg(0), nchg(0);
@@ -183,14 +184,15 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
 
     if (ncg == 0)
     {   
-      mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, 
+      mols.push_back(make_shared<MoleculeSAM>(mol, 0, difftype, chg, cgpos, vdw, 
                      string(pbsamfin.surffil_[mol]), pbsamfin.tolsp_,
                      drot, dtr));
-      mols[mol].write_pqr("cg_mol"+to_string(mol)+".pqr");
+      mols[mol]->write_pqr("cg_mol"+to_string(mol)+".pqr");
     }   
     else
-      mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, sPos, 
-                                 vdwS, dtr, drot));
+      mols.push_back(make_shared<MoleculeSAM>(mol, 0, difftype, chg, 
+                                              cgpos, vdw, sPos, 
+                                              vdwS, dtr, drot));
   }
 
 
@@ -208,7 +210,7 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
 {
    // convert Valist to a vector of MoleculeSAMs
   printf("Inside pbsamrun\n");
-  vector<MoleculeSAM> mols;
+  vector<shared_ptr<BaseMolecule> > mols;
 
   for (unsigned int mol=0; mol < nmls; mol++)
   {
@@ -264,14 +266,14 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
 
     if (ncg == 0)
     {
-      mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, 
+      mols.push_back(make_shared<MoleculeSAM>(mol, 0, difftype, chg, cgpos, vdw,
                      string(pbsamParams.surffil_[mol]), pbsamParams.tolsp_,
                      drot, dtr));
-      mols[mol].write_pqr("cg_mol"+to_string(mol)+".pqr");
+      mols[mol]->write_pqr("cg_mol"+to_string(mol)+".pqr");
     }
     else
-      mols.push_back(MoleculeSAM(mol, 0, difftype, chg, cgpos, vdw, sPos, 
-                                 vdwS, dtr, drot));
+      mols.push_back(make_shared<MoleculeSAM>(mol, 0, difftype, chg, cgpos, 
+                                              vdw, sPos, vdwS, dtr, drot));
   }
 
   //  create the PBAM object

@@ -80,7 +80,7 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
 
   PBSAMInput getPBSAMParams();
   
-  PBAMInput getPBAMParams();
+//PBAMInput getPBAMParams();
 
 #ifdef __cplusplus
 }

@@ -632,8 +632,6 @@ void PhysCalcAM::compute_units( shared_ptr<Constants> cst, Units unit)
 void PhysCalcAM::print_all()
 {
   int i;
-  Pt force_i, torque_i;
-  double force_norm, torque_norm;
   streambuf * buf;
   ofstream of;
   vector<Pt> mol_pos = _sys_->get_allcenter();
@@ -648,7 +646,6 @@ void PhysCalcAM::print_all()
   
   ostream out(buf);
   out << "My units are " << unit_ << ". Time: " << _sys_->get_time() << endl;
-  
   for ( i = 0; i < N_; i++)
   {
     force_norm = 0;
@@ -656,7 +653,7 @@ void PhysCalcAM::print_all()
     out << "Molecule #" << i + 1 << " radius: " << _sys_->get_radi(i) << endl;
     out << "\tPOSITION: [" << mol_pos[i].x() << ", " << mol_pos[i].y();
     out << ", " << mol_pos[i].z() << "]" << endl;
-    out << "\tENERGY: " << unit_conv_ * get_omega()->operator[](i) << endl;
+    out << "\tENERGY: " << unit_conv_ * get_omega(i) << endl;
 
     out << "\tFORCE: " << get_forcei(i).norm() * unit_conv_ << ", [";
     out << get_forcei(i).x() * unit_conv_ << " "

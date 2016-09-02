@@ -75,13 +75,27 @@ void ForceCalcSAM::calc_all_f(vector<shared_ptr<HMatrix> > H,
   }
 }
 
+PhysCalcSAM::PhysCalcSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradsolv,
+                   string outfname, Units unit)
+:BasePhysCalc(_solv_->get_sys()->get_n(), _solv_->get_consts(), outfname, unit),
+_solv_(_solv), _gradSolv_(_gradsolv), _sys_(_solv->get_sys())
+{
+  _sys_ = _solv->get_sys();
+  
+  _eCalc_ = make_shared<EnergyCalcSAM>(_sys_->get_n());
+  _fCalc_ = make_shared<ForceCalcSAM>(_sys_->get_n(), _sys_->get_all_Ik(),
+                                   _solv->get_consts()->get_dielectric_water(),
+                                   _solv->get_sh(), _solv->get_bessel());
+  _torCalc_ = make_shared<TorqueCalcSAM>(_sys_->get_n());
+
+//  compute_units(_solv->get_consts(), unit);
+}
 
 void TorqueCalcSAM::calc_all_tau(shared_ptr<SystemSAM> sys,
                               shared_ptr<ForceCalcSAM> fcalc)
 {
   for (int i = 0; i < I_; i++)
   {
-    //    cout << "This is i " << i << endl;
     (*_tau_)[i] = calc_tauI(i, sys->get_moli(i), fcalc);
   }
 }
@@ -101,22 +115,6 @@ Pt TorqueCalcSAM::calc_tauI(int i, shared_ptr<BaseMolecule> mol,
   return tauI;
 }
 
-PhysCalcSAM::PhysCalcSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradsolv,
-                   string outfname, Units unit)
-:BasePhysCalc(_solv_->get_sys()->get_n(), _solv_->get_consts(), outfname, unit),
-_solv_(_solv), _gradSolv_(_gradsolv), _sys_(_solv->get_sys())
-{
-  _sys_ = _solv->get_sys();
-  
-  _eCalc_ = make_shared<EnergyCalcSAM>(_sys_->get_n());
-  _fCalc_ = make_shared<ForceCalcSAM>(_sys_->get_n(), _sys_->get_all_Ik(),
-                                   _solv->get_consts()->get_dielectric_water(),
-                                   _solv->get_sh(), _solv->get_bessel());
-  _torCalc_ = make_shared<TorqueCalcSAM>(_sys_->get_n());
-
-//  compute_units(_solv->get_consts(), unit);
-}
-
 Pt TorqueCalcSAM::cross_prod(Pt u, Pt v)
 {
   Pt c;
@@ -125,6 +123,7 @@ Pt TorqueCalcSAM::cross_prod(Pt u, Pt v)
   c.set_z(u[0]*v[1] - u[1]*v[0]);
   return c;
 }
+
 
 void PhysCalcSAM::calc_force()
 {
@@ -145,6 +144,37 @@ void PhysCalcSAM::calc_torque()
   _torCalc_->calc_all_tau(_sys_, _fCalc_);
 }
 
+void PhysCalcSAM::print_all()
+{
+  int i;
+  streambuf * buf;
+  ofstream of; 
+  vector<Pt> mol_pos = _sys_->get_cog();
+  
+  if(outfname_ != "") 
+  {
+    of.open(outfname_, fstream::in | fstream::out | fstream::app);
+    buf = of.rdbuf();
+  } else {
+    buf = cout.rdbuf();
+  }
+  
+  ostream out(buf);
+  out << "My units are " << unit_ << ". Time: " << _sys_->get_time() << endl;
+  for ( i = 0; i < N_; i++)
+  {
+    out << "Molecule #" << i + 1 << endl;
+    out << "\tPOSITION: [" << mol_pos[i].x() << ", " << mol_pos[i].y();
+    out << ", " << mol_pos[i].z() << "]" << endl;
+    out << "\tENERGY: " << unit_conv_ * get_omegai(i) << endl;
 
-
-
+    out << "\tFORCE: " << get_forcei(i).norm() * unit_conv_ << ", [";
+    out << get_forcei(i).x() * unit_conv_ << " " 
+        << get_forcei(i).y() * unit_conv_ << " " 
+        << get_forcei(i).z() * unit_conv_ << "]"<<endl;
+    out << "\tTORQUE: " << get_taui(i).norm() << ", [";
+    out << get_taui(i).x() * unit_conv_ << " " 
+        << get_taui(i).y() * unit_conv_ << " " 
+        << get_taui(i).z() * unit_conv_ << "]"<<endl;
+  }   
+}
