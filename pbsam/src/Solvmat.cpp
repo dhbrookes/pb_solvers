@@ -257,6 +257,15 @@ grid_exp_(_mol->get_ns()),grid_bur_(_mol->get_ns())
   compute_grid_pts(_mol);
 }
 
+IEMatrix::IEMatrix(shared_ptr<IEMatrix> imat_in)
+: p_(imat_in->p_), I_(imat_in->I_),
+IE_orig_(imat_in->IE_orig_),
+_expConst_(imat_in->_expConst_),
+calc_pts_(imat_in->calc_pts_), set_mol_(imat_in->set_mol_),
+gridPts_(imat_in->gridPts_), gridPtLocs_(imat_in->gridPtLocs_),
+grid_exp_(imat_in->grid_exp_),grid_bur_(imat_in->grid_bur_)
+{ }
+
 void IEMatrix::init_from_file(string imatfile, int k )
 {
   IMatFile imat(imatfile, p_);

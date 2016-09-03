@@ -36,9 +36,10 @@ class ForceCalcSAM : public BaseForceCalc
 protected:
   shared_ptr<SHCalc> shcalc_;
   shared_ptr<BesselCalc> bcalc_;
-  
+
+  // Force on each CG sphere of each molecule
   vector<vector<Pt> > forces_;
-//  shared_ptr<vector<Pt> > totForces_; // forces on each molecule
+
   int I_; // number of molecules in the system
   vector<int> ks_;
   

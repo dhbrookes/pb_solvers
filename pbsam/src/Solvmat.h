@@ -255,6 +255,8 @@ public:
            shared_ptr<ExpansionConstants> _expconst, bool calc_npts = false,
            int npts = Constants::IMAT_GRID, bool set_mol = false );
   
+  IEMatrix(shared_ptr<IEMatrix> imat_in);
+  
   void init_from_file(string imatfile, int k );
   void init_from_other(shared_ptr<IEMatrix> other);
   
@@ -279,6 +281,7 @@ public:
     for (int k = 0; k < IE_orig_.size(); k++)
     {
       write_mat_k(imat_prefix+"sph"+to_string(k)+".bin", k);
+//      write_mat_k_reg(imat_prefix+"sph"+to_string(k)+".out", k);
     }
   }
 

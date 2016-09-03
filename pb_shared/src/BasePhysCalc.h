@@ -117,7 +117,6 @@ public:
   
   void calc_all()     { calc_energy(); calc_force(); calc_torque(); }
   
-  
   virtual void print_all() { }
   
   virtual shared_ptr<vector<Pt> > get_Tau()

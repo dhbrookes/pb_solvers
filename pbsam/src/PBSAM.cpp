@@ -8,7 +8,7 @@
 
 #include "PBSAM.h"
 
-PBSAM::PBSAM() : PBSAMInput(), poles_(5), solveTol_(1e-4)
+PBSAM::PBSAM() : PBSAMInput(), poles_(6), solveTol_(1e-4)
 {
   vector<string> grid2d = {"tst.2d"};
   vector<string> gridax = {"x"};
@@ -37,7 +37,7 @@ PBSAM::PBSAM() : PBSAMInput(), poles_(5), solveTol_(1e-4)
 }
 
 
-PBSAM::PBSAM(string infile) : poles_(5)
+PBSAM::PBSAM(string infile) : poles_(6)
 {
   _setp_ = make_shared<Setup>(infile);
   check_setup();
@@ -62,7 +62,7 @@ PBSAM::PBSAM(string infile) : poles_(5)
 PBSAM::PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
              vector<shared_ptr<BaseMolecule> > mls )
 :
-poles_(5), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
+poles_(6), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
 {
   int i, j;
   if ((string(pbami.runType_) == "electrostatics")
@@ -238,60 +238,55 @@ shared_ptr<SystemSAM> PBSAM::make_subsystem(vector<int> mol_idx)
 // if there are expansions from self-polarization
 void PBSAM::initialize_pbsam()
 {
-  int i, k, j, expct(0), idx;
+  int i, k, j, idx, idx0;
   for (i = 0; i < _setp_->getNType(); i++)
   {
     string fil=_setp_->getTypeNPQR(i);
     // Generate surface integrals and buried and exposed points
-    // on the molecule surface
-    for (k=0; k<_setp_->getTypeNCount(i); k++)
+    // on the molecule surface for each molecule type
+    idx0 = _syst_->get_mol_global_idx(i,0);
+    auto imt = make_shared<IEMatrix>(idx0, _syst_->get_moli(idx0),
+                                     _sh_calc_, poles_, _exp_consts_,
+                                     true, 0, true); // Calc points for mol
+    
+    imats_[idx0] = make_shared<IEMatrix>(idx0, _syst_->get_moli(idx0),
+                                        _sh_calc_, poles_, _exp_consts_,
+                                        false);
+    
+    if (_setp_->getTypeNImat(i) != "" )
     {
-      idx = _syst_->get_mol_global_idx(i,k);
-      if (k==0) // Only generate sp points if this is the first mol of type i
-      {
-        auto imt = make_shared<IEMatrix>(idx, _syst_->get_moli(idx),
-                                         _sh_calc_, poles_, _exp_consts_,
-                                         true, 0, true);
-        imats_[idx] = make_shared<IEMatrix>(idx, _syst_->get_moli(idx),
-                                             _sh_calc_, poles_, _exp_consts_,
-                                            false);
-        
-      }
-      if (_setp_->getTypeNImat(i) != "" )
-      {
-        string istart = _setp_->getTypeNImat(i);
-        for (int k = 0; k < _syst_->get_Ns_i(i); k++)
-          imats_[idx]->init_from_file(istart+to_string(k)+".bin", k);
-        
-      } else
-      {
-        cout << "Generating IMatrices " << fil << endl;
-        clock_t t3 = clock();
-        
-        if (k==0) //Only generate once for each type
-        {
-          imats_[idx]->calc_vals(_syst_->get_moli(idx), _sh_calc_);
-          imats_[idx]->write_all_mat(fil.substr(0, fil.size()-4));
-        } else
-        {
-          imats_[idx] = make_shared<IEMatrix>(idx, _syst_->get_moli(idx),
-                                              _sh_calc_, poles_, _exp_consts_,
-                                              false);
-          imats_[idx]->init_from_other(imats_[_syst_->get_mol_global_idx(i,0)]);
-          _syst_->copy_grid(_syst_->get_mol_global_idx(i,0), idx);
-        }
-        
-        t3 = clock() - t3;
-        printf ("Imat took me %f seconds.\n",
-                ((float)t3)/CLOCKS_PER_SEC);
-      }
+      string istart = _setp_->getTypeNImat(i);
+      for (j = 0; j < _syst_->get_Ns_i(i); j++)
+        imats_[idx0]->init_from_file(istart+to_string(j)+".bin", j);
+      
+    } else
+    {
+      cout << "Generating IMatrices " << fil << endl;
+      clock_t t3 = clock();
+
+      imats_[idx0]->calc_vals(_syst_->get_moli(idx0), _sh_calc_);
+      imats_[idx0]->write_all_mat(fil.substr(0, fil.size()-4));
+    
+      t3 = clock() - t3;
+      printf ("Imat took me %f seconds.\n",
+              ((float)t3)/CLOCKS_PER_SEC);
     }
+    
+    for (k=1; k<_setp_->getTypeNCount(i); k++)
+    {
+      idx = _syst_->get_mol_global_idx(i,k);
+      imats_[idx] = make_shared<IEMatrix>(imats_[idx0]);
+
+      _syst_->copy_grid(_syst_->get_mol_global_idx(i,0), idx);
+    }
+    
+    
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
-      h_spol_[expct] = make_shared<HMatrix>(idx, _syst_->get_Ns_i(idx),
+      h_spol_[idx] = make_shared<HMatrix>(idx, _syst_->get_Ns_i(idx),
                                             poles_, _consts_->get_kappa());
-      f_spol_[expct] = make_shared<FMatrix>(idx, _syst_->get_Ns_i(idx),
+      f_spol_[idx] = make_shared<FMatrix>(idx, _syst_->get_Ns_i(idx),
                                             poles_, 0.0);
     }
     // Performing similar operations for expansions
@@ -302,10 +297,10 @@ void PBSAM::initialize_pbsam()
       {
         for (k = 0; k < _syst_->get_Ns_i(i); k++)
         {
-          h_spol_[expct]->init_from_exp(estart+".H."+to_string(k)+".exp",k);
-          f_spol_[expct]->init_from_exp(estart+".F."+to_string(k)+".exp",k);
+          idx = _syst_->get_mol_global_idx(i,j);
+          h_spol_[idx]->init_from_exp(estart+".H."+to_string(k)+".exp",k);
+          f_spol_[idx]->init_from_exp(estart+".F."+to_string(k)+".exp",k);
         }
-        expct++;
       }
     } else
     {
@@ -320,13 +315,13 @@ void PBSAM::initialize_pbsam()
       
       Solver self_pol(sub_syst, _consts_, _sh_calc_, _bessl_calc_, poles_,
                       sub_i, sub_h, sub_f);
-      self_pol.solve(solveTol_, 500);
+      self_pol.solve(1e-15, 500);
       
       for (int k = 0; k < _syst_->get_typect(i); k++)
       {
-        h_spol_[expct] = self_pol.get_all_H()[0];
-        f_spol_[expct] = self_pol.get_all_F()[0];
-        expct++;
+        idx = _syst_->get_mol_global_idx(i,k);
+        h_spol_[idx] = self_pol.get_all_H()[0];
+        f_spol_[idx] = self_pol.get_all_F()[0];
       }
       //Printing out H and F of selfpol
       self_pol.get_all_H()[0]->print_all_to_file(fil.substr(0, fil.size()-4)
@@ -494,7 +489,7 @@ void PBSAM::run_energyforce()
   clock_t t3 = clock();
   auto solv = make_shared<Solver>(_syst_, _consts_, _sh_calc_, _bessl_calc_,
                                   poles_, imats_, h_spol_, f_spol_);
-  if (_syst_->get_n() > 1) solv->solve(solveTol_, 100);
+  if (_syst_->get_n() > 1) solv->solve(1e-15, 100);
   
   auto gsolv = make_shared<GradSolver>(_syst_, _consts_, _sh_calc_, 
                                        _bessl_calc_, solv->get_T(),
