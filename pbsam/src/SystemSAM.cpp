@@ -494,6 +494,7 @@ SystemSAM::SystemSAM(Setup setup, double cutoff)
       << mol->get_cog().y() << ", " << mol->get_cog().z() << endl;
       
       molecules_.push_back(mol);
+      keys[0] = i; keys[1] = j;
       typeIdxToIdx_[keys] = k;
       k++;
     } // end j

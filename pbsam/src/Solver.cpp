@@ -461,12 +461,20 @@ void Solver::update_rotH(int I, int k)
 
 void Solver::solve(double tol, int maxiter)
 {
-  double mu;
+  double mu(1e15);
   for (int t = 0; t < maxiter; t++)
   {
     if ((t%50) == 0) cout << "this is t " << t << endl;
     mu = iter(t);
     if (mu < tol) break;
+  }
+  
+  for (int I = 0; I < _sys_->get_n(); I++)
+  {
+    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+    {
+      _H_[I]->print_kmat(k);
+    }
   }
 }
 
