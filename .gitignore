@@ -47,3 +47,7 @@ porin
 # manybody
 grid_test
 random_test
+
+# PBSAM outputs
+*.exp
+*.bin
