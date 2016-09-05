@@ -1,4 +1,4 @@
-runtype electrostatics 20
+runtype electrostatics 50
 runname gly.out
 
 units kT
