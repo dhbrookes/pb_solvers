@@ -18,6 +18,7 @@ cgGridPts_((int) cens.size()),
 cgGdPtExp_((int) cens.size()),
 cgGdPtBur_((int) cens.size())
 {
+  cout << "dtrans " << dtrans << " drot " << drot << endl;
   map_repos_charges();
   check_connect();
   calc_cog();
@@ -627,9 +628,10 @@ void SystemSAM::write_to_xyz(ofstream & xyz_out)
   char xyzlin[400];
   
   for ( i = 0; i < N_; i++ )
-    for ( j = 0; j < get_Nc_i(i); j++)
-      at_tot++;
-  at_tot += N_; // for adding CG centers
+  {
+    at_tot += get_Nc_i(i);
+    at_tot += get_Ns_i(i);
+  }
   
   xyz_out << at_tot << endl;
   xyz_out << "Atoms. Timestep (ps): " << t_ << endl;

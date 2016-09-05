@@ -91,11 +91,11 @@ BDStepSAM::BDStepSAM(shared_ptr<BaseSystem> _sys, shared_ptr<Constants> _consts,
                bool diff, bool force)
 :BaseBDStep(_sys, _consts, diff, force)
 {
-  for (int i = 0; i < _sys_->get_n(); i++)
-  {
-    transDiffConsts_[i] = _sys_->get_dtransi(i);
-    rotDiffConsts_[i] = _sys_->get_droti(i);
-  }
+//  for (int i = 0; i < _sys_->get_n(); i++)
+//  {
+//    transDiffConsts_[i] = _sys_->get_dtransi(i);
+//    rotDiffConsts_[i] = _sys_->get_droti(i);
+//  }
   
   random_device rd;
   randGen_ = mt19937(rd());
@@ -127,24 +127,24 @@ BDRunSAM::BDRunSAM(shared_ptr<Solver> _solv, shared_ptr<GradSolver> _gradSolv,
 _solver_(_solv), _gradSolv_(_gradSolv)
 {
   _physCalc_ = make_shared<PhysCalcSAM>(_solv, _gradSolv, outfname);
-  
   _stepper_ = make_shared<BDStepSAM> (_solver_->get_sys(),
                                    _solver_->get_consts(), diff, force);
 }
 
 void BDRunSAM::run(string xyzfile, string statfile, int nSCF)
 {
-  int i(0), scf(2), WRITEFREQ(200);
+  int i(0), scf(2), WRITEFREQ(20);
   bool term(false);
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
   stats.open(statfile, fstream::in | fstream::out | fstream::app);
-  
+
   while (i < maxIter_ and !term)
   {
     if ((i % WRITEFREQ) == 0 )
     {
       _stepper_->get_system()->write_to_xyz(xyz_out);
+      cout << "This is step " << i << endl;
       if (i != 0)  _physCalc_->print_all();
     }
     

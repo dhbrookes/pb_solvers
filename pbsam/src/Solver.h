@@ -47,7 +47,7 @@ protected:
   
   vector<shared_ptr<FMatrix> >      _F_;
   shared_ptr<TMatrix>               _T_;
-  shared_ptr<SystemSAM>                _sys_;
+  shared_ptr<SystemSAM>             _sys_;
   shared_ptr<SHCalc>                _shCalc_;
   shared_ptr<BesselCalc>            _bCalc_;
   shared_ptr<Constants>             _consts_;
@@ -84,6 +84,8 @@ public:
          int p, vector<shared_ptr<IEMatrix> > imats,
          vector<shared_ptr<HMatrix > > h_spol,
          vector<shared_ptr<FMatrix > > f_spol);
+  
+  Solver(shared_ptr<Solver> solvin);
   
   // run an iteration and return convergence value
   double iter(int t);
@@ -169,7 +171,7 @@ protected:
   
   vector<vector<shared_ptr<GradCmplxMolMat> > > gradT_A_; // pre-computed part
   
-  shared_ptr<SystemSAM>                _sys_;
+  shared_ptr<SystemSAM>             _sys_;
   shared_ptr<SHCalc>                _shCalc_;
   shared_ptr<BesselCalc>            _bCalc_;
   shared_ptr<ExpansionConstants>    _expConsts_;
@@ -198,6 +200,8 @@ public:
              shared_ptr<ExpansionConstants> _expConst, int p,
              bool no_pre_sh=false);
   
+  GradSolver(shared_ptr<GradSolver>);
+  
   void solve(double tol, int maxiter);
   
   void pre_compute_gradT_A();
@@ -205,7 +209,7 @@ public:
   void update_HF(vector<shared_ptr<FMatrix> > F,
                  vector<shared_ptr<HMatrix> > H)
   {
-    for (int i=0; i<Ns_tot_; i++)
+    for (int i=0; i<_sys_->get_n(); i++)
     {
       _F_[i] = F[i];
       _H_[i] = H[i];
