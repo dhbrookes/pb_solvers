@@ -37,7 +37,7 @@ void EnergyCalcSAM::calc_all_energy(vector<shared_ptr<HMatrix> > H,
   for (int i = 0; i < H.size(); i++)
   {
     (*omega_)[i] = calc_energy(H[i], LHN[i]);
-    cout << "Molecule energy " << i << " : " << get_ei(i) << endl;
+  //cout << "Molecule energy " << i << " : " << get_ei(i) << endl;
   }
 }
 
@@ -82,8 +82,8 @@ void ForceCalcSAM::calc_all_f(vector<shared_ptr<HMatrix> > H,
   {
     forces_[i].resize(ks_[i]);
     calc_fI(i, H[i], LHN[i], dH[i][i], dLHN[i][i]);
-    cout << "This is f i " << i << ": " << get_forcei(i).x() << " " <<
-    get_forcei(i).y() << " " << get_forcei(i).z() << " " << endl;
+  //cout << "This is f i " << i << ": " << get_forcei(i).x() << " " <<
+  //get_forcei(i).y() << " " << get_forcei(i).z() << " " << endl;
   }
 }
 
