@@ -131,6 +131,10 @@ public:
   
   cmplx get_sh(Pt p, int n, int m);
   
+  void clear_sh()
+  {
+    map_.clear();
+  }
 //  MyMatrix<cmplx> get_full_sh(Pt p) { return map_[p]; }
   
 //  bool is_calculated(Pt p) { return map_.find(p) != map_.end(); }

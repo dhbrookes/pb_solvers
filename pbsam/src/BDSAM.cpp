@@ -133,7 +133,7 @@ _solver_(_solv), _gradSolv_(_gradSolv)
 
 void BDRunSAM::run(string xyzfile, string statfile, int nSCF)
 {
-  int i(0), scf(2), WRITEFREQ(20);
+  int i(0), scf(2), WRITEFREQ(1);
   bool term(false);
   ofstream xyz_out, stats;
   xyz_out.open(xyzfile);
@@ -141,21 +141,48 @@ void BDRunSAM::run(string xyzfile, string statfile, int nSCF)
 
   while (i < maxIter_ and !term)
   {
-    if ((i % WRITEFREQ) == 0 )
-    {
-      _stepper_->get_system()->write_to_xyz(xyz_out);
-      cout << "This is step " << i << endl;
-      if (i != 0)  _physCalc_->print_all();
-    }
-    
     _solver_->reset_all();
     if (nSCF != 0) scf = nSCF;
+    
+//    for (int I = 0; I < _solver_->get_sys()->get_n(); I++)
+//    {
+//      cout << "Before solve Molecule " << I << endl;
+//      for (int k = 0; k < _solver_->get_sys()->get_Ns_i(I); k++)
+//      {
+//        _solver_->get_all_H()[I]->print_kmat(k);
+//      }
+//    }
 
     _solver_->solve(prec_, scf);
+//    for (int I = 0; I < _solver_->get_sys()->get_n(); I++)
+//    {
+//      cout << "Molecule " << I << endl;
+//      for (int k = 0; k < _solver_->get_sys()->get_Ns_i(I); k++)
+//      {
+//        _solver_->get_all_H()[I]->print_kmat(k);
+//      }
+//    }
+//    _solver_->get_all_H()[0]->print_kmat(0);
     _gradSolv_->update_HF(_solver_->get_all_F(), _solver_->get_all_H());
     _gradSolv_->solve(prec_, scf);
     _physCalc_->calc_force();
     _physCalc_->calc_torque();
+    
+    
+    if ((i % WRITEFREQ) == 0 )
+    {
+      _stepper_->get_system()->write_to_xyz(xyz_out);
+      cout << "This is step " << i << endl;
+      for (int i = 0; i<_stepper_->get_system()->get_n(); i++)
+      {
+//      cout << _stepper_->get_system()->get_cogi(i).x() <<", "<< _stepper_->get_system()->get_cogi(i).y() << ", " << _stepper_->get_system()->get_cogi(i).z() <<  endl;
+      cout << "This is force " <<  _physCalc_->get_forcei(i).x() <<", "<< _physCalc_->get_forcei(i).y() << ", " << _physCalc_->get_forcei(i).z() <<  endl;
+      }
+      
+//      if (i != 0)
+        _physCalc_->print_all();
+    }
+    
     _stepper_->bd_update(_physCalc_->get_F(), _physCalc_->get_Tau());
     
     if (_terminator_->is_terminated(_stepper_->get_system()))

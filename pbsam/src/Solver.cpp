@@ -265,7 +265,6 @@ void Solver::precalc_sh_numeric()
           else if (_T_->is_analytic(I, k, I, l)) continue;
           else
           {
-
             exp_pts = _sys_->get_gdpt_expij(I, l);
             for (int h = 0; h < exp_pts.size(); h++)
             {
@@ -277,6 +276,19 @@ void Solver::precalc_sh_numeric()
         }
     }
   }
+}
+
+void Solver::set_H_F(vector<shared_ptr<HMatrix > > h_spol,
+                     vector<shared_ptr<FMatrix > > f_spol)
+{
+  int molt;
+  for (int I = 0; I < _sys_->get_n(); I++)
+  {
+    molt = _sys_->get_moli(I)->get_type();
+    _H_[I]->set_all_mats(h_spol[molt]);
+    _F_[I]->set_all_mats(f_spol[molt]);
+  }
+  
 }
 
 double Solver::calc_converge_H(int I, int k, bool inner)
@@ -514,25 +526,26 @@ void Solver::reset_all()
 {
   for (int I = 0; I < _sys_->get_n(); I++)
   {
+    _E_[I]->calc_vals(_sys_->get_moli(I), _shCalc_,
+                      _consts_->get_dielectric_prot());
+    _LE_[I]->calc_vals(_sys_->get_moli(I), _shCalc_,
+                       _consts_->get_dielectric_prot());
     for (int k = 0; k < _sys_->get_Ns_i(I); k++)
     {
-      _E_[I]->reset_mat(k);
-      _LE_[I]->reset_mat(k);
       _LF_[I]->reset_mat(k);
       _LH_[I]->reset_mat(k);
       _LHN_[I]->reset_mat(k);
       _XF_[I]->reset_mat(k);
       _XH_[I]->reset_mat(k);
-      _H_[I]->reset_mat(k);
-      _F_[I]->reset_mat(k);
+//      _H_[I]->reset_mat(k);
+//      _F_[I]->reset_mat(k);
       _prevH_[I]->reset_mat(k);
       _outerH_[I]->reset_mat(k);
       _rotH_[I]->reset_mat(k);
     }
-    _IE_[I]->reset_mat();
   }
   
-  _precalcSH_ = make_shared<PreCalcSH>();
+  _precalcSH_->clear_sh();
   precalc_sh_lf_lh();
   precalc_sh_numeric();
 }

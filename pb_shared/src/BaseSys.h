@@ -160,6 +160,8 @@ public:
   Pt get_posijreal(int i, int j)
   {return molecules_[i]->get_posj_realspace(j);}
   
+  virtual Pt get_cogi(int i) const      {return Pt();}
+  
   shared_ptr<BaseMolecule> get_moli(int i)    { return molecules_[i]; }
   const string get_typei(int i) const {return molecules_[i]->get_move_type();}
   const double get_droti(int i) const {return molecules_[i]->get_drot();}

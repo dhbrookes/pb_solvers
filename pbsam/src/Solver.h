@@ -68,8 +68,6 @@ protected:
   
   void iter_innerH(int I, int k);
   
-  
-  
 public:
   //Used primarily for testing
   Solver(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
@@ -106,9 +104,13 @@ public:
   // pre-calculate spherical harmonics for numeric re-expansion
   void precalc_sh_numeric();
   
+  void set_H_F(vector<shared_ptr<HMatrix > > h_spol,
+               vector<shared_ptr<FMatrix > > f_spol);
+  
   void update_LHN_all();
   
   vector<shared_ptr<HMatrix> > get_all_H() {return _H_;}
+  vector<shared_ptr<EMatrix> > get_all_E() {return _E_;}
   vector<shared_ptr<FMatrix> > get_all_F() {return _F_;}
   MyMatrix<cmplx> getH_ik(int I, int k) {return _H_[I]->get_mat_k(k);}
   MyMatrix<cmplx> getF_ik(int I, int k) {return _F_[I]->get_mat_k(k);}

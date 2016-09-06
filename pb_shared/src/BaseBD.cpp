@@ -231,6 +231,7 @@ void BaseBDStep::bd_update(shared_ptr<vector<Pt> > _F,
     if ( rotDiffConsts_[i] != 0) indi_rot_update(i, _tau->operator[](i));
   }
   update_sys_time(dt_);
+  cout << "This is dt :" << dt_ << " and " << _sys_->get_time() << endl;
 }
 
 BaseBDRun::BaseBDRun(shared_ptr<BaseTerminate> _terminator, string outfname,
