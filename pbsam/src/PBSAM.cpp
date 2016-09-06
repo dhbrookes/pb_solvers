@@ -440,7 +440,7 @@ void PBSAM::run_dynamics()
     _syst_->reset_positions( _setp_->get_trajn_xyz(traj));
     _syst_->set_time(0.0);
     solv->set_H_F(h_spol_, f_spol_);
-    BDRunSAM dynamic_run( solv, gsolv, term_conds, outfile, false, true);
+    BDRunSAM dynamic_run( solv, gsolv, term_conds, outfile);
     dynamic_run.run(xyztraj, statfile);
     cout << "Done with trajectory " << traj << endl;
     if (traj==0)

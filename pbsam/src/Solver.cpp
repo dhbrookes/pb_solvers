@@ -537,8 +537,6 @@ void Solver::reset_all()
       _LHN_[I]->reset_mat(k);
       _XF_[I]->reset_mat(k);
       _XH_[I]->reset_mat(k);
-//      _H_[I]->reset_mat(k);
-//      _F_[I]->reset_mat(k);
       _prevH_[I]->reset_mat(k);
       _outerH_[I]->reset_mat(k);
       _rotH_[I]->reset_mat(k);

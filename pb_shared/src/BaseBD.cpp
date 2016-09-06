@@ -162,6 +162,7 @@ void BaseBDStep::indi_trans_update(int i, Pt fi)
   double kT = _consts_->get_kbt();
   double ikT_int = 1 / Constants::convert_j_to_int(kT);
   double coeff = transDiffConsts_[i] * dt_ * ikT_int;
+
   Pt dr = Pt(fi * coeff);
   Pt rand, new_pt;
   bool accept = false;
@@ -231,7 +232,6 @@ void BaseBDStep::bd_update(shared_ptr<vector<Pt> > _F,
     if ( rotDiffConsts_[i] != 0) indi_rot_update(i, _tau->operator[](i));
   }
   update_sys_time(dt_);
-  cout << "This is dt :" << dt_ << " and " << _sys_->get_time() << endl;
 }
 
 BaseBDRun::BaseBDRun(shared_ptr<BaseTerminate> _terminator, string outfname,
