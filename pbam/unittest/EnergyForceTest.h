@@ -9,7 +9,7 @@
 #ifndef EnergyForceTest_h
 #define EnergyForceTest_h
 
-#include "EnergyForce.h"
+#include "PhysCalcAM.h"
 
 class EnForTest
 {
@@ -18,8 +18,8 @@ class EnForTest
   void RunEnForTest()
   {
     shared_ptr<Constants> const_ = make_shared<Constants>();
-    vector< MoleculeAM > mol_;
-    vector< MoleculeAM > mol_sing_;
+    vector< shared_ptr<BaseMolecule> > mol_;
+    vector< shared_ptr<BaseMolecule> > mol_sing_;
     
     mol_.clear( );
     Pt pos[2]     = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
@@ -36,12 +36,12 @@ class EnForTest
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0] = cg[molInd]; posCharges[0] = cgPos[molInd]; vdW[0] = 0.0;
       
-      MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM> ("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
-      MoleculeAM molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      shared_ptr<MoleculeAM> molSing = make_shared<MoleculeAM> ( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
     
@@ -50,15 +50,15 @@ class EnForTest
     shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
     shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
     shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-    shared_ptr<System> sys = make_shared<System>(mol_sing_);
+    shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
     
     shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                           const_, vals);
     ASolvTest->solve_A( 1E-12 );
     ASolvTest->solve_gradA(1E-12);
 
-    ForceCalc FoTest(ASolvTest);
-    TorqueCalc TorTest(ASolvTest);
+    ForceCalcAM FoTest(ASolvTest);
+    TorqueCalcAM TorTest(ASolvTest);
     
     FoTest.calc_force();
     TorTest.calc_tau();

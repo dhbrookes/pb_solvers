@@ -1,0 +1,17 @@
+runtype energyforce
+runname gly_0.05M.out
+
+units kT
+salt 0.05
+temp 298.15
+idiel 4
+sdiel 80
+
+attypes 1
+type 1 2
+tolsp 2.0
+#surf 1 gly.vert
+#imat 1 gly_cgsph
+#exp 1 gly_cg
+pqr 1 gly_cg.pqr
+xyz 1 zero.xyz

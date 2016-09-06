@@ -9,7 +9,7 @@
 #ifndef EnergyForceUnitTest_h
 #define EnergyForceUnitTest_h
 
-#include "PhysCalc.h"
+#include "PhysCalcSAM.h"
 #include "Solver.h"
 
 /*
@@ -37,7 +37,7 @@ TEST_F(EnergyUTest, two_mol_test)
                                          pqr.get_cg_radii()));
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -79,13 +79,13 @@ TEST_F(EnergyUTest, two_mol_test)
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
   
-  EnergyCalc ecal;
-  vector<double> ene;
-  ene = ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
-  
+  EnergyCalcSAM ecal (sys->get_n());
+  shared_ptr<vector<double> > ene;
+  ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
+  ene = ecal.get_omega();
   for (int i = 0; i < sys->get_n(); i++)
   {
-    EXPECT_NEAR(ene[i]/-0.00042138573, 1.0, preclim);
+    EXPECT_NEAR((*ene)[i]/-0.00042138573, 1.0, preclim);
   }
 }
 
@@ -104,7 +104,7 @@ TEST_F(EnergyUTest, three_mol_test)
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
   mols[2]->translate(Pt(-22.28786458,-14.35779167,-15.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -146,14 +146,14 @@ TEST_F(EnergyUTest, three_mol_test)
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
   
-  EnergyCalc ecal;
-  vector<double> ene;
-  ene = ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
-  
+  EnergyCalcSAM ecal (sys->get_n());
+  shared_ptr<vector<double> > ene;
+  ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
+  ene = ecal.get_omega();
   for (int i = 0; i < sys->get_n(); i++)
   {
 //    cout << "This is energy "<< setprecision(9) << ene[i] << endl;
-    EXPECT_NEAR(ene[i]/en3[i], 1.0, preclim);
+    EXPECT_NEAR((*ene)[i]/en3[i], 1.0, preclim);
   }
 }
 
@@ -196,7 +196,7 @@ TEST_F(ForceUTest, two_mol_test)
                                          pqr.get_cg_radii()));
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -243,20 +243,20 @@ TEST_F(ForceUTest, two_mol_test)
   
   GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
                        solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
+                       solvTest.get_IE(), solvTest.get_interpol_list(),
+                       solvTest.get_precalc_sh(), _expcons, pol);
   gsolvTest.solve(1e-16, 100);
   
-  auto focal = make_shared<ForceCalc> (nmol, sys->get_all_Ik(),
+  auto focal = make_shared<ForceCalcSAM> (nmol, sys->get_all_Ik(),
                                        cst->get_dielectric_water(),
                                        SHCalcTest, BesselCal);
   focal->calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
                     gsolvTest.get_gradH_all(),gsolvTest.get_gradLHN_all());
-  vector<Pt> fo = focal->get_all_f();
+  shared_ptr<vector<Pt> > fo = focal->get_F();
   
-  TorqueCalc tocal(nmol);
+  TorqueCalcSAM tocal(nmol);
   tocal.calc_all_tau(sys, focal);
-  vector<Pt> to = tocal.get_all_tau();
+  shared_ptr<vector<Pt> > to = tocal.get_tau();
   
   for (int i = 0; i < sys->get_n(); i++)
   {
@@ -267,8 +267,8 @@ TEST_F(ForceUTest, two_mol_test)
       {
         if (k==0)
         {
-          EXPECT_NEAR(for2[i][d]/fo[i].get_cart(d), 1.0, preclim);
-          EXPECT_NEAR(tor2[i][d]/to[i].get_cart(d), 1.0, preclim);
+          EXPECT_NEAR(for2[i][d]/(*fo)[i].get_cart(d), 1.0, preclim);
+          EXPECT_NEAR(tor2[i][d]/(*to)[i].get_cart(d), 1.0, preclim);
         }
         if (fabs(forIk3[i][k][d]) > 1e-11)
           EXPECT_NEAR(forIk2[i][k][d]/fI[k].get_cart(d), 1.0, preclim);
@@ -292,7 +292,7 @@ TEST_F(ForceUTest, three_mol_test)
   mols[0]->translate(Pt(-9.28786458,-7.35779167,-0.15628125), 1e14);
   mols[1]->translate(Pt(3.71213542,-0.35779167,14.84371875), 1e14);
   mols[2]->translate(Pt(-22.28786458,-14.35779167,-15.15628125), 1e14);
-  auto sys = make_shared<System>(mols);
+  auto sys = make_shared<SystemSAM>(mols);
   auto cst = make_shared<Constants> ();
   cst->set_dielectric_water(80);
   cst->set_dielectric_prot(4);
@@ -336,20 +336,20 @@ TEST_F(ForceUTest, three_mol_test)
 
   GradSolver gsolvTest(sys, cst, SHCalcTest, BesselCal, solvTest.get_T(),
                        solvTest.get_all_F(), solvTest.get_all_H(),
-                       solvTest.get_IE(),
-                       solvTest.get_interpol_list(), _expcons, pol);
+                       solvTest.get_IE(), solvTest.get_interpol_list(),
+                       solvTest.get_precalc_sh(), _expcons, pol);
   gsolvTest.solve(1e-16, 85);
 
-  auto focal = make_shared<ForceCalc> (nmol, sys->get_all_Ik(),
+  auto focal = make_shared<ForceCalcSAM> (nmol, sys->get_all_Ik(),
                                        cst->get_dielectric_water(),
                                        SHCalcTest, BesselCal);
   focal->calc_all_f(solvTest.get_all_H(), solvTest.get_all_LHN(),
                    gsolvTest.get_gradH_all(),gsolvTest.get_gradLHN_all());
-  vector<Pt> fo = focal->get_all_f();
+  shared_ptr<vector<Pt> > fo = focal->get_F();
   
-  TorqueCalc tocal(nmol);
+  TorqueCalcSAM tocal(nmol);
   tocal.calc_all_tau(sys, focal);
-  vector<Pt> to = tocal.get_all_tau();
+  shared_ptr<vector<Pt> > to = tocal.get_tau();
 
   for (int i = 0; i < sys->get_n(); i++)
   {
@@ -360,8 +360,8 @@ TEST_F(ForceUTest, three_mol_test)
       {
         if (k==0)
         {
-          EXPECT_NEAR(for3[i][d]/fo[i].get_cart(d), 1.0, preclim);
-          EXPECT_NEAR(tor3[i][d]/to[i].get_cart(d), 1.0, preclim);
+          EXPECT_NEAR(for3[i][d]/(*fo)[i].get_cart(d), 1.0, preclim);
+          EXPECT_NEAR(tor3[i][d]/(*to)[i].get_cart(d), 1.0, preclim);
         }
         if (fabs(forIk3[i][k][d]) > 1e-11)
           EXPECT_NEAR(forIk3[i][k][d]/fI[k].get_cart(d), 1.0, preclim);

@@ -53,6 +53,36 @@ void BaseMolecule::set_Dtr_Drot(string type)
   if (type == "stat") drot_ = 0.0;
 }
 
+
+void BaseMolecule::write_pqr(string outfile)
+{
+  int j, k, ct(0);
+  ofstream pqr_out;
+  char pqrlin[400];
+  
+  pqr_out.open( outfile );
+  
+  for ( j = 0; j < get_nc(); j++)
+  {
+    sprintf(pqrlin,"%6d  C   CHG A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,0,
+            get_posj_realspace(j).x(),
+            get_posj_realspace(j).y(),
+            get_posj_realspace(j).z(),
+            get_qj(j), get_radj(j));
+    pqr_out << "ATOM " << pqrlin << endl;
+    ct++;
+  }
+  for (k = 0; k < get_ns(); k++)
+  {
+    sprintf(pqrlin,"%6d  X   CEN A%-5d    %8.3f%8.3f%8.3f %7.4f %7.4f",ct,0,
+            get_centerk(k).x(), get_centerk(k).y(),
+            get_centerk(k).z(), 0.0, get_ak(k));
+    pqr_out << "ATOM " << pqrlin << endl;
+    ct++;
+  }
+  pqr_out.close();
+}
+
 BaseSystem::BaseSystem(vector<shared_ptr<BaseMolecule> > mols,
                    double cutoff,
                double boxlength)

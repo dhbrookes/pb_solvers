@@ -9,7 +9,7 @@
 #ifndef SystemUnitTest_h
 #define SystemUnitTest_h
 
-#include "System.h"
+#include "SystemSAM.h"
 
 class CGSphereUTest : public ::testing::Test
 {
@@ -157,7 +157,7 @@ TEST_F(MoleculeSAMUTest, checkCreateCen)
                       pqr.get_atom_pts(), pqr.get_radii(),
                       surf_file.get_sp(), surf_file.get_np(), 2.5));
   
-  System sys( mols);
+  SystemSAM sys( mols);
   sys.write_to_pqr(test_dir_loc + "test_cged_out.pqr");
 }
 
@@ -336,13 +336,13 @@ TEST_F(SystemUTest, checkOverlap)
   
   try
   {
-    System sys( mol_ );
+    SystemSAM sys( mol_ );
     FAIL();
   }
   catch( const OverlappingMoleculeException& err )
   {
     // check exception
-    string error_exp = "MoleculeSAM 0 & 1 overlap";
+    string error_exp = "Molecule 0 & 1 overlap";
     EXPECT_EQ(string(err.what()), error_exp);
   }
 }
@@ -365,13 +365,13 @@ TEST_F(SystemUTest, checkPBCOverlap)
   
   try
   {
-    System sys( mol_, 80.0, 40.0 );
+    SystemSAM sys( mol_, 80.0, 40.0 );
     FAIL();
   }
   catch( const OverlappingMoleculeException& err )
   {
     // check exception
-    string error_exp = "MoleculeSAM 0 & 1 overlap";
+    string error_exp = "Molecule 0 & 1 overlap";
     EXPECT_EQ(string(err.what()), error_exp);
   }
 }
@@ -394,7 +394,7 @@ TEST_F(SystemUTest, checkVals)
     mol_[molInd]->translate(mol_[molInd]->get_cog()*(-1)+pos[molInd], 1e48);
   }
   
-  System sys( mol_, cutoff );
+  SystemSAM sys( mol_, cutoff );
   EXPECT_NEAR( 5.18149787, sys.get_lambda(), preclim);
   EXPECT_NEAR( cutoff/sys.get_cutoff(), 1.0, preclim);
 
@@ -481,7 +481,7 @@ TEST_F(SystemUTest, changeCutoff)
     mol_[molInd]->translate(mol_[molInd]->get_cog()*(-1)+pos[molInd], 1e48);
   }
   
-  System sys( mol_, cutoff, boxl );
+  SystemSAM sys( mol_, cutoff, boxl );
   EXPECT_NEAR( (boxl/2.0)/sys.get_cutoff(), 1.0, preclim);
 }
 
@@ -507,7 +507,7 @@ TEST_F(SystemUTest, PBCcheck)
     mol_[molInd]->translate(mol_[molInd]->get_cog()*(-1)+pos[molInd], 1e48);
   }
 
-  System sys( mol_, cutoff, boxl );
+  SystemSAM sys( mol_, cutoff, boxl );
   Pt dis01 = sys.get_pbc_dist_vec_base(sys.get_cogi(0), sys.get_cogi(1));
   EXPECT_NEAR( -70/dis01.x(), 1.0, preclim);
   EXPECT_NEAR( -70/dis01.y(), 1.0, preclim);

@@ -36,18 +36,17 @@ public:
     BCalcT.TestBesselCalc();
     cout << "Complete Bessel calculation test" << endl;
     
-//    ASolverTest ASolvT;
-//    ASolvT.RunASolverTest();
-//    ASolvT.RunASolverTest2();
-//    cout << "Complete ASolv test" << endl;
+    ASolverTest ASolvT;
+    ASolvT.RunASolverTest();
+    cout << "Complete ASolv test" << endl;
     
     ConstantsTest ConT;
     ConT.TestConstants();
     cout << "Complete Constant test" << endl;
     
-//    EnForTest EnForT;
-//    EnForT.RunEnForTest();
-//    cout << "Complete Energy and Force test" << endl;
+    EnForTest EnForT;
+    EnForT.RunEnForTest();
+    cout << "Complete Energy and Force test" << endl;
 
     ReExpTest ReR;
     ReR.runReExTest();

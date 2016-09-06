@@ -9,7 +9,7 @@
 #ifndef EnergyForceUnitTest_h
 #define EnergyForceUnitTest_h
 
-#include "EnergyForce.h"
+#include "PhysCalcAM.h"
 
 class EnergyForceUTest : public ::testing::Test
 {
@@ -19,8 +19,9 @@ protected :
   
   int vals_;
   shared_ptr<Constants> const_;
-  vector< MoleculeAM > mol3_; vector< MoleculeAM > mol_;
-  vector< MoleculeAM > mol_sing_;
+//  vector< MoleculeAM > mol3_;
+  vector< shared_ptr<BaseMolecule> > mol_, mol3_, mol_sing_;
+//  vector< MoleculeAM > mol_sing_;
   
   virtual void SetUp()
   {
@@ -37,12 +38,12 @@ protected :
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0]=cg[molInd]; vdW[0]=0.0; posCharges[0]=cgPos[molInd];
       
-      MoleculeAM molNew( "stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]=2.0; vdW[0] = 0.0; posCharges[0] = cgPosSi[molInd];
-      MoleculeAM molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      shared_ptr<MoleculeAM> molSing = make_shared<MoleculeAM>( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -73,7 +74,7 @@ TEST_F(EnergyForceUTest, checkEnergy)
     vector<double> vdW(M); vector<Pt> posCharges(M);
     charges[0] = 2.0; vdW[0] = 0.0; posCharges[0] = pos[molInd];
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -82,19 +83,19 @@ TEST_F(EnergyForceUTest, checkEnergy)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000);
   
-  EnergyCalc EnTest(ASolvTest);
+  EnergyCalcAM EnTest(ASolvTest);
   EnTest.calc_energy();
 
-  EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.00117849131, preclim);
-  EXPECT_NEAR( EnTest.get_omega_i_int(1), 0.00199508625, preclim);
-  EXPECT_NEAR( EnTest.get_omega_i_int(2), 0.00199508625, preclim);
+  EXPECT_NEAR( EnTest.get_ei(0), 0.00117849131, preclim);
+  EXPECT_NEAR( EnTest.get_ei(1), 0.00199508625, preclim);
+  EXPECT_NEAR( EnTest.get_ei(2), 0.00199508625, preclim);
 }
 
 TEST_F(EnergyForceUTest, checkEnergySing)
@@ -105,17 +106,17 @@ TEST_F(EnergyForceUTest, checkEnergySing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000);
   
-  EnergyCalc EnTest(ASolvTest);
+  EnergyCalcAM EnTest(ASolvTest);
   EnTest.calc_energy();
   for (int n=0; n<mol_sing_.size(); n++)
-    EXPECT_NEAR( EnTest.get_omega_i_int(0), 0.000573165, preclim);
+    EXPECT_NEAR( EnTest.get_ei(0), 0.000573165, preclim);
 }
 
 TEST_F(EnergyForceUTest, checkEnergySingMulti)
@@ -131,7 +132,7 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }
@@ -140,17 +141,17 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000);
   
-  EnergyCalc EnTest(ASolvTest);
+  EnergyCalcAM EnTest(ASolvTest);
   EnTest.calc_energy();
   for (int n=0; n<mol_.size(); n++)
-    EXPECT_NEAR( EnTest.get_omega_i_int(n)/MolTripSing[n], 1, preclim);
+    EXPECT_NEAR( EnTest.get_ei(n)/MolTripSing[n], 1, preclim);
 }
 
 TEST_F(EnergyForceUTest, checkForce)
@@ -166,7 +167,7 @@ TEST_F(EnergyForceUTest, checkForce)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -175,19 +176,19 @@ TEST_F(EnergyForceUTest, checkForce)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-40, 1000); ASolvTest->solve_gradA(1E-40, 1000);
-  ForceCalc FoTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
   FoTest.calc_force();
   for (int n=0; n<mol_.size(); n++)
   {
-    EXPECT_NEAR( FoTest.get_fi(0)[n]/Mol1F[n], 1.0, preclim);
-    EXPECT_NEAR( FoTest.get_fi(1)[n]/Mol2F[n], 1.0, preclim);
-    EXPECT_NEAR( FoTest.get_fi(2)[n]/Mol3F[n], 1.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(0)[n]/Mol1F[n], 1.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(1)[n]/Mol2F[n], 1.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(2)[n]/Mol3F[n], 1.0, preclim);
   }
 }
 
@@ -199,20 +200,20 @@ TEST_F(EnergyForceUTest, checkForceSing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-40, 1000); ASolvTest->solve_gradA(1E-40, 1000);
   
-  ForceCalc FoTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
   FoTest.calc_force();
   for (int n=0; n<2; n++)
   {
-    EXPECT_NEAR( FoTest.get_fi(n)[0], 0.0, preclim);
-    EXPECT_NEAR( FoTest.get_fi(n)[1], 0.0, preclim);
-    EXPECT_NEAR( FoTest.get_fi(n)[2]/(-3.61229952e-05*pow(-1.0,n)), 1, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(n)[0], 0.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(n)[1], 0.0, preclim);
+    EXPECT_NEAR( FoTest.get_forcei(n)[2]/(-3.61229952e-05*pow(-1.0,n)), 1, preclim);
   }
 }
 
@@ -229,7 +230,7 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -238,25 +239,25 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-30, 1000); ASolvTest->solve_gradA(1E-30, 1000);
 
-  EnergyCalc EnTest(ASolvTest);
-  ForceCalc FoTest(ASolvTest);
+  EnergyCalcAM EnTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
   EnTest.calc_energy();
   FoTest.calc_force();
-  EXPECT_NEAR( EnTest.get_omega_i_int(0)/0.0845178625, 1, preclim);
-  EXPECT_NEAR( FoTest.get_fi(0)[0], 0, 1e-12);
-  EXPECT_NEAR( FoTest.get_fi(0)[1], 0, 1e-12);
-  EXPECT_NEAR( FoTest.get_fi(0)[2]/0.0239714121, 1.0, preclim);
-  EXPECT_NEAR( EnTest.get_omega_i_int(1)/0.0845178625, 1, preclim);
-  EXPECT_NEAR( FoTest.get_fi(1)[0], 0, 1e-12);
-  EXPECT_NEAR( FoTest.get_fi(1)[1], 0, 1e-12);
-  EXPECT_NEAR( FoTest.get_fi(1)[2]/-0.0239714121, 1.0, preclim);
+  EXPECT_NEAR( EnTest.get_ei(0)/0.0845178625, 1, preclim);
+  EXPECT_NEAR( FoTest.get_forcei(0)[0], 0, 1e-12);
+  EXPECT_NEAR( FoTest.get_forcei(0)[1], 0, 1e-12);
+  EXPECT_NEAR( FoTest.get_forcei(0)[2]/0.0239714121, 1.0, preclim);
+  EXPECT_NEAR( EnTest.get_ei(1)/0.0845178625, 1, preclim);
+  EXPECT_NEAR( FoTest.get_forcei(1)[0], 0, 1e-12);
+  EXPECT_NEAR( FoTest.get_forcei(1)[1], 0, 1e-12);
+  EXPECT_NEAR( FoTest.get_forcei(1)[2]/-0.0239714121, 1.0, preclim);
 
 }
 
@@ -273,7 +274,7 @@ TEST_F(EnergyForceUTest, checkTorque)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -282,15 +283,15 @@ TEST_F(EnergyForceUTest, checkTorque)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals, 
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000); ASolvTest->solve_gradA(1E-20, 1000);
   
-  ForceCalc FoTest(ASolvTest);
-  TorqueCalc TorTest( ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
+  TorqueCalcAM TorTest( ASolvTest);
   FoTest.calc_force();
   TorTest.calc_tau();
   for (int n=0; n<3; n++)
@@ -309,15 +310,15 @@ TEST_F(EnergyForceUTest, checkTorqueSing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000); ASolvTest->solve_gradA(1E-20, 1000);
   
-  ForceCalc FoTest(ASolvTest);
-  TorqueCalc TorTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
+  TorqueCalcAM TorTest(ASolvTest);
   FoTest.calc_force();
   TorTest.calc_tau();
   for (int n=0; n<mol_.size(); n++)
@@ -338,7 +339,7 @@ TEST_F(EnergyForceUTest, checkTorqueSing3)
     charges[1]=2.0; vdW[1]=0.0; posCharges[1]=pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0.0; posCharges[2]=pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_sing_.push_back( molNew );
   }
@@ -348,15 +349,15 @@ TEST_F(EnergyForceUTest, checkTorqueSing3)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   shared_ptr<ASolver> ASolvTest = make_shared<ASolver> (bCalcu, SHCalcu, sys,
                                                         const_, vals,
                                                         sys->get_cutoff());
   ASolvTest->solve_A(1E-20, 1000); ASolvTest->solve_gradA(1E-20, 1000);
   
-  ForceCalc FoTest(ASolvTest);
-  TorqueCalc TorTest(ASolvTest);
+  ForceCalcAM FoTest(ASolvTest);
+  TorqueCalcAM TorTest(ASolvTest);
   FoTest.calc_force();
   TorTest.calc_tau();
   EXPECT_NEAR( TorTest.get_taui(0)[0], 0.0, 1e-14);

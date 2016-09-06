@@ -10,7 +10,7 @@
 
 ASolver::ASolver(shared_ptr<BesselCalc> _bcalc,
                   shared_ptr<SHCalc> _shCalc,
-                  shared_ptr<System> _sys,
+                  shared_ptr<SystemAM> _sys,
                   shared_ptr<Constants> _consts,
                   const int p,
                   double polz_cutoff)
@@ -23,24 +23,23 @@ _shCalc_(_shCalc),
 polz_cutoff_(polz_cutoff),
 _consts_(_consts)
 {
-  _gamma_ = make_shared<VecOfVecs<double>::type>(N_, MyVector<double> (p_));
-  _delta_ = make_shared<VecOfVecs<double>::type>(N_, MyVector<double> (p_));
-  _E_ = make_shared<vector<MyExpansion> >(N_, MyExpansion(p_));
+  _gamma_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, p_));
+  _delta_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, p_));
+  _E_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
+  _A_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
+  _prevA_ = make_shared<VecOfMats<cmplx>::type>(N_,MyMatrix<cmplx>(p_,2*p_+1));
+  _L_ = make_shared<VecOfMats<cmplx>::type>(N_, MyMatrix<cmplx> (p_, 2*p_+1));
+  _gradL_ = make_shared<MyVector<VecOfMats<cmplx>::type > >(N_);
   
-  _A_ = make_shared<vector<MyExpansion> >(N_, MyExpansion(p_));
-  _prevA_ = make_shared<vector<MyExpansion> >(N_,MyExpansion(p_));
-  
-  _L_ = make_shared<vector<MyExpansion> >(N_, MyExpansion(p_));
-  _gradL_ = make_shared<MyVector<MyGradExpansion> >(N_, MyGradExpansion(p_));
-  
-  _gradT_A_ = make_shared<MyMatrix<MyGradExpansion > > (N_, N_);
-  _gradA_ = make_shared<MyMatrix<MyGradExpansion> > (N_, N_);
-  _prevGradA_ = make_shared<MyMatrix<MyGradExpansion > > (N_, N_);
+  _gradT_A_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
+  _gradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
+  _prevGradA_ = make_shared<MyMatrix<VecOfMats<cmplx>::type > > (N_, N_);
   
   _allSh_ = make_shared<vector<vector<MyMatrix<cmplx> > > > (N_,
                                       vector<MyMatrix<cmplx>> (N_));
+  _sys_ = _sys;
   
-  reset_all(_sys);
+  reset_all();
 }
 
 // perform many iterations of the solution for A
@@ -70,6 +69,7 @@ void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
   int j, ct;
   
   pre_compute_gradT_A();
+
   for ( j = 0; j < N_; j++ )
   {
     ct = 0;
@@ -78,49 +78,50 @@ void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
     {
       grad_iter(j);
       cng = calc_grad_change(j);
-      
 //      if ((ct%5==0))
 //        cout << "Grad dv " << j << " ct " << ct << " and cng " << cng<< endl;
       if (ct > MAX_POL_ROUNDS) break;
       ct++;
     }
   }
-  
   calc_gradL();
 }
 
 
 void ASolver::copy_to_prevA()
 {
-  for (int i=0; i < _A_->size(); i++)
+  for (int i=0; i < _A_->get_nrows(); i++)
   {
-    _prevA_->operator[](i) = _A_->operator[](i);
+    _prevA_->set_val(i, _A_->operator[](i));
   }
 }
 
 void ASolver::copy_to_prevGradA(int j)
 {
-  for (int i=0; i < _A_->size(); i++)
+  for (int i=0; i < _A_->get_nrows(); i++)
   {
+//    for (int j = 0; j < _gradA_->get_ncols(); j++)
+//    {
+//      _prevGradA_->set_val(i, j, _gradA_->operator()(i, j));
       for (int n = 0; n < p_; n++)
       {
-        for (int m = 0; m <= n; m++)
+        for (int m = -n; m < n+1; m++)
         {
           set_prev_dAdr_ni(i, j, n, m, get_dAdr_ni(i, j, n, m));
           set_prev_dAdtheta_ni(i, j, n, m, get_dAdtheta_ni(i, j, n, m));
           set_prev_dAdphi_ni(i, j, n, m, get_dAdphi_ni(i, j, n, m));
         }
       }
+//    }
   }
 }
 
 // one iteration of numerical solution for A (eq 51 in Lotan 2006)
 void ASolver::iter()
 {
-  Pt v;
   int i, j;
-  MyExpansion Z, zj(p_), ai;
-
+  MyMatrix<cmplx> Z, zj, ai;
+  Pt v;
   copy_to_prevA();
   bool polz(false), interact(false), prev(true);
   for (i = 0; i <  N_; i++)
@@ -128,7 +129,7 @@ void ASolver::iter()
     interact = false;
     polz = false;
     // relevant re-expansions:
-    Z = MyExpansion (p_);
+    Z = MyMatrix<cmplx> (p_, 2*p_ + 1);
     for (j = 0; j < N_; j++)
     {
       if (i == j) continue;
@@ -137,10 +138,10 @@ void ASolver::iter()
       if (! _sys_->less_than_cutoff(v) ) continue; // cutoff for interaction
 
       _sys_->add_J_to_interact_I(i,j);
-      interact = true;
+      interact = true; //TODO: figure out the polarization
       if (v.norm() > polz_cutoff_+_sys_->get_ai(i)+_sys_->get_ai(j)) continue;
-
-      re_expandA(i, j, zj, prev);
+      
+      zj = re_expandA(i, j, prev);
       Z += zj;
       _sys_->add_J_to_pol_I(i,j);
       polz = true;
@@ -148,33 +149,34 @@ void ASolver::iter()
     
     if (polz)
     {
-      ai = Z * _delta_->operator[](i);
+      ai = _delta_->operator[](i) * Z;
       ai += _E_->operator[](i);
- 
-      _A_->operator[](i) = ai * _gamma_->operator[](i);
+      ai = _gamma_->operator[](i) * ai;
+      _A_->set_val(i, ai);
     } else if (interact)
     {
-      _A_->operator[](i) = _E_->operator[](i) * _gamma_->operator[](i);
+      _A_->set_val(i, _gamma_->operator[](i) * _E_->operator[](i));
     }
   }
 }
 
 // one iteration of numerical solution for grad(A) WRT j (eq 53 in Lotan 2006)
-// Solving for grad_j(A^(i)) by iterating through T^(i,k)
-// relevant re-expansions (g prefix means gradient):
 void ASolver::grad_iter(int j)
 {
-  Pt v;
+  // Solving for grad_j(A^(i)) by iterating through T^(i,k)
   int i, k;
-  MyGradExpansion add(p_);
-  
+
+  // relevant re-expansions (g prefix means gradient):
+  VecOfMats<cmplx>::type aij, add;
+  MyMatrix<cmplx> gamma_delta;
+  Pt v;
   bool prev(true), polz(false), interact(false); //want to re-expand previous
   copy_to_prevGradA(j);
   for (i = 0; i < N_; i++) // MoleculeAM of interest
   {
     interact = false;
     polz = false;
-    MyGradExpansion aij(p_);
+    aij = VecOfMats<cmplx>::type (3, MyMatrix<cmplx>(p_,2*p_+1));
     aij = get_gradT_Aij(j, i);
     
     for (k = 0; k < N_; k++) // other MoleculeAMs
@@ -184,7 +186,7 @@ void ASolver::grad_iter(int j)
       if (! _sys_->less_than_cutoff(v) ) continue;
       interact = true;
       if (v.norm() > polz_cutoff_+_sys_->get_ai(i)+_sys_->get_ai(j)) continue;
-      re_expand_gradA(i, k, j, add, prev); // T^(i,k) * grad_j A^(k)
+      add = re_expand_gradA(i, k, j, prev); // T^(i,k) * grad_j A^(k)
       aij += add;
       polz = true;
     }
@@ -194,6 +196,11 @@ void ASolver::grad_iter(int j)
       MyVector<double> gamma_delta = (_gamma_->operator[](i).
                                       mult(_delta_->operator[](i)));
       _gradA_->set_val(i, j, aij * gamma_delta);
+   // gamma_delta = _gamma_->operator[](i) * _delta_->operator[](i);
+   // aij.set_val(0, gamma_delta * aij[0]);
+   // aij.set_val(1, gamma_delta * aij[1]);
+   // aij.set_val(2, gamma_delta * aij[2]);
+   // _gradA_->set_val(i, j, aij);
     }
   }
 }
@@ -270,17 +277,19 @@ void ASolver::pre_compute_gradT_A()
   // Solving for grad_j(A^(i)) by iterating through T^(i,k)
   int i, j, k, dim;
   Pt vij, vik;
-  double sign;
+  cmplx sign;
   
   // relevant re-expansions (g prefix means gradient):
-  MyGradExpansion gjT_Ai(p_), gTA(p_);
+  VecOfMats<cmplx>::type gjT_Ai, gTA;
   bool prev = true; //want to re-expand previous
   for (i = 0; i < N_; i++) // MoleculeAM of interest
   {
     for (j = 0; j < N_; j++) // gradient of interest
     {
       vij = _sys_->get_pbc_dist_vec(i, j);
-      gjT_Ai = MyGradExpansion(p_);
+      gjT_Ai = VecOfMats<cmplx>::type (3);
+      for (dim = 0; dim < 3; dim++)
+        gjT_Ai.set_val(dim, MyMatrix<cmplx>(p_,2*p_+1));
       
       if (j == i)
       {
@@ -296,33 +305,43 @@ void ASolver::pre_compute_gradT_A()
           gTA *= sign;
 //          for (dim = 0; dim < 3; dim++)
 //            gTA.set_dim(dim, gTA.get_dim(dim)*sign);
+//        gTA  = re_expandA_gradT( i, k, prev); // grad_i T^(i,k) A^(k)
+//        
+//        sign = (( k < i ) ? cmplx(-1.0, 0.0) : cmplx(1.0, 0.0));
+//        for (dim = 0; dim < 3; dim++)
+//          gTA[dim] = sign*gTA[dim];
         
           gjT_Ai += gTA;
         }
       }
       else if ((j > i) && (_sys_->less_than_cutoff(vij) ))
-        re_expandA_gradT( j, i, gjT_Ai, prev); // grad_j T^(j,i) A^(i)
+        gjT_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(j,i) A^(i)
       else if (_sys_->less_than_cutoff(vij) )
       {
         re_expandA_gradT( j, i, gjT_Ai, prev); // grad_j T^(j,i) A^(i)
         gjT_Ai *= -1.0;
 //        for (dim = 0; dim < 3; dim++)
 //          gjT_Ai.set_dim(dim, gjT_Ai.get_dim(dim)*-1.0);
+//      gjT_Ai = re_expandA_gradT( j, i, prev); // grad_j T^(j,i) A^(i)
+//      for (dim = 0; dim < 3; dim++)
+//        gjT_Ai[dim] = cmplx(-1.0, 0.0)*gjT_Ai[dim];
       }
+
       _gradT_A_->set_val(i, j, gjT_Ai);
     }
   }
 }
 
 //re-expand element j of A with element (i, j) of T and return results
-void ASolver::re_expandA(int i, int j, MyExpansion& z, bool prev)
+MyMatrix<cmplx> ASolver::re_expandA(int i, int j, bool prev)
 {
-  MyExpansion x1(p_), x2(p_);
+  MyMatrix<cmplx> x1, x2, z;
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE, whichA=BASE;
   
-  expand_RX(  i, j, x1, whichR, whichA, prev);
-  expand_SX(  i, j, x1, x2, whichS);
-  expand_RHX( i, j, x2, z, whichRH);
+  x1 = expand_RX(  i, j, whichR, whichA, prev);
+  x2 = expand_SX(  i, j, x1, whichS);
+  z  = expand_RHX( i, j, x2, whichRH);
+  return z;
 }
 
 
@@ -330,8 +349,8 @@ void ASolver::re_expandA(int i, int j, MyExpansion& z, bool prev)
  re-expand element j of grad(A) with element (i, j) of T
  will re-expand the gradient with respect to the wrt input
  */
-void ASolver::re_expand_gradA(int i, int j, int wrt,
-                              MyGradExpansion & Z, bool prev)
+VecOfMats<cmplx>::type ASolver::re_expand_gradA(int i, int j,
+                                                int wrt, bool prev)
 {
 //  MyMatrix<cmplx> x1, x2, z;
   MyExpansion x1(p_), x2(p_); //, z(p_);
@@ -357,6 +376,31 @@ void ASolver::re_expand_gradA(int i, int j, int wrt,
   expand_RHX( i, j, x2, x1, whichRH);
   Z.set_dim(2, x1);
 
+//MyMatrix<cmplx> x1, x2, z;
+//VecOfMats<cmplx>::type Z (3);
+//WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE, whichA=DDR;
+
+//// first dA/dR
+//x1 = expand_RX(  i, j, whichR, whichA, prev, wrt);
+//x2 = expand_SX(  i, j, x1, whichS);
+//z  = expand_RHX( i, j, x2, whichRH);
+//Z.set_val(0, z);
+
+//// dA/dtheta:
+//whichA = DDTHETA;
+//x1 = expand_RX(  i, j, whichR, whichA, prev, wrt);
+//x2 = expand_SX(  i, j, x1, whichS);
+//z  = expand_RHX( i, j, x2, whichRH);
+//Z.set_val(1, z);
+//
+//// dA/dphiL
+//whichA = DDPHI;
+//x1 = expand_RX(  i, j, whichR, whichA, prev, wrt);
+//x2 = expand_SX(  i, j, x1, whichS);
+//z  = expand_RHX( i, j, x2, whichRH);
+//Z.set_val(2, z);
+  
+  return Z;
 }
 
 /*
@@ -364,10 +408,10 @@ void ASolver::re_expand_gradA(int i, int j, int wrt,
  as a 3-element vector containing the results for the re-expansion
  with each element of grad(T)
  */
-void ASolver::re_expandA_gradT(int i, int j, MyGradExpansion &Z, bool prev)
+VecOfMats<cmplx>::type ASolver::re_expandA_gradT(int i, int j, bool prev)
 {
-//  MyMatrix<cmplx> x1, x2, z, z1, z2;
-  MyExpansion x1(p_), x2(p_), z(p_), z1(p_), z2(p_);
+  MyMatrix<cmplx> x1, x2, z, z1, z2;
+  VecOfMats<cmplx>::type Z (3); // output vector
   WhichReEx whichR=BASE, whichS=BASE, whichRH=BASE, whichA=BASE;
   
   int lowI = i; int hiJ = j;
@@ -375,18 +419,18 @@ void ASolver::re_expandA_gradT(int i, int j, MyGradExpansion &Z, bool prev)
   
   // first find with respect to dT/dr:
   whichS = DDR;
-  expand_RX( i, j, x1, whichR, whichA, prev);
-  expand_SX( i, j, x1, x2, whichS);
-  expand_RHX( i, j, x2, z, whichRH);
-  Z.set_dim(0, z);
+  x1 = expand_RX( i, j, whichR, whichA, prev);
+  x2 = expand_SX( i, j, x1, whichS);
+  z = expand_RHX( i, j, x2, whichRH);
+  Z.set_val(0, z);
   
   // dT/dtheta:
   whichR=BASE;
   whichS = BASE;
   whichRH = DDTHETA;
-  expand_RX( i, j, x1, whichR, whichA, prev);
-  expand_SX( i, j, x1, x2, whichS);
-  expand_RHX( i, j, x2, z1, whichRH);
+  x1 = expand_RX(  i, j, whichR, whichA, prev);
+  x2 = expand_SX(  i, j, x1, whichS);
+  z1 = expand_RHX( i, j, x2, whichRH);
 
   whichRH = BASE;
   whichR = DDTHETA;
@@ -395,31 +439,41 @@ void ASolver::re_expandA_gradT(int i, int j, MyGradExpansion &Z, bool prev)
   expand_RHX( i, j, x2, z2, whichRH);
   z = z1 + z2;
   Z.set_dim(1, z);
+//x1 = expand_RX(  i, j, whichR, whichA, prev);
+//x2 = expand_SX(  i, j, x1, whichS);
+//z2 = expand_RHX( i, j, x2, whichRH);
+//Z.set_val(1, z1 + z2);
   
   // dT/dphi:
   whichR = BASE;
   whichRH = DDPHI;
-  expand_RX( i, j, x1, whichR, whichA, prev);
-  expand_SX( i, j, x1, x2, whichS);
-  expand_RHX( i, j, x2, z1, whichRH);
+  x1 = expand_RX(  i, j, whichR, whichA, prev);
+  x2 = expand_SX(  i, j, x1, whichS);
+  z1 = expand_RHX( i, j, x2, whichRH);
   
   whichRH = BASE;
   whichR = DDPHI;
+
   expand_RX( i, j, x1, whichR, whichA, prev);
   expand_SX( i, j, x1, x2, whichS);
   expand_RHX( i, j, x2, z2, whichRH);
   z = z1 + z2;
   Z.set_dim(2, z);
+//x1 = expand_RX(  i, j, whichR, whichA, prev);
+//x2 = expand_SX(  i, j, x1, whichS);
+//z2 = expand_RHX( i, j, x2, whichRH);
+//Z.set_val(2, z1 + z2);
 
   Z = conv_to_cart(Z, i, j);
+  return Z;
 }
 
-
 // perform first part of T*A and return results
-void ASolver::expand_RX(int i, int j, MyExpansion& x1, WhichReEx whichR,
+MyMatrix<cmplx> ASolver::expand_RX(int i, int j, WhichReEx whichR,
                                    WhichReEx whichA, bool prev, int wrt)
 {
   int n, m, s, lowI, hiJ;
+  MyMatrix<cmplx> x1(p_, 2*p_ + 1);
   cmplx inter, rval, aval;
   
   lowI = i; hiJ = j;
@@ -428,7 +482,7 @@ void ASolver::expand_RX(int i, int j, MyExpansion& x1, WhichReEx whichR,
   // fill X1:
   for (n = 0; n < p_; n++)
   {
-    for (m = 0; m <= n; m++)
+    for (m = -n; m <= n; m++)
     {
       inter  = 0;
       if (T_(lowI,hiJ).isSingular())
@@ -438,15 +492,17 @@ void ASolver::expand_RX(int i, int j, MyExpansion& x1, WhichReEx whichR,
         {
           aval = which_aval(whichA, prev, j, n, -m, wrt);
           if (vec.theta() > M_PI/2.0)
-            x1.set_val_cmplx(n, m, (n%2 == 0 ? aval : -aval));
-          else x1.set_val_cmplx(n, m, which_aval(whichA, prev, j, n, m, wrt));
+            x1.set_val(n, m+p_, (n%2 == 0 ? aval : -aval));
+          else x1.set_val(n, m+p_, which_aval(whichA, prev, j, n, m, wrt));
         } else if (whichR == DDTHETA)
         {
-          expand_dRdtheta_sing(i, j, vec.theta(), x1, false);
+          x1 = expand_dRdtheta_sing(i, j, vec.theta(), false);
+          return x1;
         }
         else
         {
-          expand_dRdphi_sing(i, j, vec.theta(), x1, false);
+          x1 = expand_dRdphi_sing(i, j, vec.theta(), false);
+          return x1;
         }
       } else
       {
@@ -458,30 +514,33 @@ void ASolver::expand_RX(int i, int j, MyExpansion& x1, WhichReEx whichR,
             rval = T_(lowI, hiJ).get_dr_dtheta_val(n, m, s);
           else
             rval = T_(lowI, hiJ).get_rval(n, m, s);
-          
+
           aval = which_aval(whichA, prev, j, n, s, wrt);
+
           inter += rval * aval;
         } // end s
-        x1.set_val_cmplx(n, m, inter);
+        x1.set_val(n, m+p_, inter);
       }
     } // end m
   } //end n
+  return x1;
 }
 
 // perform second part of T*A and return results
-void ASolver::expand_SX(int i, int j, MyExpansion x1, MyExpansion& x2,
-                        WhichReEx whichS)
+MyMatrix<cmplx> ASolver::expand_SX(int i, int j, MyMatrix<cmplx> x1,
+                                   WhichReEx whichS)
 {
   int n, m, l, lowI, hiJ;
   cmplx inter, sval;
+  MyMatrix<cmplx> x2(p_, 2*p_ + 1);
   
   lowI = i; hiJ = j;
   if ( i > j )  { lowI = j; hiJ  = i; }
-  
+
   // fill x2:
   for (n = 0; n < p_; n++)
   {
-    for (m = 0; m <= n; m++)
+    for (m = -n; m <= n; m++)
     {
       inter  = 0;
       for (l = abs(m); l < p_; l++)
@@ -496,29 +555,29 @@ void ASolver::expand_SX(int i, int j, MyExpansion x1, MyExpansion& x2,
           if (whichS == DDR) sval = T_(lowI, hiJ).get_dsdr_val(l, n, m);
           else sval = T_(lowI, hiJ).get_sval(l, n, m);
         }
-        inter += sval * x1.get_cmplx(l, m);
+        inter += sval * x1(l, m+p_);
       } // end l
-      x2.set_val_cmplx(n, m, inter);
+      x2.set_val(n, m+p_, inter);
     } // end m
   } //end n
+  return x2;
 }
 
-
 // perform third part of T*A and return results
-void ASolver::expand_RHX(int i, int j, MyExpansion x2, MyExpansion &z,
-                         WhichReEx whichRH)
+MyMatrix<cmplx> ASolver::expand_RHX(int i, int j, MyMatrix<cmplx> x2,
+                                    WhichReEx whichRH)
 {
   int n, m, s, lowI, hiJ;
   cmplx inter, rval;
-  double mult;
+  MyMatrix<cmplx> z(p_, 2*p_ + 1);
   
   lowI = i; hiJ = j;
   if ( i > j )  { lowI = j; hiJ  = i; }
-  
+
   //fill zj:
   for (n = 0; n < p_; n++)
   {
-    for (m = 0; m <= n; m++)
+    for (m = -n; m <= n; m++)
     {
       inter  = 0;
       if (T_(lowI,hiJ).isSingular())
@@ -527,17 +586,18 @@ void ASolver::expand_RHX(int i, int j, MyExpansion x2, MyExpansion &z,
         if (whichRH == BASE)
         {
           if (vec.theta() > M_PI/2.0)
-            z.set_val_cmplx(n, m, (n%2 == 0 ? x2.get_cmplx(n,-m) :
-                                   -x2.get_cmplx(n,-m)));
+            z.set_val(n, m+p_, (n%2 == 0 ? x2(n,-m+p_) : -x2(n,-m+p_)));
           else
-            z.set_val_cmplx(n, m, x2.get_cmplx(n,m));
+            z.set_val(n, m+p_, x2(n,m+p_));
         } else if (whichRH == DDTHETA)
         {
-          expand_dRdtheta_sing(lowI, hiJ, vec.theta(), x2, z, true);
+          z = expand_dRdtheta_sing(lowI, hiJ, vec.theta(), x2, true);
+          return z;
         }
         else
         {
-          expand_dRdphi_sing(lowI, hiJ, vec.theta(), x2, z, true);
+          z = expand_dRdphi_sing(lowI, hiJ, vec.theta(), x2, true);
+          return z;
         }
       } else
       {
@@ -549,48 +609,47 @@ void ASolver::expand_RHX(int i, int j, MyExpansion x2, MyExpansion &z,
             rval = T_(lowI, hiJ).get_dr_dtheta_val(n, s, m);
           else
             rval = T_(lowI, hiJ).get_rval(n, s, m);
-          
-          mult = (s==0) ? 1.0 : 2.0;
-          inter += conj(rval) * x2.get_cmplx(n, s);
+
+          inter += conj(rval) * x2(n, s+p_);
         } // end s
-        z.set_val_cmplx(n, m, inter);
+        z.set_val(n, m+p_, inter);
       }
     } // end m
   } //end n
+  return z;
 }
 
-void ASolver::expand_dRdtheta_sing(int i, int j, double theta,
-                                   MyExpansion& mat, bool ham)
+MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i,int j,double theta,bool ham)
 {
   int lowI, hiJ;
   lowI = i; hiJ = j;
   if ( i > j )  { lowI = j; hiJ  = i; }
-  expand_dRdtheta_sing(lowI, hiJ, theta, _prevA_->operator[](j), mat, ham);
+  return expand_dRdtheta_sing(lowI, hiJ, theta, _prevA_->operator[](j), ham);
 }
 
-void ASolver::expand_dRdtheta_sing(int i, int j, double theta,
-                                   MyExpansion mat_in,
-                                   MyExpansion& mat_out, bool ham)
+MyMatrix<cmplx> ASolver::expand_dRdtheta_sing(int i, int j, double theta,
+                                              MyMatrix<cmplx> mat, bool ham)
 {
-  mat_out.set_val_cmplx( 0, 0, cmplx(0.0, 0.0));
-  double rPre(0), rPre1(0), rPre2(0), rec = (ham ? -1.0 : 1.0);
+  MyMatrix<cmplx> x(p_, 2*p_ + 1);
+  x.set_val( 0, p_, cmplx(0.0, 0.0));
+  double rec = (ham ? -1.0 : 1.0);
   
   if (theta < M_PI/2)
   {
     for (int n = 1; n < p_; n++)
     {
-      rPre = T_(i,j).get_prefac_dR_val(n,0,1); // m = 0
-      mat_out.set_val_cmplx(n, 0, rec* cmplx(2.0*rPre*mat_in(n, 1, REAL),0.0));
-      
+      x.set_val( n, p_, rec*cmplx(2.0*T_(i,j).get_prefac_dR_val(n,0,1)*
+                              mat(n, 1+p_).real(), 0.0)); // m = 0
       for (int m = 1; m < n; m++)
       {
-        rPre1 = T_(i,j).get_prefac_dR_val(n,m,0);
-        rPre2 = T_(i,j).get_prefac_dR_val(n,m,1);
-        mat_out.set_val_cmplx(n, m, rec*rPre1*mat_in.get_cmplx(n,m-1)
-                              + rec*rPre2*mat_in.get_cmplx(n,m+1));
+        x.set_val( n, m+p_, rec*T_(i,j).get_prefac_dR_val(n,m,0)*mat(n,m-1+p_)
+                   + rec*T_(i,j).get_prefac_dR_val(n,m,1)*mat(n,m+1+p_));
+        x.set_val( n,-m+p_, conj( x( n, m+p_)));
       }
-      rPre = T_(i,j).get_prefac_dR_val( n, n, 0);
-      mat_out.set_val_cmplx(n, n, rec*rPre*mat_in.get_cmplx(n, n-1));
+      
+      x.set_val(n, n+p_,
+                rec*T_(i,j).get_prefac_dR_val( n, n, 0)*mat(n, n-1+p_));
+      x.set_val(n,-n+p_, conj( x( n, n+p_)));
     }
   }
   else
@@ -598,53 +657,55 @@ void ASolver::expand_dRdtheta_sing(int i, int j, double theta,
     double s = -1.0;
     for (int n = 1; n < p_; n++, s = -s)
     {
-      rPre = T_(i,j).get_prefac_dR_val(n,0,1);
-      mat_out.set_val_cmplx(n, 0,
-                            rec*cmplx(2.0*s*rPre*mat_in.
-                                      get_cmplx(n,1).real(), 0.0)); // m = 0
+      x.set_val( n, p_, rec*cmplx(2.0*s*T_(i,j).get_prefac_dR_val(n,0,1)*
+                              mat(n,1+p_).real(), 0.0)); // m = 0
       for (int m = 1; m < n; m++)
       {
-        rPre1 = T_(i,j).get_prefac_dR_val(n,m,0);
-        rPre2 = T_(i,j).get_prefac_dR_val(n,m,1);
-        mat_out.set_val_cmplx( n, m, rec*s*(rPre1*mat_in.get_cmplx(n,-m+1)
-                                            + rPre2*mat_in.get_cmplx(n,-m-1)));
-      }
-      rPre = T_(i,j).get_prefac_dR_val(n,n,0);
-      mat_out.set_val_cmplx(n, n,rec*s*rPre*mat_in.get_cmplx(n,-n+1));
+        x.set_val( n, m+p_, rec*s*
+                  (T_(i,j).get_prefac_dR_val(n,m,0)*mat(n,-m+1+p_)
+                   + T_(i,j).get_prefac_dR_val(n,m,1)*mat(n,-m-1+p_)));
+        x.set_val( n,-m+p_, conj( x( n, m+p_)));
+    }
+    
+      x.set_val(n, n+p_,rec*s*T_(i,j).get_prefac_dR_val(n, n,0)*mat(n,-n+1+p_));
+      x.set_val(n,-n+p_, conj( x( n, n+p_)));
     }
   }
+  return x;
 }
 
-void ASolver::expand_dRdphi_sing(int i, int j, double theta,
-                                 MyExpansion& mout, bool ham)
+MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i,int j,double theta,bool ham)
 {
   int lowI, hiJ;
   lowI = i; hiJ = j;
   if ( i > j )  { lowI = j; hiJ  = i; }
-  expand_dRdphi_sing(lowI, hiJ, theta, _prevA_->operator[](j), mout, ham);
+  return expand_dRdphi_sing(lowI, hiJ, theta, _prevA_->operator[](j), ham);
 }
 
-void ASolver::expand_dRdphi_sing(int i, int j, double theta, MyExpansion mat_in,
-                                 MyExpansion&mat_out, bool ham)
+MyMatrix<cmplx> ASolver::expand_dRdphi_sing(int i, int j, double theta,
+                                            MyMatrix<cmplx> mat, bool ham)
 {
-  mat_out.set_val_cmplx( 0, 0, cmplx(0.0, 0.0));
-  double rPre(0), rPre1(0), rPre2(0), rec = ((ham&&(theta<M_PI/2)) ? -1.0:1.0);
+  MyMatrix<cmplx> x(p_, 2*p_ + 1);
+  x.set_val( 0, p_, cmplx(0.0, 0.0));
+  double rec = ((ham && (theta < M_PI/2)) ? -1.0 : 1.0);
   
   if (theta < M_PI/2)
   {
     for (int n = 1; n < p_; n++)
     {
-      rPre = T_(i,j).get_prefac_dR_val(n,0,1);
-      mat_out.set_val_cmplx(n,0,rec*cmplx(2.0*rPre*mat_in(n, 1, IMAG),0.0));
+      x.set_val( n, p_, rec*cmplx(2.0*T_(i,j).get_prefac_dR_val(n,0,1)*
+                             mat(n, 1+p_).imag(),0.0));
       for (int m = 1; m < n; m++)
       {
-        rPre1 = T_(i,j).get_prefac_dR_val(n,m,0);
-        rPre2 = T_(i,j).get_prefac_dR_val(n,m,1);
-        mat_out.set_val_cmplx(n,m,rec*(cmplx(0.,rPre1)*mat_in.get_cmplx(n,m-1)-
-                                      cmplx(0.,rPre2)*mat_in.get_cmplx(n,m+1)));
+        x.set_val(n, m+p_,
+            rec*(cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m, 0))*mat(n,m-1+p_)
+                - cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat(n,m+1+p_)));
+        x.set_val( n, -m+p_, conj(x(n, m+p_)));
       }
-      rPre = T_(i,j).get_prefac_dR_val(n,n,0);
-      mat_out.set_val_cmplx(n,n,rec*cmplx(0.,rPre)*mat_in.get_cmplx(n,n-1));
+        
+      x.set_val( n, n+p_,
+            rec*cmplx( 0.0, T_(i,j).get_prefac_dR_val(n,n,0))*mat(n,n-1+p_));
+      x.set_val( n, -n+p_, conj(x( n, n+p_)));
     }
   }
   else
@@ -652,23 +713,22 @@ void ASolver::expand_dRdphi_sing(int i, int j, double theta, MyExpansion mat_in,
     double s = 1.0;
     for (int n = 1; n < p_; n++, s = -s)
     {
-      rPre = T_(i,j).get_prefac_dR_val(n,0,1);
-      mat_out.set_val_cmplx(n, 0, rec*cmplx(2.0*s*rPre*
-                                            mat_in.get_cmplx(n,1).imag(),0.0));
+      x.set_val(n, p_, rec*cmplx(2.0*s*T_(i,j).get_prefac_dR_val(n,0,1)*
+                             mat(n,1+p_).imag(),0.0));
       for (int m = 1; m < n; m++)
       {
-        rPre1 = T_(i,j).get_prefac_dR_val(n,m,0);
-        rPre2 = T_(i,j).get_prefac_dR_val(n,m,1);
-        mat_out.set_val_cmplx(n,m,rec*s*(-cmplx(0.,rPre1)
-                                         *mat_in.get_cmplx(n,-m+1)
-                                         +cmplx(0.,rPre2)
-                                         *mat_in.get_cmplx(n,-m-1)));
+        x.set_val(n, m+p_,
+            rec*s*(-cmplx(0.0,T_(i,j).get_prefac_dR_val(n,m,0))*mat(n,-m+1+p_)
+            + cmplx(0.0, T_(i,j).get_prefac_dR_val(n,m,1))*mat(n,-m-1+p_)));
+        x.set_val( n, -m+p_, conj(x(n, m+p_)));
       }
-      rPre = T_(i,j).get_prefac_dR_val(n,n,0);
-      mat_out.set_val_cmplx(n,n,rec*cmplx(0.0,-s*rPre)
-                            *mat_in.get_cmplx(n,-n+1));
+        
+      x.set_val( n,  n+p_, rec*cmplx(0.0,
+                          -s*T_(i,j).get_prefac_dR_val(n,n,0))*mat(n,-n+1+p_));
+      x.set_val( n, -n+p_, conj(x(n, n+p_)));
     }
   }
+  return x;
 }
 
 /*
@@ -716,16 +776,16 @@ void ASolver::pre_compute_all_sh()
 /*
  Calculate the SH matrix for every charge in a MoleculeAM
  */
-vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(MoleculeAM mol)
+vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(shared_ptr<BaseMolecule> mol)
 {
   vector<MyMatrix<cmplx> > vout;
-  vout.reserve(mol.get_m());
+  vout.reserve(mol->get_m());
   int j;
   double theta, phi;
   Pt pt;
-  for (j = 0; j < mol.get_m(); j++)
+  for (j = 0; j < mol->get_m(); j++)
   {
-    pt = mol.get_posj(j);
+    pt = mol->get_posj(j);
     theta = pt.theta();
     phi = pt.phi();
     _shCalc_->calc_sh(theta, phi);
@@ -737,7 +797,7 @@ vector<MyMatrix<cmplx> > ASolver::calc_mol_sh(MoleculeAM mol)
 /*
  Equation 19--Lotan 2006 page 544
  */
-double ASolver::calc_indi_gamma(int i, int n)
+cmplx ASolver::calc_indi_gamma(int i, int n)
 {
   double g;  // output
   double kap = _consts_->get_kappa();
@@ -752,13 +812,13 @@ double ASolver::calc_indi_gamma(int i, int n)
   double n_dub = (double) n;
   g = (2.0*n_dub + 1.0) * exp(kap*ai);
   g = g / (((2.0*n_dub + 1.0)*bk2) + (n_dub*bk1*((eps_p / eps_s) - 1.0)));
-  return g;
+  return cmplx(g, 0);
 }
 
 /*
  Equation 20--Lotan 2006 page 544
  */
-double ASolver::calc_indi_delta(int i, int n)
+cmplx ASolver::calc_indi_delta(int i, int n)
 {
   double d;  // output
   double kap = _consts_->get_kappa();
@@ -774,7 +834,7 @@ double ASolver::calc_indi_delta(int i, int n)
   d = (kap*kap*ai*ai) * (bi2 / (2.0*n_dub + 3.0));
   d += (n_dub * bi1 * (1.0 - (eps_p / eps_s)));
   d *= (ai * pow(ai/a_avg_, 2.0*n_dub)) / (2.0*n_dub+1.0);
-  return d;
+  return cmplx(d, 0);
 }
 
 /*
@@ -812,7 +872,9 @@ void ASolver::compute_gamma()
   for (i = 0; i < N_; i++)
   {
     for(j = 0; j < p_; j++)
-      _gamma_->operator[](i).set_val(j, calc_indi_gamma(i, j));
+    {
+      _gamma_->operator[](i).set_val(j, j, calc_indi_gamma(i, j));
+    }
   }
 }
 
@@ -828,7 +890,9 @@ void ASolver::compute_delta()
   for (i = 0; i < N_; i++)
   {
     for(j = 0; j < p_; j++)
-      _delta_->operator[](i).set_val(j, calc_indi_delta(i, j));
+    {
+      _delta_->operator[](i).set_val(j, j, calc_indi_delta(i, j));
+    }
   }
 }
 
@@ -845,8 +909,10 @@ void ASolver::compute_E()
     // m goes from -n to n so you need 2*p columns:
     for (n = 0; n < p_; n++)
     {
-      for (m = 0; m <= n; m++)
-        _E_->operator[](i).set_val_cmplx(n, m, calc_indi_e(i, n, m));
+      for (m = -n; m <= n; m++)
+      {
+        _E_->operator[](i).set_val(n, m + p_, calc_indi_e(i, n, m));
+      }
     }
   }
 }
@@ -886,21 +952,30 @@ void ASolver::init_A()
   MyMatrix<cmplx> ai;
   for (i = 0; i < N_; i++)
   {
-    _A_->operator[](i) = _E_->operator[](i) * _gamma_->operator[](i);
+    // m goes from -n to n so you need 2*p columns:
+    ai = MyMatrix<cmplx>(p_, 2*p_ + 1);
+    ai = _gamma_->operator[](i) * _E_->operator[](i);
+    _A_->set_val(i, ai);
   }
 }
 
 // Initialize grad(A) matrix to the zero matrix
 void ASolver::init_gradA()
 {
-  int i, j; //, k;
-//  VecOfMats<cmplx>::type ga_ij;
-//  MyMatrix<cmplx> wrt;
+  int i, j, k;
+  VecOfMats<cmplx>::type ga_ij;
+  MyMatrix<cmplx> wrt;
   for (i = 0; i < N_; i++)
   {
     for (j = 0; j < N_; j++)
     {
-      _gradA_->set_val(i, j, MyGradExpansion(p_));
+      ga_ij = VecOfMats<cmplx>::type (3);
+      for (k = 0; k < 3; k++)
+      {
+        wrt = MyMatrix<cmplx>(p_, 2*p_ + 1);
+        ga_ij.set_val(k, wrt);
+      }
+      _gradA_->set_val(i, j, ga_ij);
     }
   }
 }
@@ -913,17 +988,17 @@ void ASolver::calc_L()
 {
   int i, j;
   Pt v;
-  MyExpansion expand(p_);
+  MyMatrix<cmplx> expand;
   for (i = 0; i < N_; i++)
   {
-    _L_->operator[](i) = MyExpansion (p_);
+    _L_->operator[](i) = MyMatrix<cmplx> (p_, 2*p_+1);
     for (j = 0; j < N_; j++)
     {
       if (j == i) continue;
       v = _sys_->get_pbc_dist_vec(i, j);
       if (! _sys_->less_than_cutoff(v) ) continue;
       
-      re_expandA(i, j, expand);
+      expand = re_expandA(i, j);
       _L_->operator[](i) += expand;
     }
   }
@@ -933,7 +1008,7 @@ void ASolver::calc_gradL()
 {
   int i, k;
   Pt v;
-  MyGradExpansion inner1(p_), inner2(p_);
+  VecOfMats<cmplx>::type inner1, inner2;
   
   for (i = 0; i < N_; i++) // MoleculeAM of interest
   {
@@ -944,7 +1019,7 @@ void ASolver::calc_gradL()
       v = _sys_->get_pbc_dist_vec(i, k);
       if (! _sys_->less_than_cutoff(v) ) continue;
       
-      re_expand_gradA(i, k, i, inner2, false); // T^(i,k) * grad_j A^(k)
+      inner2 = re_expand_gradA(i, k, i, false); // T^(i,k) * grad_j A^(k)
       inner1 += inner2;
     }
     _gradL_->operator[](i) = inner1;
@@ -954,12 +1029,12 @@ void ASolver::calc_gradL()
 /*
  Convert derivatives from spherical to cartesian coords
  */
-MyGradExpansion ASolver::conv_to_cart(MyGradExpansion& dZ, int i, int j)
+VecOfMats<cmplx>::type ASolver::conv_to_cart( VecOfMats<cmplx>::type dZ,
+                                               int i, int j )
 {
-  int n, m, ct(0), lowI(i), hiJ(j);
+  int m, n; int lowI = i; int hiJ = j;
   double the, r, phi;
-  MyGradExpansion Zcart(p_);
-  vector<double> con1(3), con2(3), con3(3);
+  VecOfMats<cmplx>::type Zcart (3); vector<double> con1(3), con2(3), con3(3);
 
   if ( i > j ) { lowI = j; hiJ  = i; }
   
@@ -979,16 +1054,18 @@ MyGradExpansion ASolver::conv_to_cart(MyGradExpansion& dZ, int i, int j)
     con3 = {         cos(the),          -sin(the)/r,                  0.0};
   }
   
-  for(n = 0; n<p_; n++)
-    for(m = 0; m<2*n+1; m++)
+  for (n = 0; n < 3; n++)
+    Zcart[n] = MyMatrix<cmplx> (p_, 2*p_ + 1);
+  
+  for ( n = 0; n < p_; n++ )
+    for ( m = -n; m <= n; m++ )
     {
-      Zcart.set_dimi(0,ct,dZ.get_dimi(0,ct)*con1[0]+dZ.get_dimi(1,ct)*con1[1]
-                     +dZ.get_dimi(2,ct)*con1[2]);
-      Zcart.set_dimi(1,ct,dZ.get_dimi(0,ct)*con2[0]+dZ.get_dimi(1,ct)*con2[1]+
-                    dZ.get_dimi(2,ct)*con2[2]);
-      Zcart.set_dimi(2,ct,dZ.get_dimi(0,ct)*con3[0]+dZ.get_dimi(1,ct)*con3[1]+
-                    dZ.get_dimi(2,ct)*con3[2]);
-      ct++;
+      (&Zcart[0])->set_val( n, m+p_, con1[0]*dZ[0](n, m+p_)
+                        + con1[1]*dZ[1](n, m+p_)+con1[2]*dZ[2](n, m+p_));
+      (&Zcart[1])->set_val( n, m+p_, con2[0]*dZ[0](n, m+p_)
+                           + con2[1]*dZ[1](n, m+p_)+con2[2]*dZ[2](n, m+p_));
+      (&Zcart[2])->set_val( n, m+p_, con3[0]*dZ[0](n, m+p_)
+                           + con3[1]*dZ[1](n, m+p_)+con3[2]*dZ[2](n, m+p_));
     }
   return Zcart;
 }
@@ -1111,30 +1188,32 @@ void ASolver::print_dAi( int i, int j, int p)
 }
 
 
-void ASolver::reset_all(shared_ptr<System> _sys)
+void ASolver::reset_all()
 {
-  _sys_ = _sys;
-  T_  = MyMatrix<ReExpCoeffs>(_sys->get_n(), _sys->get_n());
+  T_  = MyMatrix<ReExpCoeffs>(_sys_->get_n(), _sys_->get_n());
   _reExpConsts_ = make_shared<ReExpCoeffsConstants>(_consts_->get_kappa(),
                                                     _sys_->get_lambda(), p_);
   int n, n1;
   for ( n = 0; n < N_; n++ )
   {
-    _gamma_->operator[](n) = MyVector<double> (p_);
-    _delta_->operator[](n) = MyVector<double> (p_);
-    _E_->operator[](n) = MyExpansion (p_);
-    
-    _A_->operator[](n) = MyExpansion (p_);
-    _prevA_->operator[](n) = MyExpansion (p_);
+    _gamma_->operator[](n) = MyMatrix<cmplx> (p_, p_);
+    _delta_->operator[](n) = MyMatrix<cmplx> (p_, p_);
+    _A_->operator[](n) = MyMatrix<cmplx> (p_, 2*p_+1);
+    _E_->operator[](n) = MyMatrix<cmplx> (p_, 2*p_+1);
+    _prevA_->operator[](n) = MyMatrix<cmplx> (p_, 2*p_+1);
     
     _allSh_->operator[](n) = vector<MyMatrix<cmplx>>
                               (N_, MyMatrix<cmplx> (2*p_, 2*p_));
     
     for ( n1 = 0; n1 < N_; n1++ )
     {
-      _gradT_A_->operator()(n, n1) = MyGradExpansion(p_);
-      _gradA_->operator()(n, n1) = MyGradExpansion(p_);
-      _prevGradA_->operator()(n, n1) = MyGradExpansion(p_);
+      _gradT_A_->operator()(n, n1) = VecOfMats<cmplx>::type
+          (3, MyMatrix<cmplx> (p_, 2*p_+1));
+      _gradA_->operator()(n, n1) = VecOfMats<cmplx>::type
+          (3, MyMatrix<cmplx> (p_, 2*p_+1));
+      _prevGradA_->operator()(n, n1) = VecOfMats<cmplx>::type
+          (3, MyMatrix<cmplx> (p_, 2*p_+1));
+      
     }
   }
   

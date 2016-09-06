@@ -383,14 +383,20 @@ public:
   
   void init_k(int k, shared_ptr<BaseMolecule> mol, shared_ptr<GradFMatrix> dF,
               shared_ptr<SHCalc> shcalc,
-              shared_ptr<ExpansionConstants> _expconst);
+              shared_ptr<PreCalcSH> pre_sh,
+              shared_ptr<ExpansionConstants> _expconst,
+              bool no_pre_sh=false);
   
   void calc_all_vals(shared_ptr<BaseMolecule> mol, vector<int> interpol,
-                     shared_ptr<TMatrix> T, shared_ptr<GradFMatrix> dF);
+                     shared_ptr<TMatrix> T, shared_ptr<GradFMatrix> dF,
+                     shared_ptr<PreCalcSH> pre_sh,
+                     bool no_pre_sh=false);
   
   void calc_val_k(int k, shared_ptr<BaseMolecule> mol, vector<int> interpol,
                   shared_ptr<TMatrix> T,
-                  shared_ptr<GradFMatrix> dF);
+                  shared_ptr<GradFMatrix> dF,
+                  shared_ptr<PreCalcSH> pre_sh,
+                  bool no_pre_sh=false);
 };
 
 /*
@@ -406,13 +412,19 @@ public:
   
   void init_k(int k, shared_ptr<BaseMolecule> mol, shared_ptr<GradHMatrix> dH,
               shared_ptr<SHCalc> shcalc, shared_ptr<BesselCalc> bcalc,
-              shared_ptr<ExpansionConstants> _expconst);
+              shared_ptr<PreCalcSH> pre_sh,
+              shared_ptr<ExpansionConstants> _expconst,
+              bool no_pre_sh=false);
   
   void calc_all_vals(shared_ptr<BaseMolecule> mol, vector<int> interpol,
-                     shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
+                     shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH,
+                     shared_ptr<PreCalcSH> pre_sh,
+                     bool no_pre_sh=false);
   
   void calc_val_k(int k, shared_ptr<BaseMolecule> mol, vector<int> interpol,
-                  shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH);
+                  shared_ptr<TMatrix> T, shared_ptr<GradHMatrix> dH,
+                  shared_ptr<PreCalcSH> pre_sh,
+                  bool no_pre_sh=false);
 };
 
 /*
@@ -423,11 +435,11 @@ class GradLHNMatrix : public GradCmplxMolMat
 public:
   GradLHNMatrix(int I, int wrt, int ns, int p);
   
-  void calc_all_vals(shared_ptr<System> sys, shared_ptr<TMatrix> T,
+  void calc_all_vals(shared_ptr<SystemSAM> sys, shared_ptr<TMatrix> T,
                      vector<shared_ptr<GradCmplxMolMat> > gradT_A,
                      vector<shared_ptr<GradHMatrix> > dH);
   
-  void calc_val_k(int k, shared_ptr<System> sys,
+  void calc_val_k(int k, shared_ptr<SystemSAM> sys,
                   shared_ptr<TMatrix> T,
                   vector<shared_ptr<GradCmplxMolMat> > gradT_A,
                   vector<shared_ptr<GradHMatrix> > dH,

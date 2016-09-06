@@ -43,7 +43,6 @@ protected:
 public:
   
   BaseMolecule()  { }
-//  BaseMoleculeAM(const BaseMoleculeAM& mol);
   
   // no centers or raddi of cg spheres
   BaseMolecule(int type, int type_idx, string movetype, vector<double> qs,
@@ -75,6 +74,8 @@ public:
   Pt get_posj_realspace(int j)          { return pos_[j] + get_cen_j(j); }
   const int get_ns() const              { return Ns_; }
   
+  void write_pqr(string outfile);
+
   // get center for charge j
   virtual Pt get_cen_j(int j) = 0;
   
@@ -82,8 +83,16 @@ public:
   virtual void rotate(Quat qrot) = 0;
   virtual void rotate(MyMatrix<double> rotmat) = 0;
   
-  
   //below are methods only for PBSAM that should be overridden
+  virtual vector<int> get_pol()                 { return vector<int> (); }
+  virtual vector<int> get_act()                 { return vector<int> (); }
+  virtual void clear_inter_pol()                { }
+  virtual void clear_inter_act()                { }
+  virtual void add_J_to_pol(int J)              { }
+  virtual void add_J_to_interact(int J)         { }
+  virtual bool is_J_in_pol( int J )             { return true; }
+  virtual bool is_J_in_interact( int J )        { return true; }
+  
   virtual void set_gridj(int j, vector<Pt> grid) { }
   virtual void set_gridexpj(int j, vector<int> grid_exp) { }
   virtual void set_gridburj(int j, vector<int> grid_bur) { }
@@ -91,7 +100,9 @@ public:
   virtual void add_Jl_to_inter_act_k( int k, int J, int l) { }
   virtual Pt get_gridjh(int j, int h) const   { return Pt(); }
   virtual Pt get_cog() const                  { return Pt(); }
+  virtual Pt get_unwrapped_center() const     { return Pt(); }
   virtual vector<int> get_gdpt_expj(int j) const { return vector<int>(); }
+  virtual int get_cg_of_ch(int k) const       { return 0; }
   virtual int get_nc_k(int k) const           { return 0; }
   virtual vector<int> get_neighj(int j) const { return vector<int> (); }
   virtual vector<Pt> get_gridj(int j) const   { return vector<Pt> (); }
@@ -99,7 +110,6 @@ public:
   virtual vector<int> get_ch_allin_k(int k)   { return vector<int> (); }
   virtual vector<int> get_ch_allout_k(int k)  { return vector<int> (); }
   virtual int get_ch_k_alpha(int k, int alpha){ return 0; }
-//  virtual const int get_cg_of_ch(int j)       { return 0; }
   virtual vector<vector<int> > get_inter_act_k(int k) {return vector<vector<int> >(); }
   virtual bool is_J_in_interk( int k, int J ) { return true; }
 };
@@ -145,6 +155,7 @@ public:
   Pt get_centerik(int i, int k) const      { return molecules_[i]->get_centerk(k); }
   const double get_Mi(int i) const         {return molecules_[i]->get_m();}
   const double get_qij(int i, int j) const {return molecules_[i]->get_qj(j);}
+  const double get_radij(int i, int j) const { return molecules_[i]->get_radj(j); }
   Pt get_posij(int i, int j)               {return molecules_[i]->get_posj(j);}
   Pt get_posijreal(int i, int j)
   {return molecules_[i]->get_posj_realspace(j);}
@@ -169,6 +180,9 @@ public:
   // translate every charge in molecule i by the vector dr
   void translate_mol(int i, Pt dr) { molecules_[i]->translate(dr, boxLength_); }
   
+  Pt get_unwrapped_center(int i) const
+      { return molecules_[i]->get_unwrapped_center(); }
+  
   // rotate every charge in Molecule i
   void rotate_mol(int i, Quat qrot) { molecules_[i]->rotate(qrot); }
   void rotate_mol(int i, MyMatrix<double> rotmat)
@@ -176,6 +190,9 @@ public:
   
   // Check to determine if any MoleculeSAMs are overlapping
   void check_for_overlap();
+  
+//  // attempt dynamics move and return whether there is a collisionv
+//  virtual try_translate(
   
   // get distance vector between any two points taking into account periodic
   // boundary conditions
@@ -190,6 +207,14 @@ public:
   
   // write current system configuration to XYZ file
   virtual void write_to_xyz(ofstream &xyz_out) = 0;
+  
+  //overridden by SAM:
+  virtual double calc_min_dist(int i, int j) { return 0.0; }
+  
+  //overriden by AM:
+  virtual void clear_all_lists() { }
+  virtual void add_J_to_interact_I(int i, int j) { }
+  virtual void add_J_to_pol_I(int i, int j)      { }
 };
 
 /*

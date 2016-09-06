@@ -43,6 +43,7 @@ string test_dir_loc = "../pbsam/pbsam_test_files/gtest/";
 
 //string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/gtest/";
 
+//#include "BDUnitTest.h"
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
 #include "ElectrostaticsUnitTest.h"

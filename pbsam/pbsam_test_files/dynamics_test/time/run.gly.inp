@@ -1,0 +1,22 @@
+runtype dynamics 2
+runname gly_0.05M.time.out
+
+units kT
+salt 0.05
+temp 298.15
+idiel 4
+sdiel 80
+
+termct 1
+termcombine or
+term 1 time 1000
+
+attypes 1
+type 1 2 move 0.45 0.001
+tolsp 2.0
+#surf 1 gly.vert
+#imat 1 gly_cgsph
+#exp 1 gly_cg
+pqr 1 gly_cg.pqr
+xyz 1 1 traj_1.xyz
+xyz 1 2 traj_2.xyz

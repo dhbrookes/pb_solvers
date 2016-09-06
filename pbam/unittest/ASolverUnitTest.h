@@ -19,8 +19,8 @@ protected :
   
   int vals_;
   shared_ptr<Constants> const_;
-  vector< MoleculeAM > mol_;
-  vector< MoleculeAM > mol_sing_;
+  vector< shared_ptr<BaseMolecule> > mol_;
+  vector< shared_ptr<BaseMolecule> > mol_sing_;
   
   virtual void SetUp()
   {
@@ -33,6 +33,8 @@ protected :
     
     Pt cgPosSi[2] = { Pt( 0.0, 0.0, -35.0 ), Pt( 0.0, 0.0, 0.0 ) };
     
+    shared_ptr<MoleculeAM> molNew, molSing;
+    
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
       int M = 1;
@@ -40,13 +42,14 @@ protected :
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0] = cg[molInd]; posCharges[0] = cgPos[molInd]; vdW[0] = 0.0;
       
-      MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
-                      molInd, 0);
+      molNew = make_shared<MoleculeAM>("stat",rd[molInd],charges,posCharges,
+                                       vdW,pos[molInd],
+                                       molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
 
-      MoleculeAM molSing( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      molSing = make_shared<MoleculeAM>( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -450,15 +453,15 @@ TEST_F(ASolverUTest, checkGamma)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
+
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1).real(),  1.463995711, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5).real(),  1.760111936, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 1),  1.463995711, preclim);
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 0, 5),  1.760111936, preclim);
-  
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 2),  1.621243794, preclim);
-  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 7),  1.799701878, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 2).real(),  1.621243794, preclim);
+  EXPECT_NEAR( ASolvTest.get_gamma_ni( 1, 7).real(),  1.799701878, preclim);
 }
 
 TEST_F(ASolverUTest, checkDelta)
@@ -468,15 +471,15 @@ TEST_F(ASolverUTest, checkDelta)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1),   0.87554313, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5),   0.06832297, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 1).real(),   0.87554313, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 0, 5).real(),   0.06832297, preclim);
   
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 2),   11.4370663, preclim);
-  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 7)/181.9847, 1.0, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 2).real(),   11.4370663, preclim);
+  EXPECT_NEAR( ASolvTest.get_delta_ni( 1, 7).real()/181.9847, 1.0, preclim);
 }
 
 
@@ -487,7 +490,7 @@ TEST_F(ASolverUTest, checkE)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   
@@ -517,7 +520,7 @@ TEST_F(ASolverUTest, checkSH)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
 
@@ -540,61 +543,10 @@ TEST_F(ASolverUTest, checkSH)
   EXPECT_NEAR(ASolvTest.get_SH_ij( 1, 0, 6, 5).imag(),-0.2082030597, preclim);
 }
 
-
-TEST_F(ASolverUTest, checkAMulti_iter)
-{
-  mol_.clear( );
-  Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0)};
-  for (int molInd = 0; molInd < 3; molInd ++ )
-  {
-    int M = 3; vector<double> charges(M); vector<double> vdW(M);
-    vector<Pt> posCharges(M);
-    charges[0]=2.0; vdW[0]=0; posCharges[0] = pos[molInd];
-    charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
-    charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
-    
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
-    mol_.push_back( molNew );
-  }
-  
-  const int vals = nvals;
-  shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
-  shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
-  shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
-  shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
-  
-  ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
-  ASolvTest.iter();
-  
-  int ct = 0;
-  for ( int n = 0; n < 5; n++ )
-  {
-    for ( int m = 0; m <= n; m++ )
-    {
-//      EXPECT_NEAR(ASolvTest.get_A_ni(0, n, m).real()/ATrip0[ct], 1.0, preclim);
-//      EXPECT_NEAR(ASolvTest.get_A_ni(1, n, m).real()/ATrip1[ct], 1.0, preclim);
-//      EXPECT_NEAR(ASolvTest.get_A_ni(2, n, m).real()/ATrip2[ct], 1.0, preclim);
-//      
-//      if (ATrip0im[ct] != 0)
-//        EXPECT_NEAR(ASolvTest.get_A_ni(0, n, m).imag()/ATrip0im[ct],
-//                    1.0, preclim);
-//      if (ATrip1im[ct] != 0)
-//        EXPECT_NEAR(ASolvTest.get_A_ni(1, n, m).imag()/ATrip1im[ct],
-//                    1.0, preclim);
-//      if (ATrip2im[ct] != 0)
-//        EXPECT_NEAR(ASolvTest.get_A_ni(2, n, m).imag()/ATrip2im[ct],
-//                    1.0, preclim);
-      ct++;
-    }
-  }
-}
-
-
 TEST_F(ASolverUTest, checkAMulti)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -604,7 +556,7 @@ TEST_F(ASolverUTest, checkAMulti)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
                     molInd, 0);
     mol_.push_back( molNew );
   }
@@ -614,7 +566,7 @@ TEST_F(ASolverUTest, checkAMulti)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -646,6 +598,7 @@ TEST_F(ASolverUTest, checkAMulti)
 TEST_F(ASolverUTest, checkAMultiPBC)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[4] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0),
                 Pt(-10.0,7.8,25.0), Pt( 100, 100, 100)};
   for (int molInd = 0; molInd < 4; molInd ++ )
@@ -656,8 +609,8 @@ TEST_F(ASolverUTest, checkAMultiPBC)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd]
-                    , molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -666,7 +619,7 @@ TEST_F(ASolverUTest, checkAMultiPBC)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_, 85, 175);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_, 85, 175);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -704,6 +657,7 @@ TEST_F(ASolverUTest, checkAMultiPBC)
 TEST_F(ASolverUTest, checkAPBC)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(10.0,7.8,25.0), Pt(-10.0,-7.8,-25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -713,7 +667,8 @@ TEST_F(ASolverUTest, checkAPBC)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd], molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -722,7 +677,7 @@ TEST_F(ASolverUTest, checkAPBC)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_, 40, 175);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_, 40, 175);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -754,6 +709,7 @@ TEST_F(ASolverUTest, checkAPBC)
 TEST_F(ASolverUTest, checkAPBCoutside)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(10.0,7.8,25.0), Pt(-10.0,-7.8,-25.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -763,8 +719,8 @@ TEST_F(ASolverUTest, checkAPBCoutside)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -773,7 +729,7 @@ TEST_F(ASolverUTest, checkAPBCoutside)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_, 25, 150);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_, 25, 150);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -814,7 +770,7 @@ TEST_F(ASolverUTest, checkA)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-20, 1000);
@@ -838,6 +794,7 @@ TEST_F(ASolverUTest, checkA)
 TEST_F(ASolverUTest, checkASingMult)
 {
   mol_sing_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[2] = {  Pt( 0.0, 0.0, -5.0 ), Pt( 0.0, 0.0, 0.0 )};
   for (int molInd = 0; molInd < 2; molInd ++ )
   {
@@ -847,8 +804,8 @@ TEST_F(ASolverUTest, checkASingMult)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_sing_.push_back( molNew );
   }
   
@@ -857,7 +814,7 @@ TEST_F(ASolverUTest, checkASingMult)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -885,6 +842,7 @@ TEST_F(ASolverUTest, checkASingMult)
 TEST_F(ASolverUTest, checkASingMultFlip)
 {
   mol_sing_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -894,8 +852,8 @@ TEST_F(ASolverUTest, checkASingMultFlip)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_sing_.push_back( molNew );
   }
   
@@ -904,7 +862,7 @@ TEST_F(ASolverUTest, checkASingMultFlip)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
@@ -942,7 +900,7 @@ TEST_F(ASolverUTest, checkASing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-30, 1000);
@@ -964,6 +922,7 @@ TEST_F(ASolverUTest, checkASing)
 TEST_F(ASolverUTest, checkgradT_A)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
     Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
   for (int molInd = 0; molInd < 3; molInd ++ )
@@ -974,8 +933,8 @@ TEST_F(ASolverUTest, checkgradT_A)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -984,121 +943,111 @@ TEST_F(ASolverUTest, checkgradT_A)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
-  
-  clock_t t3 = clock();
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
-  ASolvTest.solve_A(1E-40, 1000);
-  ASolvTest.solve_gradA(1E-30, 1000);
+  ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
   
-  t3 = clock() - t3;
-  printf ("grad solve calc took me %f seconds.\n",
-          ((float)t3)/CLOCKS_PER_SEC);
+  VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
+  VecOfMats<cmplx>::type dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
+  VecOfMats<cmplx>::type dT_A22 = ASolvTest.get_gradT_Aij( 2, 2);
   
-  MyGradExpansion dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
-  MyGradExpansion dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
-  MyGradExpansion dT_A22 = ASolvTest.get_gradT_Aij( 2, 2);
-  
-  MyGradExpansion dT_A02 = ASolvTest.get_gradT_Aij( 0, 2);
-  MyGradExpansion dT_A10 = ASolvTest.get_gradT_Aij( 1, 0);
-  MyGradExpansion dT_A21 = ASolvTest.get_gradT_Aij( 2, 1);
+  VecOfMats<cmplx>::type dT_A02 = ASolvTest.get_gradT_Aij( 0, 2);
+  VecOfMats<cmplx>::type dT_A10 = ASolvTest.get_gradT_Aij( 1, 0);
+  VecOfMats<cmplx>::type dT_A21 = ASolvTest.get_gradT_Aij( 2, 1);
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
   {
     for ( int m = 0; m <= n; m++ )
     {
-      if (dTA00X[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(0,n,m).real()
-                                       /dTA00X[ct],1.0, preclim);
-      if (dTA00Y[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(1,n,m).real()
-                                       /dTA00Y[ct], 1.0, preclim);
-      if (dTA00Z[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(2,n,m).real()
-                                       /dTA00Z[ct], 1.0, preclim);
-      if (dTA00Xim[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA00X[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).real()/dTA00X[ct],
+                                       1.0, preclim);
+      if (dTA00Y[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).real()/dTA00Y[ct],
+                                       1.0, preclim);
+      if (dTA00Z[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).real()/dTA00Z[ct],
+                                       1.0, preclim);
+      if (dTA00Xim[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).imag()/
                                          dTA00Xim[ct], 1.0, preclim);
-      if (dTA00Yim[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA00Yim[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).imag()/
                                          dTA00Yim[ct], 1.0, preclim);
-      if (dTA00Zim[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA00Zim[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).imag()/
                                          dTA00Zim[ct], 1.0, preclim);
       
-      if (dTA11X[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(0,n,m).real()/dTA11X[ct],
+      if (dTA11X[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).real()/dTA11X[ct],
                                        1.0, preclim);
-      if (dTA11Y[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(1,n,m).real()/dTA11Y[ct],
+      if (dTA11Y[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).real()/dTA11Y[ct],
                                        1.0, preclim);
-      if (dTA11Z[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(2,n,m).real()/dTA11Z[ct],
+      if (dTA11Z[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).real()/dTA11Z[ct],
                                        1.0, preclim);
-      if (dTA11Xim[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA11Xim[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).imag()/
                                          dTA11Xim[ct], 1.0, preclim);
-      if (dTA11Yim[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA11Yim[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).imag()/
                                          dTA11Yim[ct], 1.0, preclim);
-      if (dTA11Zim[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA11Zim[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).imag()/
                                          dTA11Zim[ct], 1.0, preclim);
       
-      if (dTA22X[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(0,n,m).real()/dTA22X[ct],
+      if (dTA22X[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).real()/dTA22X[ct],
                                        1.0, preclim);
-      if (dTA22Y[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(1,n,m).real()/dTA22Y[ct],
+      if (dTA22Y[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).real()/dTA22Y[ct],
                                        1.0, preclim);
-      if (dTA22Z[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(2,n,m).real()/dTA22Z[ct],
+      if (dTA22Z[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).real()/dTA22Z[ct],
                                        1.0, preclim);
-      if (dTA22Xim[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA22Xim[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).imag()/
                                          dTA22Xim[ct], 1.0, preclim);
-      if (dTA22Yim[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA22Yim[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).imag()/
                                          dTA22Yim[ct], 1.0, preclim);
-      if (dTA22Zim[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA22Zim[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).imag()/
                                          dTA22Zim[ct], 1.0, preclim);
       
-      if (dTA02X[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(0,n,m).real()/dTA02X[ct],
+      if (dTA02X[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).real()/dTA02X[ct],
                                        1.0, preclim);
-      if (dTA02Y[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(1,n,m).real()/dTA02Y[ct],
+      if (dTA02Y[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).real()/dTA02Y[ct],
                                        1.0, preclim);
-      if (dTA02Z[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(2,n,m).real()/dTA02Z[ct],
+      if (dTA02Z[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).real()/dTA02Z[ct],
                                        1.0, preclim);
-      if (dTA02Xim[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA02Xim[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).imag()/
                                          dTA02Xim[ct], 1.0, preclim);
-      if (dTA02Yim[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA02Yim[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).imag()/
                                          dTA02Yim[ct], 1.0, preclim);
-      if (dTA02Zim[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA02Zim[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).imag()/
                                          dTA02Zim[ct], 1.0, preclim);
       
-      if (dTA10X[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(0,n,m).real()/dTA10X[ct],
+      if (dTA10X[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).real()/dTA10X[ct],
                                        1.0, preclim);
-      if (dTA10Y[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(1,n,m).real()/dTA10Y[ct],
+      if (dTA10Y[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).real()/dTA10Y[ct],
                                        1.0, preclim);
-      if (dTA10Z[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(2,n,m).real()/dTA10Z[ct],
+      if (dTA10Z[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).real()/dTA10Z[ct],
                                        1.0, preclim);
-      if (dTA10Xim[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA10Xim[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).imag()/
                                          dTA10Xim[ct], 1.0, preclim);
-      if (dTA10Yim[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA10Yim[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).imag()/
                                          dTA10Yim[ct], 1.0, preclim);
-      if (dTA10Zim[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA10Zim[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).imag()/
                                          dTA10Zim[ct], 1.0, preclim);
       
-      if (dTA21X[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(0,n,m).real()/dTA21X[ct],
+      if (dTA21X[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).real()/dTA21X[ct],
                                        1.0, preclim);
-      if (dTA21Y[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(1,n,m).real()/dTA21Y[ct],
+      if (dTA21Y[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).real()/dTA21Y[ct],
                                        1.0, preclim);
-      if (dTA21Z[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(2,n,m).real()/dTA21Z[ct],
+      if (dTA21Z[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).real()/dTA21Z[ct],
                                        1.0, preclim);
-      if (dTA21Xim[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA21Xim[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).imag()/
                                          dTA21Xim[ct], 1.0, preclim);
-      if (dTA21Yim[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA21Yim[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).imag()/
                                          dTA21Yim[ct], 1.0, preclim);
-      if (dTA21Zim[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA21Zim[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).imag()/
                                          dTA21Zim[ct], 1.0, preclim);
       ct++;
     }
   }
-  
-  t3 = clock() - t3;
-  printf ("test took me %f seconds.\n",
-          ((float)t3)/CLOCKS_PER_SEC);
 }
 
 
 TEST_F(ASolverUTest, checkdT_ASingFlip)
 {
   mol_sing_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -1108,8 +1057,8 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_sing_.push_back( molNew );
   }
   const int vals = 5;
@@ -1117,100 +1066,100 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
   
-  MyGradExpansion dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
-  MyGradExpansion dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
-  MyGradExpansion dT_A22 = ASolvTest.get_gradT_Aij( 2, 2);
+  VecOfMats<cmplx>::type dT_A00 = ASolvTest.get_gradT_Aij( 0, 0);
+  VecOfMats<cmplx>::type dT_A11 = ASolvTest.get_gradT_Aij( 1, 1);
+  VecOfMats<cmplx>::type dT_A22 = ASolvTest.get_gradT_Aij( 2, 2);
   
-  MyGradExpansion dT_A02 = ASolvTest.get_gradT_Aij( 0, 2);
-  MyGradExpansion dT_A10 = ASolvTest.get_gradT_Aij( 1, 0);
-  MyGradExpansion dT_A21 = ASolvTest.get_gradT_Aij( 2, 1);
+  VecOfMats<cmplx>::type dT_A02 = ASolvTest.get_gradT_Aij( 0, 2);
+  VecOfMats<cmplx>::type dT_A10 = ASolvTest.get_gradT_Aij( 1, 0);
+  VecOfMats<cmplx>::type dT_A21 = ASolvTest.get_gradT_Aij( 2, 1);
 
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
   {
     for ( int m = 0; m <= n; m++ )
     {
-      if (dTA00XSin[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(0,n,m).real()/
+      if (dTA00XSin[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).real()/
                                           dTA00XSin[ct], 1.0, preclim);
-      if (dTA00YSin[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(1,n,m).real()/
+      if (dTA00YSin[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).real()/
                                           dTA00YSin[ct], 1.0, preclim);
-      if (dTA00ZSin[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(2,n,m).real()/
+      if (dTA00ZSin[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).real()/
                                           dTA00ZSin[ct], 1.0, preclim);
-      if (dTA00XimSin[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA00XimSin[ct] != 0) EXPECT_NEAR(dT_A00[0](n, m+vals).imag()/
                                          dTA00XimSin[ct], 1.0, preclim);
-      if (dTA00YimSin[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA00YimSin[ct] != 0) EXPECT_NEAR(dT_A00[1](n, m+vals).imag()/
                                          dTA00YimSin[ct], 1.0, preclim);
-      if (dTA00ZimSin[ct] != 0) EXPECT_NEAR(dT_A00.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA00ZimSin[ct] != 0) EXPECT_NEAR(dT_A00[2](n, m+vals).imag()/
                                          dTA00ZimSin[ct], 1.0, preclim);
       
-      if (dTA11XSin[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(0,n,m).real()/
+      if (dTA11XSin[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).real()/
                                           dTA11XSin[ct], 1.0, preclim);
-      if (dTA11YSin[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(1,n,m).real()/
+      if (dTA11YSin[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).real()/
                                           dTA11YSin[ct], 1.0, preclim);
-      if (dTA11ZSin[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(2,n,m).real()/
+      if (dTA11ZSin[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).real()/
                                           dTA11ZSin[ct], 1.0, preclim);
-      if (dTA11XimSin[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA11XimSin[ct] != 0) EXPECT_NEAR(dT_A11[0](n, m+vals).imag()/
                                          dTA11XimSin[ct], 1.0, preclim);
-      if (dTA11YimSin[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA11YimSin[ct] != 0) EXPECT_NEAR(dT_A11[1](n, m+vals).imag()/
                                          dTA11YimSin[ct], 1.0, preclim);
-      if (dTA11ZimSin[ct] != 0) EXPECT_NEAR(dT_A11.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA11ZimSin[ct] != 0) EXPECT_NEAR(dT_A11[2](n, m+vals).imag()/
                                          dTA11ZimSin[ct], 1.0, preclim);
       
-      if (dTA22XSin[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(0,n,m).real()/
+      if (dTA22XSin[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).real()/
                                           dTA22XSin[ct], 1.0, preclim);
-      if (dTA22YSin[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(1,n,m).real()/
+      if (dTA22YSin[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).real()/
                                           dTA22YSin[ct], 1.0, preclim);
-      if (dTA22ZSin[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(2,n,m).real()/
+      if (dTA22ZSin[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).real()/
                                           dTA22ZSin[ct], 1.0, preclim);
-      if (dTA22XimSin[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA22XimSin[ct] != 0) EXPECT_NEAR(dT_A22[0](n, m+vals).imag()/
                                          dTA22XimSin[ct], 1.0, preclim);
-      if (dTA22YimSin[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA22YimSin[ct] != 0) EXPECT_NEAR(dT_A22[1](n, m+vals).imag()/
                                          dTA22YimSin[ct], 1.0, preclim);
-      if (dTA22ZimSin[ct] != 0) EXPECT_NEAR(dT_A22.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA22ZimSin[ct] != 0) EXPECT_NEAR(dT_A22[2](n, m+vals).imag()/
                                          dTA22ZimSin[ct], 1.0, preclim);
       
-      if (dTA02XSin[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(0,n,m).real()/
+      if (dTA02XSin[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).real()/
                                           dTA02XSin[ct], 1.0, preclim);
-      if (dTA02YSin[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(1,n,m).real()/
+      if (dTA02YSin[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).real()/
                                           dTA02YSin[ct], 1.0, preclim);
-      if (dTA02ZSin[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(2,n,m).real()/
+      if (dTA02ZSin[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).real()/
                                           dTA02ZSin[ct], 1.0, preclim);
-      if (dTA02XimSin[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA02XimSin[ct] != 0) EXPECT_NEAR(dT_A02[0](n, m+vals).imag()/
                                          dTA02XimSin[ct], 1.0, preclim);
-      if (dTA02YimSin[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA02YimSin[ct] != 0) EXPECT_NEAR(dT_A02[1](n, m+vals).imag()/
                                          dTA02YimSin[ct], 1.0, preclim);
-      if (dTA02ZimSin[ct] != 0) EXPECT_NEAR(dT_A02.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA02ZimSin[ct] != 0) EXPECT_NEAR(dT_A02[2](n, m+vals).imag()/
                                          dTA02ZimSin[ct], 1.0, preclim);
       
-      if (dTA10XSin[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(0,n,m).real()/
+      if (dTA10XSin[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).real()/
                                           dTA10XSin[ct], 1.0, preclim);
-      if (dTA10YSin[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(1,n,m).real()/
+      if (dTA10YSin[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).real()/
                                           dTA10YSin[ct], 1.0, preclim);
-      if (dTA10ZSin[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(2,n,m).real()/
+      if (dTA10ZSin[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).real()/
                                           dTA10ZSin[ct], 1.0, preclim);
-      if (dTA10XimSin[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA10XimSin[ct] != 0) EXPECT_NEAR(dT_A10[0](n, m+vals).imag()/
                                          dTA10XimSin[ct], 1.0, preclim);
-      if (dTA10YimSin[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA10YimSin[ct] != 0) EXPECT_NEAR(dT_A10[1](n, m+vals).imag()/
                                          dTA10YimSin[ct], 1.0, preclim);
-      if (dTA10ZimSin[ct] != 0) EXPECT_NEAR(dT_A10.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA10ZimSin[ct] != 0) EXPECT_NEAR(dT_A10[2](n, m+vals).imag()/
                                          dTA10ZimSin[ct], 1.0, preclim);
       
-      if (dTA21XSin[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(0,n,m).real()/
+      if (dTA21XSin[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).real()/
                                           dTA21XSin[ct], 1.0, preclim);
-      if (dTA21YSin[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(1,n,m).real()/
+      if (dTA21YSin[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).real()/
                                           dTA21YSin[ct], 1.0, preclim);
-      if (dTA21ZSin[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(2,n,m).real()/
+      if (dTA21ZSin[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).real()/
                                           dTA21ZSin[ct], 1.0, preclim);
-      if (dTA21XimSin[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(0,n,m).imag()/
+      if (dTA21XimSin[ct] != 0) EXPECT_NEAR(dT_A21[0](n, m+vals).imag()/
                                          dTA21XimSin[ct], 1.0, preclim);
-      if (dTA21YimSin[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(1,n,m).imag()/
+      if (dTA21YimSin[ct] != 0) EXPECT_NEAR(dT_A21[1](n, m+vals).imag()/
                                          dTA21YimSin[ct], 1.0, preclim);
-      if (dTA21ZimSin[ct] != 0) EXPECT_NEAR(dT_A21.get_dimij_cmplx(2,n,m).imag()/
+      if (dTA21ZimSin[ct] != 0) EXPECT_NEAR(dT_A21[2](n, m+vals).imag()/
                                          dTA21ZimSin[ct], 1.0, preclim);
       ct++;
     }
@@ -1220,6 +1169,7 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
 TEST_F(ASolverUTest, checkgradA)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -1229,8 +1179,8 @@ TEST_F(ASolverUTest, checkgradA)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -1239,7 +1189,7 @@ TEST_F(ASolverUTest, checkgradA)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-25, 1000); ASolvTest.solve_gradA(1E-50, 1000);
@@ -1334,6 +1284,7 @@ TEST_F(ASolverUTest, checkgradA)
 TEST_F(ASolverUTest, checkgradASing)
 {
   mol_sing_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -1343,8 +1294,8 @@ TEST_F(ASolverUTest, checkgradASing)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_sing_.push_back( molNew );
   }
   const int vals           = 5;
@@ -1352,7 +1303,7 @@ TEST_F(ASolverUTest, checkgradASing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-30, 1000);
@@ -1483,6 +1434,7 @@ TEST_F(ASolverUTest, checkgradASing)
 TEST_F(ASolverUTest, checkL)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
     Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
   for (int molInd = 0; molInd < 2; molInd ++ )
@@ -1493,8 +1445,8 @@ TEST_F(ASolverUTest, checkL)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
   const int vals = nvals;
@@ -1502,26 +1454,22 @@ TEST_F(ASolverUTest, checkL)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
-  shared_ptr<vector<MyExpansion> > myL = ASolvTest.get_L();
+  shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
   {
     for ( int m = 0; m <= n; m++ )
     {
-      EXPECT_NEAR( myL->operator[](0).get_cmplx(n,m).real()/L0[ct],
-                  1.0, preclim);
+      EXPECT_NEAR( myL->operator[](0)(n,m+vals).real()/L0[ct], 1.0, preclim);
       if (L0_im[ct] != 0)
-        EXPECT_NEAR(myL->operator[](0).get_cmplx(n,m).imag()/L0_im[ct],
-                    1.0,preclim);
-      EXPECT_NEAR( myL->operator[](1).get_cmplx(n,m).real()/L1[ct],
-                  1.0, preclim);
+        EXPECT_NEAR(myL->operator[](0)(n,m+vals).imag()/L0_im[ct],1.0,preclim);
+      EXPECT_NEAR( myL->operator[](1)(n,m+vals).real()/L1[ct], 1.0, preclim);
       if (L1_im[ct] != 0)
-        EXPECT_NEAR(myL->operator[](1).get_cmplx(n,m).imag()/L1_im[ct],
-                    1.0,preclim);
+        EXPECT_NEAR(myL->operator[](1)(n,m+vals).imag()/L1_im[ct],1.0,preclim);
       ct++;
     }
   }
@@ -1530,6 +1478,7 @@ TEST_F(ASolverUTest, checkL)
 TEST_F(ASolverUTest, checkLSing)
 {
   mol_sing_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
@@ -1539,8 +1488,8 @@ TEST_F(ASolverUTest, checkLSing)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_sing_.push_back( molNew );
   }
   const int vals = 5;
@@ -1548,34 +1497,30 @@ TEST_F(ASolverUTest, checkLSing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000);
-  shared_ptr<vector<MyExpansion> > myL = ASolvTest.get_L();
+  shared_ptr<VecOfMats<cmplx>::type> myL = ASolvTest.get_L();
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
   {
     for ( int m = 0; m <= n; m++ )
     {
-      if (L0Sing[ct] != 0) EXPECT_NEAR(myL->operator[](0).get_cmplx(n,m).real()/
+      if (L0Sing[ct] != 0) EXPECT_NEAR( myL->operator[](0)(n,m+vals).real()/
                                        L0Sing[ct], 1,preclim);
       if (L0SingIm[ct] != 0)
-        EXPECT_NEAR(myL->operator[](0).get_cmplx(n,m).imag()/L0SingIm[ct],
-                    1,preclim);
+        EXPECT_NEAR(myL->operator[](0)(n,m+vals).imag()/L0SingIm[ct],1,preclim);
       if (L1Sing[ct] != 0)
-        EXPECT_NEAR(myL->operator[](1).get_cmplx(n,m).real()/L1Sing[ct],
-                    1,preclim);
+        EXPECT_NEAR(myL->operator[](1)(n,m+vals).real()/L1Sing[ct], 1,preclim);
       if (L1SingIm[ct] != 0)
-        EXPECT_NEAR(myL->operator[](1).get_cmplx(n,m).imag()/L1SingIm[ct],
+        EXPECT_NEAR(myL->operator[](1)(n,m+vals).imag()/L1SingIm[ct],
                     1, preclim);
       if (L2Sing[ct] != 0)
-        EXPECT_NEAR(myL->operator[](2).get_cmplx(n,m).real()/L2Sing[ct],
-                    1,preclim);
+        EXPECT_NEAR(myL->operator[](2)(n,m+vals).real()/L2Sing[ct], 1,preclim);
       if (L2SingIm[ct] != 0)
-        EXPECT_NEAR(myL->operator[](2).get_cmplx(n,m).imag()/L2SingIm[ct],
-                    1,preclim);
+        EXPECT_NEAR(myL->operator[](2)(n,m+vals).imag()/L2SingIm[ct],1,preclim);
       ct++;
     }
   }
@@ -1584,8 +1529,9 @@ TEST_F(ASolverUTest, checkLSing)
 TEST_F(ASolverUTest, checkdL)
 {
   mol_.clear( );
+  shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
-    Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
+  Pt( 10.0, 7.8, 25.0 ),Pt(-10.0, 7.8, 25.0) };
   for (int molInd = 0; molInd < 3; molInd ++ )
   {
     int M = 3; vector<double> charges(M); vector<double> vdW(M);
@@ -1594,8 +1540,8 @@ TEST_F(ASolverUTest, checkdL)
     charges[1]=2.0; vdW[1]=0; posCharges[1] = pos[molInd] + Pt(1.0, 0.0, 0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2] = pos[molInd] + Pt(0.0, 1.0, 0.0);
     
-    MoleculeAM molNew( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
-                    molInd, 0);
+    molNew = make_shared<MoleculeAM> ( "stat", 2.0, charges, posCharges, vdW, pos[molInd],
+                                      molInd, 0);
     mol_.push_back( molNew );
   }
   
@@ -1604,11 +1550,11 @@ TEST_F(ASolverUTest, checkdL)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-20, 1000); ASolvTest.solve_gradA(1E-30, 1000);
-  shared_ptr<MyVector<MyGradExpansion > > mydL = ASolvTest.get_gradL();
+  shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
 
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -1616,61 +1562,61 @@ TEST_F(ASolverUTest, checkdL)
     for ( int m = 0; m <= n; m++ )
     {
       if (dLdx0[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dim(0).
-                    get_cmplx(n,m).real()/dLdx0[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[0](n,m+vals).real()/dLdx0[ct],
+                    1, preclim);
       if (dLdx0im[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dim(0).
-                    get_cmplx(n,m).imag()/dLdx0im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[0](n,m+vals).imag()/dLdx0im[ct],
+                    1, preclim);
       if (dLdy0[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dim(1).
-                    get_cmplx(n,m).real()/dLdy0[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[1](n,m+vals).real()/dLdy0[ct],
+                    1, preclim);
       if (dLdy0im[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dim(1).
-                    get_cmplx(n,m).imag()/dLdy0im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[1](n,m+vals).imag()/dLdy0im[ct],
+                    1, preclim);
       if (dLdz0[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dim(2).
-                    get_cmplx(n,m).real()/dLdz0[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[2](n,m+vals).real()/dLdz0[ct],
+                    1, preclim);
       if (dLdz0im[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dim(2).
-                    get_cmplx(n,m).imag()/dLdz0im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](0)[2](n,m+vals).imag()/dLdz0im[ct],
+                    1, preclim);
       
       if (dLdx1[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dim(0).
-                    get_cmplx(n,m).real()/dLdx1[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[0](n,m+vals).real()/dLdx1[ct],
+                    1, preclim);
       if (dLdx1im[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dim(0).
-                    get_cmplx(n,m).imag()/dLdx1im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[0](n,m+vals).imag()/dLdx1im[ct],
+                    1, preclim);
       if (dLdy1[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dim(1).
-                    get_cmplx(n,m).real()/dLdy1[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[1](n,m+vals).real()/dLdy1[ct],
+                    1, preclim);
       if (dLdy1im[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dim(1).
-                    get_cmplx(n,m).imag()/dLdy1im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[1](n,m+vals).imag()/dLdy1im[ct],
+                    1, preclim);
       if (dLdz1[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dim(2).
-                    get_cmplx(n,m).real()/dLdz1[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[2](n,m+vals).real()/dLdz1[ct],
+                    1, preclim);
       if (dLdz1im[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dim(2).
-                    get_cmplx(n,m).imag()/dLdz1im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](1)[2](n,m+vals).imag()/dLdz1im[ct],
+                    1, preclim);
       
       if (dLdx2[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](2).get_dim(0).
-                    get_cmplx(n,m).real()/dLdx2[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[0](n,m+vals).real()/dLdx2[ct],
+                    1, preclim);
       if (dLdx2im[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](2).get_dim(0).
-                    get_cmplx(n,m).imag()/dLdx2im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[0](n,m+vals).imag()/dLdx2im[ct],
+                    1, preclim);
       if (dLdy2[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](2).get_dim(1).
-                    get_cmplx(n,m).real()/dLdy2[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[1](n,m+vals).real()/dLdy2[ct],
+                    1, preclim);
       if (dLdy2im[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](2).get_dim(1).
-                    get_cmplx(n,m).imag()/dLdy2im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[1](n,m+vals).imag()/dLdy2im[ct],
+                    1, preclim);
       if (dLdz2[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](2).get_dim(2).
-                    get_cmplx(n,m).real()/dLdz2[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[2](n,m+vals).real()/dLdz2[ct],
+                    1, preclim);
       if (dLdz2im[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](2).get_dim(2).
-                    get_cmplx(n,m).imag()/dLdz2im[ct], 1, preclim);
+        EXPECT_NEAR( mydL->operator[](2)[2](n,m+vals).imag()/dLdz2im[ct],
+                    1, preclim);
       ct++;
     }
   }  
@@ -1679,6 +1625,7 @@ TEST_F(ASolverUTest, checkdL)
 TEST_F(ASolverUTest, checkdLSing)
 {
   mol_sing_.clear();
+  shared_ptr<MoleculeAM> molSing;
   Pt cgPosSi[3] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 0.0, -5.0 ),
     Pt( 0.0, 0.0, 5.0 )};
   
@@ -1690,7 +1637,7 @@ TEST_F(ASolverUTest, checkdLSing)
     charges[1]=2.0; vdW[1]=0; posCharges[1]=cgPosSi[molInd] + Pt(1.0,0.0,0.0);
     charges[2]=2.0; vdW[2]=0; posCharges[2]=cgPosSi[molInd] + Pt(0.0,1.0,0.0);
     
-    MoleculeAM molSing( "stat", 2.0, charges, posCharges, vdW, cgPosSi[molInd],
+    molSing = make_shared<MoleculeAM>( "stat", 2.0, charges, posCharges, vdW, cgPosSi[molInd],
                      molInd, 0);
     mol_sing_.push_back( molSing );
   }
@@ -1699,11 +1646,11 @@ TEST_F(ASolverUTest, checkdLSing)
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
   shared_ptr<SHCalcConstants> SHConsta = make_shared<SHCalcConstants>(2*vals);
   shared_ptr<SHCalc> SHCalcu = make_shared<SHCalc>(2*vals, SHConsta);
-  shared_ptr<System> sys = make_shared<System>(mol_sing_);
+  shared_ptr<SystemAM> sys = make_shared<SystemAM>(mol_sing_);
   
   ASolver ASolvTest(bCalcu, SHCalcu, sys, const_, vals, sys->get_cutoff());
   ASolvTest.solve_A(1E-40, 1000); ASolvTest.solve_gradA(1E-40, 1000);
-  shared_ptr<MyVector<MyGradExpansion > > mydL = ASolvTest.get_gradL();
+  shared_ptr<MyVector<VecOfMats<cmplx>::type > > mydL = ASolvTest.get_gradL();
   
   int ct = 0;
   for ( int n = 0; n < 5; n++ )
@@ -1711,40 +1658,40 @@ TEST_F(ASolverUTest, checkdLSing)
     for ( int m = 0; m <= n; m++ )
     {
       if (dLdx0Sing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dimij_cmplx(0,n,m).real()/dLdx0Sing[ct],
+        EXPECT_NEAR( mydL->operator[](0)[0](n,m+vals).real()/dLdx0Sing[ct],
                     1, preclim);
       if (dLdy0Sing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dimij_cmplx(1,n,m).real()/dLdy0Sing[ct],
+        EXPECT_NEAR( mydL->operator[](0)[1](n,m+vals).real()/dLdy0Sing[ct],
                     1, preclim);
       if (dLdz0Sing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dimij_cmplx(2,n,m).real()/dLdz0Sing[ct],
+        EXPECT_NEAR( mydL->operator[](0)[2](n,m+vals).real()/dLdz0Sing[ct],
                     1, preclim);
       if (dLdx0imSing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dimij_cmplx(0,n,m).imag()/dLdx0imSing[ct],
+        EXPECT_NEAR( mydL->operator[](0)[0](n,m+vals).imag()/dLdx0imSing[ct],
                     1, preclim);
       if (dLdy0imSing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dimij_cmplx(1,n,m).imag()/dLdy0imSing[ct],
+        EXPECT_NEAR( mydL->operator[](0)[1](n,m+vals).imag()/dLdy0imSing[ct],
                     1, preclim);
       if (dLdz0imSing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](0).get_dimij_cmplx(2,n,m).imag()/dLdz0imSing[ct],
+        EXPECT_NEAR( mydL->operator[](0)[2](n,m+vals).imag()/dLdz0imSing[ct],
                     1, preclim);
       if (dLdx1Sing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dimij_cmplx(0,n,m).real()/dLdx1Sing[ct],
+        EXPECT_NEAR( mydL->operator[](1)[0](n,m+vals).real()/dLdx1Sing[ct],
                     1, preclim);
       if (dLdy1Sing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dimij_cmplx(1,n,m).real()/dLdy1Sing[ct],
+        EXPECT_NEAR( mydL->operator[](1)[1](n,m+vals).real()/dLdy1Sing[ct],
                     1, preclim);
       if (dLdz1Sing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dimij_cmplx(2,n,m).real()/dLdz1Sing[ct],
+        EXPECT_NEAR( mydL->operator[](1)[2](n,m+vals).real()/dLdz1Sing[ct],
                     1, preclim);
       if (dLdx1imSing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dimij_cmplx(0,n,m).imag()/dLdx1imSing[ct],
+        EXPECT_NEAR( mydL->operator[](1)[0](n,m+vals).imag()/dLdx1imSing[ct],
                     1, preclim);
       if (dLdy1imSing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dimij_cmplx(1,n,m).imag()/dLdy1imSing[ct],
+        EXPECT_NEAR( mydL->operator[](1)[1](n,m+vals).imag()/dLdy1imSing[ct],
                     1, preclim);
       if (dLdz1imSing[ct] != 0)
-        EXPECT_NEAR( mydL->operator[](1).get_dimij_cmplx(2,n,m).imag()/dLdz1imSing[ct],
+        EXPECT_NEAR( mydL->operator[](1)[2](n,m+vals).imag()/dLdz1imSing[ct],
                     1, preclim);
       ct++;
     }

@@ -33,8 +33,10 @@
 
 #include <memory>
 #include <time.h>
+//#include "PBAMStruct.h"
 #include "PBSAMStruct.h"
-#include "Electrostatics.h"
+#include "ElectrostaticsSAM.h"
+#include "BDSAM.h"
 
 using namespace std;
 
@@ -42,9 +44,8 @@ class PBSAM : protected PBSAMInput
 {
 protected:
   shared_ptr<Setup> _setp_;
-  shared_ptr<System> _syst_;
+  shared_ptr<SystemSAM> _syst_;
   shared_ptr<Constants> _consts_;
-  
   
   shared_ptr<BesselConstants> _bessl_consts_;
   shared_ptr<BesselCalc> _bessl_calc_;
@@ -53,6 +54,14 @@ protected:
   shared_ptr<ExpansionConstants> _exp_consts_;
   
   shared_ptr<Solver> solvr_;
+  
+  vector<shared_ptr<IEMatrix > > imats_;
+  vector<shared_ptr<HMatrix > > h_spol_;
+  vector<shared_ptr<FMatrix > > f_spol_;
+
+  double force_[MOL_MAX][3];
+  double torque_[MOL_MAX][3];
+  double nrg_intera_[MOL_MAX];
 
   int poles_;
   double solveTol_;
@@ -63,30 +72,33 @@ public:
   PBSAM();
   PBSAM(string infile);
   // For APBS
-  PBSAM(const PBSAMInput& pbsami, vector<MoleculeSAM> mls );
+  PBSAM(const PBAMInput& pbami, const PBSAMInput& pbsami,
+        vector<shared_ptr<BaseMolecule> > mls );
 
   friend PBSAMInput getPBSAMParams();
+  friend PBAMInput getPBAMParams();
 
   // Copy constructors
-  PBSAM( const PBSAM& pbam ) ;
-  PBSAM( const PBSAM* pbam ) ;
+  PBSAM( const PBSAM& pbsam ) ;
+  PBSAM( const PBSAM* pbsam ) ;
 
   void check_setup();
   void check_system();
 
   void init_write_system();
+  void init_consts_calcs();
   void initialize_pbsam();
 
   int run();
   // for running the APBS version
-  PBSAMOutput run_apbs( );
+  PBAMOutput run_apbs( );
 
   void run_bodyapprox();
   void run_dynamics();
   void run_electrostatics();
   void run_energyforce();
   
-  shared_ptr<System> make_subsystem(vector<int> mol_idx);
+  shared_ptr<SystemSAM> make_subsystem(vector<int> mol_idx);
 };
 
 

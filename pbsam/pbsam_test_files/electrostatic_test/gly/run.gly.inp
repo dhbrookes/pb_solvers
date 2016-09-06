@@ -1,0 +1,24 @@
+runtype electrostatics 50
+runname gly.out
+
+units kT
+salt 0.1
+temp 298
+idiel 4
+sdiel 78
+
+dx gly.dx
+3dmap gly_map.out
+
+gridct 2
+grid2D 1 gly.y.0.dat y 0
+grid2D 2 gly.z.0.dat z 0
+
+tolsp 2.5
+
+attypes 1
+type 1 3
+pqr 1 gly.pqr
+#pqr 1 cg_mol0.pqr
+surf 1 gly.vert
+xyz 1 zero.xyz

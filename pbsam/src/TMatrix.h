@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include "SHCalc.h"
 #include "ReExpCalc.h"
+#include "SystemSAM.h"
 
 using namespace std;
 
@@ -43,10 +44,10 @@ protected:
   map<vector<int>, int>   idxMap_;
   shared_ptr<SHCalc>      _shCalc_;
   shared_ptr<BesselCalc>  _besselCalc_;
-  shared_ptr<System>      _system_;
+  shared_ptr<SystemSAM>      _system_;
   
   int         Nmol_;
-  vector<int> Nsi_; // number of spheres in each MoleculeSAM
+  vector<int> Nsi_; // number of spheres in each Molecule
   
   
   // inner functions for re-expansion
@@ -84,7 +85,7 @@ public:
   
   TMatrix() { }
   
-  TMatrix(int p, shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
+  TMatrix(int p, shared_ptr<SystemSAM> _sys, shared_ptr<SHCalc> _shcalc,
           shared_ptr<Constants> _consts, shared_ptr<BesselCalc> _besselcalc,
           shared_ptr<ReExpCoeffsConstants> _reexpconsts);
   
@@ -101,7 +102,7 @@ public:
     return T_[idxMap_[{I, k, J, l}]];
   }
   
-  void update_vals(shared_ptr<System> _sys, shared_ptr<SHCalc> _shcalc,
+  void update_vals(shared_ptr<SystemSAM> _sys, shared_ptr<SHCalc> _shcalc,
                    shared_ptr<BesselCalc> _besselcalc,
                    shared_ptr<ReExpCoeffsConstants> _reexpconsts);
   
@@ -114,8 +115,13 @@ public:
   /*
    Re-expand a numerical surface with respect to T(I,k)(J,l) (Equation 27b [1])
    */
+//  MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
+//                                   int J, int l, double kappa);
+  
   MyMatrix<cmplx> re_expandX_numeric(vector<vector<double> > X, int I, int k,
-                                   int J, int l, double kappa);
+                                     int J, int l, double kappa,
+                                     shared_ptr<PreCalcSH> pre_sh,
+                                     bool no_pre_sh=false);
   
   /*
    re-expand element j of grad(X) with element (I,k,J l) of T. REquires
@@ -140,7 +146,9 @@ public:
    */
   MyMatrix<Ptx> re_expandgradX_numeric(vector<vector<Pt> > X,
                                        int I, int k,
-                                       int J, int l, double kappa);
+                                       int J, int l, double kappa,
+                                       shared_ptr<PreCalcSH> pre_sh,
+                                       bool no_pre_sh=false);
   
 
   int get_nmol() const { return Nmol_; }

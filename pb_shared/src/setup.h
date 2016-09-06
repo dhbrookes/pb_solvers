@@ -200,7 +200,7 @@ protected:
 public:
   Setup(string infile);
 
-  // Not pretty, but getting necessary inputs from APBS
+  // Not pretty, but getting necessary inputs from APBS, PBAM
   Setup(double temp, double salt_conc, double int_diel, double solv_diel, 
         int nmol, string runtype, string runname, bool randorient, double boxl,
         int pbc_type, int gridpts, string map3d, int g2dct, 
@@ -209,8 +209,11 @@ public:
         vector<string> difftype, vector<vector<double> > diffcon,
         vector<string> termcond, vector<double> termval, 
         vector<vector <int > > termnu, vector<string> confil,
-        vector<double> conpad, vector<vector <string> > xyzfil);
-  
+        vector<double> conpad, vector<vector <string> > xyzfil, string unt);
+  // APBS PBSAM  
+  void apbs_pbsam_set(vector<string> surffil, vector<string> imatfil,
+                      vector<string> expfil);
+
   // electrostatics
   string getDXoutName(  )         { return potOutfnames_[0];}
   string get_3dmap_name( )        { return potOutfnames_[1];}

@@ -34,7 +34,7 @@
 #include <memory>
 #include <time.h>
 #include "PBAMStruct.h"
-#include "BD.h"
+#include "BDAM.h"
 
 
 using namespace std;
@@ -43,8 +43,17 @@ class PBAM : protected PBAMInput
 {
 protected:
   shared_ptr<Setup> setp_;
-  shared_ptr<System> syst_;
+  shared_ptr<SystemAM> syst_;
   shared_ptr<Constants> consts_;
+
+  shared_ptr<BesselConstants> _bessl_consts_;
+  shared_ptr<BesselCalc> _bessl_calc_;
+  shared_ptr<SHCalcConstants> _sh_consts_;
+  shared_ptr<SHCalc> _sh_calc_;
+
+  double force_[MOL_MAX][3];
+  double torque_[MOL_MAX][3];
+  double nrg_intera_[MOL_MAX];
 
   int poles_;
   double solveTol_;
@@ -55,7 +64,7 @@ public:
   PBAM();
   PBAM(string infile);
   // For APBS
-  PBAM(const PBAMInput& pbami, vector<MoleculeAM> mls );
+  PBAM(const PBAMInput& pbami, vector<shared_ptr<BaseMolecule> > mls );
 
   friend PBAMInput getPBAMParams();
 
@@ -67,6 +76,7 @@ public:
   void check_system();
 
   void init_write_system();
+  void initialize_coeff_consts();
 
   int run();
   // for running the APBS version
