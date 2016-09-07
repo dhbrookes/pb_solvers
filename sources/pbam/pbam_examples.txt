@@ -4,6 +4,14 @@ PB-AM Examples
 
 This is a few examples of input files
 and their expected outputs for each type of PB-AM run.
+The following runs are described in the previous section,
+and examples of their inputs and outputs follow:
+
+- :ref:`physlab`
+- :ref:`electlab`
+- :ref:`dynamlab`
+
+.. _physlab:
 
 Physical Calculation run
 ------------------------
@@ -77,6 +85,8 @@ name: ``energyforce.2sp.jmol.out``
           FORCE: 1.19858e+08, [36.6012 -1.19858e+08 1.65408e-05]
           TORQUE: 1.78354e+06, [1.28372 1.78354e+06 1.99699e-06]
 
+
+.. _electlab:
 
 Electrostatics run
 ------------------
@@ -228,6 +238,7 @@ name: ``out.x.0.dat``
      0.3605004     0.4030045     0.4474874     0.4940082     0.5426260     0.5933995
 
 
+.. _dynamlab:
 
 Dynamics run
 ------------

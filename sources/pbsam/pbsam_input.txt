@@ -6,7 +6,7 @@ Here are the inputs that are used in a PB-SAM run, and
 their meanings. There is much overlap between PB-AM inputs and PB-SAM, but 
 the full PB-SAM list is provided here. The general format of the input is:
 
-``keyword value``
+``keyword <value>``
 
 The keyword that is most important is the `runtype` keyword.
 This specifies which type of output you are interested in generating.
