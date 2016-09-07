@@ -35,12 +35,14 @@ using namespace std;
 
 int main(int argc, const char * argv[])
 {
+  if ( argc != 2 )
+  {
+    cout << "Correct input format: ./exec run.inp " << endl;
+    exit(0);
+  }
   string input_file = argv[1];
 //string test_dir_loc = "/Users/davidbrookes/Projects/pb_solvers/pbsam/pbsam_test_files/gtest/";
-//  string input_file = "/Users/felb315/pb_solvers/pbsam/pbsam_test_files/energyforce_test/barnase_barstar/run.energyforce.hardrefs.inp";
-//string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/electrostatic_test/fas2/run.fas2.start.hardrefs.inp";
-//string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/apbs/run.apbs.hardrefs.inp";
-  
+//  string input_file = "/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/dynamics_test/opp/run.gly.hr.inp";
   
   PBSAM pbsam_run(input_file);
   pbsam_run.run();

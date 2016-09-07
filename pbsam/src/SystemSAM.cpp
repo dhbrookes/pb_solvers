@@ -18,7 +18,6 @@ cgGridPts_((int) cens.size()),
 cgGdPtExp_((int) cens.size()),
 cgGdPtBur_((int) cens.size())
 {
-  cout << "dtrans " << dtrans << " drot " << drot << endl;
   map_repos_charges();
   check_connect();
   calc_cog();
@@ -487,12 +486,10 @@ SystemSAM::SystemSAM(Setup setup, double cutoff)
         
       }
       
-      cout << "This is old cog " << mol->get_cog().x() << ", "
-      << mol->get_cog().y() << ", " << mol->get_cog().z() << endl;
       mol->rotate(rot);
       mol->translate(trans, setup.getBLen());
-      cout << "This is new cog " << mol->get_cog().x() << ", "
-      << mol->get_cog().y() << ", " << mol->get_cog().z() << endl;
+    //cout << "This is new cog " << mol->get_cog().x() << ", "
+    //<< mol->get_cog().y() << ", " << mol->get_cog().z() << endl;
       
       molecules_.push_back(mol);
       keys[0] = i; keys[1] = j;
