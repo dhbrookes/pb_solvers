@@ -11,8 +11,8 @@ the full PB-SAM list is provided here. The general format of the input is:
 The keyword that is most important is the `runtype` keyword.
 This specifies which type of output you are interested in generating.
 
-The current options are: `energyforce`, `electrostatics` 
-and `dynamics`. The keywords for each specific run follow 
+The current options are: :ref:`ef_inp`, :ref:`es_inp` 
+and :ref:`dy_inp`. The keywords for each specific run follow 
 the next section.
 
 General input file parameters
@@ -113,6 +113,7 @@ General input file parameters
 |             |                    | is required.                                           |
 +-------------+--------------------+--------------------------------------------------------+
 
+.. _ef_inp:
 
 Physical calculations
 ---------------------
@@ -128,6 +129,8 @@ for all molecules in the system.
 |             |                    |                                                        |
 |             | `<outfilename>`    | and torques for the input system.                      |
 +-------------+--------------------+--------------------------------------------------------+
+
+.. _es_inp:
 
 Electrostatic Potential Visualization
 -------------------------------------
@@ -168,6 +171,8 @@ and with the python scripts provided in the repository.
 |             |                    | along `axis` (*x*, *y*, or *z*) at `value`             |
 +-------------+--------------------+--------------------------------------------------------+
 
+
+.. _dy_inp:
 
 Brownian Dynamics Simulations
 -----------------------------

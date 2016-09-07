@@ -166,8 +166,8 @@ their meanings. The general format of the input is:</p>
 <p><code class="docutils literal"><span class="pre">keyword</span> <span class="pre">&lt;value&gt;</span></code></p>
 <p>The keyword that is most important is the <cite>runtype</cite> keyword.
 This specifies which type of output you are interested in generating.</p>
-<p>The current options are: <cite>energyforce</cite>, <cite>electrostatics</cite>
-and <cite>dynamics</cite>. The keywords for each specific run follow
+<p>The current options are: <a class="reference internal" href="#energyforce"><span class="std std-ref">Physical calculations</span></a>, <a class="reference internal" href="#electrostatics"><span class="std std-ref">Electrostatic Potential Visualization</span></a>
+and <a class="reference internal" href="#dynamics"><span class="std std-ref">Brownian Dynamics Simulations</span></a>. The keywords for each specific run follow
 the next section.</p>
 <div class="section" id="general-input-file-parameters">
 <h2>General input file parameters<a class="headerlink" href="#general-input-file-parameters" title="Permalink to this headline">¶</a></h2>
@@ -271,7 +271,7 @@ the next section.</p>
 </table>
 </div>
 <div class="section" id="physical-calculations">
-<h2>Physical calculations<a class="headerlink" href="#physical-calculations" title="Permalink to this headline">¶</a></h2>
+<span id="energyforce"></span><h2>Physical calculations<a class="headerlink" href="#physical-calculations" title="Permalink to this headline">¶</a></h2>
 <p>Will calculate the interaction energy, forces and torques
 for all molecules in the system.</p>
 <table border="1" class="docutils">
@@ -299,7 +299,7 @@ for all molecules in the system.</p>
 </table>
 </div>
 <div class="section" id="electrostatic-potential-visualization">
-<h2>Electrostatic Potential Visualization<a class="headerlink" href="#electrostatic-potential-visualization" title="Permalink to this headline">¶</a></h2>
+<span id="electrostatics"></span><h2>Electrostatic Potential Visualization<a class="headerlink" href="#electrostatic-potential-visualization" title="Permalink to this headline">¶</a></h2>
 <p>Will compute the electrostatic potential (ESP)
 and print out 2D and 3D geometries for visualization.
 Post-processing visualization can be performed in VMD
@@ -361,7 +361,7 @@ and with the python scripts provided in the repository.</p>
 </table>
 </div>
 <div class="section" id="brownian-dynamics-simulations">
-<h2>Brownian Dynamics Simulations<a class="headerlink" href="#brownian-dynamics-simulations" title="Permalink to this headline">¶</a></h2>
+<span id="dynamics"></span><h2>Brownian Dynamics Simulations<a class="headerlink" href="#brownian-dynamics-simulations" title="Permalink to this headline">¶</a></h2>
 <p>Will perform a brownian dynamics simulation
 for the given system. The user may select and
 combine a variety of termination conditions
