@@ -109,7 +109,6 @@ files should be regenerated.
 Physical Calculation run
 ------------------------
 
-
 Input Files
 ^^^^^^^^^^^
 
@@ -118,30 +117,70 @@ name:  ``run.energyforce.inp``
 .. code-block:: bash
 
   runtype energyforce
+  runname gly_0.05M.out
+    
+  units kT
+  salt 0.05
+  temp 298.15
+  idiel 4
+  sdiel 80
+  
+  attypes 1
+  type 1 2
+  tolsp 2.0
+  surf 1 gly.vert #comment when system is CGed
+  #imat 1 glyph   #uncomment when system has been run once
+  #exp 1 gly      #uncomment when system has been run once
+  pqr 1 gly.pqr
+  xyz 1 zero.xyz
 
   
-The files for PQR and XYZ are:
+The files for PQR, Surf, and XYZ are:
 
-name:  ``single_charge.pqr`` 
-
-.. code-block:: bash
-
-  ATOM      1  N   NTR     0       1.000   0.000   0.000 -1.0000 3.7300
-
-
-name:  ``positions_2.xyz`` 
+name:  ``gly.pqr`` ( the first few lines)
 
 .. code-block:: bash
 
-  -10.0  23.4  -8.7
-    0.0   0.0  -2.5
+  ATOM       1    C   A  0        0.0000   0.0000   0.0000  -0.1550 1.8700   
+  ATOM       2    C   A  0        1.5000   0.0000   0.0000   0.6500 1.8700   
+  ATOM       3    O   A  0        2.1870   0.9730   0.0000  -0.5330 1.7600   
+  ATOM       4    O   A  0        1.9820  -1.2390   0.0110  -0.4280 1.5200   
+  ATOM       5    C   A  0        3.3800  -1.4580   0.0810   0.1240 1.8700   
+  ATOM       6    C   A  0        3.8360  -1.6880   1.5170   0.1220 1.8700   
+  ATOM       7    C   A  0        5.1860  -2.3750   1.5470   0.1430 1.8700   
+  ATOM       8    O   A  0        5.4810  -2.6680   2.9010  -0.4260 1.5200   
+  ATOM       9    C   A  0        6.6410  -3.2580   3.1620   0.6450 1.8700   
+  ATOM      10    C   A  0        6.8260  -3.4910   4.6340  -0.1550 1.8700 
+
+name:  ``gly.vert`` ( the first few lines)
+
+.. code-block:: bash
+
+  # MSMS solvent excluded surface vertices for gly.xyzr
+  #vertex #sphere density probe_r
+      642      29  3.00  1.50
+     -0.041    -1.794    -0.525    -0.022    -0.960    -0.280       0       1  2 
+     -0.248    -1.747    -0.847     0.116    -0.991    -0.065       0      16  2 
+      0.947    -2.243    -0.470    -0.681    -0.661    -0.317       0       4  2 
+      0.101    -0.896    -1.738     0.433    -0.217    -0.875       0      16  2 
+      0.416    -0.678    -1.692     0.223    -0.362    -0.905       0       1  2 
+      1.084    -0.678    -1.692    -0.223    -0.362    -0.905       0       2  2 
+      1.084     0.906    -1.582    -0.223     0.485    -0.846       0       2  2 
+
+
+name:  ``zero.xyz`` 
+
+.. code-block:: bash
+
+    0.0   0.0   0.0
+   12.0  12.0  12.0
 
 
 To run:
 
 .. code-block:: bash
 
-  $$ ../../bin/pbam run.energyforce.inp
+  $$ ../../bin/pbsam run.energyforce.inp
 
 
 Output Files
@@ -149,11 +188,21 @@ Output Files
 
 And the resulting file:
 
-name: ``energyforce.2sp.jmol.out`` 
+name: ``gly_0.05M.out``
 
 .. code-block:: bash
 
-  My units are Joules/Mol
+  My units are kT. Time: 0
+  Molecule #1
+      POSITION: [0, 0, 0]
+      ENERGY: 6.17661e-05
+      FORCE: 0.00072349, [-0.000537635 -0.000423847 -0.000233967]
+      TORQUE: 2.03503e-06, [-4.31343e-05 -0.000822915 0.00078854]
+  Molecule #2
+      POSITION: [12, 12, 12] 
+      ENERGY: 6.21059e-05
+      FORCE: 0.000737173, [0.000535151 0.000445966 0.000241146]
+    TORQUE: 8.2822e-06, [0.00196746 0.00132961 -0.00398844]
 
 .. _pbsam_elec:
 
@@ -188,15 +237,16 @@ name:  ``run.electrostatic.inp``
   attypes 1
   type 1 1
   pqr 1 barnase.pqr  
+  surf 1 barnase.vert
   #pqr 1 barnase_cg.pqr #For when CG process is done
   #imat 1 barnasesph    #For when imat calculation is done
   #exp 1 barnase        #For when self-polarization is done
   xyz 1 zero.xyz
 
 
-The files for PQR and XYZ files are:
+The files for PQR, Surf, and XYZ files are:
 
-name:  ``barnase.pqr``
+name:  ``barnase.pqr`` ( the first few lines)
 
 .. code-block:: bash
 
@@ -206,21 +256,27 @@ name:  ``barnase.pqr``
   ATOM   1704  O    ALA B   1      18.578 51.351 29.318    -0.5722  1.6612
   ATOM   1705  CB   ALA B   1      21.739 52.033 28.476    -0.0597  1.9080
 
+
+name: ``barnase.vert`` ( the first few lines)
+
+.. code-block:: bash
+
+  # MSMS solvent excluded surface vertices for barnase.xyzr
+  #vertex #sphere density probe_r
+     5720     878  1.00  1.50
+      5.097    50.485    18.262     0.322    -0.456     0.830       0     123  2 
+      5.549    50.063    18.030     0.021    -0.174     0.984       0     121  2 
+      6.503    50.902    19.073    -0.615    -0.734     0.289       0     133  2 
+      5.437    49.956    18.007    -0.035    -0.228     0.973       0     121  2 
+      4.986    50.378    18.239     0.266    -0.509     0.818       0     123  2 
+      5.273    49.355    17.993     0.074     0.173     0.982       0     122  2 
+      3.731    49.067    15.692    -0.890    -0.007    -0.457       0     122  2 
+
 name:  ``zero.xyz``
 
 .. code-block:: bash
 
     0.0   0.0   0.0
-
-name: ``barnase.vert``
-
-.. code-block:: bash
-
-  ATOM      1  O    CEN     1      15.773   43.159   13.061  0.00  12.5813
-  ATOM      2  O    CEN     2      29.519   49.345   20.442  0.00  10.3065
-  ATOM      3  O    CEN     3      13.647   40.795    6.493  0.00  11.5453
-  ATOM      4  O    CEN     4      10.614   49.582   13.541  0.00  10.4199
-
 
 To run:
 
@@ -228,7 +284,6 @@ To run:
 
   $$ ../../bin/pbsam run.electrostatic.inp
 
-.. _pbsam_dyn:
 
 Output Files
 ^^^^^^^^^^^^
@@ -239,22 +294,52 @@ name: ``barnase.dx``
 
 .. code-block:: bash
 
-  # Data from PBAM Electrostat run
-  # My runname is out.dx and units kT/e
+  # Data from PBSAM Electrostat run
+  # My runname is barnase.dx and units kT/e
+  object 1 class gridpositions counts 100 100 100
+  origin -25.025 -24.4258 -30.4642
+  delta 0.538326 0.0e+00 0.0e+00
+  delta 0.0e00 0.493468 0.0e+00
+  delta 0.0e00 0.0e+00 0.563884
+  object 2 class gridconnections counts 100 100 100
+  object 3 class array type double rank 0 items 1000000 data follows
+   0.003659521  0.003697636  0.003732662  0.003764229  0.003791946 
+   0.003815395  0.003834137  0.003847709  0.003855628  0.003857388 
+   0.003852465  0.003840319  0.003820396  0.003792134  0.003754962 
+   0.003708309  0.003651608  0.003584305  0.003505857  0.003415750 
+   0.003313498  0.003198656  0.003070826  0.002929665  0.002774897 
 
 name: ``barnase_map.out``
 
 .. code-block:: bash
 
-  # Data from PBAM Electrostat run
-
+  # Data from PBSAM Electrostat run
+  # My runname is barnase_map.out and units kT
+  grid 100 100 100
+  origin -25.025 -24.4258 -30.4642
+  delta 0.538326 0.493468 0.563884
+     4.8667332   -1.1809119   -8.3553659    0.2419499 
+     5.1270905   -4.6114465   -7.2974789    0.2407265 
+     5.5570112   -3.1729867   -7.2710317    0.2437944 
+     5.7783599   -1.6880478   -7.2445845    0.2337809 
+     5.9996470   -4.5953014   -6.0809087    0.2450571 
 
 name: ``barnase.y.0.dat``
 
 .. code-block:: bash
 
-  # Data from PBAM Electrostat run
+  # Data from PBSAM Electrostat run
+  # My runname is barnase.y.0.dat
+  units kT/e
+  grid 100 100
+  axis y -0.245894
+  origin -25.025 -30.4642
+  delta 0.538326 0.563884
+  maxmin 0.350066 -0.311879
+     0.0074041     0.0076604     0.0079257     0.0081997     0.0084821 
 
+
+.. _pbsam_dyn:
 
 Dynamics run
 ------------
@@ -277,26 +362,27 @@ name:  ``run.dynamics.inp``
     
   termct 1
   termcombine or
-  term 1 contact contact.dat
-  
+  term 1 contact contact.barn_bars
+
   attypes 2
   type 1 2 move 0.015 0.000045
-  pqr 1 1BRS_chainA.pqr
-  surf 1 1BRS_chainA.vert
+  pqr 1 barnase.pqr
+  #pqr 1 barnase_cg.pqr # for after CG
+  surf 1 barnase.vert
   xyz 1 1 pos_1_1.xyz
   xyz 1 2 pos_1_2.xyz
   
   type 2 2 move 0.015 0.000045
-  pqr 2 1BRS_chainD.pqr
-  surf 2 1BRS_chainD.vert
+  pqr 2 barstar.pqr
+  #pqr 2 barstar_cg.pqr  # for after CG
+  surf 2 barstar.vert
   xyz 2 1 pos_2_1.xyz
   xyz 2 2 pos_2_2.xyz
-
-
+    
 
 The files for PQR (first 5 lines) and XYZ files for the first trajectories are:
 
-name:  ``1BRS_chainA.pqr``
+name:  ``barnase.pqr`` ( the first few lines)
 
 .. code-block:: bash
 
@@ -307,8 +393,6 @@ name:  ``1BRS_chainA.pqr``
   ATOM   1705  CB   ALA B   1      21.739 52.033 28.476    -0.0597  1.9080
   
 
-
-
 name:  ``pos_1_1.xyz``
 
 .. code-block:: bash
@@ -318,7 +402,7 @@ name:  ``pos_1_1.xyz``
 
 
 
-name:  ``1BRS_chainD.pqr``
+name:  ``barstar.pqr`` ( the first few lines)
 
 .. code-block:: bash
 
@@ -339,12 +423,25 @@ name:  ``pos_2_1.xyz``
   61.25 -26.25 61.25
 
 
+name: ``contact.barn_bars``
+
+.. code-block:: bash
+
+  1   872  2  1208    3.0
+  1  1565  2   538    3.2 
+  1   894  2   541    2.8 
+  1   862  2   566    2.9 
+  1   425  2   671    3.0 
+  1  1242  2   474    2.7 
+  1  1249  2   631    2.5 
+  1  1248  2   683    3.1
+
 
 To run:
 
 .. code-block:: bash
 
-  $$ ../../bin/pbam run.dynamics.inp
+  $$ ../../bin/pbsam run.dynamics.inp
 
 
 Output Files
