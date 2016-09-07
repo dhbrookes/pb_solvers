@@ -446,12 +446,12 @@ void PBSAM::run_dynamics()
     if (traj==0)
       for (i=0; i<_syst_->get_n(); i++)
       {   
-      //Pt tmp = dynamic_run.get_force_i(i) * _consts_->get_conv_factor();
-      //force_[i][0] = tmp.x(); force_[i][1] = tmp.y(); force_[i][2] = tmp.z();
-      //tmp = dynamic_run.get_torque_i(i) * _consts_->get_conv_factor();
-      //torque_[i][0] = tmp.x(); torque_[i][1] = tmp.y(); torque_[i][2] = tmp.z();
-      //nrg_intera_[i]=dynamic_run.get_energy_i(i)*_consts_->get_conv_factor();
-      }   
+        Pt tmp = dynamic_run.get_force_i(i)*_consts_->get_conv_factor();
+        force_[i][0]=tmp.x(); force_[i][1]=tmp.y(); force_[i][2]=tmp.z();
+        tmp = dynamic_run.get_torque_i(i)*_consts_->get_conv_factor();
+        torque_[i][0]=tmp.x(); torque_[i][1]=tmp.y(); torque_[i][2]=tmp.z();
+        nrg_intera_[i]=dynamic_run.get_energy_i(i)*_consts_->get_conv_factor();
+      }
   }
 } // end run_dynamics()
 
