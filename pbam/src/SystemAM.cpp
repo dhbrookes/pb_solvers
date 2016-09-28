@@ -43,7 +43,6 @@ MoleculeAM::MoleculeAM(string movetype, vector<double> qs, vector<Pt> pos,
   centers_[0] = cen;
   as_[0] = 0;
 
-//  as_[0] = calc_a();
   reposition_charges();
 }
 
@@ -62,12 +61,11 @@ MoleculeAM::MoleculeAM(string movetype, vector<double> qs, vector<Pt> pos,
 Pt MoleculeAM::calc_center()
 {
   // calculate the center of the MoleculeAM (for now using center):
-  double xc, yc, zc;
-  xc = 0;
-  yc = 0;
-  zc = 0;
+  double xc(0), yc(0), zc(0);
   for (int i = 0; i < Nc_; i++)
   {
+  //printf("Inside calc_center: cen: %.3f, %.3f, %.3f\n",
+  //       pos_[i].x(), pos_[i].y(), pos_[i].z());
     xc += pos_[i].x();
     yc += pos_[i].y();
     zc += pos_[i].z();
@@ -77,7 +75,6 @@ Pt MoleculeAM::calc_center()
   zc /= (double) Nc_;
   
   Pt center = Pt(xc, yc, zc);
-//  unwrappedCenter_ = center;
   return center;
 }
 
@@ -103,6 +100,8 @@ void MoleculeAM::reposition_charges()
     if (pos_[i].dist(centers_[0])+vdwr_[i] > as_[0])
       recalc_a = true;
     pos_[i] = pos_[i] - centers_[0];
+  //printf("Inside repos_charg: cen: %.3f, %.3f, %.3f\n",
+  //       pos_[i].x(), pos_[i].y(), pos_[i].z());
   }
   
   if (recalc_a) as_[0] = calc_a();

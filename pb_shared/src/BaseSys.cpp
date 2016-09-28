@@ -18,7 +18,6 @@ BaseMolecule::BaseMolecule(int type, int type_idx, string movetype,
 qs_(qs), pos_(pos), vdwr_(vdwr), type_(type), typeIdx_(type_idx),
 Nc_((int) pos.size()), centers_(1), as_(1), Ns_(1)
 {
-  
   set_Dtr_Drot(moveType_);
 }
 
@@ -31,7 +30,6 @@ BaseMolecule::BaseMolecule(int type, int type_idx, string movetype,
   centers_ = cens;
   as_ = as;
   Ns_ = (int) centers_.size();
-  
   
   set_Dtr_Drot(moveType_);
 }
@@ -112,10 +110,6 @@ boxLength_(boxlength), t_(0)
   check_for_overlap();
   lambda_ = calc_average_radius();
   if (boxLength_/2. < cutoff_)  compute_cutoff();
-  
-//  min_dist_.resize(N_);
-//  for (int i=0; i<N_; i++) min_dist_[i].resize(N_);
-//  save_min_dist();
 }
 
 
