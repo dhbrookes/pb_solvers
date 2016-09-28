@@ -15,8 +15,19 @@ cmake ..
 make pbam pbamtest
 ~~~
 
-This will make executables for pbam and pbamtest. Right now, the pbam 
+This will make executables for pbam and pbamtest. 
 Both executables can be found in the build subdirectory `bin/`
+
+If the user is building with macOS, then `vecLib` will be used to provide BLAS libraries.
+If the user is building on another system, the default `cmake` command assumes that OpenBLAS is installed on the user's system, and uses OpenBLAS to provide the BLAS libraries.  
+
+If you would like to instead  specify  either the MKL (Intel Math Kernel Library) or Atlas BLAS libraries when building on a non-macOS system, you can specify the `-DBLAS` flag when running the `cmake` command:
+
+`cmake -DBLAS="Atlas" ..` for Atlas BLAS libraries
+
+`cmake -DBLAS="MKL" ..` for MKL Blas libraries
+
+For information on installing the OpenBLas libraries, see http://www.openblas.net.
 
 ## Running
 
