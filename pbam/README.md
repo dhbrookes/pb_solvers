@@ -25,9 +25,9 @@ If you would like to instead  specify  either the MKL (Intel Math Kernel Library
 
 `cmake -DBLAS="Atlas" ..` for Atlas BLAS libraries
 
-`cmake -DBLAS="MKL" ..` for MKL Blas libraries
+`cmake -DBLAS="MKL" ..` for MKL BLAS libraries
 
-For information on installing the OpenBLas libraries, see http://www.openblas.net.
+For information on installing the OpenBLAS libraries, see http://www.openblas.net.
 
 ## Running
 
