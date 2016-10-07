@@ -413,13 +413,15 @@ void ReExpCoeffs::calc_dr_dtheta()
   for (n = 0; n < 2 * p_; n++)
   {
 //    dRdTheta_.set_val(n, MyMatrix<cmplx> (2*p_, 4*p_));
-    for (s = 0; s <= n; s++)
+    for (s = 0; s < n; s++)
     {
       val = s * (cos(theta)/sin(theta)) * get_yval(n, s);
       val -= sqrt((double)(n-s)*(n+s+1)) * exp(-phi*ic) * get_yval(n, s+1);
       set_dr_dtheta_val(n, 0, -s, val);
       set_dr_dtheta_val(n, 0, s, conj(val));
     }
+    set_dr_dtheta_val(n, 0, -n, (n*(cos(theta)/sin(theta))*get_yval(n,n)));
+    set_dr_dtheta_val(n, 0,  n, conj(n*(cos(theta)/sin(theta))*get_yval(n,n)));
   }
   
   cmplx val1, val2, val3;  // intermediate calculation values

@@ -113,9 +113,9 @@ public:
     return false;
   }  
   
-  virtual void translate(Pt dr, double boxlen);
-  virtual void rotate(Quat qrot);
-  virtual void rotate(MyMatrix<double> rotmat);
+  void translate(Pt dr, double boxlen);
+  void rotate(Quat qrot);
+  void rotate(MyMatrix<double> rotmat);
 };
 
 

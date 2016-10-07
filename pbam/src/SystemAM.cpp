@@ -122,6 +122,8 @@ void MoleculeAM::rotate(Quat qrot)
   for (int i = 0; i < Nc_; i++)
   {
     pos_[i] = qrot.rotate_point(pos_[i]);
+  //cout << "Rotated pt " << pos_[i].x() << ", "
+  //<< pos_[i].y() << ", "<< pos_[i].z() << endl;
   }
 }
 
