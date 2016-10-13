@@ -76,13 +76,6 @@ function(pbsam_extract_pbsam_version)
   set(pbsam_GIT_VERSION ${pbsam_GIT_VERSION} PARENT_SCOPE)
   set(pbsam_VERSION "<TODO> (pbsam doesn't declare its version in headers)" PARENT_SCOPE)
 
-  # pbsam_parse_header(${pbsam_INCLUDE_DIR}/pbsam/version.hpp pbsam_VERSION_LINES pbsam_MAJOR pbsam_MINOR pbsam_PATCH)
-  # set(pbsam_VERSION "${pbsam_MAJOR}.${pbsam_MINOR}.${pbsam_PATCH}" PARENT_SCOPE)
-
-  # or for #define pbsam_VERSION "x.x.x"
-  # pbsam_parse_header_single_define(pbsam ${pbsam_INCLUDE_DIR}/pbsam/version.hpp pbsam_VERSION)
-  # set(pbsam_VERSION ${pbsam_VERSION_STRING} PARENT_SCOPE)
-
 endfunction()
 
 
@@ -111,15 +104,8 @@ function(pbsam_print_configuration_summary)
   pbsam_status("")
   pbsam_status("  BUILD_SHARED_LIBS :   ${BUILD_SHARED_LIBS}")
   pbsam_status("  CPU_ONLY          :   ${CPU_ONLY}")
-  pbsam_status("Dependencies:")
-  pbsam_status("  BLAS              : " APPLE THEN "Yes (vecLib)" ELSE "Yes (${BLAS})")
-# if(BUILD_docs)
-#   pbsam_status("Documentaion:")
-#   pbsam_status("  Doxygen           :" DOXYGEN_FOUND THEN "${DOXYGEN_EXECUTABLE} (${DOXYGEN_VERSION})" ELSE "No")
-#   pbsam_status("  config_file       :   ${DOXYGEN_config_file}")
-
-#   pbsam_status("")
-# endif()
+# pbsam_status("Dependencies:")
+# pbsam_status("  BLAS              : " APPLE THEN "Yes (vecLib)" ELSE "Yes (${BLAS})")
   pbsam_status("Install:")
   pbsam_status("  Install path      :   ${CMAKE_INSTALL_PREFIX}")
   pbsam_status("")
