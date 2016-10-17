@@ -460,7 +460,7 @@ void ReExpCoeffs::calc_ds_dr()
   double val;
   double r = v_.r();
   
-  for (l = 0; l < 2 * p_; l++)
+  for (l = 0; l < 2 * p_ -1; l++)
   {
     val = l * besselK_[l] - ((2*l+1) * besselK_[l+1]);
     val *= pow((lambda_ / r), l) * (exp(-kappa_*r) / (r*r));
