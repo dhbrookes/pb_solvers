@@ -1,10 +1,10 @@
-runtype electrostatics 250
+runtype electrostatics 50
 runname electrostatic
 
 units kT
 salt 0.05
 temp 298
-idiel 4 
+idiel 4
 sdiel 78
 
 dx out.dx

@@ -512,22 +512,22 @@ void Solver::solve(double tol, int maxiter)
     if (mu < tol) break;
   }
 
-  for (int I = 0; I < _sys_->get_n(); I++)
-  {
-    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
-    {
-      cout << "This is LHN" << endl;
-      _LHN_[I]->print_kmat(k);
-    }
-  }
-  for (int I = 0; I < _sys_->get_n(); I++)
-  {
-    for (int k = 0; k < _sys_->get_Ns_i(I); k++)
-    {
-      cout << "This is H" << endl;
-      _H_[I]->print_kmat(k);
-    }
-  }
+//for (int I = 0; I < _sys_->get_n(); I++)
+//{
+//  for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+//  {
+//    cout << "This is LHN" << endl;
+//    _LHN_[I]->print_kmat(k);
+//  }
+//}
+//for (int I = 0; I < _sys_->get_n(); I++)
+//{
+//  for (int k = 0; k < _sys_->get_Ns_i(I); k++)
+//  {
+//    cout << "This is H" << endl;
+//    _H_[I]->print_kmat(k);
+//  }
+//}
 }
 
 

@@ -14,7 +14,8 @@ ElectrostaticSAM::ElectrostaticSAM(vector<shared_ptr<HMatrix> > H,
                              shared_ptr<BesselCalc> _bCalc,
                              shared_ptr<Constants> _consts,
                              int p, int npts)
-: BaseElectro(_sys, _shCalc, _bCalc, _consts, p, npts), _H_(H)
+: BaseElectro(_sys, _shCalc, _bCalc, _consts, p, npts),
+eps_s(_consts->get_dielectric_water()), _H_(H)
 {
   compute_pot();
 }
@@ -23,7 +24,7 @@ ElectrostaticSAM::ElectrostaticSAM(shared_ptr<Solver> solve, int npts)
 
 :BaseElectro(solve->get_sys(), solve->get_sh(), solve->get_bessel(),
              solve->get_consts(), solve->get_p(), npts),
-_H_(solve->get_all_H())
+eps_s(solve->get_consts()->get_dielectric_water()),_H_(solve->get_all_H())
 {
   compute_pot();
 }
@@ -35,7 +36,7 @@ double ElectrostaticSAM::compute_pot_at( Pt point )
   double rad, pot    = 0.0;
   Pt center, dist;
   MyMatrix<cmplx> localK;
-  
+
   for ( mol = 0; mol < Nmol; mol++)
   {
     for ( sph = 0; sph < _sys_->get_Ns_i(mol); sph++)
@@ -47,6 +48,6 @@ double ElectrostaticSAM::compute_pot_at( Pt point )
       pot += lotan_inner_prod( _H_[mol]->get_mat_k(sph), localK, p_);
     }
   }
-  return pot;
+  return pot*eps_s;
 }
 

@@ -5,7 +5,7 @@
 /*
  Copyright (c) 2015, Teresa Head-Gordon, Lisa Felberg, Enghui Yap, David Brookes
  All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright
@@ -16,7 +16,7 @@
  * Neither the name of UC Berkeley nor the
  names of its contributors may be used to endorse or promote products
  derived from this software without specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,7 +33,7 @@
 
 #include "PhysCalcSAM.h"
 #include "BaseElectro.h"
-#include <time.h> 
+#include <time.h>
 
 #ifdef __OMP
 #include <omp.h>
@@ -45,17 +45,18 @@
 class ElectrostaticSAM : public BaseElectro
 {
 protected:
-  
+
+  double eps_s;
   vector<shared_ptr<HMatrix> > _H_;
-  
+
   double compute_pot_at( Pt point );
-  
+
 public:
   ElectrostaticSAM(vector<shared_ptr<HMatrix> > H, shared_ptr<SystemSAM> _sys,
                 shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                 shared_ptr<Constants> _consts,
                 int p, int npts = 150);
-  
+
   ElectrostaticSAM(shared_ptr<Solver> solve, int npts=150);
 };
 

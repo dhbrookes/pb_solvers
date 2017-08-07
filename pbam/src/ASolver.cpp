@@ -58,11 +58,8 @@ void ASolver::solve_A(double prec, int MAX_POL_ROUNDS)
   }
   solvedA_ = true;
   calc_L();
-  for (int I = 0; I < _sys_->get_n(); I++)
-  {
-      print_Ai(I,5);
-      print_Li(I,5);
-  }
+//for (int I = 0; I < _sys_->get_n(); I++)
+//{ print_Ai(I,5); print_Li(I,5); }
 }
 
 void ASolver::solve_gradA(double prec, int MAX_POL_ROUNDS)
