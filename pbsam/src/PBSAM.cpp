@@ -47,14 +47,14 @@ PBSAM::PBSAM(string infile) : poles_(6)
 
   check_system();
   init_write_system();
-  
+
   if ((_setp_->getRunType() == "electrostatics")
       || ( _setp_->getRunType() == "energyforce"))
     solveTol_ = 1e-10;
   else
     solveTol_ = 1e-4;
-  
-  init_consts_calcs(); 
+
+  init_consts_calcs();
   initialize_pbsam();
 }
 
@@ -69,7 +69,7 @@ poles_(6), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
       || (string(pbami.runType_) == "energyforce")) solveTol_ = 1e-10;
   else
     solveTol_ = 1e-4;
-  
+
   // PBSAM part
   string unt = (pbami.setunits_ == 0) ? "kT" : string(pbami.units_);
   vector<string> surffil(pbsami.surfct_),imatfil(pbsami.imatct_);
@@ -78,7 +78,7 @@ poles_(6), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
   for (i=0; i<pbsami.surfct_; i++) surffil[i] = string(pbsami.surffil_[i]);
   for (i=0; i<pbsami.imatct_; i++) imatfil[i] = string(pbsami.imatfil_[i]);
   for (i=0; i<pbsami.expct_; i++)   expfil[i] = string(pbsami.expfil_[i]);
-  
+
   // Electrostatics
   vector<string> grid2Dname(pbami.grid2Dct_);
   vector<string> grid2Dax(pbami.grid2Dct_);
@@ -146,10 +146,10 @@ poles_(6), h_spol_(mls.size()), f_spol_(mls.size()), imats_(mls.size())
                              confil, conpad, xyzf, unt);
   _setp_->apbs_pbsam_set(surffil, imatfil, expfil);
   check_setup();
-  
+
   _syst_ = make_shared<SystemSAM> (mls, Constants::FORCE_CUTOFF, pbami.boxLen_);
   _consts_ = make_shared<Constants> (*_setp_);
-  
+
   init_consts_calcs();
   init_write_system();
   initialize_pbsam();
@@ -225,7 +225,7 @@ shared_ptr<SystemSAM> PBSAM::make_subsystem(vector<int> mol_idx)
   {
     sub_mols[i] = _syst_->get_moli(mol_idx[i]);
   }
-  
+
   shared_ptr<SystemSAM> _subsys = make_shared<SystemSAM>(sub_mols,
                                                    _syst_->get_cutoff(),
                                                    _syst_->get_boxlength());
@@ -248,17 +248,17 @@ void PBSAM::initialize_pbsam()
     auto imt = make_shared<IEMatrix>(idx0, _syst_->get_moli(idx0),
                                      _sh_calc_, poles_, _exp_consts_,
                                      true, 0, true); // Calc points for mol
-    
+
     imats_[idx0] = make_shared<IEMatrix>(idx0, _syst_->get_moli(idx0),
                                         _sh_calc_, poles_, _exp_consts_,
                                         false);
-    
+
     if (_setp_->getTypeNImat(i) != "" )
     {
       string istart = _setp_->getTypeNImat(i);
       for (j = 0; j < _syst_->get_Ns_i(i); j++)
         imats_[idx0]->init_from_file(istart+to_string(j)+".bin", j);
-      
+
     } else
     {
       cout << "Generating IMatrices " << fil << endl;
@@ -266,12 +266,12 @@ void PBSAM::initialize_pbsam()
 
       imats_[idx0]->calc_vals(_syst_->get_moli(idx0), _sh_calc_);
       imats_[idx0]->write_all_mat(fil.substr(0, fil.size()-4));
-    
+
       t3 = clock() - t3;
       printf ("Imat took me %f seconds.\n",
               ((float)t3)/CLOCKS_PER_SEC);
     }
-    
+
     for (k=1; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
@@ -279,8 +279,8 @@ void PBSAM::initialize_pbsam()
 
       _syst_->copy_grid(_syst_->get_mol_global_idx(i,0), idx);
     }
-    
-    
+
+
     for (k=0; k<_setp_->getTypeNCount(i); k++)
     {
       idx = _syst_->get_mol_global_idx(i,k);
@@ -309,14 +309,14 @@ void PBSAM::initialize_pbsam()
       auto sub_syst = make_subsystem({_syst_->get_mol_global_idx(i,0)});
       vector<shared_ptr<IEMatrix> > sub_i;
       sub_i.push_back(imats_[_syst_->get_mol_global_idx(i,0)]);
-      
+
       vector<shared_ptr<HMatrix> > sub_h(0);
       vector<shared_ptr<FMatrix> > sub_f(0);
-      
+
       Solver self_pol(sub_syst, _consts_, _sh_calc_, _bessl_calc_, poles_,
                       sub_i, sub_h, sub_f);
       self_pol.solve(1e-15, 500);
-      
+
       for (int k = 0; k < _syst_->get_typect(i); k++)
       {
         idx = _syst_->get_mol_global_idx(i,k);
@@ -327,7 +327,7 @@ void PBSAM::initialize_pbsam()
       self_pol.get_all_H()[0]->print_all_to_file(fil.substr(0, fil.size()-4)
                                                  +".H", _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
-      
+
       self_pol.get_all_F()[0]->print_all_to_file(fil.substr(0, fil.size()-4)
                                                  +".F", _consts_->get_kappa(),
                                                  _syst_->get_cutoff());
@@ -445,7 +445,7 @@ void PBSAM::run_dynamics()
     cout << "Done with trajectory " << traj << endl;
     if (traj==0)
       for (i=0; i<_syst_->get_n(); i++)
-      {   
+      {
         Pt tmp = dynamic_run.get_force_i(i)*_consts_->get_conv_factor();
         force_[i][0]=tmp.x(); force_[i][1]=tmp.y(); force_[i][2]=tmp.z();
         tmp = dynamic_run.get_torque_i(i)*_consts_->get_conv_factor();
@@ -462,11 +462,11 @@ void PBSAM::run_electrostatics()
   Solver solv(_syst_, _consts_, _sh_calc_, _bessl_calc_, poles_,
               imats_, h_spol_, f_spol_);
   if (_syst_->get_n() > 1) solv.solve(solveTol_, 100);
-  
+
   t3 = clock() - t3;
   printf ("Solve took me %f seconds.\n",
           ((float)t3)/CLOCKS_PER_SEC);
-  
+
   ElectrostaticSAM estat(solv.get_all_H(), _syst_, _sh_calc_, _bessl_calc_,
                       _consts_, poles_, _setp_->getGridPts());
 
@@ -490,17 +490,17 @@ void PBSAM::run_energyforce()
   clock_t t3 = clock();
   auto solv = make_shared<Solver>(_syst_, _consts_, _sh_calc_, _bessl_calc_,
                                   poles_, imats_, h_spol_, f_spol_);
-  if (_syst_->get_n() > 1) solv->solve(1e-15, 100);
-  
-  auto gsolv = make_shared<GradSolver>(_syst_, _consts_, _sh_calc_, 
+  if (_syst_->get_n() > 1) solv->solve(1e-15, 200);
+
+  auto gsolv = make_shared<GradSolver>(_syst_, _consts_, _sh_calc_,
                                        _bessl_calc_, solv->get_T(),
                                        solv->get_all_F(), solv->get_all_H(),
                                        solv->get_IE(),solv->get_interpol_list(),
                                         solv->get_precalc_sh(),
                                        _exp_consts_, poles_);
-  if (_syst_->get_n() > 1) gsolv->solve(solveTol_, 100);
-  
-  PhysCalcSAM calcEnFoTo(solv, gsolv, _setp_->getRunName(), 
+  if (_syst_->get_n() > 1) gsolv->solve(solveTol_, 200);
+
+  PhysCalcSAM calcEnFoTo(solv, gsolv, _setp_->getRunName(),
                          _consts_->get_unitsEnum());
   calcEnFoTo.calc_all();
   calcEnFoTo.print_all();
@@ -521,15 +521,15 @@ void PBSAM::run_energyforce()
 
 void PBSAM::run_bodyapprox()
 {
-//  clock_t t3 = clock();  
+//  clock_t t3 = clock();
 //  shared_ptr<ASolver> ASolv = make_shared<ASolver> (bCalcu, SHCalcu, _syst_,
 //                                                    _consts_, poles_);
-//  
-//  ThreeBody threeBodTest( ASolv, _consts_->get_unitsEnum(), 
+//
+//  ThreeBody threeBodTest( ASolv, _consts_->get_unitsEnum(),
 //                         _setp_->getRunName(), 100.0);
 //  threeBodTest.solveNmer(2);
 //  threeBodTest.solveNmer(3);
-//  t3 = clock() - t3; 
+//  t3 = clock() - t3;
 //  threeBodTest.calcTBDEnForTor();
 //
 //  threeBodTest.printTBDEnForTor(_setp_->getRunName(), _setp_->getMBDLoc());

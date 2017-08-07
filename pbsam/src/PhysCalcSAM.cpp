@@ -17,10 +17,10 @@ double EnergyCalcSAM::calc_energy(shared_ptr<HMatrix> H,
   {
 //    cout << "This is lhn" << endl;
 //    LHN->print_kmat(k);
-//    
+//
 //    cout << "This is h" << endl;
 //    H->print_kmat(k);
-    
+
     eint = 0;
     for (int n = 0; n < H->get_p(); n++)
       for (int m = -n; m < n+1; m++)
@@ -28,7 +28,7 @@ double EnergyCalcSAM::calc_energy(shared_ptr<HMatrix> H,
               +LHN->get_mat_knm(k, n, m).imag()*H->get_mat_knm(k, n, m).imag());
       E += eint;
   }
-  return E;
+  return E*epsS;
 }
 
 void EnergyCalcSAM::calc_all_energy(vector<shared_ptr<HMatrix> > H,
@@ -94,8 +94,8 @@ PhysCalcSAM::PhysCalcSAM(shared_ptr<Solver> _solv,
 _solv_(_solv), _gradSolv_(_gradsolv), _sys_(_solv->get_sys())
 {
   _sys_ = _solv->get_sys();
-  
-  _eCalc_ = make_shared<EnergyCalcSAM>(_sys_->get_n());
+
+  _eCalc_ = make_shared<EnergyCalcSAM>(_sys_->get_n(), _solv->get_consts()->get_dielectric_water());
   _fCalc_ = make_shared<ForceCalcSAM>(_sys_->get_n(), _sys_->get_all_Ik(),
                                    _solv->get_consts()->get_dielectric_water(),
                                    _solv->get_sh(), _solv->get_bessel());
@@ -159,16 +159,16 @@ void PhysCalcSAM::print_all()
 {
   int i;
   streambuf * buf;
-  ofstream of; 
-  
-  if(outfname_ != "") 
+  ofstream of;
+
+  if(outfname_ != "")
   {
     of.open(outfname_, fstream::in | fstream::out | fstream::app);
     buf = of.rdbuf();
   } else {
     buf = cout.rdbuf();
   }
-  
+
   ostream out(buf);
   out << "My units are " << unit_ << ". Time: " << _sys_->get_time() << endl;
   for ( i = 0; i < N_; i++)
@@ -180,12 +180,12 @@ void PhysCalcSAM::print_all()
     out << "\tENERGY: " << unit_conv_ * get_omegai(i) << endl;
 
     out << "\tFORCE: " << get_forcei(i).norm() * unit_conv_ << ", [";
-    out << get_forcei(i).x() * unit_conv_ << " " 
-        << get_forcei(i).y() * unit_conv_ << " " 
+    out << get_forcei(i).x() * unit_conv_ << " "
+        << get_forcei(i).y() * unit_conv_ << " "
         << get_forcei(i).z() * unit_conv_ << "]"<<endl;
     out << "\tTORQUE: " << get_taui(i).norm() << ", [";
-    out << get_taui(i).x() * unit_conv_ << " " 
-        << get_taui(i).y() * unit_conv_ << " " 
+    out << get_taui(i).x() * unit_conv_ << " "
+        << get_taui(i).y() * unit_conv_ << " "
         << get_taui(i).z() * unit_conv_ << "]"<<endl;
-  }   
+  }
 }
