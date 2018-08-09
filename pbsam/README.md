@@ -1,7 +1,7 @@
 PB-SAM code: Poisson-Boltzmann Semi-Analytical Method
 ============
 
-Welcome to the home for the [PB-SAM code](https://github.com/davas301/pb_solvers/tree/master/pbsam)!
+Welcome to the home for the [PB-SAM code](https://github.com/dhbrookes/pb_solvers/tree/master/pbsam)!
 
 ## Building
 
