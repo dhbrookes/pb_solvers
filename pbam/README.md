@@ -1,7 +1,7 @@
 PB-AM code: Poisson-Boltzmann Analytical Method
 ============
 
-Welcome to the home for the [PB-AM code](https://github.com/davas301/pb_solvers)!
+Welcome to the home for the [PB-AM code](https://github.com/dhbrookes/pb_solvers)!
 
 ## Building
 
