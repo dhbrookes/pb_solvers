@@ -73,6 +73,7 @@ if(ENABLE_PBSAM_APBS)
       ../../../../src/generic/vatom.c
       ../../../../externals/fetk/maloc/src/vsys/vmem.c
       )
+  endif()
   
   #  build pbsam library
   add_library(PBSAMLib ${PBSAMLib_src})
