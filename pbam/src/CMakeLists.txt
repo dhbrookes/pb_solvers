@@ -34,7 +34,7 @@ if(ENABLE_PBAM_APBS)
   add_definitions(-DPBAM_APBS)
   include_directories(
                       ../../../../src/ 
-                      ../../../../tools/windows/configuration\ headers/
+                      ../../build/src
                       ../../../../externals/fetk/maloc/src/base
                       ../../../../externals/fetk/maloc/src/vsys
                       ../../../../externals/fetk/maloc/src/vsh
