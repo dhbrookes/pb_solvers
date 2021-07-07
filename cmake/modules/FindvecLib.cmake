@@ -1,4 +1,4 @@
-# Find the vecLib libraries as part of Accelerate.framework 
+# Find the vecLib libraries as part of Accelerate.framework
 #  or as standalone framework
 #
 # The following are set after configuration is done:
@@ -16,16 +16,19 @@ include(FindPackageHandleStandardArgs)
 set(__vlib_incl_suff "Frameworks/vecLib.framework/Versions/Current/")
 set(__accel_incl_suff "/System/Library/Frameworks/Accelerate.framework/")
 find_path(vecLib_INCLUDE_DIR clapack.h
-          PATHS /System/Library/${__vlib_incl_suff}
-                ${__accel_incl_suff}${__vlib_incl_suff}
-                ${CMAKE_OSX_SYSROOT}/${__accel_incl_suff}${__vlib_incl_suff}/Headers/     
+          PATHS /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/
+                /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/
+                #/System/Library/${__vlib_incl_suff}
+                #${__accel_incl_suff}${__vlib_incl_suff}
+                #${CMAKE_OSX_SYSROOT}/${__accel_incl_suff}${__vlib_incl_suff}/Headers/
+                NO_DEFAULT_PATH
          )
 
 if (${vecLib_INCLUDE_DIR} MATCHES "vecLib_INCLUDE_DIR-NOTFOUND")
   find_path(vecLib_INCLUDE_DIR libBLAS.dylib
             PATHS /System/Library/${__accel_incl_suff}
            )
-endif()  
+endif()
 
 find_package_handle_standard_args(vecLib DEFAULT_MSG vecLib_INCLUDE_DIR)
 
