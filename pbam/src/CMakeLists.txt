@@ -10,8 +10,8 @@ include_directories(
 if(ENABLE_PBAM_APBS)
   add_definitions(-DPBAM_APBS)
   include_directories(
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_BINARY_DIR}/src
+    ${apbs_SOURCE_DIR}/src
+    ${Capbs_BINARY_DIR}/src
     ${FETK_INSTALL_PREFIX}/include
   )
 endif()
