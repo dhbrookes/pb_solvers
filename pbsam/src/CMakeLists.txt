@@ -10,12 +10,12 @@ include_directories(
 if(ENABLE_PBSAM_APBS)
   add_definitions(-DPBSAM_APBS)
   include_directories(
-    ${apbs_SOURCE_DIR}/src
-    ${apbs_BINARY_DIR}/src
+    ${APBS_SOURCE_DIR}/src
+    ${APBS_BINARY_DIR}/src
     ${FETK_INSTALL_PREFIX}/include
   )
   list(APPEND PBSAMLib_src
-    ${apbs_SOURCE_DIR}/src/generic/vatom.c
+    ${APBS_SOURCE_DIR}/src/generic/vatom.c
   )
   # NOTE: at the moment this will fail because we don't necessarily have vmem.c (if we're using a built version of FETK) 
   #if(APPLE)

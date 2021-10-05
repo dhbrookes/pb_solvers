@@ -10,8 +10,8 @@ include_directories(
 if(ENABLE_PBAM_APBS)
   add_definitions(-DPBAM_APBS)
   include_directories(
-    ${apbs_SOURCE_DIR}/src
-    ${Capbs_BINARY_DIR}/src
+    ${APBS_SOURCE_DIR}/src
+    ${APBS_BINARY_DIR}/src
     ${FETK_INSTALL_PREFIX}/include
   )
 endif()
