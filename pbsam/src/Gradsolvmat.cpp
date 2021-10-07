@@ -168,7 +168,7 @@ void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
 {
   int ct(0), dim(3), p2(p_*p_);
   double dfRe, dfIm;
-  double df_in[p_*p_*dim], df_out[p_*p_*dim];
+  double* df_in = new double[p_*p_*dim];
   
   for (int d = 0; d < dim; d++)  // 3 dimensions
   {
@@ -188,6 +188,7 @@ void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
   }
   
 #ifdef __LAU
+  double* df_out = new double[p_*p_*dim];
   applyMMat(&IE->get_IE_k_org(k)[0],&df_in[0],&df_out[0],1.0,0.0,p2,dim,p2);
 #else
   vector<MyMatrix<double> > df_out1(3, MyMatrix<double> (p2, 1));
@@ -196,6 +197,8 @@ void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
     MyMatrix<double> df_in1(p2, 1, &df_in[d*p2]);
     df_out1[d] = IE->get_IE_k(k) * df_in1;  // Matrix vector multiplication
   }
+
+  delete [] df_in;
   
   for (int o = 0; o<p2; o++)
     
@@ -235,6 +238,10 @@ void GradFMatrix::calc_val_k(int k, shared_ptr<IEMatrix> IE,
       }
     }
   }
+
+#ifdef __LAU
+  delete [] df_out;
+#endif
 }
 
 Ptx GradFMatrix::calc_df_P(Pt P, int k, shared_ptr<SHCalc> shcalc)
@@ -278,7 +285,7 @@ void GradHMatrix::calc_val_k(int k, vector<double> besseli,
 {
   int ct(0), d, l, s, n, m, dim(3), p2(p_*p_);
   double dhR, dhI;
-  double dh_in[p_*p_*dim], dh_out[p_*p_*dim];
+  double* dh_in = new double[p_*p_*dim];
   
   for (d = 0; d < dim; d++)  // 3 dimensions
   {
@@ -298,6 +305,7 @@ void GradHMatrix::calc_val_k(int k, vector<double> besseli,
   }
 
 #ifdef __LAU
+  double* dh_out = new double[p_*p_*dim];
   applyMMat(&IE->get_IE_k_org(k)[0],&dh_in[0],&dh_out[0],1.0,0.0,p2,dim,p2);
 #else
   vector<MyMatrix<double> > dh_out1(3, MyMatrix<double> (p2, 1));
@@ -308,6 +316,8 @@ void GradHMatrix::calc_val_k(int k, vector<double> besseli,
   }
 #endif
   
+  delete [] dh_in;
+
   ct = 0;
   for (d = 0; d < 3; d++)  // 3 dimensions
   {
@@ -342,6 +352,10 @@ void GradHMatrix::calc_val_k(int k, vector<double> besseli,
       }
     }
   }
+
+#ifdef __LAU
+  delete [] dh_out;
+#endif
 }
 
 GradLFMatrix::GradLFMatrix(int I, int wrt, int ns, int p)
