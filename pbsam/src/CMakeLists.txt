@@ -32,7 +32,7 @@ if(ENABLE_PBSAM_APBS)
 endif()
 
 #  build pbsam library
-LIST(APPEND PBSAMLib_src
+list(APPEND PBSAMLib_src
   ${pb_shared_dir}/BaseBD.cpp
   ${pb_shared_dir}/BaseElectro.cpp
   ${pb_shared_dir}/BaseSys.cpp

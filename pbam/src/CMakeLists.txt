@@ -14,10 +14,12 @@ if(ENABLE_PBAM_APBS)
     ${APBS_BINARY_DIR}/src
     ${FETK_INSTALL_PREFIX}/include
   )
+  list(APPEND PBAMLib_src
+    ${pb_wrap_dir}/PBAMWrap.cpp
+  )
 endif()
 
-#  build pbam library
-add_library(PBAMLib 
+list(APPEND PBAMLib_src
   ASolver.cpp
   ${pb_shared_dir}/BaseBD.cpp
   ${pb_shared_dir}/BaseElectro.cpp
@@ -33,9 +35,13 @@ add_library(PBAMLib
   ${pb_shared_dir}/SHCalc.cpp
   SystemAM.cpp
 )
+
 if(WIN32)
-  target_sources(PBAMLib PUBLIC ${pb_shared_dir}/drand48.cpp)
+  list(APPEND PBAMLib_src ${pb_shared_dir}/drand48.cpp)
 endif()
+
+#  build pbam library
+add_library(PBAMLib ${PBAMLib_src})
 
 # C++ code for standalone
 add_executable(pbam main.cpp)
