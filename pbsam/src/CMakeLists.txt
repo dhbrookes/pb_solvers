@@ -12,7 +12,8 @@ if(ENABLE_PBSAM_APBS)
   include_directories(
     ${APBS_SOURCE_DIR}/src
     ${APBS_BINARY_DIR}/src
-    ${FETK_INSTALL_PREFIX}/include
+    ${fetk_SOURCE_DIR}/maloc/src/vsys
+    ${fetk_BINARY_DIR}/maloc/src
   )
   list(APPEND PBSAMLib_src
     ${APBS_SOURCE_DIR}/src/generic/vatom.c
