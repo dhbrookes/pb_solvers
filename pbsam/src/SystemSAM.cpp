@@ -8,6 +8,7 @@
 
 #include "SystemSAM.h"
 
+#include <limits>
 
 MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
           vector<Pt> pos, vector<double> vdwr, vector<Pt> cens,
@@ -101,7 +102,7 @@ void MoleculeSAM::map_repos_charges()
 int MoleculeSAM::find_closest_center(Pt pos)
 {
   int idx = 0;
-  double dmin = __DBL_MAX__;
+  double dmin = std::numeric_limits<double>::max();
   double d;
   for (int k = 0; k < Ns_; k++)
   {
@@ -265,7 +266,7 @@ CGSphere MoleculeSAM::find_best_center(vector<Pt> sp,vector<Pt> np,
     double tri_a;
     int tri_N = 0;
     
-    double cmin = __DBL_MAX__;
+    double cmin = std::numeric_limits<double>::max();
     
     for (int i = 0; i < sp.size(); i++)
     {
@@ -276,7 +277,7 @@ CGSphere MoleculeSAM::find_best_center(vector<Pt> sp,vector<Pt> np,
     tri_cen = best_cen + (random_pt() * scale * random_norm());
     
     int min_id = 0;
-    tri_a = __DBL_MAX__;
+    tri_a = std::numeric_limits<double>::max();
     for (int i = 0; i < sp.size(); i++)
     {
       double distsq = (sp[i] - tri_cen).norm2();
@@ -520,7 +521,7 @@ SystemSAM::SystemSAM(Setup setup, double cutoff)
 double SystemSAM::calc_min_dist(int I, int J)
 {
   int k1, k2;
-  double dist(__DBL_MAX__), inter_act_d(100.), inter_pol_d(10.), c2c, aik, ajk;
+  double dist(std::numeric_limits<double>::max()), inter_act_d(100.), inter_pol_d(10.), c2c, aik, ajk;
   Pt cen_ik, cen_jk;
   for (k1 = 0; k1 < molecules_[I]->get_ns(); k1++)
   {

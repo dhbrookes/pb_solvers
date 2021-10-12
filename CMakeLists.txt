@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.12)
 project(pb_solvers)
 set(CMAKE_VERBOSE_MAKEFILE false)
 
@@ -16,6 +16,13 @@ set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
 set(PBSOLV_BUILD ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PBSOLV_BUILD}/bin)
 set(EXECUTABLE_INSTALL_PATH bin)
+
+option(ENABLE_PBAM "Main flag for enabling PBAM" OFF)
+option(ENABLE_PBSAM "Main flag for enabling PBSAM" OFF)
+option(ENABLE_PB_TESTING "Testing in pb_solvers" OFF)
+option(ENABLE_PBAM_APBS "pbam APBS" OFF)
+option(ENABLE_PBSAM_APBS "pbsam APBS" OFF)
+
 
 ################################################
 ##### Need a compiler for C++11
@@ -61,19 +68,18 @@ endif()
 option(ENABLE_PBAM_SPHINX "pbam SPHINX" OFF)
 if(ENABLE_PBAM_SPHINX)
 
-  if(APPLE)
-    list(APPEND CMAKE_MODULE_LINKER_FLAGS "-Wl,-undefined,dynamic_lookup")
-  endif()
-  if(WIN32)
-    list(APPEND CMAKE_MODULE_LINKER_FLAGS "/LIBPATH:C:\Python34\libs")
-  endif()
+  #if(APPLE)
+  #  list(APPEND CMAKE_MODULE_LINKER_FLAGS "-Wl,-undefined,dynamic_lookup")
+  #endif()
+  #if(WIN32)
+  #  list(APPEND CMAKE_MODULE_LINKER_FLAGS "/LIBPATH:C:\Python34\libs")
+  #endif()
 
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
-  find_package(PythonInterp 3.4 REQUIRED)
-  find_package(PythonInclude REQUIRED)
-  find_package(Cython REQUIRED)
+  #list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
+  find_package(Python3 3.4 REQUIRED COMPONENTS Interpreter Development)
+  #find_package(Cython REQUIRED)
  
-  include_directories("${PYTHON_INCLUDE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
+  include_directories(${Python3_INCLUDE_DIRS})
   add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
                      COMMAND "${PYTHON_EXECUTABLE}" -m cython
                      -o "${CMAKE_CURRENT_BINARY_DIR}/pbam_py.c"
@@ -83,28 +89,40 @@ endif()
 
 
 ################################################
-###### Not sure about this…
+###### Testing
 ################################################
-enable_testing()
+if(ENABLE_PB_TESTING)
+  find_package(GTest REQUIRED)
+  find_package(Threads REQUIRED)
+
+
+endif()
 
 
 ################################################
 ###### Sub directories for all of source
 ################################################
-add_subdirectory(pb_shared/src)
-add_subdirectory(pb_shared/unittest)
+if(ENABLE_PB_TESTING)
+  add_subdirectory(pb_shared/unittest)
+endif()
 
-add_subdirectory(pbam/src)
-add_subdirectory(pbam/unittest)
+if(ENABLE_PBAM)
+  add_subdirectory(pbam/src)
+  if(ENABLE_PB_TESTING)
+    add_subdirectory(pbam/unittest)
+  endif()
+endif()
 
-add_subdirectory(pbsam/src)
-add_subdirectory(pbsam/unittest)
-
-add_subdirectory(pb_wrap/src)
+if(ENABLE_PBSAM)
+  add_subdirectory(pbsam/src)
+  if(ENABLE_PB_TESTING)
+    add_subdirectory(pbsam/unittest)
+  endif()
+endif()
 
 ################################################
 ##### Make a directory for the executable
 ################################################
-file(MAKE_DIRECTORY build/bin)
+#file(MAKE_DIRECTORY build/bin)
 
 pbsam_print_configuration_summary()

@@ -1,92 +1,63 @@
-project(pbam)
+set(pb_shared_dir ${pb_solvers_SOURCE_DIR}/pb_shared/src/)
+set(pb_wrap_dir ${pb_solvers_SOURCE_DIR}/pb_wrap/src)
 
-include_directories("../../pb_shared/src")
-include_directories("../../pb_wrap/src")
-include_directories("./")
+include_directories(
+  ${pb_shared_dir}
+  ${pb_wrap_dir}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
-# C++ code for standalone
-add_executable(pbam
-               ASolver.cpp
-               ../../pb_shared/src/BaseBD.cpp
-               ../../pb_shared/src/BaseElectro.cpp
-               ../../pb_shared/src/BaseSys.cpp
-               BDAM.cpp
-               ../../pb_shared/src/BesselCalc.cpp
-               ../../pb_shared/src/Constants.cpp
-               ElectrostaticsAM.cpp
-               PhysCalcAM.cpp
-               main.cpp
-               PBAM.cpp
-               ../../pb_shared/src/ReExpCalc.cpp
-               ../../pb_shared/src/setup.cpp
-               ../../pb_shared/src/SHCalc.cpp
-               SystemAM.cpp
-               )
-if(WIN32)
-  target_sources(pbam PUBLIC ../../pb_shared/src/drand48.cpp)
-endif()
-
-################################################
-###### APBS components
-################################################
-option(ENABLE_PBAM_APBS "pbam APBS" OFF)
 if(ENABLE_PBAM_APBS)
   add_definitions(-DPBAM_APBS)
   include_directories(
-                      ../../../../src/
-                      ../../../../build/src
-                      ../../../../externals/fetk/maloc/src/base
-                      ../../../../externals/fetk/maloc/src/vsys
-                      ../../../../externals/fetk/maloc/src/vsh
-                      ../../../../externals/fetk/maloc/src/psh
-                      )
-
-  #  build pbam library
-  add_library(PBAMLib 
-              ASolver.cpp
-              ../../pb_shared/src/BaseBD.cpp
-              ../../pb_shared/src/BaseElectro.cpp
-              ../../pb_shared/src/BaseSys.cpp
-              BDAM.cpp
-              ../../pb_shared/src/BesselCalc.cpp
-              ../../pb_shared/src/Constants.cpp
-              ElectrostaticsAM.cpp
-              PhysCalcAM.cpp
-              PBAM.cpp
-              ../../pb_wrap/src/PBAMWrap.cpp
-              ../../pb_shared/src/ReExpCalc.cpp
-              ../../pb_shared/src/setup.cpp
-              ../../pb_shared/src/SHCalc.cpp
-              SystemAM.cpp
-              )
-  if(WIN32)
-    target_sources(PBAMLib PUBLIC ../../pb_shared/src/drand48.cpp)
-  endif()
+    ${APBS_SOURCE_DIR}/src
+    ${APBS_BINARY_DIR}/src
+    ${FETK_INSTALL_PREFIX}/include
+  )
+  list(APPEND PBAMLib_src
+    ${pb_wrap_dir}/PBAMWrap.cpp
+  )
 endif()
+
+list(APPEND PBAMLib_src
+  ASolver.cpp
+  ${pb_shared_dir}/BaseBD.cpp
+  ${pb_shared_dir}/BaseElectro.cpp
+  ${pb_shared_dir}/BaseSys.cpp
+  BDAM.cpp
+  ${pb_shared_dir}/BesselCalc.cpp
+  ${pb_shared_dir}/Constants.cpp
+  ElectrostaticsAM.cpp
+  PhysCalcAM.cpp
+  PBAM.cpp
+  ${pb_shared_dir}/ReExpCalc.cpp
+  ${pb_shared_dir}/setup.cpp
+  ${pb_shared_dir}/SHCalc.cpp
+  SystemAM.cpp
+)
+
+if(WIN32)
+  list(APPEND PBAMLib_src ${pb_shared_dir}/drand48.cpp)
+endif()
+
+#  build pbam library
+add_library(PBAMLib ${PBAMLib_src})
+
+# C++ code for standalone
+add_executable(pbam main.cpp)
+target_link_libraries(pbam PBAMLib)
 
 ################################################
 ###### Sphinx
 ################################################
 if(ENABLE_PBAM_SPHINX)
-  include_directories("${PYTHON_INCLUDE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
+  include_directories(${PYTHON_INCLUDE_DIR})
   
   add_library(pbam_sph MODULE
-              ../../pb_wrap/src/pbam_py.c
-              ASolver.cpp
-              ../../pb_shared/src/BaseBD.cpp
-              ../../pb_shared/src/BaseElectro.cpp
-              ../../pb_shared/src/BaseSys.cpp
-              BDAM.cpp
-              ../../pb_shared/src/BesselCalc.cpp
-              ../../pb_shared/src/Constants.cpp
-              ElectrostaticsAM.cpp
-              PhysCalcAM.cpp
-              PBAM.cpp
-              ../../pb_wrap/src/PBAMWrap.cpp
-              ReExpCalc.cpp
-              ../../pb_shared/src/setup.cpp
-              ../../pb_shared/src/SHCalc.cpp
-              SystemAM.cpp)
+    ${pb_wrap_dir}/pbam_py.c
+    ${pb_wrap_dir}/PBAMWrap.cpp
+  )
+  target_link_libraries(pbam_sph PBAMLib)
   
   set_target_properties(pbam_sph PROPERTIES PREFIX "")
 endif()
@@ -95,5 +66,9 @@ endif()
 ###### Install
 ################################################
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-install(TARGETS pbam RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/bin)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+install(TARGETS pbam RUNTIME)
+install(TARGETS PBAMLib LIBRARY)
+if(ENABLE_PBAM_SPHINX)
+  #install(TARGETS pbam_sph LIBRARY)
+endif()
