@@ -5,14 +5,14 @@ Welcome to the home for the [PB-SAM code](https://github.com/dhbrookes/pb_solver
 
 ## Building
 
-To build this branch, follow the instructions below:
+To build this branch with testing enabled, follow the instructions below:
 
 ~~~
 cd [pb_solvers_home]
 mkdir build
 cd build
-cmake ..
-make pbsam pbsamtest
+cmake -DENABLE_PBAM=OFF -DENABLE_PBSAM=ON -DENABLE_PB_TESTING=ON ..
+make
 ~~~
 
 This will make executables for pbsam and pbsamtest.  
@@ -26,6 +26,7 @@ To run, simply execute the following on the command line:
 ### For PBSAM
 
 ~~~
+cd [pb_solvers_home]
 ./build/bin/pbsam run.inp
 ~~~
 
@@ -33,5 +34,6 @@ To run, simply execute the following on the command line:
 ### For Google Tests
 
 ~~~
-./build/bin/pbsamtest
+cd [pb_solvers_home]/build
+ctest
 ~~~
