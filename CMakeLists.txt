@@ -7,7 +7,7 @@ set(CMAKE_VERBOSE_MAKEFILE false)
 
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
-include(ExternalProject)
+include(FetchContent)
 include(cmake/Utils.cmake)
 include(cmake/Dependencies.cmake)
 include(cmake/Summary.cmake)
@@ -22,7 +22,6 @@ option(ENABLE_PBSAM "Main flag for enabling PBSAM" OFF)
 option(ENABLE_PB_TESTING "Testing in pb_solvers" OFF)
 option(ENABLE_PBAM_APBS "pbam APBS" OFF)
 option(ENABLE_PBSAM_APBS "pbsam APBS" OFF)
-
 
 ################################################
 ##### Need a compiler for C++11
@@ -92,19 +91,28 @@ endif()
 ###### Testing
 ################################################
 if(ENABLE_PB_TESTING)
-  find_package(GTest REQUIRED)
   find_package(Threads REQUIRED)
+  # google test commit e2239ee = v1.11.0
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip
+  )
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
 
+  include_directories(
+    ${googletest_SOURCE_DIR}/googletest/include
+  )
 
+  # for finding tests for ctest
+  include(GoogleTest)
 endif()
 
 
 ################################################
 ###### Sub directories for all of source
 ################################################
-if(ENABLE_PB_TESTING)
-  add_subdirectory(pb_shared/unittest)
-endif()
 
 if(ENABLE_PBAM)
   add_subdirectory(pbam/src)
