@@ -1,5 +1,5 @@
 ---
-name: Build pb_solvers
+name: Test pb_solvers
 
 on:
   pull_request:
@@ -45,7 +45,7 @@ jobs:
 #            libomp
 #          brew upgrade gcc@9
 
-      - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
+      - name: Linux Prereqs
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
           sudo apt-get install -yq \
@@ -119,3 +119,7 @@ jobs:
           cd build/bin
           if [ -f pbamtest ]; then ./pbamtest; fi
           if [ -f pbsamtest ]; then ./pbsamtest; fi
+
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
