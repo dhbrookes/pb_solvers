@@ -1,0 +1,121 @@
+---
+name: Build pb_solvers
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+env:
+  WIN_DEPENDENCIES_RELEASE: "v0.4.0"
+  WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
+  ENABLE_PBAM: "ON"
+  ENABLE_PBSAM: "ON"
+  ENABLE_PBAM_SPHINX: "OFF"
+  ENABLE_PB_TESTING: "ON"
+
+jobs:
+  build:
+
+    name: Compile Code
+  
+    runs-on: ${{ matrix.os }}
+  
+    if: "!contains(github.event.head_commit.message, 'noci')"
+  
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+
+    steps:
+
+      - name: Add msbuild to PATH
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Checkout reposistory
+        uses: actions/checkout@master
+
+      - name: Mac Prereqs
+        if: startsWith(matrix.os, 'macos')  # Mac only
+        run: |
+          brew install \
+            openblas
+#            libomp
+#          brew upgrade gcc@9
+
+      - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
+        run: |
+          sudo apt-get install -yq \
+            libopenblas-dev
+#            software-properties-common \
+#            build-essential \
+#            libomp5 \
+#            libomp-dev
+
+      - name: Install Window dependencies
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          choco install wget
+          wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
+          7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
+          ls /c/vcpkg
+          vcpkg integrate install
+          vcpkg list --triplet x86-windows
+        shell: bash
+
+      - name: Configure for Linux and Mac
+        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')  # Linux and Mac only
+        run: |
+          mkdir -p build
+          cd build
+          cmake \
+            -DCMAKE_INSTALL_PREFIX=${PWD} \ 
+            -DENABLE_PBAM=${ENABLE_PBAM} \
+            -DENABLE_PBSAM=${ENABLE_PBSAM} \
+            -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} \
+            -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} \
+            ..
+            
+      - name: Configure for Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        env:
+          CMAKE_PREFIX_PATH: ${VCPKG_INSTALLATION_ROOT}/installed/x86-windows
+        run: |
+          mkdir -p build/Release
+          cd build
+          echo $CMAKE_PREFIX_PATH
+          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} 
+            -DVCPKG_TARGET_TRIPLET=x86-windows \
+            -DCMAKE_INSTALL_INCLUDEDIR=include \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+            -DCMAKE_INSTALL_PREFIX=${PWD} \ 
+            -DENABLE_PBAM=${ENABLE_PBAM} \
+            -DENABLE_PBSAM=${ENABLE_PBSAM} \
+            -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} \
+            -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} \
+            -G "Visual Studio 16 2019" \
+            -A Win32 \
+            ..
+        shell: bash
+
+      - name: Build and Install on Linux and Mac
+        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')  # Linux and Mac only
+        run: |
+          cd build
+          make -j install
+
+      - name: Build on Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          cd build
+          cmake --build . --config Release --parallel 2 --target install
+
+      - name: Run tests
+        run: |
+          cd build/bin
+          if [ -f pbamtest ]; then ./pbamtest; fi
+          if [ -f pbsamtest ]; then ./pbsamtest; fi
