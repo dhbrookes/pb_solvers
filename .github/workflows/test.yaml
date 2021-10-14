@@ -87,7 +87,8 @@ jobs:
           mkdir -p build/Release
           cd build
           echo $CMAKE_PREFIX_PATH
-          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} 
+          cmake \
+            -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} \
             -DVCPKG_TARGET_TRIPLET=x86-windows \
             -DCMAKE_INSTALL_INCLUDEDIR=include \
             -DCMAKE_BUILD_TYPE=Release \
