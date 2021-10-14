@@ -12,8 +12,8 @@ RUN apt-get update && \
         build-essential \
         cmake \
         libopenblas-dev \
-        python3-dev \
-        cython \
+#        python3-dev \
+#        cython \
         && \
     mkdir /src && \
     /bin/true
