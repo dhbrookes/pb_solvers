@@ -33,23 +33,23 @@ protected:
   string ax_;
   double value_;
   double range_;
+  mutable string ss_;
   
 public:
   ValueOutOfRange( string ax, double val, double ran)
-  :ax_(ax), value_(val), range_(ran)
+  :ax_(ax), value_(val), range_(ran), ss_()
   {
   }
   
   virtual const char* what() const throw()
   {
-    string ss;
-    ss = ax_ + " value " + to_string(value_)+ " out of range. It is";
+    ss_ = ax_ + " value " + to_string(value_)+ " out of range. It is";
     if (value_ < range_)
-    ss += " less than ";
+    ss_ += " less than ";
     else
-    ss += " greater than ";
-    ss += to_string(range_);
-    return ss.c_str();
+    ss_ += " greater than ";
+    ss_ += to_string(range_);
+    return ss_.c_str();
   }
 };
 

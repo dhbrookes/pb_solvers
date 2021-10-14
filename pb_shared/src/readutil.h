@@ -46,18 +46,18 @@ class CouldNotReadException: public exception
 {
 protected:
   string path_;
+  mutable string ss_;
   
 public:
   CouldNotReadException(string path)
-  :path_(path)
+  :path_(path), ss_()
   {
   }
   
   virtual const char* what() const throw()
   {
-    string ss;
-    ss = "Could not read: " + path_;
-    return ss.c_str();
+    ss_ = "Could not read: " + path_;
+    return ss_.c_str();
   }
 };
 
@@ -66,18 +66,18 @@ class NotEnoughCoordsException: public exception
 protected:
   int infile_;
   int needed_;
+  mutable string ss_;
   
 public:
   NotEnoughCoordsException( int inFile, int needed)
-  :infile_(inFile), needed_(needed)
+  :infile_(inFile), needed_(needed), ss_()
   {
   }
   
   virtual const char* what() const throw()
   {
-    string ss;
-    ss = "File has "+to_string(infile_)+" lines, need "+to_string(needed_);
-    return ss.c_str();
+    ss_ = "File has "+to_string(infile_)+" lines, need "+to_string(needed_);
+    return ss_.c_str();
   }
   
 };
@@ -87,18 +87,18 @@ class TooFewPolesException: public exception
 protected:
   int infile_;
   int needed_;
+  mutable string ss_;
   
 public:
   TooFewPolesException( int inFile, int needed)
-  :infile_(inFile), needed_(needed)
+  :infile_(inFile), needed_(needed), ss_()
   {
   }
   
   virtual const char* what() const throw()
   {
-    string ss;
-    ss = "File has "+to_string(infile_)+" poles, need "+to_string(needed_);
-    return ss.c_str();
+    ss_ = "File has "+to_string(infile_)+" poles, need "+to_string(needed_);
+    return ss_.c_str();
   }
   
 };
