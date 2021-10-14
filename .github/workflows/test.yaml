@@ -107,6 +107,7 @@ jobs:
           cd build/bin
           if [ -f pbamtest ]; then ./pbamtest; fi
           if [ -f pbsamtest ]; then ./pbsamtest; fi
+        shell: bash
 
       #- name: Setup tmate session
       #  if: ${{ ! success() }}
