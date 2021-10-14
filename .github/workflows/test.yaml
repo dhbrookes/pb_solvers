@@ -37,11 +37,11 @@ jobs:
       - name: Checkout reposistory
         uses: actions/checkout@master
 
-      - name: Mac Prereqs
-        if: startsWith(matrix.os, 'macos')  # Mac only
-        run: |
-          brew install \
-            openblas
+#      - name: Mac Prereqs
+#        if: startsWith(matrix.os, 'macos')  # Mac only
+#        run: |
+#          brew install \
+#            openblas
 #            libomp
 #          brew upgrade gcc@9
 
@@ -66,12 +66,19 @@ jobs:
           vcpkg list --triplet x86-windows
         shell: bash
 
-      - name: Configure for Linux and Mac
-        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')  # Linux and Mac only
+      - name: Configure for Linux
+        if: startsWith(matrix.os, 'ubuntu') # Linux only
         run: |
           mkdir -p build
           cd build
           cmake -DCMAKE_INSTALL_PREFIX=${PWD} -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} ..
+            
+      - name: Configure for Mac
+        if: startsWith(matrix.os, 'macos')  # Mac only
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DBLA_VENDOR=NAS -DCMAKE_INSTALL_PREFIX=${PWD} -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} ..
             
       - name: Configure for Windows
         if: startsWith(matrix.os, 'windows')  # Windows only
@@ -80,7 +87,6 @@ jobs:
         run: |
           mkdir -p build/Release
           cd build
-          echo $CMAKE_PREFIX_PATH
           cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_INSTALL_PREFIX=${PWD} -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} -G "Visual Studio 16 2019" -A Win32 ..
         shell: bash
 
@@ -102,6 +108,6 @@ jobs:
           if [ -f pbamtest ]; then ./pbamtest; fi
           if [ -f pbsamtest ]; then ./pbsamtest; fi
 
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+      #- name: Setup tmate session
+      #  if: ${{ ! success() }}
+      #  uses: mxschmitt/action-tmate@v3
