@@ -71,13 +71,7 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake \
-            -DCMAKE_INSTALL_PREFIX=${PWD} \ 
-            -DENABLE_PBAM=${ENABLE_PBAM} \
-            -DENABLE_PBSAM=${ENABLE_PBSAM} \
-            -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} \
-            -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} \
-            ..
+          cmake -DCMAKE_INSTALL_PREFIX=${PWD} -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} ..
             
       - name: Configure for Windows
         if: startsWith(matrix.os, 'windows')  # Windows only
@@ -87,20 +81,7 @@ jobs:
           mkdir -p build/Release
           cd build
           echo $CMAKE_PREFIX_PATH
-          cmake \
-            -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} \
-            -DVCPKG_TARGET_TRIPLET=x86-windows \
-            -DCMAKE_INSTALL_INCLUDEDIR=include \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
-            -DCMAKE_INSTALL_PREFIX=${PWD} \ 
-            -DENABLE_PBAM=${ENABLE_PBAM} \
-            -DENABLE_PBSAM=${ENABLE_PBSAM} \
-            -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} \
-            -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} \
-            -G "Visual Studio 16 2019" \
-            -A Win32 \
-            ..
+          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_INSTALL_PREFIX=${PWD} -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} -G "Visual Studio 16 2019" -A Win32 ..
         shell: bash
 
       - name: Build and Install on Linux and Mac
