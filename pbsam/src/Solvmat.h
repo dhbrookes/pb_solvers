@@ -30,7 +30,7 @@
 #endif
 
 #ifdef __MACOS
-#include "cblas.h"
+#include "vecLib/cblas.h"
 #endif
 
 #ifdef __XCODE
