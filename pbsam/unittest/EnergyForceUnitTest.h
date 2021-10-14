@@ -79,7 +79,7 @@ TEST_F(EnergyUTest, two_mol_test)
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
   
-  EnergyCalcSAM ecal (sys->get_n());
+  EnergyCalcSAM ecal (sys->get_n(), 78.54);
   shared_ptr<vector<double> > ene;
   ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
   ene = ecal.get_omega();
@@ -146,7 +146,7 @@ TEST_F(EnergyUTest, three_mol_test)
                   true, true, imat_loc, exp_loc);
   solvTest.update_LHN_all();
   
-  EnergyCalcSAM ecal (sys->get_n());
+  EnergyCalcSAM ecal (sys->get_n(), 78.54);
   shared_ptr<vector<double> > ene;
   ecal.calc_all_energy(solvTest.get_all_H(), solvTest.get_all_LHN());
   ene = ecal.get_omega();
