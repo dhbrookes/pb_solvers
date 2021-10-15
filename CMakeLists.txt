@@ -1,9 +1,21 @@
 cmake_minimum_required(VERSION 3.12)
-project(pb_solvers)
+project(pb_solvers LANGUAGES CXX)
 set(CMAKE_VERBOSE_MAKEFILE false)
 
 ################################################
 ################################################
+
+option(ENABLE_PBAM "Main flag for enabling PBAM" OFF)
+option(ENABLE_PBSAM "Main flag for enabling PBSAM" OFF)
+option(ENABLE_PB_TESTING "Testing in pb_solvers" OFF)
+option(ENABLE_PBAM_APBS "pbam APBS" OFF)
+option(ENABLE_PBSAM_APBS "pbsam APBS" OFF)
+
+if(APPLE AND ENABLE_PBSAM)
+  set(ENABLE_PBSAM OFF CACHE BOOL "Force PBSAM off on a Mac" FORCE)
+  message(WARNING "PBSAM disabled for mac builds")
+endif()
+
 
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
@@ -16,12 +28,6 @@ set(PBSOLV_ROOT ${PROJECT_SOURCE_DIR})
 set(PBSOLV_BUILD ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PBSOLV_BUILD}/bin)
 set(EXECUTABLE_INSTALL_PATH bin)
-
-option(ENABLE_PBAM "Main flag for enabling PBAM" OFF)
-option(ENABLE_PBSAM "Main flag for enabling PBSAM" OFF)
-option(ENABLE_PB_TESTING "Testing in pb_solvers" OFF)
-option(ENABLE_PBAM_APBS "pbam APBS" OFF)
-option(ENABLE_PBSAM_APBS "pbsam APBS" OFF)
 
 ################################################
 ##### Need a compiler for C++11
