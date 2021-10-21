@@ -25,7 +25,7 @@ protected :
   
 };
 
-TEST_F(EnergyUTest, two_mol_test)
+TEST_F(EnergyUTest, DISABLED_two_mol_test)
 {
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
@@ -90,7 +90,7 @@ TEST_F(EnergyUTest, two_mol_test)
 }
 
 
-TEST_F(EnergyUTest, three_mol_test)
+TEST_F(EnergyUTest, DISABLED_three_mol_test)
 {
   int pol(3), nmol(3);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
@@ -184,7 +184,7 @@ class ForceUTest : public ::testing::Test
   
 };
 
-TEST_F(ForceUTest, two_mol_test)
+TEST_F(ForceUTest, DISABLED_two_mol_test)
 {
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
@@ -278,7 +278,7 @@ TEST_F(ForceUTest, two_mol_test)
 }
 
 
-TEST_F(ForceUTest, three_mol_test)
+TEST_F(ForceUTest, DISABLED_three_mol_test)
 {
   int pol(3), nmol(3);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");

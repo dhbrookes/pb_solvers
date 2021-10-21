@@ -688,7 +688,7 @@ TEST_F(SolverUTest, LHN_test)
   }
 }
 
-TEST_F(SolverUTest, spol_test)
+TEST_F(SolverUTest, DISABLED_spol_test)
 {
   int pol = 3;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
@@ -735,7 +735,7 @@ TEST_F(SolverUTest, spol_test)
 }
 
 
-TEST_F(SolverUTest, mutual_pol_test)
+TEST_F(SolverUTest, DISABLED_mutual_pol_test)
 {
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
@@ -912,7 +912,7 @@ TEST_F(SolverUTest, grad_pre_test)
 }
 
 
-TEST_F(SolverUTest, grad_test)
+TEST_F(SolverUTest, DISABLED_grad_test)
 {
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
@@ -1031,7 +1031,7 @@ TEST_F(SolverUTest, grad_test)
   }
 }
 
-TEST_F(SolverUTest, grad3_test)
+TEST_F(SolverUTest, DISABLED_grad3_test)
 {
   int pol(3), nmol(3);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
