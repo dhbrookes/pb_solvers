@@ -17,15 +17,8 @@ if(ENABLE_PBSAM_APBS)
   )
   list(APPEND PBSAMLib_src
     ${APBS_SOURCE_DIR}/src/generic/vatom.c
-    ${fetk_SOURCE_DIR}/maloc/src/vsys/vmem.c
   )
-  # NOTE: at the moment this will fail because we don't necessarily have vmem.c (if we're using a built version of FETK) 
-  #if(APPLE)
-  #  LIST(APPEND PBSAMLib_src
-  #    ${apbs_SOURCE_DIR}/src/generic/vatom.c
-  #    ../../../../externals/fetk/maloc/src/vsys/vmem.c
-  #  )
-  #endif()
+  list(APPEND PBSAM_LINKER_LIBS maloc)
   list(APPEND PBSAMLib_src
     ${pb_wrap_dir}/PBSAMWrap.cpp
   )

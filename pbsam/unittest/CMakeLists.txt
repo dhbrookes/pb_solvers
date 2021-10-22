@@ -1,40 +1,19 @@
-# Set gtest properties
-ExternalProject_Get_Property(gtest source_dir binary_dir)
-include_directories("${source_dir}/include")
+include_directories("${pb_solvers_SOURCE_DIR}/pbsam/src")
+include_directories("${pb_solvers_SOURCE_DIR}/pb_shared/src")
+include_directories("${pb_solvers_SOURCE_DIR}/pb_shared/unittest")
 
-file(GLOB SRCS *.cpp)
+add_definitions("-DPBSAM_TEST_FILES_PATH=${pb_solvers_SOURCE_DIR}/pbsam/pbsam_test_files/gtest/")
 
-include_directories("../src")
-include_directories("../../pb_shared/src")
-include_directories("../../pb_shared/unittest")
-include_directories("../../pb_wrap/src")
-
-ADD_EXECUTABLE(pbsamtest
-  ../../pb_shared/src/BaseBD.cpp
-  ../../pb_shared/src/BaseElectro.cpp
-  ../../pb_shared/src/BaseSys.cpp
-  ../src/BDSAM.cpp
-  ../../pb_shared/src/BesselCalc.cpp
-  ../../pb_shared/src/Constants.cpp
-  ../src/ElectrostaticsSAM.cpp
-  ../src/Gradsolvmat.cpp
-  ../src/PBSAM.cpp
-  ../src/PhysCalcSAM.cpp
-  ../../pb_shared/src/ReExpCalc.cpp
-  ../../pb_shared/src/SHCalc.cpp
-  ../../pb_shared/src/setup.cpp
-  ../src/Solver.cpp
-  ../src/Solvmat.cpp
-  ../src/SystemSAM.cpp
-  ../src/TMatrix.cpp
+add_executable(pbsamtest 
   main.cpp
-  )
+)
+  
+target_link_libraries(pbsamtest 
+  PBSAMLib 
+  gtest_main
+  ${PBSAM_LINKER_LIBS}
+)
 
-add_test(NAME pbamtest
-         COMMAND pbamtest)
+gtest_discover_tests(pbsamtest)
 
-TARGET_LINK_LIBRARIES(pbsamtest
-                      libgtest
-                      ${PBSAM_LINKER_LIBS})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-install(TARGETS pbsamtest RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/bin)
+install(TARGETS pbsamtest)

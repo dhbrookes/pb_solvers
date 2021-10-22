@@ -1,38 +1,18 @@
-# Set gtest properties
-ExternalProject_Get_Property(gtest source_dir binary_dir)
+include_directories("${pb_solvers_SOURCE_DIR}/pbam/src")
+include_directories("${pb_solvers_SOURCE_DIR}/pb_shared/src")
+include_directories("${pb_solvers_SOURCE_DIR}/pb_shared/unittest")
 
-include_directories("${source_dir}/include")
+add_definitions("-DPBAM_TEST_FILES_PATH=${pb_solvers_SOURCE_DIR}/pbam/pbam_test_files/gtest/")
 
-file(GLOB SRCS *.cpp)
-
-include_directories("../src")
-include_directories("../../pb_shared/src")
-include_directories("../../pb_shared/unittest")
-
-ADD_EXECUTABLE(pbamtest 
-  ../src/ASolver.cpp
-  ../../pb_shared/src/BaseBD.cpp
-  ../../pb_shared/src/BaseElectro.cpp
-  ../../pb_shared/src/BaseSys.cpp
-  ../src/BDAM.cpp
-  ../../pb_shared/src/BesselCalc.cpp
-  ../../pb_shared/src/Constants.cpp
-  ../src/ElectrostaticsAM.cpp
-  ../src/PhysCalcAM.cpp
-  ../../pb_shared/src/ReExpCalc.cpp
-  ../../pb_shared/src/SHCalc.cpp
-  ../src/SystemAM.cpp
-  ../../pb_shared/src/setup.cpp
+add_executable(pbamtest 
   main.cpp
-  )
+)
   
-TARGET_LINK_LIBRARIES(pbamtest
-    libgtest
+target_link_libraries(pbamtest 
+  PBAMLib 
+  gtest_main
 )
 
-add_test(NAME pbamtest
-         COMMAND pbamtest)
+gtest_discover_tests(pbamtest)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
-  
-install(TARGETS pbamtest RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/../bin)
+install(TARGETS pbamtest)

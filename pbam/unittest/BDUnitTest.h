@@ -648,7 +648,7 @@ TEST_F(BDUTest, BDrunTimeTermXY)
   }
 }
 
-TEST_F(BDUTest, BDrunTimeTermRot)
+TEST_F(BDUTest, DISABLED_BDrunTimeTermRot)
 {
   vector<shared_ptr<BaseMolecule> > mol;
   const int ml = 2;

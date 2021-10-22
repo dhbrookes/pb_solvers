@@ -13,7 +13,7 @@ cd [pb_solvers_home]
 mkdir build
 cd build
 cmake ..
-make pbam pbsam
+make
 ~~~
 
 This will make executables for pbam and pbsam.

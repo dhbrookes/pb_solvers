@@ -5,14 +5,14 @@ Welcome to the home for the [PB-AM code](https://github.com/dhbrookes/pb_solvers
 
 ## Building
 
-To build this method, follow the instructions below:
+To build this method with testing enabled, follow the instructions below:
 
 ~~~
 cd [pb_solvers_home]
 mkdir build
 cd build
-cmake ..
-make pbam pbamtest
+cmake -DENABLE_PBAM=ON -DENABLE_PBSAM=OFF -DENABLE_PB_TESTING=ON ..
+make
 ~~~
 
 This will make executables for pbam and pbamtest. 
@@ -43,9 +43,6 @@ To run, simply execute the following on the command line:
 ### For Google Tests
 
 ~~~
-cd build # if not already in build
-./build/bin/pbsamtest
+cd [pb_solvers_home]/build
+ctest
 ~~~
-
-Note that some tests are looking for paths relative to build for files,
-so they will probably fail if you are not there!

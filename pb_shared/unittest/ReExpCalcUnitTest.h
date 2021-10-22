@@ -444,7 +444,7 @@ TEST_F(ReExpUTest, checkRZpt)
   
 }
 
-TEST_F(ReExpUTest, checkR)
+TEST_F(ReExpUTest, DISABLED_checkR)
 {
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
