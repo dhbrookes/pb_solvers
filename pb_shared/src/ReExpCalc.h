@@ -41,10 +41,11 @@ class BesselSizeException
 protected:
 int p_;
 int besselSize_;
+mutable string ss_str_;
 
 public:
 BesselSizeException(const int p, const int besselSize)
-:p_(p), besselSize_(besselSize)
+:p_(p), besselSize_(besselSize), ss_str_()
 {
 }
 
@@ -53,7 +54,8 @@ virtual const char* what() const throw()
   ostringstream ss;
   ss << "The bessel vector is the wrong size. It is supposed to be: " <<
        2 * p_ <<" but is:  " << besselSize_ << endl;
-  return ss.str().c_str();
+  ss_str_ = ss.str();
+  return ss_str_.c_str();
 }
 };
 
@@ -63,10 +65,11 @@ class SHSizeException
 protected:
   int p_;
   int shSize_;
+  mutable string ss_str_;
   
 public:
   SHSizeException(const int p, const int shSize)
-  :p_(p), shSize_(shSize)
+  :p_(p), shSize_(shSize), ss_str_()
   {
   }
   
@@ -75,7 +78,8 @@ public:
     ostringstream ss;
     ss << "The spherical harmonics vector is the wrong size." <<
     "It is supposed to be: " << 2 * p_ <<" but is:  " << shSize_ << endl;
-    return ss.str().c_str();
+    ss_str_ = ss.str();
+    return ss_str_.c_str();
   }
 };
 

@@ -291,22 +291,22 @@ class BadInputException: public exception
 {
 protected:
   vector<string> problems_;
+  mutable string ss_;
   
 public:
   BadInputException(vector<string> problems)
-  :problems_(problems)
+  :problems_(problems), ss_()
   {
   }
   
   virtual const char* what() const throw()
   {
-    string ss;
-    ss = "The following problems were found in your input file:\n";
+    ss_ = "The following problems were found in your input file:\n";
     for (int i = 0; i < problems_.size(); i++)
     {
-      ss += to_string(i) + ": " + problems_[i] + "\n";
+      ss_ += to_string(i) + ": " + problems_[i] + "\n";
     }
-    return ss.c_str();
+    return ss_.c_str();
   }
 };
 

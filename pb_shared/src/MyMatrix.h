@@ -44,11 +44,12 @@ class MatrixAccessException: public exception
 protected:
 int i_, j_;
 int nrows_, ncols_;
+mutable string ss_str_;
 
 public:
 MatrixAccessException(const int i, const int j,
                     const int nrows, const int ncols)
-:i_(i), j_(j), nrows_(nrows), ncols_(ncols)
+:i_(i), j_(j), nrows_(nrows), ncols_(ncols), ss_str_()
 {
 }
 
@@ -57,7 +58,8 @@ virtual const char* what() const throw()
 ostringstream ss;
 ss << "Cannot access point [" << i_ << "," <<  j_ <<
 "] in matrix of size (" << nrows_ << "," << ncols_ << ")" << endl;
-return ss.str().c_str();
+ss_str_ = ss.str();
+return ss_str_.c_str();
 }
 };
 
@@ -71,6 +73,7 @@ protected:
   int nrows1_, ncols1_;
   int nrows2_, ncols2_;
   ArithmeticType type_;
+  mutable string ss_str_;
   
 public:
   
@@ -78,7 +81,7 @@ public:
                             const int ncols1, const int nrows2,
                             const int ncols2)
   :nrows1_(nrows1), ncols1_(ncols1), nrows2_(nrows2),
-  ncols2_(ncols2), type_(type)
+  ncols2_(ncols2), type_(type), ss_str_()
   {
   }
   
@@ -94,7 +97,8 @@ public:
     else start = "Unknown arithmetic error with matrices of sizes (";
     ss << start << nrows1_ << "," << ncols1_ << ") and (" <<
     nrows2_ << "," << ncols2_ << ")" << endl;
-    return ss.str().c_str();
+    ss_str_ = ss.str();
+    return ss_str_.c_str();
   }
   
 };
