@@ -269,18 +269,18 @@ class OverlappingMoleculeSAMException: public exception
 protected:
   int idx1_;
   int idx2_;
+  mutable string ss_;
   
 public:
   OverlappingMoleculeSAMException(int idx1, int idx2)
-  :idx1_(idx1), idx2_(idx2)
+  :idx1_(idx1), idx2_(idx2), ss_()
   {
   }
   
   virtual const char* what() const throw()
   {
-    string ss;
-    ss = "MoleculeSAM " + to_string(idx1_)+" & " + to_string(idx2_) + " overlap";
-    return ss.c_str();
+    ss_ = "MoleculeSAM " + to_string(idx1_)+" & " + to_string(idx2_) + " overlap";
+    return ss_.c_str();
   }
 };
 

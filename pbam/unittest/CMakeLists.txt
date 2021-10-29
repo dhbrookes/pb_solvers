@@ -13,6 +13,6 @@ target_link_libraries(pbamtest
   gtest_main
 )
 
-gtest_discover_tests(pbamtest)
+gtest_discover_tests(pbamtest DISCOVERY_TIMEOUT 60)
 
 install(TARGETS pbamtest)

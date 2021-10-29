@@ -17,11 +17,12 @@ class ExpansionAccessException: public exception
 protected:
   int i_, j_;
   int poles_;
+  mutable string ss_str_;
   
 public:
   ExpansionAccessException(const int i, const int j,
                         const int poles)
-  :i_(i), j_(j), poles_(poles)
+  :i_(i), j_(j), poles_(poles), ss_str_()
   {
   }
   
@@ -30,7 +31,8 @@ public:
     ostringstream ss;
     ss << "Cannot access point [" << i_ << "," <<  j_ <<
     "] in expansion of size " << poles_ << endl;
-    return ss.str().c_str();
+    ss_str_ = ss.str();
+    return ss_str_.c_str();
   }
 };
 
@@ -40,12 +42,13 @@ class ExpansionArithmeticException: public exception
 protected:
   int poles1_, poles2_;
   ArithmeticType type_;
+  mutable string ss_str_;
       
 public:
       
   ExpansionArithmeticException(ArithmeticType type, const int poles1,
                                const int poles2)
-  :poles1_(poles1), poles2_(poles2), type_(type)
+  :poles1_(poles1), poles2_(poles2), type_(type), ss_str_()
   {
   }
       
@@ -60,7 +63,8 @@ public:
       start = "Cannot find inner product of vectors of sizes (";
     else start = "Unknown arithmetic error with matrices of sizes (";
     ss << start << poles1_ << " and " << poles2_ << ")" << endl;
-    return ss.str().c_str();
+    ss_str_ = ss.str();
+    return ss_str_.c_str();
   }
 };
 
