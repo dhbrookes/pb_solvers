@@ -11,12 +11,6 @@ option(ENABLE_PB_TESTING "Testing in pb_solvers" OFF)
 option(ENABLE_PBAM_APBS "pbam APBS" OFF)
 option(ENABLE_PBSAM_APBS "pbsam APBS" OFF)
 
-if(APPLE AND ENABLE_PBSAM)
-  set(ENABLE_PBSAM OFF CACHE BOOL "Force PBSAM off on a Mac" FORCE)
-  message(WARNING "PBSAM disabled for mac builds")
-endif()
-
-
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 include(FetchContent)
