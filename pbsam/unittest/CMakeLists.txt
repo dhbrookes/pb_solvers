@@ -14,6 +14,6 @@ target_link_libraries(pbsamtest
   ${PBSAM_LINKER_LIBS}
 )
 
-gtest_discover_tests(pbsamtest)
+gtest_discover_tests(pbsamtest DISCOVERY_TIMEOUT 60)
 
 install(TARGETS pbsamtest)
