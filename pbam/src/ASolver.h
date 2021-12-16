@@ -36,6 +36,9 @@
 #include <memory>
 #include "SystemAM.h"
 
+namespace pbsolvers
+{
+
 /*
  This class is designed to compute the vector A defined in Equation 22
  Lotan 2006, page 544
@@ -283,4 +286,5 @@ public:
 
 }; // End ASolver
 
+} /* namespace pbsolvers */
 #endif /* ASolver_h */

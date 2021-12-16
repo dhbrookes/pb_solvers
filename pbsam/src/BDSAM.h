@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BaseBD.h"
 #include "ElectrostaticsSAM.h"
 
+namespace pbsolvers
+{
 
 class ContactTerminateSAM : public BaseTerminate
 {
@@ -111,5 +113,5 @@ public:
   double get_energy_i(int i) {return _physCalc_->calc_ei(i);}
 };
 
-
+} /* namespace pbsolvers */
 #endif /* BD_h */

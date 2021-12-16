@@ -9,6 +9,9 @@
 #include "ReExpCalc.h"
 #include <iostream>
 
+namespace pbsolvers
+{
+
 ReExpCoeffsConstants::ReExpCoeffsConstants(const double &kappa,
                                            const double &lambda,
                                            const int &p,
@@ -647,3 +650,4 @@ void ReExpCoeffs::print_dSdr()
   cout << endl;
 }
 
+} /* namespace pbsolvers */

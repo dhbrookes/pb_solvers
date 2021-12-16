@@ -17,6 +17,10 @@
 #include "Constants.h"
 
 using namespace std;
+
+namespace pbsolvers
+{
+
 /*
  Base class for storing relevant data about each MoleculeAM
  */
@@ -242,4 +246,5 @@ public:
   }
 };
 
+} /* namespace pbsolvers */
 #endif /* BaseSys_h */

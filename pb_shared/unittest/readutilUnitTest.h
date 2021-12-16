@@ -11,6 +11,7 @@
 
 #include "readutil.h"
 
+
 /* Class to test opening PQR and XYZ files */
 class ReadUtilUTest : public ::testing::Test
 {
@@ -60,6 +61,7 @@ protected :
 // MSMS section
 TEST_F(ReadUtilUTest, checkMSMSExceptions)
 {
+  using namespace pbsolvers;
   string path = test_dir_loc + "none.face";
   try
   {
@@ -76,6 +78,7 @@ TEST_F(ReadUtilUTest, checkMSMSExceptions)
 
 TEST_F(ReadUtilUTest, readMSMS)
 {
+  using namespace pbsolvers;
   string path = test_dir_loc + "test.vert";
   MSMSFile MSMStest(path);
   vector<Pt> my_sp = MSMStest.get_sp();
@@ -99,6 +102,7 @@ TEST_F(ReadUtilUTest, readMSMS)
 // Contact section
 TEST_F(ReadUtilUTest, checkContactExceptions)
 {
+  using namespace pbsolvers;
   string path = test_dir_loc + "none.cont";
   try
   {
@@ -115,6 +119,7 @@ TEST_F(ReadUtilUTest, checkContactExceptions)
 
 TEST_F(ReadUtilUTest, readContact)
 {
+  using namespace pbsolvers;
   string path = test_dir_loc + "test.cont";
   ContactFile contTest(path);
   vector<vector<int > > my_pr = contTest.get_at_pairs();
@@ -139,6 +144,7 @@ TEST_F(ReadUtilUTest, readContact)
 // TransRot section
 TEST_F(ReadUtilUTest, checkTransRotExceptions)
 {
+  using namespace pbsolvers;
   string path = test_dir_loc + "none.transrot";
   try
   {
@@ -155,6 +161,7 @@ TEST_F(ReadUtilUTest, checkTransRotExceptions)
 
 TEST_F(ReadUtilUTest, readTransRot)
 {
+  using namespace pbsolvers;
   int M = 3;
   string trrot = test_dir_loc + "test.transrot";
   TransRotFile TRtest(trrot, M);
@@ -187,6 +194,7 @@ TEST_F(ReadUtilUTest, readTransRot)
 // PQR section
 TEST_F(ReadUtilUTest, checkPQRExceptions)
 {
+  using namespace pbsolvers;
   string path = test_dir_loc + "none.pqr";
   try
   {
@@ -203,6 +211,7 @@ TEST_F(ReadUtilUTest, checkPQRExceptions)
 
 TEST_F(ReadUtilUTest, readPQR)
 {
+  using namespace pbsolvers;
   string PQR = test_dir_loc + "2charge.pqr";
   PQRFile PQRtest(PQR, 10);
   vector<Pt> my_atoms = PQRtest.get_atom_pts();
@@ -232,6 +241,7 @@ TEST_F(ReadUtilUTest, readPQR)
 
 TEST_F(ReadUtilUTest, readPQRNoCen)
 {
+  using namespace pbsolvers;
   string PQR = test_dir_loc + "2charge_nocen.pqr";
   PQRFile PQRtest(PQR, 10);
   vector<Pt> my_atoms = PQRtest.get_atom_pts();
@@ -254,6 +264,7 @@ TEST_F(ReadUtilUTest, readPQRNoCen)
 
 TEST_F(ReadUtilUTest, readPQRCen)
 {
+  using namespace pbsolvers;
   int ct = 0;
   string PQR = test_dir_loc + "test_1BRS_cg.pqr";
   PQRFile PQRtest(PQR, 2000);
@@ -277,6 +288,7 @@ TEST_F(ReadUtilUTest, readPQRCen)
 
 TEST_F(ReadUtilUTest, checkXYZExceptions)
 {
+  using namespace pbsolvers;
   string path = test_dir_loc + "none.xyz";
   try
   {
@@ -293,6 +305,7 @@ TEST_F(ReadUtilUTest, checkXYZExceptions)
 
 TEST_F(ReadUtilUTest, checkXYZExceptionShort)
 {
+  using namespace pbsolvers;
   string xyz = test_dir_loc + "2charge_short.xyz";
   try
   {
@@ -310,6 +323,7 @@ TEST_F(ReadUtilUTest, checkXYZExceptionShort)
 
 TEST_F(ReadUtilUTest, readXYZ)
 {
+  using namespace pbsolvers;
   string xyz = test_dir_loc + "2charge.xyz";
   XYZFile XYZtest(xyz, 10);
   
@@ -319,6 +333,7 @@ TEST_F(ReadUtilUTest, readXYZ)
 
 TEST_F(ReadUtilUTest, readIFile)
 {
+  using namespace pbsolvers;
   int p(3), ct;
   
   for( int i = 0; i < 17; i++)
@@ -339,6 +354,7 @@ TEST_F(ReadUtilUTest, readIFile)
 
 TEST_F(ReadUtilUTest, readHFFile)
 {
+  using namespace pbsolvers;
   int p(3), ct;
   
   for( int i = 0; i < 17; i++)

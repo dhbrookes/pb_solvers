@@ -22,6 +22,8 @@ class TBDUTest : public ::testing::Test
   
   virtual void SetUp()
   {
+    using pbsolvers::Pt;
+
     mol_.clear( );
     Pt pos[2]     = { Pt( 0.0, 0.0, -8.0 ), Pt( 0, 0, 0 ) };
     Pt cgPos[2]   = { Pt( 0.0, 0.0, -7.0 ), Pt( 0, 0, 1 ) };
@@ -36,7 +38,7 @@ class TBDUTest : public ::testing::Test
       charges[1]=cg[molInd]; vdW[1]=0.0; posCharges[1]=pos[molInd]+Pt(1,0,0);
       charges[2]=cg[molInd]; vdW[2]=0.0; posCharges[2]=pos[molInd]+Pt(0,1,0);
       
-      MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      pbsolvers::MoleculeAM molNew("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
     }
@@ -81,6 +83,7 @@ class TBDUTest : public ::testing::Test
 
 TEST_F(TBDUTest, computeGroups)
 {
+  using namespace pbsolvers;
   vector<MoleculeAM> mol_sing_;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 ),
     Pt( -5.0, -5.0, 0.0 ),Pt( -5.0, 5.0, 0.0),Pt( 5.0, -5.0, 0.0 ),
@@ -132,6 +135,7 @@ TEST_F(TBDUTest, computeGroups)
 
 TEST_F(TBDUTest, computeGroupsCutoff)
 {
+  using namespace pbsolvers;
   vector<MoleculeAM> mol;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 ),
     Pt( -5.0, -5.0, 0.0 ),Pt( -5.0, 5.0, 0.0),Pt( 5.0, -5.0, 0.0 ),
@@ -180,6 +184,7 @@ TEST_F(TBDUTest, computeGroupsCutoff)
 
 TEST_F(TBDUTest, twoBD)
 {
+  using namespace pbsolvers;
   vector<MoleculeAM> mol;
   const int num = 7;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 5.0 ),Pt( -5.0, 0.0, 5.0 ),
@@ -246,6 +251,7 @@ TEST_F(TBDUTest, twoBD)
 
 TEST_F(TBDUTest, threeBD)
 {
+  using namespace pbsolvers;
   vector<MoleculeAM> mol;
   const int num = 7;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 5.0 ),Pt( -5.0, 0.0, 5.0 ),
@@ -323,6 +329,7 @@ TEST_F(TBDUTest, threeBD)
 
 TEST_F(TBDUTest, threeBDfor3)
 {
+  using namespace pbsolvers;
   vector<MoleculeAM> mol;
   const int num = 3;
   Pt pos[3] = { Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 )};
@@ -391,6 +398,7 @@ TEST_F(TBDUTest, threeBDfor3)
 
 TEST_F(TBDUTest, threeBDfor7)
 {
+  using namespace pbsolvers;
   vector<MoleculeAM> mol;
   const int num = 7;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 ),

@@ -8,6 +8,8 @@
 
 #include "Solvmat.h"
 
+namespace pbsolvers
+{
 
 // computes Y = alpha*A*X + beta*Y
 //applyMMat(IMat, &(fin), &(fout), 1.0, 0.0, p2, D, p2);
@@ -1116,3 +1118,5 @@ void FMatrix::calc_vals(shared_ptr<BaseMolecule> mol,
   delete [] f_out;
 #endif
 }
+
+} /* namespace pbsolvers */

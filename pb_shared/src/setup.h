@@ -35,6 +35,8 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
 class Setup
 {
 protected:
@@ -310,4 +312,5 @@ public:
   }
 };
 
+} /* namespace pbsolvers */
 #endif

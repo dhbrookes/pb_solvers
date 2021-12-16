@@ -8,6 +8,8 @@
 
 #include "BaseElectro.h"
 
+namespace pbsolvers
+{
 
 BaseElectro::BaseElectro(shared_ptr<BaseSystem> _sys,
                          shared_ptr<SHCalc> _shCalc,
@@ -360,3 +362,5 @@ double BaseElectro::lotan_inner_prod(MyMatrix<cmplx> U, MyMatrix<cmplx> V,
   }
   return ip;
 }
+
+} /* namespace pbsolvers */

@@ -8,6 +8,9 @@
 
 #include "Constants.h"
 
+namespace pbsolvers
+{
+
 // [F/m]=[C2/J/m] , F = Farad:
 const double Constants::PERMITTIVITY_VAC = 8.854187817e-12;
 const double Constants::KB = 1.380658e-23; //!<  [ m^2 kg/ s^2 / K ] = [ J/K ]
@@ -162,3 +165,5 @@ const double Constants::convert_int_to_kT(double val)
   double iKT_kCal = iKbT_ * ( KCAL / AVOGADRO_NUM );
   return val * intkCal_mol * iKT_kCal;
 }
+
+} /* namespace pbsolvers */

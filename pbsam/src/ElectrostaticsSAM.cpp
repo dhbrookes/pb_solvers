@@ -8,6 +8,9 @@
 
 #include "ElectrostaticsSAM.h"
 
+namespace pbsolvers
+{
+
 ElectrostaticSAM::ElectrostaticSAM(vector<shared_ptr<HMatrix> > H,
                              shared_ptr<SystemSAM> _sys,
                              shared_ptr<SHCalc> _shCalc,
@@ -51,3 +54,4 @@ double ElectrostaticSAM::compute_pot_at( Pt point )
   return pot*eps_s;
 }
 
+} /* namespace pbsolvers */

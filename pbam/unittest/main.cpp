@@ -63,6 +63,8 @@ string test_dir_loc = TOSTRING(PBAM_TEST_FILES_PATH);
 
 #include "tester.h"
 
+using namespace pbsolvers;
+
 int main(int argc, char * argv[])
 {
 

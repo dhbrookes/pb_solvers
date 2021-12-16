@@ -26,6 +26,9 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
+
 // Exception class to ensure that
 class ValueOutOfRange: public exception
 {
@@ -121,5 +124,5 @@ public:
   vector<double> get_bins()  { return step_; }
 };
 
-
+} /* namespace pbsolvers */
 #endif /* BaseElectro_h*/

@@ -8,6 +8,9 @@
 
 #include "SHCalc.h"
 
+namespace pbsolvers
+{
+
 SHCalcConstants::SHCalcConstants(const int N)
 :numVals_(N), legConsts1_(N, N), legConsts2_(N, N),
 shConsts_(N, N), dubFac_(N)
@@ -167,4 +170,4 @@ cmplx PreCalcSH::get_sh(Pt p, int n, int m)
   else return map_[p](n, m);
 }
 
-
+} /* namespace pbsolvers */

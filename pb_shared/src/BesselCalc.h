@@ -38,6 +38,8 @@
 
 #include "Constants.h"
 
+namespace pbsolvers
+{
 using namespace std;
 
 /*
@@ -112,4 +114,5 @@ public:
 //  
 //};
 
+} /* namespace pbsolvers */
 #endif /* BesselCalc_h */

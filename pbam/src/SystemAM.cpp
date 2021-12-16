@@ -8,6 +8,9 @@
 
 #include "SystemAM.h"
 
+namespace pbsolvers
+{
+
 // user specified radius and center
 MoleculeAM::MoleculeAM(string movetype, double a, vector<double> qs, vector<Pt> pos,
                    vector<double> vdwr, Pt cen, int type, int typeIdx,
@@ -342,3 +345,5 @@ void SystemAM::write_to_xyz(ofstream & xyz_out)
     xyz_out << xyzlin << endl;
   }
 }
+
+} /* namespace pbsolvers */

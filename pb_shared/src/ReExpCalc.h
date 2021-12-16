@@ -36,6 +36,8 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
 class BesselSizeException
 {
 protected:
@@ -312,5 +314,5 @@ public:
   
 };
   
-
+} /* namespace pbsolvers */
 #endif /* ReExpCalc_hpp */

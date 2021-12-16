@@ -8,6 +8,9 @@
 
 #include "BDAM.h"
 
+namespace pbsolvers
+{
+
 ContactTerminateAM::ContactTerminateAM(vector<int> mol, double distance)
 :BaseTerminate(), mol1_(mol[0]), mol2_(mol[1]), dist_contact_(distance)
 {
@@ -230,3 +233,5 @@ void BDRunAM::run(string xyzfile, string statfile, int nSCF)
   xyz_out.close();
   stats.close();
 }
+
+} /* namespace pbsolvers */

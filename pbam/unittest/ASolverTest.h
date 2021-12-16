@@ -11,6 +11,9 @@
 
 #include "ASolver.h"
 
+namespace pbsolvers
+{
+
 class ASolverTest
 {
   
@@ -60,5 +63,6 @@ public :
 };
 
 
+} /* namespace pbsolvers */
 
 #endif /* ASolverTest_h */

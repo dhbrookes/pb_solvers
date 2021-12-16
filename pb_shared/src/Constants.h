@@ -34,6 +34,9 @@
 
 #include "setup.h"
 
+namespace pbsolvers
+{
+
 enum Units { INTERNAL, KCALMOL, JMOL, kT };
 
 /**
@@ -177,4 +180,5 @@ public:
   
 };
 
+} /* namespace pbsolvers */
 #endif

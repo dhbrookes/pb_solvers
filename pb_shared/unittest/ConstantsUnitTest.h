@@ -15,7 +15,7 @@ class ConstantsUTest : public ::testing::Test
 {
 protected :
   
-  Constants ConstUTest_;
+  pbsolvers::Constants ConstUTest_;
   
   virtual void SetUp() {}
   virtual void TearDown() {}
@@ -23,6 +23,7 @@ protected :
 
 TEST_F(ConstantsUTest, settingAndCalc)
 {
+  using namespace pbsolvers;
   EXPECT_NEAR( ConstUTest_.get_kappa(), 0.03030729144, preclim);
   
   // check Kappa after changing \( eps_s \)
@@ -44,6 +45,7 @@ TEST_F(ConstantsUTest, settingAndCalc)
 
 TEST_F(ConstantsUTest, unitConv)
 {
+  using namespace pbsolvers;
   // check unit conversion
   EXPECT_NEAR(ConstUTest_.convert_int_to_kcal_mol(1.0)/332.061203,1,preclim);
   EXPECT_NEAR(ConstUTest_.convert_int_to_jmol(1.0)/1389344.0722,1,preclim);

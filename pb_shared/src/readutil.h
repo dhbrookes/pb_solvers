@@ -42,6 +42,8 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
 class CouldNotReadException: public exception
 {
 protected:
@@ -406,7 +408,7 @@ protected:
   {
     int ps = p_*p_;
     int pq = ps*ps;
-    ifstream fin(path_.c_str(), std::ios::binary);
+    ifstream fin(path_.c_str(), ios::binary);
     if (!fin.is_open()) throw CouldNotReadException(path_);
     
     // read pole order
@@ -533,5 +535,5 @@ public:
   cmplx get_mat_nm(int n, int m)            { return mat_(n, m+p_); }
 };
     
-
+} /* namespace pbsolvers */
 #endif /* readutil_h */

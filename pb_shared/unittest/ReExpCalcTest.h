@@ -11,6 +11,9 @@
 
 #include "ReExpCalc.h"
 
+namespace pbsolvers
+{
+  
 class ReExpTest 
 {
   public :
@@ -50,6 +53,6 @@ class ReExpTest
   virtual void TearDown()  { }
 };
 
-
+} /* namespace pbsolvers */
 
 #endif /* ReExpCalcTest_h */

@@ -19,16 +19,18 @@ public :
 protected :
   
   int vals_;
-  vector< shared_ptr<BaseMolecule> > mol_;
+  vector< shared_ptr<pbsolvers::BaseMolecule> > mol_;
   
   virtual void SetUp()
   {
+    using pbsolvers::Pt;
+
     mol_.clear( );
     Pt pos[2]     = { Pt( 0.0, 0.0, -8.0 ), Pt( 0, 0, 0 ) };
     Pt cgPos[2]   = { Pt( 0.0, 0.0, -7.0 ), Pt( 0, 0, 1 ) };
     double cg[2] = { -5.0, -5.0};
     double rd[2] = {  3.6,  3.6};
-    shared_ptr<MoleculeAM> molNew;
+    shared_ptr<pbsolvers::MoleculeAM> molNew;
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
       int M = 3; vector<double> charges(M);
@@ -37,7 +39,7 @@ protected :
       charges[1]=cg[molInd]; vdW[1]=0.0; posCharges[1]=pos[molInd]+Pt(1,0,0);
       charges[2]=cg[molInd]; vdW[2]=0.0; posCharges[2]=pos[molInd]+Pt(0,1,0);
 
-      molNew = make_shared<MoleculeAM>("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      molNew = make_shared<pbsolvers::MoleculeAM>("stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
     }
@@ -82,6 +84,7 @@ protected :
 
 TEST_F(ElecUTest, detailsCheck)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -112,6 +115,7 @@ TEST_F(ElecUTest, detailsCheck)
 
 TEST_F(ElecUTest, detailsCheck2)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -141,6 +145,7 @@ TEST_F(ElecUTest, detailsCheck2)
 
 TEST_F(ElecUTest, checkPot)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -169,6 +174,7 @@ TEST_F(ElecUTest, checkPot)
 
 TEST_F(ElecUTest, printDX)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -199,6 +205,7 @@ TEST_F(ElecUTest, printDX)
 
 TEST_F(ElecUTest, checkPOTZ)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -235,6 +242,7 @@ TEST_F(ElecUTest, checkPOTZ)
 
 TEST_F(ElecUTest, checkGridOutRange)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -267,6 +275,7 @@ TEST_F(ElecUTest, checkGridOutRange)
 
 TEST_F(ElecUTest, checkGridOutRange2)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -299,6 +308,7 @@ TEST_F(ElecUTest, checkGridOutRange2)
 
 TEST_F(ElecUTest, printPOTX)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -333,6 +343,7 @@ TEST_F(ElecUTest, printPOTX)
 
 TEST_F(ElecUTest, printPOTY)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -367,6 +378,7 @@ TEST_F(ElecUTest, printPOTY)
 
 TEST_F(ElecUTest, printPOTZ)
 {
+  using namespace pbsolvers;
   const int vals = 5;
   Constants const_( INTERNAL );
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -401,6 +413,7 @@ TEST_F(ElecUTest, printPOTZ)
 
 TEST_F(ElecUTest, printPOT)
 {
+  using namespace pbsolvers;
   vector<shared_ptr<BaseMolecule> > mol_sing_;
   Pt pos[9] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 5.0, 0.0, 0.0 ),Pt( -5.0, 0.0, 0.0 ),
             Pt( -5.0, -5.0, 0.0 ),Pt( -5.0, 5.0, 0.0),Pt( 5.0, -5.0, 0.0 ),

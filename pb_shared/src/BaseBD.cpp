@@ -8,6 +8,8 @@
 
 #include "BaseBD.h"
 
+namespace pbsolvers
+{
 
 string BaseTerminate::get_how_term(shared_ptr<BaseSystem> _sys)
 {
@@ -240,3 +242,4 @@ BaseBDRun::BaseBDRun(shared_ptr<BaseTerminate> _terminator, string outfname,
 {
 }
 
+} /* namespace pbsolvers */

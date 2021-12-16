@@ -8,6 +8,9 @@
 
 #include "setup.h"
 
+namespace pbsolvers
+{
+
 const double Setup::MAX_DIST = 1.4e18;
 
 Setup::Setup(string infile)
@@ -596,3 +599,4 @@ void Setup::check_inputs()
   if (problems.size() > 0) throw BadInputException(problems);
 }
 
+} /* namespace pbsolvers */

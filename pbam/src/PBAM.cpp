@@ -8,6 +8,9 @@
 
 #include "PBAM.h"
 
+namespace pbsolvers
+{
+
 PBAM::PBAM() : PBAMInput()
 {
   poles_ = 5;
@@ -382,3 +385,4 @@ void PBAM::run_bodyapprox()
           ((float)t3)/CLOCKS_PER_SEC);
 }
 
+} /* namespace pbsolvers */

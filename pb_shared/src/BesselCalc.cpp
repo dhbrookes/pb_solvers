@@ -8,6 +8,8 @@
 
 #include "BesselCalc.h"
 
+namespace pbsolvers
+{
 
 BesselConstants::BesselConstants(const int N)
 :numVals_(N)
@@ -114,3 +116,5 @@ const vector<double> BesselCalc::calc_mbfI(const int n,
 //  }
 //  
 //}
+
+} /* namespace pbsolvers */

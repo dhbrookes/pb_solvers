@@ -12,6 +12,7 @@
 #include "ReExpCalc.h"
 #include <iostream>
 
+
 /*
  Class to test R and S constants : A, B, alpha, beta, nu and mu
  */
@@ -27,14 +28,14 @@ class ReExpConstUTest : public ::testing::Test
   {
     kappa_  = kappa;
     lambda_ = lambd;
-    ReExpCo_ = ReExpCoeffsConstants( kappa_, lambda_, vals_);
+    ReExpCo_ = pbsolvers::ReExpCoeffsConstants( kappa_, lambda_, vals_);
   }
   
   protected :
   int vals_;
   double kappa_;
   double lambda_;
-  ReExpCoeffsConstants ReExpCo_;
+  pbsolvers::ReExpCoeffsConstants ReExpCo_;
   
   double A9[nvals*2] = { 0, 0.21821789,  0.30037570,  0.35751860,  0.40050094,
     0.43355498, 0.45883147, 0.47756693,  0.49051147,  0.49811675,  0.50062617,
@@ -82,6 +83,7 @@ class ReExpConstUTest : public ::testing::Test
 
 TEST_F(ReExpConstUTest, checkA)
 {
+  using namespace pbsolvers;
   for ( int s = -nvals + 1 ; s < nvals; s++ )
   {
     EXPECT_NEAR( ReExpCo_.get_a_val( nvals-1, s), A9[ s+nvals], preclim);
@@ -91,6 +93,7 @@ TEST_F(ReExpConstUTest, checkA)
 
 TEST_F(ReExpConstUTest, checkB)
 {
+  using namespace pbsolvers;
   
   for ( int s = -nvals+1; s < nvals; s++ )
   {
@@ -101,6 +104,7 @@ TEST_F(ReExpConstUTest, checkB)
 
 TEST_F(ReExpConstUTest, checkAlpha)
 {
+  using namespace pbsolvers;
   
   for ( int s = -nvals+1; s < nvals; s++ )
   {
@@ -121,6 +125,7 @@ TEST_F(ReExpConstUTest, checkAlpha)
 
 TEST_F(ReExpConstUTest, checkBeta)
 {
+  using namespace pbsolvers;
   
   for ( int s = -nvals+1; s < nvals; s++ )
   {
@@ -140,6 +145,7 @@ TEST_F(ReExpConstUTest, checkBeta)
 
 TEST_F(ReExpConstUTest, checkNu)
 {
+  using namespace pbsolvers;
   
   for ( int s = -nvals+1; s < nvals; s++ )
   {
@@ -159,6 +165,7 @@ TEST_F(ReExpConstUTest, checkNu)
 
 TEST_F(ReExpConstUTest, checkMu)
 {
+  using namespace pbsolvers;
   
   for ( int s = -nvals+1; s < nvals; s++ )
   {
@@ -295,6 +302,7 @@ protected :
 
 TEST_F(ReExpUTest, checkSpecialSH)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 35.0);
   SHCalcConstants shCon( 2*nvals );
@@ -322,6 +330,7 @@ TEST_F(ReExpUTest, checkSpecialSH)
 
 TEST_F(ReExpUTest, checkSingPrefactor)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 35.0);
   SHCalcConstants shCon( 2*nvals );
@@ -353,6 +362,7 @@ TEST_F(ReExpUTest, checkSingPrefactor)
 
 TEST_F(ReExpUTest, checkR0Zpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 5.0);
   SHCalcConstants shCon( 2*nvals );
@@ -383,6 +393,7 @@ TEST_F(ReExpUTest, checkR0Zpt)
 
 TEST_F(ReExpUTest, checkR0)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );
@@ -414,6 +425,7 @@ TEST_F(ReExpUTest, checkR0)
 
 TEST_F(ReExpUTest, checkRZpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 5.0);
   SHCalcConstants shCon( 2*nvals );
@@ -446,6 +458,7 @@ TEST_F(ReExpUTest, checkRZpt)
 
 TEST_F(ReExpUTest, DISABLED_checkR)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );
@@ -476,6 +489,7 @@ TEST_F(ReExpUTest, DISABLED_checkR)
 
 TEST_F(ReExpUTest, checkS0Zpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 1.0);
   SHCalcConstants shCon( 2*nvals );
@@ -506,6 +520,7 @@ TEST_F(ReExpUTest, checkS0Zpt)
 
 TEST_F(ReExpUTest, checkS0)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );
@@ -535,6 +550,7 @@ TEST_F(ReExpUTest, checkS0)
 
 TEST_F(ReExpUTest, checkSZpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 5.0);
   SHCalcConstants shCon( 2*nvals );
@@ -566,6 +582,7 @@ TEST_F(ReExpUTest, checkSZpt)
 
 TEST_F(ReExpUTest, checkS)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );
@@ -601,6 +618,7 @@ TEST_F(ReExpUTest, checkS)
 
 TEST_F(ReExpUTest, checkdRdtheta0Zpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 5.0);
   SHCalcConstants shCon( 2*nvals );
@@ -624,6 +642,7 @@ TEST_F(ReExpUTest, checkdRdtheta0Zpt)
 
 TEST_F(ReExpUTest, checkdRdtheta0)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );
@@ -655,6 +674,7 @@ TEST_F(ReExpUTest, checkdRdtheta0)
 
 TEST_F(ReExpUTest, checkdRdthetaZpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 5.0);
   SHCalcConstants shCon( 2*nvals );
@@ -687,6 +707,7 @@ TEST_F(ReExpUTest, checkdRdthetaZpt)
 
 TEST_F(ReExpUTest, checkdRdtheta)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );
@@ -718,6 +739,7 @@ TEST_F(ReExpUTest, checkdRdtheta)
 
 TEST_F(ReExpUTest, checkdRdphi0Zpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 5.0);
   SHCalcConstants shCon( 2*nvals );
@@ -747,6 +769,7 @@ TEST_F(ReExpUTest, checkdRdphi0Zpt)
 
 TEST_F(ReExpUTest, checkdRdphi0)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );
@@ -778,6 +801,7 @@ TEST_F(ReExpUTest, checkdRdphi0)
 
 TEST_F(ReExpUTest, checkdRdphiZpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 5.0);
   SHCalcConstants shCon( 2*nvals );
@@ -809,6 +833,7 @@ TEST_F(ReExpUTest, checkdRdphiZpt)
 
 TEST_F(ReExpUTest, checkdRdphi)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );
@@ -841,6 +866,7 @@ TEST_F(ReExpUTest, checkdRdphi)
 
 TEST_F(ReExpUTest, checkdSdr0Zpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 1.0);
   SHCalcConstants shCon( 2*nvals );
@@ -872,6 +898,7 @@ TEST_F(ReExpUTest, checkdSdr0Zpt)
 
 TEST_F(ReExpUTest, checkdSdr0)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );
@@ -902,6 +929,7 @@ TEST_F(ReExpUTest, checkdSdr0)
 
 TEST_F(ReExpUTest, checkdSdrZpt)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 0.0, 0.0, 25.0);
   SHCalcConstants shCon( 2*nvals );
@@ -935,6 +963,7 @@ TEST_F(ReExpUTest, checkdSdrZpt)
 
 TEST_F(ReExpUTest, checkdSdr)
 {
+  using namespace pbsolvers;
   Constants Cst;
   Pt testPt = Pt( 6.9,-4.3,-0.2);
   SHCalcConstants shCon( 2*nvals );

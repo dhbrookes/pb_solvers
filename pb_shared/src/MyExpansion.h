@@ -11,7 +11,9 @@
 
 #include <map>
 
-
+namespace pbsolvers
+{
+  
 class ExpansionAccessException: public exception
 {
 protected:
@@ -393,4 +395,5 @@ public:
   
 };
 
+} /* namespace pbsolvers */
 #endif /* MyExpansion_h */

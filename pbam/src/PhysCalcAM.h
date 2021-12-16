@@ -44,6 +44,9 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
+
 /*
  Class for calculating the energy of molecules in the system given
  an ASolver object
@@ -373,5 +376,7 @@ public:
   virtual double get_omegai(int i) {return get_energyi_approx(i); }
   
 };
+
+} /* namespace pbsolvers */
 
 #endif /* PhysCalcAM_h */

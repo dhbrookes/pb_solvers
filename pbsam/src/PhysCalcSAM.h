@@ -15,6 +15,9 @@
 #include "BasePhysCalc.h"
 #include <map>
 
+namespace pbsolvers
+{
+
 /*
  Class for calculating interaction energy of a MoleculeSAM given H^(I,k)
  and LHN^(I,k) matrices
@@ -128,6 +131,7 @@ public:
 
 };
 
+} /* namespace pbsolvers */
 #endif /* PhysCalcCalc_h */
 
 

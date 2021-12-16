@@ -17,6 +17,10 @@
 #include "BasePhysCalc.h"
 
 using namespace std;
+
+namespace pbsolvers
+{
+
 /*
  Base class for implementing termination conditions in BD
  */
@@ -185,6 +189,6 @@ public:
 };
 
 
-
+} /* namespace pbsolvers */
 
 #endif /* BaseBD_h */

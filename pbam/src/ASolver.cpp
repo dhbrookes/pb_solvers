@@ -8,6 +8,9 @@
 
 #include "ASolver.h"
 
+namespace pbsolvers
+{
+
 ASolver::ASolver(shared_ptr<BesselCalc> _bcalc,
                   shared_ptr<SHCalc> _shCalc,
                   shared_ptr<SystemAM> _sys,
@@ -1203,3 +1206,5 @@ void ASolver::reset_all()
   init_A();
   init_gradA();
 }
+
+} /* namespace pbsolvers */

@@ -39,6 +39,9 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
+
 class PBAM : protected PBAMInput
 {
 protected:
@@ -88,5 +91,6 @@ public:
   void run_energyforce();
 };
 
+} /* namespace pbsolvers */
 
 #endif

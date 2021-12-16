@@ -11,6 +11,7 @@
 
 #include "SystemSAM.h"
 
+
 class CGSphereUTest : public ::testing::Test
 {
   public :
@@ -23,6 +24,7 @@ class CGSphereUTest : public ::testing::Test
 
 TEST_F(CGSphereUTest, checkUserSpecRadCent)
 {
+  using namespace pbsolvers;
   Pt pos(102.57,33.0,-5.0); double rad = 5.3;
   int M = 3; vector<int> charges(M);
   charges[0]=20; charges[1]=4; charges[2]=1;
@@ -103,6 +105,7 @@ protected :
 
 TEST_F(MoleculeSAMUTest, checkUserSpecCG)
 {
+  using namespace pbsolvers;
   vector<Pt> pos(1); vector<double> cgRad(1);
   int M = 3; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
@@ -149,6 +152,7 @@ TEST_F(MoleculeSAMUTest, checkUserSpecCG)
 //TODO: Not sure this is actually something we can test...
 TEST_F(MoleculeSAMUTest, checkCreateCen)
 {
+  using namespace pbsolvers;
   srand(1);
   PQRFile pqr(test_dir_loc + "test.pqr");
   MSMSFile surf_file (test_dir_loc + "test.vert");
@@ -163,6 +167,7 @@ TEST_F(MoleculeSAMUTest, checkCreateCen)
 
 TEST_F(MoleculeSAMUTest, check1BRSCGtoAtMap)
 {
+  using namespace pbsolvers;
   int ct = 0;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   
@@ -181,6 +186,7 @@ TEST_F(MoleculeSAMUTest, check1BRSCGtoAtMap)
 
 TEST_F(MoleculeSAMUTest, translate)
 {
+  using namespace pbsolvers;
   int ct = 0;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   MoleculeSAM molNew( 0, 0, "stat", pqr.get_charges(),
@@ -209,6 +215,7 @@ TEST_F(MoleculeSAMUTest, translate)
 
 TEST_F(MoleculeSAMUTest, translatePBC)
 {
+  using namespace pbsolvers;
   int ct = 0;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   MoleculeSAM molNew( 0, 0, "stat", pqr.get_charges(),
@@ -236,6 +243,7 @@ TEST_F(MoleculeSAMUTest, translatePBC)
 
 TEST_F(MoleculeSAMUTest, rotateSimple)
 {
+  using namespace pbsolvers;
   int ct = 0;
   vector<MoleculeSAM> mols;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
@@ -264,6 +272,7 @@ TEST_F(MoleculeSAMUTest, rotateSimple)
 
 TEST_F(MoleculeSAMUTest, rotate2)
 {
+  using namespace pbsolvers;
   int ct = 0;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   MoleculeSAM molNew( 0, 0, "stat", pqr.get_charges(),
@@ -294,7 +303,7 @@ class SystemUTest : public ::testing::Test
 public :
   
 protected :
-  Constants const_;
+  pbsolvers::Constants const_;
   
   virtual void SetUp() {}
   virtual void TearDown() {}
@@ -323,6 +332,7 @@ protected :
 
 TEST_F(SystemUTest, checkOverlap)
 {
+  using namespace pbsolvers;
   int M = 2;
   vector<shared_ptr<BaseMolecule> > mol_;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
@@ -349,6 +359,7 @@ TEST_F(SystemUTest, checkOverlap)
 
 TEST_F(SystemUTest, checkPBCOverlap)
 {
+  using namespace pbsolvers;
   vector<shared_ptr<BaseMolecule> > mol_; const int nMol = 3;
   PQRFile pqr(test_dir_loc + "test_1BRS_cg.pqr");
   
@@ -379,6 +390,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
 
 TEST_F(SystemUTest, checkVals)
 {
+  using namespace pbsolvers;
   vector<shared_ptr<BaseMolecule> > mol_;
   int nMol = 3; int ct = 0;
   double cutoff = 45.876;
@@ -465,6 +477,7 @@ TEST_F(SystemUTest, checkVals)
 
 TEST_F(SystemUTest, changeCutoff)
 {
+  using namespace pbsolvers;
   double cutoff = 245.876;
   double boxl   = 255.876;
   vector<shared_ptr<BaseMolecule> > mol_;
@@ -488,6 +501,7 @@ TEST_F(SystemUTest, changeCutoff)
 
 TEST_F(SystemUTest, PBCcheck)
 {
+  using namespace pbsolvers;
   double cutoff = 75.0;
   double boxl   = 180.0;
   vector<shared_ptr<BaseMolecule> > mol_;

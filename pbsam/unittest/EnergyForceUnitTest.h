@@ -27,6 +27,7 @@ protected :
 
 TEST_F(EnergyUTest, DISABLED_two_mol_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
@@ -92,6 +93,7 @@ TEST_F(EnergyUTest, DISABLED_two_mol_test)
 
 TEST_F(EnergyUTest, DISABLED_three_mol_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(3);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
@@ -186,6 +188,7 @@ class ForceUTest : public ::testing::Test
 
 TEST_F(ForceUTest, DISABLED_two_mol_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
@@ -280,6 +283,7 @@ TEST_F(ForceUTest, DISABLED_two_mol_test)
 
 TEST_F(ForceUTest, DISABLED_three_mol_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(3);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;

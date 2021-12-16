@@ -8,6 +8,9 @@
 
 #include "PBSAM.h"
 
+namespace pbsolvers
+{
+
 PBSAM::PBSAM() : PBSAMInput(), poles_(6), solveTol_(1e-4)
 {
   vector<string> grid2d = {"tst.2d"};
@@ -538,3 +541,4 @@ void PBSAM::run_bodyapprox()
 //          ((float)t3)/CLOCKS_PER_SEC);
 }
 
+} /* namespace pbsolvers */

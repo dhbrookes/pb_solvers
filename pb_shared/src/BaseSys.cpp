@@ -8,7 +8,8 @@
 
 #include "BaseSys.h"
 
-
+namespace pbsolvers
+{
 
 BaseMolecule::BaseMolecule(int type, int type_idx, string movetype,
                            vector<double> qs, vector<Pt> pos,
@@ -179,4 +180,4 @@ void BaseSystem::check_for_overlap()
   }
 }
 
-
+} /* namespace pbsolvers */

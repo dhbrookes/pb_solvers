@@ -12,6 +12,9 @@
 #include "Constants.h"
 using namespace std;
 
+namespace pbsolvers
+{
+
 /*
  Class for testing system constants class
  */
@@ -52,4 +55,5 @@ public:
   
 };
 
+} /* namespace pbsolvers */
 #endif /* ConstantsTest_h */
