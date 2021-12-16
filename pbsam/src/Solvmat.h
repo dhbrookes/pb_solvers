@@ -30,7 +30,8 @@
 #endif
 
 #ifdef __MACOS
-#include "cblas.h"
+//#include "cblas.h"
+#include <Accelerate/Accelerate.h>
 #endif
 
 #ifdef __XCODE
