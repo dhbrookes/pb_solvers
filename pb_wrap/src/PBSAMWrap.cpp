@@ -206,7 +206,7 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
 //  to call from APBS
 #ifdef PBSAM_APBS
 PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
-                            Valist* pbsolvers::Molecules[], int nmls )
+                            Valist* Molecules[], int nmls )
 {
    // convert Valist to a vector of MoleculeSAMs
   printf("Inside pbsamrun\n");
@@ -215,7 +215,7 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
   for (unsigned int mol=0; mol < nmls; mol++)
   {
     Vatom *atom;
-    unsigned int natoms = Valist_getNumberAtoms(pbsolvers::Molecules[mol]);
+    unsigned int natoms = Valist_getNumberAtoms(Molecules[mol]);
 
     int ncg(0), nchg(0);
     vector<double> vdw, chg, vdwS;
@@ -242,7 +242,7 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
     for (unsigned int i=0; i < natoms; i++)
     {
       char resName[RESLEN];
-      atom = Valist_getAtom(pbsolvers::Molecules[mol], i);
+      atom = Valist_getAtom(Molecules[mol], i);
       Vatom_getResName(atom, resName);
       string rName = string(resName);
       if (rName == "CEN")

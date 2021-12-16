@@ -172,7 +172,7 @@ PBAMOutput runPBAMWrapAPBS( PBAMInput pbamParams,
   for (unsigned int mol=0; mol < nmls; mol++)
   {
     Vatom *atom;
-    unsigned int natoms = Valist_getNumberAtoms(pbsolvers::MoleculeAMs[mol]);
+    unsigned int natoms = Valist_getNumberAtoms(MoleculeAMs[mol]);
 
     vector<double> vdw, chg;
     vector<pbsolvers::Pt> cgpos;
