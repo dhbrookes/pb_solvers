@@ -60,7 +60,7 @@ using namespace std;
 PBAMInput getPBAMParams()
 {
   // create the pbam
-  PBAM pbam;
+  pbsolvers::PBAM pbam;
 
   // get the struct for use in the c code
   PBAMInput pbamI = pbam;
@@ -117,12 +117,12 @@ PBAMOutput runPBAMSphinxWrap( double xyzrc[][AT_MAX][XYZRCWIDTH],
    // convert xyzrc to a vector of MoleculeAMs
   printf("Inside pbamrun sphinx\n");
   printPBAMStruct(pbamfin);
-  vector<shared_ptr<BaseMolecule> > mols;
+  vector<shared_ptr<pbsolvers::BaseMolecule> > mols;
   for (int mol=0; mol < nmol; mol++)
   {
     int natoms = natm[mol];
     vector<double> vdw, chg;
-    vector<Pt> cgpos;
+    vector<pbsolvers::Pt> cgpos;
     string difftype;
     double dtr, drot;
 
@@ -144,18 +144,18 @@ PBAMOutput runPBAMSphinxWrap( double xyzrc[][AT_MAX][XYZRCWIDTH],
 
     for (unsigned int i=0; i < natoms; i++)
     {
-      cgpos.push_back( Pt(xyzrc[mol][i][0],
+      cgpos.push_back( pbsolvers::Pt(xyzrc[mol][i][0],
                           xyzrc[mol][i][1],
                           xyzrc[mol][i][2]));
       vdw.push_back(xyzrc[mol][i][3]);
       chg.push_back(xyzrc[mol][i][4]);
     }
-    mols.push_back(make_shared<MoleculeAM>(difftype, chg, cgpos, vdw, 
+    mols.push_back(make_shared<pbsolvers::MoleculeAM>(difftype, chg, cgpos, vdw, 
                                            mol, 0, dtr, drot));
   }
 
   //  create the PBAM object
-  PBAM pbam( pbamfin, mols );
+  pbsolvers::PBAM pbam( pbamfin, mols );
 
   PBAMOutput pbamOut = pbam.run_apbs( );
   return pbamOut;
@@ -168,14 +168,14 @@ PBAMOutput runPBAMWrapAPBS( PBAMInput pbamParams,
 {
    // convert Valist to a vector of MoleculeAMs
   printf("Inside pbamrun\n");
-  vector<shared_ptr< BaseMolecule > > mols;
+  vector<shared_ptr< pbsolvers::BaseMolecule > > mols;
   for (unsigned int mol=0; mol < nmls; mol++)
   {
     Vatom *atom;
-    unsigned int natoms = Valist_getNumberAtoms(MoleculeAMs[mol]);
+    unsigned int natoms = Valist_getNumberAtoms(pbsolvers::MoleculeAMs[mol]);
 
     vector<double> vdw, chg;
-    vector<Pt> cgpos;
+    vector<pbsolvers::Pt> cgpos;
     string difftype;
     double dtr, drot;
 
@@ -197,19 +197,19 @@ PBAMOutput runPBAMWrapAPBS( PBAMInput pbamParams,
 
     for (unsigned int i=0; i < natoms; i++)
     {
-      atom = Valist_getAtom(MoleculeAMs[mol], i);
-      cgpos.push_back( Pt(Vatom_getPosition(atom)[0],
+      atom = Valist_getAtom(pbsolvers::MoleculeAMs[mol], i);
+      cgpos.push_back( pbsolvers::Pt(Vatom_getPosition(atom)[0],
                           Vatom_getPosition(atom)[1],
                           Vatom_getPosition(atom)[2]));
       vdw.push_back(Vatom_getRadius(atom));
       chg.push_back(Vatom_getCharge(atom));
     }
-    mols.push_back(make_shared<MoleculeAM> (difftype, chg, cgpos, vdw, 
+    mols.push_back(make_shared<pbsolvers::MoleculeAM> (difftype, chg, cgpos, vdw, 
                                             mol, 0, dtr, drot));
   }
 
   //  create the PBAM object
-  PBAM pbam( pbamParams, mols );
+  pbsolvers::PBAM pbam( pbamParams, mols );
 
   //  run PBAM!
   PBAMOutput pbamO = pbam.run_apbs( );
