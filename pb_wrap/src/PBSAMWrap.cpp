@@ -139,7 +139,7 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
     int ncg(0), nchg(0);
     int natoms = natm[mol];
     vector<double> vdw, chg, vdwS;
-    vector<Pt> cgpos, sPos;
+    vector<pbsolvers::Pt> cgpos, sPos;
     string difftype;
     double dtr, drot;
 
@@ -206,7 +206,7 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
 //  to call from APBS
 #ifdef PBSAM_APBS
 PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
-                            Valist* Molecules[], int nmls )
+                            Valist* pbsolvers::Molecules[], int nmls )
 {
    // convert Valist to a vector of MoleculeSAMs
   printf("Inside pbsamrun\n");
@@ -248,13 +248,13 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
       if (rName == "CEN")
       {
         vdwS.push_back(Vatom_getRadius(atom));
-        sPos.push_back(Pt(Vatom_getPosition(atom)[0],
+        sPos.push_back(pbsolvers::Pt(Vatom_getPosition(atom)[0],
                             Vatom_getPosition(atom)[1],
                             Vatom_getPosition(atom)[2]));
         ncg++;
       }else
       {
-        cgpos.push_back( Pt(Vatom_getPosition(atom)[0],
+        cgpos.push_back( pbsolvers::Pt(Vatom_getPosition(atom)[0],
                             Vatom_getPosition(atom)[1],
                             Vatom_getPosition(atom)[2]));
         vdw.push_back(Vatom_getRadius(atom));
