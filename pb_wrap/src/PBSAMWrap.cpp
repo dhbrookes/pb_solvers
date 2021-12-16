@@ -60,7 +60,7 @@ using namespace std;
 PBSAMInput getPBSAMParams()
 {
   // create the pbam
-  PBSAM pbsam;
+  pbsolvers::PBSAM pbsam;
 
   // get the struct for use in the c code
   PBSAMInput pbsamI = pbsam;
@@ -133,7 +133,7 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
    // convert xyzrc to a vector of Molecules
   printf("Inside pbamrun sphinx\n");
   printPBSAMStruct(pbamfin, pbsamfin);
-  vector<shared_ptr <BaseMolecule> > mols;
+  vector<shared_ptr <pbsolvers::BaseMolecule> > mols;
   for (int mol=0; mol < nmol; mol++)
   {
     int ncg(0), nchg(0);
@@ -165,14 +165,14 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
       string rName = string(resName);
       if (rName == "CEN")
       {
-        sPos.push_back( Pt(xyzrc[mol][i][0],
+        sPos.push_back( pbsolvers::Pt(xyzrc[mol][i][0],
                             xyzrc[mol][i][1],
                             xyzrc[mol][i][2]));
         vdwS.push_back(xyzrc[mol][i][3]);
         ncg++;
       }else
       {
-        cgpos.push_back( Pt(xyzrc[mol][i][0],
+        cgpos.push_back( pbsolvers::Pt(xyzrc[mol][i][0],
                             xyzrc[mol][i][1],
                             xyzrc[mol][i][2]));
         vdw.push_back(xyzrc[mol][i][3]);
@@ -184,20 +184,20 @@ PBAMOutput runPBSAMSphinxWrap(double xyzrc[][AT_MAX][XYZRCWIDTH],
 
     if (ncg == 0)
     {   
-      mols.push_back(make_shared<MoleculeSAM>(mol, 0, difftype, chg, cgpos, vdw, 
+      mols.push_back(make_shared<pbsolvers::MoleculeSAM>(mol, 0, difftype, chg, cgpos, vdw, 
                      string(pbsamfin.surffil_[mol]), pbsamfin.tolsp_,
                      drot, dtr));
       mols[mol]->write_pqr("cg_mol"+to_string(mol)+".pqr");
     }   
     else
-      mols.push_back(make_shared<MoleculeSAM>(mol, 0, difftype, chg, 
+      mols.push_back(make_shared<pbsolvers::MoleculeSAM>(mol, 0, difftype, chg, 
                                               cgpos, vdw, sPos, 
                                               vdwS, dtr, drot));
   }
 
 
   //  create the PBAM object
-  PBSAM pbsam( pbamfin, pbsamfin, mols );
+  pbsolvers::PBSAM pbsam( pbamfin, pbsamfin, mols );
 
   PBAMOutput pbamOut = pbsam.run_apbs( );
   return pbamOut;
@@ -210,16 +210,16 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
 {
    // convert Valist to a vector of MoleculeSAMs
   printf("Inside pbsamrun\n");
-  vector<shared_ptr<BaseMolecule> > mols;
+  vector<shared_ptr<pbsolvers::BaseMolecule> > mols;
 
   for (unsigned int mol=0; mol < nmls; mol++)
   {
     Vatom *atom;
-    unsigned int natoms = Valist_getNumberAtoms(Molecules[mol]);
+    unsigned int natoms = Valist_getNumberAtoms(pbsolvers::Molecules[mol]);
 
     int ncg(0), nchg(0);
     vector<double> vdw, chg, vdwS;
-    vector<Pt> cgpos, sPos;
+    vector<pbsolvers::Pt> cgpos, sPos;
     string difftype;
     double dtr, drot;
 
@@ -242,7 +242,7 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
     for (unsigned int i=0; i < natoms; i++)
     {
       char resName[RESLEN];
-      atom = Valist_getAtom(Molecules[mol], i);
+      atom = Valist_getAtom(pbsolvers::Molecules[mol], i);
       Vatom_getResName(atom, resName);
       string rName = string(resName);
       if (rName == "CEN")
@@ -266,18 +266,18 @@ PBAMOutput runPBSAMWrapAPBS(PBAMInput pbamParams, PBSAMInput pbsamParams,
 
     if (ncg == 0)
     {
-      mols.push_back(make_shared<MoleculeSAM>(mol, 0, difftype, chg, cgpos, vdw,
+      mols.push_back(make_shared<pbsolvers::MoleculeSAM>(mol, 0, difftype, chg, cgpos, vdw,
                      string(pbsamParams.surffil_[mol]), pbsamParams.tolsp_,
                      drot, dtr));
       mols[mol]->write_pqr("cg_mol"+to_string(mol)+".pqr");
     }
     else
-      mols.push_back(make_shared<MoleculeSAM>(mol, 0, difftype, chg, cgpos, 
+      mols.push_back(make_shared<pbsolvers::MoleculeSAM>(mol, 0, difftype, chg, cgpos, 
                                               vdw, sPos, vdwS, dtr, drot));
   }
 
   //  create the PBAM object
-  PBSAM pbsam( pbamParams, pbsamParams, mols );
+  pbsolvers::PBSAM pbsam( pbamParams, pbsamParams, mols );
 
   //  run PBAM!
   PBAMOutput pbamO = pbsam.run_apbs( );
