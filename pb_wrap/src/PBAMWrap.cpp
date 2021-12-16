@@ -197,7 +197,7 @@ PBAMOutput runPBAMWrapAPBS( PBAMInput pbamParams,
 
     for (unsigned int i=0; i < natoms; i++)
     {
-      atom = Valist_getAtom(pbsolvers::MoleculeAMs[mol], i);
+      atom = Valist_getAtom(MoleculeAMs[mol], i);
       cgpos.push_back( pbsolvers::Pt(Vatom_getPosition(atom)[0],
                           Vatom_getPosition(atom)[1],
                           Vatom_getPosition(atom)[2]));
