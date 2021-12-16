@@ -42,7 +42,7 @@ using namespace std;
 namespace pbsolvers
 {
 
-class PBAM : protected PBAMInput
+class PBAM : public PBAMInput
 {
 protected:
   shared_ptr<Setup> setp_;

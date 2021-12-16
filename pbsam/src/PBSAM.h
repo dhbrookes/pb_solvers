@@ -43,7 +43,7 @@ using namespace std;
 namespace pbsolvers
 {
   
-class PBSAM : protected PBSAMInput
+class PBSAM : public PBSAMInput
 {
 protected:
   shared_ptr<Setup> _setp_;
