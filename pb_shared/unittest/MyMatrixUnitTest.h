@@ -13,6 +13,7 @@
 #include "util.h"
 using namespace std;
 
+
 /*
  Class for testing matrix class
  */
@@ -56,7 +57,7 @@ protected :
   }
   virtual void TearDown() {}
   
-  MyMatrix <double> testMat_;
+  pbsolvers::MyMatrix <double> testMat_;
   vector< vector<double> > testInp_;
   vector< vector<double> > testInp2_;
 }; // end MyMatrixTest
@@ -65,6 +66,7 @@ protected :
 
 TEST_F(MyMatrixUTest, constFromOther)
 {
+  using namespace pbsolvers;
   MyMatrix <double> testMat_( testInp_ );
   EXPECT_NEAR( testMat_(0,0), 1.0, preclim);
   EXPECT_NEAR( testMat_(0,3), 4.0, preclim);
@@ -74,6 +76,7 @@ TEST_F(MyMatrixUTest, constFromOther)
 
 TEST_F(MyMatrixUTest, defaultConstruct)
 {
+  using namespace pbsolvers;
   MyMatrix <double> testMat_( 4, 3);
   ASSERT_EQ( testMat_.get_nrows() , 4 );
   ASSERT_EQ( testMat_.get_ncols() , 3 );
@@ -84,6 +87,7 @@ TEST_F(MyMatrixUTest, defaultConstruct)
 // testing matrix addition
 TEST_F(MyMatrixUTest, matAdd)
 {
+  using namespace pbsolvers;
   MyMatrix <double> testMat1( testInp_ );
   MyMatrix <double> testMat2( testInp_ );
   MyMatrix <double> testMat3;
@@ -99,6 +103,7 @@ TEST_F(MyMatrixUTest, matAdd)
 // testing matrix multiplication
 TEST_F(MyMatrixUTest, matMul)
 {
+  using namespace pbsolvers;
   MyMatrix <double> testMat1( testInp_ );
   MyMatrix <double> testMat2( testInp2_ );
   MyMatrix <double> testMat3;
@@ -116,6 +121,7 @@ TEST_F(MyMatrixUTest, matMul)
 // testing scalar matrix multiplication
 TEST_F(MyMatrixUTest, scalMatMulRHS)
 {
+  using namespace pbsolvers;
   MyMatrix <double> testMat1( testInp_ );
   MyMatrix <double> testMat3;
   
@@ -132,6 +138,7 @@ TEST_F(MyMatrixUTest, scalMatMulRHS)
 // testing scalar matrix multiplication
 TEST_F(MyMatrixUTest, scalMatMulLHS)
 {
+  using namespace pbsolvers;
   MyMatrix <double> testMat1( testInp2_ );
   MyMatrix <double> testMat3;
   
@@ -148,6 +155,7 @@ TEST_F(MyMatrixUTest, scalMatMulLHS)
 // testing matrix assertions for accessing matrix members
 TEST_F(MyMatrixUTest, exceptAccess)
 {
+  using namespace pbsolvers;
   MyMatrix <double> testMat_( testInp_ );
   ASSERT_THROW(testMat_( 0, 5), MatrixAccessException);
   ASSERT_THROW(testMat_( 5, 0), MatrixAccessException);
@@ -158,6 +166,7 @@ TEST_F(MyMatrixUTest, exceptAccess)
 // testing matrix assertions for addition
 TEST_F(MyMatrixUTest, exceptAdd)
 {
+  using namespace pbsolvers;
   MyMatrix <double> testMat1( testInp_ );
   MyMatrix <double> testMat2( testInp2_ );
   ASSERT_THROW(testMat1 + testMat2, MatrixArithmeticException);
@@ -166,6 +175,7 @@ TEST_F(MyMatrixUTest, exceptAdd)
 // testing matrix assertions for multiplication
 TEST_F(MyMatrixUTest, exceptMult)
 {
+  using namespace pbsolvers;
   MyMatrix <double> testMat1( testInp_ );
   MyMatrix <double> testMat2( testInp_ );
   ASSERT_THROW(testMat1 * testMat2, MatrixArithmeticException);

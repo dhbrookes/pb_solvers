@@ -11,6 +11,7 @@
 
 #include "ASolver.h"
 
+
 class ASolverUTest : public ::testing::Test
 {
 public :
@@ -18,22 +19,24 @@ public :
 protected :
   
   int vals_;
-  shared_ptr<Constants> const_;
-  vector< shared_ptr<BaseMolecule> > mol_;
-  vector< shared_ptr<BaseMolecule> > mol_sing_;
+  shared_ptr<pbsolvers::Constants> const_;
+  vector< shared_ptr<pbsolvers::BaseMolecule> > mol_;
+  vector< shared_ptr<pbsolvers::BaseMolecule> > mol_sing_;
   
   virtual void SetUp()
   {
-    const_ = make_shared<Constants>();
+    using pbsolvers::Pt;
+
+    const_ = make_shared<pbsolvers::Constants>();
     
     mol_.clear( );
-    Pt pos[2]     = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
-    Pt cgPos[2]   = { Pt( 0.0, 0.0, -5.5 ), Pt( 11.0, 6.9, 24.3 ) };
+    pbsolvers::Pt pos[2]     = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
+    pbsolvers::Pt cgPos[2]   = { Pt( 0.0, 0.0, -5.5 ), Pt( 11.0, 6.9, 24.3 ) };
     double cg[2] = { 5.0, -0.4}; double rd[2] = { 5.6, 10.4};
     
-    Pt cgPosSi[2] = { Pt( 0.0, 0.0, -35.0 ), Pt( 0.0, 0.0, 0.0 ) };
+    pbsolvers::Pt cgPosSi[2] = { Pt( 0.0, 0.0, -35.0 ), Pt( 0.0, 0.0, 0.0 ) };
     
-    shared_ptr<MoleculeAM> molNew, molSing;
+    shared_ptr<pbsolvers::MoleculeAM> molNew, molSing;
     
     for (int molInd = 0; molInd < 2; molInd ++ )
     {
@@ -42,14 +45,14 @@ protected :
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0] = cg[molInd]; posCharges[0] = cgPos[molInd]; vdW[0] = 0.0;
       
-      molNew = make_shared<MoleculeAM>("stat",rd[molInd],charges,posCharges,
+      molNew = make_shared<pbsolvers::MoleculeAM>("stat",rd[molInd],charges,posCharges,
                                        vdW,pos[molInd],
                                        molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]    = 2.0; posCharges[0] = cgPosSi[molInd];
 
-      molSing = make_shared<MoleculeAM>( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      molSing = make_shared<pbsolvers::MoleculeAM>( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -448,6 +451,7 @@ protected :
 
 TEST_F(ASolverUTest, checkGamma)
 {
+  using namespace pbsolvers;
   const int vals = nvals;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
@@ -466,6 +470,7 @@ TEST_F(ASolverUTest, checkGamma)
 
 TEST_F(ASolverUTest, checkDelta)
 {
+  using namespace pbsolvers;
   const int vals = nvals;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
@@ -485,6 +490,7 @@ TEST_F(ASolverUTest, checkDelta)
 
 TEST_F(ASolverUTest, checkE)
 {
+  using namespace pbsolvers;
   const int vals = nvals;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
@@ -515,6 +521,7 @@ TEST_F(ASolverUTest, checkE)
 
 TEST_F(ASolverUTest, checkSH)
 {
+  using namespace pbsolvers;
   const int vals = nvals;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
@@ -545,6 +552,7 @@ TEST_F(ASolverUTest, checkSH)
 
 TEST_F(ASolverUTest, checkAMulti)
 {
+  using namespace pbsolvers;
   mol_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0)};
@@ -597,6 +605,7 @@ TEST_F(ASolverUTest, checkAMulti)
 
 TEST_F(ASolverUTest, checkAMultiPBC)
 {
+  using namespace pbsolvers;
   mol_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[4] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0),
@@ -656,6 +665,7 @@ TEST_F(ASolverUTest, checkAMultiPBC)
 
 TEST_F(ASolverUTest, checkAPBC)
 {
+  using namespace pbsolvers;
   mol_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(10.0,7.8,25.0), Pt(-10.0,-7.8,-25.0)};
@@ -708,6 +718,7 @@ TEST_F(ASolverUTest, checkAPBC)
 
 TEST_F(ASolverUTest, checkAPBCoutside)
 {
+  using namespace pbsolvers;
   mol_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt(0.0,0.0,0.0), Pt(10.0,7.8,25.0), Pt(-10.0,-7.8,-25.0)};
@@ -765,6 +776,7 @@ TEST_F(ASolverUTest, checkAPBCoutside)
 
 TEST_F(ASolverUTest, checkA)
 {
+  using namespace pbsolvers;
   const int vals = nvals;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
@@ -793,6 +805,7 @@ TEST_F(ASolverUTest, checkA)
 
 TEST_F(ASolverUTest, checkASingMult)
 {
+  using namespace pbsolvers;
   mol_sing_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[2] = {  Pt( 0.0, 0.0, -5.0 ), Pt( 0.0, 0.0, 0.0 )};
@@ -841,6 +854,7 @@ TEST_F(ASolverUTest, checkASingMult)
 
 TEST_F(ASolverUTest, checkASingMultFlip)
 {
+  using namespace pbsolvers;
   mol_sing_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
@@ -895,6 +909,7 @@ TEST_F(ASolverUTest, checkASingMultFlip)
 
 TEST_F(ASolverUTest, checkASing)
 {
+  using namespace pbsolvers;
   const int vals = nvals;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
   shared_ptr<BesselCalc> bCalcu = make_shared<BesselCalc>(2*vals, bConsta);
@@ -921,6 +936,7 @@ TEST_F(ASolverUTest, checkASing)
 
 TEST_F(ASolverUTest, checkgradT_A)
 {
+  using namespace pbsolvers;
   mol_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
@@ -1046,6 +1062,7 @@ TEST_F(ASolverUTest, checkgradT_A)
 
 TEST_F(ASolverUTest, checkdT_ASingFlip)
 {
+  using namespace pbsolvers;
   mol_sing_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
@@ -1168,6 +1185,7 @@ TEST_F(ASolverUTest, checkdT_ASingFlip)
 
 TEST_F(ASolverUTest, checkgradA)
 {
+  using namespace pbsolvers;
   mol_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt(0.0,0.0,-5.0), Pt(10.0,7.8,25.0), Pt(-10.0,7.8,25.0) };
@@ -1283,6 +1301,7 @@ TEST_F(ASolverUTest, checkgradA)
 
 TEST_F(ASolverUTest, checkgradASing)
 {
+  using namespace pbsolvers;
   mol_sing_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
@@ -1433,6 +1452,7 @@ TEST_F(ASolverUTest, checkgradASing)
 
 TEST_F(ASolverUTest, checkL)
 {
+  using namespace pbsolvers;
   mol_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
@@ -1477,6 +1497,7 @@ TEST_F(ASolverUTest, checkL)
 
 TEST_F(ASolverUTest, checkLSing)
 {
+  using namespace pbsolvers;
   mol_sing_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
@@ -1528,6 +1549,7 @@ TEST_F(ASolverUTest, checkLSing)
 
 TEST_F(ASolverUTest, checkdL)
 {
+  using namespace pbsolvers;
   mol_.clear( );
   shared_ptr<MoleculeAM> molNew;
   Pt pos[3] = { Pt( 0.0, 0.0, -5.0 ),
@@ -1624,6 +1646,7 @@ TEST_F(ASolverUTest, checkdL)
 
 TEST_F(ASolverUTest, checkdLSing)
 {
+  using namespace pbsolvers;
   mol_sing_.clear();
   shared_ptr<MoleculeAM> molSing;
   Pt cgPosSi[3] = { Pt( 0.0, 0.0, 0.0 ), Pt( 0.0, 0.0, -5.0 ),

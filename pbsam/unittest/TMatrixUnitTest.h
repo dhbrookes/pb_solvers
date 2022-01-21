@@ -32,6 +32,7 @@ class TMatrixUTest : public ::testing::Test
 
 TEST_F(TMatrixUTest, xfor_numeric_test)
 {
+  using namespace pbsolvers;
   int pol = 5;
   double kap = 0.0;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
@@ -95,6 +96,7 @@ TEST_F(TMatrixUTest, xfor_numeric_test)
 
 TEST_F(TMatrixUTest, xforIntra_analytic_test)
 {
+  using namespace pbsolvers;
   int pol = 5;
   double kap = 0.21053961;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");

@@ -8,6 +8,9 @@
 
 #include "ElectrostaticsAM.h"
 
+namespace pbsolvers
+{
+
 ElectrostaticAM::ElectrostaticAM(shared_ptr<VecOfMats<cmplx>::type> _A,
                              shared_ptr<SystemAM> _sys,
                              shared_ptr<SHCalc> _shCalc,
@@ -46,3 +49,5 @@ double ElectrostaticAM::compute_pot_at( Pt point )
  
   return pot;
 }
+
+} /* namespace pbsolvers */

@@ -40,7 +40,10 @@
 
 using namespace std;
 
-class PBSAM : protected PBSAMInput
+namespace pbsolvers
+{
+  
+class PBSAM : public PBSAMInput
 {
 protected:
   shared_ptr<Setup> _setp_;
@@ -101,5 +104,5 @@ public:
   shared_ptr<SystemSAM> make_subsystem(vector<int> mol_idx);
 };
 
-
+} /* namespace pbsolvers */
 #endif

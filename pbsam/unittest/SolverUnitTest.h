@@ -349,6 +349,7 @@ public:
 
 TEST_F(SolverUTest, UniSphGrid)
 {
+  using namespace pbsolvers;
   int grid = 200;
   vector<Pt> grids = make_uniform_sph_grid(grid, 5.7);
   
@@ -362,6 +363,7 @@ TEST_F(SolverUTest, UniSphGrid)
 
 TEST_F(SolverUTest, IMATTestIntermediates)
 {
+  using namespace pbsolvers;
   int pol = 5;
   PQRFile pqr(test_dir_loc + "test_zund.pqr");
   auto mol = make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
@@ -404,6 +406,7 @@ TEST_F(SolverUTest, IMATTestIntermediates)
 
 TEST_F(SolverUTest, IMATTestImatOrig)
 {
+  using namespace pbsolvers;
   int pol = 5;
   PQRFile pqr(test_dir_loc + "test_zund.pqr");
   auto mol = make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
@@ -438,6 +441,7 @@ TEST_F(SolverUTest, IMATTestImatOrig)
 
 TEST_F(SolverUTest, Efix_test)
 {
+  using namespace pbsolvers;
   int pol = 5;
   PQRFile pqr(test_dir_loc + "test_zund.pqr");
   auto mol = make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
@@ -467,6 +471,7 @@ TEST_F(SolverUTest, Efix_test)
 
 TEST_F(SolverUTest, LEfix_test)
 {
+  using namespace pbsolvers;
   int pol = 5;
   PQRFile pqr(test_dir_loc + "test_zund.pqr");
   auto mol = make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
@@ -496,6 +501,7 @@ TEST_F(SolverUTest, LEfix_test)
 
 TEST_F(SolverUTest, Hinit_test)
 {
+  using namespace pbsolvers;
   int pol = 5;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   auto mol = make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
@@ -526,6 +532,7 @@ TEST_F(SolverUTest, Hinit_test)
 
 TEST_F(SolverUTest, H_calc_test)
 {
+  using namespace pbsolvers;
   int pol = 5;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   auto mol = make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
@@ -573,6 +580,7 @@ TEST_F(SolverUTest, H_calc_test)
 
 TEST_F(SolverUTest, LHinit_test)
 {
+  using namespace pbsolvers;
   int pol = 5;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   auto mol = make_shared<MoleculeSAM>(0, 0, "stat", pqr.get_charges(),
@@ -606,6 +614,7 @@ TEST_F(SolverUTest, LHinit_test)
 
 TEST_F(SolverUTest, LHN_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
@@ -690,6 +699,7 @@ TEST_F(SolverUTest, LHN_test)
 
 TEST_F(SolverUTest, DISABLED_spol_test)
 {
+  using namespace pbsolvers;
   int pol = 3;
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
@@ -737,6 +747,7 @@ TEST_F(SolverUTest, DISABLED_spol_test)
 
 TEST_F(SolverUTest, DISABLED_mutual_pol_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
@@ -816,6 +827,7 @@ TEST_F(SolverUTest, DISABLED_mutual_pol_test)
 
 TEST_F(SolverUTest, grad_pre_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
@@ -914,6 +926,7 @@ TEST_F(SolverUTest, grad_pre_test)
 
 TEST_F(SolverUTest, DISABLED_grad_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(2);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
@@ -1033,6 +1046,7 @@ TEST_F(SolverUTest, DISABLED_grad_test)
 
 TEST_F(SolverUTest, DISABLED_grad3_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(3);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;

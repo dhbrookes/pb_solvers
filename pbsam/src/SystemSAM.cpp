@@ -10,6 +10,9 @@
 
 #include <limits>
 
+namespace pbsolvers
+{
+
 MoleculeSAM::MoleculeSAM(int type, int type_idx, string movetype, vector<double> qs,
           vector<Pt> pos, vector<double> vdwr, vector<Pt> cens,
           vector<double> as, double drot, double dtrans)
@@ -649,3 +652,5 @@ void SystemSAM::write_to_xyz(ofstream & xyz_out)
     }
   }
 }
+
+} /* namespace pbsolvers */

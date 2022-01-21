@@ -18,6 +18,9 @@
 #include "SolverTest.h"
 #include "SystemTest.h"
 
+namespace pbsolvers
+{
+
 /*
  Class for testing all Classes
  */
@@ -68,4 +71,5 @@ public:
   
 };
 
+} /* namespace pbsolvers */
 #endif /* tester_h */

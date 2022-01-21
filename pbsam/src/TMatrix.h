@@ -19,6 +19,9 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
+
 /*
  Re-expansion coefficients
  */
@@ -165,5 +168,5 @@ public:
   
 };
 
-
+} /* namespace pbsolvers */
 #endif /* TMatrix_h */

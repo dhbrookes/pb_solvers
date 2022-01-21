@@ -20,7 +20,7 @@ public :
   BesselConstUTest() : bConstTest_( nvals ) {  }
   
 protected :
-  BesselConstants bConstTest_;
+  pbsolvers::BesselConstants bConstTest_;
 
   double kPreFactors[10] = { -1. , 0.33333333, 0.06666667,
              0.02857143, 0.01587302, 0.01010101,
@@ -33,6 +33,7 @@ protected :
 
 TEST_F(BesselConstUTest, first10)
 {
+  using namespace pbsolvers;
   ASSERT_EQ( bConstTest_.get_n() , nvals ); // make sure numVals stores right
 
   for (int i = 0; i < nvals; i++) // check that our prefactors are right
@@ -54,8 +55,8 @@ public:
   }
   
 protected :
-  shared_ptr<BesselConstants> _bConstTest_;
-  BesselCalc bCalcTest_;
+  shared_ptr<pbsolvers::BesselConstants> _bConstTest_;
+  pbsolvers::BesselCalc bCalcTest_;
   
   virtual void SetUp() { }
   virtual void TearDown() { }
@@ -84,6 +85,7 @@ protected :
 
 TEST_F(BesselCalcUTest, first10)
 {
+  using namespace pbsolvers;
  // BesselCalcUTest bcut = BesselCalcUTest() ;
   _bConstTest_ = make_shared<BesselConstants> (nvals);
   BesselCalc bCalcTest_( nvals, _bConstTest_);

@@ -32,6 +32,7 @@
 #include "PBAM.h"
 
 using namespace std;
+using namespace pbsolvers;
 
 int main(int argc, const char * argv[])
 {

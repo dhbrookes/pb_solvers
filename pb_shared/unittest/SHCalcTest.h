@@ -13,7 +13,11 @@
 
 using namespace std;
 
-/*
+
+namespace pbsolvers
+{
+       
+ /*
  Class for testing spherical harmonics constants
  */
 class SHCalcConstantsTest
@@ -149,5 +153,7 @@ public:
 
   }
 }; // end SHCalcTest
+
+} /* namespace pbsolvers */
 
 #endif /* SHCalcTest_h */

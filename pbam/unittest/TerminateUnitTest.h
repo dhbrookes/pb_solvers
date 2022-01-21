@@ -27,6 +27,7 @@ protected :
 // Checking time termination class
 TEST_F(TermUTest, timeTerm)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -53,6 +54,7 @@ TEST_F(TermUTest, timeTerm)
 // Checking x<= termination class
 TEST_F(TermUTest, xLETerm)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -80,6 +82,7 @@ TEST_F(TermUTest, xLETerm)
 // Checking x>= termination class
 TEST_F(TermUTest, xGETerm)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -107,6 +110,7 @@ TEST_F(TermUTest, xGETerm)
 // Checking y<= termination class
 TEST_F(TermUTest, yLETerm)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -134,6 +138,7 @@ TEST_F(TermUTest, yLETerm)
 // Checking y>= termination class
 TEST_F(TermUTest, yGETerm)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -161,6 +166,7 @@ TEST_F(TermUTest, yGETerm)
 // Checking z<= termination class
 TEST_F(TermUTest, zLETerm)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -188,6 +194,7 @@ TEST_F(TermUTest, zLETerm)
 // Checking z>= termination class
 TEST_F(TermUTest, zGETerm)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -215,6 +222,7 @@ TEST_F(TermUTest, zGETerm)
 // Checking z<= termination class with many MoleculeAM of one type
 TEST_F(TermUTest, zLETermManyType)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -243,6 +251,7 @@ TEST_F(TermUTest, zLETermManyType)
 // Checking z>= termination class for many instances of one type
 TEST_F(TermUTest, xGETermManyType)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -275,6 +284,7 @@ TEST_F(TermUTest, xGETermManyType)
 // Checking x<= class for many instances of one type with PBCs
 TEST_F(TermUTest, xLETermManyTypePBC)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -307,6 +317,7 @@ TEST_F(TermUTest, xLETermManyTypePBC)
 // Checking y>= class for many instances of one type with PBCs
 TEST_F(TermUTest, yGETermManyTypePBC)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -342,6 +353,7 @@ TEST_F(TermUTest, yGETermManyTypePBC)
 // Checking r termination class
 TEST_F(TermUTest, rTermType)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -373,6 +385,7 @@ TEST_F(TermUTest, rTermType)
 // Checking r termination class for many instances of one type
 TEST_F(TermUTest, rTermManyType)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -405,6 +418,7 @@ TEST_F(TermUTest, rTermManyType)
 // Checking r class for many instances of one type with PBCs
 TEST_F(TermUTest, rTermManyTypePBC)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -443,6 +457,7 @@ TEST_F(TermUTest, rTermManyTypePBC)
 // Checking contact termination class
 TEST_F(TermUTest, contTermType)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   Pt pos[nmol] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 5.0, 0.0), Pt(5, 0, 0)};
@@ -475,6 +490,7 @@ TEST_F(TermUTest, contTermType)
 // Checking contact class for many instances of one type
 TEST_F(TermUTest, contTermManyType)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -508,6 +524,7 @@ TEST_F(TermUTest, contTermManyType)
 // Checking contact class for many instances of one type with PBCs
 TEST_F(TermUTest, contTermManyTypePBC)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -543,6 +560,7 @@ TEST_F(TermUTest, contTermManyTypePBC)
 // Checking contact + time class combined with OR
 TEST_F(TermUTest, combineTermORPBC)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -590,6 +608,7 @@ TEST_F(TermUTest, combineTermORPBC)
 // Checking contact + time class combined with AND
 TEST_F(TermUTest, combineTermANDPBC)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -639,6 +658,7 @@ TEST_F(TermUTest, combineTermANDPBC)
 // Checking x<= + contact + time class combined with AND
 TEST_F(TermUTest, combineTerm3ORPBC)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};
@@ -690,6 +710,7 @@ TEST_F(TermUTest, combineTerm3ORPBC)
 // Checking x<= + contact + time class combined with AND
 TEST_F(TermUTest, combineTerm3ANDPBC)
 {
+  using namespace pbsolvers;
   const int nmol = 3;
   vector<shared_ptr<BaseMolecule> > mol;
   vector<int> typ = { 1, 0, 1}; vector<int> typind = { 0, 0, 1};

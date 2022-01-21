@@ -20,6 +20,9 @@
  [2] Yap, E., Head-Gordon, T. 2013. JCTC
  */
 
+namespace pbsolvers
+{
+
 /*
  Base class for gradients of ComplexMoleculeMatrix objects
  */
@@ -447,4 +450,5 @@ public:
   
 };
 
+} /* namespace pbsolvers */
 #endif /* Gradsolvmat_h */

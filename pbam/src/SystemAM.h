@@ -38,6 +38,8 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
 
 /*
  Class for storing relevant data about each MoleculeAM
@@ -167,5 +169,7 @@ public:
   void write_to_xyz(ofstream &xyz_out);
   
 };
+
+} /* namespace pbsolvers */
 
 #endif /* SystemAM_h */

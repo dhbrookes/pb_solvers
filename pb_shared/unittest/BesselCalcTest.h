@@ -12,6 +12,9 @@
 #include "BesselCalc.h"
 using namespace std;
 
+namespace pbsolvers
+{
+
 /*
  Class for testing Bessel recursion constants
  */
@@ -92,5 +95,6 @@ public:
 	}
 }; // end BesselCalcTest
 
+} /* namespace pbsolvers */
 
 #endif /* BesselCalcTest_h */

@@ -8,6 +8,9 @@
 
 #include "BDSAM.h"
 
+namespace pbsolvers
+{
+
 ContactTerminateSAM::ContactTerminateSAM(vector<int> mol,
                                          vector<vector<int> > atpairs,
                                          vector<double> dists, double pad)
@@ -176,3 +179,5 @@ void BDRunSAM::run(string xyzfile, string statfile, int nSCF)
   xyz_out.close();
   stats.close();
 }
+
+} /* namespace pbsolvers */

@@ -8,6 +8,8 @@
 
 #include "PhysCalcSAM.h"
 
+namespace pbsolvers
+{
 
 double EnergyCalcSAM::calc_energy(shared_ptr<HMatrix> H,
                                   shared_ptr<LHNMatrix> LHN)
@@ -189,3 +191,5 @@ void PhysCalcSAM::print_all()
         << get_taui(i).z() * unit_conv_ << "]"<<endl;
   }
 }
+
+} /* namespace pbsolvers */

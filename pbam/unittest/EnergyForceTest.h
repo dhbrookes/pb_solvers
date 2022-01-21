@@ -11,6 +11,9 @@
 
 #include "PhysCalcAM.h"
 
+namespace pbsolvers
+{
+
 class EnForTest
 {
   
@@ -67,5 +70,5 @@ class EnForTest
 
 };
 
-
+} /* namespace pbsolvers */
 #endif /* EnergyForceTest_h */

@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ElectrostaticsAM.h"
 #include "BaseBD.h"
 
+namespace pbsolvers
+{
 
 /*
  Class for contact based termination. This terminates based on whether
@@ -132,6 +134,7 @@ public:
 };
 
 
+} /* namespace pbsolvers */
 
 
 #endif /* BDAM_h */

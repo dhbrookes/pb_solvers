@@ -8,6 +8,9 @@
 
 #include "Solver.h"
 
+namespace pbsolvers
+{
+
 Solver::Solver(shared_ptr<SystemSAM> _sys, shared_ptr<Constants> _consts,
                shared_ptr<SHCalc> _shCalc, shared_ptr<BesselCalc> _bCalc,
                int p, bool readImat, bool readHF,
@@ -892,3 +895,5 @@ void GradSolver::pre_compute_gradT_A()
     }
   }
 }
+
+} /* namespace pbsolvers */

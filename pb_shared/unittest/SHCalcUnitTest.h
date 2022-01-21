@@ -11,6 +11,7 @@
 
 #include "SHCalc.h"
 
+
 /*
  Class for unit testing spherical harmonics constants
  */
@@ -35,11 +36,11 @@ class SHConstUTest : public ::testing::Test
   
   virtual void SetUp()
   {
-    SHCalcConstants SHConstTest( nvals );
+    pbsolvers::SHCalcConstants SHConstTest( nvals );
   }
   virtual void TearDown() {}
   
-  SHCalcConstants SHConstTest_;
+  pbsolvers::SHCalcConstants SHConstTest_;
 public:
   SHConstUTest( ) : SHConstTest_( nvals ) {  }
   
@@ -48,6 +49,7 @@ public:
 
 TEST_F(SHConstUTest, constantTest)
 {
+  using namespace pbsolvers;
   ASSERT_EQ( SHConstTest_.get_n() , nvals ); // make sure numVals stores right
 
   for (int i = 0; i < nvals; i++) // check that our prefactors are right
@@ -58,6 +60,7 @@ TEST_F(SHConstUTest, constantTest)
 
 TEST_F(SHConstUTest, LegConsTest)
 {
+  using namespace pbsolvers;
   for (int constIt = 0; constIt < 6; constIt++)
   {
     EXPECT_NEAR( SHConstTest_.get_leg_consts1_val( 5, constIt),
@@ -70,6 +73,7 @@ TEST_F(SHConstUTest, LegConsTest)
 
 TEST_F(SHConstUTest, SHConsTest)
 {
+  using namespace pbsolvers;
   for (int i = 0; i < nvals; i++) // check that our prefactors are right
   {
     EXPECT_NEAR( SHConstTest_.get_sh_consts_val( nvals - 1, i ),
@@ -85,8 +89,8 @@ TEST_F(SHConstUTest, SHConsTest)
 class SHCalcUTest : public ::testing::Test
 {
   protected :
-  shared_ptr<SHCalcConstants> _SHConstTest_;
-  SHCalc SHCalcTest_;
+  shared_ptr<pbsolvers::SHCalcConstants> _SHConstTest_;
+  pbsolvers::SHCalc SHCalcTest_;
   
 public:
   SHCalcUTest( )
@@ -96,6 +100,7 @@ public:
 
 TEST_F(SHCalcUTest, legendre_0)
 {
+  using namespace pbsolvers;
   shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
   SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( 0.0, 0.0 );
@@ -108,6 +113,7 @@ TEST_F(SHCalcUTest, legendre_0)
 
 TEST_F(SHCalcUTest, legendre_pi3)
 {
+  using namespace pbsolvers;
   shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
   SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( M_PI/3.0, 0.0 );
@@ -122,6 +128,7 @@ TEST_F(SHCalcUTest, legendre_pi3)
 
 TEST_F(SHCalcUTest, legendre_2pi3)
 {
+  using namespace pbsolvers;
   shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
   SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( 2.0*M_PI/3.0, 0.0 );
@@ -136,6 +143,7 @@ TEST_F(SHCalcUTest, legendre_2pi3)
 
 TEST_F(SHCalcUTest, legendre_pi)
 {
+  using namespace pbsolvers;
   shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
   SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( M_PI, 0.0 );
@@ -148,6 +156,7 @@ TEST_F(SHCalcUTest, legendre_pi)
 
 TEST_F(SHCalcUTest, sphHarm_t0p0)
 {
+  using namespace pbsolvers;
   shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
   SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( 0.0, 0.0 );
@@ -161,6 +170,7 @@ TEST_F(SHCalcUTest, sphHarm_t0p0)
 
 TEST_F(SHCalcUTest, sphHarm_t05p05)
 {
+  using namespace pbsolvers;
   shared_ptr<SHCalcConstants> _SHConstTest_ = make_shared<SHCalcConstants> (10);
   SHCalc SHCalcTest_(10, _SHConstTest_);
   SHCalcTest_.calc_sh( 0.5, 0.5 );

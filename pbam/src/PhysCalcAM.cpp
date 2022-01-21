@@ -8,6 +8,9 @@
 
 #include "PhysCalcAM.h"
 
+namespace pbsolvers
+{
+
 EnergyCalcAM::EnergyCalcAM(shared_ptr<VecOfMats<cmplx>::type> _A,
                        shared_ptr<VecOfMats<cmplx>::type> _L,
                        shared_ptr<Constants> _const, int N, int p)
@@ -670,3 +673,5 @@ ThreeBodyPhysCalcAM::ThreeBodyPhysCalcAM(shared_ptr<ASolver> _asolv, int num,
 outfname_(outfname)
 {
 }
+
+} /* namespace pbsolvers */

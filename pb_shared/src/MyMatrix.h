@@ -38,6 +38,8 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
 
 class MatrixAccessException: public exception
 {
@@ -448,4 +450,5 @@ struct VecOfMats
   typedef MyVector<MyMatrix<T> > type;
 };
 
+} /* namespace pbsolvers */
 #endif /* MyMatrix_h */

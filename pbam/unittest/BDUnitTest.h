@@ -11,6 +11,9 @@
 
 #include "BDAM.h"
 
+namespace pbsolvers
+{
+
 class BDUTest : public ::testing::Test
 {
 public :
@@ -697,4 +700,5 @@ TEST_F(BDUTest, DISABLED_BDrunTimeTermRot)
   }
 }
 
+} /* namespace pbsolvers */
 #endif /* BDUnitTest_h */

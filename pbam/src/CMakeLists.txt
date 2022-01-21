@@ -1,7 +1,7 @@
 set(pb_shared_dir ${pb_solvers_SOURCE_DIR}/pb_shared/src/)
 set(pb_wrap_dir ${pb_solvers_SOURCE_DIR}/pb_wrap/src)
 
-include_directories(
+include_directories( BEFORE
   ${pb_shared_dir}
   ${pb_wrap_dir}
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -9,7 +9,7 @@ include_directories(
 
 if(ENABLE_PBAM_APBS)
   add_definitions(-DPBAM_APBS)
-  include_directories(
+  include_directories( BEFORE
     ${APBS_SOURCE_DIR}/src
     ${APBS_BINARY_DIR}/src
     ${FETK_INSTALL_PREFIX}/include

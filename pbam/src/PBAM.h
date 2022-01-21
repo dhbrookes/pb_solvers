@@ -39,7 +39,10 @@
 
 using namespace std;
 
-class PBAM : protected PBAMInput
+namespace pbsolvers
+{
+
+class PBAM : public PBAMInput
 {
 protected:
   shared_ptr<Setup> setp_;
@@ -88,5 +91,6 @@ public:
   void run_energyforce();
 };
 
+} /* namespace pbsolvers */
 
 #endif

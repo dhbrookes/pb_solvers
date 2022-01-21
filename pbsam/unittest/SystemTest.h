@@ -13,6 +13,9 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
+
 /*
  Class for testing spherical harmonics constants
  */
@@ -33,7 +36,7 @@ public:
 
 };
 
-
+} /* namespace pbsolvers */
 
 #endif
 

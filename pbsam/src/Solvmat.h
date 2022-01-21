@@ -30,12 +30,16 @@
 #endif
 
 #ifdef __MACOS
-#include "cblas.h"
+//#include "cblas.h"
+#include <Accelerate/Accelerate.h>
 #endif
 
 #ifdef __XCODE
 #include "vecLib/cblas.h"
 #endif
+
+namespace pbsolvers
+{
 
 void applyMMat(const double * A, const double * X, double * Y,
                const double alpha, const double beta, int ma, int nc, int na);
@@ -537,6 +541,6 @@ public:
   
 };
 
-
+} /* namespace pbsolvers */
 #endif /* Solvmat_h */
 

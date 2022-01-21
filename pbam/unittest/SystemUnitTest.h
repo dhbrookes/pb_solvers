@@ -23,6 +23,7 @@ protected :
 
 TEST_F(MoleculeAMUTest, checkUserSpecRadCent)
 {
+  using namespace pbsolvers;
   Pt pos(0.0,0.0,-5.0);
   int M = 3; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
@@ -63,6 +64,7 @@ TEST_F(MoleculeAMUTest, checkUserSpecRadCent)
 
 TEST_F(MoleculeAMUTest, checkUserSpecRad)
 {
+  using namespace pbsolvers;
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
@@ -100,6 +102,7 @@ TEST_F(MoleculeAMUTest, checkUserSpecRad)
 
 TEST_F(MoleculeAMUTest, checkUserSpecCent)
 {
+  using namespace pbsolvers;
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
@@ -137,6 +140,7 @@ TEST_F(MoleculeAMUTest, checkUserSpecCent)
 
 TEST_F(MoleculeAMUTest, checkCreateCen)
 {
+  using namespace pbsolvers;
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
@@ -174,6 +178,7 @@ TEST_F(MoleculeAMUTest, checkCreateCen)
 
 TEST_F(MoleculeAMUTest, translate)
 {
+  using namespace pbsolvers;
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
@@ -206,6 +211,7 @@ TEST_F(MoleculeAMUTest, translate)
 
 TEST_F(MoleculeAMUTest, rotateSimple)
 {
+  using namespace pbsolvers;
   Pt pos( 0.0, 0.0, 0.0);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
@@ -240,6 +246,7 @@ TEST_F(MoleculeAMUTest, rotateSimple)
 
 TEST_F(MoleculeAMUTest, rotate2)
 {
+  using namespace pbsolvers;
   Pt pos(-10.0,23.4,-8.7);
   int M = 2; vector<double> charges(M); vector<double> vdW(M);
   vector<Pt> posCharges(M);
@@ -275,7 +282,7 @@ class SystemUTest : public ::testing::Test
 public :
   
 protected :
-  Constants const_;
+  pbsolvers::Constants const_;
   
   virtual void SetUp() {}
   virtual void TearDown() {}
@@ -284,6 +291,7 @@ protected :
 
 TEST_F(SystemUTest, checkOverlap)
 {
+  using namespace pbsolvers;
   vector < shared_ptr<BaseMolecule > > mol_;
   shared_ptr<BaseMolecule> molNew;
   Pt pos[2] = { Pt( 0.0, 0.0, -5.0), Pt( 0.0, 0.0, 0.0)};
@@ -317,6 +325,7 @@ TEST_F(SystemUTest, checkOverlap)
 
 TEST_F(SystemUTest, checkPBCOverlap)
 {
+  using namespace pbsolvers;
   vector < shared_ptr<BaseMolecule > > mol_;
   shared_ptr<BaseMolecule> molNew;
   const int nMol = 3;
@@ -348,6 +357,7 @@ TEST_F(SystemUTest, checkPBCOverlap)
 
 TEST_F(SystemUTest, checkVals)
 {
+  using namespace pbsolvers;
   vector < shared_ptr<BaseMolecule > > mol_;
   shared_ptr<BaseMolecule> molNew;
   double cutoff = 45.876;
@@ -405,6 +415,7 @@ TEST_F(SystemUTest, checkVals)
 
 TEST_F(SystemUTest, changeCutoff)
 {
+  using namespace pbsolvers;
   vector < shared_ptr<BaseMolecule > > mol_;
   shared_ptr<BaseMolecule> molNew;
   double cutoff = 45.876;
@@ -431,6 +442,7 @@ TEST_F(SystemUTest, changeCutoff)
 
 TEST_F(SystemUTest, PBCcheck)
 {
+  using namespace pbsolvers;
   vector < shared_ptr<BaseMolecule > > mol_;
   shared_ptr<BaseMolecule> molNew;
   double cutoff =  5.00;

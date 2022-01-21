@@ -16,6 +16,9 @@
 #include "BaseSys.h"
 
 using namespace std;
+
+namespace pbsolvers
+{
 /*
  Base class for energy calculations
  */
@@ -134,4 +137,5 @@ public:
   virtual Pt get_moli_pos(int i) { return Pt(); }
 };
 
+} /* namespace pbsolvers */
 #endif /* BasePhysCalc_h */

@@ -12,6 +12,9 @@
 #include "Solver.h"
 #include "ElectrostaticsSAM.h"
 
+namespace pbsolvers
+{
+
 class SolverTest
 {
 public:
@@ -132,5 +135,7 @@ public:
   }
   
 };
+
+} /* namespace pbsolvers */
 
 #endif /* SolverTest_h */

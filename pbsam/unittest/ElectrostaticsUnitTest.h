@@ -30,6 +30,7 @@ class ElectroUTest : public ::testing::Test
 
 TEST_F(ElectroUTest, DISABLED_one_mol_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(1);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;
@@ -111,6 +112,7 @@ TEST_F(ElectroUTest, DISABLED_one_mol_test)
 
 TEST_F(ElectroUTest, DISABLED_three_mol_test)
 {
+  using namespace pbsolvers;
   int pol(3), nmol(3);
   PQRFile pqr(test_dir_loc + "test_cged.pqr");
   vector<shared_ptr<BaseMolecule> > mols;

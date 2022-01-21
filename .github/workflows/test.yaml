@@ -37,23 +37,11 @@ jobs:
       - name: Checkout reposistory
         uses: actions/checkout@master
 
-      - name: Mac Prereqs
-        if: startsWith(matrix.os, 'macos')  # Mac only
-        run: |
-          brew install \
-            openblas
-#            libomp
-#          brew upgrade gcc@9
-
       - name: Linux Prereqs
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
           sudo apt-get install -yq \
             libopenblas-dev
-#            software-properties-common \
-#            build-essential \
-#            libomp5 \
-#            libomp-dev
 
       - name: Install Window dependencies
         if: startsWith(matrix.os, 'windows')  # Windows only
@@ -71,14 +59,14 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake -DCMAKE_INSTALL_PREFIX=${PWD} -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} ..
+          cmake -DBLA_VENDOR=OpenBLAS -DCMAKE_INSTALL_PREFIX=${PWD} -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} ..
             
       - name: Configure for Mac
         if: startsWith(matrix.os, 'macos')  # Mac only
         run: |
           mkdir -p build
           cd build
-          cmake -DBLA_VENDOR=OpenBLAS -DCMAKE_PREFIX_PATH=/usr/local/opt/openblas -DCMAKE_INSTALL_PREFIX=${PWD} -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} ..
+          cmake -DBLA_VENDOR=Apple -DCMAKE_INSTALL_PREFIX=${PWD} -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PBAM_SPHINX=${ENABLE_PBAM_SPHINX} -DENABLE_PB_TESTING=${ENABLE_PB_TESTING} ..
             
       - name: Configure for Windows
         if: startsWith(matrix.os, 'windows')  # Windows only

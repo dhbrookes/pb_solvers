@@ -41,6 +41,9 @@
 #include <omp.h>
 #endif
 
+namespace pbsolvers
+{
+
 /*
  Class for printing out electrostatics of system
  */
@@ -61,5 +64,6 @@ public:
   ElectrostaticAM(shared_ptr<ASolver> _asolv, int npts=150);
 };
 
+} /* namespace pbsolvers */
 
 #endif /* Electrostatics_h */

@@ -18,7 +18,8 @@
 #include <vector>
 
 
-
+namespace pbsolvers
+{
 
 /*
  Class the uses the above classes to iteratively solve for the F and H matrices
@@ -239,7 +240,7 @@ public:
 };
 
 
-
+} /* namespace pbsolvers */
 
 #endif /* Solver_h */
 

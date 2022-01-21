@@ -11,6 +11,7 @@
 
 #include "setup.h"
 
+
 /*
  Class to test setting up details for the PBAM system
  */
@@ -24,6 +25,7 @@ protected :
 
 TEST_F(SetupUTest, checkOpen)
 {
+  using namespace pbsolvers;
   string path = test_dir_loc + "none.inp";
   try
   {
@@ -40,6 +42,7 @@ TEST_F(SetupUTest, checkOpen)
 
 TEST_F(SetupUTest, readInp)
 {
+  using namespace pbsolvers;
   string inp = test_dir_loc + "run.1.inp";
   class Setup setTest(inp);
  

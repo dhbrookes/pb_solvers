@@ -18,13 +18,15 @@ public :
 protected :
   
   int vals_;
-  shared_ptr<Constants> const_;
+  shared_ptr<pbsolvers::Constants> const_;
 //  vector< MoleculeAM > mol3_;
-  vector< shared_ptr<BaseMolecule> > mol_, mol3_, mol_sing_;
+  vector< shared_ptr<pbsolvers::BaseMolecule> > mol_, mol3_, mol_sing_;
 //  vector< MoleculeAM > mol_sing_;
   
   virtual void SetUp()
   {
+    using pbsolvers::Pt;
+
     mol_.clear( );
     Pt pos[2]     = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
     Pt cgPos[2]   = { Pt( 0.0, 0.0, -5.0 ), Pt( 10.0, 7.8, 25.0 ) };
@@ -38,12 +40,12 @@ protected :
       vector<double> vdW(M); vector<Pt> posCharges(M);
       charges[0]=cg[molInd]; vdW[0]=0.0; posCharges[0]=cgPos[molInd];
       
-      shared_ptr<MoleculeAM> molNew = make_shared<MoleculeAM>( "stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
+      shared_ptr<pbsolvers::MoleculeAM> molNew = make_shared<pbsolvers::MoleculeAM>( "stat",rd[molInd],charges,posCharges,vdW,pos[molInd],
                       molInd, 0);
       mol_.push_back( molNew );
       
       charges[0]=2.0; vdW[0] = 0.0; posCharges[0] = cgPosSi[molInd];
-      shared_ptr<MoleculeAM> molSing = make_shared<MoleculeAM>( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
+      shared_ptr<pbsolvers::MoleculeAM> molSing = make_shared<pbsolvers::MoleculeAM>( "stat", 10.0, charges, posCharges, vdW, molInd, 0);
       mol_sing_.push_back( molSing );
     }
   } // end SetUp
@@ -64,6 +66,7 @@ protected :
 
 TEST_F(EnergyForceUTest, checkEnergy)
 {
+  using namespace pbsolvers;
   shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_.clear( );
   
@@ -100,6 +103,7 @@ TEST_F(EnergyForceUTest, checkEnergy)
 
 TEST_F(EnergyForceUTest, checkEnergySing)
 {
+  using namespace pbsolvers;
   shared_ptr<Constants> const_ = make_shared<Constants>();
   const int vals           = nvals;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -121,6 +125,7 @@ TEST_F(EnergyForceUTest, checkEnergySing)
 
 TEST_F(EnergyForceUTest, checkEnergySingMulti)
 {
+  using namespace pbsolvers;
   shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_sing_.clear( );
   Pt pos[3] = {  Pt( 0.0, 0.0, 0.0 ),Pt( 0.0, 0.0, -5.0 ),Pt( 0.0, 0.0, 5.0)};
@@ -156,6 +161,7 @@ TEST_F(EnergyForceUTest, checkEnergySingMulti)
 
 TEST_F(EnergyForceUTest, checkForce)
 {
+  using namespace pbsolvers;
   shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_.clear( );
   Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
@@ -194,6 +200,7 @@ TEST_F(EnergyForceUTest, checkForce)
 
 TEST_F(EnergyForceUTest, checkForceSing)
 {
+  using namespace pbsolvers;
   shared_ptr<Constants> const_ = make_shared<Constants>();
   const int vals           = nvals;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -219,6 +226,7 @@ TEST_F(EnergyForceUTest, checkForceSing)
 
 TEST_F(EnergyForceUTest, checkForce3Cg)
 {
+  using namespace pbsolvers;
   shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_.clear( );
   Pt pos[2] = {Pt(0.0, 0.0, 0.0), Pt(0.0, 0.0, -5.0)};
@@ -263,6 +271,7 @@ TEST_F(EnergyForceUTest, checkForce3Cg)
 
 TEST_F(EnergyForceUTest, checkTorque)
 {
+  using namespace pbsolvers;
   shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_.clear( );
   Pt pos[3] = {Pt(0.0, 0.0, -5.0), Pt(10.0, 7.8, 25.0), Pt(-10.0, 7.8, 25.0)};
@@ -304,6 +313,7 @@ TEST_F(EnergyForceUTest, checkTorque)
 
 TEST_F(EnergyForceUTest, checkTorqueSing)
 {
+  using namespace pbsolvers;
   shared_ptr<Constants> const_ = make_shared<Constants>();
   const int vals           = nvals;
   shared_ptr<BesselConstants> bConsta = make_shared<BesselConstants>(2*vals);
@@ -328,6 +338,7 @@ TEST_F(EnergyForceUTest, checkTorqueSing)
 
 TEST_F(EnergyForceUTest, checkTorqueSing3)
 {
+  using namespace pbsolvers;
   shared_ptr<Constants> const_ = make_shared<Constants>();
   mol_sing_.clear( );
   Pt pos[3] = {Pt(0.0, 0.0, 0.0),Pt(0.0, 0.0, -5.0),Pt(0.0, 0.0, 5.0)};

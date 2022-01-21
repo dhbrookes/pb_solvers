@@ -42,7 +42,8 @@
 
 using namespace std;
 
-
+namespace pbsolvers
+{
 /*
  Class for storing the constants that may be used in
  multiple spherical harmonics calculations
@@ -143,5 +144,5 @@ public:
   
 };
 
-
+} /* namespace pbsolvers */
 #endif /* SHCalc_hpp */

@@ -39,6 +39,8 @@
 
 using namespace std;
 
+namespace pbsolvers
+{
 
 class CGSphere
 {
@@ -284,4 +286,5 @@ public:
   }
 };
 
+} /* namespace pbsolvers */
 #endif /* Setup_hpp */

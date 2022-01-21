@@ -28,6 +28,7 @@ public:
 	
 	int unitTest(int argc, char * argv[])
 	{
+    using namespace pbsolvers;
     BesselConstantsTest BCT;
     BCT.TestBesselConstants();
     cout << "Complete Bessel constant test" << endl;

@@ -8,6 +8,8 @@
 
 #include "Gradsolvmat.h"
 
+namespace pbsolvers
+{
 
 void GradCmplxMolMat::reset_mat()
 {
@@ -592,3 +594,5 @@ void GradLHNMatrix::calc_val_k(int k, shared_ptr<SystemSAM> sys,
     mat_[k] = lhn_k;
   }
 }
+
+} /* namespace pbsolvers */

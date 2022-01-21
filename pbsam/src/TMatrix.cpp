@@ -8,6 +8,9 @@
 
 #include "TMatrix.h"
 
+namespace pbsolvers
+{
+
 TMatrix::TMatrix(int p, shared_ptr<SystemSAM> _sys,
                  shared_ptr<SHCalc> _shcalc,
                  shared_ptr<Constants> _consts,
@@ -661,3 +664,5 @@ MyMatrix<Ptx> TMatrix::convert_to_ptx(VecOfMats<cmplx>::type X)
     }
   return result;
 }
+
+} /* namespace pbsolvers */

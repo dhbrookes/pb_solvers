@@ -51,6 +51,8 @@
   extern double drand48();
 #endif
 
+namespace pbsolvers
+{
 /*
  Right scalar multiplication of a matrix
 */
@@ -471,13 +473,14 @@ typedef Point<double> Pt;
 typedef Point<cmplx> Ptx;
 typedef Quaternion Quat;
 
+} /* namespace pbsolvers */
 
 namespace std {
   //hash for Point classes:
   template <>
-  struct hash<Pt>
+  struct hash<pbsolvers::Pt>
   {
-    size_t operator()(const Pt& k) const
+    size_t operator()(const pbsolvers::Pt& k) const
     {
       size_t h1 = std::hash<double>()(k.get_p1());
       size_t h2 = std::hash<double>()(k.get_p2());
@@ -486,6 +489,7 @@ namespace std {
     }
   };
 }
+
 
 
 #endif /* util_h */

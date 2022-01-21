@@ -49,6 +49,7 @@ string test_dir_loc = TOSTRING(PBSAM_TEST_FILES_PATH); //"../pbsam/pbsam_test_fi
 //string test_dir_loc = "/Users/lfelberg/PBSAM/pb_solvers/pbsam/pbsam_test_files/gtest/";
 
 //#include "BDUnitTest.h"
+#include "utilUnitTest.h"
 #include "BesselCalcUnitTest.h"
 #include "ConstantsUnitTest.h"
 #include "ElectrostaticsUnitTest.h"
@@ -61,7 +62,6 @@ string test_dir_loc = TOSTRING(PBSAM_TEST_FILES_PATH); //"../pbsam/pbsam_test_fi
 #include "SolverUnitTest.h"
 #include "SystemUnitTest.h"
 #include "TMatrixUnitTest.h"
-#include "utilUnitTest.h"
 
 #include "tester.h"
 
@@ -71,7 +71,7 @@ int main(int argc, char * argv[])
   if (test)
   {
     cout << "Welcome to test suite" << endl;
-    CTester allTest = CTester();
+    pbsolvers::CTester allTest = pbsolvers::CTester();
     allTest.unitTest( argc, argv );
   }
   
